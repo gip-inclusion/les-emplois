@@ -25,7 +25,7 @@ from tests.companies.factories import (
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import normalize_fields_history
 
 
@@ -335,9 +335,12 @@ class TestCompanyModel:
         invit.refresh_from_db()
         assert invit.has_expired is True
 
-        non_employer = PrescriberFactory()
+        prescriber = PrescriberFactory()
+        company.add_or_activate_membership(prescriber)
+
+        non_caseworker = LaborInspectorFactory()
         with pytest.raises(ValidationError):
-            company.add_or_activate_membership(non_employer)
+            company.add_or_activate_membership(non_caseworker)
 
     def test_siret_from_asp_source(self):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, source=CompanySource.ASP)

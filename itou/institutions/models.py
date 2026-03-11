@@ -61,7 +61,7 @@ class Institution(AddressMixin, OrganizationAbstract):
 class InstitutionMembership(MembershipAbstract):
     """Intermediary model between `User` and `Institution`."""
 
-    user_kind = UserKind.LABOR_INSPECTOR
+    user_kinds = [UserKind.LABOR_INSPECTOR]  # FIXME: set to user_kind whne prescriber and omployer are merged
 
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(

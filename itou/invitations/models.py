@@ -181,7 +181,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     def guest_can_join_organization(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_prescriber
+        return user == request.user and user.is_caseworker
 
     # Notifications
     @property
@@ -248,7 +248,7 @@ class EmployerInvitation(InvitationAbstract):
 
     def guest_can_join_company(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and request.user.is_employer  # FIXME replace with is_caseworker
+        return user == request.user and request.user.is_caseworker
 
     # Notifications
     @property

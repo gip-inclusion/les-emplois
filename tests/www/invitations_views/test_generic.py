@@ -253,6 +253,10 @@ class BaseTestSendInvitation:
             LaborInspectorFactory,
             ItouStaffFactory,
         } - {self.user_factory}
+        if self.user_kind == UserKind.PRESCRIBER:
+            user_factory_choices - {EmployerFactory}
+        if self.user_kind == UserKind.EMPLOYER:
+            user_factory_choices - {PrescriberFactory}
         guest = random.choice(list(user_factory_choices))()
         post_data = {
             "form-TOTAL_FORMS": "1",
@@ -267,9 +271,9 @@ class BaseTestSendInvitation:
         response = client.post(self.invitation_url, data=post_data)
         assert response.status_code == 200
         if self.user_kind == UserKind.PRESCRIBER:
-            self.assert_no_invitation(response, "Cet utilisateur n'est pas un prescripteur.")
+            self.assert_no_invitation(response, "Cet utilisateur n'est pas un professionel.")
         elif self.user_kind == UserKind.EMPLOYER:
-            self.assert_no_invitation(response, "Cet utilisateur n'est pas un employeur.")
+            self.assert_no_invitation(response, "Cet utilisateur n'est pas un professionel.")
         else:
             self.assert_no_invitation(response, "Cet utilisateur n'est pas un inspecteur du travail.")
 
