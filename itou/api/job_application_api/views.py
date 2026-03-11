@@ -16,7 +16,6 @@ from itou.api.job_application_api.serializers import (
 from itou.api.job_application_api.throttling import JobApplicationSearchThrottle
 from itou.companies.models import JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
-from itou.users.enums import UserKind
 from itou.utils.auth import LoginNotRequiredMixin
 
 
@@ -101,14 +100,6 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
                     JobApplicationTransitionLog.objects.all().order_by("-timestamp").values("timestamp")[:1],
                 ),
                 F("updated_at"),
-            ),
-            employer_email=Coalesce(
-                Subquery(
-                    JobApplicationTransitionLog.objects.filter(user__kind=UserKind.EMPLOYER)
-                    .order_by("-timestamp")
-                    .values("user__email")[:1],
-                ),
-                F("to_company__email"),
             ),
         )
         .select_related(
