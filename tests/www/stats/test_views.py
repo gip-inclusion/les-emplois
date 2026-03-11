@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import factory
 import pytest
+from django.http import HttpResponse
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
@@ -316,6 +317,33 @@ def test_stats_dgefp_iae_log_visit(client, view_name):
     )
 
     assert not has_activated_pilotage_in_nexus(user)
+
+
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="x" * 64)
+@pytest.mark.parametrize(
+    "dashboard_full_name,expected_params",
+    [
+        ("cd_hiring", "69 - Rhône"),
+        ("ddets_iae_ph_prescription", ["69"]),
+        ("ddets_iae_auto_prescription", ["69"]),
+    ],
+)
+def test_stats_dgefp_iae_showroom_sends_department_code_to_metabase(
+    client, mocker, dashboard_full_name, expected_params
+):
+    mocker.spy(mb, "metabase_embedded_url")
+    mocker.patch("itou.www.stats.views.render", return_value=HttpResponse())
+    institution = InstitutionFactory(kind=InstitutionKind.DGEFP_IAE, with_membership=True)
+    client.force_login(institution.members.get())
+
+    response = client.get(
+        reverse("stats:stats_dgefp_iae_showroom", kwargs={"dashboard_full_name": dashboard_full_name})
+    )
+    assert response.status_code == 200
+
+    mb.metabase_embedded_url.assert_called_once()
+    params = mb.metabase_embedded_url.call_args.kwargs["params"]
+    assert params[mb.DEPARTMENT_FILTER_KEY] == expected_params
 
 
 @freeze_time("2023-03-10")
