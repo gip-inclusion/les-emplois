@@ -31,6 +31,7 @@ echo "Dump models data into $FIXTURES_DIRECTORY"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 rdv_insertion.location -o "$FIXTURES_DIRECTORY/35_rdv_insertion_location.json"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 rdv_insertion.appointment -o "$FIXTURES_DIRECTORY/36_rdv_insertion_appointment.json"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 rdv_insertion.participation -o "$FIXTURES_DIRECTORY/37_rdv_insertion_participation.json"
+./manage.py dumpdata --format json-no-auto-fields --indent 2 users.jobseekerassignment -o "$FIXTURES_DIRECTORY/38_job_seeker_assignment.json"
 
 
 for file in $(find "$FIXTURES_DIRECTORY" -iname '*.json' | sort); do
