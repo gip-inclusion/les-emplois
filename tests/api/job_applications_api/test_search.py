@@ -13,7 +13,6 @@ from itou.companies.enums import CompanySource
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from tests.api.utils import _str_with_tz
-from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -218,19 +217,17 @@ class TestJobApplicationSearchApi:
             len(JobApplicationSearchResponseSerializer(self.job_application).data["entreprise_siret"]) == expected_len
         )
 
-    def test_logs_annotations(self, api_client):
+    def test_logs_annotation(self, api_client):
         api_client.force_authenticate(ServiceAccount(), self.token)
 
         # No transition logs
-        # Must fallback on job application last update and company email
+        # Must fallback on job application last update
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
         first_application = response.json()["results"][-1]  # Reversed sorting
         assert not self.job_application.logs.exists()
         assert first_application["dernier_changement_le"] == _str_with_tz(self.job_application.updated_at)
-        assert first_application["entreprise_employeur_email"] == self.job_application.to_company.email
 
         # 'PROCESS' transition performed by employer
-        # Both annotations should consider this transition log
         employer = self.job_application.to_company.members.first()
         employer_log = JobApplicationTransitionLog.objects.create(
             user=employer,
@@ -240,10 +237,8 @@ class TestJobApplicationSearchApi:
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
         first_application = response.json()["results"][-1]  # Reversed sorting
         assert first_application["dernier_changement_le"] == _str_with_tz(employer_log.timestamp)
-        assert first_application["entreprise_employeur_email"] == employer.email
 
         # 'ACCEPT' transition performed by staff user
-        # last_modification_at should consider this transition log but employer_email the employer's one
         staff_user_log = JobApplicationTransitionLog.objects.create(
             user=ItouStaffFactory(),
             job_application=self.job_application,
@@ -252,17 +247,3 @@ class TestJobApplicationSearchApi:
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
         first_application = response.json()["results"][-1]  # Reversed sorting
         assert first_application["dernier_changement_le"] == _str_with_tz(staff_user_log.timestamp)
-        assert first_application["entreprise_employeur_email"] == employer.email
-
-        # 'CANCEL' transition performed by employer
-        # Both annotations should consider this transition log again
-        other_employer = CompanyMembershipFactory(company=self.job_application.to_company).user
-        other_employer_log = JobApplicationTransitionLog.objects.create(
-            user=other_employer,
-            job_application=self.job_application,
-            to_state=JobApplicationState.CANCELLED,
-        )
-        response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
-        first_application = response.json()["results"][-1]  # Reversed sorting
-        assert first_application["dernier_changement_le"] == _str_with_tz(other_employer_log.timestamp)
-        assert first_application["entreprise_employeur_email"] == other_employer.email
