@@ -656,9 +656,9 @@ faker==40.8.0 \
     # via
     #   -r test.txt
     #   factory-boy
-filelock==3.25.0 \
-    --hash=sha256:5ccf8069f7948f494968fc0713c10e5c182a9c9d9eef3a636307a20c2490f047 \
-    --hash=sha256:8f00faf3abf9dc730a1ffe9c354ae5c04e079ab7d3a683b7c32da5dd05f26af3
+filelock==3.25.1 \
+    --hash=sha256:18972df45473c4aa2c7921b609ee9ca4925910cc3a0fb226c96b92fc224ef7bf \
+    --hash=sha256:b9a2e977f794ef94d77cdf7d27129ac648a61f585bff3ca24630c1629f701aa9
     # via
     #   python-discovery
     #   virtualenv
