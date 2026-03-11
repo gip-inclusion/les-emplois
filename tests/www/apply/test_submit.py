@@ -2771,9 +2771,15 @@ class TestApplyAsCompany:
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
 
-        # Check JobSeekerAssignment: no assignment is created when an application is created by an employer
+        # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            professional=user,
+            company=user.company_set.first(),
+            last_action_kind=ActionKind.APPLY,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_employer(self, client, pdf_file):
