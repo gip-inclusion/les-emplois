@@ -2527,9 +2527,9 @@ urllib3==2.6.3 \
     #   django-anymail
     #   requests
     #   sentry-sdk
-virtualenv==21.1.0 \
-    --hash=sha256:164f5e14c5587d170cf98e60378eb91ea35bf037be313811905d3a24ea33cc07 \
-    --hash=sha256:1990a0188c8f16b6b9cf65c9183049007375b26aad415514d377ccacf1e4fb44
+virtualenv==21.2.0 \
+    --hash=sha256:1720dc3a62ef5b443092e3f499228599045d7fea4c79199770499df8becf9098 \
+    --hash=sha256:1bd755b504931164a5a496d217c014d098426cddc79363ad66ac78125f9d908f
     # via pre-commit
 wcwidth==0.6.0 \
     --hash=sha256:1a3a1e510b553315f8e146c54764f4fb6264ffad731b3d78088cdb1478ffbdad \
