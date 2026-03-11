@@ -12,6 +12,7 @@ import httpx
 from django.conf import settings
 from django.contrib.staticfiles.finders import BaseFinder
 
+
 # ITOU_CACHE is used in demo/prod with a sensible XDG compatible default
 _CACHE_HOME = os.getenv("ITOU_CACHE", os.getenv("XDG_CACHE_HOME", os.path.join(os.getenv("HOME"), ".cache")))
 # Where the downloaded assets (NPM packages, zip files, etc) will be stored

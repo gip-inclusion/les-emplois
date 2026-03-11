@@ -1983,7 +1983,7 @@
                           </span>
                       </button>
                       <a href="/portal/homepage">
-                          <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
@@ -2141,11 +2141,11 @@
                           </form>
                       </li>
                       <li>
-                          <a class="d-none d-md-inline-block d-xl-none" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <a class="d-none d-md-inline-block d-xl-none ms-1" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                           </a>
-                          <a class="d-md-none d-xl-inline-block px-1" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus.svg" width="133"/>
+                          <a class="d-md-none d-xl-inline-block px-1 ms-3" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi.svg"/>
                           </a>
                       </li>
                   </ul>
@@ -2171,7 +2171,7 @@
                           </span>
                       </button>
                       <a href="/portal/homepage">
-                          <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
@@ -2329,11 +2329,11 @@
                           </form>
                       </li>
                       <li>
-                          <a class="d-none d-md-inline-block d-xl-none" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <a class="d-none d-md-inline-block d-xl-none ms-1" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                           </a>
-                          <a class="d-md-none d-xl-inline-block px-1" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus.svg" width="133"/>
+                          <a class="d-md-none d-xl-inline-block px-1 ms-3" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi.svg"/>
                           </a>
                       </li>
                   </ul>
@@ -2359,7 +2359,7 @@
                           </span>
                       </button>
                       <a href="/portal/homepage">
-                          <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
@@ -2517,11 +2517,11 @@
                           </form>
                       </li>
                       <li>
-                          <a class="d-none d-md-inline-block d-xl-none" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <a class="d-none d-md-inline-block d-xl-none ms-1" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                           </a>
-                          <a class="d-md-none d-xl-inline-block px-1" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus.svg" width="133"/>
+                          <a class="d-md-none d-xl-inline-block px-1 ms-3" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi.svg"/>
                           </a>
                       </li>
                   </ul>
@@ -2547,7 +2547,7 @@
                           </span>
                       </button>
                       <a href="/portal/homepage">
-                          <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                       </a>
                   </div>
                   <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
@@ -2694,11 +2694,11 @@
                           </form>
                       </li>
                       <li>
-                          <a class="d-none d-md-inline-block d-xl-none" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg" width="40"/>
+                          <a class="d-none d-md-inline-block d-xl-none ms-1" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi-mini.svg" width="35"/>
                           </a>
-                          <a class="d-md-none d-xl-inline-block px-1" href="">
-                              <img alt="Nexus - La plateforme de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus.svg" width="133"/>
+                          <a class="d-md-none d-xl-inline-block px-1 ms-3" href="">
+                              <img alt="Nexus - La plateforme de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/nexus/logo-pdi.svg"/>
                           </a>
                       </li>
                   </ul>
@@ -2726,7 +2726,7 @@
               <hr/>
               <div class="my-auto d-flex flex-column align-items-center">
                   <div class="mb-3 mb-md-4">
-                      <img alt="" class="img-fluid" src="/static/vendor/theme-inclusion/images/logo-nexus.png"/>
+                      <img alt="" class="img-fluid" src="/static/vendor/theme-inclusion/images/logo-generique-plateforme.svg"/>
                   </div>
                   <div class="c-box bg-light mb-3">
                       <h2 class="h4 mb-md-4">
