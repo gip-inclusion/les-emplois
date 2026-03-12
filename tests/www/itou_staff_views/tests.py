@@ -941,6 +941,7 @@ class TestMergeUsers:
 
     def test_merge_assignments(self, client, caplog):
         org = PrescriberOrganizationFactory()
+        company = CompanyFactory()
         prescriber_1 = PrescriberFactory(membership__organization=org)
         prescriber_2 = PrescriberFactory(membership=None)
 
@@ -982,6 +983,24 @@ class TestMergeUsers:
         )
         assignment_5 = JobSeekerAssignmentFactory(
             job_seeker=assignment_5_to_user.job_seeker,
+            professional=prescriber_2,
+            prescriber_organization=org,
+            last_action_kind=ActionKind.APPLY,
+        )
+
+        # JSA(job_seeker, from_user, companyA)
+        # will get: JSA(job_seeker, to_user, companyA)
+        assignment_6 = JobSeekerAssignmentFactory(professional=prescriber_2, company=company)
+
+        # JSA(job_seeker, from_user, orgaA, None) ; JSA(job_seeker, to_user, None, companyA)
+        # will get: JSA(job_seeker, to_user, orgaA, None) ; JSA(job_seeker, to_user, None, companyA)
+        assignment_7_to_user = JobSeekerAssignmentFactory(
+            professional=prescriber_1,
+            company=company,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_7 = JobSeekerAssignmentFactory(
+            job_seeker=assignment_7_to_user.job_seeker,
             professional=prescriber_2,
             prescriber_organization=org,
             last_action_kind=ActionKind.APPLY,
@@ -1034,13 +1053,33 @@ class TestMergeUsers:
         assert updated_assignment_5_to_user.created_at == assignment_5_to_user.created_at
         assert updated_assignment_5_to_user.updated_at == assignment_5_to_user.updated_at
 
+        updated_assignment_6 = JobSeekerAssignment.objects.get(pk=assignment_6.pk)
+        assert updated_assignment_6.professional == prescriber_1
+        assert updated_assignment_6.company == company
+        assert updated_assignment_6.last_action_kind == assignment_6.last_action_kind
+        assert updated_assignment_6.created_at == assignment_6.created_at
+        assert updated_assignment_6.updated_at == assignment_6.updated_at
+
+        updated_assignment_7 = JobSeekerAssignment.objects.get(pk=assignment_7.pk)
+        updated_assignment_7_to_user = JobSeekerAssignment.objects.get(pk=assignment_7_to_user.pk)
+        assert updated_assignment_7.professional == prescriber_1
+        assert updated_assignment_7.prescriber_organization == org
+        assert updated_assignment_7.last_action_kind == assignment_7.last_action_kind
+        assert updated_assignment_7.created_at == assignment_7.created_at
+        assert updated_assignment_7.updated_at == assignment_7.updated_at
+        assert updated_assignment_7_to_user.professional == prescriber_1
+        assert updated_assignment_7_to_user.company == company
+        assert updated_assignment_7_to_user.last_action_kind == assignment_7_to_user.last_action_kind
+        assert updated_assignment_7_to_user.created_at == assignment_7_to_user.created_at
+        assert updated_assignment_7_to_user.updated_at == assignment_7_to_user.updated_at
+
         assert caplog.messages == [
             f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
             "itou.users.models.JobSeekerAssignment.professional updated : "
             f"[{assignment_3_to_user.pk}, {assignment_2_to_user.pk}]",
             f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
             "itou.users.models.JobSeekerAssignment.professional moved : "
-            f"[{assignment_5.pk}, {assignment_4.pk}, {assignment_1.pk}]",
+            f"[{assignment_7.pk}, {assignment_6.pk}, {assignment_5.pk}, {assignment_4.pk}, {assignment_1.pk}]",
             f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
             "HTTP 302 Found",
         ]
