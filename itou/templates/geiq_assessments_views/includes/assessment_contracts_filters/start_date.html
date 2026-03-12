@@ -2,14 +2,16 @@
 
 <div class="dropdown"{% if request.htmx %} hx-swap-oob="true"{% endif %} id="dropdown-start-date-container">
     <button type="button"
-            class="btn btn-dropdown-filter dropdown-toggle {% if filters_form.start_date_lower.value or filters_form.start_date_upper.value %}border-primary fw-bold text-primary{% endif %} {% if filters_form.start_date_lower.errors or filters_form.start_date_upper.errors %}border-danger{% endif %}"
+            class="btn btn-dropdown-filter dropdown-toggle {% if filters_form.start_date_lower.value or filters_form.start_date_upper.value %}has-selected-item{% endif %} {% if filters_form.start_date_lower.errors or filters_form.start_date_upper.errors %}border-danger{% endif %}"
             data-bs-toggle="dropdown"
             data-bs-auto-close="outside"
             aria-expanded="false"
             id="btn-filter-start-date">Date de début de contrat</button>
-    <div class="dropdown-menu p-3 shadow border-0 overflow-visible" aria-labelledby="btn-filter-start-date">
-        {% bootstrap_field filters_form.start_date_lower %}
-        {% bootstrap_field filters_form.start_date_upper %}
-        <button class="btn btn-sm btn-primary btn-block">Appliquer</button>
+    <div class="dropdown-menu overflow-visible" aria-labelledby="btn-filter-start-date">
+        {% bootstrap_field filters_form.start_date_lower wrapper_class="dropdown-item" %}
+        {% bootstrap_field filters_form.start_date_upper wrapper_class="dropdown-item" %}
+        <span class="d-block py-2 px-3">
+            <button class="btn btn-sm btn-primary btn-block">Appliquer</button>
+        </span>
     </div>
 </div>
