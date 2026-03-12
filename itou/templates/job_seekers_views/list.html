@@ -92,4 +92,59 @@
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/sliding_tabs.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+    <script nonce="{{ csp_nonce }}">
+        window.addEventListener("load", () => {
+            const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
+            const orientationLink = document.getElementById("introjs-orienter-vers-service-insertion");
+
+            if (orientationLink && window.matchMedia('(min-width: ' + breakpointMD + ')').matches) {
+                const moreActionsButton = document.getElementById("dropdown_1_action_menu");
+                const moreActionsMenu = moreActionsButton.parentElement.getElementsByClassName("dropdown-menu")[0];
+                const dropDown = bootstrap.Dropdown.getOrCreateInstance(moreActionsButton);
+                const originalDropdownConfig = dropDown._config.autoClose;
+
+                const tour = introJs.tour();
+                tour.setOptions({
+                    disableInteraction: false,
+                    dontShowAgain: true,
+                    dontShowAgainCookie: "introjsOrientationLinkListDontShowAgain",
+                    dontShowAgainCookieDays: 90,
+                    dontShowAgainLabel: "Ne plus afficher",
+                    showProgress: false,
+                    showBullets: false,
+                    skipLabel: '',
+                    prevLabel: 'Précédent',
+                    nextLabel: 'Suivant',
+                    doneLabel: 'J’ai compris',
+                    steps: [{
+                        element: moreActionsButton,
+                        title: 'Plus d’actions pour vos candidats !',
+                        intro: '<p>Une nouvelle possibilité s’ajoute : vous pouvez désormais orienter un candidat ' +
+                            'vers un service d’insertion, directement depuis votre tableau.</p>'
+                    }, {
+                        element: orientationLink,
+                        title: 'Orienter vers un service d’insertion',
+                        intro: '<p>Trouvez des structures qui accompagnent les personnes dans leur parcours ' +
+                            '(remobilisation, formation, accès à l’emploi, accompagnement social…).</p>' +
+                            '<p>Utile pour identifier des partenaires ou orienter un candidat ' +
+                            'vers le bon acteur, au bon moment.</p>',
+                    }],
+                });
+                tour.onStart(() => {
+                    dropDown._config.autoClose = false;
+                });
+                tour.onBeforeChange(() => {
+                    if (tour.getCurrentStep() === 1) {
+                        dropDown.show();
+                    } else {
+                        dropDown.hide();
+                    }
+                });
+                tour.onBeforeExit((element) => {
+                    dropDown._config.autoClose = originalDropdownConfig;
+                });
+                tour.start();
+            }
+        });
+    </script>
 {% endblock %}
