@@ -43,7 +43,8 @@ from itou.job_applications.enums import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
-from itou.users.enums import KIND_EMPLOYER, LackOfPoleEmploiId, UserKind
+from itou.users.enums import KIND_EMPLOYER, ActionKind, LackOfPoleEmploiId, UserKind
+from itou.users.models import JobSeekerAssignment
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
@@ -1256,6 +1257,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
+
+        # Sync job seeker assignment
+        JobSeekerAssignment.objects.upsert_assignment(self.job_seeker, user, self.to_company, ActionKind.ACCEPT)
 
     @xwf_models.transition()
     def add_to_pool(self, *, user):

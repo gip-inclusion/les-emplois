@@ -34,8 +34,14 @@ from itou.job_applications.enums import JobApplicationState, QualificationLevel,
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId, UserKind
-from itou.users.models import IdentityCertification, User
+from itou.users.enums import (
+    ActionKind,
+    IdentityCertificationAuthorities,
+    LackOfNIRReason,
+    LackOfPoleEmploiId,
+    UserKind,
+)
+from itou.users.models import IdentityCertification, JobSeekerAssignment, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
@@ -1206,6 +1212,15 @@ class TestProcessAcceptViewsInWizard:
         approval = job_application.job_seeker.approvals.first()
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=self.job_seeker,
+            professional=employer,
+            company=self.company,
+            last_action_kind=ActionKind.ACCEPT,
+        ).exists()
 
     @pytest.mark.usefixtures("api_particulier_settings")
     @pytest.mark.parametrize("from_kind", UserKind.caseworkers())
@@ -2554,8 +2569,9 @@ class TestAcceptConfirmation:
     def test_as_iae(self, client, snapshot):
         hiring_start_at = timezone.localdate()
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        user = company.members.first()
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+        client.force_login(user)
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
@@ -2590,6 +2606,15 @@ class TestAcceptConfirmation:
         assert job_application.hiring_start_at == hiring_start_at
 
         assert accept_session.name not in client.session
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=self.job_seeker,
+            professional=user,
+            company=company,
+            last_action_kind=ActionKind.ACCEPT,
+        ).exists()
 
     def test_as_iae_missing_data(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
@@ -2671,8 +2696,9 @@ class TestAcceptConfirmation:
 
     def test_as_geiq(self, client, snapshot):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
+        user = company.members.first()
         GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
-        client.force_login(company.members.first())
+        client.force_login(user)
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
@@ -2730,6 +2756,15 @@ class TestAcceptConfirmation:
         assert job_application.hired_job_id == company.job_description_through.first().pk
 
         assert accept_session.name not in client.session
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=self.job_seeker,
+            professional=user,
+            company=company,
+            last_action_kind=ActionKind.ACCEPT,
+        ).exists()
 
     def test_as_geiq_missing_data(self, client):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
