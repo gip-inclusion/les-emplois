@@ -70,7 +70,6 @@
       }),
       dict({
         'origin': list([
-          'ItouUserAdmin.get_object[<site-packages>/django/contrib/admin/options.py]',
           'ItouUserAdmin.get_object[utils/admin.py]',
         ]),
         'sql': '''
