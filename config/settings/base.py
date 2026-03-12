@@ -890,5 +890,9 @@ NEXUS_METABASE_DB_PASSWORD = os.getenv("NEXUS_METABASE_DB_PASSWORD")
 NEXUS_ALLOWED_REDIRECT_HOSTS = os.getenv("NEXUS_ALLOWED_REDIRECT_HOSTS", "").split(",")
 NEXUS_MVP_DEPARTMENTS = ["29", "31", "33", "34", "44", "67", "76", "88"]
 
+JOB_APPLICATIONS_SHOW_EXTERNAL_PERIOD = datetime.timedelta(
+    days=int(os.getenv("JOB_APPLICATIONS_SHOW_EXTERNAL_PERIOD_DAYS", 365))
+)
+
 pdi_jwt_key = os.getenv("PDI_JWT_KEY")
 PDI_JWT_KEY = json.loads(pdi_jwt_key) if pdi_jwt_key else None

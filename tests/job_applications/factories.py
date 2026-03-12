@@ -17,6 +17,7 @@ from itou.job_applications.enums import (
     SenderKind,
 )
 from itou.jobs.models import Appellation
+from itou.users.enums import ActionKind
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
@@ -30,6 +31,7 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import (
     EmployerFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     PrescriberFactory,
 )
@@ -169,6 +171,24 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         if create and extracted:
             public_storage = storages["public"]
             public_storage.save(self.resume.key, extracted)
+
+    @factory.post_generation
+    def with_job_seeker_assignment(self, create, extracted, **kwargs):
+        # Hook that creates a JobSeekerAssignment. We want to keep it
+        # simple, but bear in mind that there is a unique constraint
+        # on the job seeker/prescriber couple. If you create multiple
+        # matching job applications `with_job_seeker_assignment=True`,
+        # that will break.
+        if not create:  # build only, do nothing
+            return
+        if extracted:
+            JobSeekerAssignmentFactory(
+                updated_at=self.created_at,
+                job_seeker=self.job_seeker,
+                prescriber=self.sender,
+                prescriber_organization=self.sender_prescriber_organization,
+                last_action_kind=ActionKind.APPLY,
+            )
 
 
 class PriorActionFactory(factory.django.DjangoModelFactory):

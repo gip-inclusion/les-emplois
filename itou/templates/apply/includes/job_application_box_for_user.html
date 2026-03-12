@@ -1,4 +1,5 @@
 {% load str_filters %}
+
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
     <div class="c-box--results__header">
         {% include "apply/includes/job_application_creation_info.html" with job_application=job_application request=request only %}
@@ -9,12 +10,14 @@
             {% include "apply/includes/selected_jobs_list.html" with job_application=job_application only %}
         </div>
     </div>
-    <div class="c-box--results__footer">
-        <div class="d-flex justify-content-end">
-            <a href="{{ detail_url }}?back_url={{ request.get_full_path|urlencode }}"
-               class="btn btn-outline-primary btn-block w-100 w-md-auto"
-               {{ matomo_event_attrs }}
-               aria-label="Voir la candidature de {{ job_application.sender.get_inverted_full_name|mask_unless:can_view_personal_information }}">Voir sa candidature</a>
+    {% if job_application.user_can_see_details|default_if_none:True %}
+        <div class="c-box--results__footer">
+            <div class="d-flex justify-content-end">
+                <a href="{{ detail_url }}?back_url={{ request.get_full_path|urlencode }}"
+                   class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                   {{ matomo_event_attrs }}
+                   aria-label="Voir la candidature de {{ job_application.sender.get_inverted_full_name|mask_unless:can_view_personal_information }}">Voir sa candidature</a>
+            </div>
         </div>
-    </div>
+    {% endif %}
 </div>
