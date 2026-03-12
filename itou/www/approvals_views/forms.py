@@ -54,7 +54,7 @@ class ApprovalForm(forms.Form):
 
     job_seeker = forms.ChoiceField(
         required=False,
-        label="Nom",
+        label="Nom du salarié",
         widget=Select2Widget(
             attrs={
                 "data-placeholder": "Nom du salarié",
