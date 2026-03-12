@@ -1,5 +1,4 @@
 from functools import partial
-from unittest import mock
 
 from django import forms
 from django.contrib import admin
@@ -10,7 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.forms import fields as gis_fields
 from django.contrib.messages import WARNING
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
@@ -209,9 +208,24 @@ class ItouModelMixin:
         )
 
     def get_object(self, request, object_id, from_field=None):
-        # Eager-loading all relations, but only when editing one object because `list_select_related` exists
-        with mock.patch.object(self, "get_queryset", self._get_queryset_with_relations):
-            return super().get_object(request, object_id, from_field)
+        """Return the object matching the given id, with all relations eagerly loaded.
+
+        This is a verbatim copy of `ModelAdmin.get_object`, with one intentional difference:
+        the queryset is built via `_get_queryset_with_relations` instead of `get_queryset`, so
+        that all relations are select_related/prefetch_related when editing a single object,
+        without affecting the changelist (which has its own `list_select_related`).
+
+        An alternative would be to override `get_queryset` and branch on whether a single object
+        is being fetched, but things get complicated.
+        """
+        queryset = self._get_queryset_with_relations(request)
+        model = queryset.model
+        field = model._meta.pk if from_field is None else model._meta.get_field(from_field)
+        try:
+            object_id = field.to_python(object_id)
+            return queryset.get(**{field.attname: object_id})
+        except (model.DoesNotExist, ValidationError, ValueError):
+            return None
 
     def get_list_display(self, request):
         fields_with_pii = self.list_display_with_pii()
