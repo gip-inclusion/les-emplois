@@ -123,7 +123,7 @@ def handle_follow_up_group_membership(model, from_user, to_user):
 def handle_job_seeker_assignment(model, from_user, to_user):
     from_user_assignments = model.objects.filter(caseworker=from_user)
     to_user_assignments = {
-        (assignment.job_seeker_id, assignment.prescriber_organization_id): assignment
+        (assignment.job_seeker_id, assignment.prescriber_organization_id, assignment.company_id): assignment
         for assignment in model.objects.filter(caseworker=to_user)
     }
     updated_pks = []
@@ -132,6 +132,7 @@ def handle_job_seeker_assignment(model, from_user, to_user):
         key = (
             from_user_assignment.job_seeker.pk,
             from_user_assignment.prescriber_organization.pk if from_user_assignment.prescriber_organization else None,
+            from_user_assignment.company.pk if from_user_assignment.company else None,
         )
         if to_user_assignment := to_user_assignments.get(key):
             updated_pks.append(to_user_assignment.pk)
