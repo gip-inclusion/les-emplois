@@ -179,7 +179,7 @@ class ServiceSearchForm(forms.Form):
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Autour de (Lyon, Lille, Paris…)",
+                "data-placeholder": "Rechercher autour de…",
             }
         ),
     )

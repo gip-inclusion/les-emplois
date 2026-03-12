@@ -23,7 +23,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 class FilterForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=False,
-        label="Nom",
+        label="Nom du candidat",
         widget=Select2Widget(
             attrs={
                 "data-placeholder": "Nom du candidat",

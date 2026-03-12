@@ -287,7 +287,7 @@
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
                               <div class="w-lg-400px">
                                   <label class="visually-hidden" for="id_job_seeker">
-                                      Nom
+                                      Nom du candidat
                                   </label>
                                   <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
                                       <option selected="" value="">
@@ -576,7 +576,7 @@
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
                               <div class="w-lg-400px">
                                   <label class="visually-hidden" for="id_job_seeker">
-                                      Nom
+                                      Nom du candidat
                                   </label>
                                   <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
                                       <option selected="" value="">
