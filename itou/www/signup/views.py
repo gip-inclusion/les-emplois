@@ -15,6 +15,7 @@ from django.db import Error, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.generic import FormView, TemplateView, View
 
@@ -27,6 +28,7 @@ from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url
@@ -297,6 +299,7 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
         }
 
 
+@method_decorator(bypass_terms_acceptance, name="dispatch")
 class CompanyJoinView(CompanyBaseView):
     def get(self, request, *args, **kwargs):
         if not request.from_employer:
@@ -732,6 +735,7 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
     return render(request, template_name, context)
 
 
+@bypass_terms_acceptance
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_join_org(request):

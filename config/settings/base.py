@@ -154,6 +154,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
     # Itou specific
+    "itou.www.middleware.TermsAcceptanceMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     "itou.www.middleware.RateLimitMiddleware",
@@ -395,7 +396,6 @@ SELECT2_THEME = "bootstrap-5"
 
 # ITOU settings
 # -------------
-
 
 ITOU_ENVIRONMENT = ItouEnvironment(os.getenv("ITOU_ENVIRONMENT", ItouEnvironment.PROD))
 ITOU_PROTOCOL = "https"
@@ -754,6 +754,8 @@ SECURE_CSP = {
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
 
 FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
+
+BYPASS_TERMS_ACCEPTANCE = bool(int(os.getenv("BYPASS_TERMS_ACCEPTANCE", 0)))
 
 DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr")
 

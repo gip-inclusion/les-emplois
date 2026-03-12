@@ -1,0 +1,20 @@
+<p>Vous trouverez ci-dessous les différentes versions des conditions générales d'utilisation&nbsp;:</p>
+<ul>
+    {# From most recent to least recent #}
+    {% for version in all_versions %}
+        <li>
+            {% if version.slug == requested_terms_version.slug %}
+                Version du {{ version.date|date:"d/m/Y" }}
+            {% else %}
+                <a href="{% url "legal-terms-version" version_slug=version.slug %}">Version du {{ version.date|date:"d/m/Y" }}</a>
+            {% endif %}
+            {% if version.slug == requested_terms_version.slug and version.slug == latest_terms_version.slug %}
+                <span class="text-muted">(vous consultez la dernière version)</span>
+            {% elif version.slug == requested_terms_version.slug %}
+                <span class="text-muted">(version actuellement consultée)</span>
+            {% elif version.slug == latest_terms_version.slug %}
+                <span class="text-muted">(dernière version)</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

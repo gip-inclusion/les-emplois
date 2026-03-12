@@ -52,7 +52,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.testing import get_request
+from tests.utils.testing import accept_legal_terms, get_request
 
 
 class TestProConnectModel:
@@ -797,7 +797,8 @@ class TestProConnectLogin:
         """
         # Create an account with ProConnect.
         response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
-        client.get(response.url)  # display welcoming_tour
+        response = client.get(response.url, follow=True)  # completes welcoming tour
+        accept_legal_terms(client, response)
 
         # Then log out.
         response = client.post(reverse("account_logout"))
@@ -916,7 +917,8 @@ class TestProConnectLogout:
         response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
         assert auth.get_user(client).is_authenticated
         # Follow the redirection.
-        response = client.get(response.url)
+        response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
         assert client.session.get(constants.PRO_CONNECT_SESSION_KEY)
@@ -1015,6 +1017,7 @@ class TestProConnectMapChannel:
         assert auth.get_user(client).is_authenticated
 
         response = client.get(response.url)
+        response = accept_legal_terms(client, response)
         assert response.status_code == 200
 
     def test_create_user_organization_not_found(self, client, pro_connect):
