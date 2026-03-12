@@ -771,6 +771,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                                 job_seeker=to_user,
                                 professional=item.professional,
                                 prescriber_organization=item.prescriber_organization,
+                                company=item.company,
                             ).first()
                             if to_user_assignment:
                                 merge_job_seeker_assignments(
