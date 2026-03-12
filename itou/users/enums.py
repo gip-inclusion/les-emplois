@@ -100,5 +100,7 @@ class LackOfPoleEmploiId(models.TextChoices):
 class ActionKind(models.TextChoices):
     CREATE = "CREATE", "création du compte candidat"
     APPLY = "APPLY", "envoi de candidature"
+    HIRE = "HIRE", "déclaration d'embauche"
+    ACCEPT = "ACCEPT", "acceptation de candidature"
     IAE_ELIGIBILITY = "IAE_ELIGIBILITY", "validation de l'éligibilité IAE"
     GEIQ_ELIGIBILITY = "GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"
