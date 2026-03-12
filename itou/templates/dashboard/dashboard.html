@@ -163,11 +163,6 @@
                 </a>
             </li>
         {% endif %}
-        {% if request.from_employer or request.from_prescriber %}
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="evenements-tab" data-bs-toggle="tab" href="#evenements" role="tab" aria-controls="evenements" aria-selected="false" {% matomo_event "dashboard" "clic-onglet" "evenements" %}>Événements à venir</a>
-            </li>
-        {% endif %}
     </ul>
 {% endblock %}
 
@@ -246,15 +241,6 @@
                                 </div>
                             {% endif %}
                         </div>
-                        {% if request.from_employer or request.from_prescriber %}
-                            <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
-                                <h2>Événements à venir</h2>
-                                <div class="mt-3 mt-md-4">
-                                    <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=10" title="Événements des emplois de l'inclusion | Livestorm">
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
