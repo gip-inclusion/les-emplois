@@ -614,9 +614,14 @@ class TestDirectHireFullProcess:
         assertTemplateUsed(response, "utils/templatetags/approval_box.html")
         assert response.status_code == 200
 
-        # Check JobSeekerAssignment: no assignment is created when a job seeker is hired
+        # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            company=company,
+            last_action_kind=ActionKind.HIRE,
+        ).exists()
 
     @freeze_time()
     def test_hire_as_geiq(self, client, mocker, settings):
@@ -833,6 +838,15 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=job_seeker,
+            caseworker=user,
+            company=company,
+            last_action_kind=ActionKind.HIRE,
+        ).exists()
 
 
 class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
