@@ -7244,21 +7244,23 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -7302,21 +7304,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature à l'étude
@@ -7381,21 +7385,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature à l'étude
@@ -7460,21 +7466,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature en attente
@@ -7539,21 +7547,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
                           Candidature acceptée
@@ -7597,21 +7607,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
                           Candidature acceptée
@@ -7670,21 +7682,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-01 text-white" id="state_[PK of JobApplication]">
                           Vivier
@@ -7728,21 +7742,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature en attente
@@ -7798,21 +7814,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -7856,21 +7874,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature à l'étude
@@ -7914,21 +7934,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -7987,21 +8009,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -8670,21 +8694,23 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -8728,21 +8754,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature à l'étude
@@ -8807,21 +8835,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">
                           Candidature déclinée
@@ -8871,21 +8901,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature en attente
@@ -8950,21 +8982,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
                           Candidature acceptée
@@ -9008,21 +9042,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              ACME Inc.
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  ACME Inc.
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
                           Candidature acceptée
@@ -9066,21 +9102,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-01 text-white" id="state_[PK of JobApplication]">
                           Vivier
@@ -9124,21 +9162,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">
                           Candidature déclinée
@@ -9188,21 +9228,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature en attente
@@ -9258,21 +9300,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              L'autre GEIQ
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  L'autre GEIQ
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-01 text-white" id="state_[PK of JobApplication]">
                           Vivier
@@ -9328,21 +9372,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -9386,21 +9432,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -9444,21 +9492,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
                           Candidature acceptée
@@ -9514,21 +9564,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary" id="state_[PK of JobApplication]">
                           Candidature à l'étude
@@ -9572,21 +9624,23 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                      chez
-                      <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
-                          <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                          </i>
-                          <span>
-                              Tartempion
-                          </span>
-                      </a>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                          chez
+                          <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist%26order%3Dcreated_at">
+                              <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                              </i>
+                              <span>
+                                  Tartempion
+                              </span>
+                          </a>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature

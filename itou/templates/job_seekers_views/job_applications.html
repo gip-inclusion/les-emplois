@@ -45,10 +45,41 @@
                 <div class="s-section__col col-12">
                     <div class="tab-content">
                         <div class="tab-pane fade show active">
-                            <h2>Candidatures envoyées par ma structure</h2>
+                            <h2>Candidatures envoyées</h2>
+                            {% if request.from_authorized_prescriber %}
+                                {% if can_see_external_job_applications %}
+                                    {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                        {% fragment as title %}
+                                            Périmètre de suivi : Accès à toutes les candidatures
+                                        {% endfragment %}
+                                        {% fragment as content %}
+                                            <p>
+                                                En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures du candidat, y compris celles déposées par d’autres organisations ou par le candidat lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                            </p>
+                                            <p class="mb-0">
+                                                <a class="btn-link has-external-link" rel="noopener noreferrer" target="_blank" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                                            </p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% else %}
+                                    {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                        {% fragment as title %}
+                                            Périmètre de suivi : Accès limité aux candidatures réalisées par votre structure
+                                        {% endfragment %}
+                                        {% fragment as content %}
+                                            <p>
+                                                Votre visibilité sur les candidatures de ce candidat se limite à celles réalisées exclusivement par votre organisation. En tant que prescripteur habilité, vous pouvez toutefois bénéficier d’une vision d’ensemble des candidatures de ce candidat, y compris celles réalisées en dehors de votre structure, si un membre de votre organisation effectue une action pour celui-ci.
+                                            </p>
+                                            <p class="mb-0">
+                                                <a class="btn-link has-external-link" rel="noopener noreferrer" target="_blank" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297">En savoir plus</a>
+                                            </p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% endif %}
+                            {% endif %}
                             <hr>
                             {% matomo_event "candidat" "clic" "detail-candidature" as matomo_event_attrs %}
-                            {% for job_application in sent_job_applications %}
+                            {% for job_application in job_applications %}
                                 {% url 'apply:details_for_prescriber' job_application_id=job_application.id as detail_url %}
                                 {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
                             {% empty %}

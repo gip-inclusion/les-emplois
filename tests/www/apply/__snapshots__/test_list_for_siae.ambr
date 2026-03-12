@@ -8390,16 +8390,18 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Pres. Org.
-                      </strong>
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1">
-                      </i>
-                      Orienteur
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Pres. Org.
+                          </strong>
+                          <i aria-hidden="true" class="ri-home-smile-2-line me-1">
+                          </i>
+                          Orienteur
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">
                           Candidature déclinée
@@ -8449,13 +8451,15 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <strong>
-                          Vous
-                      </strong>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <strong>
+                              Vous
+                          </strong>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
                           Nouvelle candidature
@@ -8505,15 +8509,17 @@
       </div>
       <div class="c-box c-box--results has-links-inside my-3 my-md-4">
           <div class="c-box--results__header">
-              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                  <p class="fs-sm mb-0 flex-grow-1">
-                      Émise le 27 novembre 2024 par
-                      <i aria-hidden="true" class="ri-user-line me-1">
-                      </i>
-                      <strong>
-                          Le candidat lui-même
-                      </strong>
-                  </p>
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                  <div class="fs-sm mb-0 flex-grow-1">
+                      <span class="d-block">
+                          Émise le 27 novembre 2024 par
+                          <i aria-hidden="true" class="ri-user-line me-1">
+                          </i>
+                          <strong>
+                              Le candidat lui-même
+                          </strong>
+                      </span>
+                  </div>
                   <div>
                       <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
                           Candidature acceptée

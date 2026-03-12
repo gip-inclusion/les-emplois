@@ -1552,26 +1552,51 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <h2>
-                                  Candidatures envoyées par ma structure
+                                  Candidatures envoyées
                               </h2>
+                              <div class="alert alert-info mb-3 mb-md-4" role="status">
+                                  <div class="row">
+                                      <div class="col-auto pe-0">
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </div>
+                                      <div class="col">
+                                          <p class="mb-2">
+                                              <strong>
+                                                  Périmètre de suivi : Accès à toutes les candidatures
+                                              </strong>
+                                          </p>
+                                          <p>
+                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures du candidat, y compris celles déposées par d’autres organisations ou par le candidat lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                          </p>
+                                          <p class="mb-0">
+                                              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297" rel="noopener noreferrer" target="_blank">
+                                                  En savoir plus
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
                               <hr/>
                               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                   <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                                          <p class="fs-sm mb-0 flex-grow-1">
-                                              Émise le 14 août 2024 par
-                                              <strong>
-                                                  Vous
-                                              </strong>
-                                              chez
-                                              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                                                  </i>
-                                                  <span>
-                                                      ACME Inc.
-                                                  </span>
-                                              </a>
-                                          </p>
+                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                                          <div class="fs-sm mb-0 flex-grow-1">
+                                              <span class="d-block">
+                                                  Émise le 14 août 2024 par
+                                                  <strong>
+                                                      Vous
+                                                  </strong>
+                                                  chez
+                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                                                      </i>
+                                                      <span>
+                                                          ACME Inc.
+                                                      </span>
+                                                  </a>
+                                              </span>
+                                          </div>
                                           <div>
                                               <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">
                                                   Nouvelle candidature
@@ -1599,21 +1624,23 @@
                               </div>
                               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                   <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                                          <p class="fs-sm mb-0 flex-grow-1">
-                                              Émise le 14 août 2024 par
-                                              <strong>
-                                                  Vous
-                                              </strong>
-                                              chez
-                                              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
-                                                  </i>
-                                                  <span>
-                                                      Autre Entreprise
-                                                  </span>
-                                              </a>
-                                          </p>
+                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                                          <div class="fs-sm mb-0 flex-grow-1">
+                                              <span class="d-block">
+                                                  Émise le 14 août 2024 par
+                                                  <strong>
+                                                      Vous
+                                                  </strong>
+                                                  chez
+                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                                                      </i>
+                                                      <span>
+                                                          Autre Entreprise
+                                                      </span>
+                                                  </a>
+                                              </span>
+                                          </div>
                                           <div>
                                               <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-222222222222">
                                                   Nouvelle candidature
@@ -1649,9 +1676,9 @@
   
   '''
 # ---
-# name: test_job_application_tab[job seeker job applications view with sent job applications]
+# name: test_job_application_tab[SQL queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -2347,15 +2374,53 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_approval"
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_approval"."end_at" >= %s
+                 AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)
+          LIMIT 1
+        ''',
       }),
       dict({
         'origin': list([
-          'ForNode[job_seekers_views/job_applications.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/job_applications.html]',
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_prolongationrequest"
+          INNER JOIN "approvals_approval" ON ("approvals_prolongationrequest"."approval_id" = "approvals_approval"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_prolongationrequest"."created_at" >= %s
+                 AND "approvals_prolongationrequest"."prescriber_organization_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                 AND "users_jobseekerassignment"."updated_at" >= %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2403,6 +2468,15 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = %s
+                    AND ((U0."sender_id" = %s
+                          AND U0."sender_prescriber_organization_id" IS NULL)
+                         OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."id" = ("job_applications_jobapplication"."id"))
+             LIMIT 1) AS "user_can_see_details",
                  T3."id",
                  T3."password",
                  T3."last_login",
@@ -2478,18 +2552,13 @@
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
-          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND (("job_applications_jobapplication"."sender_id" = %s
-                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
+          WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
         'origin': list([
-          'ForNode[job_seekers_views/job_applications.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/job_applications.html]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -2525,6 +2594,1199 @@
                                                                                         %s)
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_job_application_tab_shows_external_application_to_authorized_prescriber[HTML]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Candidat : DOE Jane
+                              </h1>
+                          </div>
+                          <div class="c-title__cta">
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour ce candidat
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <h2>
+                                  Candidatures envoyées
+                              </h2>
+                              <div class="alert alert-info mb-3 mb-md-4" role="status">
+                                  <div class="row">
+                                      <div class="col-auto pe-0">
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </div>
+                                      <div class="col">
+                                          <p class="mb-2">
+                                              <strong>
+                                                  Périmètre de suivi : Accès à toutes les candidatures
+                                              </strong>
+                                          </p>
+                                          <p>
+                                              En tant que prescripteur habilité, vous bénéficiez d’une vision d’ensemble sur toutes les candidatures du candidat, y compris celles déposées par d’autres organisations ou par le candidat lui-même. Cette visibilité étendue est rendue possible car votre structure a réalisé une action visant à faciliter son entrée dans un parcours d’insertion ou à favoriser son maintien dans celui-ci.
+                                          </p>
+                                          <p class="mb-0">
+                                              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44496401665297" rel="noopener noreferrer" target="_blank">
+                                                  En savoir plus
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                                  <div class="c-box--results__header">
+                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                                          <div class="fs-sm mb-0 flex-grow-1">
+                                              <span class="d-block">
+                                                  Émise le 14 août 2024 par
+                                                  <strong>
+                                                      Vous
+                                                  </strong>
+                                                  chez
+                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                                                      </i>
+                                                      <span>
+                                                          ACME Inc.
+                                                      </span>
+                                                  </a>
+                                              </span>
+                                          </div>
+                                          <div>
+                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">
+                                                  Nouvelle candidature
+                                              </span>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <hr class="m-0"/>
+                                  <div class="c-box--results__body">
+                                      <div class="c-box--results__list-data">
+                                          <div class="c-info c-info--borderless">
+                                              <span class="c-info__summary">
+                                                  Candidature spontanée
+                                              </span>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="c-box--results__footer">
+                                      <div class="d-flex justify-content-end">
+                                          <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              Voir sa candidature
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                                  <div class="c-box--results__header">
+                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+                                          <div class="fs-sm mb-0 flex-grow-1">
+                                              <span class="d-block">
+                                                  Émise le 14 août 2024 par
+                                                  <strong>
+                                                      L'Autre Organisation
+                                                  </strong>
+                                                  <i aria-hidden="true" class="ri-home-smile-2-line me-1">
+                                                  </i>
+                                                  Prescripteur habilité
+                  
+              
+              
+                  chez
+                                                  <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                      <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
+                                                      </i>
+                                                      <span>
+                                                          Autre Entreprise
+                                                      </span>
+                                                  </a>
+                                              </span>
+                                              <span class="text-muted">
+                                                  <i aria-hidden="true" class="ri-lock-line ri-sm">
+                                                  </i>
+                                                  Candidature externe, détail non accessible
+                                              </span>
+                                          </div>
+                                          <div>
+                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-222222222222">
+                                                  Nouvelle candidature
+                                              </span>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <hr class="m-0"/>
+                                  <div class="c-box--results__body">
+                                      <div class="c-box--results__list-data">
+                                          <div class="c-info c-info--borderless">
+                                              <span class="c-info__summary">
+                                                  Candidature spontanée
+                                              </span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_job_application_tab_shows_external_application_to_authorized_prescriber[SQL queries]
+  dict({
+    'num_queries': 24,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at",
+                 COALESCE(
+                            (SELECT U0."valid_since" AS "valid_since"
+                             FROM "nexus_nexusressourcesyncstatus" U0
+                             WHERE U0."service" = ("nexus_nexususer"."source")
+                             ORDER BY RANDOM() ASC
+                             LIMIT 1), %s) AS "_threshold"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
+                                                               (SELECT U0."valid_since" AS "valid_since"
+                                                                FROM "nexus_nexusressourcesyncstatus" U0
+                                                                WHERE U0."service" = ("nexus_nexususer"."source")
+                                                                ORDER BY RANDOM() ASC
+                                                                LIMIT 1), %s))
+                 AND "nexus_nexususer"."email" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_activatedservice"."id",
+                 "nexus_activatedservice"."user_id",
+                 "nexus_activatedservice"."service",
+                 "nexus_activatedservice"."created_at"
+          FROM "nexus_activatedservice"
+          WHERE "nexus_activatedservice"."user_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."fields_history"
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."public_id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_geiqeligibilitydiagnosis"."id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_kind",
+                 "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_geiqeligibilitydiagnosis"."created_at",
+                 "eligibility_geiqeligibilitydiagnosis"."updated_at",
+                 "eligibility_geiqeligibilitydiagnosis"."expires_at",
+                 "eligibility_geiqeligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_geiq_id",
+                 T5."id",
+                 T5."password",
+                 T5."last_login",
+                 T5."is_superuser",
+                 T5."username",
+                 T5."first_name",
+                 T5."last_name",
+                 T5."is_staff",
+                 T5."is_active",
+                 T5."date_joined",
+                 T5."address_line_1",
+                 T5."address_line_2",
+                 T5."post_code",
+                 T5."city",
+                 T5."department",
+                 T5."coords",
+                 T5."geocoding_score",
+                 T5."geocoding_updated_at",
+                 T5."ban_api_resolved_address",
+                 T5."insee_city_id",
+                 T5."title",
+                 T5."full_name_search_vector",
+                 T5."email",
+                 T5."phone",
+                 T5."kind",
+                 T5."identity_provider",
+                 T5."has_completed_welcoming_tour",
+                 T5."created_by_id",
+                 T5."external_data_source_history",
+                 T5."last_checked_at",
+                 T5."public_id",
+                 T5."address_filled_at",
+                 T5."first_login",
+                 T5."upcoming_deletion_notified_at",
+                 T5."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "eligibility_geiqeligibilitydiagnosis"
+          LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "users_user" T5 ON ("eligibility_geiqeligibilitydiagnosis"."author_id" = T5."id")
+          WHERE ("eligibility_geiqeligibilitydiagnosis"."expires_at" > %s
+                 AND "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" = %s
+                 AND ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" IS NULL
+                      OR "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" IS NOT NULL))
+          ORDER BY "eligibility_geiqeligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_approval"."end_at" >= %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.latest_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" = %s
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 CASE
+                     WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
+                     ELSE %s
+                 END AS "from_prescriber",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
+          WHERE ("eligibility_eligibilitydiagnosis"."author_kind" = %s
+                 AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
+          ORDER BY 10 DESC,
+                   "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."last_certification_attempt_at",
+                 "eligibility_selectedadministrativecriteria"."created_at",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id"
+          FROM "eligibility_selectedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroup"."id",
+                 "gps_followupgroup"."created_at",
+                 "gps_followupgroup"."created_in_bulk",
+                 "gps_followupgroup"."updated_at",
+                 "gps_followupgroup"."beneficiary_id"
+          FROM "gps_followupgroup"
+          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroup"."beneficiary_id" = %s)
+          ORDER BY "gps_followupgroup"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_approval"
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_approval"."end_at" >= %s
+                 AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_prolongationrequest"
+          INNER JOIN "approvals_approval" ON ("approvals_prolongationrequest"."approval_id" = "approvals_approval"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_prolongationrequest"."created_at" >= %s
+                 AND "approvals_prolongationrequest"."prescriber_organization_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                 AND "users_jobseekerassignment"."updated_at" >= %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = %s
+                    AND ((U0."sender_id" = %s
+                          AND U0."sender_prescriber_organization_id" IS NULL)
+                         OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."id" = ("job_applications_jobapplication"."id"))
+             LIMIT 1) AS "user_can_see_details",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          WHERE "job_applications_jobapplication"."job_seeker_id" = %s
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."last_employer_update_at",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source"
+          FROM "companies_jobdescription"
+          INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                        %s)
+          ORDER BY "jobs_appellation"."name" ASC,
+                   "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[apply/includes/job_application_creation_info.html]',
+          'IfNode[apply/includes/job_application_creation_info.html]',
+          'IncludeNode[apply/includes/job_application_box_for_user.html]',
+          'IncludeNode[job_seekers_views/job_applications.html]',
+          'ForNode[job_seekers_views/job_applications.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/job_applications.html]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" = %s
+          LIMIT 21
         ''',
       }),
       dict({
@@ -4529,7 +5791,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -5224,6 +6486,185 @@
       }),
       dict({
         'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_approval"
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_approval"."end_at" >= %s
+                 AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_prolongationrequest"
+          INNER JOIN "approvals_approval" ON ("approvals_prolongationrequest"."approval_id" = "approvals_approval"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_prolongationrequest"."created_at" >= %s
+                 AND "approvals_prolongationrequest"."prescriber_organization_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                 AND "users_jobseekerassignment"."updated_at" >= %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 %s AS "user_can_see_details",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
+                 AND (("job_applications_jobapplication"."sender_id" = %s
+                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -5697,7 +7138,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -6410,6 +7851,159 @@
                  AND "gps_followupgroup"."beneficiary_id" = %s)
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_see_external_job_applications[www/job_seekers_views/views.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_approval"
+          INNER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_approval"."end_at" >= %s
+                 AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = %s
+                    AND ((U0."sender_id" = %s
+                          AND U0."sender_prescriber_organization_id" IS NULL)
+                         OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."id" = ("job_applications_jobapplication"."id"))
+             LIMIT 1) AS "user_can_see_details",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          WHERE "job_applications_jobapplication"."job_seeker_id" = %s
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({

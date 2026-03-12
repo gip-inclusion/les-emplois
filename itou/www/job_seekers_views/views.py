@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -17,6 +17,8 @@ from django.utils.html import format_html
 from django.views.decorators.http import require_POST, require_safe
 from django.views.generic import DetailView, TemplateView, View
 
+from itou.approvals.enums import ProlongationRequestStatus
+from itou.approvals.models import ProlongationRequest
 from itou.asp.models import Country
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -127,6 +129,9 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         group = FollowUpGroup.objects.filter(beneficiary=self.object).first()
         user_in_group = False if group is None else group.members.contains(self.request.user)
 
+        can_see_external = can_see_external_job_applications(self.object, self.request)
+        job_applications = self.get_job_applications(can_see_external)
+        has_external_applications = any(not a.user_can_see_details for a in job_applications)
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
@@ -134,23 +139,60 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             "matomo_custom_title": "Détail candidat",
             "approval": approval,
             "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
-            "sent_job_applications": (
-                self.object.job_applications.prescriptions_of(
-                    self.request.user,
-                    getattr(self.request, "current_organization", None),  # job seekers have no current_organization
-                )
-                .select_related(
-                    "to_company",
-                    "sender",
-                )
-                .prefetch_related("selected_jobs")
-            ),
+            "job_applications": job_applications,
+            "can_see_external_job_applications": can_see_external,
+            "has_external_applications": has_external_applications,
             # already checked in test_func because the user name is displayed in the title
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "group": group,
             "user_in_group": user_in_group,
         }
+
+    def get_job_applications(self, can_see_external):
+        own_applications_qs = self.object.job_applications.prescriptions_of(
+            self.request.user,
+            self.request.current_organization,
+        )
+        if can_see_external:
+            applications = self.object.job_applications.annotate(
+                user_can_see_details=Exists(own_applications_qs.filter(pk=OuterRef("pk"))),
+            ).all()
+        else:
+            applications = own_applications_qs.annotate(user_can_see_details=Value(True)).all()
+        return applications.select_related("to_company", "sender").prefetch_related("selected_jobs")
+
+
+def can_see_external_job_applications(job_seeker, request):
+    if not request.from_authorized_prescriber:
+        return False
+
+    org = request.current_organization
+
+    if job_seeker.approvals.valid().filter(eligibility_diagnosis__author_prescriber_organization=org).exists():
+        return True
+
+    threshold = timezone.localtime() - settings.JOB_APPLICATIONS_SHOW_EXTERNAL_PERIOD
+
+    return (
+        ProlongationRequest.objects.filter(
+            prescriber_organization=org,
+            approval__user=job_seeker,
+            status=ProlongationRequestStatus.GRANTED,
+            created_at__gte=threshold,
+        ).exists()
+        or JobSeekerAssignment.objects.filter(
+            job_seeker=job_seeker,
+            prescriber_organization=org,
+            updated_at__gte=threshold,
+        )
+        .exclude(
+            # Just creating a job seeker account is not enough to see
+            # their job applications.
+            last_action_kind=ActionKind.CREATE,
+        )
+        .exists()
+    )
 
 
 @require_POST

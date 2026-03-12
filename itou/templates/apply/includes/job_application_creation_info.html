@@ -3,46 +3,53 @@
 {% enums "job_applications" "Origin" as JobApplicationOrigin %}
 {% enums "job_applications" "SenderKind" as SenderKind %}
 
-
-<div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-    <p class="fs-sm mb-0 flex-grow-1">
-        Émise le {{ job_application.created_at|date:"d F Y" }} par
-        {% if request.user == job_application.sender %}
-            <strong>Vous</strong>
-        {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
-            <i class="ri-user-line me-1" aria-hidden="true"></i><strong>Le candidat lui-même</strong>
-        {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
-            <strong>{{ job_application.sender_company.display_name }}</strong>
-            {% if request.from_employer %}
-                {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
-                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
-                {% elif job_application.sender_company == job_application.to_company %}
-                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Auto-prescription)
-                {% else %}
-                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Orientation)
+<div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3">
+    <div class="fs-sm mb-0 flex-grow-1">
+        <span class="d-block">
+            Émise le {{ job_application.created_at|date:"d F Y" }} par
+            {% if request.user == job_application.sender %}
+                <strong>Vous</strong>
+            {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
+                <i class="ri-user-line me-1" aria-hidden="true"></i><strong>Le candidat lui-même</strong>
+            {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
+                <strong>{{ job_application.sender_company.display_name }}</strong>
+                {% if request.from_employer %}
+                    {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
+                        <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
+                    {% elif job_application.sender_company == job_application.to_company %}
+                        <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Auto-prescription)
+                    {% else %}
+                        <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Orientation)
+                    {% endif %}
+                {% elif request.user.is_job_seeker %}
+                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur
                 {% endif %}
-            {% elif request.user.is_job_seeker %}
-                <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur
+            {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
+                {% if job_application.sender_prescriber_organization %}
+                    <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
+                {% else %}
+                    <strong>{{ job_application.sender.get_inverted_full_name }}</strong>
+                {% endif %}
+                {% if job_application.is_sent_by_authorized_prescriber %}
+                    <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Prescripteur habilité
+                {% else %}
+                    <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Orienteur
+                {% endif %}
             {% endif %}
-        {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
-            {% if job_application.sender_prescriber_organization %}
-                <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
-            {% else %}
-                <strong>{{ job_application.sender.get_inverted_full_name }}</strong>
+            {% if not request.user.is_job_seeker and job_application.to_company != request.current_organization %}
+                chez
+                <a href="{% url 'companies_views:card' company_pk=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-ico btn-link">
+                    <i class="ri-community-line fw-medium ri-sm me-1" aria-hidden="true"></i>
+                    <span>{{ job_application.to_company.display_name }}</span>
+                </a>
             {% endif %}
-            {% if job_application.is_sent_by_authorized_prescriber %}
-                <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Prescripteur habilité
-            {% else %}
-                <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Orienteur
-            {% endif %}
+        </span>
+        {% if not job_application.user_can_see_details|default_if_none:True %}
+            <span class="text-muted">
+                <i class="ri-lock-line ri-sm" aria-hidden="true"></i>
+                Candidature externe, détail non accessible
+            </span>
         {% endif %}
-        {% if not request.user.is_job_seeker and job_application.to_company != request.current_organization %}
-            chez
-            <a href="{% url 'companies_views:card' company_pk=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-ico btn-link">
-                <i class="ri-community-line fw-medium ri-sm me-1" aria-hidden="true"></i>
-                <span>{{ job_application.to_company.display_name }}</span>
-            </a>
-        {% endif %}
-    </p>
+    </div>
     <div>{% job_application_state_badge job_application %}</div>
 </div>

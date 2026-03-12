@@ -2,15 +2,19 @@ import datetime
 import random
 import uuid
 
+from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
-from tests.approvals.factories import ApprovalFactory
+from itou.users.models import JobSeekerAssignment
+from itou.www.job_seekers_views.views import can_see_external_job_applications
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
@@ -23,7 +27,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented
 
 
 def test_anonymous_user(client):
@@ -383,11 +387,12 @@ def test_job_application_tab(client, snapshot):
         sent_by_authorized_prescriber_organisation=True,
         sender_prescriber_organization=prescriber_membership.organization,
         sender=prescriber_membership.user,
+        with_job_seeker_assignment=True,
     )
     client.force_login(prescriber_membership.user)
     url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application_1.job_seeker.public_id})
 
-    with assertSnapshotQueries(snapshot(name="job seeker job applications view with sent job applications")):
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(url)
     soup = parse_response_to_soup(
         response,
@@ -570,3 +575,148 @@ def test_display_job_seeker_referent(client, snapshot):
         ],
     )
     assert pretty_indented(soup) == snapshot()
+
+
+@freeze_time("2024-08-14")
+def test_job_application_tab_shows_external_application_to_authorized_prescriber(client, snapshot):
+    prescriber_membership = PrescriberMembershipFactory(
+        user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
+    )
+    job_application_1 = JobApplicationFactory(
+        for_snapshot=True,
+        sent_by_authorized_prescriber_organisation=True,
+        sender_prescriber_organization=prescriber_membership.organization,
+        sender=prescriber_membership.user,
+        created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+        with_iae_eligibility_diagnosis=True,
+        with_job_seeker_assignment=True,
+    )
+    # External job application (not from the prescriber's org).
+    # Appears in the list, but without link to details.
+    other_prescriber_membership = PrescriberMembershipFactory(
+        organization__authorized=True,
+        organization__name="L'Autre Organisation",
+    )
+    job_application_2 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
+        job_seeker=job_application_1.job_seeker,
+        to_company__name="Autre Entreprise",
+        sender_prescriber_organization=other_prescriber_membership.organization,
+        sender=other_prescriber_membership.user,
+        with_job_seeker_assignment=True,
+    )
+    client.force_login(prescriber_membership.user)
+    url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application_1.job_seeker.public_id})
+
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(url)
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            ("href", f"/company/{job_application_1.to_company.pk}/card", "/company/[PK of Company]/card"),
+            ("href", f"/company/{job_application_2.to_company.pk}/card", "/company/[PK of Company]/card"),
+        ],
+    )
+    assert pretty_indented(soup) == snapshot(name="HTML")
+
+
+class TestCanSeeExternalJobApplication(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.job_seeker = JobSeekerFactory()
+        cls.authorized_prescriber = PrescriberFactory(
+            membership=True,
+            membership__organization__authorized=True,
+        )
+
+    def test_only_authorized_prescriber_can_see_external_job_applications(self):
+        request = get_request(EmployerFactory())
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+    def test_authorized_prescriber_can_see_external_job_applications_if_approval_exists(self):
+        org = self.authorized_prescriber.prescribermembership_set.get().organization
+        request = get_request(self.authorized_prescriber)
+
+        # No approval => not authorized
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+        # Approval by another organization => not authorized
+        approval = ApprovalFactory(user=self.job_seeker)
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+        # Approval by the prescriber organization => authorized
+        approval.eligibility_diagnosis.author_prescriber_organization = org
+        approval.eligibility_diagnosis.save()
+        assert can_see_external_job_applications(self.job_seeker, request)
+
+    def test_authorized_prescriber_can_see_external_job_applications_if_recently_assigned(self):
+        org = self.authorized_prescriber.prescribermembership_set.get().organization
+        request = get_request(self.authorized_prescriber)
+
+        # No application => not authorized
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+        # Only application is by another organization => not authorized
+        _another_org_application = JobApplicationFactory(
+            job_seeker=self.job_seeker,
+            sent_by_authorized_prescriber_organisation=True,
+            with_job_seeker_assignment=True,
+        )
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+        # Own application, but too old => not authorized
+        _too_old_application = JobApplicationFactory(
+            job_seeker=self.job_seeker,
+            sent_by_authorized_prescriber_organisation=True,
+            sender_prescriber_organization=org,
+            created_at=timezone.localtime() - datetime.timedelta(days=500),
+            with_job_seeker_assignment=True,
+        )
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+        # Own application is recent enough => authorized
+        recent_application = JobApplicationFactory(
+            job_seeker=self.job_seeker,
+            sent_by_authorized_prescriber_organisation=True,
+            sender_prescriber_organization=org,
+            created_at=timezone.localtime() - datetime.timedelta(days=1),
+        )
+        assignment = JobSeekerAssignment.objects.filter(
+            prescriber_organization=org,
+        ).get()
+        assignment.updated_at = recent_application.created_at
+        assignment.save()
+        assert can_see_external_job_applications(self.job_seeker, request)
+
+    def test_authorized_prescriber_can_see_external_job_applications_if_recently_prolonged(self):
+        approval = ApprovalFactory(user=self.job_seeker)
+        org = self.authorized_prescriber.prescribermembership_set.get().organization
+        request = get_request(self.authorized_prescriber)
+
+        # No prolongation => not authorized
+        assert not can_see_external_job_applications(self.job_seeker, request)
+
+        # Prolongation by another organization => not authorized
+        p = ProlongationRequestFactory(approval=approval)
+        assert not can_see_external_job_applications(self.job_seeker, request)
+        p.delete()  # prolongation model has non-overlapping constraints
+
+        # Prolongation by the same org, but too old => not authorized
+        p = ProlongationRequestFactory(
+            approval=approval,
+            prescriber_organization=org,
+            created_at=timezone.localtime() - datetime.timedelta(days=500),
+        )
+        assert not can_see_external_job_applications(self.job_seeker, request)
+        p.delete()  # prolongation model has non-overlapping constraints
+
+        # Recent prolongation by the same or => authorized
+        ProlongationRequestFactory(
+            status=ProlongationRequestStatus.GRANTED,
+            approval=approval,
+            prescriber_organization=org,
+            created_at=timezone.localtime() - datetime.timedelta(days=1),
+        )
+        assert can_see_external_job_applications(self.job_seeker, request)
