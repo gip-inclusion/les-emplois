@@ -4,7 +4,7 @@
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
       <div class="offcanvas-header offcanvas-header--structure">
           <div class="dropdown dropdown-structure flex-grow-1 py-4">
-              <button aria-controls="switchStructureDropdownMobile" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" type="button">
+              <button aria-controls="switchOrganizationDropdownMobile" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-community-line">
                   </i>
                   <span>
@@ -14,7 +14,7 @@
                       ACME Inc.
                   </strong>
               </button>
-              <div class="dropdown-menu" id="switchStructureDropdownMobile">
+              <div class="dropdown-menu" id="switchOrganizationDropdownMobile">
                   <form action="/dashboard/switch-organization?next_url=/dashboard/" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
@@ -391,14 +391,14 @@
               </div>
           </li>
           <li class="d-none d-lg-inline-block dropdown dropdown-structure">
-              <button aria-controls="switchStructureDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
+              <button aria-controls="switchOrganizationDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-community-line">
                   </i>
                   <span>
                       EI - ACME Inc.
                   </span>
               </button>
-              <div class="dropdown-menu w-100" id="switchStructureDropdown">
+              <div class="dropdown-menu w-100" id="switchOrganizationDropdown">
                   <form action="/dashboard/switch-organization?next_url=/dashboard/" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
