@@ -765,23 +765,29 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
     [kind, name] = re.match(r"(cd|convergence|ddets_iae|ft|iae_network|ph|siae)_(\w+)", dashboard_full_name).groups()
     if kind == "cd":
         params = get_params_for_departement(
-            DGEFP_SHOWROOM_DEPARTMENT, with_department_name=dashboard_full_name not in {"cd_hiring"}
+            DGEFP_SHOWROOM_DEPARTMENT,
+            with_department_name=False,
         )
     if kind == "ddets_iae":
         params = get_params_for_departement(
-            DGEFP_SHOWROOM_DEPARTMENT, with_department_name=dashboard_full_name not in {"ddets_iae_hiring"}
+            DGEFP_SHOWROOM_DEPARTMENT,
+            with_department_name=name not in {"auto_prescription", "ph_prescription", "hiring"},
         )
     if kind == "convergence":
         params = get_params_for_region(DGEFP_SHOWROOM_CONVERGENCE_REGION)
     elif kind == "ft":
         params = {
-            **get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT, with_department_name=False),
+            **get_params_for_departement(
+                DGEFP_SHOWROOM_DEPARTMENT,
+                with_department_name=False,
+            ),
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         }
     elif kind == "iae_network":
         params = {
             mb.IAE_NETWORK_FILTER_KEY: Institution.objects.filter(
-                kind=InstitutionKind.IAE_NETWORK, name=DGEFP_SHOWROOM_IAE_NETWORK_NAME
+                kind=InstitutionKind.IAE_NETWORK,
+                name=DGEFP_SHOWROOM_IAE_NETWORK_NAME,
             )
             .values_list("pk", flat=True)
             .get()
@@ -808,7 +814,10 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
                     mb.C1_PRESCRIBER_ORG_FILTER_KEY: list(organization_pks),
                 }
             case "beneficiaries":
-                params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT, with_department_name=False)
+                params = get_params_for_departement(
+                    DGEFP_SHOWROOM_DEPARTMENT,
+                    with_department_name=False,
+                )
     elif kind == "siae":
         match name:
             case "orga_etp" | "beneficiaries":
