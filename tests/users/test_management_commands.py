@@ -19,7 +19,7 @@ from pytest_django.asserts import assertQuerySetEqual
 import itou.utils.mocks.pole_emploi as pole_emploi_api_mocks
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication, JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationState, JobApplicationTransitionLog
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import ActionKind, IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email, sync_job_seeker_assignments
@@ -1431,7 +1431,7 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         organization_2 = PrescriberOrganizationFactory(membership__user=prescriber)
         company_1 = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company_1.members.first()
-        company_2 = CompanyFactory(membership__user=employer)
+        company_2 = CompanyFactory(membership__user=employer, kind=CompanyKind.GEIQ)
 
         # Prescriber made actions alone
         job_seeker_1 = JobSeekerFactory(
@@ -1463,7 +1463,10 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             expires_at=datetime.date.today() - datetime.timedelta(days=1),
         )
         job_app_orga_2 = JobApplicationFactory(
-            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=organization_2
+            job_seeker=job_seeker_1,
+            sender=prescriber,
+            sender_prescriber_organization=organization_2,
+            to_company=company_2,
         )
 
         # Employer made actions for company 1
@@ -1476,8 +1479,9 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         )
 
         # Employer made actions for company 2
-        job_app_company_2 = JobApplicationFactory(
-            sent_by_company=True, job_seeker=job_seeker_2, sender=employer, sender_company=company_2
+        job_app_orga_2.accept(user=employer)
+        transition = JobApplicationTransitionLog.objects.get(
+            job_application=job_app_orga_2, to_state=JobApplicationState.ACCEPTED
         )
 
         # Ignore job seekers
@@ -1502,6 +1506,9 @@ class TestSyncJobSeekerAssignmentManagementCommand:
                     (employer.pk, None, company_1.pk): [
                         {"timestamp": iae_diag_company_1.created_at, "action_kind": ActionKind.IAE_ELIGIBILITY.value},
                     ],
+                    (employer.pk, None, company_2.pk): [
+                        {"timestamp": transition.timestamp, "action_kind": ActionKind.ACCEPT.value},
+                    ],
                 },
             ),
             job_seeker_2.pk: defaultdict(
@@ -1509,9 +1516,6 @@ class TestSyncJobSeekerAssignmentManagementCommand:
                 {
                     (prescriber.pk, organization_2.pk, None): [
                         {"timestamp": job_seeker_2.date_joined, "action_kind": ActionKind.CREATE.value},
-                    ],
-                    (employer.pk, None, company_2.pk): [
-                        {"timestamp": job_app_company_2.created_at, "action_kind": ActionKind.APPLY.value},
                     ],
                 },
             ),
@@ -1521,7 +1525,7 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         organization_1 = PrescriberOrganizationFactory(with_membership=True)
         prescriber = organization_1.members.first()
         organization_2 = PrescriberOrganizationFactory(membership__user=prescriber)
-        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        company = CompanyFactory(with_membership=True, kind=CompanyKind.GEIQ)
         employer = company.members.first()
 
         ## Contacts that will create a new assignment
@@ -1555,7 +1559,10 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             last_action_kind=ActionKind.IAE_ELIGIBILITY,
         )
         job_app_2_orga_2 = JobApplicationFactory(
-            job_seeker=job_seeker_2, sender=prescriber, sender_prescriber_organization=organization_2
+            job_seeker=job_seeker_2,
+            sender=prescriber,
+            sender_prescriber_organization=organization_2,
+            to_company=company,
         )  # last action, to set updated_at and last_action_kind
         # Another job seeker with the same prescriber and organization should not be disturbing
         JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization_2)
@@ -1564,11 +1571,12 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             job_seeker=job_seeker_2,
             professional=employer,
             company=company,
-            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+            last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
         )
-        job_app_2_company = JobApplicationFactory(
-            sent_by_company=True, job_seeker=job_seeker_2, sender=employer, sender_company=company
-        )  # last action, to set updated_at and last_action_kind
+        job_app_2_orga_2.accept(user=employer)  # last action, to set updated_at and last_action_kind
+        transition = JobApplicationTransitionLog.objects.get(
+            job_application=job_app_2_orga_2, to_state=JobApplicationState.ACCEPTED
+        )
 
         call_command("sync_job_seeker_assignments", wet_run=True)
 
@@ -1599,8 +1607,8 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         assert assignment_2_2.last_action_kind == ActionKind.APPLY
 
         assignment_2_company.refresh_from_db()
-        assert assignment_2_company.updated_at == job_app_2_company.created_at
-        assert assignment_2_company.last_action_kind == ActionKind.APPLY
+        assert assignment_2_company.updated_at == transition.timestamp
+        assert assignment_2_company.last_action_kind == ActionKind.ACCEPT
 
 
 @pytest.mark.parametrize("is_after_cutoff", [True, False])

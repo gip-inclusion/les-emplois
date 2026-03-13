@@ -11,7 +11,8 @@ from django.db.models.functions import JSONObject
 
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.utils.command import BaseCommand
@@ -72,7 +73,25 @@ def get_users_contacts(ids):
                 )
             )
         )
-        # FIXME: add hire + accept
+        .annotate(
+            job_app_accepted_by=ArraySubquery(
+                JobApplicationTransitionLog.objects.filter(
+                    job_application__job_seeker=OuterRef("pk"), to_state=JobApplicationState.ACCEPTED
+                )
+                .select_related("job_application")
+                .filter(user__kind__in=UserKind.professionals())
+                .values(
+                    json=JSONObject(
+                        user_id="user_id",
+                        prescriber_organization_id=None,
+                        company_id="job_application__to_company_id",
+                        timestamp="timestamp",
+                        # Mixing HIRE and ACCEPT here, the additional information is not worth the computational cost
+                        action_kind=Value(ActionKind.ACCEPT),
+                    )
+                )
+            )
+        )
     )
 
     users_contacts = {}
@@ -87,7 +106,10 @@ def get_users_contacts(ids):
                 a["action_kind"],
             )
             for a in (
-                job_seeker.job_apps_senders + job_seeker.geiq_diagnosis_authors + job_seeker.iae_diagnosis_authors
+                job_seeker.job_apps_senders
+                + job_seeker.geiq_diagnosis_authors
+                + job_seeker.iae_diagnosis_authors
+                + job_seeker.job_app_accepted_by
             )
         ]:
             contacts[(user_id, prescriber_organization_id, company_id)].append(
