@@ -2,8 +2,8 @@
 {% load datetime_filters %}
 {% load enums %}
 {% load matomo %}
+{% load organization_switcher %}
 {% load str_filters %}
-{% load structure_switcher %}
 {% load theme_inclusion %}
 
 
@@ -27,7 +27,7 @@
                             </h1>
                         </div>
                         <div class="c-title__cta" role="group" aria-label="Changement de structure active">
-                            {% structure_switcher mode="nexus" %}
+                            {% organization_switcher mode="nexus" %}
                         </div>
                     </div>
                 </div>
