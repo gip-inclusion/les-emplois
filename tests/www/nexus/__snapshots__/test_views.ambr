@@ -174,14 +174,14 @@
                           </div>
                           <div aria-label="Changement de structure active" class="c-title__cta" role="group">
                               <div class="dropdown dropdown-structure">
-                                  <button aria-controls="switchStructureDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-primary btn-ico dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                                  <button aria-controls="switchOrganizationDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-primary btn-ico dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-community-line">
                                       </i>
                                       <span>
                                           EI - ACME Inc.
                                       </span>
                                   </button>
-                                  <div class="dropdown-menu w-100" id="switchStructureDropdown">
+                                  <div class="dropdown-menu w-100" id="switchOrganizationDropdown">
                                       <form action="/dashboard/switch-organization?next_url=/portal/service/emplois" method="post">
                                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                           <ul class="list-unstyled">
