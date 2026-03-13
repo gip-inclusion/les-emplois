@@ -16,7 +16,8 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
-from itou.users.enums import UserKind
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
@@ -334,6 +335,13 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
                 # Mark job seeker's infos as up-to-date
                 job_application.job_seeker.last_checked_at = timezone.now()
                 job_application.job_seeker.save(update_fields=["last_checked_at"])
+
+                # Sync job seeker assignment
+                last_action_kind = ActionKind.HIRE if creating else ActionKind.ACCEPT
+                JobSeekerAssignment.objects.upsert_assignment(
+                    self.job_seeker, request.user, self.company, last_action_kind
+                )
+
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.", extra_tags="toast")
             return HttpResponseClientRedirect(self.get_error_url())
@@ -459,7 +467,9 @@ class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
         if self.diagnosis:
-            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(self.diagnosis, self.request.user, None, criteria)
+            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+                self.diagnosis, self.request.user, self.company, criteria
+            )
         else:
             GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                 self.job_seeker, self.request.user, self.company, criteria

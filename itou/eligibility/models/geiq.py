@@ -216,16 +216,17 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
-        if author_kind == UserKind.PRESCRIBER:
-            # Sync job seeker assignment to a prescriber
-            JobSeekerAssignment.objects.upsert_assignment(job_seeker, author, author_org, ActionKind.GEIQ_ELIGIBILITY)
+        # Sync job seeker assignment
+        JobSeekerAssignment.objects.upsert_assignment(
+            job_seeker, author, author_structure, ActionKind.GEIQ_ELIGIBILITY
+        )
 
         return result
 
     @classmethod
     @transaction.atomic()
     def update_eligibility_diagnosis(
-        cls, diagnosis, author: User, author_organization: PrescriberOrganization, administrative_criteria
+        cls, diagnosis, author: User, author_structure: PrescriberOrganization | Company, administrative_criteria
     ):
         if not issubclass(diagnosis.__class__, cls):
             raise ValueError("Le diagnostic fourni n'est pas un diagnostic GEIQ")
@@ -243,11 +244,10 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         diagnosis.administrative_criteria.set(administrative_criteria)
         diagnosis.schedule_certification()
 
-        if author.is_prescriber:
-            # Sync job seeker assignment to a prescriber
-            JobSeekerAssignment.objects.upsert_assignment(
-                diagnosis.job_seeker, author, author_organization, ActionKind.GEIQ_ELIGIBILITY
-            )
+        # Sync job seeker assignment
+        JobSeekerAssignment.objects.upsert_assignment(
+            diagnosis.job_seeker, author, author_structure, ActionKind.GEIQ_ELIGIBILITY
+        )
 
         return diagnosis
 

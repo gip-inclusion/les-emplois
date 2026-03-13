@@ -293,6 +293,15 @@ class TestEligibilityDiagnosisModel:
         assert membership.member == user
         assert membership.creator == user
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.job_seeker == job_seeker
+        assert assignment.caseworker == user
+        assert assignment.prescriber_organization is None
+        assert assignment.company == company
+        assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
+
     @freeze_time("2024-12-03")
     def test_create_diagnosis_prescriber(self):
         job_seeker = JobSeekerFactory()
@@ -325,7 +334,7 @@ class TestEligibilityDiagnosisModel:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
-        assert assignment.prescriber == prescriber
+        assert assignment.caseworker == prescriber
         assert assignment.prescriber_organization == organization
         assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
 
@@ -393,7 +402,7 @@ class TestEligibilityDiagnosisModel:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == new_diagnosis.job_seeker
-        assert assignment.prescriber == new_diagnosis.author
+        assert assignment.caseworker == new_diagnosis.author
         assert assignment.prescriber_organization == prescriber_organization
         assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
 

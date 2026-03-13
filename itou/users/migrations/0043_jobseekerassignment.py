@@ -69,6 +69,8 @@ class Migration(migrations.Migration):
                         choices=[
                             ("CREATE", "création du compte candidat"),
                             ("APPLY", "envoi de candidature"),
+                            ("HIRE", "déclaration d'embauche"),
+                            ("ACCEPT", "acceptation de candidature"),
                             ("IAE_ELIGIBILITY", "validation de l'éligibilité IAE"),
                             ("GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"),
                         ],

@@ -1064,7 +1064,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.CREATE,
         ).get()
@@ -1138,7 +1138,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.APPLY,
         ).exists()
@@ -1396,7 +1396,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.CREATE,
         ).get()
@@ -1455,6 +1455,16 @@ class TestApplyAsAuthorizedPrescriber:
         assert diag.is_valid is True
         assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
+
         next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
@@ -1507,7 +1517,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.APPLY,
         ).exists()
@@ -1928,7 +1938,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=None,
             last_action_kind=ActionKind.CREATE,
         ).get()
@@ -2001,7 +2011,7 @@ class TestApplyAsPrescriber:
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None, last_action_kind=ActionKind.APPLY
+            job_seeker=new_job_seeker, caseworker=user, prescriber_organization=None, last_action_kind=ActionKind.APPLY
         ).exists()
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
@@ -2684,9 +2694,15 @@ class TestApplyAsCompany:
         ).get()
         membership.delete()  # delete it to check it is created again when applying
 
-        # Check JobSeekerAssignment: no assignment is created when a job seeker is created by an employer
+        # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            company=user.company_set.first(),
+            last_action_kind=ActionKind.CREATE,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -2752,9 +2768,15 @@ class TestApplyAsCompany:
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
 
-        # Check JobSeekerAssignment: no assignment is created when an application is created by an employer
+        # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            company=user.company_set.first(),
+            last_action_kind=ActionKind.APPLY,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_employer(self, client, pdf_file):

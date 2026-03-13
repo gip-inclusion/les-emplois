@@ -13,6 +13,7 @@ from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.siae_evaluations.models import EvaluatedSiae
 from itou.users import models as users_models
+from itou.users.utils import merge_job_seeker_assignments
 
 
 class TransferField(TextChoices):
@@ -20,6 +21,7 @@ class TransferField(TextChoices):
     GEIQ_DIAG_CREATED = "geiq_diag_created", "Diagnostics GEIQ créés"
     JOB_APPLICATIONS_SENT = "job_applications_sent", "Candidatures envoyées"
     JOB_APPLICATIONS_RECEIVED = "job_applications_received", "Candidatures reçues"
+    JOB_SEEKER_ASSIGNMENTS = "job_seeker_assignments", "Affectations candidats"
     EMPLOYEE_RECORDS_CREATED = "employee_records_created", "Fiches salarié (transférées via les candidatures reçues)"
     JOB_DESCRIPTIONS = "job_descriptions", "Fiches de poste"
     MEMBERSHIPS = "memberships", "Utilisateurs membres"
@@ -55,6 +57,17 @@ TRANSFER_SPECS = {
     TransferField.JOB_APPLICATIONS_RECEIVED: {
         "related_model": job_applications_models.JobApplication,
         "related_model_field": "to_company",
+    },
+    TransferField.JOB_SEEKER_ASSIGNMENTS: {
+        "related_model": users_models.JobSeekerAssignment,
+        "related_model_field": "company",
+        "upsert": {
+            "key": {"job_seeker", "caseworker", "company"},
+            "fields": {},  # Don't upsert specific fields but the whole object, as fields depend on each other
+            "merge_function": lambda from_item, to_item: merge_job_seeker_assignments(
+                assignment_to_delete=from_item, assignment_to_keep=to_item
+            ),
+        },
     },
     TransferField.EMPLOYEE_RECORDS_CREATED: {
         "related_model": EmployeeRecord,
@@ -220,7 +233,11 @@ def transfer_company_data(
                                 getattr(to_item, field),
                             )
                             setattr(to_item, field, final_value)
-                        to_item.save()
+                        if merge_function := spec["upsert"].get("merge_function"):
+                            # The merge function should handle the save() or update()
+                            merge_function(item, to_item)
+                        else:
+                            to_item.save()
 
                 reporter.add(transfer_field, _format_model(item))
 

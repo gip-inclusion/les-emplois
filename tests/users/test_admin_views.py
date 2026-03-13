@@ -17,7 +17,7 @@ from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
-from tests.companies.factories import CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -256,17 +256,39 @@ class TestTransferUserData:
     def test_transfer_assignments(self, admin_client):
         from_user = JobSeekerFactory()
         to_user = JobSeekerFactory()
+        prescriber_organization = PrescriberOrganizationFactory()
+        company = CompanyFactory()
 
         # assignment without collision risk
         assignment_1 = JobSeekerAssignmentFactory(job_seeker=from_user)
 
-        # assignment with the same prescriber and organization: assignment_2 will be deleted and assignmmment_3 updated
-        assignment_2 = JobSeekerAssignmentFactory(job_seeker=from_user)
+        # assignment with the same caseworker and organization: assignment_2 will be deleted and assignment_3 updated
+        assignment_2 = JobSeekerAssignmentFactory(
+            job_seeker=from_user, prescriber_organization=random.choice([prescriber_organization, None])
+        )
         assignment_3 = JobSeekerAssignmentFactory(
             job_seeker=to_user,
-            prescriber=assignment_2.prescriber,
+            caseworker=assignment_2.caseworker,
             prescriber_organization=assignment_2.prescriber_organization,
         )
+        # another assignment with the same job_seeker, caseworker, company, this is to check whether the filters
+        # return only 1 result.
+        JobSeekerAssignmentFactory(
+            job_seeker=to_user,
+            caseworker=assignment_2.caseworker,
+            prescriber_organization=PrescriberOrganizationFactory(),
+        )
+
+        # assignment with the same caseworker and company: assignment_4 will be deleted and assignment_5 updated
+        assignment_4 = JobSeekerAssignmentFactory(job_seeker=from_user, company=random.choice([company, None]))
+        assignment_5 = JobSeekerAssignmentFactory(
+            job_seeker=to_user,
+            caseworker=assignment_4.caseworker,
+            company=assignment_4.company,
+        )
+        # another assignment with the same job_seeker, caseworker, prescriber_organization. This is to check whether
+        # the filters return only 1 result.
+        JobSeekerAssignmentFactory(job_seeker=to_user, caseworker=assignment_4.caseworker, company=CompanyFactory())
 
         transfer_url = reverse(
             "admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk, "to_user_pk": to_user.pk}
@@ -283,6 +305,14 @@ class TestTransferUserData:
         assert updated_assignment_3.created_at == assignment_2.created_at  # oldest
         assert updated_assignment_3.updated_at == assignment_3.updated_at  # newest
         assert updated_assignment_3.last_action_kind == assignment_3.last_action_kind  # newest
+
+        assert not JobSeekerAssignment.objects.filter(pk=assignment_4.pk).exists()
+
+        updated_assignment_5 = JobSeekerAssignment.objects.get(pk=assignment_5.pk)
+        assert updated_assignment_5.job_seeker == to_user
+        assert updated_assignment_5.created_at == assignment_4.created_at  # oldest
+        assert updated_assignment_5.updated_at == assignment_5.updated_at  # newest
+        assert updated_assignment_5.last_action_kind == assignment_5.last_action_kind  # newest
 
         user_content_type = ContentType.objects.get_for_model(User)
         to_user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=to_user.pk).first()

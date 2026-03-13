@@ -12,12 +12,15 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource, JobSource
 from itou.companies.models import Company, JobDescription
+from itou.users.enums import ActionKind
+from itou.users.models import JobSeekerAssignment
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.users.factories import JobSeekerAssignmentFactory
 
 
 class TestMoveCompanyData:
@@ -141,6 +144,64 @@ class TestMoveCompanyData:
         assert stderr == ""
         assert f"MOVE DATA OF company.id={company1.pk}" in stdout
         assert f"INTO company.id={company2.pk}" in stdout
+
+    def test_with_job_seeker_assignments(self, capsys):
+        membership = companies_factories.CompanyMembershipFactory()
+        company_1 = membership.company
+        employer = membership.user
+        company_2 = companies_factories.CompanyFactory()
+
+        # Assignment without similar assignment in the other organization
+        assignment_1 = JobSeekerAssignmentFactory(
+            caseworker=employer,
+            company=company_1,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        )
+        # Assignment with a similar assignment in the other org but older
+        assignment_2 = JobSeekerAssignmentFactory(
+            caseworker=employer,
+            company=company_1,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_2_to_comp = JobSeekerAssignmentFactory(
+            job_seeker=assignment_2.job_seeker,
+            caseworker=assignment_2.caseworker,
+            company=company_2,
+            last_action_kind=ActionKind.APPLY,
+        )
+        # Assignment with a similar assignment in the other org but more recent
+        assignment_3_to_comp = JobSeekerAssignmentFactory(
+            caseworker=employer,
+            company=company_2,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_3 = JobSeekerAssignmentFactory(
+            job_seeker=assignment_3_to_comp.job_seeker,
+            caseworker=assignment_3_to_comp.caseworker,
+            company=company_1,
+            last_action_kind=ActionKind.APPLY,
+        )
+
+        assert JobSeekerAssignment.objects.count() == 5
+        management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
+        updated_assignment_1 = JobSeekerAssignment.objects.get(pk=assignment_1.pk)
+        updated_assignment_2_to_comp = JobSeekerAssignment.objects.get(pk=assignment_2_to_comp.pk)
+        updated_assignment_3_to_comp = JobSeekerAssignment.objects.get(pk=assignment_3_to_comp.pk)
+        assert JobSeekerAssignment.objects.count() == 3
+        assert updated_assignment_1.company_id == company_2.pk
+        assert updated_assignment_1.created_at == assignment_1.created_at
+        assert updated_assignment_1.updated_at == assignment_1.updated_at
+        assert updated_assignment_1.last_action_kind == ActionKind.IAE_ELIGIBILITY
+        assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
+        assert updated_assignment_2_to_comp.company_id == company_2.pk
+        assert updated_assignment_2_to_comp.created_at == assignment_2.created_at
+        assert updated_assignment_2_to_comp.updated_at == assignment_2_to_comp.updated_at
+        assert updated_assignment_2_to_comp.last_action_kind == ActionKind.APPLY
+        assert not JobSeekerAssignment.objects.filter(pk=assignment_3.pk).exists()
+        assert updated_assignment_3_to_comp.company_id == company_2.pk
+        assert updated_assignment_3_to_comp.created_at == assignment_3_to_comp.created_at
+        assert updated_assignment_3_to_comp.updated_at == assignment_3.updated_at
+        assert updated_assignment_3_to_comp.last_action_kind == ActionKind.APPLY
 
 
 def test_update_companies_job_app_score(caplog):

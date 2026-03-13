@@ -583,7 +583,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
                     request.user,
-                    request.current_organization if request.from_prescriber else None,
+                    request.current_organization,
                     self.form.cleaned_data,
                 )
             else:
@@ -592,7 +592,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
                         self.geiq_eligibility_diagnosis,
                         request.user,
-                        request.current_organization if request.from_prescriber else None,
+                        request.current_organization,
                         self.form.cleaned_data,
                     )
 
@@ -658,11 +658,10 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
-            if self.request.from_prescriber:
-                # Sync job seeker assignment to a prescriber
-                JobSeekerAssignment.objects.upsert_assignment(
-                    self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
-                )
+            # Sync job seeker assignment
+            JobSeekerAssignment.objects.upsert_assignment(
+                self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
+            )
 
         # Send notifications
         company_recipients = job_application.to_company.active_members.all()

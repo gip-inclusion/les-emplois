@@ -4,6 +4,7 @@ import json
 import random
 import re
 import uuid
+from functools import partial
 from operator import attrgetter
 from unittest import mock
 
@@ -1322,12 +1323,18 @@ def test_user_first_login(client):
 
 
 class TestJobSeekerAssignment:
-    def test_str(self):
-        organization_id = random.choice([PrescriberOrganizationFactory().pk, None])
-        assignment = JobSeekerAssignmentFactory(prescriber_organization_id=organization_id)
+    @pytest.mark.parametrize(
+        "prescriber_organization_factory,company_factory",
+        [(partial(PrescriberOrganizationFactory), None), (None, partial(CompanyFactory)), (None, None)],
+    )
+    def test_str(self, prescriber_organization_factory, company_factory):
+        organization_id = prescriber_organization_factory().pk if prescriber_organization_factory else None
+        company_id = company_factory().pk if company_factory else None
+        assignment = JobSeekerAssignmentFactory(prescriber_organization_id=organization_id, company_id=company_id)
         assert str(assignment) == (
             f"Affectation de JobSeeker pk={assignment.job_seeker.pk} à "
-            f"prescriber={assignment.prescriber.pk}, organization={organization_id}"
+            f"caseworker={assignment.caseworker.pk}, organization={organization_id}, "
+            f"company={company_id}"
         )
 
     @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
@@ -1340,64 +1347,84 @@ class TestJobSeekerAssignment:
                 not_a_job_seeker, prescriber, None, random.choice(ActionKind.values)
             )
 
-    @pytest.mark.parametrize("factory", [JobSeekerFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
-    def test_is_prescriber(self, factory, caplog):
-        not_a_prescriber = factory()
+    @pytest.mark.parametrize("factory", [JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_is_caseworker(self, factory, caplog):
+        not_a_caseworker = factory()
         job_seeker = JobSeekerFactory()
 
         JobSeekerAssignment.objects.upsert_assignment(
-            job_seeker, not_a_prescriber, None, random.choice(ActionKind.values)
+            job_seeker, not_a_caseworker, None, random.choice(ActionKind.values)
         )
-        assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_prescriber}"
+        assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_caseworker.pk}"
 
-    def test_prescriber_and_organization(self):
+    def test_caseworker_and_organization(self):
         job_seeker = JobSeekerFactory()
-        prescriber = PrescriberFactory()
+        caseworker = random.choice([PrescriberFactory(), EmployerFactory()])
         prescriber_organization = PrescriberOrganizationFactory()
 
-        # prescriber_organization is not mandatory
-        JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, None, random.choice(ActionKind.values))
+        # organization is not mandatory
+        JobSeekerAssignment.objects.upsert_assignment(job_seeker, caseworker, None, random.choice(ActionKind.values))
 
-        # prescriber is mandatory
+        # caseworker is mandatory
         with pytest.raises(AttributeError):
             JobSeekerAssignment.objects.upsert_assignment(
                 job_seeker, None, prescriber_organization, random.choice(ActionKind.values)
             )
 
     def test_unique_constraint(self):
-        prescriber = PrescriberFactory()
+        caseworker = random.choice([PrescriberFactory(), EmployerFactory()])
         organization = PrescriberOrganizationFactory()
-        assignment = JobSeekerAssignmentFactory(prescriber=prescriber, prescriber_organization=organization)
+        assignment = JobSeekerAssignmentFactory(caseworker=caseworker, prescriber_organization=organization)
 
         # upsert_assignment updates the existing assignment
         JobSeekerAssignment.objects.upsert_assignment(
-            assignment.job_seeker, prescriber, organization, random.choice(ActionKind.values)
+            assignment.job_seeker, caseworker, organization, random.choice(ActionKind.values)
         )
 
         # no error with another value for prescriber_organization
         JobSeekerAssignmentFactory(
-            job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=None
+            job_seeker=assignment.job_seeker, caseworker=caseworker, prescriber_organization=None
         )
 
         with pytest.raises(IntegrityError):
             JobSeekerAssignmentFactory(
-                job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=organization
+                job_seeker=assignment.job_seeker, caseworker=caseworker, prescriber_organization=organization
             )
 
-    @pytest.mark.parametrize("with_organization", [True, False])
-    def test_assign_job_seeker(self, with_organization, snapshot):
+    def test_constraint_company_and_prescriber_organization(self):
         job_seeker = JobSeekerFactory()
-        prescriber = PrescriberFactory()
-        organization = PrescriberOrganizationFactory() if with_organization else None
+        caseworker = random.choice([PrescriberFactory(), EmployerFactory()])
+        prescriber_organization = PrescriberOrganizationFactory()
+        company = CompanyFactory()
+
+        with pytest.raises(IntegrityError):
+            JobSeekerAssignment(
+                job_seeker=job_seeker,
+                caseworker=caseworker,
+                prescriber_organization=prescriber_organization,
+                company=company,
+                last_action_kind=random.choice(ActionKind.values),
+            ).save()
+
+    @pytest.mark.parametrize(
+        "with_prescriber_organization, with_company", [(True, False), (False, True), (False, False)]
+    )
+    def test_assign_job_seeker(self, with_prescriber_organization, with_company, snapshot):
+        job_seeker = JobSeekerFactory()
+        caseworker = random.choice([PrescriberFactory(), EmployerFactory()])
+        prescriber_organization = PrescriberOrganizationFactory() if with_prescriber_organization else None
+        company = CompanyFactory() if with_company else None
+        organization = prescriber_organization or company or None
 
         # Creation
         with freezegun.freeze_time("2025-11-14 12:00:01"):
             with assertSnapshotQueries(snapshot(name="assignment creation sql queries")):
-                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization, ActionKind.CREATE)
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, caseworker, organization, ActionKind.CREATE)
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
-        assert assignment.prescriber == prescriber
-        assert assignment.prescriber_organization == organization
+        assert assignment.caseworker == caseworker
+        assert assignment.prescriber_organization == prescriber_organization
+        assert assignment.company == company
         assert assignment.last_action_kind == ActionKind.CREATE
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
@@ -1405,11 +1432,12 @@ class TestJobSeekerAssignment:
         # Update
         with freezegun.freeze_time("2025-11-15 18:00:01"):
             with assertSnapshotQueries(snapshot(name="assignment update sql queries")):
-                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization, ActionKind.APPLY)
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, caseworker, organization, ActionKind.APPLY)
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
-        assert assignment.prescriber == prescriber
-        assert assignment.prescriber_organization == organization
+        assert assignment.caseworker == caseworker
+        assert assignment.prescriber_organization == prescriber_organization
+        assert assignment.company == company
         assert assignment.last_action_kind == ActionKind.APPLY
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)

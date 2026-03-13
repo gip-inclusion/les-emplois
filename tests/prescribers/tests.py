@@ -291,31 +291,31 @@ class TestPrescriberOrganizationModel:
 
         # Assignment without similar assignment in the other organization: will be updated
         assignment_1 = JobSeekerAssignmentFactory(
-            prescriber=prescriber_1,
+            caseworker=prescriber_1,
             prescriber_organization=organization_1,
             last_action_kind=ActionKind.IAE_ELIGIBILITY,
         )
         # Assignment with a similar assignment in the other org but older: will be deleted
         assignment_2 = JobSeekerAssignmentFactory(
-            prescriber=prescriber_1,
+            caseworker=prescriber_1,
             prescriber_organization=organization_1,
             last_action_kind=ActionKind.CREATE,
         )
         assignment_2_to_org = JobSeekerAssignmentFactory(
             job_seeker=assignment_2.job_seeker,
-            prescriber=assignment_2.prescriber,
+            caseworker=assignment_2.caseworker,
             prescriber_organization=organization_2,
             last_action_kind=ActionKind.APPLY,
         )
         # Assignment with a similar assignment in the other org but more recent: will be kept
         assignment_3_to_org = JobSeekerAssignmentFactory(
-            prescriber=prescriber_1,
+            caseworker=prescriber_1,
             prescriber_organization=organization_2,
             last_action_kind=ActionKind.CREATE,
         )
         assignment_3 = JobSeekerAssignmentFactory(
             job_seeker=assignment_3_to_org.job_seeker,
-            prescriber=assignment_3_to_org.prescriber,
+            caseworker=assignment_3_to_org.caseworker,
             prescriber_organization=organization_1,
             last_action_kind=ActionKind.APPLY,
         )

@@ -1545,7 +1545,7 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         )  # first action to set assignment's created_at
         assignment_2_2 = JobSeekerAssignmentFactory(
             job_seeker=job_seeker_2,
-            prescriber=prescriber,
+            caseworker=prescriber,
             prescriber_organization=organization_2,
             last_action_kind=ActionKind.IAE_ELIGIBILITY,
         )
@@ -1558,14 +1558,14 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         call_command("sync_job_seeker_assignments", wet_run=True)
 
         assignment_1_none = JobSeekerAssignment.objects.get(
-            job_seeker=job_seeker_1, prescriber=prescriber, prescriber_organization=None
+            job_seeker=job_seeker_1, caseworker=prescriber, prescriber_organization=None
         )
         assert assignment_1_none.created_at == job_seeker_1.date_joined
         assert assignment_1_none.updated_at == job_app_1_no_orga.created_at
         assert assignment_1_none.last_action_kind == ActionKind.APPLY
 
         assignment_1_orga_1 = JobSeekerAssignment.objects.get(
-            job_seeker=job_seeker_1, prescriber=prescriber, prescriber_organization=organization_1
+            job_seeker=job_seeker_1, caseworker=prescriber, prescriber_organization=organization_1
         )
         assert assignment_1_orga_1.created_at == job_app_1_orga_1.created_at
         assert assignment_1_orga_1.updated_at == geiq_diag_1_orga_1.created_at

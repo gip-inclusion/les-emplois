@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
@@ -66,7 +68,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     assert membership.creator == diagnosis.author
     assignment = JobSeekerAssignment.objects.get()
     assert assignment.job_seeker == diagnosis.job_seeker
-    assert assignment.prescriber == diagnosis.author
+    assert assignment.caseworker == diagnosis.author
     assert assignment.prescriber_organization == prescriber_org
     assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 
@@ -83,7 +85,12 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
     assert membership.member == diagnosis.author
     assert membership.creator == diagnosis.author
-    assert JobSeekerAssignment.objects.count() == 1  # The second diagnosis was from GEIQ, no assignment created
+    assert JobSeekerAssignment.objects.filter(
+        job_seeker=diagnosis.job_seeker,
+        caseworker=diagnosis.author,
+        company=geiq,
+        last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
+    )
 
     # bad cops:
 
@@ -124,14 +131,19 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
         )
 
     # correct update case:
-    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
+    from_prescriber = random.choice([True, False])
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=from_prescriber, from_employer=not from_prescriber)
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-        diagnosis, diagnosis.author, diagnosis.author_prescriber_organization, [administrative_criteria_annex_1]
+        diagnosis,
+        diagnosis.author,
+        diagnosis.author_prescriber_organization or diagnosis.author_geiq,
+        [administrative_criteria_annex_1],
     )
     assignment = JobSeekerAssignment.objects.get()
     assert assignment.job_seeker == diagnosis.job_seeker
-    assert assignment.prescriber == diagnosis.author
+    assert assignment.caseworker == diagnosis.author
     assert assignment.prescriber_organization == diagnosis.author_prescriber_organization
+    assert assignment.company == diagnosis.author_geiq
     assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 
     assert list(diagnosis.administrative_criteria.all()) == [administrative_criteria_annex_1]
