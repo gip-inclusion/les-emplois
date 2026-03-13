@@ -644,7 +644,7 @@ class Company(AddressMixin, OrganizationAbstract):
 class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""
 
-    user_kind = UserKind.EMPLOYER
+    user_kinds = UserKind.caseworkers()  # FIXME: set to user_kind whne prescriber and omployer are merged
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(

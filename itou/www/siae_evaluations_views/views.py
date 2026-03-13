@@ -22,7 +22,7 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
     Sanctions,
 )
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -119,7 +119,7 @@ def institution_evaluated_siae_list(
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_labor_inspector or user.is_employer)
+@check_request(lambda request: request.user.is_labor_inspector or request.from_employer)
 def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evaluations/evaluated_siae_detail.html"):
     owner_data = {}
     if request.user.is_labor_inspector:
@@ -405,7 +405,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         )
 
 
-@check_user(lambda user: user.is_labor_inspector or user.is_employer)
+@check_request(lambda request: request.user.is_labor_inspector or request.from_employer)
 def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     allowed_viewers = {
         "institution": (get_current_institution_or_404, "evaluation_campaign__institution"),

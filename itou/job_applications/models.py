@@ -13,7 +13,7 @@ from django_xworkflows import models as xwf_models
 from xworkflows import before_transition
 
 from itou.approvals.models import Approval, Suspension
-from itou.approvals.notifications import PassAcceptedEmployerNotification
+from itou.approvals.notifications import PassAcceptedCaseworkerNotification
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
@@ -510,16 +510,18 @@ class JobApplicationQuerySet(models.QuerySet):
         )
 
     def prescriptions_of(self, user, organization=None):
-        if organization is None and user.is_prescriber:
+        if not user.is_caseworker:
+            return self.none()
+        if organization is None:
             return self.filter(sender=user)
-        if organization and isinstance(organization, PrescriberOrganization) and user.is_prescriber:
+        if isinstance(organization, PrescriberOrganization):
             return self.filter(
                 (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
                 | Q(sender_prescriber_organization=organization)
             )
-        if organization and isinstance(organization, Company) and user.is_employer:
+        if isinstance(organization, Company):
             return self.filter(sender_company=organization).exclude(to_company=organization)
-        return self.none()
+        raise ValueError("Invalid organization kind")
 
     def visible_by_employers(self):
         """
@@ -1050,7 +1052,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Can't transfer to same structure
         if target_company == self.to_company:
             return False
-        if not user.is_employer:
+        if not user.is_caseworker:
             return False
         return self.transfer.is_available()
 
@@ -1318,7 +1320,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # Notifications
     def notifications_new_for_employer(self, employer):
-        return job_application_notifications.JobApplicationNewForEmployerNotification(
+        return job_application_notifications.JobApplicationNewForCaseworkerNotification(
             employer,
             self.to_company,
             job_application=self,
@@ -1416,7 +1418,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     def notifications_deliver_approval(self, accepted_by):
-        return PassAcceptedEmployerNotification(
+        return PassAcceptedCaseworkerNotification(
             accepted_by,
             self.to_company,
             job_application=self,
@@ -1424,7 +1426,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     def notifications_transfer_for_previous_employer(self, previous_employer, notification_context):
-        return job_application_notifications.JobApplicationTransferredForEmployerNotification(
+        return job_application_notifications.JobApplicationTransferredForCaseworkerNotification(
             previous_employer,
             self.transferred_from,
             **notification_context,

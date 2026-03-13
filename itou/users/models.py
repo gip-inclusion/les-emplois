@@ -525,14 +525,6 @@ class User(AbstractUser, AddressMixin):
         return self.kind in UserKind.caseworkers()
 
     @property
-    def is_prescriber(self):
-        return self.kind == UserKind.PRESCRIBER
-
-    @property
-    def is_employer(self):
-        return self.kind == UserKind.EMPLOYER
-
-    @property
     def is_labor_inspector(self):
         return self.kind == UserKind.LABOR_INSPECTOR
 
@@ -636,7 +628,7 @@ class User(AbstractUser, AddressMixin):
     @cached_property
     def is_prescriber_with_authorized_org_memberships(self):
         return (
-            self.is_prescriber
+            self.is_prescriber  # Replace with user.is_professional
             and self.prescribermembership_set.filter(
                 organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
             ).exists()

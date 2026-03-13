@@ -34,7 +34,13 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerAssignmentFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerAssignmentFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 
 
 class TestPrescriberOrganizationManager:
@@ -251,9 +257,12 @@ class TestPrescriberOrganizationModel:
         invit.refresh_from_db()
         assert invit.has_expired is True
 
-        non_prescriber = EmployerFactory()
+        employer = EmployerFactory()
+        org.add_or_activate_membership(employer)
+
+        non_caseworker = LaborInspectorFactory()
         with pytest.raises(ValidationError):
-            org.add_or_activate_membership(non_prescriber)
+            org.add_or_activate_membership(non_caseworker)
 
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_merge_two_organizations(self, wet_run):

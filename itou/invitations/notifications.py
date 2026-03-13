@@ -1,9 +1,9 @@
 from itou.communications import NotificationCategory, registry as notifications_registry
-from itou.communications.dispatch import EmailNotification, PrescriberOrEmployerNotification, WithStructureMixin
+from itou.communications.dispatch import CaseworkerNotification, EmailNotification, WithStructureMixin
 
 
 @notifications_registry.register
-class InvitationAcceptedNotification(WithStructureMixin, PrescriberOrEmployerNotification, EmailNotification):
+class InvitationAcceptedNotification(WithStructureMixin, CaseworkerNotification, EmailNotification):
     """Notification sent to a user when the invitation is accepted"""
 
     name = "Demande d'ajout acceptée"

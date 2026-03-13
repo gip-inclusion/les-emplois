@@ -24,6 +24,7 @@
                             <div class="c-box--results__header">
                                 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
                                     <div class="c-box--results__summary flex-grow-1">
+                                        {# FIXME : how do we know what kind the user is ? do we track the used organization ? #}
                                         {% if membership.member.is_employer %}
                                             <i class="ri-community-line" aria-hidden="true"></i>
                                         {% elif membership.member.is_prescriber_with_authorized_org_memberships %}

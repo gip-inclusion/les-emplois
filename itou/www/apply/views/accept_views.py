@@ -18,7 +18,7 @@ from itou.job_applications.models import (
 )
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -54,7 +54,7 @@ def initialize_accept_session(request, data):
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def start_accept_wizard(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
         "job_seeker", "job_seeker__jobseeker_profile", "to_company"

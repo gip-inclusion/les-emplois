@@ -117,6 +117,15 @@ class TestPrescriberWithOrgInvitation:
         assert org_members == org_members_after
         assert org_active_members + 1 == org_active_members_after
 
+    # FIXME: Remove once replaced with casworker
+    def test_with_employer(self):
+        invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
+        EmployerFactory(email=invitation.email)
+        org_members = invitation.organization.members.count()
+        invitation.add_invited_user_to_organization()
+        org_members_after = invitation.organization.members.count()
+        assert org_members + 1 == org_members_after
+
 
 class TestPrescriberWithOrgInvitationEmails:
     def test_accepted_notif_sender(self):
@@ -172,6 +181,15 @@ class TestCompanyInvitation:
         company_active_members_after = invitation.company.active_members.count()
         assert employers == employers_after
         assert company_active_members + 1 == company_active_members_after
+
+    # FIXME: Remove once replaced with casworker
+    def test_with_prescriber(self):
+        invitation = EmployerInvitationFactory(email="hey@you.com")
+        PrescriberFactory(email=invitation.email)
+        employers = invitation.company.members.count()
+        invitation.add_invited_user_to_company()
+        employers_after = invitation.company.members.count()
+        assert employers + 1 == employers_after
 
 
 class TestCompanyInvitationEmails:

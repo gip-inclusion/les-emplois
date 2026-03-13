@@ -1,5 +1,6 @@
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.prescribers.models import PrescriberOrganization
 
 
 def assert_set_admin_role_creation(user, organization, mailoutbox):
@@ -15,7 +16,7 @@ def assert_set_admin_role_creation(user, organization, mailoutbox):
     ) in email.body
     assert email.to[0] == user.email
 
-    if user.is_prescriber:
+    if isinstance(organization, PrescriberOrganization):
         assert "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617" in email.body
     elif user.is_labor_inspector:
         assert "https://aide.emplois.inclusion.beta.gouv.fr/" not in email.body

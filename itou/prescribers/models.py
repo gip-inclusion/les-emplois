@@ -373,7 +373,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
 class PrescriberMembership(MembershipAbstract):
     """Intermediary model between `User` and `PrescriberOrganization`."""
 
-    user_kind = UserKind.PRESCRIBER
+    user_kinds = UserKind.caseworkers()  # FIXME: set to user_kind whne prescriber and omployer are merged
 
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(
