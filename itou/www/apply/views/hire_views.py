@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -47,11 +48,6 @@ class HirePermissionMixin:
             raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
         if not self.company.has_member(request.user):
             raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-        if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-            raise PermissionDenied(
-                "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                "a posteriori. " + suspension_explanation
-            )
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -122,10 +118,7 @@ class HireBaseView(HirePermissionMixin, TemplateView):
     def get_reset_url(self):
         return self.hire_session.get("reset_url")
 
-    def get_eligibility_for_hire_step_url(self):
-        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
-            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
-
+    def iae_eligibility_required(self):
         bypass_eligibility_conditions = [
             # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
             not self.company.is_subject_to_iae_rules,
@@ -134,7 +127,13 @@ class HireBaseView(HirePermissionMixin, TemplateView):
             # Job seeker must not have a diagnosis
             self.eligibility_diagnosis,
         ]
-        if not any(bypass_eligibility_conditions):
+        return not any(bypass_eligibility_conditions)
+
+    def get_eligibility_for_hire_step_url(self):
+        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
+            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
+
+        if self.iae_eligibility_required():
             return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
 
         return None
@@ -304,6 +303,20 @@ class ConfirmationForHireView(HireBaseView, common_views.BaseConfirmationView):
 
     def clean_session(self):
         self.hire_session.delete()
+
+    def missing_steps_redirect(self):
+        redirect = super().missing_steps_redirect()
+        if redirect is None and self.iae_eligibility_required():  # GEIQ eligibility might be skipped
+            # This should not happen
+            messages.error(
+                self.request,
+                "Un diagnostic d'éligibilité est nécessaire pour déclarer une embauche.",
+                extra_tags="toast",
+            )
+            redirect = HttpResponseRedirect(
+                reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
+            )
+        return redirect
 
     def get_back_url(self):
         return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.hire_session.name})
