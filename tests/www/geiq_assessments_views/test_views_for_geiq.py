@@ -1478,7 +1478,7 @@ class TestAssessmentContractsListView:
             "start_date_upper": "2024-06-30",
         }
         response_full = client.get(url, filter_data)
-        form_full = parse_response_to_soup(response_full, selector="#filter-and-list-container")
+        form_full = parse_response_to_soup(response_full, selector="#filter-container")
         table_full = parse_response_to_soup(response_full, selector="#contracts-results-table")
 
         response_initial = client.get(url)
@@ -1486,9 +1486,9 @@ class TestAssessmentContractsListView:
 
         response_htmx = client.get(url, filter_data, headers={"HX-Request": "true"})
 
-        update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
 
-        form_simulated = simulated_page.select_one("#filter-and-list-container")
+        form_simulated = simulated_page.select_one("#filter-container")
         table_simulated = simulated_page.select_one("#contracts-results-table")
 
         assertSoupEqual(form_simulated, form_full)
@@ -1610,11 +1610,11 @@ class TestAssessmentContractsListView:
 
         response_htmx = client.get(self.url, filter_data, headers={"HX-Request": "true"})
 
-        update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
 
         assertSoupEqual(
-            simulated_page.select_one("#filter-and-list-container"),
-            parse_response_to_soup(response_full, selector="#filter-and-list-container"),
+            simulated_page.select_one("#filter-container"),
+            parse_response_to_soup(response_full, selector="#filter-container"),
         )
 
     @pytest.mark.parametrize(
