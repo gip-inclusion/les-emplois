@@ -891,6 +891,24 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(client, self.company.members.first())
 
+    def test_as_company_with_non_proxied_job_seeker_with_place_infos(self, client):
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["last_login"])
+
+        # Set birth place infos
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+        geispolsheim_commune = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
+        self.job_seeker.jobseeker_profile.birth_place = geispolsheim_commune
+        self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
+        self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
+        self._check_only_administrative_allowed(client, self.company.members.first())
+
+        # Check that birth place infos are still there
+        assert self.job_seeker.jobseeker_profile.birth_place == geispolsheim_commune
+        assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+
     def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())
         invalid_session_name = uuid.uuid4()
