@@ -38,4 +38,31 @@
     </div>
     {# end of alerts #}
 
+    <div id="global-alerts">
+        <h1>Alertes globales</h1>
+
+        {% for variant in global_alerts.variants %}
+            <h2>{{ variant }}</h2>
+            {% component_alert_global content=content variant=variant %}
+                {% fragment as content %}
+                    Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                {% endfragment %}
+            {% endcomponent_alert_global %}
+        {% endfor %}
+
+        <h2>dismissible</h2>
+        {% component_alert_global content=content variant="info" dismissible=True %}
+            {% fragment as content %}
+                Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+            {% endfragment %}
+        {% endcomponent_alert_global %}
+
+        <h2>primary</h2>
+        {% component_alert_global content=content variant="primary" exit_url="https://example.com" %}
+            {% fragment as content %}
+                Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+            {% endfragment %}
+        {% endcomponent_alert_global %}
+    </div>
+
 {% endblock %}
