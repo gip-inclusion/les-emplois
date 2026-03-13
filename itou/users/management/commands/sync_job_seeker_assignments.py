@@ -11,7 +11,8 @@ from django.db.models.functions import JSONObject
 
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.utils.command import BaseCommand
@@ -28,11 +29,12 @@ def get_users_contacts(ids):
             job_apps_senders=ArraySubquery(
                 JobApplication.objects.filter(job_seeker=OuterRef("pk"))
                 # not using sender_kind as discrepancies exist
-                .filter(sender__kind=UserKind.PRESCRIBER)
+                .filter(sender__kind__in=UserKind.caseworkers())
                 .values(
                     json=JSONObject(
                         user_id="sender_id",
                         prescriber_organization_id="sender_prescriber_organization_id",
+                        company_id="sender_company_id",
                         timestamp="created_at",
                         action_kind=Value(ActionKind.APPLY),
                     )
@@ -43,11 +45,12 @@ def get_users_contacts(ids):
             geiq_diagnosis_authors=ArraySubquery(
                 GEIQEligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk"))
                 # not using author_kind as discrepancies exist
-                .filter(author__kind=UserKind.PRESCRIBER)
+                .filter(author__kind__in=UserKind.caseworkers())
                 .values(
                     json=JSONObject(
                         user_id="author_id",
                         prescriber_organization_id="author_prescriber_organization_id",
+                        company_id="author_geiq_id",
                         timestamp="created_at",
                         action_kind=Value(ActionKind.GEIQ_ELIGIBILITY),
                     )
@@ -58,13 +61,33 @@ def get_users_contacts(ids):
             iae_diagnosis_authors=ArraySubquery(
                 EligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk"))
                 # not using author_kind as discrepancies exist
-                .filter(author__kind=UserKind.PRESCRIBER)
+                .filter(author__kind__in=UserKind.caseworkers())
                 .values(
                     json=JSONObject(
                         user_id="author_id",
                         prescriber_organization_id="author_prescriber_organization_id",
+                        company_id="author_siae_id",
                         timestamp="created_at",
                         action_kind=Value(ActionKind.IAE_ELIGIBILITY),
+                    )
+                )
+            )
+        )
+        .annotate(
+            job_app_accepted_by=ArraySubquery(
+                JobApplicationTransitionLog.objects.filter(
+                    job_application__job_seeker=OuterRef("pk"), to_state=JobApplicationState.ACCEPTED
+                )
+                .select_related("job_application")
+                .filter(user__kind__in=UserKind.caseworkers())
+                .values(
+                    json=JSONObject(
+                        user_id="user_id",
+                        prescriber_organization_id=None,
+                        company_id="job_application__to_company_id",
+                        timestamp="timestamp",
+                        # Mixing HIRE and ACCEPT here, the additional information is not worth the computational cost
+                        action_kind=Value(ActionKind.ACCEPT),
                     )
                 )
             )
@@ -74,26 +97,32 @@ def get_users_contacts(ids):
     users_contacts = {}
     for job_seeker in job_seekers_qs:
         contacts = defaultdict(list)
-        for user_id, prescriber_organization_id, timestamp, action_kind in [
+        for user_id, prescriber_organization_id, company_id, timestamp, action_kind in [
             (
                 a["user_id"],
                 a["prescriber_organization_id"],
+                a["company_id"],
                 datetime.fromisoformat(a["timestamp"]),
                 a["action_kind"],
             )
             for a in (
-                job_seeker.job_apps_senders + job_seeker.geiq_diagnosis_authors + job_seeker.iae_diagnosis_authors
+                job_seeker.job_apps_senders
+                + job_seeker.geiq_diagnosis_authors
+                + job_seeker.iae_diagnosis_authors
+                + job_seeker.job_app_accepted_by
             )
         ]:
-            contacts[(user_id, prescriber_organization_id)].append(
+            contacts[(user_id, prescriber_organization_id, company_id)].append(
                 {"timestamp": timestamp, "action_kind": action_kind}
             )
-        if job_seeker.created_by and job_seeker.created_by.kind == UserKind.PRESCRIBER:
+        if job_seeker.created_by and job_seeker.created_by.kind in UserKind.caseworkers():
             contacts[
                 (
                     job_seeker.created_by_id,
                     # created_by_prescriber_organization was only introduced in Feb 2025
                     job_seeker.jobseeker_profile.created_by_prescriber_organization_id,
+                    # we never tracked for which company a job seeker was created, if created by an employer
+                    None,
                 )
             ].append({"timestamp": job_seeker.date_joined, "action_kind": ActionKind.CREATE.value})
         users_contacts[job_seeker.pk] = contacts
@@ -133,6 +162,7 @@ class Command(BaseCommand):
                         assignment.job_seeker_id,
                         assignment.caseworker_id,
                         assignment.prescriber_organization_id,
+                        assignment.company_id,
                     ): assignment
                     for assignment in JobSeekerAssignment.objects.filter(
                         job_seeker_id__in=job_seekers_ids
@@ -143,12 +173,14 @@ class Command(BaseCommand):
                 assignments_to_update = set()
 
                 for job_seeker_id, contacts in users_contacts.items():
-                    for (caseworker_id, prescriber_organization_id), actions in contacts.items():
+                    for (caseworker_id, prescriber_organization_id, company_id), actions in contacts.items():
                         sorted_actions = sorted(actions, key=lambda a: a.get("timestamp"))
                         first_action = sorted_actions[0]
                         last_action = sorted_actions[-1]
 
-                        if assignment := assignments.get((job_seeker_id, caseworker_id, prescriber_organization_id)):
+                        if assignment := assignments.get(
+                            (job_seeker_id, caseworker_id, prescriber_organization_id, company_id)
+                        ):
                             # update assignment
                             if last_action["timestamp"] > assignment.updated_at:
                                 assignment.updated_at = last_action["timestamp"]
@@ -165,6 +197,7 @@ class Command(BaseCommand):
                                     job_seeker_id=job_seeker_id,
                                     caseworker_id=caseworker_id,
                                     prescriber_organization_id=prescriber_organization_id,
+                                    company_id=company_id,
                                     created_at=first_action["timestamp"],
                                     updated_at=last_action["timestamp"],
                                     last_action_kind=last_action["action_kind"],
