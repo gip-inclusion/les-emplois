@@ -1122,11 +1122,9 @@ def test_end_of_support_for_ea_eatt_banner(client, factory, assertion):
     assertion(
         response,
         """
-        <p class="mb-0">
           À partir du <strong>11 mai 2026</strong>, les comptes EA/EATT seront clôturés.
           Publiez désormais vos offres sur
           <a class="has-external-link" href="https://www.francetravail.fr" target="_blank">France Travail</a>.
-        </p>
         """,
         html=True,
     )

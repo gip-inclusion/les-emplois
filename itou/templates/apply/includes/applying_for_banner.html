@@ -1,8 +1,8 @@
 {% load components %}
 {% load str_filters %}
 
-{% component_alert_global__acting_for content=content exit_url=exit_url %}
+{% component_alert_global content=content variant="primary" exit_url=exit_url %}
     {% fragment as content %}
         <strong>Vous postulez actuellement pour {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</strong>
     {% endfragment %}
-{% endcomponent_alert_global__acting_for %}
+{% endcomponent_alert_global %}

@@ -7,6 +7,9 @@ def show_components(request):
     context = {
         "alerts": {
             "variants": ("info", "success", "warning", "danger", "important"),
-        }
+        },
+        "global_alerts": {
+            "variants": ("info", "danger", "warning"),
+        },
     }
     return render(request, "components/index.html", context)

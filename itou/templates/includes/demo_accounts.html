@@ -1,26 +1,28 @@
+{% load components %}
 {% load demo_accounts %}
 {% load django_bootstrap5 %}
 {% load static %}
 
 {% if SHOW_DEMO_ACCOUNTS_BANNER %}
-    <div class="alert alert-danger alert-dismissible fade show" role="status">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        <strong class="me-2">{{ ITOU_ENVIRONMENT }} - Données fictives</strong>
-        {% if not user.is_authenticated %}
-            <button type="button" class="btn btn-sm btn-ico btn-outline-white" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
-                <i class="ri-user-community-line" aria-hidden="true"></i>
-                <span>Sélectionner un compte</span>
-            </button>
-        {% else %}
-            <form method="post" action="{% url 'account_logout' %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-ico btn-outline-white">
-                    <i class="ri-refresh-line" aria-hidden="true"></i>
-                    <span>Changer de compte</span>
+    {% component_alert_global content=content variant="danger" dismissible=True exit_url=exit_url %}
+        {% fragment as content %}
+            <strong class="me-2">{{ ITOU_ENVIRONMENT }} - Données fictives</strong>
+            {% if not user.is_authenticated %}
+                <button type="button" class="btn btn-sm btn-ico btn-outline-white" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
+                    <i class="ri-user-community-line" aria-hidden="true"></i>
+                    <span>Sélectionner un compte</span>
                 </button>
-            </form>
-        {% endif %}
-    </div>
+            {% else %}
+                <form method="post" action="{% url 'account_logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-ico btn-outline-white">
+                        <i class="ri-refresh-line" aria-hidden="true"></i>
+                        <span>Changer de compte</span>
+                    </button>
+                </form>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_alert_global %}
 
     <div class="modal fade" id="testAccountsModal" tabindex=-1 role="dialog" aria-modal="true" aria-labelledby="testAccountsModalTitle">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
