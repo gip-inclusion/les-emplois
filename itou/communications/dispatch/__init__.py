@@ -7,5 +7,5 @@ from .utils import (
     PrescriberNotification,
     PrescriberOrEmployerNotification,
     PrescriberOrEmployerOrLaborInspectorNotification,
-    WithStructureMixin,
+    WithOrganizationMixin,
 )

@@ -6,10 +6,10 @@ Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion
 
 Organisation :
 
-- Nom : {{ structure.display_name }}
-- Type : {{ structure.kind }}
-{% if structure.email %}
-- Email de contact : {{ structure.email }}
+- Nom : {{ organization.display_name }}
+- Type : {{ organization.kind }}
+{% if organization.email %}
+- Email de contact : {{ organization.email }}
 {% endif %}
 
 Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.

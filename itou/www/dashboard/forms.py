@@ -163,13 +163,13 @@ class EditUserEmailForm(forms.Form):
 
 
 class EditUserNotificationForm(forms.Form):
-    def __init__(self, user, structure, *args, **kwargs):
+    def __init__(self, user, organization, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        self.structure = structure
+        self.organization = organization
         self.layout = {}
 
-        notification_settings = self.user.notification_settings.for_structure(self.structure).first()
+        notification_settings = self.user.notification_settings.for_organization(self.organization).first()
         if notification_settings:
             disabled_notifications = [
                 disabled.notification_class for disabled in notification_settings.disabled_notifications.all()
@@ -179,7 +179,7 @@ class EditUserNotificationForm(forms.Form):
 
         previous_category = None
         for notification_class in notification_registry:
-            notification = notification_class(self.user, self.structure)
+            notification = notification_class(self.user, self.organization)
             notification_class_name = notification_class.__name__
             category_slug = slugify(notification.category)
 
@@ -214,7 +214,7 @@ class EditUserNotificationForm(forms.Form):
                 self.layout[category_slug]["notifications"].append(notification_class_name)
 
     def save(self):
-        notification_settings, _ = NotificationSettings.get_or_create(self.user, self.structure)
+        notification_settings, _ = NotificationSettings.get_or_create(self.user, self.organization)
 
         disabled_field_names = [
             field_name

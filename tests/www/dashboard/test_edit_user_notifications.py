@@ -96,8 +96,8 @@ def test_employer_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.get(
                 user=employer,
-                structure_type=ContentType.objects.get_for_model(company),
-                structure_pk=company.pk,
+                organization_type=ContentType.objects.get_for_model(company),
+                organization_pk=company.pk,
                 disabled_notifications__isnull=True,
             )
         ],
@@ -115,8 +115,8 @@ def test_employer_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
                 user=employer,
-                structure_type=ContentType.objects.get_for_model(company),
-                structure_pk=company.pk,
+                organization_type=ContentType.objects.get_for_model(company),
+                organization_pk=company.pk,
                 disabled_notifications__count=len(available_notifications),
             )
         ],
@@ -150,8 +150,8 @@ def test_prescriber_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.get(
                 user=prescriber,
-                structure_type=ContentType.objects.get_for_model(organization),
-                structure_pk=organization.pk,
+                organization_type=ContentType.objects.get_for_model(organization),
+                organization_pk=organization.pk,
                 disabled_notifications__isnull=True,
             )
         ],
@@ -169,8 +169,8 @@ def test_prescriber_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
                 user=prescriber,
-                structure_type=ContentType.objects.get_for_model(organization),
-                structure_pk=organization.pk,
+                organization_type=ContentType.objects.get_for_model(organization),
+                organization_pk=organization.pk,
                 disabled_notifications__count=len(available_notifications),
             )
         ],
@@ -201,8 +201,8 @@ def test_solo_adviser_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.get(
                 user=solo_adviser,
-                structure_type=None,
-                structure_pk=None,
+                organization_type=None,
+                organization_pk=None,
                 disabled_notifications__isnull=True,
             )
         ],
@@ -220,8 +220,8 @@ def test_solo_adviser_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
                 user=solo_adviser,
-                structure_type=None,
-                structure_pk=None,
+                organization_type=None,
+                organization_pk=None,
                 disabled_notifications__count=len(available_notifications),
             )
         ],
@@ -252,8 +252,8 @@ def test_job_seeker_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.get(
                 user=job_seeker,
-                structure_type=None,
-                structure_pk=None,
+                organization_type=None,
+                organization_pk=None,
                 disabled_notifications__isnull=True,
             )
         ],
@@ -271,8 +271,8 @@ def test_job_seeker_create_update_notification_settings(client, snapshot):
         [
             NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
                 user=job_seeker,
-                structure_type=None,
-                structure_pk=None,
+                organization_type=None,
+                organization_pk=None,
                 disabled_notifications__count=len(available_notifications),
             )
         ],

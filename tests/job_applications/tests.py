@@ -1526,11 +1526,11 @@ class TestJobApplicationNotifications:
         for transition in ["cancel", "postpone", "refuse", "new", "accept"]:
             with subtests.test(transition):
                 assert (
-                    getattr(employer_job_app, f"notifications_{transition}_for_proxy").structure
+                    getattr(employer_job_app, f"notifications_{transition}_for_proxy").organization
                     == employer_job_app.sender_company
                 )
                 assert (
-                    getattr(prescriber_job_app, f"notifications_{transition}_for_proxy").structure
+                    getattr(prescriber_job_app, f"notifications_{transition}_for_proxy").organization
                     == prescriber_job_app.sender_prescriber_organization
                 )
 
