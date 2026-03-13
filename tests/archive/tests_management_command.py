@@ -57,7 +57,7 @@ from tests.cities.factories import (
     create_city_geispolsheim,
     create_city_saint_andre,
 )
-from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
@@ -1541,15 +1541,20 @@ class TestAnonymizeProfessionalManagementCommand:
         anonymized_prescriber = AnonymizedProfessional.objects.get()
         assert anonymized_prescriber.had_memberships_in_authorized_organization is True
 
-    @pytest.mark.parametrize("with_organization", [True, False])
+    @pytest.mark.parametrize(
+        "with_prescriber_organization, with_company",
+        [(True, False), (False, True), (False, False)],
+    )
     def test_anonymize_professional_with_job_seeker_assignment(
-        self, with_organization, django_capture_on_commit_callbacks, caplog, respx_mock
+        self, with_prescriber_organization, with_company, django_capture_on_commit_callbacks, caplog, respx_mock
     ):
-        organization = PrescriberOrganizationFactory() if with_organization else None
+        prescriber_organization = PrescriberOrganizationFactory() if with_prescriber_organization else None
+        company = CompanyFactory() if with_company else None
         JobSeekerAssignmentFactory(
             caseworker__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
             caseworker__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
-            prescriber_organization=organization,
+            prescriber_organization=prescriber_organization,
+            company=company,
         )
 
         with django_capture_on_commit_callbacks(execute=True):
@@ -1557,19 +1562,21 @@ class TestAnonymizeProfessionalManagementCommand:
 
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages
 
-        # If the assignment beared an organization, nothing was really deleted in order to keep somewhere the link
-        # between the job seeker and the organization
-        assert JobSeekerAssignment.objects.exists() is with_organization
+        # If the assignment beared an organization or a company, nothing was really deleted in order to keep somewhere
+        # the link between the job seeker and the organization.
+        assert JobSeekerAssignment.objects.exists() == any([with_prescriber_organization, with_company])
 
-        # The previous assignment blocked the actual deletion, even if there was no organization…
+        # The previous assignment blocked the actual deletion, even if there was no organization or company…
         assert User.objects.filter(kind=UserKind.PRESCRIBER).exists()
 
-        # …but running again the command deletes it for real, if there was no organization.
+        # …but running again the command deletes it for real, if there was no organization or company.
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
 
         assert caplog.messages.count("Anonymized professionals after grace period, count: 1") == 2
-        assert User.objects.filter(kind=UserKind.PRESCRIBER).exists() is with_organization
+        assert User.objects.filter(kind=UserKind.PRESCRIBER).exists() == any(
+            [with_prescriber_organization, with_company]
+        )
 
     @pytest.mark.parametrize("is_active", [True, False])
     def test_anonymize_professionals_notification(
