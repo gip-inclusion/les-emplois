@@ -1217,19 +1217,18 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             "ass_allocation",
             "aah_allocation",
             "lack_of_nir",
-            # ForeignKeys - the session value will be the ID serialization and not the instance
-            "birth_place",
-            "birth_country",
         ]
 
-        birth_data = {
-            "birth_place_id": self.job_seeker_session.get("profile", {}).get("birth_place"),
-            "birth_country_id": self.job_seeker_session.get("profile", {}).get("birth_country"),
-        }
-
-        return birth_data | {
+        profile_data = {
             k: v for k, v in self.job_seeker_session.get("profile", {}).items() if k not in fields_to_exclude
         }
+        # ForeignKeys - the session value will be the ID serialization and not the instance
+        if "birth_place" in profile_data:
+            profile_data["birth_place_id"] = profile_data.pop("birth_place")
+        if "birth_country" in profile_data:
+            profile_data["birth_country_id"] = profile_data.pop("birth_country")
+
+        return profile_data
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
