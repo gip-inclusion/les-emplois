@@ -1136,7 +1136,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-container">
                       <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -1386,7 +1386,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-container">
                       <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -1662,7 +1662,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-container">
                       <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -2109,7 +2109,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-container">
                       <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -2327,7 +2327,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-container">
                       <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -2571,7 +2571,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-container">
                       <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
