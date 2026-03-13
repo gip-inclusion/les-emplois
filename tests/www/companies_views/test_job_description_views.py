@@ -19,28 +19,20 @@ from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.session import SessionNamespace
 from itou.www.companies_views.views import JOB_DESCRIPTION_EDIT_SESSION_KIND
-from tests.companies.factories import (
-    CompanyFactory,
-    CompanyWith2MembershipsFactory,
-    JobDescriptionFactory,
-)
+from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import (
-    PAGINATION_PAGE_ONE_MARKUP,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
 
 POSTULER = "Postuler"
 REMINDER_BANNER = (
-    '<p class="mb-0"> Une ou plusieurs de vos fiches de poste n’ont pas été actualisées depuis plus de 2 mois. '
+    "Une ou plusieurs de vos fiches de poste n’ont pas été actualisées depuis plus de 2 mois. "
     "Elles seront automatiquement dépubliées après 3 mois sans mise à jour. "
     f'<a href="{reverse("companies_views:job_description_list")}">Pensez à les mettre à jour pour maintenir '
-    "leur visibilité</a>.</p>"
+    "leur visibilité</a>."
 )
 SPONTANEOUS_APPLICATIONS_MARKUP = "<td><strong>Candidatures spontanées</strong></td>"
 
