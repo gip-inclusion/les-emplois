@@ -88,6 +88,46 @@ class ImportACIConvergencePHCForm(forms.Form):
         return self.cleaned_data
 
 
+class ImportFS3437FromAspForm(forms.Form):
+    file = ItouFileField(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        max_upload_size=1 * MB,
+        label="Fichier 3437 ASP",
+    )
+    wet_run = forms.BooleanField(
+        label="Exécuter les modifications",
+        required=False,
+        help_text="Si non coché, le fichier sera analysé mais aucune modification ne sera appliquée.",
+    )
+
+    def clean_file(self):
+        file = self.cleaned_data["file"]
+        df = pandas.read_excel(
+            file,
+            dtype={
+                "NIR": str,
+                "NTT": str,
+                "numeroIDE": str,
+                "passIae": str,
+                "Comentaires": str,
+                "idItou": str,
+            },
+            converters={"dateNaissance": lambda d: d.strftime("%Y-%m-%d") if d else ""},
+        )  # Avoid auto-conversion of numbers & dates
+        for mandatory_column in ["idItou", "Commentaires"]:
+            if mandatory_column not in df.columns:
+                self.add_error("file", f"La colonne {mandatory_column} est absente du fichier.")
+        if not self.errors:
+            # Drop lines without idItou
+            df = df[df["idItou"].notna()]
+            # Replace NaN with empty string
+            df.fillna("", inplace=True)
+            # Only keep lines with valid idItou in Commentaires column
+            df = df[df["Commentaires"].str.fullmatch(r"[0-9a-f]{30}")]
+            return df
+        return
+
+
 class MergeUserForm(forms.Form):
     email_1 = forms.EmailField(
         label="E-mail du premier compte",

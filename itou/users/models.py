@@ -1245,6 +1245,9 @@ class JobSeekerProfile(models.Model):
         triggers = [
             FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid", "is_not_stalled_anymore"])
         ]
+        permissions = [
+            ("import_fs_3437_from_asp", "Can import FS 3437 return file from ASP and update asp_uid field"),
+        ]
 
     def __str__(self):
         return f"JobSeekerProfile — pk={self.pk}"

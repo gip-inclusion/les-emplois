@@ -7,7 +7,7 @@ import segno
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.http import FileResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -20,11 +20,11 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from itou.approvals.models import Approval
 from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransitionLog
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.auth import check_user
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
@@ -39,6 +39,7 @@ from itou.www.itou_staff_views.export_utils import (
 from itou.www.itou_staff_views.forms import (
     ConfirmTOTPDeviceForm,
     ImportACIConvergencePHCForm,
+    ImportFS3437FromAspForm,
     ItouStaffExportJobApplicationForm,
     MergeUserConfirmForm,
     MergeUserForm,
@@ -240,6 +241,79 @@ def export_fs_3437(request):
             ),
         },
         streaming_content=(writer.writerow(row) for row in content()),
+    )
+
+
+@check_user(lambda user: user.is_staff)
+@permission_required("users.import_fs_3437_from_asp")
+def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3437_from_asp.html"):
+    form = (
+        ImportFS3437FromAspForm(data=request.POST, files=request.FILES)
+        if request.method == "POST"
+        else ImportFS3437FromAspForm()
+    )
+    results = []
+    if request.method == "POST" and form.is_valid():
+        df = form.cleaned_data["file"]
+        known_job_seeker_profiles = (
+            JobSeekerProfile.objects.filter(asp_uid__in=df["idItou"].unique())
+            .select_related("user")
+            .annotate(
+                with_3437=Exists(
+                    EmployeeRecordTransitionLog.objects.filter(
+                        employee_record__job_application__job_seeker_id=OuterRef("pk"),
+                        to_state=Status.REJECTED,
+                        asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+                    )
+                )
+            )
+        )
+        known_job_seeker_profiles_map = {profile.asp_uid: profile for profile in known_job_seeker_profiles}
+        to_updates = []
+        for _index, line in df.iterrows():
+            profile = known_job_seeker_profiles_map.get(line.idItou)
+            if profile is None:
+                results.append((line["idItou"], "Candidat non trouvé", None, None))
+                continue
+
+            mismatch = {}
+            for key, old_value, new_value in (
+                ("Nom", profile.user.last_name, line.get("nomUsage")),
+                ("Prénom", profile.user.first_name, line.get("prenom")),
+                (
+                    "Date de naissance",
+                    profile.birthdate.isoformat() if profile.birthdate else None,
+                    line.get("dateNaissance"),
+                ),
+                ("NIR", profile.nir, line.get("NIR")),
+                ("Identifiant FT", profile.pole_emploi_id, line.get("numeroIDE") or ""),
+            ):
+                if old_value != new_value:
+                    mismatch[key] = (old_value, new_value)
+
+            results.append(
+                (
+                    line["idItou"],
+                    f"Candidat identifié - {profile.user.get_full_name()} - nouvel idItou: {line['Commentaires']}",
+                    profile.with_3437,
+                    mismatch,
+                )
+            )
+            if form.cleaned_data.get("wet_run"):
+                profile.asp_uid = line["Commentaires"]
+                to_updates.append(profile)
+
+        if to_updates:
+            JobSeekerProfile.objects.bulk_update(to_updates, ["asp_uid"])
+
+    return render(
+        request,
+        template_name,
+        {
+            "form": form,
+            "results_count": len(results),
+            "results": results,
+        },
     )
 
 
