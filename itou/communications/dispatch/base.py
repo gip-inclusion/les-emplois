@@ -6,9 +6,9 @@ class BaseNotification:
 
     can_be_disabled = True
 
-    def __init__(self, user, structure=None, forward_from_user=None, /, **kwargs):
+    def __init__(self, user, organization=None, forward_from_user=None, /, **kwargs):
         self.user = user
-        self.structure = structure
+        self.organization = organization
         self.forward_from_user = forward_from_user
         self.context = kwargs
 
@@ -28,7 +28,7 @@ class BaseNotification:
             return False
         if self.is_manageable_by_user():
             return not (
-                self.user.notification_settings.for_structure(self.structure)
+                self.user.notification_settings.for_organization(self.organization)
                 .filter(disabled_notifications__notification_class=self.__class__.__name__)
                 .exists()
             )
@@ -37,9 +37,9 @@ class BaseNotification:
     def get_context(self):
         return self.validate_context() | {
             "user": self.user,
-            "structure": self.structure,
+            "organization": self.organization,
             "forward_from_user": self.forward_from_user,
-            "structure_label": "structure" if isinstance(self.structure, Company) else "organisation",
+            "organization_label": "structure" if isinstance(self.organization, Company) else "organisation",
         }
 
     def validate_context(self):

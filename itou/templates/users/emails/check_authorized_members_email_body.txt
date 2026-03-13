@@ -3,7 +3,7 @@
 {% block body %}
 Bonjour,
 
-En tant qu’administrateur de l’organisation {{ structure.name }}, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+En tant qu’administrateur de l’organisation {{ organization.name }}, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
 
 RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : {{ members_url }}
 

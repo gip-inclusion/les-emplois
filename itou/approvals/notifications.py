@@ -60,7 +60,7 @@ class ProlongationRequestDeniedForEmployerNotification(EmployerNotification, Ema
     body_template = "approvals/email/prolongation_request/denied/employer_body.txt"
 
     def is_applicable(self):
-        return self.structure and self.structure.kind in CompanyKind.siae_kinds()
+        return self.organization and self.organization.kind in CompanyKind.siae_kinds()
 
 
 @notifications_registry.register
@@ -96,7 +96,7 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
         return self.context
 
     def is_applicable(self):
-        return self.structure and self.structure.kind in CompanyKind.siae_kinds()
+        return self.organization and self.organization.kind in CompanyKind.siae_kinds()
 
 
 @notifications_registry.register
@@ -107,7 +107,7 @@ class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, Em
     body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
 
     def is_applicable(self):
-        return self.structure and self.structure.kind in CompanyKind.siae_kinds()
+        return self.organization and self.organization.kind in CompanyKind.siae_kinds()
 
 
 @notifications_registry.register

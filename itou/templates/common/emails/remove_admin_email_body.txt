@@ -6,11 +6,11 @@ Un administrateur vous a retiré les droits d'administrateur d'une structure sur
 
 Organisation :
 
-- Nom : {{ structure.display_name }}
-- Type : {{ structure.kind }}
+- Nom : {{ organization.display_name }}
+- Type : {{ organization.kind }}
 {# Institutions don't have a contact email address. #}
-{% if structure.email  %}
-- Email de contact : {{ structure.email }}
+{% if organization.email  %}
+- Email de contact : {{ organization.email }}
 {% endif %}
 
 Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.

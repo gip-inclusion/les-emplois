@@ -23,6 +23,6 @@ class PrescriberOrEmployerOrLaborInspectorNotification:
         return super().is_manageable_by_user() and self.user.is_professional
 
 
-class WithStructureMixin:
+class WithOrganizationMixin:
     def is_manageable_by_user(self):
-        return super().is_manageable_by_user() and self.structure is not None
+        return super().is_manageable_by_user() and self.organization is not None

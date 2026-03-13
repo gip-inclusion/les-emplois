@@ -384,7 +384,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
         if obj.is_caseworker:
-            return "Voir pour chaque structure ci-dessous"
+            return "Voir pour chaque organisation ci-dessous"
         notification_settings, _ = NotificationSettings.get_or_create(obj)
         disabled_notifications = notification_settings.disabled_notifications_names
         if disabled_notifications:
