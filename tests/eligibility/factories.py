@@ -144,7 +144,15 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
     @factory.post_generation
     def identity_certification(obj, create, extracted, **kwargs):
         if obj.certification_period is not None:
-            IdentityCertification.objects.create(
-                certifier=IdentityCertificationAuthorities.API_PARTICULIER,
-                jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
-            )
+            if obj.administrative_criteria.kind in AdministrativeCriteriaKind.certifiable_by_api_particulier():
+                IdentityCertification.objects.create(
+                    certifier=IdentityCertificationAuthorities.API_PARTICULIER,
+                    jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
+                )
+            elif obj.administrative_criteria.kind in AdministrativeCriteriaKind.certifiable_by_api_france_travail():
+                IdentityCertification.objects.create(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHER_USAGER,
+                    jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
+                )
+            else:
+                raise ValueError(obj.administrative_criteria.kind)
