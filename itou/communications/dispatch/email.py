@@ -30,18 +30,20 @@ class EmailNotification(BaseNotification):
             not self.forward_from_user
             # Don't use should_send() if the user left the org because we don't want to use his settings
             and self.is_applicable()
-            and self.structure
+            and self.organization
             and self.user.is_caseworker
         ):
-            if isinstance(self.structure, PrescriberOrganization):
-                memberships = PrescriberMembership.objects.filter(organization=self.structure).select_related("user")
-            elif isinstance(self.structure, Company):
-                memberships = CompanyMembership.objects.filter(company=self.structure).select_related("user")
+            if isinstance(self.organization, PrescriberOrganization):
+                memberships = PrescriberMembership.objects.filter(organization=self.organization).select_related(
+                    "user"
+                )
+            elif isinstance(self.organization, Company):
+                memberships = CompanyMembership.objects.filter(company=self.organization).select_related("user")
             members = [m.user for m in memberships]
             if self.user not in members:
                 admins = [m.user for m in memberships if m.is_admin]
                 logger.info("Send email copy to admin, admin_count=%d", len(admins))
                 for admin in admins:
-                    self.__class__(admin, self.structure, self.user, **self.context).send()
+                    self.__class__(admin, self.organization, self.user, **self.context).send()
         if self.should_send():
             self.build().send()

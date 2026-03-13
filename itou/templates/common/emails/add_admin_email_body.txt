@@ -4,7 +4,7 @@
 
 Bonjour {{ user.get_full_name }}
 
-Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation {{ structure.name }} ({{ structure.kind }}) sur les emplois de l’inclusion.
+Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation {{ organization.name }} ({{ organization.kind }}) sur les emplois de l’inclusion.
 
 {% if documentation_link %}
 Ce statut vous permet d’avoir accès à certaines fonctionnalités, la liste complète est disponible ici : {{ documentation_link }}.

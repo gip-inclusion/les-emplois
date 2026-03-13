@@ -295,12 +295,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s)
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -688,12 +688,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s)
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -729,11 +729,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s
+          WHERE ("communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -1136,12 +1136,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s)
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -1155,11 +1155,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s
+          WHERE ("communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -1182,8 +1182,8 @@
         ]),
         'sql': '''
           INSERT INTO "communications_notificationsettings" ("user_id",
-                                                             "structure_type_id",
-                                                             "structure_pk")
+                                                             "organization_type_id",
+                                                             "organization_pk")
           VALUES (%s, %s, %s) RETURNING "communications_notificationsettings"."id"
         ''',
       }),
@@ -1324,12 +1324,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL)
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -1454,12 +1454,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL)
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -1495,11 +1495,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+          WHERE ("communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -1674,12 +1674,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL)
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -1693,11 +1693,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+          WHERE ("communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -1720,8 +1720,8 @@
         ]),
         'sql': '''
           INSERT INTO "communications_notificationsettings" ("user_id",
-                                                             "structure_type_id",
-                                                             "structure_pk")
+                                                             "organization_type_id",
+                                                             "organization_pk")
           VALUES (%s, %s, %s) RETURNING "communications_notificationsettings"."id"
         ''',
       }),
@@ -2000,12 +2000,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s)
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -2294,12 +2294,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s)
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -2335,11 +2335,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s
+          WHERE ("communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -2678,12 +2678,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s)
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -2697,11 +2697,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s
+          WHERE ("communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -2724,8 +2724,8 @@
         ]),
         'sql': '''
           INSERT INTO "communications_notificationsettings" ("user_id",
-                                                             "structure_type_id",
-                                                             "structure_pk")
+                                                             "organization_type_id",
+                                                             "organization_pk")
           VALUES (%s, %s, %s) RETURNING "communications_notificationsettings"."id"
         ''',
       }),
@@ -3030,12 +3030,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL)
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -3324,12 +3324,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL)
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -3365,11 +3365,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+          WHERE ("communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -3706,12 +3706,12 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL)
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
         ''',
@@ -3725,11 +3725,11 @@
         'sql': '''
           SELECT "communications_notificationsettings"."id",
                  "communications_notificationsettings"."user_id",
-                 "communications_notificationsettings"."structure_type_id",
-                 "communications_notificationsettings"."structure_pk"
+                 "communications_notificationsettings"."organization_type_id",
+                 "communications_notificationsettings"."organization_pk"
           FROM "communications_notificationsettings"
-          WHERE ("communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+          WHERE ("communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL
                  AND "communications_notificationsettings"."user_id" = %s)
           LIMIT 21
         ''',
@@ -3752,8 +3752,8 @@
         ]),
         'sql': '''
           INSERT INTO "communications_notificationsettings" ("user_id",
-                                                             "structure_type_id",
-                                                             "structure_pk")
+                                                             "organization_type_id",
+                                                             "organization_pk")
           VALUES (%s, %s, %s) RETURNING "communications_notificationsettings"."id"
         ''',
       }),

@@ -231,8 +231,8 @@
           INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
           INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" = %s
-                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationsettings"."organization_pk" = %s
+                 AND "communications_notificationsettings"."organization_type_id" = %s
                  AND "communications_notificationrecord"."notification_class" = %s)
           LIMIT 1
         ''',
@@ -269,8 +269,8 @@
           INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
           INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
           WHERE ("communications_notificationsettings"."user_id" = %s
-                 AND "communications_notificationsettings"."structure_pk" IS NULL
-                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+                 AND "communications_notificationsettings"."organization_pk" IS NULL
+                 AND "communications_notificationsettings"."organization_type_id" IS NULL
                  AND "communications_notificationrecord"."notification_class" = %s)
           LIMIT 1
         ''',
