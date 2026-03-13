@@ -1448,6 +1448,17 @@ class TestAssessmentResult:
 class TestAssessmentContractsListView:
     RESET_BTN_LABEL = "Effacer tout"
 
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        self.user = membership.user
+        self.company = membership.company
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [self.company.post_code[:2]]
+        self.assessment = AssessmentFactory(companies=[self.company])
+        self.url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": self.assessment.pk})
+
+        client.force_login(self.user)
+
     def test_contract_list_htmx_consistency(self, client, settings):
         """
         Check that the HTMX response for the contracts list view is consistent with the full page response,
@@ -1467,7 +1478,7 @@ class TestAssessmentContractsListView:
             "start_date_upper": "2024-06-30",
         }
         response_full = client.get(url, filter_data)
-        form_full = parse_response_to_soup(response_full, selector="#filter-and-list-container")
+        form_full = parse_response_to_soup(response_full, selector="#filter-container")
         table_full = parse_response_to_soup(response_full, selector="#contracts-results-table")
 
         response_initial = client.get(url)
@@ -1475,9 +1486,9 @@ class TestAssessmentContractsListView:
 
         response_htmx = client.get(url, filter_data, headers={"HX-Request": "true"})
 
-        update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
 
-        form_simulated = simulated_page.select_one("#filter-and-list-container")
+        form_simulated = simulated_page.select_one("#filter-container")
         table_simulated = simulated_page.select_one("#contracts-results-table")
 
         assertSoupEqual(form_simulated, form_full)
@@ -1554,3 +1565,82 @@ class TestAssessmentContractsListView:
         response = client.get(url)
         assert len(response.context["contracts_page"].object_list) == 1
         assertNotContains(response, self.RESET_BTN_LABEL)
+
+    @pytest.mark.parametrize(
+        "query_params, expected_in, expected_not_in",
+        [
+            # Only ≥ 90
+            ({"duration_longer_or_equal_90": "on"}, ["contract_plus"], ["contract_minus"]),
+            # Only < 90
+            ({"duration_strictly_shorter_90": "on"}, ["contract_minus"], ["contract_plus"]),
+            # Both checked = no filter
+            (
+                {"duration_longer_or_equal_90": "on", "duration_strictly_shorter_90": "on"},
+                ["contract_plus", "contract_minus"],
+                [],
+            ),
+        ],
+    )
+    def test_contract_list_filter_by_90_days(self, client, query_params, expected_in, expected_not_in):
+        contract_plus = EmployeeContractFactory(employee__assessment=self.assessment, nb_days_in_campaign_year=90)
+        contract_minus = EmployeeContractFactory(employee__assessment=self.assessment, nb_days_in_campaign_year=89)
+
+        contracts_map = {"contract_plus": contract_plus, "contract_minus": contract_minus}
+        response = client.get(self.url, query_params)
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        for key in expected_in:
+            assert contracts_map[key] in contracts_in_page
+        for key in expected_not_in:
+            assert contracts_map[key] not in contracts_in_page
+
+    def test_contract_list_reset_button_visibility_90_days(self, client):
+        response = client.get(self.url, {"duration_longer_or_equal_90": "on"})
+        assertContains(response, self.RESET_BTN_LABEL)
+        assert response.context["filters_counter"] == 1
+
+    def test_contract_list_htmx_consistency_90_days(self, client):
+        EmployeeContractFactory(employee__assessment=self.assessment, nb_days_in_campaign_year=90)
+        filter_data = {"duration_longer_or_equal_90": "on"}
+
+        response_full = client.get(self.url, filter_data)
+        response_initial = client.get(self.url)
+        simulated_page = parse_response_to_soup(response_initial, selector="body")
+
+        response_htmx = client.get(self.url, filter_data, headers={"HX-Request": "true"})
+
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
+
+        assertSoupEqual(
+            simulated_page.select_one("#filter-container"),
+            parse_response_to_soup(response_full, selector="#filter-container"),
+        )
+
+    @pytest.mark.parametrize(
+        "query_params, expected_counter",
+        [
+            ({"start_date_lower": "2023-01-01"}, 1),
+            ({"duration_longer_or_equal_90": "on"}, 1),
+            ({"start_date_lower": "2023-01-01", "duration_longer_or_equal_90": "on"}, 2),
+            ({"start_date_lower": "2023-01-01", "start_date_upper": "2023-12-31"}, 1),
+            ({"duration_longer_or_equal_90": "on", "duration_strictly_shorter_90": "on"}, 1),
+            (
+                {
+                    "start_date_lower": "2023-01-01",
+                    "start_date_upper": "2023-12-31",
+                    "duration_longer_or_equal_90": "on",
+                    "duration_strictly_shorter_90": "on",
+                },
+                2,
+            ),
+        ],
+    )
+    def test_contract_list_filters_counter(self, client, query_params, expected_counter):
+        response = client.get(self.url, query_params)
+        assert response.status_code == 200
+        assert response.context["filters_counter"] == expected_counter
+        if expected_counter > 0:
+            assertContains(response, self.RESET_BTN_LABEL)
+        else:
+            assertNotContains(response, self.RESET_BTN_LABEL)
