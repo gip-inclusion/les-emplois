@@ -1152,6 +1152,7 @@ class JobSeekerProfile(models.Model):
         help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
     )
 
+    # TODO(ewen): drop this when the job_seekers_views:list use job seeker assignments.
     created_by_prescriber_organization = models.ForeignKey(
         PrescriberOrganization,
         verbose_name="créé par un membre de l'organisation",

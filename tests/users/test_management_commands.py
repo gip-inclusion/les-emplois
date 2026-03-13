@@ -1446,6 +1446,9 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         organization_1 = PrescriberOrganizationFactory(with_membership=True)
         prescriber = organization_1.members.first()
         organization_2 = PrescriberOrganizationFactory(membership__user=prescriber)
+        company_1 = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        employer = company_1.members.first()
+        company_2 = CompanyFactory(membership__user=employer)
 
         # Prescriber made actions alone
         job_seeker_1 = JobSeekerFactory(
@@ -1480,36 +1483,53 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=organization_2
         )
 
-        # Ignore employers and job seekers
-        JobApplicationFactory(job_seeker=job_seeker_1, sent_by_company=True)
+        # Employer made actions for company 1
+        iae_diag_company_1 = IAEEligibilityDiagnosisFactory(
+            from_employer=True,
+            job_seeker=job_seeker_1,
+            author=employer,
+            author_siae=company_1,
+            expires_at=datetime.date.today() - datetime.timedelta(days=1),
+        )
+
+        # Employer made actions for company 2
+        job_app_company_2 = JobApplicationFactory(
+            sent_by_company=True, job_seeker=job_seeker_2, sender=employer, sender_company=company_2
+        )
+
+        # Ignore job seekers
         JobApplicationFactory(job_seeker=job_seeker_1, sent_by_job_seeker=True)
-        GEIQEligibilityDiagnosisFactory(job_seeker=job_seeker_1, from_employer=True)
-        IAEEligibilityDiagnosisFactory(job_seeker=job_seeker_1, from_employer=True)
 
         assert sync_job_seeker_assignments.get_users_contacts([job_seeker_1.pk, job_seeker_2.pk]) == {
             job_seeker_1.pk: defaultdict(
                 list,
                 {
-                    (prescriber.pk, None): [
+                    (prescriber.pk, None, None): [
                         {"timestamp": job_app_no_orga.created_at, "action_kind": ActionKind.APPLY.value},
                         {"timestamp": job_seeker_1.date_joined, "action_kind": ActionKind.CREATE.value},
                     ],
-                    (prescriber.pk, organization_1.pk): [
+                    (prescriber.pk, organization_1.pk, None): [
                         {"timestamp": job_app_orga_1.created_at, "action_kind": ActionKind.APPLY.value},
                         {"timestamp": geiq_diag_orga_1.created_at, "action_kind": ActionKind.GEIQ_ELIGIBILITY.value},
                     ],
-                    (prescriber.pk, organization_2.pk): [
+                    (prescriber.pk, organization_2.pk, None): [
                         {"timestamp": job_app_orga_2.created_at, "action_kind": ActionKind.APPLY.value},
                         {"timestamp": iae_diag_orga_2.created_at, "action_kind": ActionKind.IAE_ELIGIBILITY.value},
+                    ],
+                    (employer.pk, None, company_1.pk): [
+                        {"timestamp": iae_diag_company_1.created_at, "action_kind": ActionKind.IAE_ELIGIBILITY.value},
                     ],
                 },
             ),
             job_seeker_2.pk: defaultdict(
                 list,
                 {
-                    (prescriber.pk, organization_2.pk): [
+                    (prescriber.pk, organization_2.pk, None): [
                         {"timestamp": job_seeker_2.date_joined, "action_kind": ActionKind.CREATE.value},
-                    ]
+                    ],
+                    (employer.pk, None, company_2.pk): [
+                        {"timestamp": job_app_company_2.created_at, "action_kind": ActionKind.APPLY.value},
+                    ],
                 },
             ),
         }
@@ -1518,14 +1538,16 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         organization_1 = PrescriberOrganizationFactory(with_membership=True)
         prescriber = organization_1.members.first()
         organization_2 = PrescriberOrganizationFactory(membership__user=prescriber)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        employer = company.members.first()
 
         ## Contacts that will create a new assignment
-        # Prescriber made actions alone
+        # caseworker made actions alone
         job_seeker_1 = JobSeekerFactory(
             created_by=prescriber, jobseeker_profile__created_by_prescriber_organization=None
-        )
+        )  # last action, the assignment will have these informations
         job_app_1_no_orga = JobApplicationFactory(
-            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=None
+            job_seeker=job_seeker_1, sender=employer, sender_company=None
         )  # last action, the assignment will have these informations
 
         # Prescriber made actions for orga 1
@@ -1555,14 +1577,31 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         # Another job seeker with the same prescriber and organization should not be disturbing
         JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization_2)
 
+        assignment_2_company = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker_2,
+            caseworker=employer,
+            company=company,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        )
+        job_app_2_company = JobApplicationFactory(
+            sent_by_company=True, job_seeker=job_seeker_2, sender=employer, sender_company=company
+        )  # last action, to set updated_at and last_action_kind
+
         call_command("sync_job_seeker_assignments", wet_run=True)
 
-        assignment_1_none = JobSeekerAssignment.objects.get(
-            job_seeker=job_seeker_1, caseworker=prescriber, prescriber_organization=None
+        assignment_1_prescriber = JobSeekerAssignment.objects.get(
+            job_seeker=job_seeker_1, caseworker=prescriber, prescriber_organization=None, company=None
         )
-        assert assignment_1_none.created_at == job_seeker_1.date_joined
-        assert assignment_1_none.updated_at == job_app_1_no_orga.created_at
-        assert assignment_1_none.last_action_kind == ActionKind.APPLY
+        assert assignment_1_prescriber.created_at == job_seeker_1.date_joined
+        assert assignment_1_prescriber.updated_at == job_seeker_1.date_joined
+        assert assignment_1_prescriber.last_action_kind == ActionKind.CREATE
+
+        assignment_1_employer = JobSeekerAssignment.objects.get(
+            job_seeker=job_seeker_1, caseworker=employer, prescriber_organization=None, company=None
+        )
+        assert assignment_1_employer.created_at == job_app_1_no_orga.created_at
+        assert assignment_1_employer.updated_at == job_app_1_no_orga.created_at
+        assert assignment_1_employer.last_action_kind == ActionKind.APPLY
 
         assignment_1_orga_1 = JobSeekerAssignment.objects.get(
             job_seeker=job_seeker_1, caseworker=prescriber, prescriber_organization=organization_1
@@ -1575,6 +1614,10 @@ class TestSyncJobSeekerAssignmentManagementCommand:
         assert assignment_2_2.created_at == job_seeker_2.date_joined
         assert assignment_2_2.updated_at == job_app_2_orga_2.created_at
         assert assignment_2_2.last_action_kind == ActionKind.APPLY
+
+        assignment_2_company.refresh_from_db()
+        assert assignment_2_company.updated_at == job_app_2_company.created_at
+        assert assignment_2_company.last_action_kind == ActionKind.APPLY
 
 
 @pytest.mark.parametrize("is_after_cutoff", [True, False])
