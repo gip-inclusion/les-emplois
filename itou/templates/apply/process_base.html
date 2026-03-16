@@ -41,51 +41,53 @@
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% block sidebar %}
-                        {% if job_application.archived_at %}
-                            <div class="c-box mb-4">
-                                <div class="mb-2">
-                                    <span class="badge badge-base rounded-pill bg-primary">
-                                        <i class="ri-archive-line" aria-hidden="true"></i>
-                                        Candidature archivée
-                                    </span>
-                                </div>
-                                <p>
-                                    Cette candidature a été archivée
-                                    {% if job_application.archived_by %}
-                                        par
-                                        {% if user.is_job_seeker %}
-                                            l’employeur
+                        {% block archived %}
+                            {% if job_application.archived_at %}
+                                <div class="c-box mb-4">
+                                    <div class="mb-2">
+                                        <span class="badge badge-base rounded-pill bg-primary">
+                                            <i class="ri-archive-line" aria-hidden="true"></i>
+                                            Candidature archivée
+                                        </span>
+                                    </div>
+                                    <p>
+                                        Cette candidature a été archivée
+                                        {% if job_application.archived_by %}
+                                            par
+                                            {% if user.is_job_seeker %}
+                                                l’employeur
+                                            {% else %}
+                                                {{ job_application.archived_by.get_inverted_full_name }}
+                                            {% endif %}
                                         {% else %}
-                                            {{ job_application.archived_by.get_inverted_full_name }}
+                                            automatiquement
                                         {% endif %}
-                                    {% else %}
-                                        automatiquement
+                                        le {{ job_application.archived_at|date }} à {{ job_application.archived_at|time }}.
+                                        {% if not user.is_job_seeker %}Elle n’est plus visible par défaut dans votre liste de candidatures.{% endif %}
+                                    </p>
+                                    <p>
+                                        <i>En savoir plus sur les candidatures archivées dans la
+                                            <a href="{{ ITOU_HELP_CENTER_URL }}/articles/27110481864593--Archiver-une-candidature"
+                                               target="_blank"
+                                               rel="noopener"
+                                               aria-label="En savoir plus sur l’archivage des candidatures (ouverture dans un nouvel onglet)">
+                                                documentation
+                                                <i class="ri-external-link-line" aria-hidden="true"></i>
+                                            </a>
+                                        </i>
+                                    </p>
+                                    {% if request.from_employer %}
+                                        <form method="post" action="{% url "apply:unarchive" job_application_id=job_application.pk %}" class="my-2">
+                                            {% csrf_token %}
+                                            <button class="btn btn-ico btn-outline-primary w-100">
+                                                <i class="ri-inbox-unarchive-line" aria-hidden="true"></i>
+                                                <span>Désarchiver</span>
+                                            </button>
+                                        </form>
                                     {% endif %}
-                                    le {{ job_application.archived_at|date }} à {{ job_application.archived_at|time }}.
-                                    {% if not user.is_job_seeker %}Elle n’est plus visible par défaut dans votre liste de candidatures.{% endif %}
-                                </p>
-                                <p>
-                                    <i>En savoir plus sur les candidatures archivées dans la
-                                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/27110481864593--Archiver-une-candidature"
-                                           target="_blank"
-                                           rel="noopener"
-                                           aria-label="En savoir plus sur l’archivage des candidatures (ouverture dans un nouvel onglet)">
-                                            documentation
-                                            <i class="ri-external-link-line" aria-hidden="true"></i>
-                                        </a>
-                                    </i>
-                                </p>
-                                {% if request.from_employer %}
-                                    <form method="post" action="{% url "apply:unarchive" job_application_id=job_application.pk %}" class="my-2">
-                                        {% csrf_token %}
-                                        <button class="btn btn-ico btn-outline-primary w-100">
-                                            <i class="ri-inbox-unarchive-line" aria-hidden="true"></i>
-                                            <span>Désarchiver</span>
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endblock archived %}
                         {% if job_application.to_company.is_subject_to_iae_rules %}
                             {% if request.from_employer %}
                                 {# Employers need to know the expiration date of an approval #}

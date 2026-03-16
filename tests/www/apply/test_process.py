@@ -95,6 +95,9 @@ NON_IAE_CANCELLATION_CONFIRMATION = (
 
 EMPLOYER_PRIVATE_COMMENT_MARKUP = "<small>Commentaire privé de l'employeur</small>"
 
+ARCHIVED_MARKUP = "<i>En savoir plus sur les candidatures archivées"
+UNARCHIVE_BUTTON_MARKUP = "<span>Désarchiver</span>"
+
 
 class TestProcessViews:
     CANCEL_OLD_JOB_APP_WARNING = f"""
@@ -401,7 +404,6 @@ class TestProcessViews:
         assertContains(response, SENDER_LEFT_ORG_ALERT)
 
     def test_details_archived(self, client):
-        UNARCHIVE = "Désarchiver"
         job_application = JobApplicationFactory(
             archived_at=datetime.datetime(2024, 9, 2, 11, 11, 11, tzinfo=timezone.get_current_timezone()),
         )
@@ -413,7 +415,8 @@ class TestProcessViews:
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        assertContains(response, UNARCHIVE)
+        assertContains(response, ARCHIVED_MARKUP)
+        assertContains(response, UNARCHIVE_BUTTON_MARKUP)
         assertContains(
             response,
             """
@@ -436,7 +439,8 @@ class TestProcessViews:
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        assertContains(response, UNARCHIVE)
+        assertContains(response, ARCHIVED_MARKUP)
+        assertContains(response, UNARCHIVE_BUTTON_MARKUP)
         assertContains(
             response,
             """
@@ -456,7 +460,8 @@ class TestProcessViews:
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        assertNotContains(response, UNARCHIVE)
+        assertContains(response, ARCHIVED_MARKUP)
+        assertNotContains(response, UNARCHIVE_BUTTON_MARKUP)
         assertContains(
             response,
             """
@@ -476,7 +481,8 @@ class TestProcessViews:
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        assertNotContains(response, UNARCHIVE)
+        assertContains(response, ARCHIVED_MARKUP)
+        assertNotContains(response, UNARCHIVE_BUTTON_MARKUP)
         assertContains(
             response,
             """

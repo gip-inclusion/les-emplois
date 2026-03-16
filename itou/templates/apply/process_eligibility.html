@@ -22,3 +22,7 @@
 {% block content_extend %}
     {% include "eligibility/includes/iae/eligibility_section.html" %}
 {% endblock %}
+
+{% block archived %}
+    {# Overwrites the original block because we don't want to display the 'archived' section in the form #}
+{% endblock archived %}
