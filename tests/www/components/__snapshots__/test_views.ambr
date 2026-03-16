@@ -137,3 +137,66 @@
   
   '''
 # ---
+# name: test_global_alerts[global-alerts]
+  '''
+  <section class="container global-messages-container" id="global-alerts">
+      <h2>
+          Alertes globales
+      </h2>
+      <h3 class="my-3">
+          info
+      </h3>
+      <div class="alert alert-info" role="status">
+          <div>
+              Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+          </div>
+      </div>
+      <h3 class="my-3">
+          danger
+      </h3>
+      <div class="alert alert-danger" role="alert">
+          <div>
+              Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+          </div>
+      </div>
+      <h3 class="my-3">
+          warning
+      </h3>
+      <div class="alert alert-warning" role="status">
+          <div>
+              Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+          </div>
+      </div>
+      <h3 class="my-3">
+          dismissible
+      </h3>
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+          </button>
+          <div>
+              Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+          </div>
+      </div>
+      <h3 class="my-3">
+          primary
+      </h3>
+      <div class="alert alert-primary fade show" role="status">
+          <div class="d-flex flex-row justify-content-between align-items-center">
+              <p class="mb-0 text-start">
+                  <i aria-hidden="true" class="ri-arrow-right-line fw-bold pe-2">
+                  </i>
+                  Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+              </p>
+              <a aria-label="Quitter la procédure" class="btn-link-white btn-ico align-items-center" href="https://example.com">
+                  <i aria-hidden="true" class="ri-close-line ri-xl fw-medium me-1">
+                  </i>
+                  <span class="fs-sm fw-medium">
+                      Quitter
+                  </span>
+              </a>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
