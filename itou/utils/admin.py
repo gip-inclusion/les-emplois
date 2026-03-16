@@ -28,16 +28,16 @@ def get_admin_view_link(obj, *, content=None, view="change"):
     return format_html('<a href="{}">{}</a>', url, content or obj.pk)
 
 
-def get_structure_view_link(structure, display_attr="name"):
+def get_organization_view_link(organization, display_attr="name"):
     format_string = "{link}"
-    format_kwargs = {"link": get_admin_view_link(structure, content=getattr(structure, display_attr))}
-    if hasattr(structure, "siret"):
+    format_kwargs = {"link": get_admin_view_link(organization, content=getattr(organization, display_attr))}
+    if hasattr(organization, "siret"):
         format_string += " — SIRET {siret}"
-        format_kwargs["siret"] = structure.siret
+        format_kwargs["siret"] = organization.siret
     format_string += " ({kind})"
-    format_kwargs["kind"] = structure.kind
+    format_kwargs["kind"] = organization.kind
     format_string += " — PK: {pk}"
-    format_kwargs["pk"] = structure.pk
+    format_kwargs["pk"] = organization.pk
     return format_html(format_string, **format_kwargs)
 
 
