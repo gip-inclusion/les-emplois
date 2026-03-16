@@ -1,0 +1,11 @@
+{% if organization.email %}
+    {% include "includes/organizations/email_li.html" with email=organization.email only %}
+{% endif %}
+
+{% if organization.phone %}
+    {% include "includes/organizations/phone_li.html" with phonenumber=organization.phone only %}
+{% endif %}
+
+{% if organization.website %}
+    {% include "includes/organizations/website_li.html" with website=organization.website only %}
+{% endif %}
