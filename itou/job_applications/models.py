@@ -1044,13 +1044,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return SenderKind(self.sender_kind).label
 
     def can_be_transferred(self, user, target_company):
-        # User must be member of both origin and target companies to make a transfer
-        if not (self.to_company.has_member(user) and target_company.has_member(user)):
-            return False
         # Can't transfer to same structure
         if target_company == self.to_company:
             return False
         if not user.is_employer:
+            return False
+        # User must be member of both origin and target companies to make a transfer
+        if not (self.to_company.has_member(user) and target_company.has_member(user)):
             return False
         return self.transfer.is_available()
 
