@@ -3,13 +3,43 @@
 
 {% block title %}Composants Slippers{% endblock %}
 
-{% block title_content %}
+{% block title_content %}<h1>Composants Slippers</h1>{% endblock %}
+{% block content %}
 
-    <div id="alerts">
-        <h1>Alertes</h1>
+    <section id="global-alerts" class="container global-messages-container">
+        <h2>Alertes globales</h2>
+
+        {% for variant in global_alerts.variants %}
+            <h3 class="my-3">{{ variant }}</h3>
+            {% component_alert_global content=content variant=variant %}
+                {% fragment as content %}
+                    Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                {% endfragment %}
+            {% endcomponent_alert_global %}
+        {% endfor %}
+
+        <h3 class="my-3">dismissible</h3>
+        {% component_alert_global content=content variant="info" dismissible=True %}
+            {% fragment as content %}
+                Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+            {% endfragment %}
+        {% endcomponent_alert_global %}
+
+        <h3 class="my-3">primary</h3>
+        {% component_alert_global content=content variant="primary" exit_url="https://example.com" %}
+            {% fragment as content %}
+                Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+            {% endfragment %}
+        {% endcomponent_alert_global %}
+    </section>
+
+    <hr class="my-5">
+
+    <section id="alerts" class="container">
+        <h2>Alertes</h2>
 
         {% for variant in alerts.variants %}
-            <h2>{{ variant }}</h2>
+            <h3 class="my-3">{{ variant }}</h3>
             {% component_alert title=title content=content variant=variant %}
                 {% fragment as title %}
                     Le titre de l&apos;alerte de type {{ variant }}
@@ -22,8 +52,7 @@
             {% endcomponent_alert %}
         {% endfor %}
 
-        <h2>rejetable ("dismissible")</h2>
-
+        <h3 class="my-3">rejetable ("dismissible")</h3>
         {% component_alert variant="info" title=title content=content dismissible=True %}
             {% fragment as title %}
                 Le titre de l&apos;alerte rejetable
@@ -35,34 +64,7 @@
             {% endfragment %}
         {% endcomponent_alert %}
 
-    </div>
-    {# end of alerts #}
+    </section>
 
-    <div id="global-alerts">
-        <h1>Alertes globales</h1>
-
-        {% for variant in global_alerts.variants %}
-            <h2>{{ variant }}</h2>
-            {% component_alert_global content=content variant=variant %}
-                {% fragment as content %}
-                    Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
-                {% endfragment %}
-            {% endcomponent_alert_global %}
-        {% endfor %}
-
-        <h2>dismissible</h2>
-        {% component_alert_global content=content variant="info" dismissible=True %}
-            {% fragment as content %}
-                Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
-            {% endfragment %}
-        {% endcomponent_alert_global %}
-
-        <h2>primary</h2>
-        {% component_alert_global content=content variant="primary" exit_url="https://example.com" %}
-            {% fragment as content %}
-                Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
-            {% endfragment %}
-        {% endcomponent_alert_global %}
-    </div>
 
 {% endblock %}

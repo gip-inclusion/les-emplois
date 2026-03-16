@@ -1,13 +1,13 @@
 # serializer version: 1
 # name: test_alerts[alerts]
   '''
-  <div id="alerts">
-      <h1>
-          Alertes
-      </h1>
+  <section class="container" id="alerts">
       <h2>
-          info
+          Alertes
       </h2>
+      <h3 class="my-3">
+          info
+      </h3>
       <div class="alert alert-info" role="status">
           <div class="row">
               <div class="col-auto pe-0">
@@ -26,9 +26,9 @@
               </div>
           </div>
       </div>
-      <h2>
+      <h3 class="my-3">
           success
-      </h2>
+      </h3>
       <div class="alert alert-success" role="status">
           <div class="row">
               <div class="col-auto pe-0">
@@ -47,9 +47,9 @@
               </div>
           </div>
       </div>
-      <h2>
+      <h3 class="my-3">
           warning
-      </h2>
+      </h3>
       <div class="alert alert-warning" role="status">
           <div class="row">
               <div class="col-auto pe-0">
@@ -68,9 +68,9 @@
               </div>
           </div>
       </div>
-      <h2>
+      <h3 class="my-3">
           danger
-      </h2>
+      </h3>
       <div class="alert alert-danger" role="status">
           <div class="row">
               <div class="col-auto pe-0">
@@ -89,9 +89,9 @@
               </div>
           </div>
       </div>
-      <h2>
+      <h3 class="my-3">
           important
-      </h2>
+      </h3>
       <div class="alert alert-important" role="status">
           <div class="row">
               <div class="col-auto pe-0">
@@ -110,9 +110,9 @@
               </div>
           </div>
       </div>
-      <h2>
+      <h3 class="my-3">
           rejetable ("dismissible")
-      </h2>
+      </h3>
       <div class="alert alert-info alert-dismissible fade show" role="status">
           <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
           </button>
@@ -133,7 +133,7 @@
               </div>
           </div>
       </div>
-  </div>
+  </section>
   
   '''
 # ---
