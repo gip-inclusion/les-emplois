@@ -205,13 +205,8 @@ class ItouCurrentOrganizationMiddleware:
         ):
             return self.get_response(request)
 
-        # Force OTP for staff users
-        if (
-            settings.REQUIRE_OTP_FOR_STAFF
-            and user.is_authenticated
-            and user.kind == UserKind.ITOU_STAFF
-            and not user.is_verified()
-        ):
+        # Maybe require OTP
+        if require_otp(user):
             login_verify_otp_url = reverse("login:verify_otp")
             if user_has_device(user) and request.path != login_verify_otp_url:
                 return HttpResponseRedirect(
@@ -224,3 +219,21 @@ class ItouCurrentOrganizationMiddleware:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 
         return self.get_response(request)
+
+
+def require_otp(user):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_verified():
+        return False
+
+    if user.kind == UserKind.ITOU_STAFF and settings.REQUIRE_OTP_FOR_STAFF:
+        return True
+
+    # FIXME: we could require OTP only for a portion of prescribers
+    # (based on a set of organizations, based on location, etc.).
+    if user.kind == UserKind.PRESCRIBER and settings.REQUIRE_OTP_FOR_PRESCRIBERS:
+        return True
+
+    return False

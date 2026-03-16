@@ -17,6 +17,14 @@ from itou.users.enums import IdentityProvider
 from tests.utils.testing import reload_module
 
 
+TEST_SETTINGS = {
+    "PRO_CONNECT_BASE_URL": "https://pro.connect.fake",
+    "PRO_CONNECT_CLIENT_ID": "PC_CLIENT_ID_123",
+    "PRO_CONNECT_CLIENT_SECRET": "PC_CLIENT_SECRET_QUUUUUUUUUUUUUX",
+    "PRO_CONNECT_FT_IDP_HINT": "xxxxxx",
+}
+
+
 OIDC_USERINFO = {
     "given_name": "Michel",
     "usual_name": "AUDIARD",
@@ -30,7 +38,13 @@ OIDC_USERINFO_FT_WITH_SAFIR = OIDC_USERINFO | {
 }
 
 
-ID_TOKEN = "123456"
+ID_TOKEN = {
+    "sub": OIDC_USERINFO["sub"],
+    "aud": TEST_SETTINGS["PRO_CONNECT_CLIENT_ID"],
+    "acr": "https://proconnect.gouv.fr/assurance/consistency-checked",
+    "amr": ["pwd"],
+    # There are other attributes, but they are not needed.
+}
 
 
 # Make sure to use respx_mock fixture or @respx.mock decorator on tests using this helper.
@@ -64,7 +78,12 @@ def mock_oauth_dance(
     response = client.get(authorize_url)
     assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
 
-    token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
+    token_json = {
+        "access_token": "access_token",
+        "token_type": "Bearer",
+        "expires_in": 60,
+        "id_token": jwt.encode(payload=ID_TOKEN, key=constants.PRO_CONNECT_CLIENT_SECRET, algorithm="HS256"),
+    }
     respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     user_info = oidc_userinfo or OIDC_USERINFO.copy()
@@ -102,14 +121,6 @@ def assert_and_mock_forced_logout(client, response, expected_redirect_url=revers
     response = client.get(add_url_params(local_url, {"state": state}))
     assertRedirects(response, expected_redirect_url)
     return response
-
-
-TEST_SETTINGS = {
-    "PRO_CONNECT_BASE_URL": "https://pro.connect.fake",
-    "PRO_CONNECT_CLIENT_ID": "PC_CLIENT_ID_123",
-    "PRO_CONNECT_CLIENT_SECRET": "PC_CLIENT_SECRET_QUUUUUUUUUUUUUX",
-    "PRO_CONNECT_FT_IDP_HINT": "xxxxxx",
-}
 
 
 class pro_connect_setup:
