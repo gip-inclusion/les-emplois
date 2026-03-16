@@ -30,7 +30,7 @@ from itou.utils.admin import (
     PkSupportRemarkInline,
     ReadonlyMixin,
     get_admin_view_link,
-    get_structure_view_link,
+    get_organization_view_link,
 )
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -66,7 +66,7 @@ class JobApplicationInline(ReadonlyMixin, ItouStackedInline):
 
     @admin.display(description="Entreprise destinataire")
     def to_company_link(self, obj):
-        return get_structure_view_link(obj.to_company, display_attr="display_name")
+        return get_organization_view_link(obj.to_company, display_attr="display_name")
 
     # Custom read-only fields as workaround :
     # there is no direct relation between approvals and employee records
@@ -411,7 +411,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
     def assigned_company(self, obj):
         if obj.assigned_company:
             company = Company.objects.get(pk=obj.assigned_company)
-            return get_structure_view_link(company, display_attr="display_name")
+            return get_organization_view_link(company, display_attr="display_name")
         return self.get_empty_value_display()
 
 

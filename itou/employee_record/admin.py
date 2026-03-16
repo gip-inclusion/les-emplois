@@ -16,7 +16,7 @@ from itou.utils.admin import (
     ItouTabularInline,
     ReadonlyMixin,
     get_admin_view_link,
-    get_structure_view_link,
+    get_organization_view_link,
 )
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -290,7 +290,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         except (companies_models.Company.DoesNotExist, companies_models.Company.MultipleObjectsReturned):
             return obj.siret
         else:
-            return get_structure_view_link(asp_company, display_attr="display_name")
+            return get_organization_view_link(asp_company, display_attr="display_name")
 
     @admin.display(description="type de traitement")
     def asp_processing_type(self, obj):

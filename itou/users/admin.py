@@ -49,7 +49,7 @@ from itou.utils.admin import (
     ReadonlyMixin,
     add_support_remark_to_obj,
     get_admin_view_link,
-    get_structure_view_link,
+    get_organization_view_link,
 )
 from itou.utils.validators import is_france_travail_id_format
 
@@ -119,7 +119,7 @@ class CompanyMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, Members
 
     @admin.display(description="Entreprise")
     def company_siret_link(self, obj):
-        return get_structure_view_link(obj.company)
+        return get_organization_view_link(obj.company)
 
 
 class PrescriberMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, MembershipInlineMixin, ItouTabularInline):
@@ -139,7 +139,7 @@ class PrescriberMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, Memb
     fk_name = "user"
 
     def organization_id_link(self, obj):
-        return get_structure_view_link(obj.organization)
+        return get_organization_view_link(obj.organization)
 
 
 class InstitutionMembershipInline(ReadonlyMixin, MembershipInlineMixin, ItouTabularInline):
@@ -158,7 +158,7 @@ class InstitutionMembershipInline(ReadonlyMixin, MembershipInlineMixin, ItouTabu
     fk_name = "user"
 
     def institution_id_link(self, obj):
-        return get_structure_view_link(obj.institution)
+        return get_organization_view_link(obj.institution)
 
 
 class JobApplicationInline(ReadonlyMixin, ItouTabularInline):
