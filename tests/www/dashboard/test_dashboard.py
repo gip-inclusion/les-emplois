@@ -897,7 +897,6 @@ class TestDashboardView:
         GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
             diagnosis,
             diagnosis.author,
-            None,
             [administrative_criteria_annex_1],
         )
         response = client.get(url)
