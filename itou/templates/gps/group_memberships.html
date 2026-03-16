@@ -24,12 +24,10 @@
                             <div class="c-box--results__header">
                                 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
                                     <div class="c-box--results__summary flex-grow-1">
-                                        {% if membership.member.is_employer %}
-                                            <i class="ri-community-line" aria-hidden="true"></i>
-                                        {% elif membership.member.is_prescriber_with_authorized_org_memberships %}
+                                        {% if membership.member.is_prescriber_with_authorized_org_memberships %}
                                             <i class="ri-home-smile-line" aria-hidden="true"></i>
                                         {% else %}
-                                            <i class="ri-user-line" aria-hidden="true"></i>
+                                            <i class="ri-community-line" aria-hidden="true"></i>
                                         {% endif %}
                                         <div>
                                             <div class="d-flex align-items-center gap-2">
