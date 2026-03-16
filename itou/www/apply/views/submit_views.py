@@ -531,8 +531,11 @@ class ApplicationIAEEligibilityView(CheckApplySessionMixin, ApplicationBaseView,
         return context
 
 
-class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
+class ApplicationGEIQEligibilityView(UserPassesTestMixin, CheckApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/geiq_eligibility.html"
+
+    def test_func(self):
+        return self.request.from_authorized_prescriber
 
     def __init__(self):
         super().__init__()
@@ -583,19 +586,9 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
                     request.user,
-                    request.current_organization if request.from_prescriber else None,
+                    request.current_organization,
                     self.form.cleaned_data,
                 )
-            else:
-                # Check if update is really needed: may change diagnosis expiration date
-                if self.form.has_changed():
-                    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-                        self.geiq_eligibility_diagnosis,
-                        request.user,
-                        request.current_organization if request.from_prescriber else None,
-                        self.form.cleaned_data,
-                    )
-
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
