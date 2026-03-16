@@ -51,22 +51,28 @@ class Command(BaseCommand):
             .all()
         )
         self.logger.info("Job applications sent by the prescriber count=%s", len(job_applications))
-        eligibility_diagnosis = prescriber.eligibilitydiagnosis_set.filter(
-            author_prescriber_organization=from_org, jobapplication__in=job_applications
-        ).distinct()
-        self.logger.info("Eligibility diagnosis created by the prescriber count=%s", len(eligibility_diagnosis))
+        for diagnosis_qs, diag_kind, reverse_filter in [
+            (prescriber.eligibilitydiagnosis_set, "IAE", "jobapplication__in"),
+            (prescriber.geiqeligibilitydiagnosis_set, "GEIQ", "job_applications__in"),
+        ]:
+            eligibility_diagnosis = diagnosis_qs.filter(
+                author_prescriber_organization=from_org, **{reverse_filter: job_applications}
+            ).distinct()
+            self.logger.info(
+                f"{diag_kind} eligibility diagnosis created by the prescriber count=%s", len(eligibility_diagnosis)
+            )
 
-        # Create log entries and related objects before updating the data so the queryset is not empty
-        log_entries = admin_models.LogEntry.objects.log_actions(
-            user_id=staff.pk,
-            queryset=eligibility_diagnosis,
-            action_flag=admin_models.CHANGE,
-            change_message=f"author_prescriber_organization from {from_org} to {to_org}",
-            single_object=False,
-        )
-        self.logger.info("Created log entries for eligibility diagnosis count=%s", len(log_entries))
-        updated = eligibility_diagnosis.update(author_prescriber_organization=to_org)
-        self.logger.info("Updated eligibility diagnosis count=%s", updated)
+            # Create log entries and related objects before updating the data so the queryset is not empty
+            log_entries = admin_models.LogEntry.objects.log_actions(
+                user_id=staff.pk,
+                queryset=eligibility_diagnosis,
+                action_flag=admin_models.CHANGE,
+                change_message=f"author_prescriber_organization from {from_org} to {to_org}",
+                single_object=False,
+            )
+            self.logger.info(f"Created log entries for {diag_kind} eligibility diagnosis count=%s", len(log_entries))
+            updated = eligibility_diagnosis.update(author_prescriber_organization=to_org)
+            self.logger.info(f"Updated {diag_kind} eligibility diagnosis count=%s", updated)
 
         # Then the job applications
         log_entries = admin_models.LogEntry.objects.log_actions(
