@@ -18,3 +18,7 @@
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
+
+{% block archived %}
+    {# Overwrites the original block because we don't want to display the 'archived' section in the form #}
+{% endblock archived %}

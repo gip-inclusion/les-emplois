@@ -68,6 +68,7 @@ from tests.utils.testing import (
     get_session_name,
     parse_response_to_soup,
 )
+from tests.www.apply.test_process import ARCHIVED_MARKUP, UNARCHIVE_BUTTON_MARKUP
 
 
 NIR_FIELD_ID = 'id="id_nir"'
@@ -336,6 +337,16 @@ class TestProcessAcceptViewsInWizard:
             assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_unarchive_button_not_shown_in_sidebar(self, client):
+        job_application = self.create_job_application(archived_at=timezone.now())
+        employer = self.company.members.first()
+        client.force_login(employer)
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertTemplateUsed(response, "apply/process_accept_base.html", count=1)
+        assertNotContains(response, ARCHIVED_MARKUP)
+        assertNotContains(response, UNARCHIVE_BUTTON_MARKUP)
 
     def test_accept_with_iae_eligibility(self, client):
         today = timezone.localdate()
@@ -2378,6 +2389,7 @@ class TestIAEEligibility:
         PREFILLED_TEMPLATE = "eligibility/includes/iae/criteria_filled_from_job_seeker.html"
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            archived_at=timezone.now(),
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(
                 born_in_france=True,
@@ -2416,7 +2428,10 @@ class TestIAEEligibility:
         response = client.get(url)
         assert response.status_code == 200
         assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+        assertTemplateUsed(response, "apply/process_eligibility.html", count=1)
         assertTemplateNotUsed(response, PREFILLED_TEMPLATE)
+        assertNotContains(response, ARCHIVED_MARKUP)
+        assertNotContains(response, UNARCHIVE_BUTTON_MARKUP)
 
         # Update profile to now have some pre-filled criteria
         job_application.job_seeker.jobseeker_profile.aah_allocation_since = AllocationDuration.FROM_6_TO_11_MONTHS
