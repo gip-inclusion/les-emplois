@@ -224,9 +224,11 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @classmethod
     @transaction.atomic()
-    def update_eligibility_diagnosis(
-        cls, diagnosis, author: User, author_organization: PrescriberOrganization, administrative_criteria
-    ):
+    def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
+        """
+        Only employers can update a GEIQ eligibility diagnosis, if the diagnosis is not expired and
+        does grant the allowance.
+        """
         if not issubclass(diagnosis.__class__, cls):
             raise ValueError("Le diagnostic fourni n'est pas un diagnostic GEIQ")
 
@@ -242,12 +244,6 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # - only administrative criteria are updatable
         diagnosis.administrative_criteria.set(administrative_criteria)
         diagnosis.schedule_certification()
-
-        if author.is_prescriber:
-            # Sync job seeker assignment to a prescriber
-            JobSeekerAssignment.objects.upsert_assignment(
-                diagnosis.job_seeker, author, author_organization, ActionKind.GEIQ_ELIGIBILITY
-            )
 
         return diagnosis
 

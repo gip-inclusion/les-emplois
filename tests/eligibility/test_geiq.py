@@ -114,35 +114,26 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # Updating nothing
     with pytest.raises(ValueError, match="Le diagnostic fourni n'est pas un diagnostic GEIQ"):
-        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, None, ())
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, ())
 
     # Trying to update an expired diagnosis
     diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
     with pytest.raises(ValueError, match="Impossible de modifier un diagnostic GEIQ expiré"):
-        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-            diagnosis, diagnosis.author, diagnosis.author_prescriber_organization, administrative_criteria=()
-        )
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, diagnosis.author, administrative_criteria=())
 
     # correct update case:
-    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-        diagnosis, diagnosis.author, diagnosis.author_prescriber_organization, [administrative_criteria_annex_1]
+        diagnosis, diagnosis.author, [administrative_criteria_annex_1]
     )
-    assignment = JobSeekerAssignment.objects.get()
-    assert assignment.job_seeker == diagnosis.job_seeker
-    assert assignment.prescriber == diagnosis.author
-    assert assignment.prescriber_organization == diagnosis.author_prescriber_organization
-    assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 
     assert list(diagnosis.administrative_criteria.all()) == [administrative_criteria_annex_1]
 
 
 def test_update_geiq_eligibility_diagnosis_author():
-    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
     other_user = ItouStaffFactory()
-    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-        diagnosis, other_user, diagnosis.author_prescriber_organization, ()
-    )
+    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, other_user, ())
     diagnosis.refresh_from_db()
 
     assert diagnosis.author == other_user
