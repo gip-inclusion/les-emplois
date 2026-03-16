@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2026-03-16
+
+### Ajouté
+
+- [GEIQ : Ajout d'un filtre “date de début de contrat” sur la liste des contrats d'un bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7574)
+
+### Modifié
+
+- [API : Simplification du code en prévision de la fusion des utilisateurs pro.](https://github.com/gip-inclusion/les-emplois/pull/7666)
+- [Candidature : Correction d'un bug dans le parcours de vérification du profil de demandeur d'emploi](https://github.com/gip-inclusion/les-emplois/pull/7690)
+- [Candidature : Permettre aux prescripteurs habilités de visualiser toutes les candidatures des candidats accompagnés](https://github.com/gip-inclusion/les-emplois/pull/7669)
+- [Fiche salarié : Gestion des espaces dans le NTT](https://github.com/gip-inclusion/les-emplois/pull/7667)
+- [Interface : Passer tous les “Diagnostic d’éligibilité à l’IAE” dans leur propre c-box](https://github.com/gip-inclusion/les-emplois/pull/7592)
+- [Nexus : Correction des liens vers MonRécap et ajout de tracking matomo](https://github.com/gip-inclusion/les-emplois/pull/7663)
+- [Permettre aux devs de contourner le verrou de transfert d'une entreprise source ASP vers une entreprise source UTILISATEUR](https://github.com/gip-inclusion/les-emplois/pull/7659)
+
 ## 2026-03-09
 
 ### Modifié
