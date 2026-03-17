@@ -7,7 +7,7 @@ from itoutils.django.commands import dry_runnable
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
-from itou.approvals.notifications import ProlongationRequestCreatedReminderForPrescriberNotification
+from itou.approvals.notifications import ProlongationRequestCreatedReminderForProfessionalNotification
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.command import BaseCommand
 
@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
         prolongation_reminded = 0
         for prolongation_request in queryset:
-            ProlongationRequestCreatedReminderForPrescriberNotification(
+            ProlongationRequestCreatedReminderForProfessionalNotification(
                 prolongation_request.assigned_to,
                 prolongation_request.prescriber_organization,
                 prolongation_request=prolongation_request,
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 .order_by("-is_admin", F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
             ]
             for colleague in colleagues_to_notify:
-                ProlongationRequestCreatedReminderForPrescriberNotification(
+                ProlongationRequestCreatedReminderForProfessionalNotification(
                     colleague,
                     prolongation_request.prescriber_organization,
                     prolongation_request=prolongation_request,

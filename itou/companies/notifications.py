@@ -1,10 +1,10 @@
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification
-from itou.communications.dispatch.utils import EmployerNotification
+from itou.communications.dispatch.utils import ProfessionalNotification
 
 
 @notifications_registry.register
-class OldJobDescriptionDeactivationNotification(EmailNotification, EmployerNotification):
+class OldJobDescriptionDeactivationNotification(EmailNotification, ProfessionalNotification):
     """Notification sent to the members of a company when an old job description is deactivated"""
 
     name = "Désactivation de fiche de poste"
