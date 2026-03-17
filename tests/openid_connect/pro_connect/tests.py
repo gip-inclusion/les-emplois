@@ -639,26 +639,13 @@ class TestProConnectCallbackView:
         )
         assertQuerySetEqual(org.members.all(), [user])
 
+    # FIXME: Remove test once kinds are merged in db
     def test_callback_update_FT_organization_as_employer_does_not_crash(self, client, pro_connect):
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         pro_connect.mock_oauth_dance(
             client,
             UserKind.EMPLOYER,
             oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
-        )
-        user = get_user(client)
-        assert user.is_authenticated
-        assert not user.prescribermembership_set.exists()
-
-        # If he's a prescriber and uses the employer login button
-        user.kind = UserKind.PRESCRIBER
-        user.save()
-        client.logout()
-        pro_connect.mock_oauth_dance(
-            client,
-            UserKind.EMPLOYER,
-            oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
-            register=False,
         )
         user = get_user(client)
         assert user.is_authenticated

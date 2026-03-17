@@ -9,6 +9,8 @@ from itou.users.forms import validate_francetravail_email
 from itou.users.models import User
 
 
+# FIXME(alaurent) Refactor these classes
+
 ########################################################################
 ##################### PrescriberWithOrg invitation #####################
 ########################################################################
@@ -31,8 +33,8 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_prescriber:
-                error = forms.ValidationError("Cet utilisateur n'est pas un prescripteur.")
+            if not user.is_professional:
+                error = forms.ValidationError("Cet utilisateur n'est pas un professionel.")
                 self.add_error("email", error)
             else:
                 user_is_member = self.organization.active_members.filter(email=user.email).exists()
@@ -105,8 +107,8 @@ class EmployerInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_employer:
-                error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
+            if not user.is_professional:
+                error = forms.ValidationError("Cet utilisateur n'est pas un professionel.")
                 self.add_error("email", error)
             else:
                 user_is_member = self.company.active_members.filter(email=user.email).exists()
@@ -162,8 +164,8 @@ class LaborInspectorInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_labor_inspector:
-                error = forms.ValidationError("Cet utilisateur n'est pas un inspecteur du travail.")
+            if not user.is_professional:
+                error = forms.ValidationError("Cet utilisateur n'est pas un professionel.")
                 self.add_error("email", error)
             else:
                 user_is_member = self.institution.active_members.filter(email=user.email).exists()
