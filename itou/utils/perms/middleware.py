@@ -145,14 +145,14 @@ class ItouCurrentOrganizationMiddleware:
             )
             request.from_prescriber = user.is_prescriber  # FIXME: Replace with the following line when merging kinds
             # request.fromprescriber = bool(
-            #     user.is_caseworker and (
+            #     user.is_professional and (
             #         request.current_organization is None
             #         or isinstance(request.current_organization, PrescriberOrganization)
             #     )
             # )
             request.from_employer = user.is_employer  # FIXME: Replace with the following line when merging kinds
             # request.from_employer = bool(
-            #     user.is_caseworker
+            #     user.is_professional
             #     and request.current_organization
             #     and isinstance(request.current_organization, Company)
             # )
