@@ -136,6 +136,7 @@ urlpatterns = [
     path("gps/", include("itou.www.gps.urls")),
     path("rdvi/", include("itou.www.rdv_insertion.urls")),
     path("staff/", include("itou.www.itou_staff_views.urls")),
+    path("otp/", include("itou.www.otp_views.urls")),
 ]
 
 if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:

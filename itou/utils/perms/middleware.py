@@ -217,8 +217,8 @@ class ItouCurrentOrganizationMiddleware:
                 return HttpResponseRedirect(
                     add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
                 )
-            if not request.path.startswith("/staff/otp"):
-                return HttpResponseRedirect(reverse("itou_staff_views:otp_devices"))
+            if not request.path.startswith("/otp"):
+                return HttpResponseRedirect(reverse("otp_views:otp_devices"))
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
