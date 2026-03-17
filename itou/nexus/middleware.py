@@ -29,7 +29,7 @@ class DropDownMiddleware:
             not request.path.startswith("/portal")
             and request.user.is_authenticated
             and request.user.is_active
-            and request.user.is_caseworker
+            and (request.from_employer or request.from_prescriber)
         )
 
     def __call__(self, request):

@@ -284,7 +284,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -670,7 +670,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -1056,7 +1056,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("sender_company_display_name",
@@ -1442,7 +1442,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("prescribers_prescriberorganization"."name",

@@ -29,7 +29,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.auth import check_request, check_user
+from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
@@ -335,7 +335,7 @@ class GetOrCreateJobSeekerStartView(View):
         self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_caseworker:
+        if not (request.from_employer or request.from_prescriber):
             raise PermissionDenied("Vous n'êtes pas autorisé à rechercher ou créer un compte candidat.")
 
         return super().dispatch(request, *args, **kwargs)
@@ -469,7 +469,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.sender.is_caseworker:
+        if not (request.from_employer or request.from_prescriber):
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
@@ -1388,7 +1388,7 @@ class CheckJobSeekerInformationsForHire(HireBaseView):
         }
 
 
-@check_user(lambda user: user.is_job_seeker or user.is_caseworker)
+@check_request(lambda request: request.user.is_job_seeker or request.from_employer or request.from_prescriber)
 def nir_modification_request(request, public_id, *, template_name="job_seekers_views/nir_modification_request.html"):
     job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
     if not can_view_personal_information(request, job_seeker):

@@ -662,7 +662,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         for employer in company_recipients:
             job_application.notifications_new_for_employer(employer).send()
         job_application.notifications_new_for_job_seeker.send()
-        if self.request.user.is_caseworker:
+        if self.request.from_employer or self.request.from_prescriber:
             job_application.notifications_new_for_proxy.send()
         return job_application
 
@@ -757,7 +757,7 @@ class ApplyForJobSeekerMixin:
         self.exit_url = reverse("home:hp")
         self.can_view_personal_information = False
 
-        if request.user.is_authenticated and request.user.is_caseworker:
+        if request.user.is_authenticated and (request.from_employer or request.from_prescriber):
             if request.from_prescriber:
                 self.exit_url = reverse("job_seekers_views:list")
             elif request.from_employer:

@@ -28,7 +28,7 @@ from itou.job_applications.models import (
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title
-from itou.utils.auth import check_request, check_user
+from itou.utils.auth import check_request
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -331,7 +331,7 @@ def delete_comment_for_company(request, job_application_id, comment_id):
     )
 
 
-@check_user(lambda u: u.is_caseworker)
+@check_request(lambda request: request.from_employer or request.from_prescriber)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details.html"):
     """
     Detail of an application for an SIAE with the ability:
