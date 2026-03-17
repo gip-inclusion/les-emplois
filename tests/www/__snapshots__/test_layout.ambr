@@ -2,8 +2,8 @@
 # name: test_navigation_authenticated[Employer][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <button aria-controls="switchOrganizationDropdownMobile" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-community-line">
                   </i>
@@ -390,7 +390,7 @@
                   </ul>
               </div>
           </li>
-          <li class="d-none d-lg-inline-block dropdown dropdown-structure">
+          <li class="d-none d-lg-inline-block dropdown dropdown-organization">
               <button aria-controls="switchOrganizationDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-community-line">
                   </i>
@@ -436,8 +436,8 @@
 # name: test_navigation_authenticated[JobSeeker][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-user-line">
                   </i>
@@ -730,8 +730,8 @@
 # name: test_navigation_authenticated[LaborInspector][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-government-line">
                   </i>
@@ -1019,8 +1019,8 @@
 # name: test_navigation_authenticated[PrescriberWithAuthorizedOrganization][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-home-smile-line">
                   </i>
@@ -1358,8 +1358,8 @@
 # name: test_navigation_authenticated[PrescriberWithUnauthorizedOrganization][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-home-smile-line">
                   </i>
@@ -1687,8 +1687,8 @@
 # name: test_navigation_authenticated[PrescriberWithoutOrganization][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-user-line">
                   </i>
@@ -2079,8 +2079,8 @@
 # name: test_nexus_dropdown[disabled]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-user-line">
                   </i>
@@ -2315,8 +2315,8 @@
 # name: test_nexus_dropdown[enabled]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-home-smile-line">
                   </i>
@@ -2631,8 +2631,8 @@
 # name: test_nexus_dropdown[enabled_all_activated]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-home-smile-line">
                   </i>
@@ -2962,8 +2962,8 @@
 # name: test_nexus_dropdown[enabled_no_proconnect]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
-      <div class="offcanvas-header offcanvas-header--structure">
-          <div class="dropdown dropdown-structure flex-grow-1 py-4">
+      <div class="offcanvas-header offcanvas-header--organization">
+          <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
                   <i aria-hidden="true" class="ri-home-smile-line">
                   </i>

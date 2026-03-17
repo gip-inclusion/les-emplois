@@ -1,7 +1,7 @@
 {% load url_add_query %}
 
-<div class="c-box c-box--structure {{ extra_box_class|default:'' }}">
-    <button class="c-box--structure__summary w-100"
+<div class="c-box c-box--organization {{ extra_box_class|default:'' }}">
+    <button class="c-box--organization__summary w-100"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#collapseBoxOrganization"
@@ -13,9 +13,9 @@
             <span class="d-block h3">{{ organization.display_name }}</span>
         </div>
     </button>
-    <div class="c-box--structure__detail collapse{% if show|default:False %} show{% endif %}" id="collapseBoxOrganization">
+    <div class="c-box--organization__detail collapse{% if show|default:False %} show{% endif %}" id="collapseBoxOrganization">
         <hr class="my-4">
-        <ul class="c-box--structure__list-contact">
+        <ul class="c-box--organization__list-contact">
             <li>
                 <i class="ri-map-pin-2-line fw-normal me-2" aria-hidden="true"></i>
                 <address class="m-0">{{ organization.address_on_one_line }}</address>
