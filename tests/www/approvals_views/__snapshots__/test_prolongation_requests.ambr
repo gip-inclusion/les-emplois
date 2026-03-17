@@ -2031,8 +2031,8 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure mb-3 mb-md-4">
-                          <button aria-controls="collapseBoxOrganization" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxOrganization" data-bs-toggle="collapse" type="button">
+                      <div class="c-box c-box--organization mb-3 mb-md-4">
+                          <button aria-controls="collapseBoxOrganization" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseBoxOrganization" data-bs-toggle="collapse" type="button">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
                               <div>
@@ -2044,9 +2044,9 @@
                                   </span>
                               </div>
                           </button>
-                          <div class="c-box--structure__detail collapse" id="collapseBoxOrganization">
+                          <div class="c-box--organization__detail collapse" id="collapseBoxOrganization">
                               <hr class="my-4"/>
-                              <ul class="c-box--structure__list-contact">
+                              <ul class="c-box--organization__list-contact">
                                   <li>
                                       <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
                                       </i>
@@ -2301,8 +2301,8 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure mb-3 mb-md-4">
-                          <button aria-controls="collapseBoxOrganization" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxOrganization" data-bs-toggle="collapse" type="button">
+                      <div class="c-box c-box--organization mb-3 mb-md-4">
+                          <button aria-controls="collapseBoxOrganization" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseBoxOrganization" data-bs-toggle="collapse" type="button">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
                               <div>
@@ -2314,9 +2314,9 @@
                                   </span>
                               </div>
                           </button>
-                          <div class="c-box--structure__detail collapse" id="collapseBoxOrganization">
+                          <div class="c-box--organization__detail collapse" id="collapseBoxOrganization">
                               <hr class="my-4"/>
-                              <ul class="c-box--structure__list-contact">
+                              <ul class="c-box--organization__list-contact">
                                   <li>
                                       <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
                                       </i>
@@ -2607,8 +2607,8 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure mb-3 mb-md-4">
-                          <button aria-controls="collapseBoxOrganization" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxOrganization" data-bs-toggle="collapse" type="button">
+                      <div class="c-box c-box--organization mb-3 mb-md-4">
+                          <button aria-controls="collapseBoxOrganization" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseBoxOrganization" data-bs-toggle="collapse" type="button">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
                               <div>
@@ -2620,9 +2620,9 @@
                                   </span>
                               </div>
                           </button>
-                          <div class="c-box--structure__detail collapse" id="collapseBoxOrganization">
+                          <div class="c-box--organization__detail collapse" id="collapseBoxOrganization">
                               <hr class="my-4"/>
-                              <ul class="c-box--structure__list-contact">
+                              <ul class="c-box--organization__list-contact">
                                   <li>
                                       <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
                                       </i>
