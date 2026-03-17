@@ -7,16 +7,14 @@ from itou.communications.apps import sync_notifications
 from itou.communications.dispatch.base import BaseNotification
 from itou.communications.dispatch.email import EmailNotification
 from itou.communications.dispatch.utils import (
-    EmployerNotification,
     JobSeekerNotification,
-    PrescriberNotification,
-    PrescriberOrEmployerNotification,
+    ProfessionalNotification,
     WithStructureMixin,
 )
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 
 
 class TestBaseNotification:
@@ -340,80 +338,47 @@ class TestProfiledNotification:
         self.prescriber = PrescriberFactory(membership=True)
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
         self.prescriber_single = PrescriberFactory(membership=False)
+        self.labor_inspector = LaborInspectorFactory(membership=True)
+        self.institution = self.labor_inspector.institution_set.first()
 
         class TestJobSeekerNotification(JobSeekerNotification, BaseNotification):
             pass
 
-        class TestEmployerNotification(EmployerNotification, BaseNotification):
+        class TestProfessionalNotification(ProfessionalNotification, BaseNotification):
             pass
 
-        class TestPrescriberNotification(PrescriberNotification, BaseNotification):
-            pass
-
-        class TestPrescriberWithStructureNotification(WithStructureMixin, PrescriberNotification, BaseNotification):
-            pass
-
-        class TestPrescriberOrEmployerNotification(PrescriberOrEmployerNotification, BaseNotification):
-            pass
-
-        class TestPrescriberOrEmployerWithStructureNotification(
-            WithStructureMixin, PrescriberOrEmployerNotification, BaseNotification
+        class TestProfessionalWithStructureNotification(
+            WithStructureMixin, ProfessionalNotification, BaseNotification
         ):
             pass
 
         self.TestJobSeekerNotification = TestJobSeekerNotification
-        self.TestEmployerNotification = TestEmployerNotification
-        self.TestPrescriberNotification = TestPrescriberNotification
-        self.TestPrescriberOrEmployerNotification = TestPrescriberOrEmployerNotification
-        self.TestPrescriberWithStructureNotification = TestPrescriberWithStructureNotification
-        self.TestPrescriberOrEmployerWithStructureNotification = TestPrescriberOrEmployerWithStructureNotification
+        self.TestProfessionalNotification = TestProfessionalNotification
+        self.TestProfessionalWithStructureNotification = TestProfessionalWithStructureNotification
 
     def test_job_seeker_notification_is_manageable_by_user(self):
         assert self.TestJobSeekerNotification(self.job_seeker).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.employer, self.employer_structure).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.prescriber_single).is_manageable_by_user()
+        assert not self.TestJobSeekerNotification(self.labor_inspector, self.institution).is_manageable_by_user()
 
-    def test_employer_notification_is_manageable_by_user(self):
-        assert not self.TestEmployerNotification(self.job_seeker).is_manageable_by_user()
-        assert self.TestEmployerNotification(self.employer, self.employer_structure).is_manageable_by_user()
-        assert not self.TestEmployerNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
-        assert not self.TestEmployerNotification(self.prescriber_single).is_manageable_by_user()
+    def test_professional_notification_is_manageable_by_user(self):
+        assert not self.TestProfessionalNotification(self.job_seeker).is_manageable_by_user()
+        assert self.TestProfessionalNotification(self.employer, self.employer_structure).is_manageable_by_user()
+        assert self.TestProfessionalNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
+        assert self.TestProfessionalNotification(self.prescriber_single).is_manageable_by_user()
+        assert self.TestProfessionalNotification(self.labor_inspector, self.institution).is_manageable_by_user()
 
-    def test_prescriber_notification_is_manageable_by_user(self):
-        assert not self.TestPrescriberNotification(self.job_seeker).is_manageable_by_user()
-        assert not self.TestPrescriberNotification(self.employer, self.employer_structure).is_manageable_by_user()
-        assert self.TestPrescriberNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
-        assert self.TestPrescriberNotification(self.prescriber_single).is_manageable_by_user()
-
-    def test_prescriber_with_structure_notification_is_manageable_by_user(self):
-        assert not self.TestPrescriberWithStructureNotification(self.job_seeker).is_manageable_by_user()
-        assert not self.TestPrescriberWithStructureNotification(
+    def test_professional_with_structure_notification_is_manageable_by_user(self):
+        assert not self.TestProfessionalWithStructureNotification(self.job_seeker).is_manageable_by_user()
+        assert self.TestProfessionalWithStructureNotification(
             self.employer, self.employer_structure
         ).is_manageable_by_user()
-        assert self.TestPrescriberWithStructureNotification(
+        assert self.TestProfessionalWithStructureNotification(
             self.prescriber, self.prescriber_structure
         ).is_manageable_by_user()
-        assert not self.TestPrescriberWithStructureNotification(self.prescriber_single).is_manageable_by_user()
-
-    def test_prescriber_or_employer_notification_is_manageable_by_user(self):
-        assert not self.TestPrescriberOrEmployerNotification(self.job_seeker).is_manageable_by_user()
-        assert self.TestPrescriberOrEmployerNotification(
-            self.employer, self.employer_structure
-        ).is_manageable_by_user()
-        assert self.TestPrescriberOrEmployerNotification(
-            self.prescriber, self.prescriber_structure
-        ).is_manageable_by_user()
-        assert self.TestPrescriberOrEmployerNotification(self.prescriber_single).is_manageable_by_user()
-
-    def test_prescriber_or_employer_with_structure_notification_is_manageable_by_user(self):
-        assert not self.TestPrescriberOrEmployerWithStructureNotification(self.job_seeker).is_manageable_by_user()
-        assert self.TestPrescriberOrEmployerWithStructureNotification(
-            self.employer, self.employer_structure
-        ).is_manageable_by_user()
-        assert self.TestPrescriberOrEmployerWithStructureNotification(
-            self.prescriber, self.prescriber_structure
-        ).is_manageable_by_user()
-        assert not self.TestPrescriberOrEmployerWithStructureNotification(
-            self.prescriber_single
+        assert not self.TestProfessionalWithStructureNotification(self.prescriber_single).is_manageable_by_user()
+        assert self.TestProfessionalWithStructureNotification(
+            self.labor_inspector, self.institution
         ).is_manageable_by_user()

@@ -1624,7 +1624,7 @@ class ProlongationRequest(CommonProlongation):
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
     def notify_authorized_prescriber(self):
-        notifications.ProlongationRequestCreatedForPrescriberNotification(
+        notifications.ProlongationRequestCreatedForProfessionalNotification(
             self.assigned_to, self.prescriber_organization, prolongation_request=self
         ).send()
 
@@ -1639,7 +1639,7 @@ class ProlongationRequest(CommonProlongation):
             prolongation.save()
             self.save()
 
-        notifications.ProlongationRequestGrantedForEmployerNotification(
+        notifications.ProlongationRequestGrantedForProfessionalNotification(
             self.declared_by,
             self.declared_by_siae,
             prolongation_request=self,
@@ -1662,7 +1662,7 @@ class ProlongationRequest(CommonProlongation):
             information.save()
             self.save()
 
-        notifications.ProlongationRequestDeniedForEmployerNotification(
+        notifications.ProlongationRequestDeniedForProfessionalNotification(
             self.declared_by, self.declared_by_siae, prolongation_request=self
         ).send()
         notifications.ProlongationRequestDeniedForJobSeekerNotification(
