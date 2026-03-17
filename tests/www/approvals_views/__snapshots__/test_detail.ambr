@@ -5393,9 +5393,6 @@
                           <li class="nav-item">
                               <a class="nav-link active" href="/approvals/contracts/[Public ID of Approval]?back_url=/dashboard/">
                                   Suivi des contrats IAE
-                                  <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                      Nouveau
-                                  </span>
                               </a>
                           </li>
                       </ul>
