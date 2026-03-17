@@ -8,6 +8,7 @@ from django.db.models import Prefetch, Q
 from django.forms import ValidationError
 from django.utils import timezone
 
+from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
 
 
@@ -315,17 +316,19 @@ class MembershipAbstract(models.Model):
     objects = ActiveMembershipManager()
     include_inactive = MembershipQuerySet.as_manager()
 
+    user_kinds = UserKind.professionals()
+
     class Meta:
         abstract = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.user.field.remote_field.limit_choices_to = {"kind": cls.user_kind}
+        cls.user.field.remote_field.limit_choices_to = {"kind__in": cls.user_kinds}
 
     def clean(self, *args, **kwargs):
         super().clean()
-        if getattr(self, "user", None) and self.user.kind != self.user_kind:
-            raise ValidationError(f"L'utilisateur d'un {self.__class__.__name__} doit être {self.user_kind.label}")
+        if getattr(self, "user", None) and self.user.kind not in self.user_kinds:
+            raise ValidationError(f"L'utilisateur d'un {self.__class__.__name__} doit être dans {self.user_kinds}")
 
     def save(self, *args, **kwargs):
         self.clean()
