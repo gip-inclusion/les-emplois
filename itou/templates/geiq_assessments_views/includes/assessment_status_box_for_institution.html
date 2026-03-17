@@ -22,19 +22,20 @@
                     </li>
                 {% endfor %}
             </ul>
-            <button type="button" class="btn btn-primary btn-block" disabled>
-                <span>Contrôler le dossier</span>
-            </button>
+            {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+                <button type="button" class="btn btn-primary btn-block" disabled>Valider et transmettre la décision au GEIQ</button>
+            {% else %}
+                <button type="button" class="btn btn-primary btn-block" disabled>Valider le contrôle</button>
+            {% endif %}
         {% elif request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
             <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#final_review_modal">
-                Valider le dossier
+                Valider et transmettre la décision au GEIQ
             </button>
         {% else %}
             <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-ico btn-primary btn-block" name="action" value="{{ InstitutionAction.REVIEW }}">
-                    <i aria-hidden="true" class="ri-check-line"></i>
-                    <span>Valider le contrôle</span>
+                <button type="submit" class="btn btn-primary btn-block" name="action" value="{{ InstitutionAction.REVIEW }}">
+                    Valider le contrôle
                 </button>
             </form>
         {% endif %}
@@ -49,20 +50,20 @@
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.FIX }}">
-                    Corriger le dossier
+                    Renvoyer à la DDETS pour correction
                 </button>
             </form>
             <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#final_review_modal">
-                Valider le dossier
+                Valider et transmettre la décision au GEIQ
             </button>
         {% endif %}
     </div>
 {% else %}
-    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-03">
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
         <h3>Bilan d’exécution traité le {{ assessment.final_reviewed_at|date:"d/m/Y" }}</h3>
         <p>La décision a été envoyée au GEIQ.</p>
         <a class="btn btn-primary btn-block" href="{% url 'geiq_assessments_views:assessment_review' pk=assessment.pk %}">
-            <span>Afficher la décision</span>
+            Afficher la décision
         </a>
     </div>
 {% endif %}
