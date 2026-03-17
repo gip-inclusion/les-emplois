@@ -59,6 +59,12 @@
         window._paq.push(['trackVisibleContentImpressions']);
     };
     (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
+
+    {% if MATOMO_TAG_MANAGER_CONTAINER_ID %}
+    // Matomo Tag Manager :
+    tarteaucitron.user.matomotmUrl = '{{ MATOMO_BASE_URL }}js/container_{{ MATOMO_TAG_MANAGER_CONTAINER_ID }}.js';
+    (tarteaucitron.job = tarteaucitron.job || []).push('matomotm');
+    {% endif %}
     {% endif %}
     /* beautify ignore:end */
 
