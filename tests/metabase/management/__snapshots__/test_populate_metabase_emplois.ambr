@@ -4214,7 +4214,7 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 42,
+    'num_queries': 43,
     'queries': list([
       dict({
         'origin': list([
@@ -4284,7 +4284,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_candidatures" ("id" UUID,
-                                                                "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"date_mise_à_jour_metabase" date)
+                                                                "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"id_utilisateur_origine_candidature" integer,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -4582,6 +4582,17 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id_utilisateur_origine_candidature" IS \'ID de l\'\'utilisateur à l\'\'origine de la candidature\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_embauche" IS \'Date embauche le cas échéant\'',
       }),
       dict({
@@ -4763,6 +4774,7 @@
                                      "nom_org_prescripteur",
                                      "safir_org_prescripteur",
                                      "nom_prénom_conseiller",
+                                     "id_utilisateur_origine_candidature",
                                      "date_embauche",
                                      "injection_ai",
                                      "mode_attribution_pass_iae",

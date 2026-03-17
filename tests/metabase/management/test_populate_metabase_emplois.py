@@ -486,6 +486,7 @@ def test_populate_job_applications(snapshot):
                 None,
                 None,
                 None,
+                ja.sender_id,  # id_utilisateur_origine_candidature
                 None,
                 False,
                 "",

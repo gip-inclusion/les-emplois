@@ -213,6 +213,12 @@ TABLE.add_columns(
             "fn": get_ja_sender_full_name_if_pe_or_spip,
         },
         {
+            "name": "id_utilisateur_origine_candidature",
+            "type": "integer",
+            "comment": "ID de l'utilisateur à l'origine de la candidature",
+            "fn": attrgetter("sender_id"),
+        },
+        {
             "name": "date_embauche",
             "type": "date",
             "comment": "Date embauche le cas échéant",
