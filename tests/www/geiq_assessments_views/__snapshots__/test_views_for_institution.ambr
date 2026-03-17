@@ -15,7 +15,7 @@
   
   En tant que DREETS, il vous revient de vérifier et valider ce contrôle afin de finaliser le traitement de ce bilan d’exécution. Pour cela, connectez-vous à votre espace “Institution partenaire” sur le site : http://localhost:8000/.
   
-  Si des modifications sont nécessaires, le bouton "Corriger le dossier" vous permettra de revenir à l’étape précédente, afin que la DDETS 29 ou vous-même puissiez effectuer les ajustements requis.
+  Si des modifications sont nécessaires, le bouton "Renvoyer à la DDETS pour correction" vous permettra de revenir à l’étape précédente, afin que la DDETS 29 ou vous-même puissiez effectuer les ajustements requis.
   
   Cordialement,
   
@@ -281,9 +281,7 @@
                           </li>
                       </ul>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
-                          <span>
-                              Contrôler le dossier
-                          </span>
+                          Valider le contrôle
                       </button>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -646,12 +644,8 @@
                       </p>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-ico btn-primary btn-block" name="action" type="submit" value="review">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              <span>
-                                  Valider le contrôle
-                              </span>
+                          <button class="btn btn-primary btn-block" name="action" type="submit" value="review">
+                              Valider le contrôle
                           </button>
                       </form>
                   </div>
@@ -954,7 +948,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-03">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
                       <h3>
                           Bilan d’exécution traité le 27/05/2025
                       </h3>
@@ -962,9 +956,7 @@
                           La décision a été envoyée au GEIQ.
                       </p>
                       <a class="btn btn-primary btn-block" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
-                          <span>
-                              Afficher la décision
-                          </span>
+                          Afficher la décision
                       </a>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -1280,9 +1272,7 @@
                           </li>
                       </ul>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
-                          <span>
-                              Contrôler le dossier
-                          </span>
+                          Valider le contrôle
                       </button>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -2881,192 +2871,6 @@
   
   '''
 # ---
-# name: TestListAssessmentsView.test_limited_access_without_links_to_details[DGEFP GEIQ][assessment list without links to details]
-  '''
-  <section class="s-section">
-      <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
-                  <p>
-                      1 résultat
-                  </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      GEIQ
-                                  </th>
-                                  <th scope="col">
-                                      Structures
-                                  </th>
-                                  <th scope="col">
-                                      Campagne
-                                  </th>
-                                  <th scope="col">
-                                      Référent
-                                  </th>
-                                  <th scope="col">
-                                      Statut du bilan
-                                  </th>
-                                  <th scope="col">
-                                      Nombre de contrats
-                                  </th>
-                                  <th scope="col">
-                                      Montant accordé
-                                  </th>
-                                  <th scope="col">
-                                      Montant conventionné
-                                  </th>
-                                  <th scope="col">
-                                      Taux de réalisation
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      Un Joli GEIQ
-                                  </td>
-                                  <td>
-                                      <ul class="mb-0">
-                                          <li>
-                                              Siège (12)
-                                          </li>
-                                          <li>
-                                              Une antenne (12)
-                                          </li>
-                                      </ul>
-                                  </td>
-                                  <td>
-                                      2024
-                                  </td>
-                                  <td>
-                                  </td>
-                                  <td>
-                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
-                                          En attente
-                                      </span>
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
-  
-  '''
-# ---
-# name: TestListAssessmentsView.test_limited_access_without_links_to_details[FFGEIQ][assessment list without links to details]
-  '''
-  <section class="s-section">
-      <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
-                  <p>
-                      1 résultat
-                  </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      GEIQ
-                                  </th>
-                                  <th scope="col">
-                                      Structures
-                                  </th>
-                                  <th scope="col">
-                                      Campagne
-                                  </th>
-                                  <th scope="col">
-                                      Référent
-                                  </th>
-                                  <th scope="col">
-                                      Statut du bilan
-                                  </th>
-                                  <th scope="col">
-                                      Nombre de contrats
-                                  </th>
-                                  <th scope="col">
-                                      Montant accordé
-                                  </th>
-                                  <th scope="col">
-                                      Montant conventionné
-                                  </th>
-                                  <th scope="col">
-                                      Taux de réalisation
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      Un Joli GEIQ
-                                  </td>
-                                  <td>
-                                      <ul class="mb-0">
-                                          <li>
-                                              Siège (12)
-                                          </li>
-                                          <li>
-                                              Une antenne (12)
-                                          </li>
-                                      </ul>
-                                  </td>
-                                  <td>
-                                      2024
-                                  </td>
-                                  <td>
-                                  </td>
-                                  <td>
-                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
-                                          En attente
-                                      </span>
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
-  
-  '''
-# ---
 # name: TestListAssessmentsView.test_full_access_with_links_to_details[DDETS GEIQ][assessment list with links to details]
   '''
   <section class="s-section">
@@ -3230,6 +3034,192 @@
                                   </td>
                                   <td>
                                       Une institution GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
+                                          En attente
+                                      </span>
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestListAssessmentsView.test_limited_access_without_links_to_details[DGEFP GEIQ][assessment list without links to details]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <p>
+                      1 résultat
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      GEIQ
+                                  </th>
+                                  <th scope="col">
+                                      Structures
+                                  </th>
+                                  <th scope="col">
+                                      Campagne
+                                  </th>
+                                  <th scope="col">
+                                      Référent
+                                  </th>
+                                  <th scope="col">
+                                      Statut du bilan
+                                  </th>
+                                  <th scope="col">
+                                      Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant accordé
+                                  </th>
+                                  <th scope="col">
+                                      Montant conventionné
+                                  </th>
+                                  <th scope="col">
+                                      Taux de réalisation
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      Un Joli GEIQ
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Siège (12)
+                                          </li>
+                                          <li>
+                                              Une antenne (12)
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
+                                          En attente
+                                      </span>
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestListAssessmentsView.test_limited_access_without_links_to_details[FFGEIQ][assessment list without links to details]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <p>
+                      1 résultat
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      GEIQ
+                                  </th>
+                                  <th scope="col">
+                                      Structures
+                                  </th>
+                                  <th scope="col">
+                                      Campagne
+                                  </th>
+                                  <th scope="col">
+                                      Référent
+                                  </th>
+                                  <th scope="col">
+                                      Statut du bilan
+                                  </th>
+                                  <th scope="col">
+                                      Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant accordé
+                                  </th>
+                                  <th scope="col">
+                                      Montant conventionné
+                                  </th>
+                                  <th scope="col">
+                                      Taux de réalisation
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      Un Joli GEIQ
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Siège (12)
+                                          </li>
+                                          <li>
+                                              Une antenne (12)
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
                                   </td>
                                   <td>
                                       <span class="badge rounded-pill text-nowrap badge-sm bg-warning">

@@ -16,7 +16,7 @@ Références du dossier :
 
 En tant que DREETS, il vous revient de vérifier et valider ce contrôle afin de finaliser le traitement de ce bilan d’exécution. Pour cela, connectez-vous à votre espace “Institution partenaire” sur le site : {{ base_url }}.
 
-Si des modifications sont nécessaires, le bouton "Corriger le dossier" vous permettra de revenir à l’étape précédente, afin que la {{ assessment.reviewed_by_institution.name }} ou vous-même puissiez effectuer les ajustements requis.
+Si des modifications sont nécessaires, le bouton "Renvoyer à la DDETS pour correction" vous permettra de revenir à l’étape précédente, afin que la {{ assessment.reviewed_by_institution.name }} ou vous-même puissiez effectuer les ajustements requis.
 
 Cordialement,
 {% endblock body %}
