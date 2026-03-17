@@ -1,5 +1,6 @@
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -18,7 +19,7 @@ def assert_set_admin_role_creation(user, organization, mailoutbox):
 
     if isinstance(organization, PrescriberOrganization):
         assert "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617" in email.body
-    elif user.is_labor_inspector:
+    elif isinstance(organization, Institution):
         assert "https://aide.emplois.inclusion.beta.gouv.fr/" not in email.body
     elif isinstance(organization, Company):
         if organization.kind in [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.EITI]:

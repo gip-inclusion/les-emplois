@@ -318,7 +318,7 @@ class LaborInspectorInvitation(InvitationAbstract):
 
     def guest_can_join_institution(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_labor_inspector
+        return user == request.user and user.is_labor_inspector  # FIXME replace with is_caseworker
 
     # Notifications
     @property

@@ -226,13 +226,13 @@
                                 {% endif %}
                                 {# end of if request.from_employer #}
 
-                                {% if user.is_labor_inspector %}
+                                {% if request.from_institution %}
                                     {% include "dashboard/includes/labor_inspector_organization_card.html" %}
                                     {% if active_campaigns or closed_campaigns %}
                                         {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
                                     {% endif %}
                                 {% endif %}
-                                {# end of if user.is_labor_inspector #}
+                                {# end of if request.from_institution #}
                             </div>
                             {% if request.from_employer or request.from_prescriber %}
                                 <h2>Services partenaires</h2>

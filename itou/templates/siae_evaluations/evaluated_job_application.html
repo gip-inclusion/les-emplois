@@ -25,7 +25,7 @@
                         </div>
                         <hr class="m-0">
                         <div class="c-box--results__body">
-                            {% if request.user.is_labor_inspector and not evaluated_job_application.accepted_from_certified_criteria %}
+                            {% if request.from_institution and not evaluated_job_application.accepted_from_certified_criteria %}
                                 <p>
                                     Si vous estimez que certains critères ne sont pas nécessaires pour valider cette auto-prescription, <a href="{% zendesk_form_url request=request %}" rel="noopener" target="_blank" aria-label="Contacter le support (ouverture dans un nouvel onglet)">veuillez contacter notre support technique.</a>
                                 </p>
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                 </div>
-                {% if request.user.is_labor_inspector and not evaluated_siae.evaluation_is_final and not evaluated_job_application.accepted_from_certified_criteria %}
+                {% if request.from_institution and not evaluated_siae.evaluation_is_final and not evaluated_job_application.accepted_from_certified_criteria %}
                     <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                         <div class="c-form my-3 my-md-4">
                             <form method="post" class="js-prevent-multiple-submit">

@@ -4,14 +4,14 @@ from django.urls import reverse, reverse_lazy
 
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.users.models import User
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 
 
 class MemberList(BaseMemberList):
     template_name = "institutions/members.html"
 
     def test_func(self):
-        return self.request.user.is_labor_inspector
+        return self.request.from_institution
 
     def get_invitation_url(self):
         return reverse("invitations_views:invite_labor_inspector")
@@ -22,7 +22,7 @@ class MemberList(BaseMemberList):
         return context
 
 
-@check_user(lambda user: user.is_labor_inspector)
+@check_request(lambda request: request.from_institution)
 def deactivate_member(request, public_id, template_name="institutions/deactivate_member.html"):
     user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
@@ -33,7 +33,7 @@ def deactivate_member(request, public_id, template_name="institutions/deactivate
     )
 
 
-@check_user(lambda user: user.is_labor_inspector)
+@check_request(lambda request: request.from_institution)
 def update_admin_role(request, action, public_id, template_name="institutions/update_admins.html"):
     if action not in ["add", "remove"]:
         raise BadRequest

@@ -100,7 +100,7 @@ def can_view_stats_ddets_iae(request):
     Users of a DDETS IAE can view the confidential DDETS IAE stats of their department only.
     """
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DDETS_IAE
     )
@@ -108,7 +108,7 @@ def can_view_stats_ddets_iae(request):
 
 def can_view_stats_ddets_log(request):
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DDETS_LOG
     )
@@ -119,7 +119,7 @@ def can_view_stats_dreets_iae(request):
     Users of a DREETS IAE can view the confidential DREETS IAE stats of their region only.
     """
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DREETS_IAE
     )
@@ -130,7 +130,7 @@ def can_view_stats_dgefp_iae(request):
     Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
     """
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DGEFP_IAE
     )
@@ -138,7 +138,7 @@ def can_view_stats_dgefp_iae(request):
 
 def can_view_stats_dihal(request):
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DIHAL
     )
@@ -146,7 +146,7 @@ def can_view_stats_dihal(request):
 
 def can_view_stats_drihl(request):
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DRIHL
     )
@@ -154,7 +154,7 @@ def can_view_stats_drihl(request):
 
 def can_view_stats_iae_network(request):
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.IAE_NETWORK
     )
@@ -162,7 +162,7 @@ def can_view_stats_iae_network(request):
 
 def can_view_stats_convergence(request):
     return (
-        request.user.is_labor_inspector
+        request.from_institution
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.CONVERGENCE
     )

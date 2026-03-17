@@ -358,7 +358,7 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
             menu_items.append(NAV_ENTRIES["gps"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
-        elif request.user.is_labor_inspector:
+        elif request.from_institution:
             menu_items.append(
                 NavGroup(
                     label="Organisation",

@@ -165,7 +165,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-    elif request.user.is_labor_inspector:
+    elif request.from_institution:
         current_org = get_current_institution_or_404(request)
         six_months_ago = timezone.now() - timezone.timedelta(days=182)
         for campaign in EvaluationCampaign.objects.for_institution(current_org).viewable():
@@ -239,7 +239,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
                 }
             )
             context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER
-    elif request.user.is_labor_inspector:
+    elif request.from_institution:
         if request.current_organization.kind in [
             InstitutionKind.DGEFP_IAE,
             InstitutionKind.DREETS_IAE,
@@ -391,7 +391,7 @@ def switch_organization(request):
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if request.user.is_staff:
         raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
-    elif request.user.is_labor_inspector:
+    elif request.from_institution:
         raise Http404("Ce compte utilisateur ne peut gérer ses notifications.")
     elif request.user.is_job_seeker:
         notification_form = EditUserNotificationForm(user=request.user, structure=None, data=request.POST or None)

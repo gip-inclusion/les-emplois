@@ -137,7 +137,7 @@ def render_stats(
             extra_data["current_company_id"] = request.current_organization.pk
         elif request.from_prescriber and request.current_organization:
             extra_data["current_prescriber_organization_id"] = request.current_organization.pk
-        elif request.user.is_labor_inspector:
+        elif request.from_institution:
             extra_data["current_institution_id"] = request.current_organization.pk
         user_kind = request.user.kind
         department = base_context.get("department")

@@ -16,7 +16,7 @@
         <label class="form-check-label{% if from_list %} visually-hidden{% endif %}" for="allowance_for_contract_{{ contract.pk }}">
             {% if request.from_employer %}
                 Obtenir l’aide
-            {% elif request.user.is_labor_inspector %}
+            {% elif request.from_institution %}
                 Accorder l’aide
             {% endif %}
         </label>
