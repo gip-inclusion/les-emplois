@@ -1634,6 +1634,9 @@ class TestAssessmentContractsListView:
                 },
                 2,
             ),
+            ({"potential_allowance_1400": "on"}, 1),
+            ({"potential_allowance_1400": "on", "start_date_lower": "2023-01-01"}, 2),
+            ({"potential_allowance_1400": "on", "potential_allowance_814": "on", "potential_allowance_0": "on"}, 1),
         ],
     )
     def test_contract_list_filters_counter(self, client, query_params, expected_counter):
@@ -1644,3 +1647,61 @@ class TestAssessmentContractsListView:
             assertContains(response, self.RESET_BTN_LABEL)
         else:
             assertNotContains(response, self.RESET_BTN_LABEL)
+
+    @pytest.mark.parametrize(
+        "query_params, expected_in, expected_not_in",
+        [
+            ({"potential_allowance_1400": "on"}, ["contract_1400"], ["contract_814", "contract_0"]),
+            ({"potential_allowance_814": "on"}, ["contract_814"], ["contract_1400", "contract_0"]),
+            ({"potential_allowance_0": "on"}, ["contract_0"], ["contract_1400", "contract_814"]),
+            (
+                {"potential_allowance_1400": "on", "potential_allowance_814": "on"},
+                ["contract_1400", "contract_814"],
+                ["contract_0"],
+            ),
+            (
+                {"potential_allowance_1400": "on", "potential_allowance_814": "on", "potential_allowance_0": "on"},
+                ["contract_1400", "contract_814", "contract_0"],
+                [],
+            ),
+        ],
+    )
+    def test_contract_list_filter_by_potential_allowance(self, client, query_params, expected_in, expected_not_in):
+        contract_1400 = EmployeeContractFactory(employee__assessment=self.assessment, employee__allowance_amount=1_400)
+        contract_814 = EmployeeContractFactory(employee__assessment=self.assessment, employee__allowance_amount=814)
+        contract_0 = EmployeeContractFactory(employee__assessment=self.assessment, employee__allowance_amount=0)
+
+        contracts_map = {
+            "contract_1400": contract_1400,
+            "contract_814": contract_814,
+            "contract_0": contract_0,
+        }
+        response = client.get(self.url, query_params)
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        for key in expected_in:
+            assert contracts_map[key] in contracts_in_page
+        for key in expected_not_in:
+            assert contracts_map[key] not in contracts_in_page
+
+    def test_contract_list_reset_button_visibility_potential_allowance(self, client):
+        response = client.get(self.url, {"potential_allowance_1400": "on"})
+        assertContains(response, self.RESET_BTN_LABEL)
+        assert response.context["filters_counter"] == 1
+
+    def test_contract_list_htmx_consistency_potential_allowance(self, client):
+        EmployeeContractFactory(employee__assessment=self.assessment, employee__allowance_amount=1_400)
+        filter_data = {"potential_allowance_1400": "on"}
+
+        response_full = client.get(self.url, filter_data)
+        response_initial = client.get(self.url)
+        simulated_page = parse_response_to_soup(response_initial, selector="body")
+
+        response_htmx = client.get(self.url, filter_data, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
+
+        assertSoupEqual(
+            simulated_page.select_one("#filter-container"),
+            parse_response_to_soup(response_full, selector="#filter-container"),
+        )

@@ -1193,6 +1193,43 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="dropdown" id="dropdown-potential-allowance-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" id="btn-filter-potential-allowance" type="button">
+                                  Aide potentielle
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_1400" name="potential_allowance_1400" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_1400">
+                                                  1 400 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_814" name="potential_allowance_814" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_814">
+                                                  814 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_0" name="potential_allowance_0" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_0">
+                                                  0 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
@@ -1437,6 +1474,43 @@
                                               <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
                                               <label class="form-check-label" for="id_duration_strictly_shorter_90">
                                                   Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="dropdown" id="dropdown-potential-allowance-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" id="btn-filter-potential-allowance" type="button">
+                                  Aide potentielle
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_1400" name="potential_allowance_1400" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_1400">
+                                                  1 400 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_814" name="potential_allowance_814" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_814">
+                                                  814 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_0" name="potential_allowance_0" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_0">
+                                                  0 €
                                               </label>
                                           </div>
                                       </div>
@@ -1713,6 +1787,43 @@
                                               <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
                                               <label class="form-check-label" for="id_duration_strictly_shorter_90">
                                                   Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="dropdown" id="dropdown-potential-allowance-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" id="btn-filter-potential-allowance" type="button">
+                                  Aide potentielle
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_1400" name="potential_allowance_1400" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_1400">
+                                                  1 400 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_814" name="potential_allowance_814" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_814">
+                                                  814 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_0" name="potential_allowance_0" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_0">
+                                                  0 €
                                               </label>
                                           </div>
                                       </div>
@@ -2167,6 +2278,43 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="dropdown" id="dropdown-potential-allowance-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" id="btn-filter-potential-allowance" type="button">
+                                  Aide potentielle
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_1400" name="potential_allowance_1400" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_1400">
+                                                  1 400 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_814" name="potential_allowance_814" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_814">
+                                                  814 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_0" name="potential_allowance_0" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_0">
+                                                  0 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
@@ -2379,6 +2527,43 @@
                                               <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
                                               <label class="form-check-label" for="id_duration_strictly_shorter_90">
                                                   Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="dropdown" id="dropdown-potential-allowance-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" id="btn-filter-potential-allowance" type="button">
+                                  Aide potentielle
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_1400" name="potential_allowance_1400" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_1400">
+                                                  1 400 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_814" name="potential_allowance_814" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_814">
+                                                  814 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_0" name="potential_allowance_0" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_0">
+                                                  0 €
                                               </label>
                                           </div>
                                       </div>
@@ -2623,6 +2808,43 @@
                                               <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
                                               <label class="form-check-label" for="id_duration_strictly_shorter_90">
                                                   Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="dropdown" id="dropdown-potential-allowance-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" id="btn-filter-potential-allowance" type="button">
+                                  Aide potentielle
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_1400" name="potential_allowance_1400" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_1400">
+                                                  1 400 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_814" name="potential_allowance_814" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_814">
+                                                  814 €
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_potential_allowance_0" name="potential_allowance_0" type="checkbox"/>
+                                              <label class="form-check-label" for="id_potential_allowance_0">
+                                                  0 €
                                               </label>
                                           </div>
                                       </div>

@@ -97,6 +97,8 @@
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
                             {# filter 2/6 #}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
+                            {# filter 3/6 #}
+                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/potential_allowance.html" with request=request filters_form=filters_form only %}
                             {# reset button #}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
                         </div>
@@ -107,6 +109,7 @@
                             {% if request.htmx and not request.htmx.boosted %}
                                 {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
                                 {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
+                                {% include "geiq_assessments_views/includes/assessment_contracts_filters/potential_allowance.html" with request=request filters_form=filters_form only %}
                                 {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
                             {% endif %}
                             {% if filters_form.is_valid %}
