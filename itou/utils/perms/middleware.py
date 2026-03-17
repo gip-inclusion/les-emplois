@@ -59,6 +59,7 @@ class ItouCurrentOrganizationMiddleware:
         logout_warning = None
         request.from_employer = False
         request.from_prescriber = False
+        request.from_institution = False
         if user.is_authenticated:
             if user.is_employer:
                 # Do not use the default manager to avoid double checking whether the user is_active.
@@ -154,6 +155,13 @@ class ItouCurrentOrganizationMiddleware:
             #     user.is_caseworker
             #     and request.current_organization
             #     and isinstance(request.current_organization, Company)
+            # )
+            request.from_institution = user.is_labor_inspector
+            # FIXME: Replace with the following line when merging kinds
+            # request.from_instution = bool(
+            #     user.is_professional
+            #     and request.current_organization
+            #     and isinstance(request.current_organization, Institution)
             # )
 
         # Accepting an invitation to join a group is a two-step process.

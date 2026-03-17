@@ -272,7 +272,7 @@ class InviteLaborInspectorView(BaseInviteUserView):
     back_url = reverse_lazy("institutions_views:members")
 
     def test_func(self):
-        return self.request.user.is_labor_inspector
+        return self.request.from_institution
 
     def get_form_kwargs(self):
         return {"sender": self.request.user, "institution": self.organization}

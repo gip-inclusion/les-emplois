@@ -77,7 +77,7 @@ def serialize_zendesk_params(request):
                     # but we don't have to pre-fill the field, the user can do it himself
                     logger.error("Invalid employer kind : this should not happen")
 
-    elif request.user.is_labor_inspector:
+    elif request.from_institution:
         zendesk_user_kind = "ddets-dreets"
         if request.current_organization:  # We might not have one in the invitation flow
             match request.current_organization.kind:

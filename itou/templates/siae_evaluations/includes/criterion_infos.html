@@ -29,7 +29,7 @@
                        rel="noreferrer noopener"
                        aria-label="Page de détails de la candidature correspondant à l’auto-prescription (ouverture dans un nouvel onglet)">la page de détails de la candidature</a>
                     mentionnant la certification, celle-ci valant pièce justificative.
-                {% elif request.user.is_labor_inspector %}
+                {% elif request.from_institution %}
                     Cependant, conformément à l’article R5132-1-7 du Code du travail,
                     la structure doit conserver un justificatif relatif à ce critère pendant une durée de deux ans.
                 {% endif %}

@@ -22,7 +22,7 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
     Sanctions,
 )
-from itou.utils.auth import check_request, check_user
+from itou.utils.auth import check_request
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -41,7 +41,7 @@ from itou.www.siae_evaluations_views.forms import (
 )
 
 
-@check_user(lambda user: user.is_labor_inspector)
+@check_request(lambda request: request.from_institution)
 def samples_selection(request, template_name="siae_evaluations/samples_selection.html"):
     institution = get_current_institution_or_404(request)
     evaluation_campaign = get_object_or_404(
@@ -88,7 +88,7 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_labor_inspector)
+@check_request(lambda request: request.from_institution)
 def institution_evaluated_siae_list(
     request, evaluation_campaign_pk, template_name="siae_evaluations/institution_evaluated_siae_list.html"
 ):
@@ -119,10 +119,10 @@ def institution_evaluated_siae_list(
     return render(request, template_name, context)
 
 
-@check_request(lambda request: request.user.is_labor_inspector or request.from_employer)
+@check_request(lambda request: request.from_institution or request.from_employer)
 def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evaluations/evaluated_siae_detail.html"):
     owner_data = {}
-    if request.user.is_labor_inspector:
+    if request.from_institution:
         owner_data["evaluation_campaign__institution"] = get_current_institution_or_404(request)
     elif request.from_employer:
         owner_data["siae"] = get_current_company_or_404(request)
@@ -405,7 +405,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         )
 
 
-@check_request(lambda request: request.user.is_labor_inspector or request.from_employer)
+@check_request(lambda request: request.from_institution or request.from_employer)
 def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     allowed_viewers = {
         "institution": (get_current_institution_or_404, "evaluation_campaign__institution"),
@@ -466,7 +466,7 @@ def evaluated_job_application(
     request, evaluated_job_application_pk, template_name="siae_evaluations/evaluated_job_application.html"
 ):
     owner_data = {}
-    if request.user.is_labor_inspector:
+    if request.from_institution:
         owner_data["evaluated_siae__evaluation_campaign__institution"] = get_current_institution_or_404(request)
     elif request.from_employer:
         owner_data["evaluated_siae__siae"] = get_current_company_or_404(request)
@@ -813,7 +813,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
 def view_proof(request, evaluated_administrative_criteria_id):
     if request.from_employer:
         org_lookup = "evaluated_job_application__evaluated_siae__siae__in"
-    elif request.user.is_labor_inspector:
+    elif request.from_institution:
         org_lookup = "evaluated_job_application__evaluated_siae__evaluation_campaign__institution__in"
     else:
         raise Http404(request.user.kind)

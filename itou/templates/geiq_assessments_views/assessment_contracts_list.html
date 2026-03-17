@@ -23,7 +23,7 @@
                     {% else %}
                         {% include "geiq_assessments_views/includes/badge_to_complete.html" with badge_size="badge-base" only %}
                     {% endif %}
-                {% elif request.user.is_labor_inspector %}
+                {% elif request.from_institution %}
                     {% if assessment.grants_selection_validated_at %}
                         {% include "geiq_assessments_views/includes/badge_checked.html" with badge_size="badge-base" only %}
                     {% else %}
@@ -72,7 +72,7 @@
                             L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                             Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                         </p>
-                    {% elif request.user.is_labor_inspector %}
+                    {% elif request.from_institution %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide</h2>
                         <p class="mb-0">
                             L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
@@ -145,7 +145,7 @@
                                                 <th scope="col">Aide potentielle</th>
                                                 {% if request.from_employer %}
                                                     <th scope="col">Obtenir l’aide</th>
-                                                {% elif request.user.is_labor_inspector %}
+                                                {% elif request.from_institution %}
                                                     <th scope="col">Éligible à l’aide</th>
                                                 {% endif %}
                                             </tr>
@@ -176,7 +176,7 @@
                                                     <td>
                                                         {% if request.from_employer %}
                                                             {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request disable_stats_oob=True only %}
-                                                        {% elif request.user.is_labor_inspector %}
+                                                        {% elif request.from_institution %}
                                                             {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request disable_stats_oob=True only %}
                                                         {% endif %}
                                                     </td>
