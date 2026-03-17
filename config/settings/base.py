@@ -674,6 +674,7 @@ ASP_FLUX_IAE_DIR = os.getenv("ASP_FLUX_IAE_DIR")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL")
 MATOMO_SITE_ID = os.getenv("MATOMO_SITE_ID")
 MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
+MATOMO_TAG_MANAGER_CONTAINER_ID = os.getenv("MATOMO_TAG_MANAGER_CONTAINER_ID")
 
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
