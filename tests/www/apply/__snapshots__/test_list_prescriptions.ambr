@@ -284,7 +284,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -669,7 +669,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -1054,7 +1054,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("to_company_display_name",
@@ -1670,7 +1670,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON (T4."first_name",
@@ -2002,7 +2002,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -2334,7 +2334,7 @@
       dict({
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("to_company_display_name",
@@ -2906,7 +2906,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -2930,7 +2930,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON (T3."department") T3."department" AS "job_seeker__department"
@@ -2945,7 +2945,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -2966,7 +2966,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -3069,7 +3069,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -3486,7 +3486,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -3528,7 +3528,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -3570,7 +3570,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -5326,7 +5326,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -5350,7 +5350,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON (T4."department") T4."department" AS "job_seeker__department"
@@ -5367,7 +5367,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -5390,7 +5390,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -5495,7 +5495,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -5914,7 +5914,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -5957,7 +5957,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -6000,7 +6000,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -6032,7 +6032,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqselectedadministrativecriteria"."id",
@@ -6068,7 +6068,7 @@
         'origin': list([
           '_add_geiq_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id",
@@ -6141,7 +6141,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_prescriptions.html]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -6427,7 +6427,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -6451,7 +6451,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON (T4."department") T4."department" AS "job_seeker__department"
@@ -6468,7 +6468,7 @@
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -6491,7 +6491,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -6566,7 +6566,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -6955,7 +6955,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -6998,7 +6998,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -7041,7 +7041,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -7073,7 +7073,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqselectedadministrativecriteria"."id",
@@ -7109,7 +7109,7 @@
         'origin': list([
           '_add_geiq_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id",
@@ -7185,7 +7185,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_prescriptions.html]',
           'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"

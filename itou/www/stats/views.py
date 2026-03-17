@@ -153,7 +153,7 @@ def render_stats(
             **extra_data,
         )
 
-    if request.user.is_authenticated and request.user.is_caseworker:
+    if request.user.is_authenticated and (request.from_employer or request.from_prescriber):
         activate_pilotage(request.user)
 
     return render(request, template_name, base_context)
