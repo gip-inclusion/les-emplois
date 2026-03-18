@@ -910,7 +910,7 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
-    @pytest.mark.parametrize("kind", UserKind.caseworkers())
+    @pytest.mark.parametrize("kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
     def test_merge_updated_by_membership(self, kind, admin_client, caplog):
         if kind == UserKind.EMPLOYER:
             user_factory = EmployerFactory
