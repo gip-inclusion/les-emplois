@@ -217,44 +217,6 @@
           'ItouUserAdmin.get_inlines[users/admin.py]',
         ]),
         'sql': '''
-          SELECT "companies_companymembership"."id",
-                 "companies_companymembership"."user_id",
-                 "companies_companymembership"."joined_at",
-                 "companies_companymembership"."is_admin",
-                 "companies_companymembership"."is_active",
-                 "companies_companymembership"."created_at",
-                 "companies_companymembership"."updated_at",
-                 "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
-          FROM "companies_companymembership"
-          WHERE "companies_companymembership"."user_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ItouUserAdmin.get_inlines[users/admin.py]',
-        ]),
-        'sql': '''
-          SELECT "institutions_institutionmembership"."id",
-                 "institutions_institutionmembership"."user_id",
-                 "institutions_institutionmembership"."joined_at",
-                 "institutions_institutionmembership"."is_admin",
-                 "institutions_institutionmembership"."is_active",
-                 "institutions_institutionmembership"."created_at",
-                 "institutions_institutionmembership"."updated_at",
-                 "institutions_institutionmembership"."institution_id",
-                 "institutions_institutionmembership"."updated_by_id"
-          FROM "institutions_institutionmembership"
-          WHERE "institutions_institutionmembership"."user_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ItouUserAdmin.get_inlines[users/admin.py]',
-        ]),
-        'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -388,6 +350,46 @@
           FROM "prescribers_prescribermembership"
           WHERE "prescribers_prescribermembership"."user_id" = %s
           ORDER BY "prescribers_prescribermembership"."id" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'CompanyMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE "companies_companymembership"."user_id" = %s
+          ORDER BY "companies_companymembership"."id" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'InstitutionMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id"
+          FROM "institutions_institutionmembership"
+          WHERE "institutions_institutionmembership"."user_id" = %s
+          ORDER BY "institutions_institutionmembership"."id" ASC
         ''',
       }),
       dict({
