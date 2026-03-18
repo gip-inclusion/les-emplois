@@ -1,0 +1,16 @@
+<form hx-get="{{ request.path }}" hx-trigger="change delay:.5s, duetChange delay:.5s" hx-target="#contracts-results-table" hx-swap="outerHTML" hx-indicator="#contracts-results-table" hx-push-url="true">
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFilters" aria-labelledby="offcanvasFiltersLabel">
+        <div class="offcanvas-header">
+            <h4 class="mb-0 btn-ico">
+                <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
+                <span>Filtrer</span>
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+        </div>
+
+        {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_body.html" with assessment=assessment request=request filters_form=filters_form only %}
+        {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_form=filters_form only %}
+
+    </div>
+</form>

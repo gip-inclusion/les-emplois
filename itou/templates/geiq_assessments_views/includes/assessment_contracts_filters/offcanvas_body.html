@@ -1,0 +1,4 @@
+<div class="offcanvas-body"{% if request.htmx %} hx-swap-oob="true"{% endif %} id="offcanvasFiltersContent">
+    {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
+    {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
+</div>

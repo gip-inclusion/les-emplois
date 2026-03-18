@@ -1193,6 +1193,15 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="all-filter-container" id="all-filters-btn-container">
+                              <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                                  </i>
+                                  <span>
+                                      Tous les filtres
+                                  </span>
+                              </button>
+                          </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
@@ -1442,6 +1451,15 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="all-filter-container" id="all-filters-btn-container">
+                              <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                                  </i>
+                                  <span>
+                                      Tous les filtres
+                                  </span>
+                              </button>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -1718,6 +1736,15 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="all-filter-container" id="all-filters-btn-container">
+                              <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                                  </i>
+                                  <span>
+                                      Tous les filtres
+                                  </span>
+                              </button>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -2167,6 +2194,15 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="all-filter-container" id="all-filters-btn-container">
+                              <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                                  </i>
+                                  <span>
+                                      Tous les filtres
+                                  </span>
+                              </button>
+                          </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
@@ -2384,6 +2420,15 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="all-filter-container" id="all-filters-btn-container">
+                              <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                                  </i>
+                                  <span>
+                                      Tous les filtres
+                                  </span>
+                              </button>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -2628,6 +2673,15 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="all-filter-container" id="all-filters-btn-container">
+                              <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                                  </i>
+                                  <span>
+                                      Tous les filtres
+                                  </span>
+                              </button>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
