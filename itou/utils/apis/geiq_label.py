@@ -36,8 +36,9 @@ class LabelApiClient:
         command = LabelCommand(command)
         if command in (LabelCommand.DownloadCompte, LabelCommand.SynthesePDF):
             raise ValueError(f"{command} does not return JSON data")
-        if "where" in params and isinstance(params["where"], list):
-            params["where[]"] = params.pop("where")
+        for key in ("where", "join"):
+            if key in params and isinstance(params[key], list):
+                params[f"{key}[]"] = params.pop(key)
         try:
             response_data = (
                 self.client.get(
@@ -103,15 +104,18 @@ class LabelApiClient:
     def get_all_contracts(self, geiq_id, *, page_size=100, date_fin=None):
         data = []
         p = 1
-        where = f"s.geiq,=,{geiq_id}"
+        join = ["salariecontrat.salarie,s", "salariecontrat.nature_contrat,nc"]
+        where = [
+            f"s.geiq,=,{geiq_id}",
+            # Only import apprenticeship (CAPP) and professionalization (CPRO) contracts
+            "nc.libelle_abr,in,CAPP;CPRO",
+        ]
         if date_fin:
-            where = [where, f"salariecontrat.date_fin,>,{date_fin}"]
-        expected_nb = self._command(
-            LabelCommand.SalarieContrat, join="salariecontrat.salarie,s", where=where, count=True
-        )
+            where.append(f"salariecontrat.date_fin,>,{date_fin}")
+        expected_nb = self._command(LabelCommand.SalarieContrat, join=join, where=where, count=True)
         while new_values := self._command(
             LabelCommand.SalarieContrat,
-            join="salariecontrat.salarie,s",
+            join=join,
             where=where,
             sort="salariecontrat.id",
             n=page_size,

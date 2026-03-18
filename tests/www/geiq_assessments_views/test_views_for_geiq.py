@@ -497,11 +497,15 @@ class TestAssessmentDetailsForGEIQView:
         # Retrieve Contracts infos
         respx_mock.get(
             f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat"
-            f"?join=salariecontrat.salarie,s&count=true&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=salariecontrat.date_fin,>,2022-09-30",
+            f"?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+            f"&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=nc.libelle_abr,in,CAPP;CPRO&where[]=salariecontrat.date_fin,>,2022-09-30"
+            "&count=true",
         ).respond(200, json={"status": "Success", "result": 0})
         respx_mock.get(
             f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat"
-            f"?join=salariecontrat.salarie,s&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=salariecontrat.date_fin,>,2022-09-30&sort=salariecontrat.id&n=100&p=1"
+            f"?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+            f"&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=nc.libelle_abr,in,CAPP;CPRO&where[]=salariecontrat.date_fin,>,2022-09-30"
+            "&sort=salariecontrat.id&n=100&p=1"
         ).respond(200, json={"status": "Success", "result": []})
         respx_mock.get(
             f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalariePreQualification"
@@ -1157,11 +1161,15 @@ class TestAssessmentContractsSync:
         # TODO(xfernandez): add contracts & pre-qualifications data to test sync
         respx_mock.get(
             f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat"
-            f"?join=salariecontrat.salarie,s&count=true&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=salariecontrat.date_fin,>,2022-09-30",
+            f"?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+            f"&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=nc.libelle_abr,in,CAPP;CPRO&where[]=salariecontrat.date_fin,>,2022-09-30"
+            "&count=true",
         ).respond(200, json={"status": "Success", "result": 0})
         respx_mock.get(
             f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat"
-            f"?join=salariecontrat.salarie,s&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=salariecontrat.date_fin,>,2022-09-30&sort=salariecontrat.id&n=100&p=1"
+            f"?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+            f"&where[]=s.geiq,=,{assessment.label_geiq_id}&where[]=nc.libelle_abr,in,CAPP;CPRO&where[]=salariecontrat.date_fin,>,2022-09-30"
+            "&sort=salariecontrat.id&n=100&p=1"
         ).respond(200, json={"status": "Success", "result": []})
         respx_mock.get(
             f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalariePreQualification"

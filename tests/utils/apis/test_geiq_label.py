@@ -61,25 +61,39 @@ def test_get_all_geiq(respx_mock, label_settings):
 
 
 def test_get_all_contracts_empty(respx_mock, label_settings):
+    base = label_settings.API_GEIQ_LABEL_BASE_URL
     respx_mock.get(
-        f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat?join=salariecontrat.salarie,s&where=s.geiq,=,123&count=true"
+        f"{base}/rest/SalarieContrat"
+        "?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+        "&where[]=s.geiq,=,123&where[]=nc.libelle_abr,in,CAPP;CPRO"
+        "&count=true"
     ).respond(200, json={"status": "Success", "result": 0})
     respx_mock.get(
-        f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat?join=salariecontrat.salarie,s&where=s.geiq,=,123&sort=salariecontrat.id&n=100&p=1"
+        f"{base}/rest/SalarieContrat"
+        "?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+        "&where[]=s.geiq,=,123&where[]=nc.libelle_abr,in,CAPP;CPRO"
+        "&sort=salariecontrat.id&n=100&p=1"
     ).respond(200, json={"status": "Success", "result": []})
     client = geiq_label.get_client()
     assert client.get_all_contracts(123) == []
 
 
 def test_get_all_contracts(respx_mock, label_settings):
+    base = label_settings.API_GEIQ_LABEL_BASE_URL
     expected_data = [
         {"id": nb, "antenne": {}, "salarie": {"id": nb * 11, "nom": f"Salarie du contrat {nb}"}} for nb in range(1, 91)
     ]
     respx_mock.get(
-        f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat?join=salariecontrat.salarie,s&where=s.geiq,=,123&count=true"
+        f"{base}/rest/SalarieContrat"
+        "?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+        "&where[]=s.geiq,=,123&where[]=nc.libelle_abr,in,CAPP;CPRO"
+        "&count=true"
     ).respond(200, json={"status": "Success", "result": 90})
     respx_mock.get(
-        f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalarieContrat?join=salariecontrat.salarie,s&where=s.geiq,=,123&sort=salariecontrat.id&n=100&p=1"
+        f"{base}/rest/SalarieContrat"
+        "?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+        "&where[]=s.geiq,=,123&where[]=nc.libelle_abr,in,CAPP;CPRO"
+        "&sort=salariecontrat.id&n=100&p=1"
     ).respond(200, json={"status": "Success", "result": expected_data})
 
     client = geiq_label.get_client()
