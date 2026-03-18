@@ -573,28 +573,23 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             lambda user: user.job_applications_sent.all(), SentJobApplicationInline, True
         )
         conditional_inlines = {
-            "is_employer": [
-                ConditionalInline(
-                    lambda user: CompanyMembership.include_inactive.filter(user=user),
-                    CompanyMembershipInline,
-                    False,
-                ),
-                sent_applications_inline,
-            ],
-            "is_prescriber": [
+            "is_professional": [
                 ConditionalInline(
                     lambda user: PrescriberMembership.include_inactive.filter(user=user),
                     PrescriberMembershipInline,
                     False,
                 ),
-                sent_applications_inline,
-            ],
-            "is_labor_inspector": [
+                ConditionalInline(
+                    lambda user: CompanyMembership.include_inactive.filter(user=user),
+                    CompanyMembershipInline,
+                    False,
+                ),
                 ConditionalInline(
                     lambda user: InstitutionMembership.include_inactive.filter(user=user),
                     InstitutionMembershipInline,
                     False,
                 ),
+                sent_applications_inline,
             ],
             "is_job_seeker": [
                 ConditionalInline(lambda user: user.eligibility_diagnoses.all(), EligibilityDiagnosisInline, False),
