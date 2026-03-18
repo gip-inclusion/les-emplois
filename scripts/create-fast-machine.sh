@@ -19,10 +19,15 @@ if [ ! -f "$HOME/.config/clever-cloud/clever-tools.json" ]; then
   exit 1
 fi
 
+if [ -z "$CLEVER_ORG_ID" ]; then
+    echo "No \$CLEVER_ORG_ID configured"
+    exit 1;
+fi
+
 APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
 
-clever create "$APP_NAME" --type python --region par --alias "$APP_NAME" --org Itou
-clever link "$APP_NAME" --org Itou
+clever create "$APP_NAME" --type python --region par --alias "$APP_NAME" --org "$CLEVER_ORG_ID"
+clever link "$APP_NAME" --org "$CLEVER_ORG_ID"
 clever scale --flavor XL --alias "$APP_NAME"
 
 clever env set ITOU_ENVIRONMENT "PROD" --alias "$APP_NAME"
