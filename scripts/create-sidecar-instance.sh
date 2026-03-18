@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script creates a machine on Clever Cloud that is then used in order to perform the database imports
-# It is meant to be run from the root (./scripts/create-fast-machine.sh)
+# It is meant to be run from the root (./scripts/create-sidecar-instance.sh)
 
 # It requires clever tools in order to be run:
 # - https://github.com/CleverCloud/clever-tools/
@@ -24,11 +24,11 @@ if [ -z "$CLEVER_ORG_ID" ]; then
     exit 1;
 fi
 
-APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
+APP_NAME=c1-sidecar-$(date +%y-%m-%d-%Hh-%M)
 
 clever create "$APP_NAME" --type python --region par --alias "$APP_NAME" --org "$CLEVER_ORG_ID"
 clever link "$APP_NAME" --org "$CLEVER_ORG_ID"
-clever scale --flavor XL --alias "$APP_NAME"
+clever scale --flavor M --alias "$APP_NAME"
 
 clever env set ITOU_ENVIRONMENT "PROD" --alias "$APP_NAME"
 # By default Clever creates a python app with CC_PYTHON_VERSION set to "3"
