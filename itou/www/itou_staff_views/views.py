@@ -409,7 +409,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 def merge_users_confirm(
     request, user_1_public_id, user_2_public_id, template_name="itou_staff_views/merge_users_confirm.html"
 ):
-    ALLOWED_USER_KINDS = UserKind.caseworkers()
+    ALLOWED_USER_KINDS = UserKind.professionals()
 
     user_1 = get_object_or_404(User, public_id=user_1_public_id)
     user_2 = get_object_or_404(User, public_id=user_2_public_id)
@@ -428,9 +428,9 @@ def merge_users_confirm(
     if to_user == from_user:
         to_user_error = from_user_error = "Les utilisateurs doivent être différents"
     if to_user.kind not in ALLOWED_USER_KINDS:
-        to_user_error = "L’utilisateur doit être employeur ou prescripteur"
+        to_user_error = "L’utilisateur doit être un professionel"
     if from_user.kind not in ALLOWED_USER_KINDS:
-        from_user_error = "L’utilisateur doit être employeur ou prescripteur"
+        from_user_error = "L’utilisateur doit être un professionel"
 
     form = MergeUserConfirmForm(data=request.POST or None)
 

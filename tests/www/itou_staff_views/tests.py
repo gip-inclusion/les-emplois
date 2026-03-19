@@ -26,6 +26,7 @@ from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.gps.models import FollowUpGroupMembership
+from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
@@ -44,6 +45,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordTransitionLogFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -432,7 +434,6 @@ class TestMergeUsers:
         prescriber = PrescriberFactory()
         employer = EmployerFactory()
         job_seeker = JobSeekerFactory()
-        labor_inspector = LaborInspectorFactory()
         itou_staff = ItouStaffFactory(is_superuser=True)
 
         client.force_login(itou_staff)
@@ -450,10 +451,10 @@ class TestMergeUsers:
         response = client.post(url)
         assert merge_users_mock.call_count == 0
 
-        # if the users are not employers of prescribers
-        url = reverse("itou_staff_views:merge_users_confirm", args=(job_seeker.public_id, labor_inspector.public_id))
+        # if the users are not professionals
+        url = reverse("itou_staff_views:merge_users_confirm", args=(job_seeker.public_id, itou_staff.public_id))
         response = client.get(url)
-        assertContains(response, "L’utilisateur doit être employeur ou prescripteur", count=2)
+        assertContains(response, "L’utilisateur doit être un professionel", count=2)
         assertNotContains(response, BUTTON_TXT)
         assertNotContains(response, DATA_TITLE)
         response = client.post(url)
@@ -649,6 +650,44 @@ class TestMergeUsers:
             f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — "
             f"itou.companies.models.CompanyMembership.user updated : [{membership_1.pk}]",
             f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_institution_memberships(self, client, caplog):
+        labor_inspector_1 = LaborInspectorFactory()
+        labor_inspector_2 = LaborInspectorFactory()
+        other_labor_inspector = LaborInspectorFactory()
+        institution = InstitutionFactory()
+        membership_1 = InstitutionMembershipFactory(
+            user=labor_inspector_1, institution=institution, is_active=False, is_admin=True
+        )
+        membership_2 = InstitutionMembershipFactory(
+            user=labor_inspector_2,
+            institution=institution,
+            is_active=True,
+            is_admin=False,
+            updated_by=other_labor_inspector,
+        )
+
+        with freeze_time() as frozen_now:
+            client.force_login(ItouStaffFactory(is_superuser=True))
+            url = reverse(
+                "itou_staff_views:merge_users_confirm", args=(labor_inspector_1.public_id, labor_inspector_2.public_id)
+            )
+            client.post(url, data={"user_to_keep": "to_user"})
+            membership = InstitutionMembership.objects.get()
+            assert membership.user == labor_inspector_1
+            assert membership.is_admin is True
+            assert membership.is_active is True
+            assert membership.joined_at == min(membership_1.joined_at, membership_2.joined_at)
+            assert membership.created_at == min(membership_1.created_at, membership_2.created_at)
+            assert membership.updated_at == frozen_now().replace(tzinfo=datetime.UTC)
+            assert membership.updated_by == other_labor_inspector
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {labor_inspector_1.pk} ← {labor_inspector_2.pk} — "
+            f"itou.institutions.models.InstitutionMembership.user updated : [{membership_1.pk}]",
+            f"Fusion utilisateurs {labor_inspector_1.pk} ← {labor_inspector_2.pk} — Done !",
             "HTTP 302 Found",
         ]
 
