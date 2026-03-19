@@ -16,6 +16,8 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
+from itou.nexus.enums import Service
+from itou.nexus.models import ActivatedService
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.utils import merge_job_seeker_assignments
@@ -158,11 +160,42 @@ def handle_token(model, from_user, to_user):
     Token.objects.filter(user=from_user).update(user=to_user)
 
 
+def handle_activated_services(model, from_user, to_user):
+    from_user_activated_services = model.objects.filter(
+        user=from_user,
+        # Don't move the other services since the email was given by the external service
+        service__in=Service.internal_services(),
+    )
+    to_user_activated_services = {
+        activated_service.service: activated_service for activated_service in model.objects.filter(user=to_user)
+    }
+    updated_pks = []
+    moved_pks = []
+    for from_user_activated_service in from_user_activated_services:
+        if to_user_activated_service := to_user_activated_services.get(from_user_activated_service.service):
+            updated_pks.append(to_user_activated_service.pk)
+            to_user_activated_service.created_at = min(
+                to_user_activated_service.created_at, from_user_activated_service.created_at
+            )
+            to_user_activated_service.save()
+        else:
+            moved_pks.append(from_user_activated_service.pk)
+            from_user_activated_service.user = to_user
+            from_user_activated_service.save()
+    base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.user"
+    if updated_pks:
+        logger.info(f"{base_log} updated : {updated_pks}")
+    if moved_pks:
+        logger.info(f"{base_log} moved : {moved_pks}")
+    return len(from_user_activated_services)
+
+
 def noop(*args):
     return 0
 
 
 MODEL_MAPPING = {
+    (ActivatedService, "user"): handle_activated_services,
     (CompanyMembership, "user"): partial(handle_membership, org_field_name="company"),
     (PrescriberMembership, "user"): partial(handle_membership, org_field_name="organization"),
     (InstitutionMembership, "user"): partial(handle_membership, org_field_name="institution"),
@@ -267,6 +300,7 @@ def merge_users(to_user, from_user, update_personal_data):
         "companies.CompanyMembership",
         "institutions.InstitutionMembership",
         "authtoken.Token",
+        "nexus.ActivatedService",
     }:
         raise Exception(f"Forbidden models deleted : {forbidden_models}")
     to_user.save()

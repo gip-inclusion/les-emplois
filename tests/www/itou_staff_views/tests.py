@@ -29,6 +29,8 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
+from itou.nexus.enums import Service
+from itou.nexus.models import ActivatedService
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
@@ -590,6 +592,37 @@ class TestMergeUsers:
         assert (
             admin_remark.remark == f"2024-11-19: Fusion des utilisateurs {prescriber_1.email} et {prescriber_2.email}"
         )
+
+    def test_merge_activated_services(self, client, caplog):
+        user_1 = PrescriberFactory()
+        user_2 = PrescriberFactory()
+        activated_service_monrecap_2 = ActivatedService.objects.create(user=user_2, service=Service.MON_RECAP)
+        activated_service_pilotage_2 = ActivatedService.objects.create(user=user_2, service=Service.PILOTAGE)
+        ActivatedService.objects.create(user=user_2, service=Service.DORA)
+        ActivatedService.objects.create(user=user_2, service=Service.MARCHE)
+        activated_service_monrecap_1 = ActivatedService.objects.create(user=user_1, service=Service.MON_RECAP)
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(user_1.public_id, user_2.public_id))
+        client.post(url, data={"user_to_keep": "to_user"})
+        assertQuerySetEqual(
+            ActivatedService.objects.all(),
+            [
+                (user_1.pk, Service.MON_RECAP, activated_service_monrecap_2.created_at),  # updated created_at
+                (user_1.pk, Service.PILOTAGE, activated_service_pilotage_2.created_at),
+            ],
+            transform=lambda s: (s.user_id, s.service, s.created_at),
+            ordered=False,
+        )
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — itou.nexus.models.ActivatedService.user updated :"
+            f" [{activated_service_monrecap_1.pk}]",
+            f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — itou.nexus.models.ActivatedService.user moved :"
+            f" [{activated_service_pilotage_2.pk}]",
+            f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
 
     def test_merge_prescriber_memberships(self, client, caplog):
         prescriber_1 = PrescriberFactory()
