@@ -16,7 +16,8 @@ class MalformedResponseException(Exception):
 
 # https://app.brevo.com/contact/list-listing
 class BrevoListID(enum.IntEnum):
-    LES_EMPLOIS = 31
+    EMPLOYERS = 203
+    PRESCRIBERS = 204
     CANDIDATS = 82
     CANDIDATS_AUTONOMES_BLOQUES = 83
     CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC = 116

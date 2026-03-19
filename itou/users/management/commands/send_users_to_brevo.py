@@ -86,7 +86,7 @@ class Command(BaseCommand):
 
     def import_professionals(self, client, *, wet_run):
         professional_qs = (
-            User.objects.filter(kind__in=UserKind.caseworkers())
+            User.objects.filter(kind__in=UserKind.professionals())
             .filter(
                 Exists(
                     EmailAddress.objects.filter(
@@ -108,7 +108,7 @@ class Command(BaseCommand):
 
     def import_employers(self, client, professional_qs, *, wet_run):
         employers = list(
-            professional_qs.filter(kind=UserKind.EMPLOYER).filter(
+            professional_qs.filter(
                 Exists(
                     CompanyMembership.objects.filter(
                         user_id=OuterRef("pk"),
@@ -119,23 +119,25 @@ class Command(BaseCommand):
         )
         self.logger.info("SIAE users count: %d", len(employers))
         if wet_run:
-            client.import_users(employers, BrevoListID.LES_EMPLOIS, employer_serializer)
+            client.import_users(employers, BrevoListID.EMPLOYERS, employer_serializer)
 
     def import_prescribers(self, client, professional_qs, *, wet_run):
-        all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
+        all_prescribers = professional_qs.filter(Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"))))
+
         authorized_prescriber_memberships = PrescriberMembership.objects.filter(
             user_id=OuterRef("pk"),
             organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
-        prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
-        self.logger.info("Prescribers count: %d", len(prescribers))
+        authorized_prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
+
+        self.logger.info("Prescribers count: %d", len(authorized_prescribers))
         if wet_run:
-            client.import_users(prescribers, BrevoListID.LES_EMPLOIS, authorized_prescriber_serializer)
+            client.import_users(authorized_prescribers, BrevoListID.PRESCRIBERS, authorized_prescriber_serializer)
 
         orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
         self.logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
-            client.import_users(orienteurs, BrevoListID.LES_EMPLOIS, prescriber_serializer)
+            client.import_users(orienteurs, BrevoListID.PRESCRIBERS, prescriber_serializer)
 
     def import_job_seekers(self, client, *, wet_run):
         job_seekers = User.objects.filter(

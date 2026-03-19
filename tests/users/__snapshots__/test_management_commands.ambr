@@ -156,7 +156,7 @@
     tuple(
       'itou.users.management.commands.send_users_to_brevo',
       20,
-      'Orienteurs count: 3',
+      'Orienteurs count: 1',
     ),
     tuple(
       'httpx',
