@@ -297,7 +297,7 @@ class TestCommandSendUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BrevoListID.LES_EMPLOIS],
+                "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -397,7 +397,7 @@ class TestCommandSendUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BrevoListID.LES_EMPLOIS],
+                "listIds": [BrevoListID.PRESCRIBERS],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -428,6 +428,7 @@ class TestCommandSendUsersToBrevo:
 
     @freeze_time("2023-05-02")
     def test_wet_run_orienteurs(self, caplog, respx_mock, snapshot):
+        # Prescribers without memberships are ignored
         PrescriberFactory(
             first_name="Billy",
             last_name="Boo",
@@ -438,7 +439,7 @@ class TestCommandSendUsersToBrevo:
             last_name="Sunder",
             email="sonny.sunder@mailinator.com",
         )
-        # Inactive memberships are considered orienteur.
+        # Inactive memberships are also ignored.
         PrescriberMembershipFactory(user=sonny, is_active=False)
         # Members of unauthorized organizations are orienteurs.
         timmy = PrescriberFactory(
@@ -469,30 +470,12 @@ class TestCommandSendUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BrevoListID.LES_EMPLOIS],
+                "listIds": [BrevoListID.PRESCRIBERS],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
                 "emptyContactsAttributes": False,
                 "jsonBody": [
-                    {
-                        "email": "billy.boo@mailinator.com",
-                        "attributes": {
-                            "prenom": "Billy",
-                            "nom": "BOO",
-                            "date_inscription": "2023-05-02",
-                            "type": "orienteur",
-                        },
-                    },
-                    {
-                        "email": "sonny.sunder@mailinator.com",
-                        "attributes": {
-                            "prenom": "Sonny",
-                            "nom": "SUNDER",
-                            "date_inscription": "2023-05-02",
-                            "type": "orienteur",
-                        },
-                    },
                     {
                         "email": "timmy.timber@mailinator.com",
                         "attributes": {
@@ -726,7 +709,7 @@ class TestCommandSendUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BrevoListID.LES_EMPLOIS],
+                "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -744,7 +727,7 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
             {
-                "listIds": [BrevoListID.LES_EMPLOIS],
+                "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -780,7 +763,7 @@ class TestCommandSendUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BrevoListID.LES_EMPLOIS],
+                "listIds": [BrevoListID.EMPLOYERS],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
