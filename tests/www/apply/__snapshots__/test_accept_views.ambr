@@ -2272,6 +2272,114 @@
     ]),
   })
 # ---
+# name: TestContractInfosForAccept.test_iae_hiring_start_at[employer_diag_hiring_in_more_than_92_days-modal_error:AFTER_MORE_THAN_92_DAYS_ERROR_CODE][modal]
+  '''
+  <div aria-labelledby="hiring_start_at_issue-label" aria-modal="true" class="modal" id="hiring_start_at_issue-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="hiring_start_at_issue-label">
+                      Embauche à cette date impossible
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Il n’est pas possible de valider une embauche si la date de début de contrat est prévue dans plus
+                              de 92 jours.
+                  </p>
+                  <p>
+                      Veuillez mettre cette candidature en attente pour la traiter plus tard ou modifier la
+                                  date de début de contrat.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <a aria-label="Mettre la candidature en attente" class="btn btn-sm btn-ouline-primary" href="/apply/[PK of JobApplication]/siae/postpone">
+                      Mettre en attente
+                  </a>
+                  <button aria-label="Revenir au formulaire" class="btn btn-sm btn-primary" data-bs-dismiss="modal" type="button">
+                      Modifier la date
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestContractInfosForAccept.test_iae_hiring_start_at[no_diag_hiring_in_more_than_92_days-modal_error:AFTER_MORE_THAN_92_DAYS_ERROR_CODE][modal]
+  '''
+  <div aria-labelledby="hiring_start_at_issue-label" aria-modal="true" class="modal" id="hiring_start_at_issue-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="hiring_start_at_issue-label">
+                      Embauche à cette date impossible
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Il n’est pas possible de valider une embauche si la date de début de contrat est prévue dans plus
+                              de 92 jours.
+                  </p>
+                  <p>
+                      Veuillez mettre cette candidature en attente pour la traiter plus tard ou modifier la
+                                  date de début de contrat.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <a aria-label="Mettre la candidature en attente" class="btn btn-sm btn-ouline-primary" href="/apply/[PK of JobApplication]/siae/postpone">
+                      Mettre en attente
+                  </a>
+                  <button aria-label="Revenir au formulaire" class="btn btn-sm btn-primary" data-bs-dismiss="modal" type="button">
+                      Modifier la date
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestContractInfosForAccept.test_iae_hiring_start_at[valid_approval_hiring_outside_validity_period-modal_error:OUTSIDE_APPROVAL_BOUNDS_ERROR_CODE][modal]
+  '''
+  <div aria-labelledby="hiring_start_at_issue-label" aria-modal="true" class="modal" id="hiring_start_at_issue-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="hiring_start_at_issue-label">
+                      Embauche à cette date impossible
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      La date de début de contrat prévue n’est pas couverte par la période de validité du PASS IAE,
+                              par conséquent l’embauche n’est pas possible. Si la situation du candidat le nécessite vous
+                              pouvez faire appel à un prescripteur habilité afin qu’il valide l’éligibilité du candidat.
+                      <br/>
+                      La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de
+                              fin de validité du PASS IAE.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <a aria-label="Mettre la candidature en attente" class="btn btn-sm btn-ouline-primary" href="/apply/[PK of JobApplication]/siae/postpone">
+                      Mettre en attente
+                  </a>
+                  <button aria-label="Revenir au formulaire" class="btn btn-sm btn-primary" data-bs-dismiss="modal" type="button">
+                      Modifier la date
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestFillJobSeekerInfosForAccept.test_no_missing_data_iae[view queries]
   dict({
     'num_queries': 16,
