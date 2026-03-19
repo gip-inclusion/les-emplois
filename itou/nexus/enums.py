@@ -29,8 +29,13 @@ class Service(models.TextChoices):
         return [(k, v) for k, v in cls.choices if k in [cls.DORA, cls.MARCHE]]
 
     @classmethod
-    def activated_services_choices(cls):
-        return [(k, v) for k, v in cls.choices if k in [cls.MON_RECAP, cls.PILOTAGE]]
+    def internal_services(cls):
+        # Services managed in ActivatedServices. EMPLOIS will soon join them
+        return [cls.PILOTAGE, cls.MON_RECAP]
+
+    @classmethod
+    def internal_services_choices(cls):
+        return [(k, v) for k, v in cls.choices if k in cls.internal_services()]
 
 
 class Auth(models.TextChoices):

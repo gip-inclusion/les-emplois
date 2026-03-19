@@ -171,7 +171,7 @@ class ActivatedService(models.Model):
         related_name="activated_services",
         on_delete=models.CASCADE,
     )
-    service = models.CharField(verbose_name="service", choices=Service.activated_services_choices())
+    service = models.CharField(verbose_name="service", choices=Service.internal_services_choices())
     created_at = models.DateTimeField(verbose_name="date d'activation", default=timezone.now)
 
     objects = ActivatedServiceManager()
