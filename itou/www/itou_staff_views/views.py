@@ -2,6 +2,7 @@ import csv
 import datetime
 import io
 from base64 import b32encode
+from dataclasses import dataclass
 
 import segno
 from dateutil.relativedelta import relativedelta
@@ -14,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.http import content_disposition_header
+from django.utils.safestring import SafeString
 from django_otp import devices_for_user, login as otp_login
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
@@ -245,6 +247,16 @@ def export_fs_3437(request):
     )
 
 
+@dataclass
+class ImportFS3437Result:
+    asp_uid: str
+    summary: str
+    with_3437: bool | None
+    mismatch: dict | None
+    duplicate_link: SafeString | None
+    er_to_resend: list[EmployeeRecord]
+
+
 @check_user(lambda user: user.is_staff)
 @permission_required("users.import_fs_3437_from_asp")
 def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3437_from_asp.html"):
@@ -276,7 +288,16 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
         for _index, line in df.iterrows():
             profile = known_job_seeker_profiles_map.get(line.idItou)
             if profile is None:
-                results.append((line["idItou"], "Candidat non trouvé", None, None, None, []))
+                results.append(
+                    ImportFS3437Result(
+                        asp_uid=line["idItou"],
+                        summary="Candidat non trouvé",
+                        with_3437=None,
+                        mismatch=None,
+                        duplicate_link=None,
+                        er_to_resend=[],
+                    )
+                )
                 continue
 
             mismatch = {}
@@ -306,13 +327,15 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
             for er in er_to_resend:
                 er.admin_link = get_admin_view_link(er)
             results.append(
-                (
-                    line["idItou"],
-                    f"Candidat identifié - {profile.user.get_full_name()} - nouvel idItou: {new_asp_uid}",
-                    profile.with_3437,
-                    mismatch,
-                    get_admin_view_link(duplicate, content=duplicate.display_with_pii) if duplicate else None,
-                    er_to_resend,
+                ImportFS3437Result(
+                    asp_uid=line["idItou"],
+                    summary=f"Candidat identifié - {profile.user.get_full_name()} - nouvel idItou: {new_asp_uid}",
+                    with_3437=profile.with_3437,
+                    mismatch=mismatch,
+                    duplicate_link=get_admin_view_link(duplicate, content=duplicate.display_with_pii)
+                    if duplicate
+                    else None,
+                    er_to_resend=er_to_resend,
                 )
             )
             if wet_run and duplicate is None:
