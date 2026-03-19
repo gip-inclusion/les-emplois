@@ -668,7 +668,7 @@ class TestStandaloneCreateAsPrescriber:
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="714612105555578" if with_nia else "178122978200508",
+            jobseeker_profile__nir="714618619455570" if with_nia else "178128619400507",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
@@ -733,6 +733,10 @@ class TestStandaloneCreateAsPrescriber:
         response = client.get(next_url)
         # The NIR is prefilled
         assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
+        # Birth place is prefilled from NIR (not from NIA)
+        assert_ = assertNotContains if with_nia else assertContains
+        assert_(response, " selected>FRANCE</option>")
+        assert_(response, " selected>POITIERS (086)</option>")
         # Check that the back url is correct
         assertContains(
             response,

@@ -21,6 +21,7 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
+from itou.asp.utils import guess_birth_place_from_nir
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -751,8 +752,13 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         session_birthdate = self.job_seeker_session.get("profile", {}).get("birthdate")
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
-        session_birth_place = self.job_seeker_session.get("profile", {}).get("birth_place")
-        session_birth_country = self.job_seeker_session.get("profile", {}).get("birth_country")
+        prefilled_birth_place = self.job_seeker_session.get("profile", {}).get("birth_place")
+        prefilled_birth_country = self.job_seeker_session.get("profile", {}).get("birth_country")
+
+        if session_nir:
+            birth_city_from_nir, birth_country_from_nir = guess_birth_place_from_nir(session_nir)
+            prefilled_birth_place = prefilled_birth_place or birth_city_from_nir
+            prefilled_birth_country = prefilled_birth_country or birth_country_from_nir
 
         self.form = CreateOrUpdateJobSeekerStep1Form(
             data=request.POST or None,
@@ -761,8 +767,8 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 "birthdate": session_birthdate,
                 "nir": session_nir,
                 "lack_of_nir_reason": session_lack_of_nir_reason,
-                "birth_place": session_birth_place,
-                "birth_country": session_birth_country,
+                "birth_place": prefilled_birth_place,
+                "birth_country": prefilled_birth_country,
             },
         )
 
