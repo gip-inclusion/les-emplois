@@ -83,32 +83,8 @@
             </div>
             <div class="s-section__row row">
                 <div class="col-12">
-                    <form hx-get="{{ request.path }}"
-                          hx-target="#contracts-results-table"
-                          hx-swap="outerHTML"
-                          hx-indicator="#contracts-results-table"
-                          hx-trigger="submit, change delay:.5s"
-                          hx-push-url="true"
-                          id="filter-container">
-
-                        {# row for filters and reset button #}
-                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                            {# filter 1/6 #}
-                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
-                            {# filter 2/6 #}
-                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
-                            {# reset button #}
-                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
-                        </div>
-                    </form>
                     {% partialdef contracts-results-table inline %}
                         <div id="contracts-results-table">
-
-                            {% if request.htmx and not request.htmx.boosted %}
-                                {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
-                                {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
-                                {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
-                            {% endif %}
                             {% if filters_form.is_valid %}
                                 <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                     <div class="flex-md-grow-1">
