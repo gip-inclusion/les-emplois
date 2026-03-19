@@ -10,6 +10,6 @@
         <div class="offcanvas-body">
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with filters_form=filters_form only %}
         </div>
-        {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request only %}
+        {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_counter=filters_counter only %}
     </div>
 </form>

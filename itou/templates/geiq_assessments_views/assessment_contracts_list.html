@@ -56,7 +56,7 @@
 {% endblock %}
 
 {% block content %}
-    {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas.html" with request=request filters_form=filters_form only %}
+    {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas.html" with request=request filters_counter=filters_form.get_qs_filters_counter filters_form=filters_form only %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
@@ -84,8 +84,15 @@
             </div>
             <div class="s-section__row row">
                 <div class="col-12">
-                    {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_button.html" %}
+                    <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                        {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_button.html" %}
+                        {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter top_filter=True only %}
+                    </div>
                     {% partialdef contracts-results-table inline %}
+                        {% if request.htmx and not request.htmx.boosted %}
+                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter top_filter=True only %}
+                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
+                        {% endif %}
                         <div id="contracts-results-table">
                             {% if filters_form.is_valid %}
                                 <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">

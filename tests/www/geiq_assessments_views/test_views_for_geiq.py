@@ -12,6 +12,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
+    assertNotContains,
     assertQuerySetEqual,
     assertRedirects,
 )
@@ -1453,6 +1454,8 @@ class TestAssessmentResult:
 
 
 class TestAssessmentContractsListView:
+    RESET_BTN_LABEL = "<span>Effacer tout</span>"
+
     @pytest.fixture(autouse=True)
     def setup_method(self, client, settings):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -1522,3 +1525,27 @@ class TestAssessmentContractsListView:
         contracts_in_page = response.context["contracts_page"].object_list
 
         assert contracts_in_page == [target_contract]
+
+    def test_contract_list_reset_button_visibility(self, client):
+        response = client.get(self.url)
+        assertNotContains(response, self.RESET_BTN_LABEL)
+
+        response = client.get(self.url, {"start_date_lower": "2024-01-01"})
+        assertContains(response, self.RESET_BTN_LABEL, html=True)
+
+        assert response.context["filters_counter"] == 1
+
+    def test_contract_list_reset_action(self, client):
+        EmployeeContractFactory(employee__assessment=self.assessment, start_at=datetime.date(2024, 1, 1))
+
+        response = client.get(self.url, {"start_date_lower": "2025-01-01"})
+        assert len(response.context["contracts_page"].object_list) == 0
+
+        soup_reset = parse_response_to_soup(response, selector="#reset-button-container")
+        reset_link = soup_reset.find("a")
+
+        assert reset_link["href"] == self.url
+
+        response = client.get(self.url)
+        assert len(response.context["contracts_page"].object_list) == 1
+        assertNotContains(response, self.RESET_BTN_LABEL)
