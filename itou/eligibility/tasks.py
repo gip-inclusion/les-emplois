@@ -124,7 +124,7 @@ def certify_criterion_with_api_france_travail(criterion):
         except PoleEmploiAPIBadResponse as e:
             logger.error("Error certifying criterion %r: code=%d json=%s", criterion, e.response_code, e.response_data)
             criterion.data_returned_by_api = e.response_data
-        except httpx.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             if e.response.status_code == 429:
                 # https://francetravail.io/produits-partages/documentation/utilisation-api-france-travail/erreurs-frequentes#:~:text=429 Too Many Requests  # noqa: E501
                 delay_str = e.response.headers.get("Retry-After", "60")
