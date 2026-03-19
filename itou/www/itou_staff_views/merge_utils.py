@@ -165,7 +165,7 @@ def noop(*args):
 MODEL_MAPPING = {
     (CompanyMembership, "user"): partial(handle_membership, org_field_name="company"),
     (PrescriberMembership, "user"): partial(handle_membership, org_field_name="organization"),
-    (InstitutionMembership, "user"): noop,
+    (InstitutionMembership, "user"): partial(handle_membership, org_field_name="institution"),
     (EmailAddress, "user"): noop,
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
@@ -184,6 +184,12 @@ MODEL_REPR_MAPPING = {
     ],
     PrescriberMembership: [
         lambda obj: f"<{obj.__class__.__name__}: {obj.user.get_full_name()} in {obj.organization} ({obj.pk})>",
+        [
+            "user",
+        ],
+    ],
+    InstitutionMembership: [
+        lambda obj: f"<{obj.__class__.__name__}: {obj.user.get_full_name()} in {obj.institution} ({obj.pk})>",
         [
             "user",
         ],
@@ -230,7 +236,7 @@ def migrate_field(model, field_name, from_user, to_user):
 
 @transaction.atomic
 def merge_users(to_user, from_user, update_personal_data):
-    assert to_user.is_caseworker
+    assert to_user.is_professional
     assert to_user.kind == from_user.kind
     support_remark = f"{timezone.localdate()}: Fusion des utilisateurs {to_user.email} et {from_user.email}"
     for model, field_name in get_users_relations():
@@ -259,6 +265,7 @@ def merge_users(to_user, from_user, update_personal_data):
         "communications.NotificationSettings",
         "prescribers.PrescriberMembership",
         "companies.CompanyMembership",
+        "institutions.InstitutionMembership",
         "authtoken.Token",
     }:
         raise Exception(f"Forbidden models deleted : {forbidden_models}")
