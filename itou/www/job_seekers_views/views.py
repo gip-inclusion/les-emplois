@@ -19,9 +19,10 @@ from django.views.generic import DetailView, TemplateView, View
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.models import Company, Contract
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
@@ -87,7 +88,15 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     context_object_name = "job_seeker"
 
     def test_func(self):
-        return self.request.from_prescriber or self.request.from_employer
+        if self.template_name in (
+            "job_seekers_views/job_applications.html",
+            "job_seekers_views/details.html",
+        ):
+            return self.request.from_prescriber or self.request.from_employer
+        if self.template_name == "job_seekers_views/contracts.html":
+            return self.request.from_authorized_prescriber
+
+        raise ValueError(f"Unexpected template name: {self.template_name}")
 
     def get_context_data(self, **kwargs):
         geiq_eligibility_diagnosis = None
@@ -139,6 +148,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             "matomo_custom_title": "Détail candidat",
             "approval": approval,
             "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
+            "contracts": self.get_contracts(self.request, approval),
             "job_applications": job_applications,
             "can_see_external_job_applications": can_see_external,
             "has_external_applications": has_external_applications,
@@ -161,6 +171,11 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         else:
             applications = own_applications_qs.annotate(user_can_see_details=Value(True)).all()
         return applications.select_related("to_company", "sender").prefetch_related("selected_jobs")
+
+    def get_contracts(self, request, approval):
+        if not request.from_authorized_prescriber or not approval:
+            return Contract.objects.none()
+        return get_contracts(approval)
 
 
 def can_see_external_job_applications(job_seeker, request):

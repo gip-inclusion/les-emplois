@@ -1,0 +1,90 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load format_filters %}
+{% load static %}
+{% load str_filters %}
+{% load url_add_query %}
+
+{% block title %}
+    Profil de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False show_copy_public_id_link=False only %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker active_nav_tab="contracts" back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Suivi des contrats IAE</h2>
+
+            {% if approval %}
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
+                        Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
+                        Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                    {% endfragment %}
+                {% endcomponent_info %}
+
+                {% for contract in contracts %}
+                    <div class="c-box c-box--results mb-3 mb-md-4">
+                        <div class="c-box--results__header">
+                            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                <div class="c-box--results__summary flex-grow-1">
+                                    <i class="ri-home-smile-2-line" aria-hidden="true"></i>
+                                    <div>
+                                        <span>{{ contract.company.kind }}</span>
+                                        <h3>{{ contract.company.display_name }}</h3>
+                                    </div>
+                                </div>
+                                <div class="align-self-center">
+                                    <span>
+                                        <i class="ri-calendar-line ri-lg fw-normal" aria-hidden="true"></i>
+
+                                        {% if contract.end_date %}
+                                            Du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}
+                                        {% else %}
+                                            Depuis le {{ contract.start_date|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="c-box c-box--results mb-3 mb-md-4">
+                        <div class="c-box--results__body">
+                            <p class="mb-0">
+                                Aucun contrat IAE n’a été trouvé. Cela peut s’expliquer par l’absence d’enregistrement dans l’Extranet ou par une impossibilité de récupération des données.
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            {% else %}
+                {# FIXME: texte à adapter (cc: Z. + UX) #}
+                {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
+                        Cette personne n’a pas de PASS IAE en cours de validité.
+                    {% endfragment %}
+                {% endcomponent_info %}
+            {% endif %}
+
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}
