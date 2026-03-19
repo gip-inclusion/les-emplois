@@ -1484,3 +1484,41 @@ class TestAssessmentContractsListView:
         trigger_btn = soup.find("button", {"data-bs-target": "#offcanvasFilters"})
         assert trigger_btn is not None
         assert trigger_btn.get("type") == "button"
+
+    def test_contract_list_htmx_consistency(self, client):
+        EmployeeContractFactory(employee__assessment=self.assessment)
+
+        filter_data = {
+            "start_date_lower": "2024-06-01",
+            "start_date_upper": "2024-06-30",
+        }
+
+        response = client.get(self.url, filter_data)
+        page = parse_response_to_soup(response, selector="#main")
+
+        response_htmx = client.get(self.url, filter_data, headers={"HX-Request": "true"})
+        update_page_with_htmx(page, "form[hx-target='#contracts-results-table']", response_htmx)
+
+        response_full = client.get(self.url, filter_data)
+        fresh_page = parse_response_to_soup(response_full, selector="#main")
+
+        assertSoupEqual(page, fresh_page)
+
+    def test_contract_list_filter_by_date(self, client):
+        target_contract = EmployeeContractFactory(
+            employee__assessment=self.assessment, start_at=datetime.date(2024, 6, 15)
+        )
+
+        EmployeeContractFactory(employee__assessment=self.assessment, start_at=datetime.date(2024, 12, 1))
+
+        filter_data = {
+            "start_date_lower": "2024-06-01",
+            "start_date_upper": "2024-06-30",
+        }
+        response = client.get(self.url, filter_data)
+
+        assert response.status_code == 200
+
+        contracts_in_page = response.context["contracts_page"].object_list
+
+        assert contracts_in_page == [target_contract]
