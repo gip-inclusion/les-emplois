@@ -1,4 +1,5 @@
 from itou.companies.enums import CompanyKind
+from itou.companies.models import Contract
 
 
 def get_user_last_accepted_siae_job_application(user):
@@ -21,3 +22,14 @@ def last_hire_was_made_by_siae(user, siae):
         return False
     last_accepted_job_application = get_user_last_accepted_siae_job_application(user)
     return last_accepted_job_application and last_accepted_job_application.to_company_id == siae.pk
+
+
+def get_contracts(approval):
+    return (
+        Contract.objects.filter(job_seeker=approval.user)
+        # Filter out contracts that do not overlap the approval
+        .exclude(end_date__lt=approval.start_at)
+        .exclude(start_date__gt=approval.end_at)
+        .select_related("company")
+        .order_by("-start_date")
+    )

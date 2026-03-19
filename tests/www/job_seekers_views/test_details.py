@@ -15,7 +15,7 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
-from tests.companies.factories import CompanyMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -720,3 +720,76 @@ class TestCanSeeExternalJobApplication(TestCase):
             created_at=timezone.localtime() - datetime.timedelta(days=1),
         )
         assert can_see_external_job_applications(self.job_seeker, request)
+
+
+class TestContracts:
+    @freeze_time("2025-08-07")
+    def test_for_authorized_prescriber(self, client, snapshot):
+        approval = ApprovalFactory(
+            for_snapshot=True,
+            start_at="2025-01-01",
+            end_at="2026-12-31",
+        )
+        job_seeker = approval.user
+        authorized_prescriber = PrescriberFactory(
+            membership=True,
+            membership__organization__authorized=True,
+        )
+
+        # Not displayed contracts
+        ContractFactory(start_date="2025-01-02")  # Contract on another job seeker
+        ContractFactory(job_seeker=job_seeker, start_date="2024-12-01", end_date="2024-12-31")  # Before approval
+        ContractFactory(job_seeker=job_seeker, start_date="2027-01-01", end_date="2027-06-30")  # After approval
+
+        # Displayed contracts
+        ContractFactory(
+            company__name="Tif'any",
+            job_seeker=job_seeker,
+            start_date="2025-01-01",
+            end_date="2025-08-07",
+            company__kind=CompanyKind.EI,
+        )  # Fully inside approval validity
+        ContractFactory(
+            company__name="Tralal’Hair",
+            job_seeker=job_seeker,
+            start_date="2025-02-01",
+            end_date=None,
+            company__kind=CompanyKind.EI,
+        )  # start date inside approval validity
+        ContractFactory(
+            company__name="Faudra Tif Hair",
+            job_seeker=job_seeker,
+            start_date="2024-10-01",
+            end_date="2025-01-10",
+            company__kind=CompanyKind.EI,
+        )  # end date inside approval validity
+        ContractFactory(
+            company__name="Inter Planet Hair",
+            job_seeker=job_seeker,
+            start_date="2024-10-01",
+            end_date="2028-06-30",
+            company__kind=CompanyKind.EI,
+        )  # approval inside contract dates
+
+        client.force_login(authorized_prescriber)
+        response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response, "#main", replace_in_attr=[("href", str(approval.public_id), "[Public ID of Approval]")]
+                )
+            )
+            == snapshot
+        )
+
+    def test_forbidden(self, client):
+        job_seeker = JobSeekerFactory()
+        for user, expected_status in [
+            (LaborInspectorFactory(membership=True), 403),
+            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership__organization__authorized=True), 200),
+            (EmployerFactory(membership=True), 403),
+        ]:
+            client.force_login(user)
+            response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
+            assert response.status_code == expected_status

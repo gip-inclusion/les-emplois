@@ -30,6 +30,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
+from itou.approvals.utils import get_contracts
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -373,14 +374,7 @@ class ContractsView(BaseApprovalDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["contracts"] = (
-            Contract.objects.filter(job_seeker=self.object.user)
-            # Filter out contracts that do not overlap the approval
-            .exclude(end_date__lt=self.object.start_at)
-            .exclude(start_date__gt=self.object.end_at)
-            .select_related("company")
-            .order_by("-start_date")
-        )
+        context["contracts"] = get_contracts(self.object)
         return context
 
 

@@ -17,6 +17,11 @@ urlpatterns = [
         name="job_applications",
     ),
     path(
+        "contracts/<uuid:public_id>",
+        views.JobSeekerDetailView.as_view(template_name="job_seekers_views/contracts.html"),
+        name="contracts",
+    ),
+    path(
         "switch_stalled_status/<uuid:public_id>",
         views.switch_stalled_status,
         name="switch_stalled_status",

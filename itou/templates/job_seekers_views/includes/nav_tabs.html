@@ -11,4 +11,11 @@
            href="{% url 'job_seekers_views:job_applications' public_id=job_seeker.public_id %}?back_url={{ back_url }}"
            {% matomo_event "candidat" "clic-onglet" "candidatures" %}>Candidatures</a>
     </li>
+    {% if request.from_authorized_prescriber %}
+        <li class="nav-item">
+            <a class="nav-link{% if active_nav_tab == "contracts" %} active{% endif %}"
+               href="{% url 'job_seekers_views:contracts' public_id=job_seeker.public_id %}?back_url={{ back_url }}"
+               {% matomo_event "candidat" "clic-onglet" "suivi contrats iae" %}>Suivi des contrats IAE</a>
+        </li>
+    {% endif %}
 </ul>
