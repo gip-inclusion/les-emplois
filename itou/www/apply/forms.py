@@ -1,5 +1,7 @@
 import datetime
+import enum
 import logging
+import uuid
 from functools import wraps
 from operator import itemgetter
 
@@ -9,6 +11,7 @@ from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
@@ -16,7 +19,9 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import Company, CompanyMembership, JobDescription
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
@@ -272,6 +277,67 @@ class AnswerForm(forms.Form):
     )
 
 
+class HiringStartAtErrorCode(enum.Enum):
+    START_IN_FAR_FUTURE = enum.auto()
+    AFTER_EMPLOYER_DIAGNOSIS_VALIDITY = enum.auto()
+    OUTSIDE_APPROVAL_BOUNDS = enum.auto()
+
+    def error_html(self, max_date: datetime.date, job_application_id: uuid.UUID | None):
+        context = {"max_date_str": max_date.strftime("%d/%m/%Y")}
+        match self:
+            case self.START_IN_FAR_FUTURE:
+                message = (
+                    "Il n'est pas possible de faire commencer un contrat aussi loin dans le futur. "
+                    "Indiquez une date plus proche (avant le {max_date_str})."
+                )
+            case self.AFTER_EMPLOYER_DIAGNOSIS_VALIDITY:
+                if job_application_id:
+                    postpone_suggestion = format_html(
+                        '<br>Veuillez <a href="{}">mettre cette candidature en attente</a> pour la traiter '
+                        "plus tard ou modifier la date de début de contrat.",
+                        reverse("apply:postpone", kwargs={"job_application_id": job_application_id}),
+                    )
+                else:
+                    postpone_suggestion = ""
+                context["postpone_suggestion"] = postpone_suggestion
+                message = """\
+                    <p>
+                        Il n’est pas possible de valider une embauche si la date de début de contrat est
+                        prévue dans plus de 92 jours (après le {max_date_str}).{postpone_suggestion}
+                    </p>"""
+            case self.OUTSIDE_APPROVAL_BOUNDS:
+                message = """\
+                    <p>
+                        La date de début de contrat prévue n’est pas couverte par la période de validité du
+                        PASS IAE, par conséquent l’embauche n’est pas possible. Si la situation du candidat le
+                        nécessite vous pouvez faire appel à un prescripteur habilité afin qu’il valide
+                        l’éligibilité du candidat.
+                        <br>
+                        La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de
+                        fin de validité du PASS IAE ({max_date_str}).
+                    </p>"""
+        return format_html(message, **context)
+
+    def explanation(self, max_date: datetime.date):
+        context = {"max_date_str": max_date.strftime("%d/%m/%Y")}
+        match self:
+            case self.START_IN_FAR_FUTURE:
+                message = "Cette date doit être comprise dans les 6 prochains mois (avant le {max_date_str})."
+            case self.AFTER_EMPLOYER_DIAGNOSIS_VALIDITY:
+                message = (
+                    "En l’absence d’un PASS IAE valide ou d’un diagnostic de prescripteur habilité, "
+                    "un diagnostic employeur est nécessaire. Ce type de diagnostic ayant une durée de "
+                    f"validité de {EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA.days} jours, "
+                    "la date doit donc être inférieure au {max_date_str}."
+                )
+            case self.OUTSIDE_APPROVAL_BOUNDS:
+                message = (
+                    "Le candidat disposant d’un PASS IAE en court de validité se terminant le {max_date_str}, "
+                    "la date doit être comprise dans cette période et être inférieure au {max_date_str}."
+                )
+        return format_html(message, **context)
+
+
 class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     """
     Allow a company to accept a job application.
@@ -330,16 +396,25 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, company, job_seeker, current_user=None, initial=None, **kwargs):
+    def __init__(
+        self, *args, company, job_seeker, iae_eligibility_diagnosis, current_user=None, initial=None, **kwargs
+    ):
         super().__init__(*args, initial=initial, **kwargs)
         self.company = company
         self.is_geiq = company.kind == CompanyKind.GEIQ
         self.job_seeker = job_seeker
+        self.iae_eligibility_diagnosis = iae_eligibility_diagnosis
         attrs_min = {}
         self._today = timezone.localdate()  # Make sure the form stays consistent around midnight
+        self.max_hiring_start_at_error_code, self.max_hiring_start_at = self.get_max_hiring_start_at_constraint()
+        self.max_hiring_start_at_explanation = self.max_hiring_start_at_error_code.explanation(
+            self.max_hiring_start_at
+        )
         if not self.is_geiq:
             attrs_min["min"] = self._today.isoformat()
-        attrs_max = {"max": self.get_far_future_date().isoformat()}
+        attrs_max = {
+            "max": self.max_hiring_start_at.isoformat(),
+        }
         self.fields["hiring_start_at"].required = True
         self.fields["hiring_start_at"].widget = DuetDatePickerWidget(attrs=attrs_min | attrs_max)
         self.fields["hiring_end_at"].widget = DuetDatePickerWidget(attrs=attrs_min)
@@ -472,8 +547,25 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         )
         self.fields["advisor"] = get_advisor_choice_field(current_user, job_seeker.get_inverted_full_name(), qs)
 
-    def get_far_future_date(self):
-        return self._today + relativedelta(months=6)
+    def get_max_hiring_start_at_constraint(self):
+        constraints = [(HiringStartAtErrorCode.START_IN_FAR_FUTURE, self._today + relativedelta(months=6))]
+
+        if self.company.is_subject_to_iae_rules:
+            if self.job_seeker.has_valid_approval:
+                constraints.append(
+                    (HiringStartAtErrorCode.OUTSIDE_APPROVAL_BOUNDS, self.job_seeker.latest_approval.end_at)
+                )
+            elif (
+                self.iae_eligibility_diagnosis is None
+                or self.iae_eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
+            ):
+                constraints.append(
+                    (
+                        HiringStartAtErrorCode.AFTER_EMPLOYER_DIAGNOSIS_VALIDITY,
+                        self._today + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA,
+                    )
+                )
+        return min(constraints, key=itemgetter(1))
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
@@ -481,17 +573,18 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         # Hiring in the past is *temporarily* possible for GEIQ
         if hiring_start_at < self._today and not self.is_geiq:
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_PAST))
-        elif hiring_start_at > self.get_far_future_date():
-            self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_FAR_FUTURE))
-        elif (
-            # Keep in sync with the JobApplication.accept() transition logic.
-            self.company.is_subject_to_iae_rules
-            and self.job_seeker.has_valid_approval
-            and hiring_start_at > self.job_seeker.latest_approval.end_at
-        ):
-            self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES))
-        else:
-            return hiring_start_at
+        elif hiring_start_at > self.max_hiring_start_at:
+            self.add_error(
+                "hiring_start_at",
+                forms.ValidationError(
+                    message=self.max_hiring_start_at_error_code.error_html(
+                        max_date=self.max_hiring_start_at,
+                        job_application_id=self.instance.pk if not self.instance._state.adding else None,
+                    ),
+                    code=self.max_hiring_start_at_error_code,
+                ),
+            )
+        return hiring_start_at if not self.has_error("hiring_start_at") else None
 
     def has_error_on_date(self):
         return self.has_error("hiring_start_at") or self.has_error("hiring_end_at")
