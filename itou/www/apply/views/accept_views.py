@@ -228,7 +228,11 @@ class AcceptHTMXFragmentView(UserPassesTestMixin, TemplateView):
         )
         job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
         self.form_accept = AcceptForm(
-            company=company, job_seeker=job_seeker, current_user=request.user, data=request.POST or None
+            company=company,
+            job_seeker=job_seeker,
+            iae_eligibility_diagnosis=None,
+            current_user=request.user,
+            data=request.POST or None,
         )
 
     def get_context_data(self, **kwargs):
