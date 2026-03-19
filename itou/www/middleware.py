@@ -124,6 +124,7 @@ class TermsAcceptanceMiddleware:
             # professionals reaching these endpoints to first accept the terms and then get a 403/404
             "admin",
             "itou_staff_views",
+            "otp_views",
         ]:
             return None
         if getattr(view_func, "_bypass_terms_acceptance", False):  # views can be decorated to be exempt from the check

@@ -864,6 +864,7 @@ SERIALIZATION_MODULES = {
 OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
 OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
+REQUIRE_OTP_FOR_PRESCRIBERS = os.getenv("REQUIRE_OTP_FOR_PRESCRIBERS", "False") == "True"
 
 # anonymize users
 # ------------------------------------------------------------------------------

@@ -533,7 +533,7 @@ class TestItouStaffLogin:
         login_url = reverse("login:itou_staff")
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
         verify_otp_url = reverse("login:verify_otp")
-        setup_otp_url = reverse("itou_staff_views:otp_devices")
+        setup_otp_url = reverse("otp_views:otp_devices")
         settings.REQUIRE_OTP_FOR_STAFF = True
 
         response = client.get(admin_url)
@@ -564,7 +564,7 @@ class TestItouStaffLogin:
         response = client.get(setup_otp_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
         other_device = TOTPDevice.objects.create(user=user, confirmed=False)
-        setup_otp_confirm_device_url = reverse("itou_staff_views:otp_confirm_device", args=(other_device.pk,))
+        setup_otp_confirm_device_url = reverse("otp_views:otp_confirm_device", args=(other_device.pk,))
         response = client.get(setup_otp_confirm_device_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
 
