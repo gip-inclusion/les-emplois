@@ -276,7 +276,7 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
         for _index, line in df.iterrows():
             profile = known_job_seeker_profiles_map.get(line.idItou)
             if profile is None:
-                results.append((line["idItou"], "Candidat non trouvé", None, None, []))
+                results.append((line["idItou"], "Candidat non trouvé", None, None, None, []))
                 continue
 
             mismatch = {}
@@ -293,6 +293,8 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
             ):
                 if old_value != new_value:
                     mismatch[key] = (old_value, new_value)
+            new_asp_uid = line["Commentaires"]
+            duplicate = JobSeekerProfile.objects.filter(asp_uid=new_asp_uid).first()
 
             er_to_resend = list(
                 EmployeeRecord.objects.filter(
@@ -306,14 +308,15 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
             results.append(
                 (
                     line["idItou"],
-                    f"Candidat identifié - {profile.user.get_full_name()} - nouvel idItou: {line['Commentaires']}",
+                    f"Candidat identifié - {profile.user.get_full_name()} - nouvel idItou: {new_asp_uid}",
                     profile.with_3437,
                     mismatch,
+                    get_admin_view_link(duplicate, content=duplicate.display_with_pii) if duplicate else None,
                     er_to_resend,
                 )
             )
-            if wet_run:
-                profile.asp_uid = line["Commentaires"]
+            if wet_run and duplicate is None:
+                profile.asp_uid = new_asp_uid
                 to_updates.append(profile)
                 for er in er_to_resend:
                     er.ready()

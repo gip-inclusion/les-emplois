@@ -36,7 +36,7 @@
                                 {% endfragment %}
                             {% endcomponent_alert %}
                             <ul>
-                                {% for idItou, result, with_3437, mismatch, er_to_resend in results %}
+                                {% for idItou, result, with_3437, mismatch, duplicate_link, er_to_resend in results %}
                                     <li>
                                         <span {% if with_3437 is None %}class="text-muted"{% endif %}>{{ idItou }} - {{ result }}</span>
                                         {% if with_3437 is not None %}
@@ -52,7 +52,11 @@
                                                         </ul>
                                                     </li>
                                                 {% endif %}
-                                                {% if er_to_resend %}
+                                                {% if duplicate_link %}
+                                                    <li class="text-warning">
+                                                        Nouvel idItou déjà connu pour un autre candidat (probable doublon) : {{ duplicate_link }}. L’identifiant ne sera pas modifié.
+                                                    </li>
+                                                {% elif er_to_resend %}
                                                     <li>
                                                         {{ er_to_resend|length|pluralize:"Cette fiche salarié passera,Ces fiches salarié passeront" }} à l'état Complétée :
                                                         <ul>

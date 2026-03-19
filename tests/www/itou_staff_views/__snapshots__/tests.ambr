@@ -2907,7 +2907,7 @@
           Résultats de l’import
       </h2>
       <p>
-          3 lignes traitées.
+          4 lignes traitées.
       </p>
       <div class="alert alert-warning" role="status">
           <div class="row">
@@ -2966,6 +2966,23 @@
                   </li>
               </ul>
           </li>
+          <li>
+              <span>
+                  777777777777777777777777777777 - Candidat identifié - Bec BLANC - nouvel idItou: 888888888888888888888888888888
+              </span>
+              <ul>
+                  <li class="text-warning">
+                      Erreur 3437 détectée : Non
+                  </li>
+                  <li class="text-warning">
+                      Nouvel idItou déjà connu pour un autre candidat (probable doublon) :
+                      <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                          Bec BLANC — bec.blanc@exemple.fr
+                      </a>
+                      . L’identifiant ne sera pas modifié.
+                  </li>
+              </ul>
+          </li>
       </ul>
   </div>
   
@@ -2978,7 +2995,7 @@
           Résultats de l’import
       </h2>
       <p>
-          3 lignes traitées.
+          4 lignes traitées.
       </p>
       <div class="alert alert-success" role="status">
           <div class="row">
@@ -3034,6 +3051,23 @@
                               Nom : Martin / Dupont
                           </li>
                       </ul>
+                  </li>
+              </ul>
+          </li>
+          <li>
+              <span>
+                  777777777777777777777777777777 - Candidat identifié - Bec BLANC - nouvel idItou: 888888888888888888888888888888
+              </span>
+              <ul>
+                  <li class="text-warning">
+                      Erreur 3437 détectée : Non
+                  </li>
+                  <li class="text-warning">
+                      Nouvel idItou déjà connu pour un autre candidat (probable doublon) :
+                      <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                          Bec BLANC — bec.blanc@exemple.fr
+                      </a>
+                      . L’identifiant ne sera pas modifié.
                   </li>
               </ul>
           </li>
