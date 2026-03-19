@@ -178,6 +178,7 @@ class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
             instance=self.job_application,
             company=self.company,
             job_seeker=self.job_seeker,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
             current_user=self.request.user,
             data=self.request.POST or None,
             initial=contract_form_data,
@@ -253,6 +254,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
             instance=getattr(self, "job_application", None),
             company=self.company,
             job_seeker=self.job_seeker,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
             data=contract_form_data,
         )
 

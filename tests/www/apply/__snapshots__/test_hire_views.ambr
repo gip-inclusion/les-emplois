@@ -6183,6 +6183,50 @@
     ]),
   })
 # ---
+# name: TestHireContract.test_iae_hiring_start_at[employer_diag_hiring_in_more_than_92_days-form_error:AFTER_EMPLOYER_DIAGNOSIS_VALIDITY][error]
+  '''
+  <div class="w-100" id="id_hiring_start_at_error">
+      <div class="invalid-feedback d-block">
+          <p>
+              Il n’est pas possible de valider une embauche si la date de début de contrat est
+                          prévue dans plus de 92 jours (après le 30/10/2026).
+          </p>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestHireContract.test_iae_hiring_start_at[no_diag_hiring_in_more_than_92_days-form_error:AFTER_EMPLOYER_DIAGNOSIS_VALIDITY][error]
+  '''
+  <div class="w-100" id="id_hiring_start_at_error">
+      <div class="invalid-feedback d-block">
+          <p>
+              Il n’est pas possible de valider une embauche si la date de début de contrat est
+                          prévue dans plus de 92 jours (après le 30/10/2026).
+          </p>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestHireContract.test_iae_hiring_start_at[valid_approval_hiring_outside_validity_period-form_error:OUTSIDE_APPROVAL_BOUNDS][error]
+  '''
+  <div class="w-100" id="id_hiring_start_at_error">
+      <div class="invalid-feedback d-block">
+          <p>
+              La date de début de contrat prévue n’est pas couverte par la période de validité du
+                          PASS IAE, par conséquent l’embauche n’est pas possible. Si la situation du candidat le
+                          nécessite vous pouvez faire appel à un prescripteur habilité afin qu’il valide
+                          l’éligibilité du candidat.
+              <br/>
+              La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de
+                          fin de validité du PASS IAE (08/08/2026).
+          </p>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_job_seeker[queries - start]
   dict({
     'num_queries': 13,

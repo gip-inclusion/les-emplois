@@ -47,7 +47,7 @@ from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.badges import job_application_state_badge
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.apply.forms import AcceptForm
+from itou.www.apply.forms import AcceptForm, HiringStartAtErrorCode
 from itou.www.apply.views.accept_views import ACCEPT_SESSION_KIND, initialize_accept_session
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_geispolsheim
@@ -67,7 +67,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import get_session_name, parse_response_to_soup
+from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_process import ARCHIVED_MARKUP, UNARCHIVE_BUTTON_MARKUP
 
 
@@ -660,7 +660,10 @@ class TestProcessAcceptViewsInWizard:
         assertFormError(
             response.context["form_accept"],
             "hiring_start_at",
-            JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES,
+            HiringStartAtErrorCode.OUTSIDE_APPROVAL_BOUNDS.error_html(
+                max_date=approval.end_at,
+                job_application_id=None,  # Unused
+            ),
         )
 
         # employer amends the situation by submitting a different hiring start date
@@ -2525,6 +2528,140 @@ class TestFillJobSeekerInfosForAccept:
         else:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == ""
             assert self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason != ""
+
+
+class TestContractInfosForAccept:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings, mocker):
+        self.job_seeker = JobSeekerFactory(
+            first_name="Clara",
+            last_name="Sion",
+            jobseeker_profile__with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+            born_in_france=True,
+        )
+
+    def start_session(self, client, job_application):
+        response = client.get(reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk}))
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        assertRedirects(
+            response,
+            reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}),
+            fetch_redirect_response=False,
+        )
+        return session_uuid
+
+    @pytest.mark.parametrize(
+        "scenario,result",
+        [
+            ("no_diag_hiring_today", "redirect_to:accept_iae_eligibility"),
+            ("no_diag_hiring_in_more_than_92_days", "form_error:AFTER_EMPLOYER_DIAGNOSIS_VALIDITY"),
+            ("prescriber_diag_hiring_today", "redirect_to:accept_confirmation"),
+            ("prescriber_diag_hiring_in_more_than_92_days", "redirect_to:accept_confirmation"),
+            ("prescriber_diag_hiring_outside_validity_period", "redirect_to:accept_confirmation"),
+            ("employer_diag_hiring_today", "redirect_to:accept_confirmation"),
+            ("employer_diag_hiring_in_more_than_92_days", "form_error:AFTER_EMPLOYER_DIAGNOSIS_VALIDITY"),
+            ("employer_diag_hiring_outside_validity_period", "redirect_to:accept_confirmation"),  # This will change
+            ("valid_approval_hiring_inside_validity_period", "redirect_to:accept_confirmation"),
+            ("valid_approval_hiring_outside_validity_period", "form_error:OUTSIDE_APPROVAL_BOUNDS"),
+        ],
+    )
+    @freeze_time("2026-07-30")
+    def test_iae_hiring_start_at(self, client, snapshot, scenario, result):
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        match scenario:
+            case "no_diag_hiring_today":
+                hiring_start_at = timezone.localdate()
+            case "no_diag_hiring_in_more_than_92_days":
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=93)
+            case "prescriber_diag_hiring_today":
+                IAEEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, from_prescriber=True)
+                hiring_start_at = timezone.localdate()
+            case "prescriber_diag_hiring_in_more_than_92_days":
+                diag = IAEEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, from_prescriber=True)
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=93)
+                assert hiring_start_at < diag.expires_at
+            case "prescriber_diag_hiring_outside_validity_period":
+                # Even after the 92 days, it will be accepted
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=100)
+                diag = IAEEligibilityDiagnosisFactory(
+                    job_seeker=job_application.job_seeker,
+                    from_prescriber=True,
+                    expires_at=hiring_start_at - datetime.timedelta(days=1),
+                )
+            case "employer_diag_hiring_today":
+                IAEEligibilityDiagnosisFactory(
+                    job_seeker=job_application.job_seeker, from_employer=True, author_siae=company
+                )
+                hiring_start_at = timezone.localdate()
+            case "employer_diag_hiring_in_more_than_92_days":
+                diag = IAEEligibilityDiagnosisFactory(
+                    job_seeker=job_application.job_seeker, from_employer=True, author_siae=company
+                )
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=93)
+                assert hiring_start_at < diag.expires_at
+            case "employer_diag_hiring_outside_validity_period":
+                # Keep the hiring start at inside the 92 days
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=10)
+                diag = IAEEligibilityDiagnosisFactory(
+                    job_seeker=job_application.job_seeker,
+                    from_employer=True,
+                    author_siae=company,
+                    expires_at=hiring_start_at - datetime.timedelta(days=1),
+                )
+            case "valid_approval_hiring_inside_validity_period":
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=10)
+                approval = ApprovalFactory(user=job_application.job_seeker)
+                assert approval.start_at <= hiring_start_at <= approval.end_at
+            case "valid_approval_hiring_outside_validity_period":
+                hiring_start_at = timezone.localdate() + datetime.timedelta(days=10)
+                approval = ApprovalFactory(
+                    user=job_application.job_seeker, end_at=hiring_start_at - datetime.timedelta(days=1)
+                )
+            case _:
+                raise ValueError(f"Unknown {scenario=}")
+
+        client.force_login(company.members.get())
+        session_uuid = self.start_session(client, job_application)
+        contract_infos_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid})
+        response = client.get(contract_infos_url)
+        assertContains(response, "Accepter la candidature de SION Clara")
+
+        response = client.post(
+            contract_infos_url,
+            data={
+                "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": "",
+                "answer": "",
+            },
+        )
+
+        # Check result
+        if result.startswith("redirect_to:"):
+            target = result.split(":", 1)[1]
+            assertRedirects(response, reverse(f"apply:{target}", kwargs={"session_uuid": session_uuid}))
+        elif result.startswith("form_error:"):
+            form_error = result.split(":", 1)[1]
+            error_code = getattr(HiringStartAtErrorCode, form_error)
+            assert response.status_code == 200
+            form_accept = response.context["form_accept"]
+            assert form_accept.has_error("hiring_start_at", code=error_code)
+
+            hiring_start_at_error = parse_response_to_soup(
+                response,
+                selector="#id_hiring_start_at_error",
+                replace_in_attr=[("href", str(job_application.pk), "[PK of JobApplication]")],
+            )
+            assert pretty_indented(hiring_start_at_error) == snapshot(name="error")
+        else:
+            raise ValueError(f"Unknown {result=}")
 
 
 class TestIAEEligibility:
