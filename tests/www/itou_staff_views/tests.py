@@ -1316,6 +1316,15 @@ class TestImportFS3437FromAsp:
             jobseeker_profile__asp_uid="333333333333333333333333333333", last_name="Martin", first_name="Martine"
         )
         without_3437_future_asp_uid = "666666666666666666666666666666"
+        known_job_seeker_to_update_with_duplicate = JobSeekerFactory(
+            jobseeker_profile__asp_uid="777777777777777777777777777777", last_name="Blanc", first_name="Bec"
+        )
+        duplicate = JobSeekerFactory(
+            jobseeker_profile__asp_uid="888888888888888888888888888888",
+            last_name="BLANC",
+            first_name="Bec",
+            email="bec.blanc@exemple.fr",
+        )
         with io.BytesIO() as xlsxfile:
             workbook = openpyxl.Workbook()
             sheet = workbook.active
@@ -1408,6 +1417,23 @@ class TestImportFS3437FromAsp:
                     without_3437_future_asp_uid,
                 ]
             )
+            sheet.append(
+                [
+                    known_job_seeker_to_update_with_duplicate.jobseeker_profile.asp_uid,
+                    known_job_seeker_to_update_with_duplicate.last_name,
+                    known_job_seeker_to_update_with_duplicate.first_name,
+                    known_job_seeker_to_update_with_duplicate.jobseeker_profile.birthdate,
+                    "",
+                    known_job_seeker_to_update_with_duplicate.jobseeker_profile.nir,
+                    "",
+                    "999991234567",
+                    "98765432100001",
+                    "ACI_DC",
+                    "RIAE_FS_20260128145512.json",
+                    "2026",
+                    duplicate.jobseeker_profile.asp_uid,
+                ]
+            )
             workbook.save(xlsxfile)
             xlsxfile.seek(0)
             xlsxfile.name = "20260220_retour_ddes_idItou.xlsx"
@@ -1418,7 +1444,17 @@ class TestImportFS3437FromAsp:
             assertContains(
                 response, f"{known_job_seeker_to_update_with_3437.jobseeker_profile.asp_uid} - Candidat identifié"
             )
-            soup = parse_response_to_soup(response, selector=".c-box")
+            soup = parse_response_to_soup(
+                response,
+                selector=".c-box",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"/admin/users/jobseekerprofile/{duplicate.pk}/change/",
+                        "/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/",
+                    )
+                ],
+            )
             assert pretty_indented(soup) == snapshot(name="dry run")
 
             known_job_seeker_to_update_with_3437.refresh_from_db()
@@ -1431,9 +1467,25 @@ class TestImportFS3437FromAsp:
                 reverse("itou_staff_views:import_fs_3437_from_asp"), {"file": xlsxfile, "wet_run": True}
             )
             assert response.status_code == 200
-            soup = parse_response_to_soup(response, selector=".c-box")
+            soup = parse_response_to_soup(
+                response,
+                selector=".c-box",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"/admin/users/jobseekerprofile/{duplicate.pk}/change/",
+                        "/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/",
+                    )
+                ],
+            )
+
             assert pretty_indented(soup) == snapshot(name="wet run")
             known_job_seeker_to_update_with_3437.refresh_from_db()
             assert known_job_seeker_to_update_with_3437.jobseeker_profile.asp_uid == with_3437_future_asp_uid
             known_job_seeker_to_update_without_3437.refresh_from_db()
             assert known_job_seeker_to_update_without_3437.jobseeker_profile.asp_uid == without_3437_future_asp_uid
+            known_job_seeker_to_update_with_duplicate.refresh_from_db()
+            assert (
+                known_job_seeker_to_update_with_duplicate.jobseeker_profile.asp_uid
+                != duplicate.jobseeker_profile.asp_uid
+            )
