@@ -1,0 +1,11 @@
+{% if hiring_start_at_issue_code %}
+    {# Show the modal if an issue is detected #}
+    <script nonce="{{ csp_nonce }}">
+        document.addEventListener("DOMContentLoaded", function() {
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const hiringStartAtIssueModal = new bootstrap.Modal("#hiring_start_at_issue-modal");
+            hiringStartAtIssueModal.show();
+        });
+    </script>
+{% endif %}

@@ -20,7 +20,9 @@ class TestAcceptForm:
     def test_accept_form_without_geiq(self):
         # Job application accept form for a "standard" SIAE
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.EI)
-        form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
+        form = apply_forms.AcceptForm(
+            company=job_application.to_company, job_seeker=job_application.job_seeker, iae_eligibility_diagnosis=None
+        )
 
         assert sorted(form.fields.keys()) == [
             "advisor",
@@ -52,7 +54,9 @@ class TestAcceptForm:
         ]
         # Job application accept form for a GEIQ: more fields
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
-        form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
+        form = apply_forms.AcceptForm(
+            company=job_application.to_company, job_seeker=job_application.job_seeker, iae_eligibility_diagnosis=None
+        )
 
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
@@ -61,6 +65,7 @@ class TestAcceptForm:
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
             job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
             data={"contract_type": ContractType.OTHER},
         )
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
@@ -72,7 +77,10 @@ class TestAcceptForm:
         job_description = JobDescriptionFactory(company=job_application.to_company, location=None)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
         form = apply_forms.AcceptForm(
-            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+            company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
+            data=post_data,
         )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
@@ -89,7 +97,10 @@ class TestAcceptForm:
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
         form = apply_forms.AcceptForm(
-            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+            company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
+            data=post_data,
         )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
@@ -107,7 +118,10 @@ class TestAcceptForm:
             "contract_type": ContractType.PROFESSIONAL_TRAINING,
         }
         form = apply_forms.AcceptForm(
-            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+            company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
+            data=post_data,
         )
         assert form.is_valid()
 
@@ -125,6 +139,7 @@ class TestAcceptForm:
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
             job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
             data=post_data | {"contract_type": ContractType.OTHER},
         )
 
@@ -139,6 +154,7 @@ class TestAcceptForm:
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
             job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
             data=post_data
             | {
                 "contract_type": ContractType.OTHER,
@@ -155,6 +171,7 @@ class TestAcceptForm:
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
             job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
             data=post_data
             | {
                 "contract_type": ContractType.APPRENTICESHIP,
@@ -170,6 +187,7 @@ class TestAcceptForm:
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
             job_seeker=job_application.job_seeker,
+            iae_eligibility_diagnosis=None,
             data=post_data
             | {
                 "contract_type": ContractType.PROFESSIONAL_TRAINING,

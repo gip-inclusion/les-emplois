@@ -178,6 +178,7 @@ class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
             instance=self.job_application,
             company=self.company,
             job_seeker=self.job_seeker,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
             current_user=self.request.user,
             data=self.request.POST or None,
             initial=contract_form_data,
@@ -195,7 +196,6 @@ class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
         form_accept = self.forms["accept"]
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
-        context["has_form_error"] = bool(form_accept.errors)
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["hide_value"] = ContractType.OTHER.value
         context["matomo_custom_title"] = "Candidature acceptée"
@@ -253,6 +253,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
             instance=getattr(self, "job_application", None),
             company=self.company,
             job_seeker=self.job_seeker,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
             data=contract_form_data,
         )
 
