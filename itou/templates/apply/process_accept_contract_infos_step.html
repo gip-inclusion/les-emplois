@@ -1,7 +1,13 @@
 {% extends "apply/process_accept_base.html" %}
+{% load buttons_form %}
 
 {% block content_extend %}
     {% include "apply/includes/job_application_accept_form.html" %}
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% include "apply/includes/hiring_start_at_issue/modal.html" with hiring_start_at_issue=hiring_start_at_issue job_application=job_application only %}
 {% endblock %}
 
 {% block script %}
@@ -25,4 +31,6 @@
             });
         });
     </script>
+
+    {% include "apply/includes/hiring_start_at_issue/script.html" with csp_nonce=csp_nonce hiring_start_at_issue=hiring_start_at_issue only %}
 {% endblock %}

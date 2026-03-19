@@ -1,0 +1,23 @@
+{% if hiring_start_at_issue %}
+    <div class="modal" id="hiring_start_at_issue-modal" tabindex="-1" role="dialog" aria-labelledby="hiring_start_at_issue-label" aria-modal="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="hiring_start_at_issue-label">Embauche à cette date impossible</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ hiring_start_at_issue }}</p>
+                </div>
+                <div class="modal-footer">
+                    {% if job_application and job_application.postpone.is_available %}
+                        <a class="btn btn-sm btn-ouline-primary" href="{% url "apply:postpone" job_application_id=job_application.pk %}" aria-label="Mettre la candidature en attente">Mettre en attente</a>
+                    {% endif %}
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal" aria-label="Revenir au formulaire">
+                        Modifier la date
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

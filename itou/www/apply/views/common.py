@@ -14,7 +14,9 @@ from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBi
 from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import ActionKind
@@ -41,6 +43,30 @@ class IsIAEEligibilityDiagnosisNeededMixin:
             and self.eligibility_diagnosis is None
             and not self.job_seeker.has_valid_approval
         )
+
+
+def get_hiring_start_at_issue(hiring_start_at, *, company, approval=None, iae_eligibility_diagnosis=None):
+    if not company.is_subject_to_iae_rules:
+        return ""
+    if approval and approval.is_valid():
+        if approval.end_at < hiring_start_at:
+            return (
+                "La date de début de contrat prévue n’est pas couverte par la période de validité du PASS IAE, "
+                "par conséquent l’embauche n’est pas possible. Si la situation du candidat le nécessite vous "
+                "pouvez faire appel à un prescripteur habilité afin qu’il valide l’éligibilité du candidat. "
+                "La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de "
+                "fin de validité du PASS IAE."
+            )
+        return ""  # Valid approval and hiring_start_at within validity period
+    if hiring_start_at < timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA:
+        return ""
+    if iae_eligibility_diagnosis and iae_eligibility_diagnosis.author_kind == AuthorKind.PRESCRIBER:
+        return ""
+    return (
+        "Il n’est pas possible de valider une embauche si la date de début de contrat est prévue dans plus "
+        "de 92 jours. Veuillez mettre cette candidature en attente pour la traiter plus tard ou modifier la "
+        "date de début de contrat."
+    )
 
 
 class CommonUserInfoFormsMixin:
@@ -195,7 +221,7 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
     def get_reset_url(self):
         raise NotImplementedError
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, hiring_start_at_issue=None, **kwargs):
         form_accept = self.forms["accept"]
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
@@ -209,6 +235,14 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
         context["back_url"] = self.get_back_url()
         context["reset_url"] = self.get_reset_url()
         context["hire_process"] = self.job_application is None
+        if hiring_start_at_issue is None and (hiring_start_at := form_accept["hiring_start_at"].value()):
+            hiring_start_at_issue = get_hiring_start_at_issue(
+                hiring_start_at=hiring_start_at,
+                company=self.company,
+                approval=self.job_seeker.latest_approval,
+                iae_eligibility_diagnosis=self.eligibility_diagnosis,
+            )
+        context["hiring_start_at_issue"] = hiring_start_at_issue
         return context
 
     def missing_or_invalid_job_seeker_infos(self):
@@ -235,6 +269,15 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
         # Store accept form data in session
         session = self.get_session()
         session.set("contract_form_data", self.forms["accept"].cleaned_data)
+        if hiring_start_at_issue := get_hiring_start_at_issue(
+            hiring_start_at=self.forms["accept"].cleaned_data["hiring_start_at"],
+            company=self.company,
+            approval=self.job_seeker.latest_approval,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
+        ):
+            context = self.get_context_data(hiring_start_at_issue=hiring_start_at_issue, **kwargs)
+            return self.render_to_response(context)
+
         return HttpResponseRedirect(self.get_success_url())
 
 
