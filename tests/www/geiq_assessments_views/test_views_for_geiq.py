@@ -1494,6 +1494,7 @@ class TestAssessmentContractsListView:
         filter_data = {
             "start_date_lower": "2024-06-01",
             "start_date_upper": "2024-06-30",
+            "duration_longer_or_equal_90": "on",
         }
 
         response = client.get(self.url, filter_data)
@@ -1549,3 +1550,34 @@ class TestAssessmentContractsListView:
         response = client.get(self.url)
         assert len(response.context["contracts_page"].object_list) == 1
         assertNotContains(response, self.RESET_BTN_LABEL)
+
+    @pytest.mark.parametrize(
+        "query_params, expected_in, expected_not_in",
+        [
+            ({"duration_longer_or_equal_90": "on"}, ["contract_plus"], ["contract_minus"]),
+            ({"duration_strictly_shorter_90": "on"}, ["contract_minus"], ["contract_plus"]),
+            (
+                {"duration_longer_or_equal_90": "on", "duration_strictly_shorter_90": "on"},
+                ["contract_plus", "contract_minus"],
+                [],
+            ),
+        ],
+    )
+    def test_contract_list_filter_by_90_days(self, client, query_params, expected_in, expected_not_in):
+        contract_plus = EmployeeContractFactory(employee__assessment=self.assessment, nb_days_in_campaign_year=90)
+        contract_minus = EmployeeContractFactory(employee__assessment=self.assessment, nb_days_in_campaign_year=89)
+
+        contracts_map = {"contract_plus": contract_plus, "contract_minus": contract_minus}
+        response = client.get(self.url, query_params)
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        for key in expected_in:
+            assert contracts_map[key] in contracts_in_page
+        for key in expected_not_in:
+            assert contracts_map[key] not in contracts_in_page
+
+    def test_contract_list_reset_button_visibility_90_days(self, client):
+        response = client.get(self.url, {"duration_longer_or_equal_90": "on"})
+        assertContains(response, self.RESET_BTN_LABEL)
+        assert response.context["filters_counter"] == 1
