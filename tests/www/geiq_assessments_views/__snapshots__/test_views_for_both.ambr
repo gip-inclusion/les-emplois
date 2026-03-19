@@ -1326,6 +1326,13 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
+                  <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </button>
                   <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
@@ -1517,6 +1524,13 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
+                  <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </button>
                   <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
@@ -1734,6 +1748,13 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
+                  <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </button>
                   <div id="contracts-results-table">
                       <div class="text-center my-3 my-md-4">
                           <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
@@ -2196,6 +2217,13 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
+                  <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </button>
                   <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
@@ -2355,6 +2383,13 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
+                  <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </button>
                   <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
@@ -2540,6 +2575,13 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
+                  <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </button>
                   <div id="contracts-results-table">
                       <div class="text-center my-3 my-md-4">
                           <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>

@@ -1450,3 +1450,37 @@ class TestAssessmentResult:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:assessment_result", kwargs={"pk": assessment.pk}))
         assert response.status_code == 404
+
+
+class TestAssessmentContractsListView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        self.user = membership.user
+        self.company = membership.company
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [self.company.post_code[:2]]
+        self.assessment = AssessmentFactory(companies=[self.company])
+        self.url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": self.assessment.pk})
+
+        client.force_login(self.user)
+
+    def test_offcanvas_initial_render_integrity(self, client):
+        response = client.get(self.url)
+
+        assertContains(response, 'data-bs-toggle="offcanvas"')
+        assertContains(response, 'data-bs-target="#offcanvasFilters"')
+
+        assertContains(response, 'id="offcanvasFilters"')
+        assertContains(response, "Filtrer", count=2)
+
+    def test_offcanvas_form_structure_validity(self, client):
+        response = client.get(self.url)
+        soup = parse_response_to_soup(response, selector="body")
+
+        forms = soup.find_all("form")
+        for form in forms:
+            assert not form.find("form")
+
+        trigger_btn = soup.find("button", {"data-bs-target": "#offcanvasFilters"})
+        assert trigger_btn is not None
+        assert trigger_btn.get("type") == "button"
