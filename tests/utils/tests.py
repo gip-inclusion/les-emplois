@@ -850,6 +850,15 @@ class TestUtilsTemplateTags:
 
         assert f"url:{get_tally_form_url('abcde', pk=test_id, hard='coded')}" == out
 
+    def test_default_if_invalid(self):
+        template = Template("""{% load default_if_invalid %}{{ value|default_if_invalid:default }}""")
+        assert template.render(Context({"value": "foo", "default": "bar"})) == "foo"
+        assert template.render(Context({"value": None, "default": "bar"})) == "None"
+        assert template.render(Context({"value": False, "default": "bar"})) == "False"
+
+        assert template.render(Context({"default": "bar"})) == "bar"
+        assert template.render(Context({"value": "", "default": "bar"})) == "bar"
+
 
 class TestUtilsTemplateFilters:
     def test_format_phone(self):
@@ -1824,6 +1833,11 @@ def test_invalid_variable_in_template():
 
     # This should not fail with default filter
     assert Template("{{ invalid_variable|default:'' }}").render(Context({})) == ""
+
+    # This should not fail with default_if_invalid filter
+    assert (
+        Template("{% load default_if_invalid %}{{ invalid_variable|default_if_invalid:'' }}").render(Context({})) == ""
+    )
 
 
 @pytest.mark.parametrize(
