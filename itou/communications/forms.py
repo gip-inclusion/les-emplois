@@ -3,23 +3,17 @@ import uuid
 
 from django import forms
 
-from itou.communications.models import AnnouncementItem
+from itou.communications.models import AnnouncementItem, UserKindTag
 from itou.files.forms import ItouAdminImageInput
 from itou.files.models import File
-from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
-
-
-def user_kind_tag_choices():
-    valid_choices = [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.EMPLOYER]
-    return [(u.value, u.label) for u in valid_choices]
 
 
 class AnnouncementItemForm(forms.ModelForm):
     user_kind_tags = forms.MultipleChoiceField(
         required=False,
         widget=forms.CheckboxSelectMultiple,
-        choices=user_kind_tag_choices,
+        choices=UserKindTag.choices,
         label="Utilisateurs concernés",
     )
     image = forms.ImageField(

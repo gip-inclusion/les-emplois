@@ -184,8 +184,6 @@ class Migration(migrations.Migration):
                                 ("job_seeker", "candidat"),
                                 ("prescriber", "prescripteur"),
                                 ("employer", "employeur"),
-                                ("labor_inspector", "inspecteur du travail"),
-                                ("itou_staff", "administrateur"),
                             ]
                         ),
                         default=list,

@@ -11,7 +11,13 @@ from django.db import models
 from django.db.models import Q
 
 from itou.files.models import File
-from itou.users.enums import UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_JOB_SEEKER, KIND_PRESCRIBER, UserKind
+
+
+class UserKindTag(models.TextChoices):
+    JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
+    PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
+    EMPLOYER = KIND_EMPLOYER, "employeur"
 
 
 class NotificationRecordQuerySet(models.QuerySet):
@@ -209,7 +215,7 @@ class AnnouncementItem(models.Model):
     )
     user_kind_tags = ArrayField(
         default=list,
-        base_field=models.CharField(choices=UserKind.choices),
+        base_field=models.CharField(choices=UserKindTag.choices),
         verbose_name="utilisateurs concernés",
     )
     image = models.ImageField(
@@ -272,4 +278,4 @@ class AnnouncementItem(models.Model):
 
     @property
     def user_kind_labels(self):
-        return [UserKind(u).label for u in self.user_kind_tags]
+        return [UserKindTag(u).label for u in self.user_kind_tags]

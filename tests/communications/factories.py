@@ -5,8 +5,7 @@ import factory
 from django.utils import timezone
 from faker import Faker
 
-from itou.communications.models import AnnouncementCampaign, AnnouncementItem
-from itou.users.enums import UserKind
+from itou.communications.models import AnnouncementCampaign, AnnouncementItem, UserKindTag
 from tests.files.factories import FileFactory
 
 
@@ -29,7 +28,7 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def with_items_for_every_user_kind(obj, create, extracted, **kwargs):
         if create and extracted:
-            for i, user_kind in enumerate(UserKind.values):
+            for i, user_kind in enumerate(UserKindTag.values):
                 AnnouncementItemFactory(campaign=obj, for_snapshot=True, user_kind_tags=[user_kind], priority=i + 1)
             AnnouncementItemFactory(campaign=obj, for_snapshot=True, user_kind_tags=[], priority=0)
 
@@ -58,7 +57,7 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
         for_snapshot = factory.Trait(
             title="Nouvelle fonctionnalité sur notre site",
             description="Il est désormais possible de faire de nouvelles actions avec votre compte",
-            user_kind_tags=[UserKind.JOB_SEEKER, UserKind.PRESCRIBER],
+            user_kind_tags=[UserKindTag.JOB_SEEKER, UserKindTag.PRESCRIBER],
             link="https://example.com/",
             priority=999,
         )
@@ -67,5 +66,5 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
     title = factory.Faker("sentence", locale="fr_FR")
     description = factory.Faker("paragraph", locale="fr_FR")
     priority = factory.Sequence(lambda n: n + 1)
-    user_kind_tags = faker.random_elements(UserKind.values, unique=True)
+    user_kind_tags = faker.random_elements(UserKindTag.values, unique=True)
     link = factory.Faker("url")

@@ -1,3 +1,4 @@
+import random
 from datetime import date
 
 import pytest
@@ -6,10 +7,16 @@ from django.forms.models import model_to_dict
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.communications.models import AnnouncementCampaign
-from itou.users.enums import UserKind
+from itou.communications.models import AnnouncementCampaign, UserKindTag
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, random_user_kind_factory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    random_user_kind_factory,
+)
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -81,17 +88,19 @@ class TestRenderAnnouncementCampaign:
         MODAL_ID = "news-modal"
         campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
         user = random_user_kind_factory()
+        # Only job_seeker, prescriber and employer are values used in production
+        user_kind = [user.kind] if user.kind in UserKindTag.values else []
         AnnouncementItemFactory(
-            campaign=campaign, title="Item A", description="Item A", priority=0, user_kind_tags=[user.kind]
+            campaign=campaign, title="Item A", description="Item A", priority=0, user_kind_tags=user_kind
         )
         AnnouncementItemFactory(
-            campaign=campaign, title="Item B", description="Item B", priority=1, user_kind_tags=[user.kind]
+            campaign=campaign, title="Item B", description="Item B", priority=1, user_kind_tags=user_kind
         )
         AnnouncementItemFactory(
-            campaign=campaign, title="Item D", description="Item D", priority=3, user_kind_tags=[user.kind]
+            campaign=campaign, title="Item D", description="Item D", priority=3, user_kind_tags=user_kind
         )
         AnnouncementItemFactory(
-            campaign=campaign, title="Item C", description="Item C", priority=2, user_kind_tags=[user.kind]
+            campaign=campaign, title="Item C", description="Item C", priority=2, user_kind_tags=user_kind
         )
 
         response = client.get(reverse("search:employers_results"))
@@ -129,14 +138,18 @@ class TestRenderAnnouncementCampaign:
     def test_campaign_rendered_dashboard_for_job_seeker(self, client, snapshot):
         campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
         AnnouncementItemFactory(
-            campaign=campaign, title="Item A", description="Item A", priority=0, user_kind_tags=[UserKind.JOB_SEEKER]
+            campaign=campaign,
+            title="Item A",
+            description="Item A",
+            priority=0,
+            user_kind_tags=[UserKindTag.JOB_SEEKER],
         )
         AnnouncementItemFactory(
             campaign=campaign,
             title="Item B",
             description="Item B",
             priority=1,
-            user_kind_tags=[UserKind.JOB_SEEKER, UserKind.PRESCRIBER],
+            user_kind_tags=[UserKindTag.JOB_SEEKER, UserKindTag.PRESCRIBER],
         )
         AnnouncementItemFactory(campaign=campaign, title="Item D", description="Item D", priority=3, user_kind_tags=[])
         AnnouncementItemFactory(
@@ -144,7 +157,7 @@ class TestRenderAnnouncementCampaign:
             title="Item C",
             description="Item C",
             priority=2,
-            user_kind_tags=UserKind.caseworkers(),
+            user_kind_tags=[UserKindTag.PRESCRIBER, UserKindTag.EMPLOYER],
         )
 
         client.force_login(JobSeekerFactory())
@@ -154,3 +167,44 @@ class TestRenderAnnouncementCampaign:
         assert pretty_indented(content) == snapshot
         assert len(content.select("li > div")) == 3
         assert "Item C" not in str(content)
+
+    def test_campaign_rendered_dashboard_for_professionals(self, client, snapshot):
+        campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
+        AnnouncementItemFactory(
+            campaign=campaign,
+            title="Item A",
+            description="Item A",
+            priority=0,
+            user_kind_tags=[UserKindTag.JOB_SEEKER],
+        )
+        AnnouncementItemFactory(
+            campaign=campaign,
+            title="Item B",
+            description="Item B",
+            priority=1,
+            user_kind_tags=[UserKindTag.JOB_SEEKER, UserKindTag.PRESCRIBER],
+        )
+        AnnouncementItemFactory(campaign=campaign, title="Item D", description="Item D", priority=3, user_kind_tags=[])
+        AnnouncementItemFactory(
+            campaign=campaign,
+            title="Item C",
+            description="Item C",
+            priority=2,
+            user_kind_tags=[UserKindTag.PRESCRIBER, UserKindTag.EMPLOYER],
+        )
+
+        client.force_login(
+            random.choice(
+                [
+                    PrescriberFactory(),
+                    EmployerFactory(membership=True),
+                    LaborInspectorFactory(membership=True),
+                ]
+            )
+        )
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        content = parse_response_to_soup(response, "#news-modal")
+        assert pretty_indented(content) == snapshot
+        assert len(content.select("li > div")) == 3
+        assert "Item D" not in str(content)

@@ -1,3 +1,4 @@
+import random
 from unittest.mock import patch
 
 import pytest
@@ -7,9 +8,9 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains
 
-from itou.users.enums import UserKind
+from itou.communications.models import UserKindTag
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -48,21 +49,27 @@ class TestNewsRender:
         campaign = AnnouncementCampaignFactory(with_items_for_every_user_kind=True)
         url = reverse("announcements:news")
 
-        # prescriber receives all items
-        user = PrescriberFactory()
+        # professionals receive all items
+        user = random.choice(
+            [
+                PrescriberFactory(),
+                EmployerFactory(membership=True),
+                LaborInspectorFactory(membership=True),
+            ]
+        )
         client.force_login(user)
         response = client.get(url)
         self._assert_all_items_rendered(response, campaign)
 
         # candidates only receive news relating to them
-        assert campaign.items.exclude(user_kind_tags__contains=[UserKind.JOB_SEEKER]).exists()
+        assert campaign.items.exclude(user_kind_tags__contains=[UserKindTag.JOB_SEEKER]).exists()
         client.force_login(JobSeekerFactory())
         response = client.get(url)
         assert response.status_code == 200
 
         items = response.context["news_page"][0].items
         for tags in items.values_list("user_kind_tags", flat=True):
-            assert len(tags) == 0 or UserKind.JOB_SEEKER.value in tags
+            assert len(tags) == 0 or UserKindTag.JOB_SEEKER.value in tags
         assert items.count() < campaign.items.count()
         assert items.count() == response.context["news_page"][0].count_items
 
@@ -121,7 +128,7 @@ class TestNewsRender:
 
         # it's also possible that there are live campaigns without content for my user kind
         AnnouncementItemFactory(
-            user_kind_tags=[UserKind.PRESCRIBER],
+            user_kind_tags=[UserKindTag.PRESCRIBER],
             campaign__start_date=(timezone.localdate() - relativedelta(months=1)).replace(day=1),
         )
         client.force_login(JobSeekerFactory())
