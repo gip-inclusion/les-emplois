@@ -299,6 +299,22 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
                     )
                 )
                 continue
+            new_asp_uid = line["Commentaires"]
+            if new_asp_uid == line["idItou"]:
+                results.append(
+                    ImportFS3437Result(
+                        asp_uid=line["idItou"],
+                        summary=format_html(
+                            "Candidat identifié - {} - identifiant inchangé",
+                            get_admin_view_link(profile, content=profile.display_with_pii),
+                        ),
+                        with_3437=None,
+                        mismatch=None,
+                        duplicate_link=None,
+                        er_to_resend=[],
+                    )
+                )
+                continue
 
             mismatch = {}
             for key, old_value, new_value in (
@@ -314,7 +330,6 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
             ):
                 if old_value != new_value:
                     mismatch[key] = (old_value, new_value)
-            new_asp_uid = line["Commentaires"]
             duplicate = JobSeekerProfile.objects.filter(asp_uid=new_asp_uid).first()
 
             er_to_resend = list(
