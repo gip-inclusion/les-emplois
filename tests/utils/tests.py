@@ -1822,6 +1822,9 @@ def test_invalid_variable_in_template():
     # This should not fail with attrs tag
     assert Template("{% attrs invalid_variable %}").render(Context({})) == ""
 
+    # This should not fail with default filter
+    assert Template("{{ invalid_variable|default:'' }}").render(Context({})) == ""
+
 
 @pytest.mark.parametrize(
     "remark_model,obj_factory",
