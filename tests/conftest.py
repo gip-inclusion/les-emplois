@@ -332,7 +332,7 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
     patchy.patch(
         base_template.FilterExpression.resolve,
         """\
-            @@ -7,11 +7,10 @@
+            @@ -7,11 +7,11 @@
                              obj = None
                          else:
                              string_if_invalid = context.template.engine.string_if_invalid
@@ -342,7 +342,8 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
             -                    else:
             -                        return string_if_invalid
             +                from django.template.defaultfilters import default as default_filter
-            +                if default_filter not in {func for func, _args in self.filters}:
+            +                from itou.utils.templatetags.default_if_invalid import default_if_invalid
+            +                if not {default_filter, default_if_invalid} & {func for func, _args in self.filters}:
             +                    from tests.conftest import _fail_for_invalid_template_variable
             +                    obj = _fail_for_invalid_template_variable(self.var)
                              else:
