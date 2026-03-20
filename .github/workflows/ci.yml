@@ -8,10 +8,10 @@ on:
   merge_group:
 
 jobs:
-  test:
+  test_core:
     runs-on: ubuntu-latest
     permissions: {}
-    env:
+    env: &test_env
       CELLAR_ADDON_HOST_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}
       CELLAR_ADDON_KEY_ID_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_KEY_ID_FOR_TESTS }}
       CELLAR_ADDON_SECRET_KEY_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_SECRET_KEY_FOR_TESTS }}
@@ -19,9 +19,9 @@ jobs:
       REDIS_URL: redis://127.0.0.1:6379
       REQUIREMENTS_PATH: requirements/test.txt
     concurrency:
-      group: ${{ github.workflow }}-test-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+      group: ${{ github.workflow }}-test_core-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
       cancel-in-progress: true
-    services:
+    services: &test_services
       redis:
         image: redis
         ports:
@@ -43,7 +43,35 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - uses: ./.github/actions/setup
     - name: 🤹 Django tests
-      run: make test
+      run: make test TARGET="--ignore=tests/www"
+
+  test_www:
+    runs-on: ubuntu-latest
+    permissions: {}
+    env: *test_env
+    concurrency:
+      group: ${{ github.workflow }}-test_www-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+      cancel-in-progress: true
+    services: *test_services
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - uses: ./.github/actions/setup
+    - name: 🤹 Django tests
+      run: make test TARGET="tests/www --ignore=tests/www/apply"
+
+  test_www_apply:
+    runs-on: ubuntu-latest
+    permissions: {}
+    env: *test_env
+    concurrency:
+      group: ${{ github.workflow }}-test_www_apply-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+      cancel-in-progress: true
+    services: *test_services
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - uses: ./.github/actions/setup
+    - name: 🤹 Django tests
+      run: make test TARGET="tests/www/apply"
 
   quality:
       runs-on: ubuntu-latest
