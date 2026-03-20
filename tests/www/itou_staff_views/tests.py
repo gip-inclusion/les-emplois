@@ -1440,6 +1440,12 @@ class TestImportFS3437FromAsp:
             first_name="Bec",
             email="bec.blanc@exemple.fr",
         )
+        known_job_seeker_with_same_asp_uid = JobSeekerFactory(
+            jobseeker_profile__asp_uid="999999999999999999999999999999",
+            last_name="Duck",
+            first_name="Donald",
+            email="donald.duck@example.com",
+        )
         with io.BytesIO() as xlsxfile:
             workbook = openpyxl.Workbook()
             sheet = workbook.active
@@ -1549,6 +1555,23 @@ class TestImportFS3437FromAsp:
                     duplicate.jobseeker_profile.asp_uid,
                 ]
             )
+            sheet.append(
+                [
+                    known_job_seeker_with_same_asp_uid.jobseeker_profile.asp_uid,
+                    known_job_seeker_with_same_asp_uid.last_name,
+                    known_job_seeker_with_same_asp_uid.first_name,
+                    known_job_seeker_with_same_asp_uid.jobseeker_profile.birthdate,
+                    "",
+                    known_job_seeker_with_same_asp_uid.jobseeker_profile.nir,
+                    "",
+                    "999991234568",
+                    "98765432100001",
+                    "ACI_DC",
+                    "RIAE_FS_20260128145512.json",
+                    "2026",
+                    known_job_seeker_with_same_asp_uid.jobseeker_profile.asp_uid,  # Same as first column
+                ]
+            )
             workbook.save(xlsxfile)
             xlsxfile.seek(0)
             xlsxfile.name = "20260220_retour_ddes_idItou.xlsx"
@@ -1572,6 +1595,7 @@ class TestImportFS3437FromAsp:
                         known_job_seeker_to_update_with_3437,
                         known_job_seeker_to_update_without_3437,
                         known_job_seeker_to_update_with_duplicate,
+                        known_job_seeker_with_same_asp_uid,
                         duplicate,
                     ]
                 ],
@@ -1601,6 +1625,7 @@ class TestImportFS3437FromAsp:
                         known_job_seeker_to_update_with_3437,
                         known_job_seeker_to_update_without_3437,
                         known_job_seeker_to_update_with_duplicate,
+                        known_job_seeker_with_same_asp_uid,
                         duplicate,
                     ]
                 ],

@@ -2907,7 +2907,7 @@
           Résultats de l’import
       </h2>
       <p>
-          4 lignes traitées.
+          5 lignes traitées.
       </p>
       <div class="alert alert-warning" role="status">
           <div class="row">
@@ -2995,6 +2995,15 @@
                   </li>
               </ul>
           </li>
+          <li>
+              <span class="text-muted">
+                  999999999999999999999999999999 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Donald DUCK — donald.duck@example.com
+                  </a>
+                  - identifiant inchangé
+              </span>
+          </li>
       </ul>
   </div>
   
@@ -3007,7 +3016,7 @@
           Résultats de l’import
       </h2>
       <p>
-          4 lignes traitées.
+          5 lignes traitées.
       </p>
       <div class="alert alert-success" role="status">
           <div class="row">
@@ -3094,6 +3103,15 @@
                       . L’identifiant ne sera pas modifié.
                   </li>
               </ul>
+          </li>
+          <li>
+              <span class="text-muted">
+                  999999999999999999999999999999 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Donald DUCK — donald.duck@example.com
+                  </a>
+                  - identifiant inchangé
+              </span>
           </li>
       </ul>
   </div>
