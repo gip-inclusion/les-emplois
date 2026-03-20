@@ -107,3 +107,57 @@
   
   '''
 # ---
+# name: TestRenderAnnouncementCampaign.test_campaign_rendered_dashboard_for_professionals
+  '''
+  <div aria-labelledby="news-modal-label" aria-modal="true" class="modal" id="news-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="news-modal-label">
+                      Il y a du nouveau !
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <div aria-hidden="true" class="text-center mb-3">
+                      <img alt="" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
+                  </div>
+                  <ol>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item A
+                          </strong>
+                          <div>
+                              Item A
+                          </div>
+                      </li>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item B
+                          </strong>
+                          <div>
+                              Item B
+                          </div>
+                      </li>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item C
+                          </strong>
+                          <div>
+                              Item C
+                          </div>
+                      </li>
+                  </ol>
+              </div>
+              <div class="modal-footer">
+                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
+                      Voir toutes les nouveautés
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---

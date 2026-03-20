@@ -8,7 +8,7 @@
                   <div class="h3 mb-0">
                       Janvier 2024
                       <span class="badge badge-sm bg-emploi-light text-info rounded-pill ms-2">
-                          6
+                          4
                           <span class="visually-hidden">
                               articles
                           </span>
@@ -82,48 +82,6 @@
                           <div aria-label="groupes d'utilisateurs concernés">
                               <span class="tag tag-base bg-info-lighter text-info">
                                   EMPLOYEUR
-                              </span>
-                          </div>
-                          <p class="h4 my-2">
-                              Nouvelle fonctionnalité sur notre site
-                          </p>
-                          <p>
-                              Il est désormais possible de faire de nouvelles actions avec votre compte
-                          </p>
-                          <a aria-label="Plus d'informations sur Nouvelle fonctionnalité sur notre site" class="btn-link has-external-link" href="https://example.com/" rel="noopener" target="_blank">
-                              En savoir plus
-                          </a>
-                      </div>
-                  </div>
-                  <div class="row mb-3">
-                      <div class="col-12 col-xxl-4 col-xxxl-3 d-none d-md-inline">
-                          <img alt="" aria-hidden="true" class="img-fitcover img-thumbnail img-muted" height="396" loading="lazy" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" width="420"/>
-                      </div>
-                      <div class="col-12 col-xxl-8 col-xxxl-9">
-                          <div aria-label="groupes d'utilisateurs concernés">
-                              <span class="tag tag-base bg-info-lighter text-info">
-                                  INSPECTEUR DU TRAVAIL
-                              </span>
-                          </div>
-                          <p class="h4 my-2">
-                              Nouvelle fonctionnalité sur notre site
-                          </p>
-                          <p>
-                              Il est désormais possible de faire de nouvelles actions avec votre compte
-                          </p>
-                          <a aria-label="Plus d'informations sur Nouvelle fonctionnalité sur notre site" class="btn-link has-external-link" href="https://example.com/" rel="noopener" target="_blank">
-                              En savoir plus
-                          </a>
-                      </div>
-                  </div>
-                  <div class="row mb-3">
-                      <div class="col-12 col-xxl-4 col-xxxl-3 d-none d-md-inline">
-                          <img alt="" aria-hidden="true" class="img-fitcover img-thumbnail img-muted" height="396" loading="lazy" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" width="420"/>
-                      </div>
-                      <div class="col-12 col-xxl-8 col-xxxl-9">
-                          <div aria-label="groupes d'utilisateurs concernés">
-                              <span class="tag tag-base bg-info-lighter text-info">
-                                  ADMINISTRATEUR
                               </span>
                           </div>
                           <p class="h4 my-2">
