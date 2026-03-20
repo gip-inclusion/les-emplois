@@ -5,7 +5,7 @@
 
 # It requires clever tools in order to be run:
 # - https://github.com/CleverCloud/clever-tools/
-# - https://www.clever-cloud.com/doc/getting-started/cli/
+# - https://www.clever.cloud/developers/doc/cli/
 
 RUN_DIRECTORY=$(dirname "$0")
 if [[ ! $RUN_DIRECTORY =~ "scripts" ]]; then
