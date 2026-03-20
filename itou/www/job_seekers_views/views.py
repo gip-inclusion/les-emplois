@@ -28,6 +28,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
+from itou.users.perms import can_prefill_orientation_on_dora
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
@@ -77,6 +78,20 @@ def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
         "show_birth_place": jobseeker_profile.birth_country_id == Country.FRANCE_ID,
         "other_infos": [key for key in other_infos_keys if getattr(jobseeker_profile, key)],
     }
+
+
+def build_services_search_url(request, job_seeker):
+    if not can_prefill_orientation_on_dora(request):
+        return None
+
+    query = {
+        "job_seeker_public_id": job_seeker.public_id,
+        "back_url": request.get_full_path(),
+    }
+    # Authorized prescribers can_view_personal_information, it is not checked here.
+    if job_seeker.city_slug:
+        query["city"] = job_seeker.city_slug
+    return reverse("search:services_results", query=query)
 
 
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
@@ -145,6 +160,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             # already checked in test_func because the user name is displayed in the title
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
+            "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
             "group": group,
             "user_in_group": user_in_group,
         }
@@ -280,7 +296,12 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
-        job_seeker.show_more_actions = not job_seeker.has_valid_approval or job_seeker.jobseeker_profile.is_stalled
+        job_seeker.show_more_actions = (
+            not job_seeker.has_valid_approval
+            or job_seeker.jobseeker_profile.is_stalled
+            or can_prefill_orientation_on_dora(request)
+        )
+        job_seeker.services_search_url = build_services_search_url(request, job_seeker)
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
