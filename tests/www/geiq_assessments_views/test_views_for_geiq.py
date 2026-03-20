@@ -1581,3 +1581,16 @@ class TestAssessmentContractsListView:
         response = client.get(self.url, {"duration_longer_or_equal_90": "on"})
         assertContains(response, self.RESET_BTN_LABEL)
         assert response.context["filters_counter"] == 1
+
+    def test_contract_list_filter_date_error_rendering(self, client):
+        filter_data = {
+            "start_date_lower": "2024-12-31",
+            "start_date_upper": "2024-01-01",
+        }
+
+        response = client.get(self.url, filter_data, headers={"HX-Request": "true"})
+
+        assert response.context["filters_form"].is_valid() is False
+
+        assertContains(response, "La date de fin doit être postérieure à la date de début.")
+        assertContains(response, 'id="form-errors-container"')

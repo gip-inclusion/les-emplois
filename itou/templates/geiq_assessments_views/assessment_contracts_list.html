@@ -90,6 +90,7 @@
                     </div>
                     {% partialdef contracts-results-table inline %}
                         {% if request.htmx and not request.htmx.boosted %}
+                            <div id="form-errors-container" hx-swap-oob="true">{% bootstrap_form_errors filters_form %}</div>
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter top_filter=True only %}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
                         {% endif %}
