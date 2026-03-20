@@ -44,7 +44,7 @@ AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID_TEST", "minioadmin")
 AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_SECRET_KEY_TEST", "minioadmin")
 # S3 bucket names must be globally unique. CI uses Cellar, so the storage
 # bucket name must not exist on all of Cellar.
-# https://www.clever-cloud.com/developers/doc/addons/cellar/#name-your-bucket
+# https://www.clever.cloud/developers/doc/addons/cellar/#name-your-bucket
 AWS_STORAGE_BUCKET_NAME = None
 
 PILOTAGE_DATA_HASH_SALT = None
