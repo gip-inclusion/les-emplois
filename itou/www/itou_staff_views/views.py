@@ -329,7 +329,11 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
             results.append(
                 ImportFS3437Result(
                     asp_uid=line["idItou"],
-                    summary=f"Candidat identifié - {profile.user.get_full_name()} - nouvel idItou: {new_asp_uid}",
+                    summary=format_html(
+                        "Candidat identifié - {} - nouvel idItou: {}",
+                        get_admin_view_link(profile, content=profile.display_with_pii),
+                        new_asp_uid,
+                    ),
                     with_3437=profile.with_3437,
                     mismatch=mismatch,
                     duplicate_link=get_admin_view_link(duplicate, content=duplicate.display_with_pii)

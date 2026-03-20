@@ -1409,6 +1409,7 @@ class TestImportFS3437FromAsp:
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             born_in_france=True,
+            email="jeanne.dupont@exemple.fr",
         )
         EmployeeRecordTransitionLogFactory(
             to_state=Status.REJECTED,
@@ -1421,11 +1422,17 @@ class TestImportFS3437FromAsp:
         )
         with_3437_future_asp_uid = "555555555555555555555555555555"
         known_job_seeker_to_update_without_3437 = JobSeekerFactory(
-            jobseeker_profile__asp_uid="333333333333333333333333333333", last_name="Martin", first_name="Martine"
+            jobseeker_profile__asp_uid="333333333333333333333333333333",
+            last_name="Martin",
+            first_name="Martine",
+            email="martine.martin@exemple.fr",
         )
         without_3437_future_asp_uid = "666666666666666666666666666666"
         known_job_seeker_to_update_with_duplicate = JobSeekerFactory(
-            jobseeker_profile__asp_uid="777777777777777777777777777777", last_name="Blanc", first_name="Bec"
+            jobseeker_profile__asp_uid="777777777777777777777777777777",
+            last_name="Blanc",
+            first_name="Bec",
+            email="bec.blanc@example.com",
         )
         duplicate = JobSeekerFactory(
             jobseeker_profile__asp_uid="888888888888888888888888888888",
@@ -1558,9 +1565,15 @@ class TestImportFS3437FromAsp:
                 replace_in_attr=[
                     (
                         "href",
-                        f"/admin/users/jobseekerprofile/{duplicate.pk}/change/",
+                        f"/admin/users/jobseekerprofile/{profile.pk}/change/",
                         "/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/",
                     )
+                    for profile in [
+                        known_job_seeker_to_update_with_3437,
+                        known_job_seeker_to_update_without_3437,
+                        known_job_seeker_to_update_with_duplicate,
+                        duplicate,
+                    ]
                 ],
             )
             assert pretty_indented(soup) == snapshot(name="dry run")
@@ -1581,9 +1594,15 @@ class TestImportFS3437FromAsp:
                 replace_in_attr=[
                     (
                         "href",
-                        f"/admin/users/jobseekerprofile/{duplicate.pk}/change/",
+                        f"/admin/users/jobseekerprofile/{profile.pk}/change/",
                         "/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/",
                     )
+                    for profile in [
+                        known_job_seeker_to_update_with_3437,
+                        known_job_seeker_to_update_without_3437,
+                        known_job_seeker_to_update_with_duplicate,
+                        duplicate,
+                    ]
                 ],
             )
 

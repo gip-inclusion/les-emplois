@@ -2930,7 +2930,11 @@
           </li>
           <li>
               <span>
-                  222222222222222222222222222222 - Candidat identifié - Jeanne DUPONT - nouvel idItou: 555555555555555555555555555555
+                  222222222222222222222222222222 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Jeanne DUPONT — jeanne.dupont@exemple.fr
+                  </a>
+                  - nouvel idItou: 555555555555555555555555555555
               </span>
               <ul>
                   <li class="text-success">
@@ -2950,7 +2954,11 @@
           </li>
           <li>
               <span>
-                  333333333333333333333333333333 - Candidat identifié - Martine MARTIN - nouvel idItou: 666666666666666666666666666666
+                  333333333333333333333333333333 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Martine MARTIN — martine.martin@exemple.fr
+                  </a>
+                  - nouvel idItou: 666666666666666666666666666666
               </span>
               <ul>
                   <li class="text-warning">
@@ -2968,7 +2976,11 @@
           </li>
           <li>
               <span>
-                  777777777777777777777777777777 - Candidat identifié - Bec BLANC - nouvel idItou: 888888888888888888888888888888
+                  777777777777777777777777777777 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Bec BLANC — bec.blanc@example.com
+                  </a>
+                  - nouvel idItou: 888888888888888888888888888888
               </span>
               <ul>
                   <li class="text-warning">
@@ -3018,7 +3030,11 @@
           </li>
           <li>
               <span>
-                  222222222222222222222222222222 - Candidat identifié - Jeanne DUPONT - nouvel idItou: 555555555555555555555555555555
+                  222222222222222222222222222222 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Jeanne DUPONT — jeanne.dupont@exemple.fr
+                  </a>
+                  - nouvel idItou: 555555555555555555555555555555
               </span>
               <ul>
                   <li class="text-success">
@@ -3038,7 +3054,11 @@
           </li>
           <li>
               <span>
-                  333333333333333333333333333333 - Candidat identifié - Martine MARTIN - nouvel idItou: 666666666666666666666666666666
+                  333333333333333333333333333333 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Martine MARTIN — martine.martin@exemple.fr
+                  </a>
+                  - nouvel idItou: 666666666666666666666666666666
               </span>
               <ul>
                   <li class="text-warning">
@@ -3056,7 +3076,11 @@
           </li>
           <li>
               <span>
-                  777777777777777777777777777777 - Candidat identifié - Bec BLANC - nouvel idItou: 888888888888888888888888888888
+                  777777777777777777777777777777 - Candidat identifié -
+                  <a href="/admin/users/jobseekerprofile/[PK of JobSeekerProfile]/change/">
+                      Bec BLANC — bec.blanc@example.com
+                  </a>
+                  - nouvel idItou: 888888888888888888888888888888
               </span>
               <ul>
                   <li class="text-warning">
