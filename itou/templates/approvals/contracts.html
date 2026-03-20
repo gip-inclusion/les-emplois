@@ -44,6 +44,14 @@
                         </div>
                     </div>
                 </div>
+            {% empty %}
+                <div class="c-box c-box--results mb-3 mb-md-4">
+                    <div class="c-box--results__body">
+                        <p class="mb-0">
+                            Aucun contrat IAE n’a été trouvé. Cela peut s’expliquer par l’absence d’enregistrement dans l’Extranet ou par une impossibilité de récupération des données.
+                        </p>
+                    </div>
+                </div>
             {% endfor %}
         </div>
     </section>
