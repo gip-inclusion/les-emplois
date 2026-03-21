@@ -75,6 +75,7 @@
           WHERE ("users_user"."email"::text IS NOT NULL
                  AND "users_user"."is_active"
                  AND "users_user"."kind" IN (%s,
+                                             %s,
                                              %s))
           ORDER BY RANDOM() ASC
         ''',

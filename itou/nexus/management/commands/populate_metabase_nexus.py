@@ -120,20 +120,15 @@ class Command(BaseCommand):
     help = "Populate nexus metabase database."
 
     def populate_users(self):
-        queryset = User.objects.filter(is_active=True, kind__in=UserKind.caseworkers(), email__isnull=False).annotate(
+        queryset = User.objects.filter(
+            is_active=True, kind__in=UserKind.professionals(), email__isnull=False
+        ).annotate(
             has_authorized_prescriber_orgnization_membership=Exists(
                 PrescriberMembership.objects.filter(
                     user=OuterRef("pk"), organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
                 )
             )
         )
-
-        def get_user_kind(user):
-            if user.kind == UserKind.PRESCRIBER:
-                if user.has_authorized_prescriber_orgnization_membership:
-                    return "prescripteur habilité"
-                return "orienteur"
-            return user.get_kind_display()
 
         def serializer(user):
             return [
@@ -146,7 +141,7 @@ class Command(BaseCommand):
                 user.phone,
                 user.last_login,
                 user.get_identity_provider_display(),
-                get_user_kind(user),
+                "pro",
                 self.run_at,
             ]
 
