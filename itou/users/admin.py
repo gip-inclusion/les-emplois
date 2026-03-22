@@ -404,7 +404,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 url = reverse("admin:gps_followupgroup_change", args=(memberships[0].follow_up_group_id,))
                 return format_html('<a href="{}">Groupe de suivi de ce bénéficiaire</a>', url, len(memberships))
             return "Pas de groupe de suivi"
-        if obj.is_caseworker:
+        if obj.is_professional:
             url = reverse("admin:gps_followupgroupmembership_changelist", query={"member": obj.id})
             count = FollowUpGroupMembership.objects.filter(member=obj).count()
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
