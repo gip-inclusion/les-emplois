@@ -5,24 +5,28 @@ from django.urls import reverse
 from django_otp import user_has_device
 from itoutils.urls import add_url_params
 
-from itou.common_apps.organizations.models import OrganizationKind
-from itou.companies.models import CompanyMembership
-from itou.institutions.models import InstitutionMembership
+from itou.companies.models import Company, CompanyMembership
+from itou.institutions.models import Institution, InstitutionMembership
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.prescribers.models import PrescriberMembership
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.www.logout.enums import LogoutWarning
 
 
-def extract_membership_infos_and_update_session(memberships, org_through_field, session):
+def extract_membership_infos_and_update_session(
+    company_memberships,
+    prescriber_memberships,
+    institution_memberships,
+    session,
+):
     current_org_key = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
 
     orgs = []
     current_org = None
     admin_status = {}
-    for membership in memberships:
-        org = getattr(membership, org_through_field)
+    for membership in company_memberships + prescriber_memberships + institution_memberships:
+        org = membership.get_organization()
         orgs.append(org)
         if org.organization_switch_key == current_org_key:
             current_org = org
@@ -106,15 +110,25 @@ class ItouCurrentOrganizationMiddleware:
         request.from_prescriber = False
         request.from_institution = False
         if user.is_authenticated:
-            if user.is_employer:
+            if user.is_professional:
                 company_memberships, has_inactive_company_membership = get_active_company_memberships(user)
+                prescriber_memberships = get_active_prescriber_memberships(user)
+                institution_memberships = get_active_institution_memberships(user)
+
+                # FT users must have at least one FT organization
+                if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
+                    m.organization.kind == PrescriberOrganizationKind.FT for m in prescriber_memberships
+                ):
+                    logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
+
                 (
                     request.organizations,
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
                     company_memberships,
-                    OrganizationKind.COMPANY,
+                    prescriber_memberships,
+                    institution_memberships,
                     request.session,
                 )
 
@@ -124,60 +138,20 @@ class ItouCurrentOrganizationMiddleware:
                     if has_inactive_company_membership:
                         logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
                     else:
+                        # What do we display here ?
                         logout_warning = LogoutWarning.EMPLOYER_NO_COMPANY
+                        logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
+                    # Or request.from_prescriber = True ?
 
-            elif user.is_prescriber:
-                active_prescriber_memberships = get_active_prescriber_memberships(user)
-                if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
-                    m.organization.kind == PrescriberOrganizationKind.FT for m in active_prescriber_memberships
-                ):
-                    logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
-                (
-                    request.organizations,
-                    request.current_organization,
-                    request.is_current_organization_admin,
-                ) = extract_membership_infos_and_update_session(
-                    active_prescriber_memberships,
-                    OrganizationKind.PRESCRIBER_ORGANIZATION,
-                    request.session,
-                )
-
-            elif user.is_labor_inspector:
-                (
-                    request.organizations,
-                    request.current_organization,
-                    request.is_current_organization_admin,
-                ) = extract_membership_infos_and_update_session(
-                    get_active_institution_memberships(user),
-                    OrganizationKind.INSTITUTION,
-                    request.session,
-                )
-                if not request.current_organization:
-                    logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
-
-            request.from_authorized_prescriber = bool(
-                user.is_prescriber and request.current_organization and request.current_organization.is_authorized
-            )
-            request.from_prescriber = user.is_prescriber  # FIXME: Replace with the following line when merging kinds
-            # request.fromprescriber = bool(
-            #     user.is_professional and (
-            #         request.current_organization is None
-            #         or isinstance(request.current_organization, PrescriberOrganization)
-            #     )
-            # )
-            request.from_employer = user.is_employer  # FIXME: Replace with the following line when merging kinds
-            # request.from_employer = bool(
-            #     user.is_professional
-            #     and request.current_organization
-            #     and isinstance(request.current_organization, Company)
-            # )
-            request.from_institution = user.is_labor_inspector
-            # FIXME: Replace with the following line when merging kinds
-            # request.from_instution = bool(
-            #     user.is_professional
-            #     and request.current_organization
-            #     and isinstance(request.current_organization, Institution)
-            # )
+                else:
+                    if isinstance(request.current_organization, PrescriberOrganization):
+                        request.from_prescriber = True
+                        if request.current_organization.is_authorized:
+                            request.from_authorized_prescriber = True
+                    elif isinstance(request.current_organization, Company):
+                        request.from_prescriber = True
+                    elif isinstance(request.current_organization, Institution):
+                        request.from_institution = True
 
         # Accepting an invitation to join a group is a two-step process.
         # - View one: account creation or login.

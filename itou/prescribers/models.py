@@ -410,3 +410,6 @@ class PrescriberMembership(MembershipAbstract):
         subject = "common/emails/request_for_invitation_subject.txt"
         body = "common/emails/request_for_invitation_body.txt"
         return get_email_message(to, context, subject, body)
+
+    def get_organization(self):
+        return self.organization
