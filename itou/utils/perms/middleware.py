@@ -44,6 +44,51 @@ def extract_membership_infos_and_update_session(memberships, org_through_field, 
     )
 
 
+def get_active_company_memberships(user):
+    # Do not use the default manager to avoid double checking whether the user is_active.
+    # The AuthenticationMiddleware already checked that the user is_active.
+    memberships = list(CompanyMembership.include_inactive.filter(user=user, is_active=True))
+    companies = {
+        company.pk: company
+        for company in user.company_set.filter(pk__in=[membership.company_id for membership in memberships])
+        .active_or_in_grace_period()
+        .select_related("convention")
+    }
+    active_memberships = []
+    has_inactive = False
+    for membership in memberships:
+        if membership.company_id in companies:
+            # The company is active (or in grace period)
+            membership.company = companies[membership.company_id]
+            active_memberships.append(membership)
+        else:
+            has_inactive = True
+    # If there is no current company, we want to default to the first active one
+    # (and preferably not one in grace period)
+    active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.joined_at))
+    return active_memberships, has_inactive
+
+
+def get_active_prescriber_memberships(user):
+    # Do not use the default manager to avoid double checking whether the user is_active.
+    # The AuthenticationMiddleware already checked that the user is_active.
+    return list(
+        PrescriberMembership.include_inactive.filter(user=user, is_active=True)
+        .order_by("joined_at")
+        .select_related("organization")
+    )
+
+
+def get_active_institution_memberships(user):
+    # Do not use the default manager to avoid double checking whether the user is_active.
+    # The AuthenticationMiddleware already checked that the user is_active.
+    return list(
+        InstitutionMembership.include_inactive.filter(user=user, is_active=True)
+        .order_by("joined_at")
+        .select_related("institution")
+    )
+
+
 class ItouCurrentOrganizationMiddleware:
     """
     Store the ID of the current prescriber organization or employer structure in session
@@ -62,33 +107,13 @@ class ItouCurrentOrganizationMiddleware:
         request.from_institution = False
         if user.is_authenticated:
             if user.is_employer:
-                # Do not use the default manager to avoid double checking whether the user is_active.
-                # The AuthenticationMiddleware already checked that the user is_active.
-                active_memberships = list(CompanyMembership.include_inactive.filter(user=user, is_active=True))
-                companies = {
-                    company.pk: company
-                    for company in user.company_set.filter(
-                        pk__in=[membership.company_id for membership in active_memberships]
-                    )
-                    .active_or_in_grace_period()
-                    .select_related("convention")
-                }
-                really_active_memberships = []
-                for membership in active_memberships:
-                    if membership.company_id in companies:
-                        # The company is active (or in grace period)
-                        membership.company = companies[membership.company_id]
-                        really_active_memberships.append(membership)
-                # If there is no current company, we want to default to the first active one
-                # (and preferably not one in grace period)
-                really_active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.joined_at))
-
+                company_memberships, has_inactive_company_membership = get_active_company_memberships(user)
                 (
                     request.organizations,
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
-                    really_active_memberships,
+                    company_memberships,
                     OrganizationKind.COMPANY,
                     request.session,
                 )
@@ -96,21 +121,15 @@ class ItouCurrentOrganizationMiddleware:
                 if not request.current_organization:
                     # SIAE user has no active SIAE and thus must not be able to access any page,
                     # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
-                    if not active_memberships:
-                        logout_warning = LogoutWarning.EMPLOYER_NO_COMPANY
-                    else:
+                    if has_inactive_company_membership:
                         logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
+                    else:
+                        logout_warning = LogoutWarning.EMPLOYER_NO_COMPANY
 
             elif user.is_prescriber:
-                active_memberships = list(
-                    # Do not use the default manager to avoid double checking whether the user is_active.
-                    # The AuthenticationMiddleware already checked that the user is_active.
-                    PrescriberMembership.include_inactive.filter(user=user, is_active=True)
-                    .order_by("joined_at")
-                    .select_related("organization")
-                )
+                active_prescriber_memberships = get_active_prescriber_memberships(user)
                 if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
-                    m.organization.kind == PrescriberOrganizationKind.FT for m in active_memberships
+                    m.organization.kind == PrescriberOrganizationKind.FT for m in active_prescriber_memberships
                 ):
                     logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
                 (
@@ -118,7 +137,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
-                    active_memberships,
+                    active_prescriber_memberships,
                     OrganizationKind.PRESCRIBER_ORGANIZATION,
                     request.session,
                 )
@@ -129,11 +148,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
-                    # Do not use the default manager to avoid double checking whether the user is_active.
-                    # The AuthenticationMiddleware already checked that the user is_active.
-                    InstitutionMembership.include_inactive.filter(user=user, is_active=True)
-                    .order_by("joined_at")
-                    .select_related("institution"),
+                    get_active_institution_memberships(user),
                     OrganizationKind.INSTITUTION,
                     request.session,
                 )

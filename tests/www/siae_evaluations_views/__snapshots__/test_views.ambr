@@ -206,7 +206,7 @@
       }),
       dict({
         'origin': list([
-          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'get_active_institution_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -968,7 +968,7 @@
       }),
       dict({
         'origin': list([
-          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'get_active_institution_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -1545,7 +1545,7 @@
       }),
       dict({
         'origin': list([
-          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'get_active_institution_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
