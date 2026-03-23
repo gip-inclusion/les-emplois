@@ -285,7 +285,7 @@ class EmployerInvitation(InvitationAbstract):
 
 
 class LaborInspectorInvitation(InvitationAbstract):
-    USER_KIND = UserKind.LABOR_INSPECTOR
+    USER_KIND = KIND_LABOR_INSPECTOR
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
