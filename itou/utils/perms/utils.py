@@ -2,47 +2,38 @@ def can_view_personal_information(request, user):
     return _can_view_personal_information(
         request.user,
         user,
-        viewer_is_prescriber_from_authorized_org=request.from_authorized_prescriber,
-        viewer_is_employer=request.from_employer,
+        is_allowed=request.from_authorized_prescriber or request.from_employer,
     )
 
 
-def _can_view_personal_information(viewer, user, *, viewer_is_prescriber_from_authorized_org, viewer_is_employer):
+def _can_view_personal_information(viewer, user, *, is_allowed):
     if _can_edit_personal_information(
-        viewer,
-        user,
-        editor_is_prescriber_from_authorized_org=viewer_is_prescriber_from_authorized_org,
-        editor_is_employer=viewer_is_employer,
+        viewer, user, is_allowed=is_allowed
     ):  # If we can edit them then we can view them
         return True
 
-    if user.is_job_seeker:  # Restrict display of personal information to job seeker
-        if viewer.is_caseworker:
-            if viewer_is_prescriber_from_authorized_org or viewer_is_employer:
-                return True
-            else:
-                return user.is_handled_by_proxy and user.is_created_by(viewer)
-
-    return False
+    return (
+        user.is_job_seeker
+        and viewer.is_caseworker
+        and (is_allowed or (user.is_handled_by_proxy and user.is_created_by(viewer)))
+    )
 
 
 def can_edit_personal_information(request, user):
     return _can_edit_personal_information(
         request.user,
         user,
-        editor_is_prescriber_from_authorized_org=request.from_authorized_prescriber,
-        editor_is_employer=request.from_employer,
+        is_allowed=request.from_authorized_prescriber or request.from_employer,
     )
 
 
-def _can_edit_personal_information(editor, user, *, editor_is_prescriber_from_authorized_org, editor_is_employer):
+def _can_edit_personal_information(editor, user, *, is_allowed):
     if editor.pk == user.pk:  # I am me
         return True
 
-    if editor.is_caseworker:
-        if editor_is_prescriber_from_authorized_org or editor_is_employer:
-            return user.is_handled_by_proxy
-        else:
-            return user.is_handled_by_proxy and user.is_created_by(editor)
-
-    return False
+    return (
+        user.is_job_seeker
+        and editor.is_caseworker
+        and user.is_handled_by_proxy
+        and (is_allowed or user.is_created_by(editor))
+    )

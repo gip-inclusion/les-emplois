@@ -34,8 +34,8 @@ class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
             "can_view_personal_information": _can_view_personal_information(
                 viewer=self.user,
                 user=job_application.job_seeker,
-                viewer_is_prescriber_from_authorized_org=self.user.is_prescriber_with_authorized_org_memberships,
-                viewer_is_employer=isinstance(self.structure, Company),
+                is_allowed=self.user.is_prescriber_with_authorized_org_memberships
+                or isinstance(self.structure, Company),
             ),
         }
 
