@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2026-03-23
+
+### Ajouté
+
+- [2/6 [Filtres contrats Geiq] Ajouter un filtre “Contrat ≥ 90 jours”](https://github.com/gip-inclusion/les-emplois/pull/7674)
+- [Candidature : Ajout d'un onglet "Suivi des contrats IAE" depuis la page de détails d'un candidat](https://github.com/gip-inclusion/les-emplois/pull/7721)
+- [Connexion : Les professionnels doivent explicitement accepter les CGU](https://github.com/gip-inclusion/les-emplois/pull/7586)
+- [Connexion : Nouvelle version des Conditions Générales d'Utilisation](https://github.com/gip-inclusion/les-emplois/pull/7707)
+- [Éligibilité : Certifier le critère d’éligibilité Travailleur Handicapé](https://github.com/gip-inclusion/les-emplois/pull/7541)
+
+### Modifié
+
+- [Admin : Gestion des doublons asp_uid/idItou dans la vue d'import du fichier de l'ASP](https://github.com/gip-inclusion/les-emplois/pull/7729)
+- [GEIQ : Seuls les contrats de professionnalisation et d’apprentissage sont importés par l'API LABEL](https://github.com/gip-inclusion/les-emplois/pull/7720)
+- [Tech : Ouverture de l'objet intermédiaire entre candidats et prescripteurs à tous les accompagnateurs](https://github.com/gip-inclusion/les-emplois/pull/7670)
+
+### Tech
+
+- [Admin : Résolution d'un accès concurrent susceptible d'aboutir à une erreur 500](https://github.com/gip-inclusion/les-emplois/pull/7686) 🖼
+- [Chore : Fix DGEFP showroom Metabase params](https://github.com/gip-inclusion/les-emplois/pull/7684)
+
 ## 2026-03-16
 
 ### Ajouté
