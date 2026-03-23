@@ -30,7 +30,7 @@ def service_id(service, id):
 def get_service_users(*, email=None, user=None):
     assert (email is None) ^ (user is None), "One and only one of email and user is required"
     if email:
-        user = User.objects.filter(email=email, is_active=True, kind__in=UserKind.caseworkers()).first()
+        user = User.objects.filter(email=email, is_active=True, kind__in=UserKind.professionals()).first()
     else:
         email = user.email
 

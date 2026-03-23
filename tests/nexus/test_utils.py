@@ -79,8 +79,9 @@ class TestGetServiceUsers:
         with pytest.raises(AssertionError):
             get_service_users(email=user.email, user=user)
 
-    def test_emplois_user(self):
-        user = PrescriberFactory()
+    @pytest.mark.parametrize("user_factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
+    def test_emplois_user(self, user_factory):
+        user = user_factory()
         expected = [build_user(serialize_user(user), Service.EMPLOIS)]
         assert get_service_users(user=user) == expected
         assert get_service_users(email=user.email) == expected
@@ -104,7 +105,7 @@ class TestGetServiceUsers:
         assert get_service_users(email=nexus_user.email) == [nexus_user]
 
     def test_wrong_emplois_user(self):
-        for factory in [JobSeekerFactory, ItouStaffFactory, LaborInspectorFactory]:
+        for factory in [JobSeekerFactory, ItouStaffFactory]:
             user = factory()
             assert get_service_users(email=user.email) == []
 
