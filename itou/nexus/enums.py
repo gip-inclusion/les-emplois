@@ -133,6 +133,7 @@ class NexusStructureKind(models.TextChoices):
 emplois_kind_mapping = {
     UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
     UserKind.PRESCRIBER: NexusUserKind.GUIDE,
+    UserKind.LABOR_INSPECTOR: "",
 }
 USER_KIND_MAPPING = {
     Service.EMPLOIS: emplois_kind_mapping,

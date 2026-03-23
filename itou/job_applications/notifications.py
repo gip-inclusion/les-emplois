@@ -3,9 +3,8 @@ from django.urls import reverse
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import (
     EmailNotification,
-    EmployerNotification,
     JobSeekerNotification,
-    PrescriberOrEmployerNotification,
+    ProfessionalNotification,
 )
 from itou.companies.models import Company
 from itou.job_applications.enums import RefusalReason
@@ -26,7 +25,7 @@ class WithJobSeekersApplicationsLink:
         return context
 
 
-class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+class ProxyNotification(ProfessionalNotification, EmailNotification):
     def get_context(self):
         context = super().get_context()
         job_application = context["job_application"]
@@ -34,8 +33,8 @@ class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
             "can_view_personal_information": _can_view_personal_information(
                 viewer=self.user,
                 user=job_application.job_seeker,
-                viewer_is_prescriber_from_authorized_org=self.user.is_prescriber_with_authorized_org_memberships,
-                viewer_is_employer=isinstance(self.structure, Company),
+                is_allowed=self.user.is_prescriber_with_authorized_org_memberships
+                or isinstance(self.structure, Company),
             ),
         }
 
@@ -61,7 +60,7 @@ class JobApplicationNewForProxyNotification(WithJobSeekersApplicationsLink, Prox
 
 
 @notifications_registry.register
-class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotification):
+class JobApplicationNewForProfessionalNotification(ProfessionalNotification, EmailNotification):
     """Notification sent to new employers when created"""
 
     name = "Nouvelle candidature"
@@ -191,7 +190,7 @@ class JobApplicationTransferredForProxyNotification(WithJobSeekersApplicationsLi
 
 
 @notifications_registry.register
-class JobApplicationTransferredForEmployerNotification(EmployerNotification, EmailNotification):
+class JobApplicationTransferredForProfessionalNotification(ProfessionalNotification, EmailNotification):
     """Notification sent to original employer when transferred"""
 
     name = "Transfert de candidature"

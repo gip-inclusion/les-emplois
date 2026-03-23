@@ -114,6 +114,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -134,6 +135,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''

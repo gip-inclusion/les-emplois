@@ -19,7 +19,6 @@ from itou.common_apps.organizations.models import (
     OrganizationQuerySet,
 )
 from itou.institutions.enums import InstitutionKind
-from itou.users.enums import UserKind
 
 
 class Institution(AddressMixin, OrganizationAbstract):
@@ -61,8 +60,6 @@ class Institution(AddressMixin, OrganizationAbstract):
 class InstitutionMembership(MembershipAbstract):
     """Intermediary model between `User` and `Institution`."""
 
-    user_kind = UserKind.LABOR_INSPECTOR
-
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -74,3 +71,6 @@ class InstitutionMembership(MembershipAbstract):
 
     class Meta:
         unique_together = ("user_id", "institution_id")
+
+    def get_organization(self):
+        return self.institution

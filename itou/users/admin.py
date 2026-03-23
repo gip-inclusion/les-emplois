@@ -383,7 +383,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
 
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
-        if obj.is_caseworker:
+        if obj.is_professional:
             return "Voir pour chaque structure ci-dessous"
         notification_settings, _ = NotificationSettings.get_or_create(obj)
         disabled_notifications = notification_settings.disabled_notifications_names
@@ -404,7 +404,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 url = reverse("admin:gps_followupgroup_change", args=(memberships[0].follow_up_group_id,))
                 return format_html('<a href="{}">Groupe de suivi de ce bénéficiaire</a>', url, len(memberships))
             return "Pas de groupe de suivi"
-        if obj.is_caseworker:
+        if obj.is_professional:
             url = reverse("admin:gps_followupgroupmembership_changelist", query={"member": obj.id})
             count = FollowUpGroupMembership.objects.filter(member=obj).count()
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
@@ -573,28 +573,23 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             lambda user: user.job_applications_sent.all(), SentJobApplicationInline, True
         )
         conditional_inlines = {
-            "is_employer": [
-                ConditionalInline(
-                    lambda user: CompanyMembership.include_inactive.filter(user=user),
-                    CompanyMembershipInline,
-                    False,
-                ),
-                sent_applications_inline,
-            ],
-            "is_prescriber": [
+            "is_professional": [
                 ConditionalInline(
                     lambda user: PrescriberMembership.include_inactive.filter(user=user),
                     PrescriberMembershipInline,
                     False,
                 ),
-                sent_applications_inline,
-            ],
-            "is_labor_inspector": [
+                ConditionalInline(
+                    lambda user: CompanyMembership.include_inactive.filter(user=user),
+                    CompanyMembershipInline,
+                    False,
+                ),
                 ConditionalInline(
                     lambda user: InstitutionMembership.include_inactive.filter(user=user),
                     InstitutionMembershipInline,
                     False,
                 ),
+                sent_applications_inline,
             ],
             "is_job_seeker": [
                 ConditionalInline(lambda user: user.eligibility_diagnoses.all(), EligibilityDiagnosisInline, False),

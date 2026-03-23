@@ -32,7 +32,6 @@ from itou.companies.enums import (
     JobSource,
     JobSourceTag,
 )
-from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.triggers import FieldsHistory
@@ -644,8 +643,6 @@ class Company(AddressMixin, OrganizationAbstract):
 class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""
 
-    user_kind = UserKind.EMPLOYER
-
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -659,6 +656,9 @@ class CompanyMembership(MembershipAbstract):
         constraints = [
             models.UniqueConstraint(fields=["user", "company"], name="user_company_unique"),
         ]
+
+    def get_organization(self):
+        return self.company
 
 
 class JobDescriptionQuerySet(models.QuerySet):

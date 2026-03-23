@@ -65,6 +65,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -85,6 +86,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -452,6 +454,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -472,6 +475,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -901,6 +905,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -921,6 +926,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -1830,6 +1836,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -2118,6 +2125,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -2374,6 +2382,8 @@
                                                                                   %s,
                                                                                   %s,
                                                                                   %s,
+                                                                                  %s,
+                                                                                  %s,
                                                                                   %s))
           ORDER BY "communications_notificationrecord"."category" ASC,
                    "communications_notificationrecord"."name" ASC
@@ -2403,6 +2413,8 @@
           SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
+                                                                                    %s,
+                                                                                    %s,
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,
@@ -2503,6 +2515,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -2863,6 +2876,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -3151,6 +3165,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''
@@ -3406,6 +3421,8 @@
                                                                                   %s,
                                                                                   %s,
                                                                                   %s,
+                                                                                  %s,
+                                                                                  %s,
                                                                                   %s))
           ORDER BY "communications_notificationrecord"."category" ASC,
                    "communications_notificationrecord"."name" ASC
@@ -3435,6 +3452,8 @@
           SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
+                                                                                    %s,
+                                                                                    %s,
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,
@@ -3534,6 +3553,7 @@
       }),
       dict({
         'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
         'sql': '''

@@ -55,7 +55,7 @@ def test_populate_metabase_nexus(snapshot):
                 authorized_prescriber.phone,
                 authorized_prescriber.last_login,
                 authorized_prescriber.get_identity_provider_display(),
-                "prescripteur habilité",
+                "pro",
                 timezone.now(),
             ),
             (
@@ -68,7 +68,7 @@ def test_populate_metabase_nexus(snapshot):
                 employer.phone,
                 employer.last_login,
                 employer.get_identity_provider_display(),
-                "employeur",
+                "pro",
                 timezone.now(),
             ),
             (
@@ -81,7 +81,7 @@ def test_populate_metabase_nexus(snapshot):
                 prescriber_1.phone,
                 prescriber_1.last_login,
                 prescriber_1.get_identity_provider_display(),
-                "orienteur",
+                "pro",
                 timezone.now(),
             ),
             (
@@ -94,7 +94,7 @@ def test_populate_metabase_nexus(snapshot):
                 prescriber_2.phone,
                 prescriber_2.last_login,
                 prescriber_2.get_identity_provider_display(),
-                "orienteur",
+                "pro",
                 timezone.now(),
             ),
         ]
