@@ -1490,8 +1490,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             "can_view_personal_information": _can_view_personal_information(
                 viewer=self.sender,
                 user=self.job_seeker,
-                viewer_is_prescriber_from_authorized_org=self.sender.is_prescriber_with_authorized_org_memberships,
-                viewer_is_employer=self.sender_kind == KIND_EMPLOYER,
+                is_allowed=self.sender.is_prescriber_with_authorized_org_memberships
+                or self.sender_kind == KIND_EMPLOYER,
             ),
         }
         return get_email_message(to, context, subject, body)
