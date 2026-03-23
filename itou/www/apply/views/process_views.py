@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 from urllib.parse import urljoin
 
@@ -863,6 +864,14 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                 if response.status_code in (httpx.codes.UNAUTHORIZED, httpx.codes.FORBIDDEN):
                     headers = get_api_credentials(refresh=True)
                     response = httpx.post(url=url, headers=headers, json=data, timeout=10)
+                if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    error_message = 'Got "422 Unprocessable Content" response from RDVI'
+                    try:
+                        errors = response.json().get("errors", 'errors are not available: "errors" key is missing')
+                    except json.JSONDecodeError:
+                        logger.error("%s: could not JSON-decode response", error_message)
+                    else:
+                        logger.error(error_message, extra={"errors": errors})
                 response_data = response.raise_for_status().json()
 
                 invitation_request = InvitationRequest.objects.create(

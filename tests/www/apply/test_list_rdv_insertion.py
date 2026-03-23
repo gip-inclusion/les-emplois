@@ -1,4 +1,5 @@
 import datetime
+import json
 from urllib.parse import urljoin
 
 import httpx
@@ -286,14 +287,37 @@ class TestRdvInsertionView:
         error_button = parse_response_to_soup(response, selector=".text-danger")
         assert pretty_indented(error_button) == snapshot()
 
+    @pytest.mark.parametrize(
+        "response_code,response_body",
+        [
+            [
+                422,
+                json.dumps(
+                    {
+                        "success": False,
+                        "errors": [
+                            {
+                                "error_details": "Erreur en envoyant l'invitation par email: "
+                                "Plusieurs catégories de motifs disponibles et aucune n'a été choisie"
+                            }
+                        ],
+                    },
+                ),
+            ],
+            [422, "not a JSON-encoded response"],
+            [500, json.dumps(RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY)],
+        ],
+    )
     @respx.mock
-    def test_rdv_insertion_configured_with_failed_rdv_insertion_exchange(self, client, snapshot, mocker):
+    def test_rdv_insertion_configured_with_failed_rdv_insertion_exchange(
+        self, client, snapshot, mocker, response_code, response_body
+    ):
         mocker.patch(
             "itou.www.apply.views.process_views.get_api_credentials", return_value=RDV_INSERTION_AUTH_SUCCESS_HEADERS
         )
         assert InvitationRequest.objects.count() == 0
         respx.routes["rdv_solidarites_create_and_invite"].mock(
-            return_value=httpx.Response(500, json=RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY)
+            return_value=httpx.Response(response_code, content=response_body)
         )
 
         client.force_login(self.job_application.to_company.members.get())
