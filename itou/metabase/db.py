@@ -116,7 +116,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                 "comment": "Date de dernière mise à jour de Metabase",
                 # As metabase daily updates run typically every night after midnight, the last day with
                 # complete data is yesterday, not today.
-                "fn": lambda o: timezone.localdate() + timezone.timedelta(days=-1),
+                "fn": lambda o: timezone.localdate(),
             },
         ]
     )
