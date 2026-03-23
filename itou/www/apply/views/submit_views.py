@@ -24,6 +24,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
+from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -350,6 +351,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             "is_subject_to_iae_rules": self.company.is_subject_to_iae_rules,
             "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
             "is_subject_to_geiq_rules": self.company.kind == CompanyKind.GEIQ,
+            "ITOU_DIAGNOSTIC_URL": ITOU_DIAGNOSTIC_URL,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
             # Do not show the warning for job seekers
