@@ -660,6 +660,9 @@ class CompanyMembership(MembershipAbstract):
             models.UniqueConstraint(fields=["user", "company"], name="user_company_unique"),
         ]
 
+    def get_organization(self):
+        return self.company
+
 
 class JobDescriptionQuerySet(models.QuerySet):
     def with_job_applications_count(self, filters=None):
