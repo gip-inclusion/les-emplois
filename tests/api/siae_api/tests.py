@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from rest_framework.test import APIClient
 
@@ -241,6 +242,7 @@ class TestSiaeAPIFetchList:
             (JobSeekerFactory, 120),
         ],
     )
+    @freeze_time()
     def test_fetch_siae_list_rate_limits(self, api_client, user_factory, max_requests):
         if user_factory:
             api_client.force_authenticate(user=user_factory())
