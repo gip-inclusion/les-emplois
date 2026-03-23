@@ -7,7 +7,10 @@ from itou.users import enums as users_enums, models as users_models
 def collect_analytics_data(before):
     counts = {
         info["kind"]: info["count"]
-        for info in users_models.User.objects.values("kind").annotate(count=Count("pk")).values("kind", "count")
+        for info in users_models.User.objects.filter(is_active=True)
+        .values("kind")
+        .annotate(count=Count("pk"))
+        .values("kind", "count")
     }
     return {
         models.DatumCode.USER_COUNT: sum(counts.values()),

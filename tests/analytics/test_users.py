@@ -41,6 +41,7 @@ def test_collect_analytics_with_data():
     users_factories.EmployerFactory.create_batch(4)
     users_factories.LaborInspectorFactory.create_batch(5)
     users_factories.ItouStaffFactory.create_batch(6)
+    users_factories.JobSeekerFactory(is_active=False)
     assert users.collect_analytics_data(timezone.now()) == {
         models.DatumCode.USER_COUNT: 20,
         models.DatumCode.USER_JOB_SEEKER_COUNT: 2,
