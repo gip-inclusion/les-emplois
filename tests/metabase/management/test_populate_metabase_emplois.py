@@ -52,7 +52,7 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberF
 @freeze_time("2023-03-10")
 @pytest.mark.django_db(transaction=True)
 def test_populate_analytics(snapshot):
-    date_maj = timezone.localdate() + datetime.timedelta(days=-1)
+    date_maj = timezone.localdate()
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
     data1 = DatumFactory(code="ER-102", bucket="2020-10-17")
     data2 = DatumFactory(code="ER-102-3436", bucket="2022-08-16")
@@ -293,7 +293,7 @@ def test_populate_job_seekers(snapshot):
             "critère_n2_maîtrise_de_la_langue_française_inférieure_au_ni": None,
             "critère_n2_problème_de_mobilité": None,
             "injection_ai": 0,
-            "date_mise_à_jour_metabase": timezone.localdate() - datetime.timedelta(days=1),
+            "date_mise_à_jour_metabase": timezone.localdate(),
         },
         {
             "id": user_2.pk,
@@ -354,7 +354,7 @@ def test_populate_job_seekers(snapshot):
             "critère_n2_maîtrise_de_la_langue_française_inférieure_au_ni": 1,
             "critère_n2_problème_de_mobilité": 1,
             "injection_ai": 1,
-            "date_mise_à_jour_metabase": timezone.localdate() - datetime.timedelta(days=1),
+            "date_mise_à_jour_metabase": timezone.localdate(),
         },
         {
             "id": user_3.pk,
@@ -415,7 +415,7 @@ def test_populate_job_seekers(snapshot):
             "critère_n2_maîtrise_de_la_langue_française_inférieure_au_ni": 0,
             "critère_n2_problème_de_mobilité": 0,
             "injection_ai": 0,
-            "date_mise_à_jour_metabase": timezone.localdate() - datetime.timedelta(days=1),
+            "date_mise_à_jour_metabase": timezone.localdate(),
         },
     ]
 
@@ -430,7 +430,7 @@ def test_populate_criteria(snapshot):
         cursor.execute("SELECT * FROM critères_iae ORDER BY id")
         rows = cursor.fetchall()
         assert len(rows) == 18
-        assert rows[0] == (1, "Bénéficiaire du RSA", "1", "Revenu de solidarité active", datetime.date(2023, 2, 1))
+        assert rows[0] == (1, "Bénéficiaire du RSA", "1", "Revenu de solidarité active", datetime.date(2023, 2, 2))
 
 
 @freeze_time("2023-02-02")
@@ -492,7 +492,7 @@ def test_populate_job_applications(snapshot):
                 "",
                 ja.contract_type,
                 True,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -506,7 +506,7 @@ def test_populate_job_applications(snapshot):
             (
                 job.pk,
                 ja.pk,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -539,7 +539,7 @@ def test_populate_approvals(snapshot):
                 None,
                 0,
                 hash_content(approval.number),
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -570,7 +570,7 @@ def test_populate_prolongations(snapshot):
             "id_organisation_prescripteur": prolongation.prescriber_organization_id,
             "date_de_création": prolongation.created_at.date(),
             "id_demande_de_prolongation": prolongation_request.pk,
-            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
 
@@ -612,7 +612,7 @@ def test_populate_prolongation_requests(snapshot):
         "date_traitement": prolongation_request.processed_at,
         "id_utilisateur_traitant": prolongation_request.processed_by_id,
         "date_envoi_rappel": prolongation_request.reminder_sent_at,
-        "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+        "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
     }
 
 
@@ -636,7 +636,7 @@ def test_populate_suspensions(snapshot):
             "motif": suspension.reason.value,
             "en_cours": int(suspension.is_in_progress),
             "date_de_création": suspension.created_at,
-            "date_mise_à_jour_metabase": timezone.localdate() - datetime.timedelta(days=1),
+            "date_mise_à_jour_metabase": timezone.localdate(),
         }
     ]
 
@@ -660,7 +660,7 @@ def test_populate_institutions(snapshot):
                 "14 - Calvados",
                 "Normandie",
                 institution.name,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -684,7 +684,7 @@ def test_populate_evaluation_campaigns(snapshot):
                 evaluation_campaign.evaluated_period_start_at,
                 evaluation_campaign.evaluated_period_end_at,
                 evaluation_campaign.chosen_percent,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -708,7 +708,7 @@ def test_populate_evaluated_siaes(snapshot):
                 evaluated_siae.state,
                 evaluated_siae.reviewed_at,
                 evaluated_siae.final_reviewed_at,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -730,7 +730,7 @@ def test_populate_evaluated_job_applications(snapshot):
                 evaluated_job_application.job_application_id,
                 evaluated_job_application.evaluated_siae_id,
                 evaluated_job_application.compute_state(),
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -755,7 +755,7 @@ def test_populate_evaluated_criteria(snapshot):
                 evaluated_criteria.uploaded_at,
                 evaluated_criteria.submitted_at,
                 evaluated_criteria.review_state,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -795,7 +795,7 @@ def test_populate_users(snapshot):
                 pro_user.last_name,
                 pro_user.last_login,
                 datetime.date(2023, 2, 2),
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -826,7 +826,7 @@ def test_populate_memberships(snapshot):
                 company_membership.company_id,
                 None,
                 None,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
             (
                 prescriber_membership.user_id,
@@ -834,7 +834,7 @@ def test_populate_memberships(snapshot):
                 None,
                 prescriber_membership.organization_id,
                 None,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
             (
                 institution_membership.user_id,
@@ -842,7 +842,7 @@ def test_populate_memberships(snapshot):
                 None,
                 None,
                 institution_membership.institution_id,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -944,7 +944,7 @@ def test_populate_job_descriptions(snapshot):
                 0,
                 datetime.date(2023, 2, 2),
                 datetime.date(2023, 2, 2),
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -1032,7 +1032,7 @@ def test_populate_companies(snapshot):
                 None,
                 4,
                 0,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -1073,7 +1073,7 @@ def test_populate_gps_groups(snapshot):
                 group.updated_at,
                 group.created_in_bulk,
                 group.beneficiary.department,
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -1104,7 +1104,7 @@ def test_populate_gps_memberships(snapshot):
                 ["13", "63", "75"],
                 int(membership.created_in_bulk),
                 int(membership.is_referent_certified),
-                datetime.date(2023, 2, 1),
+                datetime.date(2023, 2, 2),
             ),
         ]
 
@@ -1159,7 +1159,7 @@ def test_populate_organizations(snapshot):
             "date_dernière_connexion": None,
             "active": 0,
             "brsa": 0,
-            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
         {
             "id": first_organisation.pk,
@@ -1187,7 +1187,7 @@ def test_populate_organizations(snapshot):
             "date_dernière_connexion": None,
             "active": 0,
             "brsa": 0,
-            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
         {
             "id": second_organisation.pk,
@@ -1215,6 +1215,6 @@ def test_populate_organizations(snapshot):
             "date_dernière_connexion": None,
             "active": 0,
             "brsa": 0,
-            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
