@@ -1,6 +1,7 @@
 import factory
 import pytest
 from django.urls import reverse_lazy
+from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -243,6 +244,7 @@ class TestApplicantsAPI:
                 "uid_structures": [str(company.uid)],
             } == result
 
+    @freeze_time()
     def test_rate_limiting(self, api_client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()

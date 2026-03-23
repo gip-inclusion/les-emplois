@@ -1207,6 +1207,7 @@ class TestOTP:
         device = TOTPDevice.objects.exclude(pk=device.pk).get()
         assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
 
+    @freeze_time()
     def test_confirm(self, client):
         staff_user = ItouStaffFactory()
         client.force_login(staff_user)
@@ -1229,7 +1230,7 @@ class TestOTP:
         device.refresh_from_db()
         assert device.confirmed is False
 
-        # there's throttling
+        # by default, django-otp's throttle delay is 1 second after the first failure
         totp = TOTP(device.bin_key)
         post_data["otp_token"] = totp.token()
         response = client.post(url, data=post_data)
