@@ -22,7 +22,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient, accept_legal_terms
 
 
@@ -220,6 +220,52 @@ class TestCompanySignup:
         assert company.has_admin(user)
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
+
+    @freeze_time("2024-09-15 15:53:54")
+    def test_join_a_company_without_members_as_an_existing_professional(self, client, pro_connect):
+        """
+        A user joins a company without members.
+        """
+        company = CompanyFactory(kind=CompanyKind.ETTI)
+        assert 0 == company.members.count()
+
+        user = PrescriberFactory(
+            username=pro_connect.oidc_userinfo["sub"],
+            email=pro_connect.oidc_userinfo["email"],
+            has_completed_welcoming_tour=True,
+        )
+
+        magic_link = company.signup_magic_link
+        response = client.get(magic_link)
+        pro_connect.assertContainsButton(response)
+
+        # Check ProConnect will redirect to the correct url
+        token = company.get_token()
+        previous_url = reverse("signup:employer", args=(company.pk, token))
+        next_url = reverse("signup:company_join", args=(company.pk, token))
+        params = {
+            "user_kind": KIND_EMPLOYER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+            "register": True,
+        }
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
+
+        response = pro_connect.mock_oauth_dance(
+            client,
+            KIND_EMPLOYER,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        response = client.get(response.url)
+        # Check user is redirected to the dashboard
+        assertRedirects(response, reverse("dashboard:index"))
+
+        # Check `User` state.
+        assert company.has_admin(user)
+        assert 1 == company.members.count()
+        assert 1 == user.company_set.count()
 
     @freeze_time("2024-09-15 15:53:54")
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
@@ -448,14 +494,14 @@ class TestCompanySignup:
         assertContains(response, "Aucun résultat pour 402191662")
 
 
-def test_non_staff_cant_join_a_company(client):
+def test_non_pro_cant_join_a_company(client):
     company = CompanyFactory(kind=CompanyKind.ETTI)
-    assert 0 == company.members.count()
+    assert company.members.count() == 0
 
-    user = PrescriberFactory()
+    user = JobSeekerFactory()
     client.force_login(user)
 
-    # Skip IC process and jump to joining the company.
+    # Skip login process and jump to joining the company.
     token = company.get_token()
     url = reverse("signup:company_join", args=(company.pk, token))
 
@@ -465,7 +511,7 @@ def test_non_staff_cant_join_a_company(client):
         [
             messages.Message(
                 messages.ERROR,
-                "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur.",
+                "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas professionnel.",
             )
         ],
     )
@@ -473,4 +519,4 @@ def test_non_staff_cant_join_a_company(client):
 
     # Check `User` state.
     assert not company.has_admin(user)
-    assert 0 == company.members.count()
+    assert company.members.count() == 0
