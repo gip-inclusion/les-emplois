@@ -302,10 +302,10 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
 @method_decorator(bypass_terms_acceptance, name="dispatch")
 class CompanyJoinView(CompanyBaseView):
     def get(self, request, *args, **kwargs):
-        if not request.from_employer:
-            logger.error("A non staff user tried to join a company")
+        if not request.user.is_professional:
+            logger.error("A non professional user tried to join a company")
             messages.error(
-                request, "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur."
+                request, "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas professionnel."
             )
             return HttpResponseRedirect(reverse("search:employers_results"))
 
