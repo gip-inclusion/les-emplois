@@ -198,7 +198,9 @@ def _async_certify_criterion(model_name, selected_administrative_criteria_id, *,
 # Retry for a long time, since the API particulier can only tell whether a job
 # seeker benefits from a subsidy **on the day we call it**.
 API_PARTICULIER_RETRY_DURATION = datetime.timedelta(days=1)
-API_PARTICULIER_RETRY_DELAY = datetime.timedelta(minutes=10)
+# FIXME(leo): increase delay due to API PARTICULIER / CNAV outage.
+# Should be reduced once resolved and/or use exponential backoff with a greater duration.
+API_PARTICULIER_RETRY_DELAY = datetime.timedelta(hours=12)
 API_PARTICULIER_RETRY_COUNT = API_PARTICULIER_RETRY_DURATION / API_PARTICULIER_RETRY_DELAY
 
 
