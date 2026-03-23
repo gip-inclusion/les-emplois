@@ -89,6 +89,27 @@ class TestAutoLoginMiddleware:
         )
         assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
 
+    def test_middleware_labor_inspector(self, client, caplog):
+        user = LaborInspectorFactory()
+        params = {"auto_login": generate_auto_login_token(user)}
+        response = client.get(reverse("home:hp", query=params))
+        expected_url = reverse(
+            "pro_connect:authorize",
+            query={"user_kind": "labor_inspector", "next_url": "/", "user_email": user.email},
+        )
+        assertRedirects(
+            response,
+            expected_url,
+            fetch_redirect_response=False,
+        )
+        assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
+
+        # But it won't work a the next step
+        caplog.clear()
+        response = client.get(expected_url)
+        assertRedirects(response, reverse("search:employers_home"))
+        assert caplog.messages == ["Wrong user kind.", "HTTP 302 Found", "HTTP 200 OK"]
+
 
 class TestDropDownMiddleware:
     def test_context(self, client):
