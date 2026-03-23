@@ -394,10 +394,10 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     elif request.from_institution:
         raise Http404("Ce compte utilisateur ne peut gérer ses notifications.")
     elif request.user.is_job_seeker:
-        notification_form = EditUserNotificationForm(user=request.user, structure=None, data=request.POST or None)
+        notification_form = EditUserNotificationForm(user=request.user, organization=None, data=request.POST or None)
     else:
         notification_form = EditUserNotificationForm(
-            user=request.user, structure=request.current_organization, data=request.POST or None
+            user=request.user, organization=request.current_organization, data=request.POST or None
         )
 
     dashboard_url = reverse_lazy("dashboard:index")

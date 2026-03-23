@@ -3,7 +3,7 @@
 {% block body %}
 Bonjour,
 
-Nous vous informons que votre fiche de poste intitulée {{ job_description.display_name }} à {{ job_description.display_location }} au sein de la structure {{ structure.kind }} {{ structure.display_name }} a été dépubliée automatiquement, car elle n’a pas été mise à jour depuis plus de 3 mois.
+Nous vous informons que votre fiche de poste intitulée {{ job_description.display_name }} à {{ job_description.display_location }} au sein de la structure {{ organization.kind }} {{ organization.display_name }} a été dépubliée automatiquement, car elle n’a pas été mise à jour depuis plus de 3 mois.
 
 En cas de besoin, vous pouvez réactiver cette fiche de poste depuis votre espace :
 Structure > Métiers et recrutements sur les Emplois de l’inclusion {{ base_url}}.

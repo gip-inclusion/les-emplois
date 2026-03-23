@@ -60,18 +60,20 @@ class DisabledNotification(models.Model):
 
 
 class NotificationSettingsQuerySet(models.QuerySet):
-    def for_structure(self, structure=None):
+    def for_organization(self, organization=None):
         qs = self.prefetch_related("disabled_notifications")
-        if structure is None:
-            return qs.filter(structure_type=None, structure_pk=None)
-        return qs.filter(structure_type=ContentType.objects.get_for_model(structure), structure_pk=structure.pk)
+        if organization is None:
+            return qs.filter(organization_type=None, organization_pk=None)
+        return qs.filter(
+            organization_type=ContentType.objects.get_for_model(organization), organization_pk=organization.pk
+        )
 
 
 class NotificationSettings(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notification_settings")
-    structure_type = models.ForeignKey(ContentType, null=True, on_delete=models.CASCADE)
-    structure_pk = models.PositiveIntegerField(null=True)
-    structure = GenericForeignKey("structure_type", "structure_pk")
+    organization_type = models.ForeignKey(ContentType, null=True, on_delete=models.CASCADE)
+    organization_pk = models.PositiveIntegerField(null=True)
+    organization = GenericForeignKey("organization_type", "organization_pk")
     disabled_notifications = models.ManyToManyField(NotificationRecord, through=DisabledNotification, related_name="+")
 
     objects = NotificationSettingsQuerySet.as_manager()
@@ -81,36 +83,36 @@ class NotificationSettings(models.Model):
         constraints = [
             models.UniqueConstraint(
                 "user",
-                condition=models.Q(structure_pk__isnull=True),
+                condition=models.Q(organization_pk__isnull=True),
                 name="unique_settings_per_individual_user",
             ),
             models.UniqueConstraint(
                 "user",
-                "structure_type",
-                "structure_pk",
-                condition=models.Q(structure_pk__isnull=False),
+                "organization_type",
+                "organization_pk",
+                condition=models.Q(organization_pk__isnull=False),
                 name="unique_settings_per_organizational_user",
             ),
         ]
 
     def __str__(self):
-        if self.structure:
-            return f"Paramètres de notification de {self.user.get_full_name()} ({self.structure})"
+        if self.organization:
+            return f"Paramètres de notification de {self.user.get_full_name()} ({self.organization})"
         return f"Paramètres de notification de {self.user.get_full_name()}"
 
     @staticmethod
-    def get_or_create(user, structure=None):
-        if structure is None:
-            structure_type = None
-            structure_pk = None
+    def get_or_create(user, organization=None):
+        if organization is None:
+            organization_type = None
+            organization_pk = None
         else:
-            structure_type = ContentType.objects.get_for_model(structure)
-            structure_pk = structure.pk
+            organization_type = ContentType.objects.get_for_model(organization)
+            organization_pk = organization.pk
 
         notification_settings, created = NotificationSettings.objects.get_or_create(
             user=user,
-            structure_type=structure_type,
-            structure_pk=structure_pk,
+            organization_type=organization_type,
+            organization_pk=organization_pk,
         )
         return notification_settings, created
 

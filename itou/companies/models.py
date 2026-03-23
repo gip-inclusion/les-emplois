@@ -337,8 +337,8 @@ class Company(AddressMixin, OrganizationAbstract):
     # Use the generic relation to let NotificationSettings being collected on deletion
     notification_settings = GenericRelation(
         "communications.NotificationSettings",
-        content_type_field="structure_type",
-        object_id_field="structure_pk",
+        content_type_field="organization_type",
+        object_id_field="organization_pk",
         related_query_name="company",
     )
 

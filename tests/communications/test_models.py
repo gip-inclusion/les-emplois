@@ -56,49 +56,55 @@ class TestNotificationSettingsModel:
         self.employer = EmployerFactory(
             first_name="Alice", last_name="Doe", membership=True, with_disabled_notifications=True
         )
-        self.employer_structure = self.employer.company_set.first()
+        self.employer_organization = self.employer.company_set.first()
         self.prescriber = PrescriberFactory(
             first_name="Bob", last_name="Doe", membership=True, with_disabled_notifications=True
         )
-        self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
+        self.prescriber_organization = self.prescriber.prescriberorganization_set.first()
 
     def test_queryset(self):
         assert NotificationSettings.objects.count() == 3
-        assert NotificationSettings.objects.for_structure(None).count() == 1
-        assert NotificationSettings.objects.for_structure(self.employer_structure).count() == 1
-        assert NotificationSettings.objects.for_structure(self.prescriber_structure).count() == 1
+        assert NotificationSettings.objects.for_organization(None).count() == 1
+        assert NotificationSettings.objects.for_organization(self.employer_organization).count() == 1
+        assert NotificationSettings.objects.for_organization(self.prescriber_organization).count() == 1
 
-        # Create new membership related to employer / employer structure
+        # Create new membership related to employer / employer organization
         membership1 = CompanyMembershipFactory(user=self.employer)
-        membership2 = CompanyMembershipFactory(company=self.employer_structure)
+        membership2 = CompanyMembershipFactory(company=self.employer_organization)
 
         # No changes by default (settings only created when calling NotificationSettings.get_or_create)
         assert NotificationSettings.objects.count() == 3
-        assert NotificationSettings.objects.for_structure(None).count() == 1
-        assert NotificationSettings.objects.for_structure(self.employer_structure).count() == 1
-        assert NotificationSettings.objects.for_structure(self.prescriber_structure).count() == 1
+        assert NotificationSettings.objects.for_organization(None).count() == 1
+        assert NotificationSettings.objects.for_organization(self.employer_organization).count() == 1
+        assert NotificationSettings.objects.for_organization(self.prescriber_organization).count() == 1
 
         # Fetch settings
         NotificationSettings.get_or_create(membership1.user, membership1.company)
         NotificationSettings.get_or_create(membership2.user, membership2.company)
         assert NotificationSettings.objects.count() == 5
-        assert NotificationSettings.objects.for_structure(None).count() == 1
-        assert NotificationSettings.objects.for_structure(self.employer_structure).count() == 2
-        assert NotificationSettings.objects.for_structure(self.employer_structure).filter(user=self.employer).exists()
+        assert NotificationSettings.objects.for_organization(None).count() == 1
+        assert NotificationSettings.objects.for_organization(self.employer_organization).count() == 2
         assert (
-            NotificationSettings.objects.for_structure(self.employer_structure).filter(user=membership2.user).exists()
+            NotificationSettings.objects.for_organization(self.employer_organization)
+            .filter(user=self.employer)
+            .exists()
         )
-        assert NotificationSettings.objects.for_structure(self.prescriber_structure).count() == 1
+        assert (
+            NotificationSettings.objects.for_organization(self.employer_organization)
+            .filter(user=membership2.user)
+            .exists()
+        )
+        assert NotificationSettings.objects.for_organization(self.prescriber_organization).count() == 1
 
     def test_str(self):
         assert str(NotificationSettings.get_or_create(self.job_seeker)[0]) == "Paramètres de notification de John DOE"
         assert (
-            str(NotificationSettings.get_or_create(self.employer, self.employer_structure)[0])
-            == f"Paramètres de notification de Alice DOE ({self.employer_structure})"
+            str(NotificationSettings.get_or_create(self.employer, self.employer_organization)[0])
+            == f"Paramètres de notification de Alice DOE ({self.employer_organization})"
         )
         assert (
-            str(NotificationSettings.get_or_create(self.prescriber, self.prescriber_structure)[0])
-            == f"Paramètres de notification de Bob DOE ({self.prescriber_structure})"
+            str(NotificationSettings.get_or_create(self.prescriber, self.prescriber_organization)[0])
+            == f"Paramètres de notification de Bob DOE ({self.prescriber_organization})"
         )
 
 
