@@ -161,6 +161,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 stalled=True,
             ).count()
             if current_org.is_authorized:
+                context["ITOU_DIAGNOSTIC_URL"] = global_constants.ITOU_DIAGNOSTIC_URL
                 context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,

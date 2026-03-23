@@ -4,7 +4,6 @@
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
-{% load url_add_query %}
 
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
 {% block step_title %}Finaliser la candidature{% endblock %}
@@ -129,11 +128,7 @@
                 {% if is_subject_to_iae_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
-                        <a class="has-external-link"
-                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
-                           target="_blank"
-                           rel="noreferrer noopener"
-                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                        <a class="has-external-link" href="{{ ITOU_DIAGNOSTIC_URL }}" target="_blank" rel="noreferrer noopener" aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
                 {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
@@ -154,11 +149,7 @@
                 {% if is_subject_to_iae_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
-                        <a class="has-external-link"
-                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
-                           target="_blank"
-                           rel="noreferrer noopener"
-                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                        <a class="has-external-link" href="{{ ITOU_DIAGNOSTIC_URL }}" target="_blank" rel="noreferrer noopener" aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
                 {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">

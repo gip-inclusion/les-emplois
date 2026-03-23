@@ -5,7 +5,6 @@
 {% load matomo %}
 {% load static %}
 {% load str_filters %}
-{% load url_add_query %}
 
 {% block title %}Présentation {{ block.super }}{% endblock %}
 
@@ -96,10 +95,7 @@
                                     {% endfragment %}
                                     {% fragment as c_info__detail %}
                                         <p>
-                                            Vous pouvez réaliser le <a href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
-    target="_blank"
-    class="has-external-link"
-    aria-label="diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                            Vous pouvez réaliser le <a href="{{ ITOU_DIAGNOSTIC_URL }}" target="_blank" class="has-external-link" aria-label="diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                                         </p>
                                     {% endfragment %}
                                 {% endcomponent_info %}

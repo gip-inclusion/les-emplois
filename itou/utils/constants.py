@@ -1,5 +1,6 @@
 DDETS_HELP_CENTER_URL = "https://plateforme-inclusion-ddets-dreets.zendesk.com/hc/fr"
 ITOU_HELP_CENTER_URL = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr"
+ITOU_DIAGNOSTIC_URL = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733750518161--Diagnostic-socio-professionnel-de-référence"
 ITOU_CONTACT_FORM_URL = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new"
 PILOTAGE_HELP_CENTER_URL = "https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr"
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"

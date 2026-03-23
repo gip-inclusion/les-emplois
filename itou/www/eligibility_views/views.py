@@ -9,6 +9,7 @@ from django.views.generic import FormView
 from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -83,6 +84,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
         context["job_seeker"] = self.job_seeker
         context["eligibility_diagnosis"] = self.eligibility_diagnosis
         context["criteria_filled_from_job_seeker"] = self.criteria_filled_from_job_seeker
+        context["ITOU_DIAGNOSTIC_URL"] = ITOU_DIAGNOSTIC_URL
         if self.eligibility_diagnosis:
             # self.request.from_authorized_prescriber is True so the user is a prescriber
             context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(UserKind.PRESCRIBER)
@@ -144,6 +146,7 @@ class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
         context["cancel_url"] = self.get_cancel_url()
         context["matomo_custom_title"] = "Evaluation de la candidature"
         context["criteria_filled_from_job_seeker"] = self.criteria_filled_from_job_seeker
+        context["ITOU_DIAGNOSTIC_URL"] = ITOU_DIAGNOSTIC_URL
         return context
 
 

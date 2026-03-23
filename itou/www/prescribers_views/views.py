@@ -11,6 +11,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import check_request
+from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
@@ -61,6 +62,7 @@ def overview(request, template_name="prescribers/overview.html"):
     context = {
         "organization": organization,
         "can_edit": organization.has_admin(request.user),
+        "ITOU_DIAGNOSTIC_URL": ITOU_DIAGNOSTIC_URL,
     }
     return render(request, template_name, context)
 
