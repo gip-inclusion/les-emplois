@@ -74,3 +74,6 @@ class InstitutionMembership(MembershipAbstract):
 
     class Meta:
         unique_together = ("user_id", "institution_id")
+
+    def get_organization(self):
+        return self.institution

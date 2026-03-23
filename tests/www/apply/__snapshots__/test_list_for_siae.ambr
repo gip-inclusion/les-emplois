@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAutocomplete.test_as_employer[SQL queries for job_seeker autocomplete]
   dict({
-    'num_queries': 8,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -168,6 +168,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -389,7 +481,7 @@
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries for sender autocomplete]
   dict({
-    'num_queries': 8,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -556,6 +648,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -777,7 +961,7 @@
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries for sender_company autocomplete]
   dict({
-    'num_queries': 8,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -944,6 +1128,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -1165,7 +1441,7 @@
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries for sender_prescriber_organization autocomplete]
   dict({
-    'num_queries': 8,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1332,6 +1608,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -1545,7 +1913,7 @@
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries when no actual search is performed ]
   dict({
-    'num_queries': 7,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -1712,6 +2080,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -1832,7 +2292,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 26,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -1999,6 +2459,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -2974,7 +3526,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 23,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -3141,6 +3693,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -4016,7 +4660,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with all filters but job_seeker]
   dict({
-    'num_queries': 28,
+    'num_queries': 30,
     'queries': list([
       dict({
         'origin': list([
@@ -4183,6 +4827,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -5406,7 +6142,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with only job_seeker filter]
   dict({
-    'num_queries': 23,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -5573,6 +6309,98 @@
                                 AND U0."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({

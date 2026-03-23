@@ -734,7 +734,7 @@
 # ---
 # name: test_empty_list_view[SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -798,6 +798,27 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
@@ -846,6 +867,46 @@
           WHERE ("prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -1173,7 +1234,7 @@
 # ---
 # name: test_list_view[SQL queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1237,6 +1298,27 @@
       }),
       dict({
         'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'get_active_prescriber_memberships[utils/perms/middleware.py]',
           'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
         ]),
@@ -1285,6 +1367,46 @@
           WHERE ("prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
