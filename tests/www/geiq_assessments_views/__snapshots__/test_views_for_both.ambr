@@ -1338,6 +1338,13 @@
                       </div>
                   </div>
                   <div id="contracts-results-table">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              <p class="mb-0">
+                                  3 résultats
+                              </p>
+                          </div>
+                      </div>
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -1540,6 +1547,13 @@
                       </div>
                   </div>
                   <div id="contracts-results-table">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              <p class="mb-0">
+                                  3 résultats
+                              </p>
+                          </div>
+                      </div>
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -1768,6 +1782,13 @@
                       </div>
                   </div>
                   <div id="contracts-results-table">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              <p class="mb-0">
+                                  0 résultat
+                              </p>
+                          </div>
+                      </div>
                       <div class="text-center my-3 my-md-4">
                           <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
                           <p class="mb-1 mt-3">
@@ -2241,6 +2262,13 @@
                       </div>
                   </div>
                   <div id="contracts-results-table">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              <p class="mb-0">
+                                  2 résultats
+                              </p>
+                          </div>
+                      </div>
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -2411,6 +2439,13 @@
                       </div>
                   </div>
                   <div id="contracts-results-table">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              <p class="mb-0">
+                                  2 résultats
+                              </p>
+                          </div>
+                      </div>
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -2607,6 +2642,13 @@
                       </div>
                   </div>
                   <div id="contracts-results-table">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              <p class="mb-0">
+                                  0 résultat
+                              </p>
+                          </div>
+                      </div>
                       <div class="text-center my-3 my-md-4">
                           <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
                           <p class="mb-1 mt-3">
