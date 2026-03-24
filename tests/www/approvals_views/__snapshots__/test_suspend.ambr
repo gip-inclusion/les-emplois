@@ -1118,15 +1118,17 @@
           </strong>
           de cette suspension.
       </p>
-      <div class="alert alert-danger fade show" role="status">
+      <div class="alert alert-danger" role="alert">
           <div class="row">
               <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-danger">
+                  <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger">
                   </i>
               </div>
               <div class="col">
                   <p class="mb-2">
-                      Attention : la suppression définitive de cette suspension aura pour conséquence de :
+                      <strong>
+                          Attention : la suppression définitive de cette suspension aura pour conséquence de :
+                      </strong>
                   </p>
                   <ul class="mb-0">
                       <li>
