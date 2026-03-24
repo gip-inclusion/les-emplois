@@ -1,5 +1,6 @@
 {% extends "job_seekers_views/submit_base_two_columns.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load static %}
@@ -15,21 +16,16 @@
                 </div>
             {% endif %}
 
-            <div class="alert alert-info mb-3" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Créer un compte pour votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}</strong>
-                        </p>
-                        <p class="mb-0">
-                            Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }} pour l'inscrire.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            {% component_alert title=title content=content variant="info" extra_classes="mb-3" %}
+                {% fragment as title %}
+                    Créer un compte pour votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }} pour l'inscrire.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
 
             {% csrf_token %}
 

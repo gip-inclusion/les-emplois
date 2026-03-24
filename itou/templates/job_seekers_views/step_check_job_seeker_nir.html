@@ -51,17 +51,12 @@
             {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
 
             {% if form.errors %}
-                <div class="alert alert-info">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
-                            <a href="{{ invalid_nir_url }}" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>Cliquez ici pour accéder à l'étape suivante.</a>
-                        </div>
-                    </div>
-                </div>
+                {% component_alert content=content variant="info" extra_classes="mb-3" %}
+                    {% fragment as content %}
+                        <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
+                        <a href="{{ invalid_nir_url }}" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>Cliquez ici pour accéder à l'étape suivante.</a>
+                    {% endfragment %}
+                {% endcomponent_alert %}
             {% else %}
                 {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
                     {% fragment as c_info__summary %}
