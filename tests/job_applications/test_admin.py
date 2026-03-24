@@ -261,7 +261,7 @@ def test_create_then_accept_job_application(admin_client, caplog):
     assert job_application.approval
 
     admin_user = User.objects.get(kind=UserKind.ITOU_STAFF)
-    assert ERROR_LOG_NOT_PROFESSIONAL % admin_user.pk in caplog.messages
+    assert ERROR_LOG_NOT_PROFESSIONAL % admin_user.pk not in caplog.messages
 
 
 def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
