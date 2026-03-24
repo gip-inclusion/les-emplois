@@ -235,17 +235,59 @@ class TestDirectHireFullProcess:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        job_seeker = JobSeekerFactory()
+        # Job seeker with all infos to prevent the need for fill_user info step
+        job_seeker = JobSeekerFactory(
+            with_ban_geoloc_address=True, jobseeker_profile__with_pole_emploi_id=True, born_outside_france=True
+        )
         user = company.members.first()
         client.force_login(user)
-        hire_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}), follow=True)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+        hire_session_name = get_session_name(client.session, HIRE_SESSION_KIND)
+        assertRedirects(
+            response, reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name})
+        )
+        # Skip job_seekers_views and directly go to check_job_seeker_info_for_hire
+        response = client.get(
+            reverse(
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                kwargs={"session_uuid": hire_session_name},
+                query={"job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        assert response.status_code == 200
 
-        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
+        eligibility_url = reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session_name})
+        response = client.post(
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": hire_session_name}),
+            data={"hiring_start_at": timezone.localdate()},
+        )
+        assertRedirects(response, eligibility_url, fetch_redirect_response=False)
+
+        # Trying to check eligibility is blocked
+        response = client.get(eligibility_url)
         assertContains(
             response,
             "suite aux mesures prises dans le cadre du contrôle a posteriori",
             status_code=403,
         )
+
+        # Confirmation redirects to eligibility page
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session_name})
+        response = client.get(confirmation_url)
+        assertRedirects(response, eligibility_url, fetch_redirect_response=False)
+        response = client.post(confirmation_url)
+        assertRedirects(response, eligibility_url, fetch_redirect_response=False)
+        assert not JobApplication.objects.filter(state=JobApplicationState.ACCEPTED).exists()
+
+        # Try with an approval now: hire should work
+        ApprovalFactory(user=job_seeker)
+        response = client.get(eligibility_url)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
+        response = client.get(confirmation_url)
+        assertContains(response, "Confirmer l’embauche")
+        client.post(confirmation_url)
+        assert JobApplication.objects.filter(state=JobApplicationState.ACCEPTED).get()
 
     @freeze_time("2025-08-22")
     def test_hire_as_company(self, client, snapshot):

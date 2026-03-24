@@ -1137,7 +1137,7 @@
 # ---
 # name: TestFillJobSeekerInfosForHire.test_no_missing_data_iae[view queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -1865,22 +1865,6 @@
       }),
       dict({
         'origin': list([
-          'Company.get_active_suspension_dates[companies/models.py]',
-          'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
-          FROM "siae_evaluations_evaluatedsiae"
-          INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
-          WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
-                 AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
-          ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
@@ -1996,7 +1980,7 @@
 # ---
 # name: TestHireConfirmation.test_as_geiq[view queries]
   dict({
-    'num_queries': 31,
+    'num_queries': 30,
     'queries': list([
       dict({
         'origin': list([
@@ -2747,28 +2731,13 @@
       }),
       dict({
         'origin': list([
-          'Company.get_active_suspension_dates[companies/models.py]',
-          'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
-          FROM "siae_evaluations_evaluatedsiae"
-          INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
-          WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
-                 AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
-          ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2831,6 +2800,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2850,6 +2820,7 @@
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2906,6 +2877,7 @@
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2914,6 +2886,7 @@
       dict({
         'origin': list([
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2932,6 +2905,7 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2941,6 +2915,7 @@
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2949,6 +2924,7 @@
       dict({
         'origin': list([
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -2963,6 +2939,7 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -3050,7 +3027,7 @@
 # ---
 # name: TestHireConfirmation.test_as_iae[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -3778,28 +3755,13 @@
       }),
       dict({
         'origin': list([
-          'Company.get_active_suspension_dates[companies/models.py]',
-          'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
-          FROM "siae_evaluations_evaluatedsiae"
-          INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
-          WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
-                 AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
-          ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -3862,6 +3824,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -3881,6 +3844,7 @@
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
@@ -4015,7 +3979,7 @@
 # ---
 # name: TestHireContract.test_as_company[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -4738,22 +4702,6 @@
                            AND U0."is_active"
                            AND U0."company_id" = %s))
                  AND "users_user"."id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.get_active_suspension_dates[companies/models.py]',
-          'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
-          FROM "siae_evaluations_evaluatedsiae"
-          INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
-          WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
-                 AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
-          ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
           LIMIT 1
         ''',
       }),
