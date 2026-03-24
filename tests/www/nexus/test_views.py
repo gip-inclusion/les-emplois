@@ -1,4 +1,6 @@
 import datetime
+import random
+from functools import partial
 
 from django.conf import settings
 from django.contrib import messages
@@ -16,12 +18,22 @@ from pytest_django.asserts import (
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.nexus.factories import NexusUserFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented, remove_static_hash
+
+
+def pro_user_factory():
+    return random.choice(
+        [
+            EmployerFactory,
+            PrescriberFactory,
+            partial(LaborInspectorFactory, identity_provider=IdentityProvider.PRO_CONNECT),
+        ]
+    )()
 
 
 class TestAutoLogin:
@@ -32,7 +44,7 @@ class TestAutoLogin:
         assertRedirects(response, add_url_params(reverse("account_login"), {"next": url}))
 
     def test_nominal_case(self, client, mock_nexus_token):
-        client.force_login(PrescriberFactory())
+        client.force_login(pro_user_factory())
         for host in settings.NEXUS_ALLOWED_REDIRECT_HOSTS:
             next_url = f"https://{host}"
             url = reverse("nexus:auto_login", query={"next_url": next_url})
@@ -40,14 +52,14 @@ class TestAutoLogin:
             assertRedirects(response, add_url_params(next_url, {"auto_login": "JWT"}), fetch_redirect_response=False)
 
     def test_missing_next_url(self, client):
-        client.force_login(PrescriberFactory())
+        client.force_login(pro_user_factory())
         # Without next_url
         url = reverse("nexus:auto_login")
         response = client.get(url)
         assert response.status_code == 404
 
     def test_bad_host(self, client):
-        client.force_login(PrescriberFactory())
+        client.force_login(pro_user_factory())
         next_url = "https://empl0is.fr"
         url = reverse("nexus:auto_login", query={"next_url": next_url})
         response = client.get(url)
@@ -55,7 +67,7 @@ class TestAutoLogin:
 
     @override_settings(PDI_JWT_KEY=None)
     def test_no_settings(self, client):
-        client.force_login(PrescriberFactory())
+        client.force_login(pro_user_factory())
         next_url = f"https://{settings.NEXUS_ALLOWED_REDIRECT_HOSTS[0]}"
         url = reverse("nexus:auto_login", query={"next_url": next_url})
         response = client.get(url)
@@ -115,7 +127,7 @@ class TestLayout:
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="all_badges")
 
     def test_logout_redirect_url(self, client):
-        client.force_login(PrescriberFactory())
+        client.force_login(pro_user_factory())
 
         response = client.get(reverse("nexus:homepage"))
         logout_url = add_url_params(reverse("account_logout"), {"redirect_url": reverse("nexus:login")})
@@ -131,13 +143,13 @@ class TestHomePageView:
     NEW_SERVICES_H2 = "Services à découvrir"
 
     def test_redirect(self, client):
-        user = EmployerFactory(membership=True)
+        user = pro_user_factory()
         client.force_login(user)
         response = client.get(reverse("nexus:index"))
         assertRedirects(response, self.url, status_code=302)
 
     def test_one_activated_service(self, client, snapshot):
-        user = EmployerFactory(membership=True)
+        user = EmployerFactory()
         client.force_login(user)
         response = client.get(self.url)
 
@@ -151,7 +163,7 @@ class TestHomePageView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="guide")
 
     def test_all_activated_services(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         for service in Service.activable():
             if service != Service.EMPLOIS:
                 NexusUserFactory(email=user.email, source=service, auth=Auth.PRO_CONNECT)
@@ -172,7 +184,7 @@ class TestActivateMonRecapView:
     url = reverse("nexus:activate_mon_recap")
 
     def test_nominal(self, client):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.post(self.url, follow=True)
@@ -194,7 +206,7 @@ class TestActivateMonRecapView:
         )
 
     def test_invalid_method(self, client):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -205,7 +217,7 @@ class TestDoraView:
     url = reverse("nexus:dora")
 
     def test_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         NexusUserFactory(email=user.email, source=Service.DORA, auth=Auth.PRO_CONNECT)
         client.force_login(user)
 
@@ -213,7 +225,7 @@ class TestDoraView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
     def test_not_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -235,7 +247,7 @@ class TestEmploisViews:
         assert response.status_code == 403
 
     def test_no_company(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         NexusUserFactory(kind=NexusUserKind.FACILITY_MANAGER, email=user.email)
         client.force_login(user)
         response = client.get(self.url)
@@ -285,7 +297,7 @@ class TestMarcheView:
     url = reverse("nexus:marche")
 
     def test_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         NexusUserFactory(email=user.email, source=Service.MARCHE, auth=Auth.PRO_CONNECT)
         client.force_login(user)
 
@@ -293,7 +305,7 @@ class TestMarcheView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
     def test_not_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -309,7 +321,7 @@ class TestMonRecapView:
     url = reverse("nexus:mon_recap")
 
     def test_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         NexusUserFactory(email=user.email, source=Service.MON_RECAP, auth=Auth.PRO_CONNECT)
         client.force_login(user)
 
@@ -317,7 +329,7 @@ class TestMonRecapView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
     def test_not_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -333,7 +345,7 @@ class TestPilotageView:
     url = reverse("nexus:pilotage")
 
     def test_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         NexusUserFactory(email=user.email, source=Service.PILOTAGE, auth=Auth.PRO_CONNECT)
         client.force_login(user)
 
@@ -341,7 +353,7 @@ class TestPilotageView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
     def test_not_activated(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -357,7 +369,7 @@ class TestStructuresView:
     url = reverse("nexus:structures")
 
     def test_display(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -373,7 +385,7 @@ class TestContactView:
     url = reverse("nexus:contact")
 
     def test_display(self, client, snapshot):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(self.url)
@@ -387,7 +399,7 @@ class TestContactView:
 
 class TestLoginView:
     def test_authenticated(self, client):
-        user = PrescriberFactory()
+        user = pro_user_factory()
         client.force_login(user)
 
         response = client.get(reverse("nexus:login"))
