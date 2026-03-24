@@ -38,18 +38,13 @@
                                 {% bootstrap_form_errors form type="non_fields" %}
                                 {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
                                 {% bootstrap_field form.rationale wrapper_class="form-group" %}
-                                <div class="alert alert-info" role="status">
-                                    <div class="row">
-                                        <div class="col-auto pe-0">
-                                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="mb-0">
-                                                Ce changement n'est <strong>pas automatique</strong>. Votre demande sera <strong>transmise au support</strong> pour être traitée dans les meilleurs délais.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% component_alert content=content variant="info" %}
+                                    {% fragment as content %}
+                                        <p class="mb-0">
+                                            Ce changement n'est <strong>pas automatique</strong>. Votre demande sera <strong>transmise au support</strong> pour être traitée dans les meilleurs délais.
+                                        </p>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
                                 {% itou_buttons_form primary_label="Enregistrer" reset_url=back_url %}
                             </form>
                         </div>

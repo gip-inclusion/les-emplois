@@ -1,11 +1,14 @@
 {% extends "apply/submit_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block content_extend %}
-    <div class="alert alert-warning" role="status">
-        <p class="mb-0">{{ missing_fields_text }}</p>
-    </div>
+    {% component_alert content=content variant="warning" icon=False extra_classes="mb-3" %}
+        {% fragment as content %}
+            <p class="mb-0">{{ missing_fields_text }}</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 
     <form method="post" class="js-prevent-multiple-submit">
         {% csrf_token %}
