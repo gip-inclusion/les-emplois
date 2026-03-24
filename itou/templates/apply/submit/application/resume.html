@@ -18,54 +18,49 @@
         {% endif %}
         {# Nothing is displayed to SIAE members when the job seeker is not eligible to the IAE #}
         {% if not auto_prescription_process or job_seeker.has_valid_approval or eligibility_diagnosis %}
-            <div class="alert alert-info mb-5" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        {% if job_seeker.has_valid_approval %}
-                            <p class="mb-2">
-                                <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_approval.end_at|date:"d/m/Y" }}</strong>
-                            </p>
-                            <p class="mb-0">
-                                {% if request.from_authorized_prescriber or auto_prescription_process %}
-                                    Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative du candidat.
-                                {% elif prescription_process %}
-                                    Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE du candidat.
-                                {% elif request.user.is_job_seeker %}
-                                    Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier votre éligibilité à l’IAE.
-                                {% endif %}
-                            </p>
-                        {% elif eligibility_diagnosis %}
-                            <p class="mb-2">
-                                <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
-                            </p>
-                            <p class="mb-0">
-                                {% if prescription_process %}
-                                    Tant que l’éligibilité IAE est valide, l’employeur n’aura pas à vérifier les critères administratifs du candidat.
-                                {% elif auto_prescription_process %}
-                                    Tant que l’éligibilité IAE est valide, vous n’aurez pas à vérifier les critères administratifs du candidat.
-                                {% elif request.user.is_job_seeker %}
-                                    Tant que votre éligibilité IAE est valide, l’employeur n’aura pas à vérifier vos critères administratifs.
-                                {% endif %}
-                            </p>
-                        {% else %}
-                            {% if prescription_process %}
-                                <p class="mb-2">
-                                    <strong>Information</strong>
-                                </p>
-                                <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider l’éligibilité IAE du candidat.</p>
+            {% component_alert content=content variant="info" extra_classes="mb-5" %}
+                {% fragment as content %}
+                    {% if job_seeker.has_valid_approval %}
+                        <p class="mb-2">
+                            <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_approval.end_at|date:"d/m/Y" }}</strong>
+                        </p>
+                        <p class="mb-0">
+                            {% if request.from_authorized_prescriber or auto_prescription_process %}
+                                Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative du candidat.
+                            {% elif prescription_process %}
+                                Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE du candidat.
                             {% elif request.user.is_job_seeker %}
-                                <p class="mb-2">
-                                    <strong>Information</strong>
-                                </p>
-                                <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider votre éligibilité à l’IAE.</p>
+                                Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier votre éligibilité à l’IAE.
                             {% endif %}
+                        </p>
+                    {% elif eligibility_diagnosis %}
+                        <p class="mb-2">
+                            <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                        </p>
+                        <p class="mb-0">
+                            {% if prescription_process %}
+                                Tant que l’éligibilité IAE est valide, l’employeur n’aura pas à vérifier les critères administratifs du candidat.
+                            {% elif auto_prescription_process %}
+                                Tant que l’éligibilité IAE est valide, vous n’aurez pas à vérifier les critères administratifs du candidat.
+                            {% elif request.user.is_job_seeker %}
+                                Tant que votre éligibilité IAE est valide, l’employeur n’aura pas à vérifier vos critères administratifs.
+                            {% endif %}
+                        </p>
+                    {% else %}
+                        {% if prescription_process %}
+                            <p class="mb-2">
+                                <strong>Information</strong>
+                            </p>
+                            <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider l’éligibilité IAE du candidat.</p>
+                        {% elif request.user.is_job_seeker %}
+                            <p class="mb-2">
+                                <strong>Information</strong>
+                            </p>
+                            <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider votre éligibilité à l’IAE.</p>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
+                    {% endif %}
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% endif %}
     {% elif is_subject_to_geiq_rules %}
         {% if not request.user.is_job_seeker and geiq_eligibility_diagnosis.author_organization %}
@@ -76,43 +71,38 @@
         {% endif %}
         {# Nothing is displayed to GEIQ members when the job seeker is not eligible #}
         {% if not auto_prescription_process or geiq_eligibility_diagnosis %}
-            <div class="alert alert-info mb-5" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        {% if geiq_eligibility_diagnosis %}
+            {% component_alert content=content variant="info" extra_classes="mb-5" %}
+                {% fragment as content %}
+                    {% if geiq_eligibility_diagnosis %}
+                        <p class="mb-2">
+                            <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                        </p>
+                        <p class="mb-0">
+                            {% if prescription_process %}
+                                Tant que l’éligibilité GEIQ est valide, l’employeur n’aura pas à valider les critères administratifs du candidat.
+                            {% elif auto_prescription_process %}
+                                Tant que l’éligibilité GEIQ est valide, vous n’aurez pas à valider les critères administratifs du candidat.
+                            {% elif request.user.is_job_seeker %}
+                                Tant que votre éligibilité GEIQ est valide, l’employeur n’aura pas à valider votre éligibilité à un accompagnement par le GEIQ.
+                            {% endif %}
+                        </p>
+                    {% else %}
+                        {% if prescription_process %}
                             <p class="mb-2">
-                                <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                                <strong>Information</strong>
                             </p>
                             <p class="mb-0">
-                                {% if prescription_process %}
-                                    Tant que l’éligibilité GEIQ est valide, l’employeur n’aura pas à valider les critères administratifs du candidat.
-                                {% elif auto_prescription_process %}
-                                    Tant que l’éligibilité GEIQ est valide, vous n’aurez pas à valider les critères administratifs du candidat.
-                                {% elif request.user.is_job_seeker %}
-                                    Tant que votre éligibilité GEIQ est valide, l’employeur n’aura pas à valider votre éligibilité à un accompagnement par le GEIQ.
-                                {% endif %}
+                                En cas d’embauche, l’employeur se chargera de valider l’éligibilité à un accompagnement par le GEIQ.
                             </p>
-                        {% else %}
-                            {% if prescription_process %}
-                                <p class="mb-2">
-                                    <strong>Information</strong>
-                                </p>
-                                <p class="mb-0">
-                                    En cas d’embauche, l’employeur se chargera de valider l’éligibilité à un accompagnement par le GEIQ.
-                                </p>
-                            {% elif request.user.is_job_seeker %}
-                                <p class="mb-2">
-                                    <strong>Information</strong>
-                                </p>
-                                <p class="mb-0">L’employeur se chargera de valider votre éligibilité à un accompagnement par le GEIQ.</p>
-                            {% endif %}
+                        {% elif request.user.is_job_seeker %}
+                            <p class="mb-2">
+                                <strong>Information</strong>
+                            </p>
+                            <p class="mb-0">L’employeur se chargera de valider votre éligibilité à un accompagnement par le GEIQ.</p>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
+                    {% endif %}
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% endif %}
     {% endif %}
 {% endblock %}
@@ -213,21 +203,16 @@
         </div>
     {% endif %}
     {% if resume_is_recommended %}
-        <div class="alert alert-warning" role="alert">
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Le CV est fortement recommandé</strong>
-                    </p>
-                    <p class="mb-0">
-                        L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
-                    </p>
-                </div>
-            </div>
-        </div>
+        {% component_alert title=title content=content variant="warning" %}
+            {% fragment as title %}
+                Le CV est fortement recommandé
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 {% endblock %}
 

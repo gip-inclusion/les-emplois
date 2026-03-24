@@ -1,4 +1,5 @@
 {% load buttons_form %}
+{% load components %}
 {% load enums %}
 {% load str_filters %}
 
@@ -97,19 +98,14 @@
             {% endif %}
         </li>
     </ul>
-    <div class="alert alert-warning" role="status">
-        <div class="row">
-            <div class="col-auto pe-0">
-                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-            </div>
-            <div class="col">
-                <p class="mb-2">
-                    <strong>Attention : ce récapitulatif ne vaut pas confirmation.</strong>
-                </p>
-                <p class="mb-0">Pour valider l’acceptation, veuillez cliquer sur le bouton "Confirmer l’embauche".</p>
-            </div>
-        </div>
-    </div>
+    {% component_alert title=title content=content variant="warning" %}
+        {% fragment as title %}
+            Attention : ce récapitulatif ne vaut pas confirmation.
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">Pour valider l’acceptation, veuillez cliquer sur le bouton "Confirmer l’embauche".</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
     <form method="post" class="js-prevent-multiple-submit">
         {% csrf_token %}
         {% itou_buttons_form primary_label="Confirmer l’embauche" primary_aria_label="Confirmer l’embauche de "|add:job_seeker.get_inverted_full_name reset_url=reset_url secondary_url=back_url show_mandatory_fields_mention=False %}

@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 
 {% block content %}
     <section class="s-section">
@@ -11,21 +12,16 @@
                             <h1 class="h2">Statut de prescripteur habilité non vérifié</h1>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-warning" role="status">
-                                <div class="row">
-                                    <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="col">
-                                        <p class="mb-2">
-                                            <strong>Attention, si vous souhaitez orienter un candidat auprès d'une SIAE, vous ne pourrez pas valider son éligibilité à l'IAE.</strong>
-                                        </p>
-                                        <p class="mb-0">
-                                            Votre statut de prescripteur habilité n'a pas encore été vérifié par nos équipes. Vous devriez être notifié(e) de sa confirmation dans un délai de 72h.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            {% component_alert title=title content=content variant="warning" %}
+                                {% fragment as title %}
+                                    Attention, si vous souhaitez orienter un candidat auprès d'une SIAE, vous ne pourrez pas valider son éligibilité à l'IAE.
+                                {% endfragment %}
+                                {% fragment as content %}
+                                    <p class="mb-0">
+                                        Votre statut de prescripteur habilité n'a pas encore été vérifié par nos équipes. Vous devriez être notifié(e) de sa confirmation dans un délai de 72h.
+                                    </p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
                             <strong>Êtes-vous certain de vouloir continuer ?</strong>
                         </div>
                         {% url 'search:employers_results' as reset_url %}

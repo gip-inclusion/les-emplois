@@ -521,7 +521,9 @@
           </b>
       </p>
       <div class="alert alert-warning" role="status">
-          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          <p class="mb-0">
+              Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          </p>
       </div>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="row">
@@ -741,7 +743,9 @@
           </b>
       </p>
       <div class="alert alert-warning" role="status">
-          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          <p class="mb-0">
+              Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          </p>
       </div>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="c-info mb-3 mb-md-4">
@@ -844,7 +848,9 @@
           </b>
       </p>
       <div class="alert alert-warning" role="status">
-          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          <p class="mb-0">
+              Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          </p>
       </div>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="row">
@@ -937,7 +943,9 @@
           </b>
       </p>
       <div class="alert alert-warning" role="status">
-          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          <p class="mb-0">
+              Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+          </p>
       </div>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="row">
