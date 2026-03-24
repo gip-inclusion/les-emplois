@@ -37,11 +37,13 @@ def test_collect_analytics_when_no_user_exists():
 
 def test_collect_analytics_with_data():
     users_factories.JobSeekerFactory.create_batch(2)
-    users_factories.PrescriberFactory.create_batch(3)
-    users_factories.EmployerFactory.create_batch(4)
-    users_factories.LaborInspectorFactory.create_batch(5)
+    users_factories.PrescriberFactory.create_batch(3, membership=True)
+    users_factories.EmployerFactory.create_batch(4, membership=True)
+    users_factories.LaborInspectorFactory.create_batch(5, membership=True)
     users_factories.ItouStaffFactory.create_batch(6)
     users_factories.JobSeekerFactory(is_active=False)
+    users_factories.PrescriberFactory()  # no membership we don't count it
+    # FIXME: Test with a professionnal with all 3 memberships
     assert users.collect_analytics_data(timezone.now()) == {
         models.DatumCode.USER_COUNT: 20,
         models.DatumCode.USER_JOB_SEEKER_COUNT: 2,
