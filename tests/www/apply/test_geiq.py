@@ -59,7 +59,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.NO_ALLOWANCE)
 
         # as a prescriber, I see my diagnosis
-        assert diagnosis.author.is_prescriber
         response = self.get_response(client, job_application, diagnosis.author)
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
@@ -86,7 +85,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
 
         # as a prescriber, I see the prescriber diagnosis isn't valid anymore
-        assert diagnosis.author.is_prescriber
         response = self.get_response(client, job_application, diagnosis.author)
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.NO_ALLOWANCE)
@@ -105,7 +103,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
 
         # as a prescriber, I see there's no diagnosis
-        assert job_application.sender.is_prescriber
         response = self.get_response(client, job_application, job_application.sender)
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
 
@@ -130,7 +127,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
 
         # as a prescriber, I see my diagnosis
-        assert diagnosis.author.is_prescriber
         response = self.get_response(client, job_application, diagnosis.author)
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
@@ -165,7 +161,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assert response.context["geiq_eligibility_diagnosis"] == diagnosis
 
         # as a prescriber, I still see my diagnosis
-        assert diagnosis.author.is_prescriber
         response = self.get_response(client, job_application, diagnosis.author)
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
