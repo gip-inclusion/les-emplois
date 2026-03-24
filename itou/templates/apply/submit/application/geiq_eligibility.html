@@ -1,4 +1,5 @@
 {% extends "apply/submit/application/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block progress_title %}{{ block.super }} - Éligibilité GEIQ{% endblock %}
@@ -11,22 +12,17 @@
                 <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
-        <div class="alert alert-info mb-5" role="status">
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
-                    </p>
-                    <p>
-                        Tant que l’éligibilité à l'aide de l'accompagnement GEIQ est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée de six mois.
-                    </p>
-                    <span class="btn btn-link text-start p-0" data-shroud-clear>Mettre à jour l’éligibilité</span>
-                </div>
-            </div>
-        </div>
+        {% component_alert title=title content=content variant="info" extra_classes="mb-5" %}
+            {% fragment as title %}
+                Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}
+            {% endfragment %}
+            {% fragment as content %}
+                <p>
+                    Tant que l’éligibilité à l'aide de l'accompagnement GEIQ est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée de six mois.
+                </p>
+                <span class="btn btn-link text-start p-0" data-shroud-clear>Mettre à jour l’éligibilité</span>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 {% endblock %}
 

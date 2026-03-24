@@ -1,14 +1,17 @@
 {% extends "apply/process_accept_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load str_filters %}
 
 {% block content_extend %}
     <div class="c-form">
         <form method="post" class="js-format-nir">
             {% if has_form_error %}
-                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                    <p class="mb-0">Merci de corriger les erreurs ci-dessous.</p>
-                </div>
+                {% component_alert content=content variant="danger" form_error=True icon=False %}
+                    {% fragment as content %}
+                        <p class="mb-0">Merci de corriger les erreurs ci-dessous.</p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
             {% endif %}
 
             {% csrf_token %}
