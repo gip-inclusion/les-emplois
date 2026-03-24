@@ -949,9 +949,49 @@
   
   '''
 # ---
+# name: TestCheckPreviousApplicationsForHireView.test_display_prev_applications_according_to_sender_type_snapshot
+  '''
+  <ul class="list-group list-group-flush mb-3 mb-md-4">
+      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+          <span>
+              Émise le 27 septembre 2025 à 02h00 par
+              <b>
+                  le candidat
+              </b>
+          </span>
+          <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/APP_JOB_SEEKER_PK/siae/start-accept">
+              Accepter la candidature
+          </a>
+      </li>
+      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+          <span>
+              Émise le 27 décembre 2025 à 01h00 par
+              <b>
+                  ACME Inc.
+              </b>
+          </span>
+          <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/APP_EMPLOYER_PK/siae/start-accept">
+              Accepter la candidature
+          </a>
+      </li>
+      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+          <span>
+              Émise le 27 janvier 2026 à 01h00 par
+              <b>
+                  Pres. Org.
+              </b>
+          </span>
+          <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/APP_PRESCRIBER_PK/siae/start-accept">
+              Accepter la candidature
+          </a>
+      </li>
+  </ul>
+  
+  '''
+# ---
 # name: TestCheckPreviousApplicationsForHireView.test_num_queries[get_with_previous_application]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -1335,6 +1375,7 @@
         'origin': list([
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/common.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1391,6 +1432,7 @@
         'origin': list([
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/common.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1445,6 +1487,7 @@
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/common.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1481,6 +1524,7 @@
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/common.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1618,6 +1662,7 @@
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/common.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1751,7 +1796,8 @@
       }),
       dict({
         'origin': list([
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/common.py]',
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1798,11 +1844,81 @@
                  "job_applications_jobapplication"."qualification_level",
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 T4."id",
+                 T4."password",
+                 T4."last_login",
+                 T4."is_superuser",
+                 T4."username",
+                 T4."first_name",
+                 T4."last_name",
+                 T4."is_staff",
+                 T4."is_active",
+                 T4."date_joined",
+                 T4."address_line_1",
+                 T4."address_line_2",
+                 T4."post_code",
+                 T4."city",
+                 T4."department",
+                 T4."coords",
+                 T4."geocoding_score",
+                 T4."geocoding_updated_at",
+                 T4."ban_api_resolved_address",
+                 T4."insee_city_id",
+                 T4."title",
+                 T4."full_name_search_vector",
+                 T4."email",
+                 T4."phone",
+                 T4."kind",
+                 T4."identity_provider",
+                 T4."has_completed_welcoming_tour",
+                 T4."created_by_id",
+                 T4."external_data_source_history",
+                 T4."last_checked_at",
+                 T4."terms_accepted_at",
+                 T4."public_id",
+                 T4."address_filled_at",
+                 T4."first_login",
+                 T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND "job_applications_jobapplication"."to_company_id" = %s)
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
+                 AND "job_applications_jobapplication"."to_company_id" = %s
+                 AND "job_applications_jobapplication"."created_at" >= %s
+                 AND NOT ("job_applications_jobapplication"."state" = %s))
+          ORDER BY "job_applications_jobapplication"."created_at" ASC
           LIMIT 1
         ''',
       }),
@@ -1891,6 +2007,137 @@
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[apply/submit_step_check_prev_applications.html]',
+          'IfNode[apply/submit_step_check_prev_applications.html]',
+          'BlockNode[apply/submit_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit_base.html]',
+          'ExtendsNode[apply/submit_step_check_prev_applications.html]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 T4."id",
+                 T4."password",
+                 T4."last_login",
+                 T4."is_superuser",
+                 T4."username",
+                 T4."first_name",
+                 T4."last_name",
+                 T4."is_staff",
+                 T4."is_active",
+                 T4."date_joined",
+                 T4."address_line_1",
+                 T4."address_line_2",
+                 T4."post_code",
+                 T4."city",
+                 T4."department",
+                 T4."coords",
+                 T4."geocoding_score",
+                 T4."geocoding_updated_at",
+                 T4."ban_api_resolved_address",
+                 T4."insee_city_id",
+                 T4."title",
+                 T4."full_name_search_vector",
+                 T4."email",
+                 T4."phone",
+                 T4."kind",
+                 T4."identity_provider",
+                 T4."has_completed_welcoming_tour",
+                 T4."created_by_id",
+                 T4."external_data_source_history",
+                 T4."last_checked_at",
+                 T4."terms_accepted_at",
+                 T4."public_id",
+                 T4."address_filled_at",
+                 T4."first_login",
+                 T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
+                 AND "job_applications_jobapplication"."to_company_id" = %s
+                 AND "job_applications_jobapplication"."created_at" >= %s
+                 AND NOT ("job_applications_jobapplication"."state" = %s))
+          ORDER BY "job_applications_jobapplication"."created_at" ASC
         ''',
       }),
       dict({

@@ -519,15 +519,14 @@ class CheckPreviousApplicationsBaseMixin:
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.prev_application = (
-            previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
-        )
+        self.prev_application = None
+        self.prev_applications = None
 
     def get_next_url(self):
         raise NotImplementedError
 
     def get(self, request, *args, **kwargs):
-        if self.prev_application is None:
+        if self.prev_application is None and not self.prev_applications:
             return HttpResponseRedirect(self.get_next_url())
         return super().get(request, *args, **kwargs)
 
@@ -542,6 +541,9 @@ class CheckPreviousApplicationsBaseMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["prev_application"] = self.prev_application
-        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["block_apply"] = (
+            self.prev_application is not None
+            and self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        )
         context["iae_eligibility_url"] = None
         return context

@@ -378,6 +378,12 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
 
 
 class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseMixin, ApplicationBaseView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.prev_application = (
+            previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
+        )
+
     def get_next_url(self):
         return reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
 

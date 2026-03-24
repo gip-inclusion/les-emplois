@@ -8,7 +8,9 @@ from django.contrib import messages
 from django.db.models import Q
 from django.urls import resolve, reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.html import escape
+from django.utils.timezone import localtime
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from itoutils.urls import add_url_params
@@ -1393,6 +1395,94 @@ class TestCheckPreviousApplicationsForHireView:
 
         with assertSnapshotQueries(snapshot(name="get_with_previous_application")):
             client.get(url)
+
+    @freeze_time("2026-03-25")
+    def test_check_prev_applications_hire(self, client):
+        DATE_FORMAT = "d F Y à H\\hi"
+        company = CompanyFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        user = company.members.first()
+        client.force_login(user)
+        now = timezone.now()
+        old_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            created_at=now - relativedelta(months=13),
+            state=JobApplicationState.PROCESSING,
+        )
+        application_in_period_refused = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            created_at=now - relativedelta(months=6),
+            state=JobApplicationState.REFUSED,
+        )
+        application_in_period_accepted = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            created_at=now - relativedelta(months=3),
+            state=JobApplicationState.ACCEPTED,
+        )
+        application_in_period_processing = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            created_at=now - relativedelta(months=1),
+            state=JobApplicationState.PROCESSING,
+        )
+
+        hire_session = fake_session_initialization(client, company, job_seeker, {})
+        prev_applicaitons_url = reverse(
+            "apply:check_prev_applications_for_hire", kwargs={"session_uuid": hire_session.name}
+        )
+        response = client.get(prev_applicaitons_url)
+
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+
+        assertContains(response, date_format(localtime(application_in_period_refused.created_at), DATE_FORMAT))
+        assertContains(response, date_format(localtime(application_in_period_processing.created_at), DATE_FORMAT))
+        assertNotContains(response, date_format(localtime(old_application.created_at), DATE_FORMAT))
+        assertNotContains(response, date_format(localtime(application_in_period_accepted.created_at), DATE_FORMAT))
+
+    @freeze_time("2026-03-27")
+    def test_display_prev_applications_according_to_sender_type_snapshot(self, client, snapshot):
+        now = timezone.now()
+        company = CompanyFactory(with_jobs=True, with_membership=True, for_snapshot=True)
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        application_by_job_seeker = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sent_by_job_seeker=True,
+            created_at=now - relativedelta(months=6),
+        )
+        application_by_employer = JobApplicationFactory(
+            job_seeker=job_seeker, to_company=company, sent_by_employer=True, created_at=now - relativedelta(months=3)
+        )
+        application_by_prescriber = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sent_by_prescriber=True,
+            sender_prescriber_organization__for_snapshot=True,
+            created_at=now - relativedelta(months=2),
+        )
+
+        hire_session = fake_session_initialization(client, company, job_seeker, {})
+        prev_applicaitons_url = reverse(
+            "apply:check_prev_applications_for_hire", kwargs={"session_uuid": hire_session.name}
+        )
+        response = client.get(prev_applicaitons_url)
+
+        content = parse_response_to_soup(
+            response,
+            selector=".list-group.list-group-flush",
+            replace_in_attr=[
+                ("href", str(application_by_job_seeker.pk), "APP_JOB_SEEKER_PK"),
+                ("href", str(application_by_employer.pk), "APP_EMPLOYER_PK"),
+                ("href", str(application_by_prescriber.pk), "APP_PRESCRIBER_PK"),
+            ],
+        )
+        assert pretty_indented(content) == snapshot
 
 
 class TestEligibilityForHire:

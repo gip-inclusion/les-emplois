@@ -1,10 +1,12 @@
 import logging
 
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import TemplateView, View
 
 from itou.companies.enums import CompanyKind
@@ -148,6 +150,22 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
 
 
 class CheckPreviousApplicationsForHireView(common_views.CheckPreviousApplicationsBaseMixin, HireBaseView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.prev_applications = (
+            common_views.previous_applications_queryset(self.job_seeker, self.company)
+            .filter(created_at__gte=timezone.now() - relativedelta(months=12))
+            .select_related("sender", "sender_prescriber_organization")
+            .exclude(state="accepted")
+            .order_by("created_at")
+        )
+        self.prev_application = self.prev_applications.first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["prev_applications"] = self.prev_applications
+        return context
+
     def get_next_url(self):
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
 
