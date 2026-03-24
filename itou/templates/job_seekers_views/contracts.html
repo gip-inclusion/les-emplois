@@ -27,14 +27,16 @@
             <h2>Suivi des contrats IAE</h2>
 
             {% if approval %}
-                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
-                    {% fragment as c_info__summary %}
+                {% component_alert title=title content=content variant="info" extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as title %}
                         Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
                     {% endfragment %}
-                    {% fragment as c_info__detail %}
-                        Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                        </p>
                     {% endfragment %}
-                {% endcomponent_info %}
+                {% endcomponent_alert %}
 
                 {% for contract in contracts %}
                     <div class="c-box c-box--results mb-3 mb-md-4">
