@@ -53,18 +53,13 @@
                             {% bootstrap_field form.description %}
 
                             <hr>
-                            <div class="alert alert-warning" role="status">
-                                <div class="row">
-                                    <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="col">
-                                        <p class="mb-0">
-                                            En cliquant sur le bouton <b>« Enregistrer »</b>, vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            {% component_alert content=content variant="warning" %}
+                                {% fragment as content %}
+                                    <p class="mb-0">
+                                        En cliquant sur le bouton <b>« Enregistrer »</b>, vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+                                    </p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
 
                             {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregister la fiche structure" %}
                         </form>

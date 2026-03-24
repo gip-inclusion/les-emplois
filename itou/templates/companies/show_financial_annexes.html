@@ -18,20 +18,24 @@
     {{ block.super }}
     {% if not siae.is_active %}
         {% if siae_is_asp %}
-            <div class="alert alert-danger" role="status">
-                <p class="mb-0">
+            {% component_alert content=content variant="danger" icon=False %}
+                {% fragment as content %}
                     {# Inactive siaes of ASP source cannot be fixed by user. #}
-                    Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez-nous via la rubrique correspondant à votre structure sur
-                    <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
-                </p>
-            </div>
+                    <p class="mb-0">
+                        Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez-nous via la rubrique correspondant à votre structure sur
+                        <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% elif siae_is_user_created %}
-            <div class="alert alert-danger" role="status">
-                <p class="mb-0">
+            {% component_alert content=content variant="danger" icon=False %}
+                {% fragment as content %}
                     {# Inactive user created siaes can be fixed by the user. #}
-                    Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
-                </p>
-            </div>
+                    <p class="mb-0">
+                        Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% endif %}
     {% endif %}
 {% endblock %}
