@@ -19,7 +19,7 @@ from tests.institutions.factories import (
     InstitutionWith2MembershipFactory,
 )
 from tests.invitations.factories import LaborInspectorInvitationFactory
-from tests.users.factories import LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 
 
 class TestInstitutionModel:
@@ -131,9 +131,15 @@ class TestInstitutionModel:
         invit.refresh_from_db()
         assert invit.has_expired is True
 
-        wrong_kind_user = PrescriberFactory()
+        prescriber = PrescriberFactory()
+        institution.add_or_activate_membership(prescriber)
+
+        employer = EmployerFactory()
+        institution.add_or_activate_membership(employer)
+
+        non_professional = JobSeekerFactory()
         with pytest.raises(ValidationError):
-            institution.add_or_activate_membership(wrong_kind_user)
+            institution.add_or_activate_membership(non_professional)
 
 
 def test_remove_last_admin_status(admin_client, mailoutbox):
