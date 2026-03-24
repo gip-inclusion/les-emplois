@@ -54,10 +54,14 @@ class TestProcessListSiae:
         job2 = JobDescriptionFactory(company=company, appellation=appellations[1], location=city)
 
         # A job application without eligibility diagnosis
-        job_app = JobApplicationFactory(to_company=company, selected_jobs=[job1, job2])
+        job_app = JobApplicationFactory(to_company=company, selected_jobs=[job1, job2], with_approval=True)
         # Two with it (ensure there are no 1+N queries)
         JobApplicationFactory.create_batch(
-            2, to_company=company, selected_jobs=[job1, job2], with_iae_eligibility_diagnosis=True
+            2,
+            to_company=company,
+            selected_jobs=[job1, job2],
+            with_iae_eligibility_diagnosis=True,
+            with_approval=True,
         )
         # A job application for another company
         JobApplicationFactory()

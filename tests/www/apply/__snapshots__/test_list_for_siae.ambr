@@ -2292,7 +2292,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 28,
+    'num_queries': 31,
     'queries': list([
       dict({
         'origin': list([
@@ -3439,6 +3439,7 @@
           FROM "eligibility_selectedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
+                                                                                            %s,
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
@@ -3491,6 +3492,93 @@
       }),
       dict({
         'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -3526,7 +3614,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 25,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -4599,6 +4687,7 @@
           FROM "eligibility_selectedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
+                                                                                            %s,
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
@@ -4646,6 +4735,102 @@
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IncludeNode[apply/includes/list_table.html]',
+          'ForNode[apply/includes/list_table.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IncludeNode[apply/includes/list_table.html]',
+          'ForNode[apply/includes/list_table.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IncludeNode[apply/includes/list_table.html]',
+          'ForNode[apply/includes/list_table.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
           LIMIT 1
         ''',
       }),
