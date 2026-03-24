@@ -743,9 +743,9 @@ def prescriber_join_org(request):
     User is redirected here after a successful oauth signup.
     This is the last step of the signup path.
     """
-    if not request.from_prescriber:
+    if not request.user.is_professional:
         messages.error(
-            request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur."
+            request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas professionnel."
         )
         return HttpResponseRedirect(reverse("search:employers_results"))
 
