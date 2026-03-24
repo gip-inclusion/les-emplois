@@ -20,18 +20,19 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="alert alert-info" role="status">
-                        <p>Voulez-vous vraiment vous déconnecter ?</p>
-                        <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
+                    {% component_alert content=content variant="info" icon=False %}
+                        {% fragment as content %}
+                            <p>Voulez-vous vraiment vous déconnecter ?</p>
+                            <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
 
-                            {% csrf_token %}
+                                {% redirection_input_field value=redirect_field_value %}
 
-                            {% redirection_input_field value=redirect_field_value %}
-
-                            {% url 'home:hp' as reset_url %}
-                            {% itou_buttons_form primary_label="Se déconnecter" reset_url=reset_url %}
-                        </form>
-                    </div>
+                                {% url 'home:hp' as reset_url %}
+                                {% itou_buttons_form primary_label="Se déconnecter" reset_url=reset_url %}
+                            </form>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
                 </div>
             </div>
         </div>

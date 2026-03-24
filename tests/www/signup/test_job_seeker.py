@@ -147,7 +147,7 @@ class TestJobSeekerSignup:
         assertContains(
             response,
             f"""
-            <div class="alert alert-danger" role="status">
+            <div class="alert alert-danger" role="alert">
                 <p class="mb-2">Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
                 <p class="mb-0">
                 Veuillez lancer <a href="{reverse("account_email")}">une nouvelle demande de confirmation</a>.

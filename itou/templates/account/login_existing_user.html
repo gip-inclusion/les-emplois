@@ -23,9 +23,11 @@
                 <div class="s-section__col col-12 col-lg-6">
                     <div class="c-form mb-5">
                         {% if login_provider == "IC" %}
-                            <div class="alert alert-important">
-                                <p class="mb-0">Inclusion Connect devient ProConnect</p>
-                            </div>
+                            {% component_alert content=content variant="important" icon=False %}
+                                {% fragment as content %}
+                                    <p class="mb-0">Inclusion Connect devient ProConnect</p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
                             {% include "pro_connect/includes/button.html" with login=True %}
                         {% elif login_provider == "PC" %}
                             {% include "pro_connect/includes/button.html" with login=True %}
@@ -37,9 +39,11 @@
                                 </p>
                                 <div>{% include "signup/includes/france_connect_button.html" %}</div>
                             {% else %}
-                                <div class="alert alert-info" role="status">
-                                    <p class="mb-0">FranceConnect est désactivé.</p>
-                                </div>
+                                {% component_alert content=content variant="info" icon=False %}
+                                    {% fragment as content %}
+                                        <p class="mb-0">FranceConnect est désactivé.</p>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
                             {% endif %}
                         {% elif login_provider == "PEC" %}
                             <p class="h4">Se connecter avec France Travail</p>
@@ -49,16 +53,20 @@
                                 </p>
                                 <div class="mt-4 text-center">{% include "signup/includes/peamu_button.html" %}</div>
                             {% else %}
-                                <div class="alert alert-info" role="status">
-                                    <p class="mb-0">France Travail est désactivé.</p>
-                                </div>
+                                {% component_alert content=content variant="info" icon=False %}
+                                    {% fragment as content %}
+                                        <p class="mb-0">France Travail est désactivé.</p>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
                             {% endif %}
                         {% elif login_provider == "DJANGO" %}
                             {% include "account/includes/login_form.html" %}
                         {% else %}
-                            <div class="alert alert-info" role="status">
-                                <p class="mb-0">Le mode de connexion associé à ce compte est désactivé. Veuillez contacter le support.</p>
-                            </div>
+                            {% component_alert content=content variant="info" icon=False %}
+                                {% fragment as content %}
+                                    <p class="mb-0">Le mode de connexion associé à ce compte est désactivé. Veuillez contacter le support.</p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
                         {% endif %}
                     </div>
                 </div>
