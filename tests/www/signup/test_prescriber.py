@@ -12,7 +12,6 @@ from pytest_django.asserts import (
     assertMessages,
     assertNotContains,
     assertRedirects,
-    assertTemplateNotUsed,
     assertTemplateUsed,
 )
 
@@ -911,6 +910,57 @@ class TestPrescriberSignup:
         response = client.post(url, data=post_data)
         assert "kind" in response.context["form"].errors
 
+    def test_professional_can_join_organisation(self, client):
+        user = EmployerFactory(membership=True)
+        client.force_login(user)
+
+        client.get(reverse("signup:prescriber_check_already_exists"))
+
+        session_signup_data = client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        # Jump over the last step to avoid double-testing each one
+        # as they are already tested on prescriber's signup views.
+        # Prescriber's signup process heavily relies on session data.
+        # Override only what's needed for our test.
+        # PrescriberOrganizationFactoy does not contain any address field
+        # so we can't use it.
+        dummy_prescriber_org = PrescriberOrganizationFactory.build()
+        prescriber_org_data = {
+            "siret": dummy_prescriber_org.siret,
+            "is_head_office": True,
+            "name": dummy_prescriber_org.name,
+            "address_line_1": dummy_prescriber_org.address_line_1,
+            "address_line_2": "",
+            "post_code": dummy_prescriber_org.post_code,
+            "city": dummy_prescriber_org.city,
+            "department": dummy_prescriber_org.department,
+            "longitude": dummy_prescriber_org.longitude,
+            "latitude": dummy_prescriber_org.latitude,
+            "geocoding_score": dummy_prescriber_org.geocoding_score,
+        }
+        # Try creating an organization with same siret and same kind
+        # (it won't work because of the psql uniqueness constraint).
+        session_signup_data = session_signup_data | {
+            "authorization_status": "NOT_SET",
+            "kind": PrescriberOrganizationKind.OTHER,
+            "prescriber_org_data": prescriber_org_data,
+        }
+
+        client_session = client.session
+        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session.save()
+
+        client.get(reverse("signup:prescriber_join_org"), follow=True)
+
+        # Check organization
+        org = PrescriberOrganization.objects.get()
+        assert not org.is_authorized
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
+
+        # Check membership.
+        assert user.prescribermembership_set.count() == 1
+        membership = user.prescribermembership_set.get(organization=org)
+        assert membership.is_admin
+
 
 class TestProConnectPrescribersViewsExceptions:
     """
@@ -983,83 +1033,6 @@ class TestProConnectPrescribersViewsExceptions:
         # Check user was created but did not join an organisation
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert not user.prescriberorganization_set.exists()
-
-    def test_non_prescriber_cant_join_organisation(self, client, pro_connect):
-        """
-        The organization creation didn't work.
-        The user is still created and can try again.
-        """
-        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        EmployerFactory(
-            email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"], membership=True
-        )
-
-        response = client.get(reverse("signup:prescriber_check_already_exists"))
-        assert response.status_code == 200
-
-        session_signup_data = client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        # Jump over the last step to avoid double-testing each one
-        # as they are already tested on prescriber's signup views.
-        # Prescriber's signup process heavily relies on session data.
-        # Override only what's needed for our test.
-        # PrescriberOrganizationFactoy does not contain any address field
-        # so we can't use it.
-        prescriber_org_data = {
-            "siret": org.siret,
-            "is_head_office": True,
-            "name": org.name,
-            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
-            "address_line_2": "",
-            "post_code": "13150",
-            "city": "TARASCON",
-            "department": "13",
-            "longitude": 4.660572,
-            "latitude": 43.805661,
-            "geocoding_score": 0.8178357293868921,
-        }
-        # Try creating an organization with same siret and same kind
-        # (it won't work because of the psql uniqueness constraint).
-        session_signup_data = session_signup_data | {
-            "authorization_status": "NOT_SET",
-            "kind": org.kind,
-            "prescriber_org_data": prescriber_org_data,
-        }
-
-        client_session = client.session
-        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
-        client_session.save()
-        signup_url = reverse("signup:prescriber_user")
-
-        response = client.get(signup_url)
-        pro_connect.assertContainsButton(response)
-
-        # Connect with ProConnect
-        previous_url = signup_url
-        next_url = reverse("signup:prescriber_join_org")
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-            register=False,
-        )
-        # Follow the redirection.
-        response = client.get(response.url, follow=True)
-        assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
-
-        # The user should be redirected to home page with a warning, the session isn't flushed
-        assert client.session.get(pro_connect.session_key)
-        assert auth.get_user(client).is_authenticated
-        assertRedirects(response, reverse("search:employers_results"))
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    messages.ERROR,
-                    "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur.",
-                )
-            ],
-        )
 
     def test_employer_already_exists(self, client, pro_connect):
         """
