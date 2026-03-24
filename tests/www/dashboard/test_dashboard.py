@@ -110,7 +110,7 @@ class TestDashboardView:
 
         url = reverse("dashboard:index")
         response = client.get(url)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
     def test_dashboard_eiti(self, client):
         company = CompanyFactory(kind=CompanyKind.EITI, with_membership=True)

@@ -315,7 +315,7 @@ class TestUserMembershipDeactivation:
         response = client.get(url)
 
         # should be redirected to logout
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_no_company"}))
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
     def test_structure_selector(self, client):
         """

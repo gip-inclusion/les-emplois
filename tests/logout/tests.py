@@ -13,7 +13,7 @@ def tests_employers_without_company(client, snapshot):
     client.force_login(user)
     response = client.get("dashboard:index", follow=True)
 
-    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_no_company"}))
+    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
     assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 
@@ -22,7 +22,7 @@ def tests_employers_with_inactive_company(client, snapshot):
     client.force_login(user)
     response = client.get("dashboard:index", follow=True)
 
-    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
+    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
     assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 

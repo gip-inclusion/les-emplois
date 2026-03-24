@@ -99,7 +99,7 @@ def test_job_application_auto_prescription_badge_in_list():
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
                 "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(EmployerFactory()),
+                "request": get_request(EmployerFactory(membership=True)),
             }
         )
     )
@@ -119,7 +119,7 @@ def test_job_application_imported_from_pe_in_list():
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
                 "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(EmployerFactory()),
+                "request": get_request(EmployerFactory(membership=True)),
             }
         )
     )
@@ -479,7 +479,7 @@ class TestCertifiedBadge:
     @pytest.mark.parametrize(
         "user_factory,displayed",
         [
-            (EmployerFactory, True),
+            (partial(EmployerFactory, membership=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (PrescriberFactory, False),
         ],
