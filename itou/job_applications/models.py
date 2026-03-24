@@ -1258,8 +1258,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
 
-        # Sync job seeker assignment
-        JobSeekerAssignment.objects.upsert_assignment(self.job_seeker, user, self.to_company, ActionKind.ACCEPT)
+        if user.is_professional:
+            # Sync job seeker assignment, but not for ITOU_STAFF users in the admin
+            JobSeekerAssignment.objects.upsert_assignment(self.job_seeker, user, self.to_company, ActionKind.ACCEPT)
 
     @xwf_models.transition()
     def add_to_pool(self, *, user):
