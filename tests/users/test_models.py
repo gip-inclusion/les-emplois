@@ -59,6 +59,9 @@ from tests.users.factories import (
 from tests.utils.testing import normalize_fields_history
 
 
+ERROR_LOG_NOT_PROFESSIONAL = "We should not try to add a JobSeekerAssignment on user=%s"
+
+
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):
         # Unique user.
@@ -1354,7 +1357,7 @@ class TestJobSeekerAssignment:
         JobSeekerAssignment.objects.upsert_assignment(
             job_seeker, not_a_professional, None, random.choice(ActionKind.values)
         )
-        assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_professional.pk}"
+        assert caplog.messages[0] == ERROR_LOG_NOT_PROFESSIONAL % not_a_professional.pk
 
     def test_professional_and_organization(self):
         job_seeker = JobSeekerFactory()
