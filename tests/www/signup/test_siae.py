@@ -370,7 +370,7 @@ class TestCompanySignup:
         assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
         # Which redirects to logout page while waiting for the validation
         response = client.get(response.url)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
 

@@ -31,38 +31,6 @@
   
   '''
 # ---
-# name: test_labor_inspector_with_no_institution
-  '''
-  <div class="s-section__container container">
-      <div class="s-section__row row g-0">
-          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
-              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
-          </div>
-          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
-              <p>
-                  Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.
-              </p>
-              <p>
-                  Veuillez vous faire inviter par un collaborateur de votre institution afin de pouvoir accéder au service.
-              </p>
-              <div class="row">
-                  <div class="col-2">
-                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
-                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
-                              <span>
-                                  Se déconnecter
-                              </span>
-                          </button>
-                      </form>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  '''
-# ---
 # name: tests_employers_with_inactive_company
   '''
   <div class="s-section__container container">
@@ -72,34 +40,45 @@
           </div>
           <div class="s-section__col col-12 col-lg-10 bg-lg-white">
               <p>
-                  Votre compte est actuellement inactif.
+                  L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.
               </p>
               <ul>
                   <li>
-                      <strong>
-                          Si vous êtes employeur en SIAE
-                      </strong>
-                      : votre compte n’est pas ou plus rattaché à une structure conventionnée.
+                      Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser
+                      <a class="btn-link" href="https://tally.so/r/npPpNq">
+                          ce formulaire d’aide
+                      </a>
+                      .
                   </li>
                   <li>
-                      <strong>
-                          Si vous êtes facilitateur de la clause sociale
-                      </strong>
-                      : votre compte est en attente de vérification par nos équipes et le réseau Alliances Villes Emploi.
+                      Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
                   </li>
                   <li>
-                      <strong>
-                          Si vous êtes employeur en GEIQ ou en EA/EATT
-                      </strong>
-                      : votre compte n’est pas ou plus rattaché à une structure active.
+                      Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
+                  </li>
+                  <li>
+                      Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                  </li>
+                  <li>
+                      <form action="/accounts/logout/?next=/signup/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
+                          <button aria-label="Se déconnecter" class="btn-link" type="submit">
+                              cliquez-ici
+                          </button>
+                          .
+                      </form>
                   </li>
               </ul>
               <p>
                   En cas de besoin, vous pouvez
-                  <a class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" target="_blank">
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" target="_blank">
                       contacter notre support technique
                   </a>
                   .
+              </p>
+              <p>
+                  Nous espérons vous revoir et vous rendre service à nouveau.
               </p>
               <div class="row">
                   <div class="col-2">
@@ -119,7 +98,7 @@
   
   '''
 # ---
-# name: tests_employers_without_company
+# name: tests_pro_without_organization
   '''
   <div class="s-section__container container">
       <div class="s-section__row row g-0">
@@ -128,27 +107,177 @@
           </div>
           <div class="s-section__col col-12 col-lg-10 bg-lg-white">
               <p>
-                  Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.
+                  L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.
               </p>
               <ul>
                   <li>
                       Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser
-                      <a href="https://tally.so/r/npPpNq">
+                      <a class="btn-link" href="https://tally.so/r/npPpNq">
                           ce formulaire d’aide
                       </a>
                       .
                   </li>
                   <li>
+                      Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
+                  </li>
+                  <li>
+                      Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
+                  </li>
+                  <li>
                       Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
                   </li>
                   <li>
-                      Si votre structure ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, merci d’utiliser
-                      <a href="/signup/siae/select">
-                          le formulaire d'inscription
+                      <form action="/accounts/logout/?next=/signup/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
+                          <button aria-label="Se déconnecter" class="btn-link" type="submit">
+                              cliquez-ici
+                          </button>
+                          .
+                      </form>
+                  </li>
+              </ul>
+              <p>
+                  En cas de besoin, vous pouvez
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" target="_blank">
+                      contacter notre support technique
+                  </a>
+                  .
+              </p>
+              <p>
+                  Nous espérons vous revoir et vous rendre service à nouveau.
+              </p>
+              <div class="row">
+                  <div class="col-2">
+                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Se déconnecter
+                              </span>
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: tests_pro_without_organization.1
+  '''
+  <div class="s-section__container container">
+      <div class="s-section__row row g-0">
+          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
+          </div>
+          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+              <p>
+                  L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.
+              </p>
+              <ul>
+                  <li>
+                      Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser
+                      <a class="btn-link" href="https://tally.so/r/npPpNq">
+                          ce formulaire d’aide
                       </a>
                       .
                   </li>
+                  <li>
+                      Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
+                  </li>
+                  <li>
+                      Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
+                  </li>
+                  <li>
+                      Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                  </li>
+                  <li>
+                      <form action="/accounts/logout/?next=/signup/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
+                          <button aria-label="Se déconnecter" class="btn-link" type="submit">
+                              cliquez-ici
+                          </button>
+                          .
+                      </form>
+                  </li>
               </ul>
+              <p>
+                  En cas de besoin, vous pouvez
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" target="_blank">
+                      contacter notre support technique
+                  </a>
+                  .
+              </p>
+              <p>
+                  Nous espérons vous revoir et vous rendre service à nouveau.
+              </p>
+              <div class="row">
+                  <div class="col-2">
+                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Se déconnecter
+                              </span>
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: tests_pro_without_organization.2
+  '''
+  <div class="s-section__container container">
+      <div class="s-section__row row g-0">
+          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
+          </div>
+          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+              <p>
+                  L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.
+              </p>
+              <ul>
+                  <li>
+                      Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser
+                      <a class="btn-link" href="https://tally.so/r/npPpNq">
+                          ce formulaire d’aide
+                      </a>
+                      .
+                  </li>
+                  <li>
+                      Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
+                  </li>
+                  <li>
+                      Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
+                  </li>
+                  <li>
+                      Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                  </li>
+                  <li>
+                      <form action="/accounts/logout/?next=/signup/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
+                          <button aria-label="Se déconnecter" class="btn-link" type="submit">
+                              cliquez-ici
+                          </button>
+                          .
+                      </form>
+                  </li>
+              </ul>
+              <p>
+                  En cas de besoin, vous pouvez
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" target="_blank">
+                      contacter notre support technique
+                  </a>
+                  .
+              </p>
               <p>
                   Nous espérons vous revoir et vous rendre service à nouveau.
               </p>
