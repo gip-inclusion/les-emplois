@@ -1,14 +1,13 @@
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
 
 
-def build_iae_diag_post_data(author, job_seeker, with_administrative_criteria=True):
+def build_iae_diag_post_data(author, author_kind, job_seeker, with_administrative_criteria=True):
     post_data = {
         "job_seeker": job_seeker.pk,
         "author": author.pk,
-        "author_kind": author.kind,
+        "author_kind": author_kind,
         "author_prescriber_organization": "",
         "author_siae": "",
         "_save": "Enregistrer",
@@ -33,9 +32,9 @@ def build_iae_diag_post_data(author, job_seeker, with_administrative_criteria=Tr
         "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
         "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
     }
-    if author.kind == UserKind.EMPLOYER:
+    if author_kind == AuthorKind.EMPLOYER:
         post_data["author_siae"] = CompanyMembership.include_inactive.get(user=author).company_id
-    elif author.kind == UserKind.PRESCRIBER:
+    elif author_kind == AuthorKind.PRESCRIBER:
         post_data["author_prescriber_organization"] = PrescriberMembership.include_inactive.get(
             user=author
         ).organization_id
@@ -50,11 +49,11 @@ def build_iae_diag_post_data(author, job_seeker, with_administrative_criteria=Tr
     return post_data
 
 
-def build_geiq_diag_post_data(author, job_seeker, with_administrative_criteria=True):
+def build_geiq_diag_post_data(author, author_kind, job_seeker, with_administrative_criteria=True):
     post_data = {
         "job_seeker": job_seeker.pk,
         "author": author.pk,
-        "author_kind": author.kind if author.kind == UserKind.PRESCRIBER else AuthorKind.GEIQ,
+        "author_kind": author_kind,
         "author_prescriber_organization": "",
         "author_geiq": "",
         "_save": "Enregistrer",
@@ -75,9 +74,9 @@ def build_geiq_diag_post_data(author, job_seeker, with_administrative_criteria=T
         "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
         "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
     }
-    if author.kind == UserKind.EMPLOYER:
+    if author_kind == AuthorKind.GEIQ:
         post_data["author_geiq"] = CompanyMembership.include_inactive.get(user=author).company_id
-    elif author.kind == UserKind.PRESCRIBER:
+    elif author_kind == AuthorKind.PRESCRIBER:
         post_data["author_prescriber_organization"] = PrescriberMembership.include_inactive.get(
             user=author
         ).organization_id

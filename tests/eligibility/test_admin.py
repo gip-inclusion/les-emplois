@@ -9,9 +9,9 @@ from pytest_django.asserts import assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import AdministrativeCriteria, EligibilityDiagnosis
-from itou.users.enums import UserKind
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.admin_utils import build_geiq_diag_post_data, build_iae_diag_post_data
@@ -78,10 +78,12 @@ def test_selected_criteria_inline(admin_client):
 
 @pytest.mark.parametrize("kind", ["iae", "geiq"])
 class TestAdminForm:
-    def build_post_data(self, kind, author, job_seeker, with_administrative_criteria=True):
+    def build_post_data(self, kind, author, author_kind, job_seeker, with_administrative_criteria=True):
         if kind == "iae":
-            return build_iae_diag_post_data(author, job_seeker, with_administrative_criteria)
-        return build_geiq_diag_post_data(author, job_seeker, with_administrative_criteria)
+            return build_iae_diag_post_data(author, author_kind, job_seeker, with_administrative_criteria)
+        if author_kind == AuthorKind.EMPLOYER:
+            author_kind = AuthorKind.GEIQ
+        return build_geiq_diag_post_data(author, author_kind, job_seeker, with_administrative_criteria)
 
     def get_add_url(self, kind):
         if kind == "iae":
@@ -98,8 +100,8 @@ class TestAdminForm:
             return reverse("admin:eligibility_eligibilitydiagnosis_change", args=(pk,))
         return reverse("admin:eligibility_geiqeligibilitydiagnosis_change", args=(pk,))
 
-    def user_factory(self, kind, user_kind):
-        if user_kind == UserKind.PRESCRIBER:
+    def user_factory(self, kind, author_kind):
+        if author_kind == AuthorKind.PRESCRIBER:
             return PrescriberFactory(membership=True, membership__organization__authorized=True)
         if kind == "iae":
             return EmployerFactory(membership=True, membership__company__subject_to_iae_rules=True)
@@ -116,28 +118,28 @@ class TestAdminForm:
         return "author_geiq"
 
     @freeze_time("2025-01-21")
-    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
-    def test_add_eligibility_diagnostic(self, admin_client, kind, user_kind):
-        author = self.user_factory(kind, user_kind)
-        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+    @pytest.mark.parametrize("author_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
+    def test_add_eligibility_diagnostic(self, admin_client, kind, author_kind):
+        author = self.user_factory(kind, author_kind)
+        post_data = self.build_post_data(kind, author=author, author_kind=author_kind, job_seeker=JobSeekerFactory())
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assertRedirects(response, self.get_list_url(kind))
 
         diagnostic = self.get_diag_model(kind).objects.get()
-        if author.kind == UserKind.PRESCRIBER or kind == "geiq":
+        if author_kind == AuthorKind.PRESCRIBER or kind == "geiq":
             assert diagnostic.expires_at == datetime.date(2025, 7, 21)  # 6 months
         else:
             assert diagnostic.expires_at == datetime.date(2025, 4, 23)  # 92 days
         assert diagnostic.administrative_criteria.count() == 1
 
     @freeze_time("2025-01-21")
-    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
-    def test_add_eligibility_diagnostic_old_membership(self, admin_client, kind, user_kind):
+    @pytest.mark.parametrize("author_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
+    def test_add_eligibility_diagnostic_old_membership(self, admin_client, kind, author_kind):
         # Allow inactive memberships
-        author = self.user_factory(kind, user_kind)
+        author = self.user_factory(kind, author_kind)
         author.prescribermembership_set.update(is_active=False)
         author.companymembership_set.update(is_active=False)
-        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+        post_data = self.build_post_data(kind, author=author, author_kind=author_kind, job_seeker=JobSeekerFactory())
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assertRedirects(response, self.get_list_url(kind))
 
@@ -146,7 +148,9 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_no_criteria(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__authorized=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
+        )
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assertRedirects(response, self.get_list_url(kind))
@@ -156,7 +160,9 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_bad_job_seeker(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__authorized=True)
-        post_data = self.build_post_data(kind, author, PrescriberFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.PRESCRIBER, PrescriberFactory(), with_administrative_criteria=False
+        )
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
 
@@ -168,7 +174,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_bad_author(self, admin_client, kind):
         author = ItouStaffFactory()
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, "", JobSeekerFactory(), with_administrative_criteria=False)
         post_data["author_kind"] = "prescriber"
         post_data["author_prescriber_organization"] = PrescriberOrganizationFactory().pk
 
@@ -180,7 +186,9 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_bad_author_kind(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__authorized=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
+        )
         post_data["author_kind"] = "geiq" if kind == "iae" else "employer"
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -191,23 +199,26 @@ class TestAdminForm:
         ]
         assert not self.get_diag_model(kind).objects.exists()
 
-    def test_add_eligibility_diagnostic_bad_prescriber(self, admin_client, kind):
+    def test_add_eligibility_diagnostic_bad_membership(self, admin_client, kind):
         author = PrescriberFactory(membership=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
+        )
         author.prescribermembership_set.all().delete()
         post_data["author_kind"] = "employer" if kind == "iae" else "geiq"
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
         assert response.context["errors"] == [
-            ["Le type ne correspond pas à l'auteur."],
             ["L'auteur n'appartient pas à cette organisation."],
         ]
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_unauthorized_prescriber(self, admin_client, kind):
         author = PrescriberFactory(membership=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
+        )
 
         response = admin_client.post(self.get_add_url(kind), data=post_data, follow=True)
         assertRedirects(response, self.get_list_url(kind))
@@ -218,65 +229,72 @@ class TestAdminForm:
         )
 
     def test_add_eligibility_diagnostic_employer_bad_author_kind(self, admin_client, kind):
-        author = self.user_factory(kind, UserKind.EMPLOYER)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        author = self.user_factory(kind, AuthorKind.EMPLOYER)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.EMPLOYER, JobSeekerFactory(), with_administrative_criteria=False
+        )
         post_data["author_kind"] = "prescriber"
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
-        assert response.context["errors"] == [["Le type ne correspond pas à l'auteur."]]
+        assert response.context["errors"] == [["La structure de l'auteur ne correspond pas à son type"]]
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_employer_bad_company_kind(self, admin_client, kind):
         author = EmployerFactory(membership=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.EMPLOYER, JobSeekerFactory(), with_administrative_criteria=False
+        )
         Company.objects.filter(pk=post_data[self.company_field_name(kind)]).update(kind=CompanyKind.EA)  # Not a siae
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
-        company_name = "SIAE" if kind == "iae" else "entreprise GEIQ"
         assert response.context["errors"] == [
+            ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."],
             [
-                "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.",
-                f"Une {company_name} est obligatoire pour cet auteur.",
+                "Une organisation prescriptrice ou une entreprise est obligatoire pour cet auteur.",
             ],
         ]
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_employer_not_a_member(self, admin_client, kind):
-        author = self.user_factory(kind, UserKind.EMPLOYER)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        author = self.user_factory(kind, AuthorKind.EMPLOYER)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.EMPLOYER, JobSeekerFactory(), with_administrative_criteria=False
+        )
         author.companymembership_set.all().delete()
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
         assert response.context["errors"] == [["L'auteur n'appartient pas à cette structure."]]
 
-    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
-    def test_add_eligibility_not_both_org_and_company(self, admin_client, kind, user_kind):
-        author = self.user_factory(kind, user_kind)
-        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
-        if user_kind == UserKind.EMPLOYER:
+    @pytest.mark.parametrize("author_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
+    def test_add_eligibility_not_both_org_and_company(self, admin_client, kind, author_kind):
+        author = self.user_factory(kind, author_kind)
+        post_data = self.build_post_data(kind, author=author, author_kind=author_kind, job_seeker=JobSeekerFactory())
+        if author_kind == AuthorKind.EMPLOYER:
             post_data["author_prescriber_organization"] = PrescriberOrganizationFactory().pk
+            organization_kind = "organisation"
         else:
             post_data[self.company_field_name(kind)] = CompanyFactory(
                 kind=CompanyKind.GEIQ if kind == "geiq" else CompanyKind.EI
             ).pk
+            organization_kind = "structure"
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
         expected_errors = [
-            [
-                "Vous ne pouvez pas saisir une entreprise et une organisation prescriptrice.",
-                "La structure de l'auteur ne correspond pas à son type",
-            ]
+            ["Vous ne pouvez pas saisir une entreprise et une organisation prescriptrice."],
+            [f"L'auteur n'appartient pas à cette {organization_kind}."],
         ]
 
         assert response.context["errors"] == expected_errors
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_dont_edit_eligibility_diagnostic_expires_at(self, admin_client, kind):
-        author = self.user_factory(kind, UserKind.PRESCRIBER)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        author = self.user_factory(kind, AuthorKind.PRESCRIBER)
+        post_data = self.build_post_data(
+            kind, author, AuthorKind.PRESCRIBER, JobSeekerFactory(), with_administrative_criteria=False
+        )
 
         with freeze_time("2025-01-21"):
             response = admin_client.post(self.get_add_url(kind), data=post_data)
