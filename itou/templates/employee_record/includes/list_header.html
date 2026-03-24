@@ -1,10 +1,18 @@
 <div id="employee-records-list-header"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+        <h2 class="mb-0">Fiches salarié ASP</h2>
+        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
+            <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
+                <i class="ri-file-add-line ri-lg" aria-hidden="true"></i>
+                <span>Créer une fiche salarié</span>
+            </a>
+        </div>
+    </div>
     {% if num_recently_missing_employee_records %}
-        <h2>Fiches salarié ASP</h2>
-        <div class="alert alert-info" role="status" id="id_missing_employee_records_alert">
+        <div class="alert alert-warning" role="status" id="id_missing_employee_records_alert">
             <div class="row align-items-center">
                 <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                 </div>
                 <div class="col">
                     {% if num_recently_missing_employee_records == 1 %}
@@ -15,22 +23,6 @@
                         </p>
                     {% endif %}
                 </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
-                        <i class="ri-file-add-line ri-lg" aria-hidden="true"></i>
-                        <span>Créer une fiche salarié</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
-            <h2 class="mb-0">Fiches salarié ASP</h2>
-            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
-                <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
-                    <i class="ri-file-add-line ri-lg" aria-hidden="true"></i>
-                    <span>Créer une fiche salarié</span>
-                </a>
             </div>
         </div>
     {% endif %}
@@ -42,21 +34,36 @@
                     <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                 </div>
                 <div class="col">
-                    <p class="mb-0">
+                    <p class="mb-2">
                         <strong>Incohérence de numéro SIRET détectée</strong>
                     </p>
-                    <p class="mb-0">
+                    <p>
                         Le numéro SIRET associé à certaines fiches salarié "Intégrées" est différent de votre numéro SIRET actuel.
                         Cela peut empêcher l'affichage de ces fiches dans votre espace Extranet IAE 2.0 de l'ASP.
                         Si vous avez besoin de les récupérer, cliquez sur "<b>Renvoyer cette fiche salarié</b>".
-                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/15266700470289--Mettre-%C3%A0-jour-une-fiche-salari%C3%A9"
-                           rel="noopener"
-                           target="_blank"
-                           aria-label="Consulter la documentation sur la mise à jour de fiche salarié (ouverture dans un nouvel onglet)"
-                           class="has-external-link">Consulter le mode d'emploi</a>
                     </p>
+                    <a href="{{ ITOU_HELP_CENTER_URL }}/articles/15266700470289--Mettre-%C3%A0-jour-une-fiche-salari%C3%A9"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Consulter la documentation sur la mise à jour de fiche salarié (ouverture dans un nouvel onglet)"
+                       class="btn-link has-external-link">Consulter le mode d'emploi</a>
                 </div>
             </div>
         </div>
     {% endif %}
+    <div class="alert alert-info" role="status">
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+            </div>
+            <div class="col">
+                <p class="mb-2">
+                    <strong>Vous ne trouvez pas votre salarié ?</strong>
+                </p>
+                <p class="mb-0">
+                    Vous pouvez faire <a href="{% url 'employee_record_views:missing_employee' %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure">une recherche avancée</a> parmi l’ensemble des candidats ou salariés de votre structure.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>

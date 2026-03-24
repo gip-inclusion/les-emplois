@@ -24,16 +24,9 @@ from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from tests.companies.factories import CompanyFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationWithCompleteJobSeekerProfileFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import (
-    PAGINATION_PAGE_ONE_MARKUP,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
 
 class TestListEmployeeRecords:
@@ -690,6 +683,7 @@ class TestListEmployeeRecords:
         ) == {job_application_1.job_seeker_id, job_application_3.job_seeker_id}
 
         response = client.get(self.URL, follow=True)
+        assertContains(response, reverse("employee_record_views:missing_employee"))
         assert pretty_indented(
             parse_response_to_soup(response, selector="#id_missing_employee_records_alert")
         ) == snapshot(name="plural")
