@@ -71,7 +71,7 @@
       <h3 class="my-3">
           danger
       </h3>
-      <div class="alert alert-danger" role="status">
+      <div class="alert alert-danger" role="alert">
           <div class="row">
               <div class="col-auto pe-0">
                   <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger">
