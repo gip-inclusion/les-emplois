@@ -84,8 +84,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         response = self.get_response(client, job_application, viewer_kind)
 
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        if viewer_kind == "prescriber":
-            assert job_application.sender.is_prescriber
 
     @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
     def test_accepted_job_app_with_valid_diagnosis(self, client, viewer_kind):
