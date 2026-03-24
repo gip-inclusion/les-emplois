@@ -3,13 +3,8 @@
 {% comment %}
     Global alert banner displayed at the top of the page.
 
-    - "info" (default): Informative alert for general announcements.
-    - "danger": Critical alert for urgent announcements or maintenance.
-    - "warning": Warning alert for important information.
-    - "primary": Procedure in progress, with an exit button.
-
     Options:
-    - variant: Alert color variant (if omitted: "info").
+    - variant: "info" | "warning" | "danger" | "primary" (required)
     - content: Message content (supports fragments).
     - dismissible: Show a close button (danger/warning/info variants).
     - extra_id="...": extra ID attribute on main div.alert
@@ -17,33 +12,33 @@
 
     Documentation -> https://gip-inclusion.github.io/itou-theme/doc/?path=/docs/components-global-alert--docs
 {% endcomment %}
-{% with alert_variant=variant|default:"info" is_dismissible=dismissible|default:False %}
-    {% if alert_variant != "info" and alert_variant != "danger" and alert_variant != "warning" and alert_variant != "primary" %}
-        {% should_not_happen "Unexpected variant for alert_global component: '%s'" alert_variant %}
+{% with is_dismissible=dismissible|default:False has_extra_id=extra_id|default:"" %}
+    {% if variant != "info" and variant != "danger" and variant != "warning" and variant != "primary" %}
+        {% should_not_happen "Unexpected variant for alert_global component: '%s'" variant %}
     {% endif %}
-    {% if exit_url|default:'' and alert_variant != "primary" %}
-        {% should_not_happen "exit_url when variant is not primary - '%s'" alert_variant %}
+    {% if exit_url|default:"" and variant != "primary" %}
+        {% should_not_happen "exit_url when variant is not primary - '%s'" variant %}
     {% endif %}
-    {% if is_dismissible and alert_variant == "primary" %}
-        {% should_not_happen "dismissible when variant is primary - '%s'" alert_variant %}
+    {% if is_dismissible and variant == "primary" %}
+        {% should_not_happen "dismissible when variant is primary - '%s'" variant %}
     {% endif %}
-    {% if alert_variant != "primary" %}
-        <div class="alert alert-{{ alert_variant }}{% if is_dismissible %} alert-dismissible fade show{% endif %}"
-             role="{% if alert_variant == "danger" %}alert{% else %}status{% endif %}"
-             {% if extra_id|default:'' %}id="{{ extra_id }}"{% endif %}>
+    {% if variant != "primary" %}
+        <div class="alert alert-{{ variant }}{% if is_dismissible %} alert-dismissible fade show{% endif %}"
+             role="{% if variant == "danger" %}alert{% else %}status{% endif %}"
+             {% if has_extra_id %}id="{{ extra_id }}"{% endif %}>
             {% if is_dismissible %}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             {% endif %}
             <div>{{ content }}</div>
         </div>
     {% else %}
-        <div class="alert alert-primary fade show" role="status"{% if extra_id|default:'' %} id="{{ extra_id }}"{% endif %}>
+        <div class="alert alert-primary fade show" role="status"{% if has_extra_id %} id="{{ extra_id }}"{% endif %}>
             <div class="d-flex flex-row justify-content-between align-items-center">
                 <p class="mb-0 text-start">
                     <i class="ri-arrow-right-line fw-bold pe-2" aria-hidden="true"></i>
                     {{ content }}
                 </p>
-                {% if exit_url|default:'' and alert_variant == "primary" %}
+                {% if exit_url|default:"" %}
                     <a href="{{ exit_url }}" class="btn-link-white btn-ico align-items-center" aria-label="Quitter la procédure">
                         <i class="ri-close-line ri-xl fw-medium me-1" aria-hidden="true"></i>
                         <span class="fs-sm fw-medium">Quitter</span>
