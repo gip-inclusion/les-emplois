@@ -220,11 +220,15 @@ class ItouCurrentOrganizationMiddleware:
 
         # Nexus : Whitelist for Nexus views
         # FIXME: Remove once we merge prescribers and employers
-        if user.is_authenticated and any(
-            [
-                request.path.startswith("/portal"),
-                user.is_employer and request.path.startswith("/signup/siae/select"),
-            ]
+        if (
+            user.is_authenticated
+            and user.is_professional
+            and any(
+                [
+                    request.path.startswith("/portal"),
+                    request.path.startswith("/signup/siae/select"),
+                ]
+            )
         ):
             return self.get_response(request)
 

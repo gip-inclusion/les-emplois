@@ -149,6 +149,7 @@ USER_KIND_MAPPING = {
         # this service does not have a user kind
         UserKind.EMPLOYER: "",
         UserKind.PRESCRIBER: "",
+        UserKind.LABOR_INSPECTOR: "",
     },
     Service.MARCHE: {
         "SIAE": NexusUserKind.FACILITY_MANAGER,
