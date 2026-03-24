@@ -400,7 +400,9 @@ class JobApplicationQuerySet(models.QuerySet):
             "selected_jobs__company",
             Prefetch(
                 "job_seeker__approvals",
-                queryset=Approval.objects.select_related("eligibility_diagnosis").order_by("-start_at"),
+                queryset=Approval.objects.select_related("eligibility_diagnosis")
+                .prefetch_related("suspension_set")
+                .order_by("-start_at"),
             ),
         )
 
