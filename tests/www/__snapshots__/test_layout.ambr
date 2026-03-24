@@ -2470,14 +2470,6 @@
                   </div>
                   <div class="dropdown-divider">
                   </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
-                      <img alt="Les Emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Activé
-                      </span>
-                  </a>
                   <div class="dropdown-divider">
                   </div>
                   <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
@@ -2786,14 +2778,6 @@
                   </div>
                   <div class="dropdown-divider">
                   </div>
-                  <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
-                      <img alt="Les Emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
-                      <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Activé
-                      </span>
-                  </a>
                   <a class="dropdown-item dropdown-item__service" data-matomo-action="portail-acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
                       <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
                       <span class="badge badge-xs rounded-pill bg-info-lighter text-info">

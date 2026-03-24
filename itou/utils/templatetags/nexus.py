@@ -357,6 +357,8 @@ def nexus_dropdown(context):
         service_urls = get_service_urls(context["user"])
         activated_services, activable_services = [], []
         for service in Service.activable():
+            if service == Service.EMPLOIS:
+                continue  # Don't display emplois since we already are on it
             if service in dropdown_status["activated_services"]:
                 activated_services.append(
                     {"service": service, **services_context[service], "url": service_urls[service]["activated"]}
