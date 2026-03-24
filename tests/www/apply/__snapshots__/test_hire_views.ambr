@@ -949,6 +949,46 @@
   
   '''
 # ---
+# name: TestCheckPreviousApplicationsForHireView.test_display_prev_applications_according_to_sender_type_snapshot
+  '''
+  <ul class="list-group list-group-flush mb-3 mb-md-4">
+      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+          <span>
+              Émise le 27 septembre 2025 à 02h00 par
+              <b>
+                  le candidat
+              </b>
+          </span>
+          <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/[PK of JobSeeker JobApplication]/siae/start-accept">
+              Accepter la candidature
+          </a>
+      </li>
+      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+          <span>
+              Émise le 27 décembre 2025 à 01h00 par
+              <b>
+                  ACME Inc.
+              </b>
+          </span>
+          <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/[PK of Employer JobApplication]/siae/start-accept">
+              Accepter la candidature
+          </a>
+      </li>
+      <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+          <span>
+              Émise le 27 janvier 2026 à 01h00 par
+              <b>
+                  Pres. Org.
+              </b>
+          </span>
+          <a class="btn btn-link btn-sm stretched-link" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="acceptation-candidature" href="/apply/[PK of Prescriber JobApplication]/siae/start-accept">
+              Accepter la candidature
+          </a>
+      </li>
+  </ul>
+  
+  '''
+# ---
 # name: TestCheckPreviousApplicationsForHireView.test_num_queries[get_with_previous_application]
   dict({
     'num_queries': 24,
@@ -1797,12 +1837,119 @@
                  "job_applications_jobapplication"."qualification_level",
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 T4."id",
+                 T4."password",
+                 T4."last_login",
+                 T4."is_superuser",
+                 T4."username",
+                 T4."first_name",
+                 T4."last_name",
+                 T4."is_staff",
+                 T4."is_active",
+                 T4."date_joined",
+                 T4."address_line_1",
+                 T4."address_line_2",
+                 T4."post_code",
+                 T4."city",
+                 T4."department",
+                 T4."coords",
+                 T4."geocoding_score",
+                 T4."geocoding_updated_at",
+                 T4."ban_api_resolved_address",
+                 T4."insee_city_id",
+                 T4."title",
+                 T4."full_name_search_vector",
+                 T4."email",
+                 T4."phone",
+                 T4."kind",
+                 T4."identity_provider",
+                 T4."has_completed_welcoming_tour",
+                 T4."created_by_id",
+                 T4."external_data_source_history",
+                 T4."last_checked_at",
+                 T4."terms_accepted_at",
+                 T4."public_id",
+                 T4."address_filled_at",
+                 T4."first_login",
+                 T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
+                 T5."id",
+                 T5."address_line_1",
+                 T5."address_line_2",
+                 T5."post_code",
+                 T5."city",
+                 T5."department",
+                 T5."coords",
+                 T5."geocoding_score",
+                 T5."geocoding_updated_at",
+                 T5."ban_api_resolved_address",
+                 T5."insee_city_id",
+                 T5."name",
+                 T5."created_at",
+                 T5."updated_at",
+                 T5."uid",
+                 T5."active_members_email_reminder_last_sent_at",
+                 T5."automatic_geocoding_update",
+                 T5."siret",
+                 T5."naf",
+                 T5."kind",
+                 T5."brand",
+                 T5."phone",
+                 T5."email",
+                 T5."auth_email",
+                 T5."website",
+                 T5."description",
+                 T5."provided_support",
+                 T5."source",
+                 T5."created_by_id",
+                 T5."block_job_applications",
+                 T5."job_applications_blocked_at",
+                 T5."spontaneous_applications_open_since",
+                 T5."convention_id",
+                 T5."job_app_score",
+                 T5."is_searchable",
+                 T5."rdv_solidarites_id",
+                 T5."fields_history",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "job_applications_jobapplication"
+          LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")
+          LEFT OUTER JOIN "companies_company" T5 ON ("job_applications_jobapplication"."sender_company_id" = T5."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND "job_applications_jobapplication"."to_company_id" = %s)
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
-          LIMIT 1
+                 AND "job_applications_jobapplication"."to_company_id" = %s
+                 AND "job_applications_jobapplication"."created_at" >= %s
+                 AND NOT ("job_applications_jobapplication"."state" = %s))
+          ORDER BY "job_applications_jobapplication"."created_at" ASC
         ''',
       }),
       dict({

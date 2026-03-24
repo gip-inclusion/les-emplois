@@ -1,6 +1,7 @@
 import logging
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
@@ -13,6 +14,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -151,19 +153,22 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
 
 class CheckPreviousApplicationsForHireView(HireBaseView):
     template_name = "apply/submit_step_check_prev_applications.html"
-    SKIP_PREV_APPLICATIONS_CHECK = True
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.prev_application = (
-            common_views.previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
+        self.prev_applications = list(
+            common_views.previous_applications_queryset(self.job_seeker, self.company)
+            .filter(created_at__gte=timezone.now() - relativedelta(months=12))
+            .select_related("sender", "sender_prescriber_organization", "sender_company")
+            .exclude(state=JobApplicationState.ACCEPTED)
+            .order_by("created_at")
         )
 
     def get_next_url(self):
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
 
     def get(self, request, *args, **kwargs):
-        if self.prev_application is None:
+        if not self.prev_applications:
             return HttpResponseRedirect(self.get_next_url())
         return super().get(request, *args, **kwargs)
 
@@ -177,9 +182,11 @@ class CheckPreviousApplicationsForHireView(HireBaseView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["prev_application"] = self.prev_application
-        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["block_apply"] = self.prev_applications and self.prev_applications[
+            -1
+        ].created_at > timezone.now() - timedelta(hours=24)
         context["iae_eligibility_url"] = None
+        context["prev_applications"] = self.prev_applications
         return context
 
 
