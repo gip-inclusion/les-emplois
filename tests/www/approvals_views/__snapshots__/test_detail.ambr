@@ -5717,12 +5717,22 @@
               <h2>
                   Suivi des contrats IAE
               </h2>
-              <div class="c-info mb-3 mb-md-4">
-                  <span class="c-info__summary">
-                      Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
-                  </span>
-                  <div class="c-info__detail">
-                      Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+              <div class="alert alert-info mb-3 mb-md-4" role="status">
+                  <div class="row">
+                      <div class="col-auto pe-0">
+                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                          </i>
+                      </div>
+                      <div class="col">
+                          <p class="mb-2">
+                              <strong>
+                                  Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
+                              </strong>
+                          </p>
+                          <p class="mb-0">
+                              Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                          </p>
+                      </div>
                   </div>
               </div>
               <div class="c-box c-box--results mb-3 mb-md-4">

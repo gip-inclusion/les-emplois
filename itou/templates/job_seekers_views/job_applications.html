@@ -61,7 +61,7 @@
                                     {% endcomponent_alert %}
                                 {% endif %}
                             {% endif %}
-                            <hr>
+
                             {% matomo_event "candidat" "clic" "detail-candidature" as matomo_event_attrs %}
                             {% for job_application in job_applications %}
                                 {% url 'apply:details_for_prescriber' job_application_id=job_application.id as detail_url %}
