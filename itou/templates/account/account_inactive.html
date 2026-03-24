@@ -14,7 +14,9 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-warning" role="status">
-        <p class="mb-0">Ce compte est inactif.</p>
-    </div>
+    {% component_alert content=content variant="warning" icon=False %}
+        {% fragment as content %}
+            <p class="mb-0">Ce compte est inactif.</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
