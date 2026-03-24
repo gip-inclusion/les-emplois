@@ -9,12 +9,15 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
 from itou.job_applications.enums import JobApplicationState
+from itou.users.enums import UserKind
+from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.test_models import ERROR_LOG_NOT_PROFESSIONAL
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -172,7 +175,7 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
 }
 
 
-def test_create_then_accept_job_application(admin_client):
+def test_create_then_accept_job_application(admin_client, caplog):
     job_seeker = JobSeekerFactory()
     company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
     employer = company.members.first()
@@ -256,6 +259,9 @@ def test_create_then_accept_job_application(admin_client):
     assert job_application.state == JobApplicationState.ACCEPTED
     assert job_application.logs.count() == 2
     assert job_application.approval
+
+    admin_user = User.objects.get(kind=UserKind.ITOU_STAFF)
+    assert ERROR_LOG_NOT_PROFESSIONAL % admin_user.pk in caplog.messages
 
 
 def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
