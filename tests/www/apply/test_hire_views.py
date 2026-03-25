@@ -2410,6 +2410,53 @@ class TestHireConfirmation:
         assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": hire_session.name}))
         assert not JobApplication.objects.exists()
 
+    def test_as_iae_missing_eligibility(self, client):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        client.force_login(company.members.first())
+        hiring_start_at = timezone.localdate()
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {
+                "selected_jobs": [],
+                "contract_form_data": {"hiring_start_at": hiring_start_at},
+            },
+        )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session.name})
+
+        response = client.get(confirmation_url)
+        assertRedirects(
+            response,
+            reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Un diagnostic d'éligibilité est nécessaire pour déclarer cette embauche.",
+                )
+            ],
+        )
+
+        response = client.post(confirmation_url)
+        assertRedirects(
+            response,
+            reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Un diagnostic d'éligibilité est nécessaire pour déclarer cette embauche.",
+                )
+            ],
+        )
+
+        assert self.job_seeker.job_applications.exists() is False
+
     def test_as_geiq(self, client, snapshot):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
