@@ -109,6 +109,10 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
                 self.job_seeker, self.company
             )
 
+    def get_session(self):
+        # Used by BaseFillJobSeekerInfosView, BaseContractInfosView & BaseConfirmationView
+        return self.accept_session
+
     def get_reset_url(self):
         return self.reset_url
 
@@ -120,9 +124,6 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
 
 class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJobSeekerInfosView):
     template_name = "apply/process_accept_fill_job_seeker_infos_step.html"
-
-    def get_session(self):
-        return self.accept_session
 
     def get_back_url(self):
         return None  # First step of the wizard: no back url
@@ -147,9 +148,6 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
     def setup(self, request, *args, **kwargs):
         self.job_application = None
         return super().setup(request, *args, **kwargs)
-
-    def get_session(self):
-        return self.accept_session
 
     def get_back_url(self):
         other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
@@ -253,9 +251,6 @@ class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
 
 class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmationView):
     template_name = "apply/process_accept_confirmation_step.html"
-
-    def get_session(self):
-        return self.accept_session
 
     def clean_session(self):
         self.accept_session.delete()
