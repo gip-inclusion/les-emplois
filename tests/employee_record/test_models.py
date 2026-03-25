@@ -696,21 +696,27 @@ class TestEmployeeRecordQueryset:
         )
 
     def test_for_asp_company(self):
-        employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
-        employee_record_in_antenna = EmployeeRecordFactory(
-            job_application__to_company__convention=employee_record_1.job_application.to_company.convention,
-            job_application__to_company__source=CompanySource.USER_CREATED,
-            job_application__approval=employee_record_1.job_application.approval,
+        employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(
+            2,
+            job_application__to_company__kind="AI",
         )
+        company_1 = employee_record_1.job_application.to_company
+        company_1_child = CompanyFactory(
+            kind=company_1.kind,
+            convention=employee_record_1.job_application.to_company.convention,
+            source=CompanySource.USER_CREATED,
+        )
+        company_1_child_copy_with_other_convention = CompanyFactory(
+            kind="ETTI",
+            siret=company_1.siret,
+            source=CompanySource.ASP,
+        )
+        company_2 = employee_record_2.job_application.to_company
 
-        assert set(EmployeeRecord.objects.for_asp_company(employee_record_1.job_application.to_company)) == {
-            employee_record_1,
-            employee_record_in_antenna,
-        }
-        assert (
-            EmployeeRecord.objects.for_asp_company(employee_record_2.job_application.to_company).get()
-            == employee_record_2
-        )
+        assert EmployeeRecord.objects.for_asp_company(company_1).get() == employee_record_1
+        assert EmployeeRecord.objects.for_asp_company(company_1_child).get() == employee_record_1
+        assert EmployeeRecord.objects.for_asp_company(company_1_child_copy_with_other_convention).count() == 0
+        assert EmployeeRecord.objects.for_asp_company(company_2).get() == employee_record_2
 
     def test_with_siret_from_asp_source(self):
         employee_record = EmployeeRecordFactory()

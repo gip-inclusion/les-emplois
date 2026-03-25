@@ -45,7 +45,7 @@ class EmployeeRecordFactory(AutoNowOverrideMixin, BareEmployeeRecordFactory):
         lambda obj: asp_models.SiaeMeasure.from_siae_kind(obj.job_application.to_company.kind)
     )
     approval_number = factory.SelfAttribute(".job_application.approval.number")
-    siret = factory.SelfAttribute(".job_application.to_company.siret")
+    siret = factory.LazyAttribute(lambda e: e.job_application.to_company.siret_from_asp_source())
 
     class Params:
         archivable = factory.Trait(
