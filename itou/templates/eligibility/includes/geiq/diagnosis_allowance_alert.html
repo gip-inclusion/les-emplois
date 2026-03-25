@@ -1,22 +1,19 @@
-<div class="alert alert-info mt-4" role="status">
-    <div class="row">
-        <div class="col-auto pe-0">
-            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-        </div>
-        <div class="col">
-            <p class="mb-2">
-                <strong>Aide à l'accompagement GEIQ</strong>
-            </p>
-            <p class="mb-0">
-                {% if diagnosis.author_prescriber_organization.is_authorized %}
-                    Ce diagnostic émis par un prescripteur habilité vous donnera droit en cas d’embauche,
-                {% elif diagnosis.author_geiq == request.current_organization %}
-                    Les critères que vous avez sélectionnés vous donnent droit en cas d’embauche,
-                {% else %}
-                    Les critères sélectionnés vous donnent droit en cas d’embauche,
-                {% endif %}
-                à une aide financière de l’État s’élevant à <b>{{ diagnosis.allowance_amount }} €</b> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
-            </p>
-        </div>
-    </div>
-</div>
+{% load components %}
+
+{% component_alert title=title content=content variant="info" extra_classes="mt-4" %}
+    {% fragment as title %}
+        Aide à l'accompagement GEIQ
+    {% endfragment %}
+    {% fragment as content %}
+        <p class="mb-0">
+            {% if diagnosis.author_prescriber_organization.is_authorized %}
+                Ce diagnostic émis par un prescripteur habilité vous donnera droit en cas d’embauche,
+            {% elif diagnosis.author_geiq == request.current_organization %}
+                Les critères que vous avez sélectionnés vous donnent droit en cas d’embauche,
+            {% else %}
+                Les critères sélectionnés vous donnent droit en cas d’embauche,
+            {% endif %}
+            à une aide financière de l’État s’élevant à <b>{{ diagnosis.allowance_amount }} €</b> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
+        </p>
+    {% endfragment %}
+{% endcomponent_alert %}
