@@ -9,6 +9,7 @@
 
 {% endcomment %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 <form method="post" role="form" class="js-prevent-multiple-submit">
@@ -33,19 +34,14 @@
         {% endif %}
     {% endfor %}
 
-    <div class="alert alert-warning" role="status">
-        <div class="row">
-            <div class="col-auto pe-0">
-                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-            </div>
-            <div class="col">
-                <p class="mb-0">
-                    En cliquant sur le bouton <b>« Valider l’éligibilité du candidat »</b>, vous confirmez que le candidat est éligible à l'insertion par l'activité économique et
-                    vous vous engagez à conserver les justificatifs correspondants aux critères d'éligibilité sélectionnés pendant 24 mois, en cas de contrôle.
-                </p>
-            </div>
-        </div>
-    </div>
+    {% component_alert content=content variant="warning" %}
+        {% fragment as content %}
+            <p class="mb-0">
+                En cliquant sur le bouton <b>« Valider l’éligibilité du candidat »</b>, vous confirmez que le candidat est éligible à l'insertion par l'activité économique et
+                vous vous engagez à conserver les justificatifs correspondants aux critères d'éligibilité sélectionnés pendant 24 mois, en cas de contrôle.
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 
     {% if cancel_url %}
         {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" secondary_url=back_url reset_url=cancel_url show_mandatory_fields_mention=False %}
