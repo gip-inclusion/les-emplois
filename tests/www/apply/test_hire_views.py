@@ -1387,9 +1387,7 @@ class TestEligibilityForHire:
         client.force_login(company.members.first())
         hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
-        assertRedirects(
-            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": hire_session.name})
-        )
+        assert response.status_code == 404
 
     def test_job_seeker_with_valid_diagnosis(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
