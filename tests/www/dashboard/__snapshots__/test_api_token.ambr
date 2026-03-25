@@ -45,7 +45,7 @@
                                       <ul>
                                           <li>
                                               Fiches salarié (
-                                              <a href="/api/v1/redoc/#tag/employee-records" target="_blank">
+                                              <a class="has-external-link" href="/api/v1/redoc/#tag/employee-records" rel="noopener" target="_blank">
                                                   voir la documentation
                                               </a>
                                               ) : cette API est disponible par défaut pour toutes vos structures.
@@ -57,7 +57,7 @@
                                           </li>
                                           <li>
                                               Candidats  (
-                                              <a href="/api/v1/redoc/#tag/candidats" target="_blank">
+                                              <a class="has-external-link" href="/api/v1/redoc/#tag/candidats" rel="noopener" target="_blank">
                                                   voir la documentation
                                               </a>
                                               ) : cette API est disponible par défaut sur une seule structure mais vous pouvez utiliser

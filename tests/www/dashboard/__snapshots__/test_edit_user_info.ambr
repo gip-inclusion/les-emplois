@@ -229,7 +229,7 @@
   <div class="alert alert-warning" id="missing-infos-warning" role="status">
       <div class="row">
           <div class="col-auto pe-0">
-              <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
               </i>
           </div>
           <div class="col">
@@ -241,7 +241,7 @@
               <p>
                   Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.
               </p>
-              <p>
+              <p class="mb-0">
                   Les champs suivants ne sont pas renseignés :
               </p>
               <ul class="mb-0">
@@ -272,7 +272,7 @@
   <div class="alert alert-warning" id="missing-infos-warning" role="status">
       <div class="row">
           <div class="col-auto pe-0">
-              <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
               </i>
           </div>
           <div class="col">
@@ -284,7 +284,7 @@
               <p>
                   Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.
               </p>
-              <p>
+              <p class="mb-0">
                   Les champs suivants ne sont pas renseignés :
               </p>
               <ul class="mb-0">

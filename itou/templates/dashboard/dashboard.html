@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load enums %}
 {% load matomo %}
 {% load static %}
@@ -16,134 +17,146 @@
     {{ block.super }}
 
     {% if request.from_employer and request.current_organization and not request.current_organization.jobs.exists %}
-        <div class="alert alert-warning alert-dismissible show" role="status">
-            <p class="mb-0">
-                Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
-            </p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
+        {% component_alert content=content variant="warning" dismissible=True %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 
     {% if request.from_prescriber and not request.current_organization %}
-        <div class="alert alert-warning" role="alert">
-            <p class="mb-0">Votre compte n’est actuellement rattaché à aucune organisation.</p>
-            <p>Les candidatures de prescripteur sans organisation ont 2 fois moins de chances d’être acceptées !</p>
-            <ul>
-                <li>
-                    Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
-                </li>
-                <li>
-                    Si vous souhaitez rejoindre le tableau de bord d’une organisation présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
-                </li>
-                <li>
-                    Si votre organisation ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, utilisez
-                    <a href="{% url 'signup:prescriber_check_already_exists' %}">le formulaire d'inscription</a>.
-                </li>
-            </ul>
-        </div>
+        {% component_alert title=title content=content variant="warning" icon=False %}
+            {% fragment as title %}
+                Votre compte n’est actuellement rattaché à aucune organisation.
+            {% endfragment %}
+            {% fragment as content %}
+                <p>Les candidatures de prescripteur sans organisation ont 2 fois moins de chances d’être acceptées !</p>
+                <ul>
+                    <li>
+                        Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq"
+    target="_blank"
+    class="has-external-link"
+    rel="noopener"
+    aria-label="Formulaire d'aide pour retrouver l’accès à votre compte existant (ouverture dans un nouvel onglet)">ce formulaire d’aide</a>.
+                    </li>
+                    <li>
+                        Si vous souhaitez rejoindre le tableau de bord d’une organisation présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                    </li>
+                    <li>
+                        Si votre organisation ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, utilisez
+                        <a href="{% url 'signup:prescriber_check_already_exists' %}">le formulaire d'inscription</a>.
+                    </li>
+                </ul>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if request.from_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
-        <div class="alert alert-warning alert-dismissible show" role="status">
-            <p class="mb-0">
+        {% component_alert title=title content=content variant="warning" dismissible=True %}
+            {% fragment as title %}
                 Nous n'avons pas pu géolocaliser votre établissement.
-                <br>
-                Cela peut affecter sa position dans les résultats de recherche.
-                <br>
-                {% if request.is_current_organization_admin %}
-                    <a href="{% url 'companies_views:edit_company_step_contact_infos' %}">Indiquez une autre adresse</a>
-                {% else %}
-                    {% with request.current_organization.active_admin_members.first as admin %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
-                    {% endwith %}
-                {% endif %}
-                ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
-            </p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
-    {% endif %}
-
-    {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
-    {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
-    {% if request.from_authorized_prescriber and not request.current_organization.has_reliable_coords_legacy %}
-        <div class="alert alert-warning alert-dismissible show" role="status">
-            <p class="mb-0">
-                Nous n'avons pas pu géolocaliser votre établissement.
-                <br>
-                Cela peut affecter sa position dans les résultats de recherche.
-                <br>
-                {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
-                    Afin de modifier l’adresse postale,
-                    <a href="{% zendesk_form_url request=request %}"
-                       target="_blank"
-                       rel="noopener"
-                       class="has-external-link"
-                       aria-label="contactez-nous pour modifier l’adresse postale de votre agence France Travail (ouverture dans un nouvel onglet)">
-                        contactez nous
-                    </a>.
-                {% else %}
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Cela peut affecter sa position dans les résultats de recherche.
+                    <br>
                     {% if request.is_current_organization_admin %}
-                        <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a>
+                        <a href="{% url 'companies_views:edit_company_step_contact_infos' %}">Indiquez une autre adresse</a>
                     {% else %}
                         {% with request.current_organization.active_admin_members.first as admin %}
                             Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                         {% endwith %}
                     {% endif %}
                     ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
-                {% endif %}
-            </p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+
+    {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
+    {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
+    {% if request.from_authorized_prescriber and not request.current_organization.has_reliable_coords_legacy %}
+        {% component_alert title=title content=content variant="warning" dismissible=True %}
+            {% fragment as title %}
+                Nous n'avons pas pu géolocaliser votre établissement.
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Cela peut affecter sa position dans les résultats de recherche.
+                    <br>
+                    {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
+                        Afin de modifier l’adresse postale,
+                        <a href="{% zendesk_form_url request=request %}"
+                           target="_blank"
+                           rel="noopener"
+                           class="has-external-link"
+                           aria-label="contactez-nous pour modifier l’adresse postale de votre agence France Travail (ouverture dans un nouvel onglet)">contactez nous</a>.
+                    {% else %}
+                        {% if request.is_current_organization_admin %}
+                            <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a>
+                        {% else %}
+                            {% with request.current_organization.active_admin_members.first as admin %}
+                                Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
+                            {% endwith %}
+                        {% endif %}
+                        ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                    {% endif %}
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 
     {% if request.from_employer and request.current_organization and not request.current_organization.is_active %}
-        <div class="alert alert-warning alert-dismissible show" role="status">
-            <p class="mb-0">
+        {% component_alert title=title content=content variant="warning" dismissible=True %}
+            {% fragment as title %}
                 Votre structure
                 {% if request.current_organization.siret %}
                     (inscrite avec le numéro SIRET : {{ request.current_organization.siret }})
                 {% endif %}
                 n'est plus conventionnée.
-                <br>
-                Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
-                <br>
-                À compter du {{ request.current_organization.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.
-                <br>
-
-                {% if request.is_current_organization_admin %}
-                    Veuillez dès que possible régulariser votre situation
-                    <a href="{% url 'companies_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide</a>.
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
                     <br>
-                {% else %}
-                    {% with request.current_organization.active_admin_members.first as admin %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle régularise la situation de votre structure.
-                    {% endwith %}
-                {% endif %}
-            </p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
+                    À compter du {{ request.current_organization.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.
+                    <br>
+
+                    {% if request.is_current_organization_admin %}
+                        Veuillez dès que possible régulariser votre situation
+                        <a href="{% url 'companies_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide</a>.
+                        <br>
+                    {% else %}
+                        {% with request.current_organization.active_admin_members.first as admin %}
+                            Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle régularise la situation de votre structure.
+                        {% endwith %}
+                    {% endif %}
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 
     {% if request.from_prescriber and request.current_organization and request.current_organization.has_pending_authorization %}
-        <div class="alert alert-warning alert-dismissible show" role="status">
-            <p class="mb-0">
-                Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des candidats.
-            </p>
-            {% if request.current_organization.has_pending_authorization_proof %}
+        {% component_alert content=content variant="warning" dismissible=True %}
+            {% fragment as content %}
                 <p class="mb-0">
-                    Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
-                    <a href="{% tally_form_url "wgDzz1" idprescriber=request.current_organization.pk iduser=user.pk source=ITOU_ENVIRONMENT %}"
-                       rel="noopener"
-                       target="_blank"
-                       class="has-external-link"
-                       aria-label="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
-                        cliquez ici pour l'envoyer
-                    </a>
+                    Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des candidats.
                 </p>
-            {% endif %}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
+                {% if request.current_organization.has_pending_authorization_proof %}
+                    <p class="mb-0">
+                        Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
+                        <a href="{% tally_form_url "wgDzz1" idprescriber=request.current_organization.pk iduser=user.pk source=ITOU_ENVIRONMENT %}"
+                           rel="noopener"
+                           target="_blank"
+                           class="has-external-link"
+                           aria-label="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">cliquez ici pour l'envoyer</a>
+                    </p>
+                {% endif %}
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 {% endblock %}
 
