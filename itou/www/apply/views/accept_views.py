@@ -76,7 +76,7 @@ def start_accept_wizard(request, job_application_id):
     return HttpResponseRedirect(reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session.name}))
 
 
-class AcceptWizardMixin:
+class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
     def __init__(self):
         self.accept_session = None
         self.job_seeker = None
@@ -116,13 +116,6 @@ class AcceptWizardMixin:
         return super().get_context_data(**kwargs) | {
             "reset_url": self.get_reset_url(),
         }
-
-    def is_iae_eligibility_diagnosis_needed(self):
-        return (
-            self.company.is_subject_to_iae_rules
-            and self.eligibility_diagnosis is None
-            and not self.job_seeker.has_valid_approval
-        )
 
 
 class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJobSeekerInfosView):
