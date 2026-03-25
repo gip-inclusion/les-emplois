@@ -81,7 +81,7 @@ class StartViewForHire(HirePermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class HireBaseView(HirePermissionMixin, TemplateView):
+class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNeededMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.hire_session = None
@@ -89,6 +89,7 @@ class HireBaseView(HirePermissionMixin, TemplateView):
         self.job_seeker = None
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
+        self.geiq_eligibility_missing = False
 
     def setup(self, request, *args, session_uuid, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -111,6 +112,7 @@ class HireBaseView(HirePermissionMixin, TemplateView):
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, self.company
             ).first()
+            self.geiq_eligibility_missing = self.geiq_eligibility_diagnosis is None
         elif self.company.is_subject_to_iae_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, self.company
@@ -121,23 +123,6 @@ class HireBaseView(HirePermissionMixin, TemplateView):
 
     def get_reset_url(self):
         return self.hire_session.get("reset_url")
-
-    def get_eligibility_for_hire_step_url(self):
-        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
-            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
-
-        bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
-            not self.company.is_subject_to_iae_rules,
-            # No need for eligibility diagnosis if the job seeker already has a PASS IAE
-            self.job_seeker.has_valid_approval,
-            # Job seeker must not have a diagnosis
-            self.eligibility_diagnosis,
-        ]
-        if not any(bypass_eligibility_conditions):
-            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
-
-        return None
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -166,7 +151,8 @@ class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer)
     template_name = "apply/submit/eligibility_for_hire.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_eligibility_for_hire_step_url() is None:
+        # If someone tries to access this page for a non-IAE company, let the base class serve a 404
+        if self.company.is_subject_to_iae_rules and not self.is_iae_eligibility_diagnosis_needed():
             return HttpResponseRedirect(self.get_success_url())
         return super().dispatch(request, *args, **kwargs)
 
@@ -199,7 +185,8 @@ class GEIQEligibilityForHireView(HireBaseView, common_views.BaseGEIQEligibilityV
         )
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_eligibility_for_hire_step_url() is None:
+        # If someone tries to access this page for a non-GEIQ company, let the base class serve a 404
+        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_missing:
             return HttpResponseRedirect(self.get_next_url())
         return super().dispatch(request, *args, **kwargs)
 
@@ -277,9 +264,11 @@ class ContractInfosForHireView(HireBaseView, common_views.BaseContractInfosView)
         )
 
     def get_success_url(self):
-        return self.get_eligibility_for_hire_step_url() or reverse(
-            "apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name}
-        )
+        if self.is_iae_eligibility_diagnosis_needed():
+            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
+        if self.geiq_eligibility_missing:
+            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
+        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
