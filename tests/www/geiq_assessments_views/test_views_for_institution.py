@@ -574,6 +574,11 @@ class TestAssessmentReviewView:
         url = reverse("geiq_assessments_views:assessment_review", kwargs={"pk": assessment.pk})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
+        # We also make accessible a printable version of the assessment after it has been finally reviewed (i.e. by a
+        # DREETS). Here it must not be accessible either.
+        url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_unauthorized_access(self, client):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -583,6 +588,17 @@ class TestAssessmentReviewView:
             submitted_by=geiq_membership.user,
         )
         url = reverse("geiq_assessments_views:assessment_review", kwargs={"pk": assessment.pk})
+        for user, expected_status in [
+            (JobSeekerFactory(), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(membership=True), 403),
+            (LaborInspectorFactory(membership=True), 404),
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == expected_status
+        # Same checks for the printable version of the assessment.
+        url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
@@ -618,9 +634,15 @@ class TestAssessmentReviewView:
         response = client.get(url)
         assert response.status_code == 404
 
+        # The printable version must not be accessible if the assessment has not been finally reviewed.
+        url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assert response.status_code == 404
+
         assessment.grants_selection_validated_at = timezone.now() + datetime.timedelta(hours=4)
         assessment.save()
 
+        url = reverse("geiq_assessments_views:assessment_review", kwargs={"pk": assessment.pk})
         response = client.get(url)
         assert response.status_code == 200
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
@@ -663,6 +685,11 @@ class TestAssessmentReviewView:
         assert assessment.advance_amount == 50_000
         assert assessment.granted_amount == 80_000
         assert assessment.review_comment == "Bravo !"
+
+        # The printable version must not be accessible at this stage as the assessment has not been finally reviewed.
+        url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assert response.status_code == 404
 
     @freeze_time("2025-05-21 12:00")
     def test_review_already_reviewed_assessment(self, client, snapshot):
@@ -738,4 +765,14 @@ class TestAssessmentReviewView:
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="disabled assessments review form with final review"
+        )
+
+        # Check also the printable version of the finally reviewed assessment.
+        # Shall we check calculations as well?
+        url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assert response.status_code == 200
+        assertContains(response, "Imprimer cette décision")
+        assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot(
+            name="print assessment with final review"
         )
