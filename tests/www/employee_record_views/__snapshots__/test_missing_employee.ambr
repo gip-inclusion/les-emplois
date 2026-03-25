@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_missing_employee[existing_employee_record_other_company]
+# name: TestMissingEmployee.test_post_hired_with_employee_record_another_siae_on_the_same_convention
   '''
   <section class="s-section">
       <div class="s-section__container container">
@@ -38,7 +38,7 @@
   
   '''
 # ---
-# name: test_missing_employee[existing_employee_record_same_company]
+# name: TestMissingEmployee.test_post_hired_with_employee_record_same_siae
   '''
   <section class="s-section">
       <div class="s-section__container container">
@@ -78,7 +78,7 @@
   
   '''
 # ---
-# name: test_missing_employee[form]
+# name: TestMissingEmployee.test_get
   '''
   <section class="s-section">
       <div class="s-section__container container">
@@ -138,7 +138,7 @@
   
   '''
 # ---
-# name: test_missing_employee[no_approval]
+# name: TestMissingEmployee.test_post_hired_without_approval
   '''
   <section class="s-section">
       <div class="s-section__container container">
@@ -162,7 +162,7 @@
   
   '''
 # ---
-# name: test_missing_employee[no_employee_record]
+# name: TestMissingEmployee.test_post_hired_with_an_approval_without_employee_record
   '''
   <section class="s-section">
       <div class="s-section__container container">
@@ -193,7 +193,7 @@
   
   '''
 # ---
-# name: test_missing_employee[no_hiring]
+# name: TestMissingEmployee.test_post_never_hired
   '''
   <section class="s-section">
       <div class="s-section__container container">
