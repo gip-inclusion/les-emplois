@@ -2493,6 +2493,31 @@ class TestIAEEligibility:
         assert criterion2 in administrative_criteria
         assert criterion3 in administrative_criteria
 
+    def test_eligibility_when_not_needed(self, client):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
+        )
+        ApprovalFactory(user=job_application.job_seeker)
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        assert response.status_code == 302
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
+        response = client.get(url)
+        assertRedirects(
+            response,
+            reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid}),
+            fetch_redirect_response=False,
+        )
+
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
         """Test eligibility for a company not subject to eligibility rules."""
 

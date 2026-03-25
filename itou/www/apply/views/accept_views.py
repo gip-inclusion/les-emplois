@@ -184,6 +184,12 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
 class IAEEligibilityForAcceptView(AcceptWizardMixin, BaseIAEEligibilityViewForEmployer):
     template_name = "apply/process_eligibility.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # If someone tries to access this page for a non-IAE company, let the base class serve a 404
+        if self.company.is_subject_to_iae_rules and not self.is_iae_eligibility_diagnosis_needed():
+            return HttpResponseRedirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         return reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
 
