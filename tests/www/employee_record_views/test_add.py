@@ -98,7 +98,7 @@ def test_wizard(snapshot, client):
     response = client.post(choose_approval_url, post_data, follow=True)
     # We are redirected to choose employee step
     assertRedirects(response, choose_employee_url)
-    assertContains(response, " Certaines informations sont absentes ou invalides")
+    assertContains(response, "Certaines informations sont absentes ou invalides")
     employee_record.delete()
 
     # Submit data for the "choose-approval" step

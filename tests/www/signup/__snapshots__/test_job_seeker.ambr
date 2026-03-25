@@ -258,7 +258,7 @@
   <form action="" class="js-prevent-multiple-submit" data-matomo-name="signup-job-seeker-credentials" method="post" role="form">
       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
       <div class="alert alert-danger" data-emplois-give-focus-if-exist="" role="alert" tabindex="0">
-          <p>
+          <p class="mb-2">
               <strong>
                   Votre formulaire contient quelques erreurs
               </strong>

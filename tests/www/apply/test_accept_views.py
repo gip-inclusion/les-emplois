@@ -48,10 +48,7 @@ from itou.utils.models import InclusiveDateRange
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
-from itou.www.apply.views.accept_views import (
-    ACCEPT_SESSION_KIND,
-    initialize_accept_session,
-)
+from itou.www.apply.views.accept_views import ACCEPT_SESSION_KIND, initialize_accept_session
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory, SiaeConventionFactory
@@ -70,10 +67,7 @@ from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import (
-    get_session_name,
-    parse_response_to_soup,
-)
+from tests.utils.testing import get_session_name, parse_response_to_soup
 from tests.www.apply.test_process import ARCHIVED_MARKUP, UNARCHIVE_BUTTON_MARKUP
 
 
@@ -1721,7 +1715,7 @@ class TestProcessAcceptViewsInWizard:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
@@ -1760,7 +1754,7 @@ class TestProcessAcceptViewsInWizard:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">

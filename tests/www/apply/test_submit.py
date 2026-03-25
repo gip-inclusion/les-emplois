@@ -24,10 +24,7 @@ from pytest_django.asserts import (
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
-from itou.eligibility.models import (
-    EligibilityDiagnosis,
-    GEIQEligibilityDiagnosis,
-)
+from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
@@ -43,11 +40,7 @@ from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, initialize_app
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_partially_in_zrr, create_test_cities
-from tests.companies.factories import (
-    CompanyFactory,
-    CompanyMembershipFactory,
-    JobDescriptionFactory,
-)
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionFactory
@@ -729,7 +722,7 @@ class TestApplyAsJobSeeker:
             """
             <div id="form_errors">
                 <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                    <p>
+                    <p class="mb-2">
                         <strong>Votre formulaire contient une erreur</strong>
                     </p>
                     <ul class="mb-0">
@@ -763,7 +756,7 @@ class TestApplyAsJobSeeker:
             """
             <div id="form_errors">
                 <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                    <p>
+                    <p class="mb-2">
                         <strong>Votre formulaire contient une erreur</strong>
                     </p>
                     <ul class="mb-0">
@@ -796,7 +789,7 @@ class TestApplyAsJobSeeker:
             """
             <div id="form_errors">
                 <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                    <p>
+                    <p class="mb-2">
                         <strong>Votre formulaire contient une erreur</strong>
                     </p>
                     <ul class="mb-0">
