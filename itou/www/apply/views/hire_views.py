@@ -155,7 +155,9 @@ class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, H
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
 
 
-class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer):
+class IAEEligibilityForHireView(
+    common_views.ContractInfosNeededMixin, HireBaseView, BaseIAEEligibilityViewForEmployer
+):
     template_name = "apply/submit/eligibility_for_hire.html"
 
     def dispatch(self, request, *args, **kwargs):
@@ -178,7 +180,9 @@ class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer)
         return context
 
 
-class GEIQEligibilityForHireView(HireBaseView, common_views.BaseGEIQEligibilityView):
+class GEIQEligibilityForHireView(
+    common_views.ContractInfosNeededMixin, HireBaseView, common_views.BaseGEIQEligibilityView
+):
     template_name = "apply/submit/geiq_eligibility_for_hire.html"
 
     def setup(self, request, *args, **kwargs):

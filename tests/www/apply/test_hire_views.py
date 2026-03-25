@@ -238,7 +238,12 @@ class TestDirectHireFullProcess:
         job_seeker = JobSeekerFactory()
         user = company.members.first()
         client.force_login(user)
-        hire_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            job_seeker,
+            {"selected_jobs": [], "contract_form_data": {"hiring_start_at": timezone.localdate()}},
+        )
 
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertContains(
@@ -1385,7 +1390,12 @@ class TestEligibilityForHire:
     def test_not_subject_to_eligibility(self, client):
         company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)  # We don't want a GEIQ here
         client.force_login(company.members.first())
-        hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {"selected_jobs": [], "contract_form_data": {"hiring_start_at": timezone.localdate()}},
+        )
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assert response.status_code == 404
 
@@ -1409,7 +1419,12 @@ class TestEligibilityForHire:
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         assert not self.job_seeker.has_valid_diagnosis(for_siae=company)
         client.force_login(company.members.first())
-        hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {"selected_jobs": [], "contract_form_data": {"hiring_start_at": timezone.localdate()}},
+        )
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Valider l'éligibilité IAE")
@@ -1459,6 +1474,17 @@ class TestEligibilityForHire:
         )
         assert self.job_seeker.has_valid_diagnosis(for_siae=company)
 
+    def test_without_contract_infos(self, client):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        client.force_login(company.members.first())
+        hire_session = fake_session_initialization(client, company, self.job_seeker, {})
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
+        assertRedirects(
+            response,
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": hire_session.name}),
+            fetch_redirect_response=False,
+        )
+
 
 class TestGEIQEligibilityForHire:
     @pytest.fixture(autouse=True)
@@ -1468,7 +1494,12 @@ class TestGEIQEligibilityForHire:
     def test_not_geiq(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         client.force_login(company.members.first())
-        hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {"selected_jobs": [], "contract_form_data": {"hiring_start_at": timezone.localdate()}},
+        )
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assert response.status_code == 404
 
@@ -1486,10 +1517,27 @@ class TestGEIQEligibilityForHire:
         )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
-        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
         client.force_login(company.members.first())
-        hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {
+                "selected_jobs": [],
+                "contract_form_data": {
+                    "hiring_start_at": timezone.localdate(),
+                    "hired_job": company.job_description_through.first().pk,
+                    "prehiring_guidance_days": 3,
+                    "nb_hours_per_week": 4,
+                    "planned_training_hours": 5,
+                    "contract_type": ContractType.APPRENTICESHIP.value,
+                    "qualification_type": QualificationType.STATE_DIPLOMA.value,
+                    "qualification_level": QualificationLevel.LEVEL_4.value,
+                },
+            },
+        )
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Eligibilité GEIQ")
@@ -1535,6 +1583,17 @@ class TestGEIQEligibilityForHire:
             fetch_redirect_response=False,
         )
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
+
+    def test_without_contract_infos(self, client):
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
+        client.force_login(company.members.first())
+        hire_session = fake_session_initialization(client, company, self.job_seeker, {})
+        response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
+        assertRedirects(
+            response,
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": hire_session.name}),
+            fetch_redirect_response=False,
+        )
 
 
 class TestFillJobSeekerInfosForHire:
