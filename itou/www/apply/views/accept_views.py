@@ -83,7 +83,6 @@ class AcceptWizardMixin:
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
         self.geiq_eligibility_missing = False
-        self.iae_eligibility_missing = False
 
     def setup(self, request, *args, session_uuid, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -109,9 +108,6 @@ class AcceptWizardMixin:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, self.company
             )
-            self.iae_eligibility_missing = (
-                self.eligibility_diagnosis is None and not self.job_seeker.has_valid_approval
-            )
 
     def get_reset_url(self):
         return self.reset_url
@@ -120,6 +116,13 @@ class AcceptWizardMixin:
         return super().get_context_data(**kwargs) | {
             "reset_url": self.get_reset_url(),
         }
+
+    def is_iae_eligibility_diagnosis_needed(self):
+        return (
+            self.company.is_subject_to_iae_rules
+            and self.eligibility_diagnosis is None
+            and not self.job_seeker.has_valid_approval
+        )
 
 
 class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJobSeekerInfosView):
@@ -163,7 +166,7 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
 
     def get_success_url(self):
         next_url = reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
-        if self.iae_eligibility_missing:
+        if self.is_iae_eligibility_diagnosis_needed():
             return reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": self.accept_session.name})
 
         elif self.geiq_eligibility_missing:
@@ -285,7 +288,7 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
 
     def missing_steps_redirect(self):
         redirect = super().missing_steps_redirect()
-        if redirect is None and self.iae_eligibility_missing:  # GEIQ eligibility might be skipped
+        if redirect is None and self.is_iae_eligibility_diagnosis_needed():  # GEIQ eligibility might be skipped
             # This should not happen
             messages.error(
                 self.request,
