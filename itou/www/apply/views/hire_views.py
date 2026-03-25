@@ -119,6 +119,10 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
                 self.job_seeker, self.company
             )
 
+    def get_session(self):
+        # Used by BaseFillJobSeekerInfosView, BaseContractInfosView & BaseConfirmationView
+        return self.hire_session
+
     def get_back_url(self):
         return None
 
@@ -220,9 +224,6 @@ class FillJobSeekerInfosForHireView(HireBaseView, common_views.BaseFillJobSeeker
     def setup(self, request, *args, **kwargs):
         self.job_application = None
         return super().setup(request, *args, **kwargs)
-
-    def get_session(self):
-        return self.hire_session
 
     def get_back_url(self):
         return reverse(
