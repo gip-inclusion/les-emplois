@@ -196,7 +196,7 @@ class TestRenderAnnouncementCampaign:
         client.force_login(
             random.choice(
                 [
-                    PrescriberFactory(),
+                    PrescriberFactory(membership=True),
                     EmployerFactory(membership=True),
                     LaborInspectorFactory(membership=True),
                 ]
