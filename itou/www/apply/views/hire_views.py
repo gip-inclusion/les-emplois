@@ -165,10 +165,6 @@ class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer)
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        # Check if contract step is already filled
-        if not self.hire_session.get("contract_form_data"):
-            # TODO: remove this case in a week
-            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
         return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name})
 
     def get_cancel_url(self):
@@ -199,10 +195,6 @@ class GEIQEligibilityForHireView(HireBaseView, common_views.BaseGEIQEligibilityV
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        # Check if contract step is already filled
-        if not self.hire_session.get("contract_form_data"):
-            # TODO: remove this case in a week
-            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
         return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name})
 
     def get_back_url(self):

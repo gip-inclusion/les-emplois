@@ -1396,7 +1396,9 @@ class TestEligibilityForHire:
         hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertRedirects(
-            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": hire_session.name})
+            response,
+            reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session.name}),
+            fetch_redirect_response=False,
         )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
@@ -1451,7 +1453,9 @@ class TestEligibilityForHire:
             },
         )
         assertRedirects(
-            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": hire_session.name})
+            response,
+            reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session.name}),
+            fetch_redirect_response=False,
         )
         assert self.job_seeker.has_valid_diagnosis(for_siae=company)
 
@@ -1476,7 +1480,9 @@ class TestGEIQEligibilityForHire:
         hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertRedirects(
-            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": hire_session.name})
+            response,
+            reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session.name}),
+            fetch_redirect_response=False,
         )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
@@ -1504,7 +1510,7 @@ class TestGEIQEligibilityForHire:
                 "back_url": reverse(
                     "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": hire_session.name}
                 ),
-                "next_url": reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": hire_session.name}),
+                "next_url": reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session.name}),
             },
         )
         assertRedirects(
@@ -1524,7 +1530,9 @@ class TestGEIQEligibilityForHire:
             },
         )
         assertRedirects(
-            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": hire_session.name})
+            response,
+            reverse("apply:hire_confirmation", kwargs={"session_uuid": hire_session.name}),
+            fetch_redirect_response=False,
         )
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
 
