@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -315,3 +316,17 @@ class ConfirmationForHireView(HireBaseView, common_views.BaseConfirmationView):
         context["expired_eligibility_diagnosis"] = None
         context["matomo_custom_title"] = "Confirmation d'embauche"
         return context
+
+    def missing_steps_redirect(self):
+        redirect = super().missing_steps_redirect()
+        if redirect is None and self.is_iae_eligibility_diagnosis_needed():  # GEIQ eligibility might be skipped
+            # This should not happen
+            messages.error(
+                self.request,
+                "Un diagnostic d'éligibilité est nécessaire pour déclarer cette embauche.",
+                extra_tags="toast",
+            )
+            redirect = HttpResponseRedirect(
+                reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
+            )
+        return redirect
