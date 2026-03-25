@@ -116,6 +116,9 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
     def get_reset_url(self):
         return self.reset_url
 
+    def get_contract_infos_url(self):
+        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "reset_url": self.get_reset_url(),
@@ -129,7 +132,7 @@ class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJo
         return None  # First step of the wizard: no back url
 
     def get_success_url(self):
-        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+        return self.get_contract_infos_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -192,7 +195,7 @@ class IAEEligibilityForAcceptView(AcceptWizardMixin, BaseIAEEligibilityViewForEm
         return reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
 
     def get_back_url(self):
-        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+        return self.get_contract_infos_url()
 
     def get_cancel_url(self):
         return self.get_reset_url()
@@ -259,7 +262,7 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
         return self.request.get_full_path()
 
     def get_back_url(self):
-        back_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+        back_url = self.get_contract_infos_url()
         if self.geiq_eligibility_missing:
             # Typically if GEIQ diagnosis wasn't created
             return reverse(
