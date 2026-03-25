@@ -706,7 +706,7 @@ class TestEmployeeRecordQueryset:
             convention=employee_record_1.job_application.to_company.convention,
             source=CompanySource.USER_CREATED,
         )
-        company_1_child_copy_with_other_convention = CompanyFactory(
+        company_1_other_kind_other_convention = CompanyFactory(
             kind="ETTI",
             siret=company_1.siret,
             source=CompanySource.ASP,
@@ -715,7 +715,7 @@ class TestEmployeeRecordQueryset:
 
         assert EmployeeRecord.objects.for_asp_company(company_1).get() == employee_record_1
         assert EmployeeRecord.objects.for_asp_company(company_1_child).get() == employee_record_1
-        assert EmployeeRecord.objects.for_asp_company(company_1_child_copy_with_other_convention).count() == 0
+        assert EmployeeRecord.objects.for_asp_company(company_1_other_kind_other_convention).get() == employee_record_1
         assert EmployeeRecord.objects.for_asp_company(company_2).get() == employee_record_2
 
     def test_with_siret_from_asp_source(self):

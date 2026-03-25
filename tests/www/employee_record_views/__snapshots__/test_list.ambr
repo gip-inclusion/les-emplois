@@ -549,14 +549,9 @@
                  AND "employee_record_employeerecord"."id" IS NULL
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
-                            (SELECT V0."approval_number" AS "approval_number"
-                             FROM "employee_record_employeerecord" V0
-                             INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
-                             WHERE V1."to_company_id" IN
-                                 (SELECT U0."id"
-                                  FROM "companies_company" U0
-                                  WHERE (NOT (U0."siret" = %s)
-                                         AND U0."convention_id" = %s))))
+                            (SELECT U0."approval_number" AS "approval_number"
+                             FROM "employee_record_employeerecord" U0
+                             WHERE U0."siret" = %s))
                  AND "job_applications_jobapplication"."hiring_start_at" >= %s)
           ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC NULLS LAST
         ''',
