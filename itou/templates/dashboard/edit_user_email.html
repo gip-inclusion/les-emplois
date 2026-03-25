@@ -14,13 +14,14 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-warning" role="status">
-        <p class="mb-0">
+    {% component_alert title=title content=content variant="warning" icon=False %}
+        {% fragment as title %}
             Vous allez recevoir un e-mail de confirmation à cette adresse.
-            <br>
-            Vous devez suivre le lien de confirmation pour que votre adresse e-mail soit effectivement changée.
-        </p>
-    </div>
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">Vous devez suivre le lien de confirmation pour que votre adresse e-mail soit effectivement changée.</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
 
 {% block content %}
