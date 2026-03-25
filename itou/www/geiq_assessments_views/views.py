@@ -977,3 +977,43 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
     )
 
     return render(request, template_name, context)
+
+
+@check_request(lambda request: request.from_institution)
+def assessment_print(request, pk, template_name="geiq_assessments_views/assessment_print.html"):
+    assessment = get_object_or_404(
+        Assessment.objects.filter(
+            institutions=request.current_organization,
+            grants_selection_validated_at__isnull=False,
+            final_reviewed_at__isnull=False,
+        ),
+        pk=pk,
+    )
+    context = {
+        "matomo_custom_title": "Imprimer la décision",
+        "assessment": assessment,
+        "stats": (
+            EmployeeContract.objects.filter(employee__assessment=assessment)
+            .filter(allowance_requested=True)
+            .aggregate(
+                allowance_of_814_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=814)),
+                allowance_of_1400_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=1400)),
+                refused_allowance_nb=Count("pk", filter=Q(allowance_granted=False)),
+                potential_allowance_amount=Sum(
+                    Case(
+                        When(allowance_granted=True, then="employee__allowance_amount"),
+                        default=0,
+                        output_field=models.IntegerField(),
+                    )
+                ),
+            )
+        ),
+        # Balance and refund amounts are originally live-calculated directly in the form when reviewing the assessment.
+        # Following calculations must give the same results as the inline script from `assessment_review.html`.
+        "balance_amount": max(0, assessment.granted_amount - assessment.advance_amount),
+        "refund_amount": assessment.advance_amount - assessment.granted_amount
+        if assessment.advance_amount > assessment.granted_amount
+        else 0,
+    }
+
+    return render(request, template_name, context)

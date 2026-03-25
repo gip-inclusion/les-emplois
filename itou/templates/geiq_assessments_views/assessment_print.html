@@ -1,0 +1,139 @@
+{% extends "layout/base_printable.html" %}
+{% load format_filters %}
+{% load humanize %}
+
+{% block title %}Décision - {{ assessment.label_geiq_name }} {{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="container py-4 px-5">
+
+        <div class="row justify-content-center d-print-none">
+            <div class="mt-5">
+                <button class="btn btn-primary btn-ico" type="button" data-it-action="print" aria-label="Imprimer cette décision">
+                    <i class="ri-printer-line" aria-hidden="true"></i>
+                    <span>Imprimer cette décision</span>
+                </button>
+            </div>
+        </div>
+
+        <h1 class="mt-5">Décision - {{ assessment.label_geiq_name }}</h1>
+
+        <section class="mt-5">
+            <h2>Structures concernées par la convention</h2>
+            <ul>
+                {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
+            </ul>
+        </section>
+
+        <section class="mt-5">
+            <h2>Récapitulatif</h2>
+            <dl class="list-data col-6 mb-3">
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Nombre d’aides à 814 €</dt>
+                    <dd>
+                        <strong>{{ stats.allowance_of_814_nb }}</strong>
+                    </dd>
+                </div>
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Nombre d’aides à 1 400 €</dt>
+                    <dd>
+                        <strong>{{ stats.allowance_of_1400_nb }}</strong>
+                    </dd>
+                </div>
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Nombre d’aides refusées</dt>
+                    <dd>
+                        <strong>{{ stats.refused_allowance_nb }}</strong>
+                    </dd>
+                </div>
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Montant total potentiel</dt>
+                    <dd>
+                        <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                    </dd>
+                </div>
+            </dl>
+            <p class="small">Ces données ont été calculées suite à la sélection que vous avez effectuée.</p>
+        </section>
+
+        <section class="mt-5">
+            <h2>Conventionnement</h2>
+            <dl class="list-data col-6">
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Montant conventionné (convention initiale + avenants)</dt>
+                    <dd>
+                        <strong>{{ assessment.convention_amount|format_int_euros }}</strong>
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="mt-5">
+            <h2>Décision</h2>
+            <dl class="list-data col-6">
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Montant total accordé</dt>
+                    <dd>
+                        <strong>{{ assessment.granted_amount|format_int_euros }}</strong>
+                    </dd>
+                </div>
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Premier versement déjà réalisé</dt>
+                    <dd>
+                        <strong>{{ assessment.advance_amount|default:'-'|format_int_euros }}</strong>
+                    </dd>
+                </div>
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Deuxième versement à prévoir</dt>
+                    <dd>
+                        <strong>{{ balance_amount|default:'-'|format_int_euros }}</strong>
+                    </dd>
+                </div>
+                <div class="d-flex gap-2">
+                    <dt class="flex-grow-1">Ordre de reversement</dt>
+                    <dd>
+                        <strong>{{ refund_amount|default:'-'|format_int_euros }}</strong>
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        {% if assessment.review_comment %}
+            <section class="mt-5">
+                <h2>Commentaire</h2>
+                <div>{{ assessment.review_comment|linebreaks }}</div>
+            </section>
+        {% endif %}
+
+        <section class="mt-5">
+            <h2>Historique</h2>
+            <ul class="list-step">
+                {% if assessment.final_reviewed_at %}
+                    <li>
+                        <time datetime="{{ assessment.final_reviewed_at.isoformat }}">Le {{ assessment.final_reviewed_at|date:"d/m/Y" }}</time>
+                        <span>Décision validée par {{ assessment.final_reviewed_by.get_full_name }} - {{ assessment.final_reviewed_by_institution.name }}</span>
+                    </li>
+                {% endif %}
+                {% if assessment.reviewed_at %}
+                    <li>
+                        <time datetime="{{ assessment.reviewed_at.isoformat }}">Le {{ assessment.reviewed_at|date:"d/m/Y" }}</time>
+                        <span>Contrôle réalisé par {{ assessment.reviewed_by.get_full_name }} - {{ assessment.reviewed_by_institution.name }}</span>
+                    </li>
+                {% endif %}
+                <li>
+                    <time datetime="{{ assessment.submitted_at.isoformat }}">Le {{ assessment.submitted_at|date:"d/m/Y" }}</time>
+                    <span>Bilan transmis par {{ assessment.submitted_by.get_full_name }} - GEIQ</span>
+                </li>
+            </ul>
+        </section>
+
+        <div class="row justify-content-center d-print-none">
+            <div class="mt-5 mb-2">
+                <button class="btn btn-primary btn-ico" type="button" data-it-action="print" aria-label="Imprimer cette décision">
+                    <i class="ri-printer-line" aria-hidden="true"></i>
+                    <span>Imprimer cette décision</span>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

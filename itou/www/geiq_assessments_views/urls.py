@@ -88,4 +88,5 @@ urlpatterns = [
     path("institution/list", views.list_for_institution, name="list_for_institution"),
     path("institution/<uuid:pk>", views.assessment_details_for_institution, name="details_for_institution"),
     path("institution/<uuid:pk>/review", views.assessment_review, name="assessment_review"),
+    path("institution/<uuid:pk>/print", views.assessment_print, name="assessment_print"),
 ]

@@ -4,7 +4,7 @@
 {% load django_bootstrap5 %}
 {% load format_filters %}
 
-{% block title %}Saisir la décision - Bilan d’exécution GEIQ - {{ block.super }}{% endblock %}
+{% block title %}Saisir la décision - Bilan d’exécution GEIQ {{ block.super }}{% endblock %}
 
 {% block title_navinfo %}
     {% include "layout/previous_step.html" with back_url=back_url only %}

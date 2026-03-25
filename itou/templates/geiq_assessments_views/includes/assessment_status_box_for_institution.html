@@ -62,8 +62,9 @@
     <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
         <h3>Bilan d’exécution traité le {{ assessment.final_reviewed_at|date:"d/m/Y" }}</h3>
         <p>La décision a été envoyée au GEIQ.</p>
-        <a class="btn btn-primary btn-block" href="{% url 'geiq_assessments_views:assessment_review' pk=assessment.pk %}">
-            Afficher la décision
+        <a class="btn btn-primary btn-block btn-ico" href="{% url 'geiq_assessments_views:assessment_print' pk=assessment.pk %}" rel="noopener" target="_blank">
+            <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+            <span>Consulter la décision</span>
         </a>
     </div>
 {% endif %}
