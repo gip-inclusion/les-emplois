@@ -165,7 +165,10 @@ class EmployeeRecordQuerySet(models.QuerySet):
         return self.filter(job_application__to_company=siae)
 
     def for_asp_company(self, siae):
-        return self.filter(job_application__to_company__in=siae.convention.siaes.all())
+        # XXX: This will not work well if the SIRET of a company
+        # changes after we save an employee record. There is no
+        # easy workaround for that.
+        return self.filter(siret=siae.siret_from_asp_source())
 
     def find_by_batch(self, filename, line_number):
         """

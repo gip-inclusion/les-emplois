@@ -53,7 +53,7 @@
                                     </p>
                                     {% if approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY %}
                                         <p>
-                                            Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : {{ employee_record.job_application.to_company.kind }} {{ employee_record.job_application.to_company.display_name }} - SIRET {{ employee_record.job_application.to_company.siret|format_siret }}
+                                            Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec le même SIRET : {{ employee_record.job_application.to_company.kind }} {{ employee_record.job_application.to_company.display_name }} - SIRET {{ employee_record.job_application.to_company.siret_from_asp_source|format_siret }}
                                         </p>
                                         <p>
                                             Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure.
@@ -61,7 +61,7 @@
                                         <p>
                                             Seule la première embauche avec ce PASS IAE nécessite une transmission de la fiche salarié.
                                             <br>
-                                            En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
+                                            Si vous souhaitez créer un nouveau contrat avec la même mesure, ou avec une mesure différente, vous pouvez rechercher le salarié directement dans l’Extranet IAE 2.0 de l’ASP. Cliquez ensuite sur « Nouveau contrat » et sélectionnez la mesure concernée.
                                         </p>
                                     {% elif approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_SAME_COMPANY %}
                                         <p>

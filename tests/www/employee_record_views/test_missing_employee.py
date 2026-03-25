@@ -17,7 +17,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 @freeze_time("2025-02-14")
 class TestMissingEmployee:
     def setUp(self, client):
-        self.siae = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        self.siae = CompanyFactory(kind="AI", for_snapshot=True, with_membership=True)
         self.url = reverse("employee_record_views:missing_employee")
         user = self.siae.members.get()
         client.force_login(user)
@@ -139,7 +139,10 @@ class TestMissingEmployee:
             approval=approval,
         )
         other_siae = CompanyFactory(
-            convention=self.siae.convention, source=CompanySource.USER_CREATED, for_snapshot=True
+            kind=self.siae.kind,
+            name="L'Autre",
+            convention=self.siae.convention,
+            source=CompanySource.USER_CREATED,
         )
         job_application = JobApplicationFactory(
             to_company=other_siae,
@@ -153,3 +156,34 @@ class TestMissingEmployee:
         response = client.post(self.url, data={"employee": job_seeker.pk})
         assert self._extract_case(response) == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
         assert self._extract_html_section(response) == snapshot()
+
+    def test_post_hired_with_employee_record_another_siae_same_siret_another_convention(self, client):
+        self.setUp(client)
+        job_seeker = JobSeekerFactory(first_name="Eliott", last_name="Emery")
+        approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00003")
+        # Add a dummy application so that the job seeker is in the
+        # pool of applicants to `self.siae`.
+        JobApplicationFactory(
+            to_company=self.siae,
+            job_seeker=job_seeker,
+            state=JobApplicationState.ACCEPTED,
+            approval=approval,
+        )
+        other_siae = CompanyFactory(
+            siret=self.siae.siret,
+            kind="ETTI",  # different from self.siae.kind
+            with_convention=True,
+        )
+        assert other_siae.kind != self.siae.kind
+        assert other_siae.convention_id != self.siae.convention_id
+        job_application = JobApplicationFactory(
+            to_company=other_siae,
+            job_seeker=job_seeker,
+            state=JobApplicationState.ACCEPTED,
+            approval=approval,
+            hiring_start_at=datetime.date(2025, 2, 14),
+        )
+        EmployeeRecordFactory(job_application=job_application)
+
+        response = client.post(self.url, data={"employee": job_seeker.pk})
+        assert self._extract_case(response) == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
