@@ -1,10 +1,11 @@
+{% load components %}
 {% load django_bootstrap5 %}
-{% load i18n %}
 {% for message in messages %}
     {% if "toast" not in message.tags and "modal" not in message.tags %}
-        <div class="alert alert-{{ message|bootstrap_message_alert_type }} alert-dismissible fade show" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'close' %}"></button>
-            {{ message }}
-        </div>
+        {% component_alert content=content variant=message|bootstrap_message_alert_type dismissible=True icon=False %}
+            {% fragment as content %}
+                <p class="mb-0">{{ message }}</p>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 {% endfor %}

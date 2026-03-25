@@ -353,7 +353,7 @@ class TestImportAciConvergencePHC:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">

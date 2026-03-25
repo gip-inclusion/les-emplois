@@ -1,11 +1,14 @@
+{% load components %}
 {% load i18n %}
 {% load str_filters %}
 
-<div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-    <p>
-        <strong>{{ errors|pluralizefr:"Votre formulaire contient une erreur,Votre formulaire contient quelques erreurs" }}</strong>
-    </p>
-    <ul class="mb-0">
-        {% for error in errors %}<li>{{ error }}</li>{% endfor %}
-    </ul>
-</div>
+{% component_alert title=title content=content variant="danger" form_error=True icon=False %}
+    {% fragment as title %}
+        {{ errors|pluralizefr:"Votre formulaire contient une erreur,Votre formulaire contient quelques erreurs" }}
+    {% endfragment %}
+    {% fragment as content %}
+        <ul class="mb-0">
+            {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    {% endfragment %}
+{% endcomponent_alert %}

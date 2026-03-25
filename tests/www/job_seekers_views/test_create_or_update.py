@@ -25,19 +25,12 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import (
-    PrescriberOrganizationFactory,
-    PrescriberOrganizationWith2MembershipFactory,
-)
+from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWith2MembershipFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_hire_views import fake_session_initialization as fake_hire_session_initialization
-from tests.www.apply.test_submit import (
-    CONFIRM_RESET_MARKUP,
-    LINK_RESET_MARKUP,
-    fake_session_initialization,
-)
+from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP, fake_session_initialization
 
 
 class TestGetOrCreateAsOther:
@@ -421,7 +414,7 @@ class TestGetOrCreateForSender:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
@@ -462,7 +455,7 @@ class TestGetOrCreateForSender:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
@@ -1154,7 +1147,7 @@ class TestUpdateForSender:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
@@ -1202,7 +1195,7 @@ class TestUpdateForSender:
             response,
             """
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                <p>
+                <p class="mb-2">
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
