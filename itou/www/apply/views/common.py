@@ -33,6 +33,15 @@ def previous_applications_queryset(job_seeker, company):
     return job_seeker.job_applications.filter(to_company=company)
 
 
+class IsIAEEligibilityDiagnosisNeededMixin:
+    def is_iae_eligibility_diagnosis_needed(self):
+        return (
+            self.company.is_subject_to_iae_rules
+            and self.eligibility_diagnosis is None
+            and not self.job_seeker.has_valid_approval
+        )
+
+
 class CommonUserInfoFormsMixin:
     def get_session(self):
         raise NotImplementedError
