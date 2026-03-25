@@ -129,6 +129,9 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
     def get_reset_url(self):
         return self.hire_session.get("reset_url")
 
+    def get_contract_infos_url(self):
+        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.hire_session.name})
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "company": self.company,
@@ -231,7 +234,7 @@ class FillJobSeekerInfosForHireView(HireBaseView, common_views.BaseFillJobSeeker
         )
 
     def get_success_url(self):
-        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.hire_session.name})
+        return self.get_contract_infos_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -297,7 +300,7 @@ class ConfirmationForHireView(HireBaseView, common_views.BaseConfirmationView):
         self.hire_session.delete()
 
     def get_back_url(self):
-        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.hire_session.name})
+        return self.get_contract_infos_url()
 
     def get_error_url(self):
         return self.request.get_full_path()
