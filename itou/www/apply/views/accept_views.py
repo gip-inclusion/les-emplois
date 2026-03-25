@@ -182,7 +182,9 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
         return context
 
 
-class IAEEligibilityForAcceptView(AcceptWizardMixin, BaseIAEEligibilityViewForEmployer):
+class IAEEligibilityForAcceptView(
+    AcceptWizardMixin, common_views.ContractInfosNeededMixin, BaseIAEEligibilityViewForEmployer
+):
     template_name = "apply/process_eligibility.html"
 
     def dispatch(self, request, *args, **kwargs):

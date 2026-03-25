@@ -2525,6 +2525,11 @@ class TestIAEEligibility:
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
+            to_company__with_jobs=True,
+            # Job seeker with enough infos to avoid FillUserInfos step
+            job_seeker__born_in_france=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
+            job_seeker__with_address=True,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -2535,6 +2540,21 @@ class TestIAEEligibility:
         )
         response = client.get(url_accept)
         session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        # Fill contract infos
+        response = client.post(
+            reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
+            data={
+                "hiring_start_at": timezone.localdate(),
+                "prehiring_guidance_days": 10,
+                "contract_type": ContractType.APPRENTICESHIP,
+                "nb_hours_per_week": 10,
+                "qualification_type": QualificationType.CQP,
+                "qualification_level": QualificationLevel.LEVEL_4,
+                "planned_training_hours": 20,
+                "hired_job": job_application.to_company.job_description_through.first().pk,
+            },
+        )
+        assert response.status_code == 302
         url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
         response = client.get(url)
         assert response.status_code == 404
@@ -2544,8 +2564,11 @@ class TestIAEEligibility:
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address=True),
             to_company__evaluable_kind=True,
+            # Job seeker with enough infos to avoid FillUserInfos step
+            job_seeker__born_in_france=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
+            job_seeker__with_address=True,
         )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_company),
@@ -2561,9 +2584,44 @@ class TestIAEEligibility:
         )
         response = client.get(url_accept)
         session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        # Fill contract infos
+        response = client.post(
+            reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
+            data={
+                "hiring_start_at": timezone.localdate(),
+            },
+        )
         url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
+        assertRedirects(response, url, fetch_redirect_response=False)
         response = client.get(url)
         assertContains(response, "suite aux mesures prises dans le cadre du contrôle a posteriori", status_code=403)
+
+    def test_eligibility_with_missing_contract_infos(self, client):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
+            # Job seeker with enough infos to avoid FillUserInfos step
+            job_seeker__born_in_france=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
+            job_seeker__with_address=True,
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        assert response.status_code == 302
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
+        response = client.get(url)
+        assertRedirects(
+            response,
+            reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
+        )
 
 
 class TestAcceptConfirmation:
