@@ -20,21 +20,23 @@
                 {% csrf_token %}
                 {% bootstrap_form_errors form type="non_fields" %}
 
-                <div class="alert alert-warning" role="status">
-                    <p class="mb-0">
-                        <strong>Fonctionnement</strong>
-                    </p>
-                    <p class="mb-0">
-                        L'ensemble des relations du compte de droite (listées plus bas) seront reliées à la place à celui de gauche.
-                    </p>
-                    <p class="mb-0">
-                        Par défaut, le compte fusionné utilise les informations personnelles du compte de droite, mais il est possible de changer
-                        ce comportement en selectionnant celui de gauche.
-                    </p>
-                    <p>
-                        <strong>Attention : si les identités ne correspondent pas, il ne faut probablement pas fusionner les comptes mais plutôt inviter le nouveau collaborateur</strong>
-                    </p>
-                </div>
+                {% component_alert title=title content=content variant="warning" icon=False %}
+                    {% fragment as title %}
+                        Fonctionnement
+                    {% endfragment %}
+                    {% fragment as content %}
+                        <p class="mb-0">
+                            L'ensemble des relations du compte de droite (listées plus bas) seront reliées à la place à celui de gauche.
+                        </p>
+                        <p class="mb-0">
+                            Par défaut, le compte fusionné utilise les informations personnelles du compte de droite, mais il est possible de changer
+                            ce comportement en selectionnant celui de gauche.
+                        </p>
+                        <p class="mb-0">
+                            <strong>Attention : si les identités ne correspondent pas, il ne faut probablement pas fusionner les comptes mais plutôt inviter le nouveau collaborateur</strong>
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
 
                 <h2>Informations personnelles</h2>
                 <div class="row mb-5" id="users_info">
