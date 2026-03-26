@@ -34,14 +34,7 @@ def test_missing_job_seeker_info(client):
     "factory,assertion",
     [
         (partial(JobApplicationFactory, sent_by_authorized_prescriber_organisation=True), assertContains),
-        (
-            partial(
-                JobApplicationFactory,
-                sent_by_authorized_prescriber_organisation=True,
-                sender_prescriber_organization__authorized=False,
-            ),
-            assertContains,
-        ),
+        (partial(JobApplicationFactory, sent_by_prescriber=True), assertContains),
         (partial(JobApplicationFactory, sent_by_another_employer=True), assertNotContains),
     ],
 )

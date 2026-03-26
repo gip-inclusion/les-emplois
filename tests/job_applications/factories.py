@@ -49,12 +49,14 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender_kind=SenderKind.JOB_SEEKER,
             sender=factory.LazyAttribute(lambda obj: obj.job_seeker),
         )
-        sent_by_authorized_prescriber_organisation = factory.Trait(
-            sender_prescriber_organization=factory.SubFactory(
-                PrescriberOrganizationFactory, authorized=True, with_membership=True
-            ),
+        sent_by_prescriber = factory.Trait(
+            sender_prescriber_organization=factory.SubFactory(PrescriberOrganizationFactory, with_membership=True),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
+        )
+        sent_by_authorized_prescriber_organisation = factory.Trait(
+            sent_by_prescriber=True,
+            sender_prescriber_organization__authorized=True,
         )
         sent_by_company = factory.Trait(
             sender_kind=SenderKind.EMPLOYER,
