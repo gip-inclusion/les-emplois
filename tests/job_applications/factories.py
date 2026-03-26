@@ -51,6 +51,10 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender_kind=SenderKind.JOB_SEEKER,
             sender=factory.SelfAttribute("job_seeker"),
         )
+        sent_by_prescriber_alone = factory.Trait(
+            sender=factory.SubFactory(PrescriberFactory),
+            sender_kind=SenderKind.PRESCRIBER,
+        )
         sent_by_prescriber = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(PrescriberOrganizationFactory, with_membership=True),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
@@ -213,23 +217,18 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
     )
 
 
-class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
-    """Generates a JobApplication() object sent by a prescriber."""
-
-    sender = factory.SubFactory(PrescriberFactory)
-    sender_kind = SenderKind.PRESCRIBER
-
-
-class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):
+class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of an organization."""
 
+    sender_kind = SenderKind.PRESCRIBER
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationFactory, with_membership=True)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
-class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescriberFactory):
+class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of Pôle emploi organization."""
 
+    sender_kind = SenderKind.PRESCRIBER
     sender_prescriber_organization = factory.SubFactory(
         PrescriberOrganizationFactory, france_travail=True, with_membership=True
     )
@@ -237,9 +236,10 @@ class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescr
     with_iae_eligibility_diagnosis = True
 
 
-class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
+class JobApplicationWithoutApprovalFactory(JobApplicationFactory):
     """Generates a JobApplication() object without an Approval() object."""
 
+    sent_by_prescriber_alone = True
     state = JobApplicationState.ACCEPTED
 
 

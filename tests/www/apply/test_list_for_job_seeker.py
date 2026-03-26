@@ -13,10 +13,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -26,7 +23,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 def test_list_for_job_seeker(client):
     job_seeker = JobApplicationFactory(sent_by_job_seeker=True).job_seeker
     JobApplicationFactory(sent_by_employer=True, job_seeker=job_seeker)
-    JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
+    JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker)
     client.force_login(job_seeker)
 
     response = client.get(reverse("apply:list_for_job_seeker"))
@@ -36,7 +33,7 @@ def test_list_for_job_seeker(client):
 def test_list_for_job_seeker_queries(client, snapshot):
     job_seeker = JobApplicationFactory(sent_by_job_seeker=True).job_seeker
     JobApplicationFactory(sent_by_employer=True, job_seeker=job_seeker)
-    JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
+    JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker)
     client.force_login(job_seeker)
 
     with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):

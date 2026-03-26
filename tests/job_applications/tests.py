@@ -50,7 +50,6 @@ from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeR
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
 )
@@ -128,7 +127,7 @@ class TestJobApplicationModel:
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationFactory(sent_by_job_seeker=True)
         assert not job_application.is_sent_by_authorized_prescriber
-        job_application = JobApplicationSentByPrescriberFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         assert not job_application.is_sent_by_authorized_prescriber
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory()
@@ -312,7 +311,7 @@ class TestJobApplicationModel:
             id="sent_by_employer_without_company_and_with_prescriber_organization",
         ),
         pytest.param(
-            lambda: JobApplicationSentByPrescriberFactory(sender_company=CompanyFactory()),
+            lambda: JobApplicationFactory(sent_by_prescriber_alone=True, sender_company=CompanyFactory()),
             "prescriber_sender_coherence",
             id="sent_by_employer_with_company",
         ),
@@ -2696,7 +2695,7 @@ class TestJobApplicationAdminForm:
         assert form.is_valid()
 
     def test_applications_sent_by_prescriber_without_organization(self):
-        job_application = JobApplicationSentByPrescriberFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender = job_application.sender
 
