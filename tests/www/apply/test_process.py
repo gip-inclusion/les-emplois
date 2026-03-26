@@ -2097,7 +2097,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
-            sent_by_company=True,
+            sent_by_employer=True,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -2985,7 +2985,7 @@ class TestJobApplicationSenderLeftOrg:
         assert job_application_sender_left_org(job_app) is True
 
     def test_sender_left_org_employer(self):
-        job_app = JobApplicationFactory(sent_by_company=True)
+        job_app = JobApplicationFactory(sent_by_employer=True)
         company_membership = job_app.sender_company.memberships.get()
         assert job_application_sender_left_org(job_app) is False
 

@@ -49,7 +49,7 @@ def test_job_application_multiple_jobs():
     tmpl = load_template("apply/includes/list_card_body.html")
 
     job_application = JobApplicationFactory(
-        sent_by_company=True,
+        sent_by_employer=True,
         selected_jobs=Appellation.objects.all(),
     )
     job_application.user_can_view_personal_information = True
@@ -86,7 +86,7 @@ def test_job_application_multiple_jobs():
 
 def test_job_application_auto_prescription_badge_in_list():
     tmpl = load_template("apply/includes/list_card_body.html")
-    job_application = JobApplicationFactory(sent_by_company=True)
+    job_application = JobApplicationFactory(sent_by_employer=True)
     job_application.user_can_view_personal_information = True
     job_application.jobseeker_valid_eligibility_diagnosis = None
     rendered = tmpl.render(
@@ -106,7 +106,7 @@ def test_job_application_auto_prescription_badge_in_list():
 
 def test_job_application_imported_from_pe_in_list():
     tmpl = load_template("apply/includes/list_card_body.html")
-    job_application = JobApplicationFactory(sent_by_company=True, origin=Origin.PE_APPROVAL)
+    job_application = JobApplicationFactory(sent_by_employer=True, origin=Origin.PE_APPROVAL)
     job_application.user_can_view_personal_information = True
     job_application.jobseeker_valid_eligibility_diagnosis = None
     rendered = tmpl.render(

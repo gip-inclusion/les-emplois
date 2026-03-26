@@ -58,13 +58,13 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sent_by_prescriber=True,
             sender_prescriber_organization__authorized=True,
         )
-        sent_by_company = factory.Trait(
+        sent_by_employer = factory.Trait(
             sender_kind=SenderKind.EMPLOYER,
             sender_company=factory.SelfAttribute("to_company"),
             sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
         )
         sent_by_another_employer = factory.Trait(
-            sent_by_company=True,
+            sent_by_employer=True,
             sender_company=factory.SubFactory(CompanyFactory, with_membership=True),
         )
         # IAE ---------------------------------------------------------------------------------------------------------

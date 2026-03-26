@@ -135,7 +135,7 @@ class TestJobApplicationModel:
         job_application = JobApplicationSentByPrescriberOrganizationFactory()
         assert not job_application.is_sent_by_authorized_prescriber
 
-        job_application = JobApplicationFactory(sent_by_company=True)
+        job_application = JobApplicationFactory(sent_by_employer=True)
         assert not job_application.is_sent_by_authorized_prescriber
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
@@ -158,13 +158,13 @@ class TestJobApplicationModel:
 
     def test_get_sender_kind_display(self, subtests):
         non_siae_items = [
-            (JobApplicationFactory(sent_by_company=True, to_company__kind=kind), "Employeur")
+            (JobApplicationFactory(sent_by_employer=True, to_company__kind=kind), "Employeur")
             for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]
         ]
         items = [
             [JobApplicationFactory(sent_by_authorized_prescriber=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
-            [JobApplicationFactory(sent_by_company=True), "Employeur"],
+            [JobApplicationFactory(sent_by_employer=True), "Employeur"],
             [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
         ] + non_siae_items
 
@@ -288,7 +288,7 @@ class TestJobApplicationModel:
         ),
         pytest.param(
             lambda: JobApplicationFactory(
-                sent_by_company=True,
+                sent_by_employer=True,
                 sender_company=None,
                 sender=EmployerFactory(),
             ),
@@ -297,14 +297,14 @@ class TestJobApplicationModel:
         ),
         pytest.param(
             lambda: JobApplicationFactory(
-                sent_by_company=True, sender_prescriber_organization=PrescriberOrganizationFactory()
+                sent_by_employer=True, sender_prescriber_organization=PrescriberOrganizationFactory()
             ),
             "employer_sender_coherence",
             id="sent_by_employer_with_prescriber_organization",
         ),
         pytest.param(
             lambda: JobApplicationFactory(
-                sent_by_company=True,
+                sent_by_employer=True,
                 sender=EmployerFactory(),
                 sender_company=None,
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
@@ -329,7 +329,7 @@ def test_sender_constraints(factory, constraint_name):
 @pytest.mark.parametrize(
     "job_application_factory",
     [
-        partial(JobApplicationFactory, sent_by_company=True),
+        partial(JobApplicationFactory, sent_by_employer=True),
         JobApplicationSentByPrescriberFactory,
         JobApplicationSentByJobSeekerFactory,
     ],
@@ -526,7 +526,7 @@ def test_prescriptions_of_for_employer_with_company():
 
 
 def test_prescriptions_of_for_employer_without_company():
-    job_application = JobApplicationFactory(sent_by_company=True)
+    job_application = JobApplicationFactory(sent_by_employer=True)
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.sender_company)) == []
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
 
@@ -541,7 +541,7 @@ def test_prescriptions_of_for_employer_is_based_on_company():
 
 
 def test_prescriptions_of_exclude_auto_prescription():
-    job_application = JobApplicationFactory(sent_by_company=True)
+    job_application = JobApplicationFactory(sent_by_employer=True)
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
 
 
@@ -617,7 +617,7 @@ class TestJobApplicationQuerySet:
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_current_employer_on_jobseeker(self):
         job_application = JobApplicationFactory(
-            sent_by_company=True,
+            sent_by_employer=True,
             to_company__subject_to_iae_rules=True,
         )
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
@@ -631,7 +631,7 @@ class TestJobApplicationQuerySet:
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_another_employer_on_jobseeker(self):
-        job_application = JobApplicationFactory(sent_by_company=True, to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(sent_by_employer=True, to_company__subject_to_iae_rules=True)
         IAEEligibilityDiagnosisFactory(
             from_employer=True,
             job_seeker=job_application.job_seeker,
@@ -731,7 +731,7 @@ class TestJobApplicationQuerySet:
             assert qs.first().jobseeker_geiq_eligibility_diagnosis_id == eligibility_diagnosis.pk
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_a_diagnosis_from_current_employer_on_jobseeker(self):
-        job_application = JobApplicationFactory(sent_by_company=True, to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_employer=True, to_company__kind=CompanyKind.GEIQ)
         eligibility_diagnosis = GEIQEligibilityDiagnosisFactory(
             from_employer=True,
             author_geiq=job_application.sender_company,
@@ -751,7 +751,7 @@ class TestJobApplicationQuerySet:
         assert qs.first().jobseeker_geiq_eligibility_diagnosis_id is None
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_a_diagnosis_from_another_employer_on_jobseeker(self):
-        job_application = JobApplicationFactory(sent_by_company=True, to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_employer=True, to_company__kind=CompanyKind.GEIQ)
         GEIQEligibilityDiagnosisFactory(
             from_employer=True,
             job_seeker=job_application.job_seeker,
@@ -770,7 +770,7 @@ class TestJobApplicationQuerySet:
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_diagnoses_on_jobapp_and_jobseeker(
         self,
     ):
-        job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, sent_by_company=True)
+        job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, sent_by_employer=True)
         assert job_application.geiq_eligibility_diagnosis.author_kind == AuthorKind.GEIQ
 
         GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
@@ -797,7 +797,7 @@ class TestJobApplicationQuerySet:
         self, diagnosis_author, criteria_kinds
     ):
         job_application = JobApplicationFactory(
-            sent_by_company=diagnosis_author == "employer", to_company__kind=CompanyKind.GEIQ
+            sent_by_employer=diagnosis_author == "employer", to_company__kind=CompanyKind.GEIQ
         )
         author_prescriber_organization = (
             PrescriberOrganizationFactory(with_membership=True) if diagnosis_author != "employer" else None
@@ -957,7 +957,7 @@ class TestJobApplicationQuerySet:
 
     def test_with_accepted_at_for_accept_transition(self):
         job_application = JobApplicationFactory(
-            sent_by_company=True,
+            sent_by_employer=True,
             with_iae_eligibility_diagnosis=True,
         )
         job_application.process()
@@ -971,7 +971,7 @@ class TestJobApplicationQuerySet:
 
     def test_with_accepted_at_with_multiple_transitions(self):
         job_application = JobApplicationFactory(
-            sent_by_company=True,
+            sent_by_employer=True,
             with_iae_eligibility_diagnosis=True,
         )
         job_application.process()
@@ -1013,7 +1013,7 @@ class TestJobApplicationQuerySet:
         assert recipients == [employer.email, job_application.job_seeker.email]
 
     def test_with_accepted_at_default_value(self):
-        job_application = JobApplicationFactory(sent_by_company=True)
+        job_application = JobApplicationFactory(sent_by_employer=True)
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
         job_application.process()  # 1 transition but no accept
@@ -1023,7 +1023,7 @@ class TestJobApplicationQuerySet:
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
     def test_with_accepted_at_for_accepted_with_no_transition(self):
-        JobApplicationFactory(sent_by_company=True, state=JobApplicationState.ACCEPTED)
+        JobApplicationFactory(sent_by_employer=True, state=JobApplicationState.ACCEPTED)
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at == job_application.created_at
 
@@ -2042,7 +2042,7 @@ class TestJobApplicationWorkflow:
         when accepting it, then the eligibility diagnosis is linked to it.
         """
         job_application = JobApplicationFactory(
-            sent_by_company=True,
+            sent_by_employer=True,
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
             job_seeker__jobseeker_profile__with_pole_emploi_id=True,
@@ -2590,7 +2590,7 @@ class TestJobApplicationAdminForm:
         ] == form.errors["__all__"]
         job_application.sender_kind = sender_kind
 
-        job_application.sender_company = JobApplicationFactory(sent_by_company=True).sender_company
+        job_application.sender_company = JobApplicationFactory(sent_by_employer=True).sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice inattendue."] == form.errors["__all__"]
@@ -2608,7 +2608,7 @@ class TestJobApplicationAdminForm:
         assert form.is_valid()
 
     def test_applications_sent_by_siae(self):
-        job_application = JobApplicationFactory(sent_by_company=True)
+        job_application = JobApplicationFactory(sent_by_employer=True)
         job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender_company = job_application.sender_company
         sender = job_application.sender
@@ -2675,7 +2675,7 @@ class TestJobApplicationAdminForm:
         assert ["Organisation du prescripteur émettrice manquante."] == form.errors["__all__"]
         job_application.sender_prescriber_organization = sender_prescriber_organization
 
-        job_application.sender_company = JobApplicationFactory(sent_by_company=True).sender_company
+        job_application.sender_company = JobApplicationFactory(sent_by_employer=True).sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice inattendue.", "Données incohérentes pour une candidature prescripteur"] == form.errors[
