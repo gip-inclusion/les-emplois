@@ -20,6 +20,7 @@ from itou.companies.models import SiaeACIConvergencePHC
 from itou.emails.models import Email
 from itou.external_data.models import ExternalDataImport
 from itou.geiq_assessments.models import LabelInfos
+from itou.insertion import models as insertion_models
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.nexus.enums import Service
@@ -106,6 +107,28 @@ def test_all_admin(admin_client, mocker, subtests):
         to_state=JobApplicationState.PROCESSING,
     )
     ActivatedService.objects.create(user=EmployerFactory(), service=Service.PILOTAGE)
+    # Insertion App
+    source = insertion_models.GenericReferenceItem.objects.create(
+        source=insertion_models.GenericReferenceItemSource.DATA_INCLUSION,
+        kind=insertion_models.GenericReferenceItemKind.SOURCE,
+        value="dora",
+        label="DORA",
+    )
+    structure = insertion_models.Structure.objects.create(
+        uid="dora--structure-uid",
+        source=source,
+        siret="12345678900012",
+        name="Structure DORA",
+        updated_on="2000-01-01",
+    )
+    insertion_models.Service.objects.create(
+        uid="dora--service-uid",
+        source=source,
+        structure=structure,
+        name="Service DORA",
+        description="Description service DORA",
+        updated_on="2000-01-01",
+    )
 
     # Call factories that need parameters
     QPVFactory(code="QP093028")

@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     "itou.rdv_insertion",
     "itou.archive",
     "itou.nexus",
+    "itou.insertion",
 ]
 
 MIDDLEWARE = [
@@ -753,7 +754,11 @@ FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"
 
+# DORA
+# ------------------------------------------------------------------------------
 DORA_WWW_BASE_URL = os.getenv("DORA_WWW_BASE_URL", "https://dora.inclusion.gouv.fr")
+DORA_API_BASE_URL = os.getenv("DORA_API_BASE_URL", "https://api.dora.inclusion.gouv.fr")
+DORA_API_TOKEN = os.getenv("DORA_API_TOKEN")
 
 FEATURE_ENABLE_PROCONNECT_SOFT_MFA = os.getenv("FEATURE_ENABLE_PROCONNECT_SOFT_MFA", "True") == "True"
 

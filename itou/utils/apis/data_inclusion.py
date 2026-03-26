@@ -31,9 +31,20 @@ class DataInclusionApiItemsIterator:
 
     def __iter__(self):
         page = self.DEFAULT_PAGE
+        # This is a workaround since data⋅inclusion uses an offset-based pagination
+        # that might change the order and IDs in a page between 2 calls. Fixing it
+        # using cursor pagination or a client-controlled ordering is not on the table
+        # yet; data⋅inclusion might even deprecate these endpoints and use parquet
+        # flat files instead. Anyway, we 'fix' it on the iterator side, making gaps and
+        # duplicates disappear.
+        seen_ids = set()
         while True:
             response = self._client_method(**{**self._params, "page": page, "size": self.page_size})
-            yield from response.items
+            for item in response.items:
+                if item["id"] in seen_ids:
+                    continue  # duplicate detected between 2 pages
+                seen_ids.add(item["id"])
+                yield item
             if response.page >= response.pages:
                 break
             page += 1

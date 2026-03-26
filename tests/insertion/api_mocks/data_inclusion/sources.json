@@ -1,0 +1,77 @@
+[
+  {
+    "slug": "action-logement",
+    "nom": "Action Logement",
+    "description": "Aides et solutions pour accompagner les salari\u00e9s dans leur parcours logement. Contient les services propos\u00e9s par les structures d\u2019Action Logement sur tout le territoire."
+  },
+  {
+    "slug": "agefiph",
+    "nom": "AGEFIPH",
+    "description": "Association charg\u00e9e de soutenir le d\u00e9veloppement de l\u2019emploi des personnes handicap\u00e9es. Contient leur offre de service nationale."
+  },
+  {
+    "slug": "cd35",
+    "nom": "Annuaire social d\u2019Ille-et-Vilaine",
+    "description": "Contient les structures et services inclusifs du d\u00e9partement de l\u2019Ille-et-Vilaine."
+  },
+  {
+    "slug": "dora",
+    "nom": "DORA",
+    "description": "Service public num\u00e9rique de recensement de l\u2019offre d\u2019insertion d\u00e9velopp\u00e9 par la Plateforme de l\u2019inclusion. Contient leurs structures et services inclusifs sur de nombreuses th\u00e9matiques."
+  },
+  {
+    "slug": "emplois-de-linclusion",
+    "nom": "Emplois de l\u2019inclusion",
+    "description": "Service public num\u00e9rique de mise en relation entre employeurs solidaires et accompagnateurs. Contient les structures employeuses et accompagnatrices dans le domaine de l\u2019insertion par l\u2019activit\u00e9 \u00e9conomique (IAE)."
+  },
+  {
+    "slug": "france-travail",
+    "nom": "Offre nationale de services de France Travail",
+    "description": "Contient l\u2019offre de service nationale de France Travail."
+  },
+  {
+    "slug": "mission-locale",
+    "nom": "Mission Locale",
+    "description": "La Mission Locale accompagne les jeunes de 16 \u00e0 25 ans dans leurs d\u00e9marches d\u2019insertion sociale et professionnelle en d\u00e9veloppant une approche globale et de proximit\u00e9."
+  },
+  {
+    "slug": "mediation-numerique",
+    "nom": "Cartographie Nationale des lieux de m\u00e9diation num\u00e9rique",
+    "description": "Contient les lieux d\u2019inclusion num\u00e9riques recens\u00e9s par l\u2019ANCT et les hubs r\u00e9gionaux."
+  },
+  {
+    "slug": "mes-aides",
+    "nom": "Mes Aides France Travail",
+    "description": "Service num\u00e9rique public d\u00e9velopp\u00e9 par France Travail. Contient leurs structures et services inclusifs sur la th\u00e9matique Mobilit\u00e9."
+  },
+  {
+    "slug": "monenfant",
+    "nom": "Monenfant.fr",
+    "description": "Service num\u00e9rique public d\u00e9velopp\u00e9 par la Caisse Nationale des Allocations Familiales. Contient leurs structures et services inclusifs sur la th\u00e9matique Famille."
+  },
+  {
+    "slug": "reseau-alpha",
+    "nom": "R\u00e9seau Alpha",
+    "description": "Association r\u00e9f\u00e9ren\u00e7ant l\u2019offre d\u2019apprentissage du fran\u00e7ais en \u00cele-de-France. Contient leurs structures et services inclusifs sur la th\u00e9matique Apprendre le Fran\u00e7ais."
+  },
+  {
+    "slug": "soliguide",
+    "nom": "Soliguide",
+    "description": "Service num\u00e9rique de recensement de l\u2019offre d\u2019insertion d\u00e9velopp\u00e9 par l\u2019association Solinum. Contient leurs structures et services sur des th\u00e9matiques vari\u00e9es d\u2019urgence sociale."
+  },
+  {
+    "slug": "fredo",
+    "nom": "Fredo",
+    "description": "Fredo est un outil diagnostique terrain pour les travailleurs sociaux. Il permet de mettre en relation les b\u00e9n\u00e9ficiaires diagnostiqu\u00e9s et les structures d'accompagnements gr\u00e2ce \u00e0 une personne ressource."
+  },
+  {
+    "slug": "carif-oref",
+    "nom": "R\u00e9seau des CARIF OREF",
+    "description": "Association qui accompagne les acteurs de l\u2019emploi, de la formation et de l\u2019orientation. Contient l\u2019offre de formation FLE et Illettrisme nationale r\u00e9f\u00e9renc\u00e9e par RCO."
+  },
+  {
+    "slug": "ma-boussole-aidants",
+    "nom": "Ma Boussole Aidants",
+    "description": "\u201cMa Boussole Aidants est une coop\u00e9rative port\u00e9e par la F\u00e9d\u00e9ration Agirc-Arrco d\u00e9di\u00e9e \u00e0 l\u2019accompagnement des aidants. Contient les CCAS, CIAS, MDS et MDA ainsi que leur offre de service pour les aidants."
+  }
+]
