@@ -13,11 +13,9 @@ from itou.gps.management.commands import sync_follow_up_groups_and_members
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
-from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
-from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -46,9 +44,8 @@ class TestSyncGroupsManagementCommand:
         # A job app sent by the employer (we don't check if it's sent to the employer company or another)
         job_app_1 = JobApplicationFactory(
             job_seeker=beneficiary,
+            sent_by_company=True,
             sender=employer,
-            sender_kind=UserKind.EMPLOYER,
-            sender_company=CompanyFactory(),
         )
         geiq_diag_1 = GEIQEligibilityDiagnosisFactory(
             job_seeker=beneficiary,

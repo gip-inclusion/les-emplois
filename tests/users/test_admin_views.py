@@ -1,4 +1,5 @@
 import random
+from functools import partial
 
 import pytest
 from allauth.account.models import EmailAddress
@@ -21,7 +22,6 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByCompanyFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
@@ -235,7 +235,7 @@ class TestTransferUserData:
         "factory",
         [
             JobApplicationSentByJobSeekerFactory,
-            JobApplicationSentByCompanyFactory,
+            partial(JobApplicationFactory, sent_by_company=True),
             JobApplicationSentByPrescriberFactory,
         ],
     )

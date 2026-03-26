@@ -15,7 +15,6 @@ from itou.www.apply.views.list_views import JobApplicationOrder, JobApplications
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByCompanyFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
@@ -27,7 +26,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 def test_list_for_job_seeker(client):
     job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
-    JobApplicationSentByCompanyFactory(job_seeker=job_seeker)
+    JobApplicationFactory(sent_by_company=True, job_seeker=job_seeker)
     JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
     client.force_login(job_seeker)
 
@@ -37,7 +36,7 @@ def test_list_for_job_seeker(client):
 
 def test_list_for_job_seeker_queries(client, snapshot):
     job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
-    JobApplicationSentByCompanyFactory(job_seeker=job_seeker)
+    JobApplicationFactory(sent_by_company=True, job_seeker=job_seeker)
     JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
     client.force_login(job_seeker)
 

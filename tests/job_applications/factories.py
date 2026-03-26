@@ -223,16 +223,6 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
         )
 
 
-class JobApplicationSentByCompanyFactory(JobApplicationFactory):
-    """Generates a JobApplication() object sent by a company."""
-
-    sender_kind = SenderKind.EMPLOYER
-    # Currently a company can only postulate for itself,
-    # this is the default behavior here.
-    sender_company = factory.SelfAttribute("to_company")
-    sender = factory.LazyAttribute(lambda obj: obj.to_company.members.first())
-
-
 class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber."""
 
