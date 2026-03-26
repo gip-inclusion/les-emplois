@@ -48,7 +48,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.files.factories import FileFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalNotCancellableFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
@@ -557,9 +557,9 @@ class TestJobApplicationQuerySet:
 
     def test_get_unique_fk_objects(self):
         # Create 3 job applications and 3 approvals for 2 candidates
-        JobApplicationWithApprovalNotCancellableFactory()
+        JobApplicationFactory(with_approval=True)
         approval = ApprovalFactory(expired=True)
-        JobApplicationWithApprovalNotCancellableFactory(job_seeker=approval.user)
+        JobApplicationFactory(with_approval=True, job_seeker=approval.user)
         JobApplicationFactory(sent_by_job_seeker=True, job_seeker=approval.user)
 
         unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")

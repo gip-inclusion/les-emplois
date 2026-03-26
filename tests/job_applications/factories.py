@@ -217,19 +217,14 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
     )
 
 
-class JobApplicationWithApprovalNotCancellableFactory(JobApplicationFactory):
-    with_approval = True
-    hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date() - relativedelta(days=5))
-    hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2, days=-5))
-
-
-class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):
+class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationFactory):
     """
     This job application has a jobseeker with a COMPLETE job seeker profile
 
     Suitable for employee records tests
     """
 
+    with_approval = True
     job_seeker = factory.SubFactory(
         JobSeekerFactory,
         with_mocked_address=True,

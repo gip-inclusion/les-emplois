@@ -11,11 +11,7 @@ from itou.employee_record.models import (
     EmployeeRecordTransitionLog,
     EmployeeRecordUpdateNotification,
 )
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationWithApprovalNotCancellableFactory,
-    JobApplicationWithCompleteJobSeekerProfileFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
@@ -42,7 +38,7 @@ class EmployeeRecordFactory(AutoNowOverrideMixin, BareEmployeeRecordFactory):
     """
 
     job_application = factory.SubFactory(
-        JobApplicationWithApprovalNotCancellableFactory, to_company__use_employee_record=True
+        JobApplicationFactory, with_approval=True, to_company__use_employee_record=True
     )
     asp_id = factory.SelfAttribute(".job_application.to_company.convention.asp_id")
     asp_measure = factory.LazyAttribute(
