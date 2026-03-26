@@ -1,0 +1,12 @@
+[
+  {
+    "value": "professionnels",
+    "label": "Professionnels",
+    "description": "Service mobilisable par les professionnels de l\u2019insertion."
+  },
+  {
+    "value": "usagers",
+    "label": "Usagers",
+    "description": "Service mobilisable par les usagers."
+  }
+]
