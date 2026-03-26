@@ -39,7 +39,6 @@ from tests.employee_record.factories import (
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.users.factories import EmployerFactory
@@ -52,7 +51,7 @@ class TestEmployeeRecordModel:
         with pytest.raises(ValidationError):
             # If the job seeker has no title (optional by default),
             # Then the job seeker profile must not be valid
-            job_application = JobApplicationWithApprovalNotCancellableFactory()
+            job_application = JobApplicationFactory(with_approval=True)
             job_application.job_seeker.title = None
             EmployeeRecord.from_job_application(job_application)
 
@@ -132,7 +131,7 @@ class TestEmployeeRecordModel:
         - geoloc issues (no API mock on this test)
         """
         # Complete profile, but geoloc API not reachable
-        job_application = JobApplicationWithApprovalNotCancellableFactory()
+        job_application = JobApplicationFactory(with_approval=True)
 
         with pytest.raises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)

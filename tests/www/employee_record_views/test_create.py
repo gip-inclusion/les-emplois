@@ -27,7 +27,7 @@ from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
-from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -77,7 +77,8 @@ class CreateEmployeeRecordTestMixin:
         self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
         self.user_siae_bad_kind = self.company_bad_kind.members.get(first_name="Barracus")
 
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
+        self.job_application = JobApplicationFactory(
+            with_approval=True,
             to_company=self.company,
             job_seeker__with_mocked_address=True,
             job_seeker__born_in_france=True,
@@ -602,7 +603,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_job_seeker_without_address(self, client):
         # Job seeker has no address filled (which should not happen without an admin operation)
-        job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
+        job_application = JobApplicationFactory(with_approval=True, to_company=self.company)
 
         response = client.get(reverse(self.URL_NAME, args=(job_application.pk,)))
 
@@ -612,7 +613,8 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_job_seeker_with_hexa_address(self, client):
         # Job seeker has already an address filled
-        job_application = JobApplicationWithApprovalNotCancellableFactory(
+        job_application = JobApplicationFactory(
+            with_approval=True,
             to_company=self.company,
             job_seeker__jobseeker_profile__with_hexa_address=True,
         )
@@ -635,7 +637,8 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
             for_snapshot=True,
             with_mocked_address=BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
         )
-        job_application = JobApplicationWithApprovalNotCancellableFactory(
+        job_application = JobApplicationFactory(
+            with_approval=True,
             to_company=self.company,
             job_seeker=job_seeker,
         )
@@ -683,7 +686,8 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_job_seeker_address_not_geolocated(self, client):
         # Job seeker has an address filled but can't be geolocated
-        job_application = JobApplicationWithApprovalNotCancellableFactory(
+        job_application = JobApplicationFactory(
+            with_approval=True,
             to_company=self.company,
             job_seeker=JobSeekerFactory(with_address=True),
         )
@@ -987,7 +991,8 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         # Incorrect context:
         # create another employee record with similar features
-        dup_job_application = JobApplicationWithApprovalNotCancellableFactory(
+        dup_job_application = JobApplicationFactory(
+            with_approval=True,
             to_company=self.company,
             job_seeker=self.job_seeker,
             approval=self.job_application.approval,
