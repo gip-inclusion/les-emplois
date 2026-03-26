@@ -44,7 +44,29 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         skip_postgeneration_save = True
 
     class Params:
-        # IAE
+        # Sender ------------------------------------------------------------------------------------------------------
+        sent_by_job_seeker = factory.Trait(
+            sender_kind=SenderKind.JOB_SEEKER,
+            sender=factory.LazyAttribute(lambda obj: obj.job_seeker),
+        )
+        sent_by_authorized_prescriber_organisation = factory.Trait(
+            sender_prescriber_organization=factory.SubFactory(
+                PrescriberOrganizationFactory, authorized=True, with_membership=True
+            ),
+            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
+            sender_kind=SenderKind.PRESCRIBER,
+        )
+        sent_by_company = factory.Trait(
+            sender_kind=SenderKind.EMPLOYER,
+            sender_company=factory.SelfAttribute("to_company"),
+            sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
+        )
+        sent_by_another_employer = factory.Trait(
+            sender_kind=SenderKind.EMPLOYER,
+            sender_company=factory.SubFactory(CompanyFactory, with_membership=True),
+            sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
+        )
+        # IAE ---------------------------------------------------------------------------------------------------------
         with_iae_eligibility_diagnosis = factory.Trait(
             eligibility_diagnosis=factory.SubFactory(
                 IAEEligibilityDiagnosisFactory,
@@ -65,7 +87,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 ),
             ),
         )
-        # GEIQ diagnosis created by a GEIQ
+        # GEIQ --------------------------------------------------------------------------------------------------------
         with_geiq_eligibility_diagnosis = factory.Trait(
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
@@ -90,23 +112,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 ),
             ),
         )
-        sent_by_authorized_prescriber_organisation = factory.Trait(
-            sender_prescriber_organization=factory.SubFactory(
-                PrescriberOrganizationFactory, authorized=True, with_membership=True
-            ),
-            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
-            sender_kind=SenderKind.PRESCRIBER,
-        )
-        sent_by_company = factory.Trait(
-            sender_kind=SenderKind.EMPLOYER,
-            sender_company=factory.SelfAttribute("to_company"),
-            sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
-        )
-        sent_by_another_employer = factory.Trait(
-            sender_kind=SenderKind.EMPLOYER,
-            sender_company=factory.SubFactory(CompanyFactory, with_membership=True),
-            sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
-        )
         was_hired = factory.Trait(
             state=JobApplicationState.ACCEPTED,
             to_company__with_jobs=True,
@@ -119,10 +124,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender__for_snapshot=True,
             job_seeker__for_snapshot=True,
             approval__for_snapshot=True,
-        )
-        sent_by_job_seeker = factory.Trait(
-            sender_kind=SenderKind.JOB_SEEKER,
-            sender=factory.LazyAttribute(lambda obj: obj.job_seeker),
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
