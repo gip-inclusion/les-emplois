@@ -37,7 +37,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.users.perms import can_prefill_orientation_on_dora
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV1Client
+from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
@@ -446,7 +446,7 @@ def search_services_results(request, template_name="search/services/results.html
         cache_key = f"data_inclusion_api_results:search:{search_query_hash}"
         cached_data = caches["failsafe"].get(cache_key)
         if cached_data is None:
-            client = DataInclusionApiV1Client(
+            client = DataInclusionApiClient(
                 global_constants.API_DATA_INCLUSION_BASE_URL,
                 settings.API_DATA_INCLUSION_TOKEN,
             )
