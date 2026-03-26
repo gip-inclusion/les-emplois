@@ -329,7 +329,7 @@ def test_sender_constraints(factory, constraint_name):
     "job_application_factory",
     [
         partial(JobApplicationFactory, sent_by_employer=True),
-        JobApplicationSentByPrescriberFactory,
+        partial(JobApplicationFactory, sent_by_prescriber=True),
         partial(JobApplicationFactory, sent_by_job_seeker=True),
     ],
 )
