@@ -62,9 +62,8 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
         )
         sent_by_another_employer = factory.Trait(
-            sender_kind=SenderKind.EMPLOYER,
+            sent_by_company=True,
             sender_company=factory.SubFactory(CompanyFactory, with_membership=True),
-            sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
         )
         # IAE ---------------------------------------------------------------------------------------------------------
         with_iae_eligibility_diagnosis = factory.Trait(
