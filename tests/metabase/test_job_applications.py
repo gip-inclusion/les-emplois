@@ -1,10 +1,7 @@
 from itou.job_applications.enums import RefusalReason
 from itou.metabase.tables.job_applications import TABLE
 from itou.prescribers.enums import PrescriberOrganizationKind
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberPoleEmploiFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
 
 
 def test_refusal_reason_old_value():
@@ -25,7 +22,10 @@ def test_refusal_reason_empty_value():
 
 
 def test_ja_sent_by_pe():
-    ja = JobApplicationSentByPrescriberPoleEmploiFactory()
+    ja = JobApplicationFactory(
+        sent_by_authorized_prescriber=True,
+        sender_prescriber_organization__france_travail=True,
+    )
     assert (
         TABLE.get(column_name="nom_prénom_conseiller", input=ja)
         == f"{ja.sender.last_name.upper()} {ja.sender.first_name}"
