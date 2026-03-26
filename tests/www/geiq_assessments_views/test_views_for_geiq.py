@@ -1652,3 +1652,52 @@ class TestAssessmentContractsListView:
             assertContains(response, self.RESET_BTN_LABEL)
         else:
             assertNotContains(response, self.RESET_BTN_LABEL)
+
+    def test_all_filters_btn_counter(self, client):
+        response = client.get(self.url)
+        assertNotContains(response, "(1)")
+
+        response = client.get(self.url, {"start_date_lower": "2023-01-01"})
+        assertContains(response, "(1)")
+
+        response = client.get(self.url, {"start_date_lower": "2023-01-01", "duration_longer_or_equal_90": "on"})
+        assertContains(response, "(2)")
+
+    def test_all_filters_btn_counter_htmx_update(self, client):
+        filter_data = {"start_date_lower": "2023-01-01"}
+        response_full = client.get(self.url, filter_data)
+        response_initial = client.get(self.url)
+        simulated_page = parse_response_to_soup(response_initial, selector="body")
+
+        response_htmx = client.get(self.url, filter_data, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
+
+        assertSoupEqual(
+            simulated_page.select_one("#filter-container"),
+            parse_response_to_soup(response_full, selector="#filter-container"),
+        )
+
+    def test_all_filters_btn_counter_resets_to_zero(self, client):
+        response = client.get(self.url, {"start_date_lower": "2023-01-01"})
+        assertContains(response, "(1)")
+
+        response = client.get(self.url)
+        assertNotContains(response, "(1)")
+
+    def test_all_filters_btn_htmx_consistency_combined_filters(self, client):
+        filter_data = {
+            "start_date_lower": "2023-01-01",
+            "start_date_upper": "2023-12-31",
+            "duration_longer_or_equal_90": "on",
+        }
+        response_full = client.get(self.url, filter_data)
+        response_initial = client.get(self.url)
+        simulated_page = parse_response_to_soup(response_initial, selector="body")
+
+        response_htmx = client.get(self.url, filter_data, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, "#filter-container", response_htmx)
+
+        assertSoupEqual(
+            simulated_page.select_one("#all-filters-btn-container"),
+            parse_response_to_soup(response_full, selector="#all-filters-btn-container"),
+        )
