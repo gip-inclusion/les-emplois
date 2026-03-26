@@ -39,7 +39,6 @@ from tests.employee_record.factories import (
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByCompanyFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
@@ -331,7 +330,7 @@ class TestEmployeeRecordModel:
             "07",
             id="JobApplicationSentByJobSeekerFactory-07",
         ),
-        (JobApplicationSentByCompanyFactory, "07"),
+        (functools.partial(JobApplicationFactory, sent_by_company=True), "07"),
         (JobApplicationSentByPrescriberFactory, "08"),
         (JobApplicationSentByPrescriberOrganizationFactory, "08"),
     ],
