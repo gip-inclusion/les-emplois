@@ -33,9 +33,11 @@
                         {% endfragment %}
                     {% endcomponent_info %}
                     {% if not accredited_orgs %}
-                        <div class="alert alert-info" role="status">
-                            <p class="mb-0">Aucun résultat.</p>
-                        </div>
+                        {% component_alert content=content variant="info" icon=False %}
+                            {% fragment as content %}
+                                <p class="mb-0">Aucun résultat.</p>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
                     {% else %}
                         <ul>
                             {% for org in accredited_orgs %}
