@@ -17,7 +17,6 @@ from django.utils import formats, timezone
 from django.views.decorators.http import require_POST
 from django_xworkflows import models as xwf_models
 
-from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import (
@@ -632,7 +631,6 @@ def delete_prior_action(request, job_application_id, prior_action_id):
             context={
                 "job_application": job_application,
                 "transition_logs": job_application.logs.select_related("user").all(),
-                "geiq_eligibility_diagnosis": job_application.get_geiq_eligibility_diagnosis(),
             }
             | get_siae_actions_context(request, job_application),
             request=request,
@@ -697,9 +695,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     job_application.move_to_prior_to_hire(user=request.user)
                     state_update = True
             form.save()
-            geiq_eligibility_diagnosis = None
-            if state_update and job_application.to_company.kind == CompanyKind.GEIQ:
-                geiq_eligibility_diagnosis = job_application.get_geiq_eligibility_diagnosis()
             return render(
                 request,
                 "apply/includes/job_application_prior_action.html",
@@ -711,7 +706,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     # If out-of-band changes are needed
                     "with_oob_state_update": state_update,
                     "transition_logs": job_application.logs.select_related("user").all() if state_update else None,
-                    "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
                 }
                 | get_siae_actions_context(request, job_application),
             )
