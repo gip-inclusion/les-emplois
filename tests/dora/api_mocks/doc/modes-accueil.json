@@ -1,0 +1,12 @@
+[
+  {
+    "value": "a-distance",
+    "label": "\u00c0 distance",
+    "description": "Le service est propos\u00e9 \u00e0 distance, par t\u00e9l\u00e9phone ou internet."
+  },
+  {
+    "value": "en-presentiel",
+    "label": "En pr\u00e9sentiel",
+    "description": "Le service est propos\u00e9 en pr\u00e9sentiel, \u00e0 l\u2019adresse associ\u00e9e \u00e0 ce service."
+  }
+]

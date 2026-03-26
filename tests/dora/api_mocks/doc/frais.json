@@ -1,0 +1,12 @@
+[
+  {
+    "value": "gratuit",
+    "label": "Gratuit",
+    "description": "L\u2019acc\u00e8s au lieu et/ou \u00e0 ses services est gratuit"
+  },
+  {
+    "value": "payant",
+    "label": "Payant",
+    "description": "L\u2019acc\u00e8s au lieu et/ou \u00e0 ses services est payant"
+  }
+]
