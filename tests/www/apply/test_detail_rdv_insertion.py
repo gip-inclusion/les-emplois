@@ -53,7 +53,7 @@ class TestRdvInsertionAppointmentsList:
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             for_snapshot=True,
         )
         self.participation = ParticipationFactory(
@@ -344,7 +344,7 @@ class TestRdvInsertionInvitationRequestsList:
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             for_snapshot=True,
         )
         self.invitation_request = InvitationRequestFactory(

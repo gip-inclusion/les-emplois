@@ -374,7 +374,7 @@ def test_job_application_tab(client, snapshot):
     )
     job_application_1 = JobApplicationFactory(
         for_snapshot=True,
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         sender_prescriber_organization=prescriber_membership.organization,
         sender=prescriber_membership.user,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
@@ -384,7 +384,7 @@ def test_job_application_tab(client, snapshot):
         pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
         job_seeker=job_application_1.job_seeker,
         to_company__name="Autre Entreprise",
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         sender_prescriber_organization=prescriber_membership.organization,
         sender=prescriber_membership.user,
         with_job_seeker_assignment=True,
@@ -584,7 +584,7 @@ def test_job_application_tab_shows_external_application_to_authorized_prescriber
     )
     job_application_1 = JobApplicationFactory(
         for_snapshot=True,
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         sender_prescriber_organization=prescriber_membership.organization,
         sender=prescriber_membership.user,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
@@ -661,7 +661,7 @@ class TestCanSeeExternalJobApplication(TestCase):
         # Only application is by another organization => not authorized
         _another_org_application = JobApplicationFactory(
             job_seeker=self.job_seeker,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             with_job_seeker_assignment=True,
         )
         assert not can_see_external_job_applications(self.job_seeker, request)
@@ -669,7 +669,7 @@ class TestCanSeeExternalJobApplication(TestCase):
         # Own application, but too old => not authorized
         _too_old_application = JobApplicationFactory(
             job_seeker=self.job_seeker,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             sender_prescriber_organization=org,
             created_at=timezone.localtime() - datetime.timedelta(days=500),
             with_job_seeker_assignment=True,
@@ -679,7 +679,7 @@ class TestCanSeeExternalJobApplication(TestCase):
         # Own application is recent enough => authorized
         recent_application = JobApplicationFactory(
             job_seeker=self.job_seeker,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             sender_prescriber_organization=org,
             created_at=timezone.localtime() - datetime.timedelta(days=1),
         )

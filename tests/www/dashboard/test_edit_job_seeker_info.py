@@ -285,7 +285,7 @@ class TestEditJobSeekerInfo:
 
     def test_edit_by_prescriber(self, client, snapshot):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker__born_in_france=True,
         )
         user = job_application.sender
@@ -303,7 +303,7 @@ class TestEditJobSeekerInfo:
         assert response.status_code == 200
 
     def test_edit_by_prescriber_of_organization(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         prescriber = job_application.sender
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -521,7 +521,7 @@ class TestEditJobSeekerInfo:
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
     def test_edit_no_address_does_not_crash(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         user = job_application.sender
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).

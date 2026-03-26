@@ -57,7 +57,7 @@ class TestJobApplicationSearchApi:
 
         self.job_application = JobApplicationFactory(
             job_seeker=self.job_seeker_1,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             with_approval=True,
             was_hired=True,
         )
@@ -172,7 +172,7 @@ class TestJobApplicationSearchApi:
     def test_serialized_data(self, api_client, snapshot, mocker):
         api_client.force_authenticate(ServiceAccount(), self.token)
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             with_approval=True,
             was_hired=True,
             for_snapshot=True,

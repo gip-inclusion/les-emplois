@@ -103,7 +103,7 @@ class TestJobApplicationModel:
 
     def test_accepted_by(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
         )
@@ -113,7 +113,7 @@ class TestJobApplicationModel:
 
     def test_refused_by(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         user = job_application.to_company.members.first()
         job_application.refuse(user=user)
@@ -121,7 +121,7 @@ class TestJobApplicationModel:
 
     def test_refused_by_without_user(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         job_application.refuse(user=None)
         assert job_application.refused_by is None
@@ -138,7 +138,7 @@ class TestJobApplicationModel:
         job_application = JobApplicationFactory(sent_by_company=True)
         assert not job_application.is_sent_by_authorized_prescriber
 
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         assert job_application.is_sent_by_authorized_prescriber
 
     def test_is_refused_for_other_reason(self, subtests):
@@ -162,7 +162,7 @@ class TestJobApplicationModel:
             for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]
         ]
         items = [
-            [JobApplicationFactory(sent_by_authorized_prescriber_organisation=True), "Prescripteur"],
+            [JobApplicationFactory(sent_by_authorized_prescriber=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
             [JobApplicationFactory(sent_by_company=True), "Employeur"],
             [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
@@ -189,7 +189,7 @@ class TestJobApplicationModel:
 
     def test_accept_follow_up_group(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
         )
@@ -603,7 +603,7 @@ class TestJobApplicationQuerySet:
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_prescriber_on_jobseeker(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
         )
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
@@ -718,7 +718,7 @@ class TestJobApplicationQuerySet:
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_a_diagnosis_from_the_prescriber_on_jobseeker(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company__kind=CompanyKind.GEIQ,
         )
         eligibility_diagnosis = GEIQEligibilityDiagnosisFactory(
@@ -996,7 +996,7 @@ class TestJobApplicationQuerySet:
 
     def test_accept_without_sender(self, django_capture_on_commit_callbacks, mailoutbox):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             with_iae_eligibility_diagnosis=True,
         )
         job_application.process()
@@ -1094,7 +1094,7 @@ class TestJobApplicationNotifications:
 
     def test_new_for_company(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             selected_jobs=Appellation.objects.all(),
         )
         employer = job_application.to_company.members.first()
@@ -1123,7 +1123,7 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_new_for_prescriber(self, is_authorized_prescriber):
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
@@ -1209,7 +1209,7 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_accept_for_prescriber(self, is_authorized_prescriber):
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
@@ -1239,13 +1239,13 @@ class TestJobApplicationNotifications:
             assert job_application.sender_prescriber_organization.accept_survey_url in email.body
 
     def test_accept_for_proxy_without_hiring_end_at(self):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, hiring_end_at=None)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True, hiring_end_at=None)
         email = job_application.notifications_accept_for_proxy.build()
         assert "Date de fin du contrat : Non renseigné" in email.body
 
     def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.ACCEPTED,
             hiring_start_at=timezone.localdate(),
         )
@@ -1272,7 +1272,7 @@ class TestJobApplicationNotifications:
 
     def test_accept_trigger_manual_approval_without_hiring_end_at(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.ACCEPTED,
             hiring_start_at=timezone.localdate(),
             hiring_end_at=None,
@@ -1293,7 +1293,7 @@ class TestJobApplicationNotifications:
             }
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=authorized_prescriber,
+            sent_by_authorized_prescriber=authorized_prescriber,
             refusal_reason_shared_with_job_seeker=is_shared_with_job_seeker,
             refusal_reason=RefusalReason.DID_NOT_COME_TO_INTERVIEW,
             answer="Pas venu",
@@ -1317,7 +1317,7 @@ class TestJobApplicationNotifications:
     def test_refuse_without_sender(self, django_capture_on_commit_callbacks, mailoutbox):
         # When sent by authorized prescriber.
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
         )
@@ -1353,7 +1353,7 @@ class TestJobApplicationNotifications:
         self, refusal_reason, expected, django_capture_on_commit_callbacks, mailoutbox
     ):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             refusal_reason=refusal_reason,
         )
         with django_capture_on_commit_callbacks(execute=True):
@@ -1371,7 +1371,7 @@ class TestJobApplicationNotifications:
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
             approval=approval,
@@ -1405,7 +1405,7 @@ class TestJobApplicationNotifications:
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
             approval=approval,
@@ -1445,7 +1445,7 @@ class TestJobApplicationNotifications:
         )
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             approval=approval,
@@ -1470,7 +1470,7 @@ class TestJobApplicationNotifications:
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
@@ -1488,7 +1488,7 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_cancel_sent_by_prescriber(self, is_authorized_prescriber, django_capture_on_commit_callbacks, mailoutbox):
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
 
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
@@ -1532,7 +1532,7 @@ class TestJobApplicationNotifications:
 
     def test_for_proxy_notification(self, subtests):
         employer_job_app = JobApplicationFactory(sent_by_another_employer=True)
-        prescriber_job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        prescriber_job_app = JobApplicationFactory(sent_by_authorized_prescriber=True)
 
         for transition in ["cancel", "postpone", "refuse", "new", "accept"]:
             with subtests.test(transition):
@@ -1563,9 +1563,7 @@ class TestJobApplicationNotifications:
         assert job_application.job_seeker.get_inverted_full_name() in mailoutbox[0].body
 
     def test_cancel_without_sender(self, django_capture_on_commit_callbacks, mailoutbox):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.ACCEPTED
-        )
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True, state=JobApplicationState.ACCEPTED)
         # User account is deleted.
         job_application.sender = None
         job_application.save(update_fields=["sender", "updated_at"])
@@ -1855,7 +1853,7 @@ class TestJobApplicationWorkflow:
         Accept a job application sent by an authorized prescriber.
         """
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             with_iae_eligibility_diagnosis=True,
@@ -1902,7 +1900,7 @@ class TestJobApplicationWorkflow:
         )
         assert approval.is_in_waiting_period
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker=user,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
@@ -2021,7 +2019,7 @@ class TestJobApplicationWorkflow:
         No approval should be delivered for an employer not subject to eligibility rules.
         """
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )

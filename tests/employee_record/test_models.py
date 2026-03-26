@@ -380,7 +380,7 @@ def test_asp_prescriber_type_for_other_sender(factory, expected):
 )
 def test_asp_prescriber_type_for_authorized_organization(kind, expected):
     employee_record = EmployeeRecordFactory(
-        job_application__sent_by_authorized_prescriber_organisation=True,
+        job_application__sent_by_authorized_prescriber=True,
         job_application__sender_prescriber_organization__kind=kind,
     )
     assert employee_record.asp_prescriber_type == expected

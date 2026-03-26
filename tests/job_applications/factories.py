@@ -54,7 +54,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
         )
-        sent_by_authorized_prescriber_organisation = factory.Trait(
+        sent_by_authorized_prescriber = factory.Trait(
             sent_by_prescriber=True,
             sender_prescriber_organization__authorized=True,
         )
@@ -101,7 +101,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             ),
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,

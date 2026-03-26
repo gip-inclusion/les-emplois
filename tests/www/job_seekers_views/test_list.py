@@ -180,7 +180,7 @@ def test_multiple(client, snapshot):
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
         job_seeker__jobseeker_profile__is_stalled=True,
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
         with_iae_eligibility_diagnosis=True,
     )
@@ -317,7 +317,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     JobApplicationFactory(
         job_seeker=alain,
         sender=prescriber,
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
         with_iae_eligibility_diagnosis=True,
     )

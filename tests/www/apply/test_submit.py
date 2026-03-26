@@ -3190,7 +3190,7 @@ class TestApplicationEndView:
         assertContains(response, expected_html, html=True)
 
     def test_wo_phone_number_as_prescriber(self, client):
-        application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, job_seeker__phone="")
+        application = JobApplicationFactory(sent_by_authorized_prescriber=True, job_seeker__phone="")
         expected_html = (
             '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
             "la prise de contact avec le candidat.</p>"

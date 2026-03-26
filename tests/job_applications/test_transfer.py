@@ -83,7 +83,7 @@ def test_transfer():
 
     job_application = JobApplicationFactory(
         to_company=origin_company,
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=JobApplicationState.ACCEPTED,
         with_iae_eligibility_diagnosis=True,
     )
@@ -133,7 +133,7 @@ def test_transfer_to_without_sender():
 
     job_application = JobApplicationFactory(
         to_company=origin_company,
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=JobApplicationState.PROCESSING,
     )
     # Sender user account is deleted.
@@ -251,7 +251,7 @@ def test_transfer_must_notify_unauthorized_prescriber(
     target_company.members.add(origin_user)
 
     # Unauthorized prescriber is the default sender
-    extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+    extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
     job_application = JobApplicationFactory(
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",

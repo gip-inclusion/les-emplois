@@ -33,7 +33,7 @@ def test_missing_job_seeker_info(client):
 @pytest.mark.parametrize(
     "factory,assertion",
     [
-        (partial(JobApplicationFactory, sent_by_authorized_prescriber_organisation=True), assertContains),
+        (partial(JobApplicationFactory, sent_by_authorized_prescriber=True), assertContains),
         (partial(JobApplicationFactory, sent_by_prescriber=True), assertContains),
         (partial(JobApplicationFactory, sent_by_another_employer=True), assertNotContains),
     ],
@@ -54,7 +54,7 @@ def test_hide_old_applications_to_employers(client, subtests):
     hidden_application = JobApplicationFactory(
         to_company=company,
         created_at=timezone.now() - timezone.timedelta(days=365 * 2),
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=random.choice(list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})),
     )
     job_seeker = hidden_application.job_seeker
@@ -67,7 +67,7 @@ def test_hide_old_applications_to_employers(client, subtests):
             job_seeker=job_seeker,
             to_company=company,
             created_at=timezone.now() - timezone.timedelta(days=365 * 2 - 1),
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             sender=prescriber,
             sender_prescriber_organization=prescriber_organization,
             state=random.choice(list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})),
@@ -77,7 +77,7 @@ def test_hide_old_applications_to_employers(client, subtests):
             job_seeker=job_seeker,
             to_company=company,
             created_at=timezone.now() - timezone.timedelta(days=365 * 2 + 1),
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             sender=prescriber,
             sender_prescriber_organization=prescriber_organization,
             state=JobApplicationState.ACCEPTED,

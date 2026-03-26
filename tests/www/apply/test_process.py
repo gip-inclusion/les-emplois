@@ -170,9 +170,7 @@ class TestProcessViews:
     def test_details_for_company_from_approval(self, client, snapshot):
         """Display the details of a job application coming from the approval detail page."""
 
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, resume=None, with_approval=True
-        )
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True, resume=None, with_approval=True)
         company = job_application.to_company
         employer = company.members.first()
         client.force_login(employer)
@@ -256,7 +254,7 @@ class TestProcessViews:
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=criterion.eligibility_diagnosis,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             resume=None,
             with_approval=True,
         )
@@ -347,7 +345,7 @@ class TestProcessViews:
                     job_seeker=approval.user,
                     approval=approval,
                     to_company=company,
-                    sent_by_authorized_prescriber_organisation=True,
+                    sent_by_authorized_prescriber=True,
                     state=state,
                 )
                 url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -390,7 +388,7 @@ class TestProcessViews:
         assertContains(response, CERTIFIED_BADGE_HTML, html=True)
 
     def test_details_when_sender_left_org(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         company = job_application.to_company
         employer = company.members.first()
         sender = job_application.sender
@@ -495,7 +493,7 @@ class TestProcessViews:
     def test_details_for_company_as_prescriber(self, client):
         """As a prescriber, I cannot access the job_applications details for companies."""
 
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         prescriber = job_application.sender_prescriber_organization.members.first()
 
         client.force_login(prescriber)
@@ -511,7 +509,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             with_approval=True,
             resume=None,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             selected_jobs=[appelation],
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
@@ -575,7 +573,7 @@ class TestProcessViews:
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certified_crit.eligibility_diagnosis,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.get()
@@ -598,7 +596,7 @@ class TestProcessViews:
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.get()
@@ -620,7 +618,7 @@ class TestProcessViews:
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.get()
@@ -635,7 +633,7 @@ class TestProcessViews:
         assertContains(response, CERTIFICATION_ERROR_BADGE_HTML, html=True, count=1)
 
     def test_details_for_prescriber_when_sender_left_org(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         prescriber = PrescriberMembershipFactory(organization=job_application.sender_prescriber_organization).user
         sender = job_application.sender
         sender.prescribermembership_set.update(is_active=False)
@@ -648,7 +646,7 @@ class TestProcessViews:
         assertContains(response, SENDER_LEFT_ORG_ALERT)
 
     def test_details_for_prescriber_as_company_when_i_am_not_the_sender(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -734,7 +732,7 @@ class TestProcessViews:
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
     def test_details_for_job_seeker_when_sender_left_org(self, client):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         sender = job_application.sender
         sender.prescribermembership_set.update(is_active=False)
 
@@ -766,7 +764,7 @@ class TestProcessViews:
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
                 with_iae_eligibility_diagnosis=True,
             )
 
@@ -791,7 +789,7 @@ class TestProcessViews:
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
                 with_iae_eligibility_diagnosis=True,
             )
 
@@ -814,7 +812,7 @@ class TestProcessViews:
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
                 with_iae_eligibility_diagnosis=True,
             )
 
@@ -841,7 +839,7 @@ class TestProcessViews:
             job_app = JobApplicationFactory(
                 for_snapshot=True,
                 job_seeker=job_seeker,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
             )
 
         employer = job_app.to_company.active_members.first()
@@ -869,12 +867,12 @@ class TestProcessViews:
             job_app1 = JobApplicationFactory(
                 for_snapshot=True,
                 job_seeker=job_seeker,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
                 with_iae_eligibility_diagnosis=True,
             )
             job_app2 = JobApplicationFactory(
                 job_seeker=job_seeker,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
                 with_iae_eligibility_diagnosis=True,
             )
 
@@ -897,7 +895,7 @@ class TestProcessViews:
 
     def test_details_for_job_seeker_when_refused(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
@@ -924,7 +922,7 @@ class TestProcessViews:
 
     def test_details_for_prescriber_when_refused(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
@@ -952,7 +950,7 @@ class TestProcessViews:
 
     def test_details_for_company_when_refused(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
@@ -987,7 +985,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             to_company__with_membership=True,
             to_company__email="refused_job_application@example.com",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
@@ -1042,7 +1040,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             to_company__with_membership=True,
             to_company__email="refused_job_application@example.com",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
@@ -1063,7 +1061,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             to_company__with_membership=True,
             to_company__email="refused_job_application@example.com",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
@@ -1081,7 +1079,7 @@ class TestProcessViews:
     def test_process(self, client):
         """Ensure that the `process` transition is triggered."""
 
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -1168,7 +1166,7 @@ class TestProcessViews:
         """Ensure that the `refuse` transition is triggered through the expected workflow for a prescriber."""
 
         state = random.choice(JobApplicationWorkflow.CAN_BE_REFUSED_STATES)
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True, state=state)
         reason, reason_label = random.choice(
             job_applications_enums.RefusalReason.displayed_choices(kind=job_application.to_company.kind)
         )
@@ -1287,7 +1285,7 @@ class TestProcessViews:
         - Unauthorized prescriber: labeled "orienteur"
         - Prescriber with no organizations: labeled "orienteur"
         """
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -1376,7 +1374,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.ACCEPTED,
         )
         employer = job_application.to_company.members.first()
@@ -1406,7 +1404,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
         )
         employer = job_application.to_company.members.first()
@@ -1434,7 +1432,7 @@ class TestProcessViews:
 
     def test_refuse_step_bypass(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.NEW,
         )
         employer = job_application.to_company.members.first()
@@ -1462,7 +1460,7 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
@@ -1569,7 +1567,7 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
@@ -1818,7 +1816,7 @@ class TestProcessViews:
     def test_diagoriente_section_as_prescriber(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             resume=None,
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
@@ -1860,7 +1858,7 @@ class TestProcessViews:
 
     def test_diagoriente_section_as_employee_for_prescriber(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         company = job_application.to_company
         employee = company.members.first()
@@ -1918,7 +1916,7 @@ class TestProcessViews:
     def test_diagoriente_invite_as_job_prescriber(self, client, mailoutbox):
         job_application = JobApplicationFactory(
             with_approval=True,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             resume=None,
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
@@ -1932,7 +1930,7 @@ class TestProcessViews:
 
     def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, client, mailoutbox):
         with freeze_time("2023-12-12 13:37:00") as frozen_time:
-            job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+            job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
             company = job_application.to_company
             employee = company.members.first()
             client.force_login(employee)
@@ -2381,7 +2379,7 @@ class TestProcessTemplates:
 @pytest.mark.parametrize("reason", ["prevent_objectives", "non_eligible"])
 def test_refuse_jobapplication_geiq_reasons(client, reason):
     job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=CompanyKind.GEIQ,
     )
@@ -2416,7 +2414,7 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
 def test_details_for_prescriber_not_can_have_prior_actions(client):
     kind = random.choice(list(set(CompanyKind) - {CompanyKind.GEIQ}))
     job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=kind,
     )
@@ -2429,7 +2427,7 @@ def test_details_for_prescriber_not_can_have_prior_actions(client):
 
 def test_details_for_prescriber_geiq_without_prior_actions(client):
     job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
     )
@@ -2446,7 +2444,7 @@ def test_details_for_prescriber_geiq_without_prior_actions(client):
 
 def test_details_for_prescriber_geiq_with_prior_actions(client):
     job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
     )
@@ -2470,7 +2468,7 @@ def test_details_for_prescriber_geiq_with_prior_actions(client):
 
 def test_details_for_jobseeker_geiq_with_prior_actions(client):
     job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
     )
@@ -2497,7 +2495,7 @@ def test_details_sender_email_display_for_job_seeker(client):
     SENDER_EMAIL_HIDDEN = "<small>Adresse e-mail</small><strong>Non communiquée</strong>"
 
     # Email hidden for prescriber
-    job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+    job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
     job_seeker = job_application.job_seeker
 
     client.force_login(job_seeker)

@@ -1252,12 +1252,12 @@ class TestBatchRefuse:
             JobApplicationFactory(
                 to_company=company,
                 state=JobApplicationState.PROCESSING,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
             ),
             JobApplicationFactory(
                 to_company=company,
                 state=JobApplicationState.PROCESSING,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
             ),
         ]
 
@@ -1543,14 +1543,14 @@ class TestBatchRefuse:
             JobApplicationFactory(
                 to_company=company,
                 state=JobApplicationState.PROCESSING,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
             ),
             JobApplicationFactory(
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="BOND",
                 to_company=company,
                 state=JobApplicationState.PROCESSING,
-                sent_by_authorized_prescriber_organisation=True,
+                sent_by_authorized_prescriber=True,
             ),
         ]
 
