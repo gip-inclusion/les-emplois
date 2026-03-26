@@ -15,7 +15,6 @@ from itou.www.apply.views.list_views import JobApplicationOrder, JobApplications
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -25,7 +24,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_list_for_job_seeker(client):
-    job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
+    job_seeker = JobApplicationFactory(sent_by_job_seeker=True).job_seeker
     JobApplicationFactory(sent_by_employer=True, job_seeker=job_seeker)
     JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
     client.force_login(job_seeker)
@@ -35,7 +34,7 @@ def test_list_for_job_seeker(client):
 
 
 def test_list_for_job_seeker_queries(client, snapshot):
-    job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
+    job_seeker = JobApplicationFactory(sent_by_job_seeker=True).job_seeker
     JobApplicationFactory(sent_by_employer=True, job_seeker=job_seeker)
     JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
     client.force_login(job_seeker)
@@ -63,8 +62,10 @@ def test_list_for_job_seeker_filtered_by_state(client):
     Provide a list of job applications sent by a job seeker
     and filtered by a state.
     """
-    job_application, *others = JobApplicationSentByJobSeekerFactory.create_batch(
-        3, state=factory.Iterator(JobApplicationWorkflow.states)
+    job_application, *others = JobApplicationFactory.create_batch(
+        3,
+        state=factory.Iterator(JobApplicationWorkflow.states),
+        sent_by_job_seeker=True,
     )
     client.force_login(job_application.job_seeker)
 
@@ -82,7 +83,9 @@ def test_list_for_job_seeker_filtered_by_dates(client):
     now = timezone.now()
     job_seeker = JobSeekerFactory()
     for diff_day in [7, 5, 3, 0]:
-        JobApplicationSentByJobSeekerFactory(created_at=now - timezone.timedelta(days=diff_day), job_seeker=job_seeker)
+        JobApplicationFactory(
+            sent_by_job_seeker=True, created_at=now - timezone.timedelta(days=diff_day), job_seeker=job_seeker
+        )
     client.force_login(job_seeker)
 
     start_date = now - timezone.timedelta(days=5)

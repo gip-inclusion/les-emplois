@@ -50,7 +50,6 @@ from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeR
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -127,7 +126,7 @@ class TestJobApplicationModel:
         assert job_application.refused_by is None
 
     def test_is_sent_by_authorized_prescriber(self):
-        job_application = JobApplicationSentByJobSeekerFactory()
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
         assert not job_application.is_sent_by_authorized_prescriber
         job_application = JobApplicationSentByPrescriberFactory()
         assert not job_application.is_sent_by_authorized_prescriber
@@ -165,7 +164,7 @@ class TestJobApplicationModel:
             [JobApplicationFactory(sent_by_authorized_prescriber=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
             [JobApplicationFactory(sent_by_employer=True), "Employeur"],
-            [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
+            [JobApplicationFactory(sent_by_job_seeker=True), "Demandeur d'emploi"],
         ] + non_siae_items
 
         for job_application, sender_kind_display in items:
@@ -282,7 +281,7 @@ class TestJobApplicationModel:
     "factory,constraint_name",
     [
         pytest.param(
-            lambda: JobApplicationSentByJobSeekerFactory(sender=JobSeekerFactory()),
+            lambda: JobApplicationFactory(sent_by_job_seeker=True, sender=JobSeekerFactory()),
             "job_seeker_sender_coherence",
             id="sent_by_other_job_seeker",
         ),
@@ -331,7 +330,7 @@ def test_sender_constraints(factory, constraint_name):
     [
         partial(JobApplicationFactory, sent_by_employer=True),
         JobApplicationSentByPrescriberFactory,
-        JobApplicationSentByJobSeekerFactory,
+        partial(JobApplicationFactory, sent_by_job_seeker=True),
     ],
 )
 def test_sender_kind_of_job_application(job_application_factory):
@@ -552,9 +551,9 @@ class TestJobApplicationQuerySet:
         hours_ago_20 = now - timezone.timedelta(hours=20)
         hours_ago_30 = now - timezone.timedelta(hours=30)
 
-        JobApplicationSentByJobSeekerFactory(created_at=hours_ago_10)
-        JobApplicationSentByJobSeekerFactory(created_at=hours_ago_20)
-        JobApplicationSentByJobSeekerFactory(created_at=hours_ago_30)
+        JobApplicationFactory(sent_by_job_seeker=True, created_at=hours_ago_10)
+        JobApplicationFactory(sent_by_job_seeker=True, created_at=hours_ago_20)
+        JobApplicationFactory(sent_by_job_seeker=True, created_at=hours_ago_30)
 
         assert JobApplication.objects.created_in_past(hours=5).count() == 0
         assert JobApplication.objects.created_in_past(hours=15).count() == 1
@@ -566,7 +565,7 @@ class TestJobApplicationQuerySet:
         JobApplicationWithApprovalNotCancellableFactory()
         approval = ApprovalFactory(expired=True)
         JobApplicationWithApprovalNotCancellableFactory(job_seeker=approval.user)
-        JobApplicationSentByJobSeekerFactory(job_seeker=approval.user)
+        JobApplicationFactory(sent_by_job_seeker=True, job_seeker=approval.user)
 
         unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")
         assert JobApplication.objects.count() == 3
@@ -579,13 +578,13 @@ class TestJobApplicationQuerySet:
         assert isinstance(unique_approvals[0], Approval)
 
     def test_with_has_suspended_approval(self):
-        job_app = JobApplicationSentByJobSeekerFactory()
+        job_app = JobApplicationFactory(sent_by_job_seeker=True)
         obj = JobApplication.objects.with_has_suspended_approval().get(pk=job_app.pk)
         assert hasattr(obj, "has_suspended_approval")
         assert not obj.has_suspended_approval
 
     def test_with_last_change(self):
-        job_app = JobApplicationSentByJobSeekerFactory()
+        job_app = JobApplicationFactory(sent_by_job_seeker=True)
         obj = JobApplication.objects.with_last_change().get(pk=job_app.pk)
         assert hasattr(obj, "last_change")
         assert obj.last_change == job_app.created_at
@@ -1168,7 +1167,7 @@ class TestJobApplicationNotifications:
         assert job_application.resume_link in email.body
 
     def test_new_for_job_seeker(self):
-        job_application = JobApplicationSentByJobSeekerFactory(selected_jobs=Appellation.objects.all())
+        job_application = JobApplicationFactory(sent_by_job_seeker=True, selected_jobs=Appellation.objects.all())
         email = job_application.notifications_new_for_job_seeker.build()
         # To.
         assert job_application.sender.email in email.to
@@ -1193,7 +1192,7 @@ class TestJobApplicationNotifications:
         assert job_application.resume_link in email.body
 
     def test_accept_for_job_seeker(self):
-        job_application = JobApplicationSentByJobSeekerFactory()
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
         email = job_application.notifications_accept_for_job_seeker.build()
         # To.
         assert job_application.job_seeker.email == job_application.sender.email
@@ -1333,7 +1332,8 @@ class TestJobApplicationNotifications:
 
     def test_refuse_afpa_message(self, settings):
         settings.AFPA_DEPARTMENTS = ["59"]
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker__jobseeker_profile__hexa_post_code="59284",
             refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
@@ -1547,7 +1547,7 @@ class TestJobApplicationNotifications:
 
     def test_cancel_sent_by_job_seeker(self, django_capture_on_commit_callbacks, mailoutbox):
         # When sent by jobseeker.
-        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
+        job_application = JobApplicationFactory(sent_by_job_seeker=True, state=JobApplicationState.ACCEPTED)
 
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
@@ -1672,7 +1672,8 @@ class TestJobApplicationWorkflow:
         """
         job_seeker = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
         approval = ApprovalFactory(user=job_seeker)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
@@ -1695,7 +1696,8 @@ class TestJobApplicationWorkflow:
     ):
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
         approval = ApprovalFactory(user=job_seeker)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
@@ -1724,7 +1726,8 @@ class TestJobApplicationWorkflow:
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
@@ -1746,7 +1749,8 @@ class TestJobApplicationWorkflow:
         job_seeker = JobSeekerFactory(
             jobseeker_profile__pole_emploi_id="",
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
@@ -1772,7 +1776,8 @@ class TestJobApplicationWorkflow:
             jobseeker_profile__nir="",
             jobseeker_profile__with_pole_emploi_id=True,
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
@@ -1795,7 +1800,8 @@ class TestJobApplicationWorkflow:
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
@@ -1973,7 +1979,8 @@ class TestJobApplicationWorkflow:
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=user)
         assert diagnosis.is_valid
 
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=user,
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
@@ -2206,7 +2213,8 @@ class TestJobApplicationXlsxExport:
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory(title=Title.MME)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             selected_jobs=Appellation.objects.all(),
@@ -2255,7 +2263,8 @@ class TestJobApplicationXlsxExport:
         with freeze_time(timezone.now() - relativedelta(days=Approval.DEFAULT_APPROVAL_DAYS + 2)):
             create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
             job_seeker = JobSeekerFactory(title=Title.MME)
-            job_application = JobApplicationSentByJobSeekerFactory(
+            job_application = JobApplicationFactory(
+                sent_by_job_seeker=True,
                 job_seeker=job_seeker,
                 state=JobApplicationState.PROCESSING,
                 selected_jobs=Appellation.objects.all(),
@@ -2569,7 +2578,7 @@ class TestJobApplicationAdminForm:
         assert form.errors.as_json() == json.dumps(form_errors)
 
     def test_applications_sent_by_job_seeker(self):
-        job_application = JobApplicationSentByJobSeekerFactory()
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
         job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender = job_application.sender
         sender_kind = job_application.sender_kind

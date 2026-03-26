@@ -31,7 +31,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
     PrescriberMembershipFactory,
@@ -124,14 +124,14 @@ class TestDeduplicateJobSeekersManagementCommands:
         }
 
         # Create `user1` through a job application sent by him.
-        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(sent_by_job_seeker=True, job_seeker__jobseeker_profile__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         assert 1 == user1.job_applications.count()
         assert job_app1.sender == user1
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app2 = JobApplicationFactory(sent_by_job_seeker=True, job_seeker__jobseeker_profile__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
         assert 1 == user2.job_applications.count()
@@ -189,8 +189,12 @@ class TestDeduplicateJobSeekersManagementCommands:
         user1 = job_app1.job_seeker
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(
-            with_approval=True, job_seeker__jobseeker_profile__nir="", with_iae_eligibility_diagnosis=True, **kwargs
+        job_app2 = JobApplicationFactory(
+            sent_by_job_seeker=True,
+            with_approval=True,
+            job_seeker__jobseeker_profile__nir="",
+            with_iae_eligibility_diagnosis=True,
+            **kwargs,
         )
         user2 = job_app2.job_seeker
 

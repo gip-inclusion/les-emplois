@@ -51,7 +51,6 @@ from tests.employee_record.factories import EmployeeRecordFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     PriorActionFactory,
 )
@@ -231,7 +230,7 @@ class TestProcessViews:
         assertContains(response, LackOfNIRReason.NO_NIR.label)
 
         # Test resume presence:
-        job_application = JobApplicationSentByJobSeekerFactory(to_company=company)
+        job_application = JobApplicationFactory(sent_by_job_seeker=True, to_company=company)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
         assertContains(response, job_application.resume_link)
@@ -316,7 +315,7 @@ class TestProcessViews:
         assertContains(response, LackOfNIRReason.NO_NIR.label)
 
         # Test resume presence:
-        job_application = JobApplicationSentByJobSeekerFactory(to_company=company)
+        job_application = JobApplicationFactory(sent_by_job_seeker=True, to_company=company)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
         assertContains(response, job_application.resume_link)
@@ -1229,7 +1228,7 @@ class TestProcessViews:
         """Ensure that the `refuse` transition is triggered through the expected workflow for a job seeker."""
 
         state = random.choice(JobApplicationWorkflow.CAN_BE_REFUSED_STATES)
-        job_application = JobApplicationSentByJobSeekerFactory(state=state)
+        job_application = JobApplicationFactory(sent_by_job_seeker=True, state=state)
         reason, reason_label = random.choice(
             job_applications_enums.RefusalReason.displayed_choices(kind=job_application.to_company.kind)
         )
@@ -1671,8 +1670,8 @@ class TestProcessViews:
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
-        job_application = JobApplicationSentByJobSeekerFactory(
-            to_company=company, job_seeker=JobSeekerFactory(with_address=True)
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True, to_company=company, job_seeker=JobSeekerFactory(with_address=True)
         )
 
         # Right states
@@ -3008,5 +3007,5 @@ class TestJobApplicationSenderLeftOrg:
         assert job_application_sender_left_org(job_app) is True
 
     def test_sender_left_org_job_seeker(self):
-        job_app = JobApplicationSentByJobSeekerFactory()
+        job_app = JobApplicationFactory(sent_by_job_seeker=True)
         assert job_application_sender_left_org(job_app) is False

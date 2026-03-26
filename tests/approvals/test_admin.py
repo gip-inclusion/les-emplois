@@ -41,7 +41,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.files.factories import FileFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -826,7 +826,8 @@ class TestCustomApprovalAdminViews:
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             approval=None,
@@ -942,7 +943,8 @@ class TestCustomApprovalAdminViews:
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             pk=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,

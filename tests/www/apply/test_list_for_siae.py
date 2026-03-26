@@ -24,7 +24,7 @@ from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
@@ -603,8 +603,10 @@ class TestProcessListSiae:
 
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         (appellation1, appellation2) = Appellation.objects.all().order_by("?")[:2]
-        job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[appellation1])
-        _another_job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[appellation2])
+        job_app = JobApplicationFactory(sent_by_job_seeker=True, to_company=company, selected_jobs=[appellation1])
+        _another_job_app = JobApplicationFactory(
+            sent_by_job_seeker=True, to_company=company, selected_jobs=[appellation2]
+        )
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"selected_jobs": [appellation1.pk]})

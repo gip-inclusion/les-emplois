@@ -39,7 +39,6 @@ from tests.employee_record.factories import (
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -323,9 +322,9 @@ class TestEmployeeRecordModel:
     "factory,expected",
     [
         pytest.param(
-            functools.partial(JobApplicationSentByJobSeekerFactory, with_iae_eligibility_diagnosis=True),
+            functools.partial(JobApplicationFactory, sent_by_job_seeker=True, with_iae_eligibility_diagnosis=True),
             "07",
-            id="JobApplicationSentByJobSeekerFactory-07",
+            id="sent_by_job_seeker-07",
         ),
         (functools.partial(JobApplicationFactory, sent_by_employer=True), "07"),
         (JobApplicationSentByPrescriberFactory, "08"),

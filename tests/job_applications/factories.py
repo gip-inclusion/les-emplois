@@ -49,7 +49,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         # Sender ------------------------------------------------------------------------------------------------------
         sent_by_job_seeker = factory.Trait(
             sender_kind=SenderKind.JOB_SEEKER,
-            sender=factory.LazyAttribute(lambda obj: obj.job_seeker),
+            sender=factory.SelfAttribute("job_seeker"),
         )
         sent_by_prescriber = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(PrescriberOrganizationFactory, with_membership=True),
@@ -211,24 +211,6 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
             datetime.now(UTC).date() + relativedelta(years=2),
         )
     )
-
-
-class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
-    """Generates a JobApplication() object sent by a job seeker."""
-
-    sender = factory.SelfAttribute("job_seeker")
-    sender_kind = SenderKind.JOB_SEEKER
-
-    class Params:
-        with_iae_eligibility_diagnosis = factory.Trait(
-            eligibility_diagnosis=factory.SubFactory(
-                IAEEligibilityDiagnosisFactory,
-                from_prescriber=True,
-                job_seeker=factory.SelfAttribute("..job_seeker"),
-                # Don't use the job app sender as author : it's the job seeker...
-            ),
-            to_company=factory.SubFactory(CompanyFactory, with_membership=True, subject_to_iae_rules=True),
-        )
 
 
 class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
