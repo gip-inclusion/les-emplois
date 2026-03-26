@@ -22,7 +22,6 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -234,7 +233,7 @@ class TestTransferUserData:
     @pytest.mark.parametrize(
         "factory",
         [
-            JobApplicationSentByJobSeekerFactory,
+            partial(JobApplicationFactory, sent_by_job_seeker=True),
             partial(JobApplicationFactory, sent_by_employer=True),
             JobApplicationSentByPrescriberFactory,
         ],

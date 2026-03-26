@@ -59,7 +59,6 @@ from tests.eligibility.factories import (
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -118,7 +117,7 @@ class TestProcessAcceptViewsInWizard:
             "to_company": self.company,
             "hiring_end_at": None,
         } | kwargs
-        return JobApplicationSentByJobSeekerFactory(**kwargs)
+        return JobApplicationFactory(sent_by_job_seeker=True, **kwargs)
 
     def _accept_jobseeker_post_data(self, job_application, post_data=None):
         if post_data is not None:
@@ -1784,7 +1783,8 @@ class TestProcessAcceptViewsInWizard:
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             to_company=self.company,
             state=JobApplicationState.PROCESSING,
@@ -1891,7 +1891,8 @@ class TestFillJobSeekerInfosForAccept:
             self.company.convention = SiaeConventionFactory(kind=self.company.kind)
             self.company.save(update_fields=["convention", "kind", "updated_at"])
             IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=self.company,
@@ -1920,7 +1921,8 @@ class TestFillJobSeekerInfosForAccept:
 
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
     def test_no_address(self, client, address):
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=self.company,
@@ -2004,7 +2006,8 @@ class TestFillJobSeekerInfosForAccept:
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_no_birthdate(self, client, birth_country):
         client.force_login(self.company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=self.company,
@@ -2121,7 +2124,8 @@ class TestFillJobSeekerInfosForAccept:
 
     @pytest.mark.parametrize("in_france", [True, False])
     def test_company_no_birth_country(self, client, in_france):
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=self.company,
@@ -2223,7 +2227,8 @@ class TestFillJobSeekerInfosForAccept:
     @pytest.mark.parametrize("with_lack_of_nir_reason", [True, False])
     def test_company_no_nir(self, client, with_lack_of_nir_reason):
         client.force_login(self.company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=self.company,
@@ -2306,7 +2311,8 @@ class TestFillJobSeekerInfosForAccept:
     def test_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
         client.force_login(self.company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=self.company,
@@ -2649,7 +2655,8 @@ class TestAcceptConfirmation:
         user = company.members.first()
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(user)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=company,
@@ -2697,7 +2704,8 @@ class TestAcceptConfirmation:
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=company,
@@ -2723,7 +2731,8 @@ class TestAcceptConfirmation:
     def test_as_iae_missing_eligibility(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         client.force_login(company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=company,
@@ -2776,7 +2785,8 @@ class TestAcceptConfirmation:
         user = company.members.first()
         GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
         client.force_login(user)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=company,
@@ -2847,7 +2857,8 @@ class TestAcceptConfirmation:
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
         client.force_login(company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
             to_company=company,

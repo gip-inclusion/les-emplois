@@ -21,7 +21,7 @@ from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.types import InclusiveDateRange
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
@@ -126,7 +126,7 @@ def test_job_application_imported_from_pe_in_list():
 
 def test_job_application_job_seeker_in_list():
     tmpl = load_template("apply/includes/list_card_body.html")
-    job_application = JobApplicationSentByJobSeekerFactory()
+    job_application = JobApplicationFactory(sent_by_job_seeker=True)
     job_application.user_can_view_personal_information = True
     job_application.jobseeker_valid_eligibility_diagnosis = None
     rendered = tmpl.render(

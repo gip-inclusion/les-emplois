@@ -29,7 +29,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory
 from tests.files.factories import FileFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 
 
@@ -1620,12 +1620,14 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
 
 
 def test_last_hire_was_made_by_siae():
-    siae_job_application = JobApplicationSentByJobSeekerFactory(
+    siae_job_application = JobApplicationFactory(
+        sent_by_job_seeker=True,
         state=JobApplicationState.ACCEPTED,
         to_company__subject_to_iae_rules=True,
     )
     user = siae_job_application.job_seeker
-    newer_non_siae_job_application = JobApplicationSentByJobSeekerFactory(
+    newer_non_siae_job_application = JobApplicationFactory(
+        sent_by_job_seeker=True,
         state=JobApplicationState.ACCEPTED,
         to_company__not_subject_to_iae_rules=True,
         job_seeker=user,
