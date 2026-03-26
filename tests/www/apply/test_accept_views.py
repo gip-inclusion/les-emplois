@@ -626,7 +626,7 @@ class TestProcessAcceptViewsInWizard:
         job_application = self.create_job_application(
             job_seeker=self.job_seeker,
             to_company=self.company,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             approval=approval,
             hiring_start_at=approval.end_at + datetime.timedelta(days=1),
         )
@@ -2495,7 +2495,7 @@ class TestIAEEligibility:
 
     def test_eligibility_when_not_needed(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
         )
@@ -2522,7 +2522,7 @@ class TestIAEEligibility:
         """Test eligibility for a company not subject to eligibility rules."""
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
             to_company__with_jobs=True,
@@ -2598,7 +2598,7 @@ class TestIAEEligibility:
 
     def test_eligibility_with_missing_contract_infos(self, client):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
             # Job seeker with enough infos to avoid FillUserInfos step

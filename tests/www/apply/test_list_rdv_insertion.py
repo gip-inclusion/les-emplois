@@ -61,7 +61,7 @@ class TestRdvInsertionDisplay:
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             for_snapshot=True,
             with_iae_eligibility_diagnosis=True,
         )
@@ -237,7 +237,7 @@ class TestRdvInsertionView:
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             for_snapshot=True,
         )
 

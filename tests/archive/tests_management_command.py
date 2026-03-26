@@ -815,7 +815,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 "to_company__department": 73,
                 "to_company__kind": CompanyKind.EITI,
                 "to_company__naf": "4573A",
-                "sent_by_authorized_prescriber_organisation": True,
+                "sent_by_authorized_prescriber": True,
                 "state": JobApplicationState.PRIOR_TO_HIRE,
                 "hiring_start_at": None,
             },

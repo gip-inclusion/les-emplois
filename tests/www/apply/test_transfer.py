@@ -50,7 +50,7 @@ class TestProcessTransferJobApplication:
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company=company,
             state=job_applications_enums.JobApplicationState.REFUSED,
         )
@@ -74,7 +74,7 @@ class TestProcessTransferJobApplication:
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company=company,
             state=job_applications_enums.JobApplicationState.PROCESSING,
         )
@@ -91,7 +91,7 @@ class TestProcessTransferJobApplication:
         user = company.members.first()
         CompanyMembershipFactory(user=user)
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company=company,
             state=job_applications_enums.JobApplicationState.ACCEPTED,
         )
@@ -108,7 +108,7 @@ class TestProcessTransferJobApplication:
         user = company.members.first()
         other_company.members.add(user)
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company=company,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__for_snapshot=True,
@@ -181,7 +181,7 @@ class TestProcessTransferJobApplication:
         other_company = CompanyFactory()
         user = JobSeekerFactory()
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             to_company=company,
             state=job_applications_enums.JobApplicationState.PROCESSING,
         )

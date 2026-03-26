@@ -328,9 +328,9 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        job_app_1 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber_organisation=True)
-        job_app_2 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber_organisation=True)
-        _job_app_3 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber_organisation=True)
+        job_app_1 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber=True)
+        job_app_2 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber=True)
+        _job_app_3 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber=True)
 
         client.force_login(employer)
         response = client.get(
@@ -622,7 +622,7 @@ class TestProcessListSiae:
         job_app = JobApplicationFactory(
             to_company=company,
             created_at=timezone.now() - timezone.timedelta(days=1),
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker__post_code="37000",
             with_approval=True,
             eligibility_diagnosis=diagnosis,
@@ -664,19 +664,19 @@ class TestProcessListSiae:
         JobApplicationFactory(
             to_company=company,
             created_at=timezone.now() - datetime.timedelta(days=365 * 2),
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=random.choice(list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})),
         )  # old job application
         recent_enough_job_app = JobApplicationFactory(
             to_company=company,
             created_at=timezone.now() - datetime.timedelta(days=365 * 2 - 1),
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=random.choice(list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})),
         )
         old_accepted_job_app = JobApplicationFactory(
             to_company=company,
             created_at=timezone.now() - datetime.timedelta(days=365 * 2 + 1),
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             state=JobApplicationState.ACCEPTED,
         )
 
@@ -2437,7 +2437,7 @@ class TestAutocomplete:
         prescriber_org_application = JobApplicationFactory(
             to_company=company,
             sender_prescriber_organization__name="Association de Prescripteurs",
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
             job_seeker__first_name="Roger",
             job_seeker__last_name="Smith",
         )

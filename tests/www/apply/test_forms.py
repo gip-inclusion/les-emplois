@@ -456,7 +456,7 @@ class TestJobApplicationRefusalReasonForm:
         "factory_kwargs,expected_reason_label",
         [
             ({}, "Choisir le motif de refus envoyé à l’orienteur"),
-            ({"sent_by_authorized_prescriber_organisation": True}, "Choisir le motif de refus envoyé au prescripteur"),
+            ({"sent_by_authorized_prescriber": True}, "Choisir le motif de refus envoyé au prescripteur"),
             ({"sent_by_another_employer": True}, "Choisir le motif de refus"),
         ],
     )
@@ -482,7 +482,7 @@ class TestJobApplicationRefusalReasonForm:
 
         # Prescriber only
         prescriber_apps_with_same_job_seeker = JobApplicationFactory.create_batch(
-            2, job_seeker=JobSeekerFactory(), to_company=company, sent_by_authorized_prescriber_organisation=True
+            2, job_seeker=JobSeekerFactory(), to_company=company, sent_by_authorized_prescriber=True
         )
         form = apply_forms.JobApplicationRefusalReasonForm(prescriber_apps_with_same_job_seeker)
         assert (

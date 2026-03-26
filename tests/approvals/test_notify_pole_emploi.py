@@ -155,7 +155,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
-            with_jobapplication__sent_by_authorized_prescriber_organisation=True,
+            with_jobapplication__sent_by_authorized_prescriber=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
         )
         with freeze_time() as frozen_now:
@@ -188,7 +188,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
-            with_jobapplication__sent_by_authorized_prescriber_organisation=True,
+            with_jobapplication__sent_by_authorized_prescriber=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
         )
         with freeze_time() as frozen_now:

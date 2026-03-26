@@ -68,7 +68,7 @@ class TestApprovalDetailView:
         assert response.status_code == 403
 
     def test_authorized_prescriber_access(self, client):
-        job_application = JobApplicationFactory(with_approval=True, sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(with_approval=True, sent_by_authorized_prescriber=True)
         url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
 
         client.force_login(job_application.sender)
@@ -121,7 +121,7 @@ class TestApprovalDetailView:
             with_approval=True,
             approval=approval,
             job_seeker=approval.user,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
@@ -180,7 +180,7 @@ class TestApprovalDetailView:
             to_company__name="Mon SIAE",
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         approval = job_application.approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -274,7 +274,7 @@ class TestApprovalDetailView:
             to_company__for_snapshot=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         approval = job_application.approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -383,7 +383,7 @@ class TestApprovalDetailView:
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         approval = job_application.approval
         siae = job_application.to_company
@@ -444,7 +444,7 @@ class TestApprovalDetailView:
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         approval = job_application.approval
         siae = job_application.to_company

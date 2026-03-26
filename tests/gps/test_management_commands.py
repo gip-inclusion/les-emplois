@@ -70,7 +70,7 @@ class TestSyncGroupsManagementCommand:
         job_app_2 = JobApplicationFactory(
             job_seeker=beneficiary,
             sender=prescriber,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         geiq_diag_2 = GEIQEligibilityDiagnosisFactory(
             job_seeker=beneficiary,
@@ -151,22 +151,22 @@ class TestSyncGroupsManagementCommand:
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_2,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_2,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         JobApplicationFactory(
             sender=follower_2,
             job_seeker=beneficiary_2,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
         JobApplicationFactory(
             sender=follower_2,
             job_seeker=beneficiary_2,
-            sent_by_authorized_prescriber_organisation=True,
+            sent_by_authorized_prescriber=True,
         )
 
         # simple contact with created job seeker

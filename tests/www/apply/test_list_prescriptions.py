@@ -44,7 +44,7 @@ INVALID_VALUE_MESSAGE = "Sélectionnez un choix valide."
 
 
 def test_get(client):
-    job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+    job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
     organization = job_application.sender_prescriber_organization
     client.force_login(job_application.sender)
     for display in JobApplicationsDisplayKind:
@@ -91,7 +91,7 @@ def test_pagination(client):
 
 
 def test_queries(client, snapshot):
-    prescriber = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True).sender
+    prescriber = JobApplicationFactory(sent_by_authorized_prescriber=True).sender
     JobApplicationFactory(sender=prescriber, with_approval=True)
     JobApplicationFactory(
         sender=prescriber,
@@ -440,7 +440,7 @@ def test_exports_with_organization(client):
 
 def test_exports_as_pole_emploi_prescriber(client, snapshot):
     job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True,
+        sent_by_authorized_prescriber=True,
         sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
     )
     client.force_login(job_application.sender)
@@ -602,7 +602,7 @@ def test_order(client, subtests):
 def test_htmx_order(client):
     url = reverse("apply:list_prescriptions")
 
-    job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+    job_app = JobApplicationFactory(sent_by_authorized_prescriber=True)
     prescriber = job_app.sender
     JobApplicationFactory(sender=prescriber)
     client.force_login(prescriber)
