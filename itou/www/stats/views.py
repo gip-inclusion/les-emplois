@@ -33,7 +33,6 @@ from itou.institutions.models import Institution
 from itou.nexus.utils import activate_pilotage
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.auth import check_request
@@ -172,12 +171,9 @@ def stats_public(request):
 
 
 def stats_redirect(request, dashboard_name):
-    match request.user.kind:
-        case UserKind.LABOR_INSPECTOR:
-            normalized_organization_kind = request.current_organization.kind.lower().replace(" ", "_")
-        case _:
-            return HttpResponseNotFound()
-
+    if not request.from_institution:
+        return HttpResponseNotFound()
+    normalized_organization_kind = request.current_organization.kind.lower().replace(" ", "_")
     return HttpResponseRedirect(reverse(f"stats:stats_{normalized_organization_kind}_{dashboard_name}"))
 
 

@@ -105,11 +105,7 @@ class ApplicationPermissionMixin:
         raise NotImplementedError
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in [
-            UserKind.JOB_SEEKER,
-            UserKind.PRESCRIBER,
-            UserKind.EMPLOYER,
-        ]:
+        if not request.user.is_job_seeker and not request.from_employer and not request.from_prescriber:
             raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
         if not self.company.has_active_members:
             raise PermissionDenied(

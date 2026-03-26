@@ -44,7 +44,7 @@ class HirePermissionMixin:
         raise NotImplementedError
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.kind != UserKind.EMPLOYER:
+        if not request.from_employer:
             raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
         if not self.company.has_member(request.user):
             raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
