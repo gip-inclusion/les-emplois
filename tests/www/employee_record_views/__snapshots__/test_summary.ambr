@@ -302,20 +302,26 @@
           </button>
           <div class="row">
               <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
                   </i>
               </div>
               <div class="col">
-                  <p class="mb-0">
+                  <p class="mb-2">
                       <strong>
                           Incohérence de numéro SIRET détectée
                       </strong>
                   </p>
                   <p class="mb-0">
                       Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
-                          Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
-                          Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
                   </p>
+                  <ul class="mb-0">
+                      <li>
+                          Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
+                      </li>
+                      <li>
+                          Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
+                      </li>
+                  </ul>
               </div>
           </div>
       </div>

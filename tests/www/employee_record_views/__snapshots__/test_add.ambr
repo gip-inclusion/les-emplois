@@ -8,12 +8,12 @@
                   <h2>
                       Vous ne pouvez pas continuer
                   </h2>
-                  <div class="alert alert-warning">
+                  <div class="alert alert-warning" role="status">
                       <p>
                           Cette fiche salarié ne peut pas être créé ou modifiée.
-                              Veuillez d’abord régulariser le numéro de sécurité sociale.
+                                  Veuillez d’abord régulariser le numéro de sécurité sociale.
                       </p>
-                      <a class="btn btn-primary" href="/job-seekers/nir-modification/00000000-0000-0000-0000-000000000001?back_url=%2Femployee_record%2Flist">
+                      <a class="btn-link mb-0" href="/job-seekers/nir-modification/00000000-0000-0000-0000-000000000001?back_url=%2Femployee_record%2Flist">
                           Régulariser le n⁰ de sécurité sociale
                       </a>
                   </div>

@@ -1,4 +1,5 @@
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 {% load url_add_query %}
@@ -10,23 +11,18 @@
                 {% csrf_token %}
                 <fieldset>
                     <legend class="h3">Annexe financière</legend>
-                    <div class="alert alert-info" role="status">
-                        <div class="row">
-                            <div class="col-auto pe-0">
-                                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                            </div>
-                            <div class="col">
-                                <p class="mb-0">
-                                    Si vous utilisez un logiciel de gestion des salariés,
-                                    vous pouvez sélectionner une annexe financière (si la
-                                    dernière en date n’est pas encore visible, vous pouvez
-                                    sélectionner celle qui la précède).
-                                    <br>
-                                    Sinon, vous pouvez passer à l’étape suivante.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    {% component_alert content=content variant="info" %}
+                        {% fragment as content %}
+                            <p class="mb-0">
+                                Si vous utilisez un logiciel de gestion des salariés,
+                                vous pouvez sélectionner une annexe financière (si la
+                                dernière en date n’est pas encore visible, vous pouvez
+                                sélectionner celle qui la précède).
+                                <br>
+                                Sinon, vous pouvez passer à l’étape suivante.
+                            </p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
                     {% bootstrap_form form alert_error_type="all" %}
                 </fieldset>
                 {% url "employee_record_views:create_step_3" job_application.id as secondary_url %}

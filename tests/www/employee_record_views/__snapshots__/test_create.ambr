@@ -521,7 +521,7 @@
                   <br/>
                   Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
               </p>
-              <p>
+              <p class="mb-0">
                   <strong>
                       Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".
                   </strong>
@@ -616,7 +616,7 @@
                   <br/>
                   Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
               </p>
-              <p>
+              <p class="mb-0">
                   <strong>
                       Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".
                   </strong>

@@ -1,3 +1,4 @@
+{% load components %}
 {% load format_filters %}
 {% load job_seekers %}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
@@ -23,102 +24,89 @@
     <div class="c-box--results__body">
         {# ASP error #}
         {% if employee_record.status == "REJECTED" %}
-            <div class="alert alert-warning" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Informations sur l'erreur de traitement :</strong>
+            {% component_alert title=title content=content variant="warning" %}
+                {% fragment as title %}
+                    Informations sur l'erreur de traitement :
+                {% endfragment %}
+                {% fragment as content %}
+                    {% if employee_record.asp_processing_code == "3308" %}
+                        <p class="mb-0">
+                            Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.
                         </p>
-                        {% if employee_record.asp_processing_code == "3308" %}
-                            <p class="mb-0">
-                                Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.
-                            </p>
-                            <p class="mb-0">
-                                Si vous ne trouvez pas la commune de naissance que vous souhaitez renseigner dans le menu déroulant, renseignez une autre ville de naissance pour débloquer le transfert.
-                            </p>
-                            <p class="mb-0">
-                                Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.
-                            </p>
-                            <small>(Erreur {{ employee_record.asp_processing_code }})</small>
-                        {% elif employee_record.asp_processing_code == "3417" %}
-                            <p class="mb-0">La commune de résidence du salarié n’est pas référencée dans l'Extranet IAE 2.0 de l'ASP.</p>
-                            <p class="mb-0">Pour débloquer le transfert vous pouvez renseigner l’adresse postale de votre structure.</p>
-                            <p class="mb-0">
-                                Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.
-                            </p>
-                            <small>(Erreur {{ employee_record.asp_processing_code }})</small>
-                        {% elif employee_record.asp_processing_code == "3435" %}
-                            <p class="mb-0">
-                                Nous n’avons pas encore reçu d’annexe financière à jour pour votre structure. Nous ne pouvons donc pas transmettre votre fiche salarié à l’ASP.
-                            </p>
-                            <p class="mb-0">
-                                Pour résoudre ce problème, rendez-vous dans l’ASP et vérifiez que votre annexe financière “valide” ou “provisoire” est à jour.
-                            </p>
-                            <p class="mb-0">Si c’est le cas, patientez une semaine, et tentez de renvoyer la fiche salarié.</p>
-                            <p>
-                                Si elle n’est pas à jour, demandez à votre DDETS de la mettre à jour dans l’ASP, et patientez une semaine le temps que nous recevions l’information avant de tenter le renvoi de la fiche salarié.
-                            </p>
-                            <p class="mb-0">
-                                Vous pouvez vérifier vos annexes financières de rattachement dans votre tableau de bord, rubrique “Annexes financières” en bas à gauche.
-                            </p>
-                            <small>(Erreur {{ employee_record.asp_processing_code }})</small>
-                        {% elif employee_record.asp_processing_code == "3436" %}
-                            <p class="mb-0">La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
-                            <p class="mb-0">Connectez-vous à l’ASP pour la retrouver et déclarer les contrats associés.</p>
-                            <p class="mb-0">
-                                Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.
-                            </p>
-                            <p class="mb-0">
-                                Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.
-                            </p>
-                            <small>(Erreur {{ employee_record.asp_processing_code }})</small>
-                        {% else %}
-                            <p class="mb-0">
-                                Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small>
-                            </p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+                        <p class="mb-0">
+                            Si vous ne trouvez pas la commune de naissance que vous souhaitez renseigner dans le menu déroulant, renseignez une autre ville de naissance pour débloquer le transfert.
+                        </p>
+                        <p class="mb-0">
+                            Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.
+                        </p>
+                        <small>(Erreur {{ employee_record.asp_processing_code }})</small>
+                    {% elif employee_record.asp_processing_code == "3417" %}
+                        <p class="mb-0">La commune de résidence du salarié n’est pas référencée dans l'Extranet IAE 2.0 de l'ASP.</p>
+                        <p class="mb-0">Pour débloquer le transfert vous pouvez renseigner l’adresse postale de votre structure.</p>
+                        <p class="mb-0">
+                            Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.
+                        </p>
+                        <small>(Erreur {{ employee_record.asp_processing_code }})</small>
+                    {% elif employee_record.asp_processing_code == "3435" %}
+                        <p class="mb-0">
+                            Nous n’avons pas encore reçu d’annexe financière à jour pour votre structure. Nous ne pouvons donc pas transmettre votre fiche salarié à l’ASP.
+                        </p>
+                        <p class="mb-0">
+                            Pour résoudre ce problème, rendez-vous dans l’ASP et vérifiez que votre annexe financière “valide” ou “provisoire” est à jour.
+                        </p>
+                        <p class="mb-0">Si c’est le cas, patientez une semaine, et tentez de renvoyer la fiche salarié.</p>
+                        <p>
+                            Si elle n’est pas à jour, demandez à votre DDETS de la mettre à jour dans l’ASP, et patientez une semaine le temps que nous recevions l’information avant de tenter le renvoi de la fiche salarié.
+                        </p>
+                        <p class="mb-0">
+                            Vous pouvez vérifier vos annexes financières de rattachement dans votre tableau de bord, rubrique “Annexes financières” en bas à gauche.
+                        </p>
+                        <small>(Erreur {{ employee_record.asp_processing_code }})</small>
+                    {% elif employee_record.asp_processing_code == "3436" %}
+                        <p class="mb-0">La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
+                        <p class="mb-0">Connectez-vous à l’ASP pour la retrouver et déclarer les contrats associés.</p>
+                        <p class="mb-0">
+                            Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.
+                        </p>
+                        <p class="mb-0">
+                            Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.
+                        </p>
+                        <small>(Erreur {{ employee_record.asp_processing_code }})</small>
+                    {% else %}
+                        <p class="mb-0">
+                            Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small>
+                        </p>
+                    {% endif %}
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% endif %}
         {# SIRET has changed #}
         {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
-            <div class="alert alert-warning" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Actualisation du numéro SIRET</strong>
-                        </p>
-                        <p class="mb-0">
-                            Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
+            {% component_alert title=title content=content variant="warning" %}
+                {% fragment as title %}
+                    Actualisation du numéro SIRET
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.</p>
+                    <ul class="mb-0">
+                        <li>
                             Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
-                            Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                        </li>
+                        <li>Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.</li>
+                    </ul>
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% endif %}
         {# Actions #}
         {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
-            <div class="alert alert-warning" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Informations manquantes</strong>
-                        </p>
-                        <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
-                    </div>
-                </div>
-            </div>
+            {% component_alert title=title content=content variant="warning" %}
+                {% fragment as title %}
+                    Informations manquantes
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% endif %}
         <ul class="list-data">
             <li>
