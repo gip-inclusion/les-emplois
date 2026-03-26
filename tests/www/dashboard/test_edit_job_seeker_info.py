@@ -15,7 +15,7 @@ from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import PrescriberFactory
 
@@ -63,8 +63,10 @@ class TestEditJobSeekerInfo:
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
-        job_application = JobApplicationSentByPrescriberFactory(
-            job_seeker__jobseeker_profile__nir="178122978200508", to_company__not_ea_eatt_kind=True
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            job_seeker__jobseeker_profile__nir="178122978200508",
+            to_company__not_ea_eatt_kind=True,
         )
         user = job_application.to_company.members.first()
 
@@ -140,7 +142,8 @@ class TestEditJobSeekerInfo:
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
-        job_application = JobApplicationSentByPrescriberFactory(
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
         )
@@ -198,8 +201,10 @@ class TestEditJobSeekerInfo:
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
-        job_application = JobApplicationSentByPrescriberFactory(
-            job_seeker__jobseeker_profile__nir="", job_seeker__jobseeker_profile__lack_of_nir_reason=""
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            job_seeker__jobseeker_profile__nir="",
+            job_seeker__jobseeker_profile__lack_of_nir_reason="",
         )
         user = job_application.to_company.members.first()
 
@@ -323,7 +328,7 @@ class TestEditJobSeekerInfo:
         assert response.status_code == 200
 
     def test_edit_autonomous_not_allowed(self, client):
-        job_application = JobApplicationSentByPrescriberFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         # The job seeker manages his own personal information (autonomous)
         user = job_application.sender
         client.force_login(user)
@@ -337,7 +342,9 @@ class TestEditJobSeekerInfo:
 
     def test_edit_not_allowed(self, client):
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
-        job_application = JobApplicationSentByPrescriberFactory(job_seeker__created_by=PrescriberFactory())
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker__created_by=PrescriberFactory()
+        )
 
         # Lambda prescriber not member of the sender organization
         prescriber = PrescriberFactory()
@@ -352,7 +359,9 @@ class TestEditJobSeekerInfo:
     def test_name_is_required(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        job_application = JobApplicationSentByPrescriberFactory(to_company=company, job_seeker__created_by=user)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, job_seeker__created_by=user
+        )
         post_data = {
             "title": "M",
             "email": "bidou@yopmail.com",
@@ -411,8 +420,11 @@ class TestEditJobSeekerInfo:
         new_email = "bidou@yopmail.com"
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        job_application = JobApplicationSentByPrescriberFactory(
-            to_company=company, job_seeker__created_by=user, job_seeker__jobseeker_profile__nir="178122978200508"
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            job_seeker__created_by=user,
+            job_seeker__jobseeker_profile__nir="178122978200508",
         )
 
         client.force_login(user)
@@ -463,8 +475,10 @@ class TestEditJobSeekerInfo:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
         new_email = "bidou@yopmail.com"
-        job_application = JobApplicationSentByPrescriberFactory(
-            job_seeker__jobseeker_profile__nir="178122978200508", job_seeker__with_verified_email=True
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            job_seeker__jobseeker_profile__nir="178122978200508",
+            job_seeker__with_verified_email=True,
         )
         user = job_application.to_company.members.first()
 
