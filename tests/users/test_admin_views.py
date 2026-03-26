@@ -20,10 +20,7 @@ from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -235,7 +232,7 @@ class TestTransferUserData:
         [
             partial(JobApplicationFactory, sent_by_job_seeker=True),
             partial(JobApplicationFactory, sent_by_employer=True),
-            JobApplicationSentByPrescriberFactory,
+            partial(JobApplicationFactory, sent_by_prescriber=True),
         ],
     )
     def test_transfer_sender(self, admin_client, factory):
