@@ -217,14 +217,6 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
     )
 
 
-class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
-    """Generates a JobApplication() object sent by a prescriber member of an organization."""
-
-    sender_kind = SenderKind.PRESCRIBER
-    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationFactory, with_membership=True)
-    sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
-
-
 class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of Pôle emploi organization."""
 

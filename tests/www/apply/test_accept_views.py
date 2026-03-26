@@ -57,10 +57,7 @@ from tests.eligibility.factories import (
     IAEEligibilityDiagnosisFactory,
     IAESelectedAdministrativeCriteriaFactory,
 )
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberOrganizationFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users import constants as users_test_constants
@@ -2403,7 +2400,8 @@ class TestIAEEligibility:
     def test_eligibility(self, client):
         PREFILLED_TEMPLATE = "eligibility/includes/iae/criteria_filled_from_job_seeker.html"
         """Test eligibility."""
-        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_prescriber=True,
             archived_at=timezone.now(),
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(
@@ -2568,7 +2566,8 @@ class TestIAEEligibility:
     def test_eligibility_for_siae_with_suspension_sanction(self, client):
         """Test eligibility for an Siae that has been suspended."""
 
-        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_prescriber=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__evaluable_kind=True,
             # Job seeker with enough infos to avoid FillUserInfos step

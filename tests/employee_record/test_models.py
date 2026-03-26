@@ -39,7 +39,6 @@ from tests.employee_record.factories import (
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
@@ -331,7 +330,11 @@ class TestEmployeeRecordModel:
             "08",
             id="sent_by_prescriber_alone-08",
         ),
-        (JobApplicationSentByPrescriberOrganizationFactory, "08"),
+        pytest.param(
+            functools.partial(JobApplicationFactory, sent_by_prescriber=True),
+            "08",
+            id="sent_by_prescriber-08",
+        ),
     ],
 )
 def test_asp_prescriber_type_for_other_sender(factory, expected):
