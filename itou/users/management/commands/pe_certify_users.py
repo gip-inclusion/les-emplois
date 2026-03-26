@@ -7,6 +7,7 @@ if needed.
 import datetime
 
 import tenacity
+from django.contrib.admin import models as admin_models
 from django.db.models import F, Q
 from django.utils import timezone
 from httpx import RequestError
@@ -128,3 +129,12 @@ class Command(BaseCommand):
 
         User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
         self.logger.info("count=%d users have been swapped", len(swapped_users))
+        admin_models.LogEntry.objects.log_actions(
+            user_id=staff.pk,
+            queryset=swapped_users,  # An iterable is needed
+            action_flag=admin_models.CHANGE,
+            change_message=(
+                "Inversion automatique du nom et prénom en se basant sur les informations de France Travail"
+            ),
+            single_object=False,
+        )
