@@ -85,7 +85,7 @@ def test_candidatures_geiq_is_empty(snapshot, job_application_status):
     client = _api_client()
 
     ja = JobApplicationFactory(
-        with_geiq_eligibility_diagnosis=True,
+        with_geiq_eligibility_diagnosis_from_employer=True,
         state=job_application_status,
     )
     _api_token_for([ja.to_company])
@@ -104,33 +104,13 @@ def test_candidatures_geiq_nominal(snapshot):
 
     job_seeker = JobSeekerFactory(for_snapshot=True, jobseeker_profile__education_level="51")
 
-    job_application = JobApplicationFactory(
-        pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9504"),
-        sent_by_authorized_prescriber=True,
-        with_geiq_eligibility_diagnosis=True,
-        was_hired=True,
-        to_company__romes=["N1101"],
-        job_seeker=job_seeker,
-        sender_kind="prescriber",
-        sender_prescriber_organization__kind="HUDA",
-        to_company__siret="11832575900001",
-        to_company__kind=CompanyKind.GEIQ,
-        prehiring_guidance_days=42,
-        contract_type="PROFESSIONAL_TRAINING",
-        nb_hours_per_week=47,
-        qualification_type="CQP",
-        qualification_level="NOT_RELEVANT",
-        planned_training_hours=1664,
-        inverted_vae_contract=True,
-    )
-
     JobApplicationFactory(
         pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9505"),
-        with_geiq_eligibility_diagnosis_from_prescriber=True,
+        with_geiq_eligibility_diagnosis_from_employer=True,
         was_hired=True,
         to_company__romes=["N1101"],
         job_seeker=job_seeker,
-        to_company__siret="11832575966666",  # same SIREN, different SIRET
+        to_company__siret="11832575966666",
         to_company__kind=CompanyKind.GEIQ,
         prehiring_guidance_days=28,
         contract_type="APPRENTICESHIP",
@@ -139,6 +119,26 @@ def test_candidatures_geiq_nominal(snapshot):
         qualification_level="LEVEL_3",
         planned_training_hours=12,
         inverted_vae_contract=False,
+    )
+
+    job_application = JobApplicationFactory(
+        pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9504"),
+        sent_by_authorized_prescriber=True,
+        with_geiq_eligibility_diagnosis_from_prescriber=True,
+        was_hired=True,
+        to_company__romes=["N1101"],
+        job_seeker=job_seeker,
+        sender_kind="prescriber",
+        sender_prescriber_organization__kind="HUDA",
+        to_company__siret="11832575900001",  # same SIREN, different SIRET
+        to_company__kind=CompanyKind.GEIQ,
+        prehiring_guidance_days=42,
+        contract_type="PROFESSIONAL_TRAINING",
+        nb_hours_per_week=47,
+        qualification_type="CQP",
+        qualification_level="NOT_RELEVANT",
+        planned_training_hours=1664,
+        inverted_vae_contract=True,
     )
 
     _api_token_for([job_application.to_company])
@@ -169,7 +169,7 @@ def test_candidatures_geiq_nominal(snapshot):
 
 def test_serializer_method_defaults():
     ja = JobApplicationFactory(
-        with_geiq_eligibility_diagnosis=False,
+        with_geiq_eligibility_diagnosis_from_employer=False,
         job_seeker__jobseeker_profile__education_level="",
     )
     serializer = serializers.GeiqJobApplicationSerializer()
@@ -207,7 +207,7 @@ def test_label_mappings(choices_class, mapping):
 @freeze_time("2023-07-21")
 def test_criteres_eligibilite():
     job_application = JobApplicationFactory(
-        with_geiq_eligibility_diagnosis=True,
+        with_geiq_eligibility_diagnosis_from_employer=True,
         was_hired=True,
     )
     serializer = serializers.GeiqJobApplicationSerializer()

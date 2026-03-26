@@ -99,9 +99,9 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             ),
         )
         # GEIQ --------------------------------------------------------------------------------------------------------
-        with_geiq_eligibility_diagnosis = factory.Trait(
+        with_geiq_eligibility_diagnosis_from_employer = factory.Trait(
+            sent_by_employer=True,
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
-            sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
                 job_seeker=factory.SelfAttribute("..job_seeker"),
