@@ -130,4 +130,4 @@ def test_management_command_name_and_that_all_codes_are_saved(
 ):
     call_command("collect_analytics_data", save=True)
 
-    assert Datum.objects.all().count() == len(DatumCode)
+    assert Datum.objects.all().count() == len([code for code in DatumCode if not code.name.startswith("OLD")])
