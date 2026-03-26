@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from itou.companies.perms import can_create_antenna
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import UserKind
 from itou.utils.errors import silently_report_exception
 
 
@@ -27,18 +26,20 @@ def organization_switcher(context, mode):
             "user": request.user,
             "next_url": reverse("nexus:emplois") if mode == "nexus" else reverse("dashboard:index"),
         }
-        userkind_context = {
-            UserKind.JOB_SEEKER: {
+        if request.user.is_job_seeker:
+            userkind_context = {
                 "icon": "ri-user-line",
                 "kind_display": "Candidat",
                 "no_org_display": request.user.get_full_name(),
-            },
-            UserKind.EMPLOYER: {
+            }
+        elif request.from_employer:
+            userkind_context = {
                 "icon": "ri-community-line",
                 "kind_display": "Employeur",
                 "no_org_display": "Compte inactif",
-            },
-            UserKind.PRESCRIBER: {
+            }
+        elif request.from_prescriber:
+            userkind_context = {
                 "icon": (
                     "ri-user-line"
                     if current_organization is None
@@ -50,19 +51,20 @@ def organization_switcher(context, mode):
                 ),
                 "kind_display": "Orienteur seul" if current_organization is None else current_organization.kind,
                 "no_org_display": request.user.get_full_name(),
-            },
-            UserKind.LABOR_INSPECTOR: {
+            }
+        elif request.from_institution:
+            userkind_context = {
                 "icon": "ri-government-line",
                 "kind_display": "Inspecteur du travail",
                 "no_org_display": "Compte inactif",
-            },
-            UserKind.ITOU_STAFF: {
+            }
+        elif request.user.is_itou_staff:
+            userkind_context = {
                 "icon": "ri-admin-line",
                 "kind_display": "Itou",
                 "no_org_display": "Staff",
-            },
-        }
-        template_context.update(userkind_context[request.user.kind])
+            }
+        template_context.update(userkind_context)
         template_name = {
             "mobile": "layout/_organization_switcher_offcanvas.html",
             "nav": "layout/_organization_switcher_nav.html",
