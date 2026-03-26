@@ -1,0 +1,102 @@
+[
+  {
+    "kind": "coach_orientation_mode",
+    "label": "Autre modalité (préciser)",
+    "value": "autre"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil départemental de la Savoie",
+    "value": "cd-savoie"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil Départemental de l'Essonne",
+    "value": "cd-essonne"
+  },
+  {
+    "kind": "beneficiary_access_mode",
+    "label": "Se faire orienter par un professionnel",
+    "value": "professionnel"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil départemental de la Vienne",
+    "value": "cd-vienne"
+  },
+  {
+    "kind": "beneficiary_access_mode",
+    "label": "Se présenter",
+    "value": "se-presenter"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Région Réunion",
+    "value": "rg-reunion"
+  },
+  {
+    "kind": "beneficiary_access_mode",
+    "label": "Nous envoyer un e-mail",
+    "value": "envoyer-un-mail"
+  },
+  {
+    "kind": "coach_orientation_mode",
+    "label": "Via le formulaire DORA",
+    "value": "formulaire-dora"
+  },
+  {
+    "kind": "beneficiary_access_mode",
+    "label": "Nous téléphoner",
+    "value": "telephoner"
+  },
+  {
+    "kind": "coach_orientation_mode",
+    "label": "Via notre propre formulaire en ligne/site internet",
+    "value": "completer-le-formulaire-dadhesion"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil départemental des Bouches-du-Rhône",
+    "value": "cd-bouches-du-rhone"
+  },
+  {
+    "kind": "coach_orientation_mode",
+    "label": "Nous envoyer un e-mail",
+    "value": "envoyer-un-mail"
+  },
+  {
+    "kind": "beneficiary_access_mode",
+    "label": "Via notre propre formulaire en ligne/site internet",
+    "value": "completer-le-formulaire-dadhesion"
+  },
+  {
+    "kind": "coach_orientation_mode",
+    "label": "Nous téléphoner",
+    "value": "telephoner"
+  },
+  {
+    "kind": "beneficiary_access_mode",
+    "label": "Autre modalité (préciser)",
+    "value": "autre"
+  },
+  {
+    "kind": "coach_orientation_mode",
+    "label": "Nous envoyer un e-mail avec une fiche de prescription",
+    "value": "envoyer-un-mail-avec-une-fiche-de-prescription"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil départemental de la Charente-Maritime",
+    "value": "cd-charente-maritime"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil départemental de l’Aveyron",
+    "value": "cd-aveyron"
+  },
+  {
+    "kind": "funding_label",
+    "label": "Conseil départemental de la Drôme",
+    "value": "cd-drome"
+  }
+]

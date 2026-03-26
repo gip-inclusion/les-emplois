@@ -1,0 +1,32 @@
+[
+  {
+    "value": "accompagnement",
+    "label": "Accompagnement",
+    "description": "Accompagnement global pour le retour \u00e0 l\u2019emploi"
+  },
+  {
+    "value": "aide-financiere",
+    "label": "Aide financi\u00e8re",
+    "description": "Prise en charge financi\u00e8re, aide ou r\u00e9mun\u00e9ration soutenant le retour \u00e0 l\u2019emploi"
+  },
+  {
+    "value": "aide-materielle",
+    "label": "Aide materielle",
+    "description": "Acc\u00e9der \u00e0 du mat\u00e9riel soutenant le retour \u00e0 l\u2019emploi (voiture, v\u00e9lo, ordinateur, alimentation, etc)"
+  },
+  {
+    "value": "atelier",
+    "label": "Atelier",
+    "description": "Groupe de travail constitu\u00e9 autour d\u2019une activit\u00e9, d\u2019un th\u00e8me soutenant le retour \u00e0 l\u2019emploi"
+  },
+  {
+    "value": "formation",
+    "label": "Formation",
+    "description": "Formation dispens\u00e9e par des professionnels pour les b\u00e9n\u00e9ficiaires"
+  },
+  {
+    "value": "information",
+    "label": "Information",
+    "description": "Premier niveau d\u2019information apport\u00e9 par des professionnels du secteur"
+  }
+]
