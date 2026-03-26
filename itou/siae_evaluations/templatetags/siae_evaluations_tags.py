@@ -3,7 +3,6 @@ from django.utils.html import format_html
 
 from itou.siae_evaluations.enums import EvaluatedJobApplicationsState
 from itou.siae_evaluations.models import EvaluatedJobApplication
-from itou.users.enums import UserKind
 
 
 register = template.Library()
@@ -155,9 +154,9 @@ def state_display_for_labor_inspector(evaluated_job_application):
 
 @register.simple_tag(takes_context=True)
 def evaluated_job_application_state_display(context, evaluated_job_application):
-    user_kind = context["request"].user.kind
-    if user_kind == UserKind.EMPLOYER:
+    request = context["request"]
+    if request.from_employer:
         return state_display_for_employer(evaluated_job_application)
-    if user_kind == UserKind.LABOR_INSPECTOR:
+    if request.from_institution:
         return state_display_for_labor_inspector(evaluated_job_application)
-    raise TypeError(f"Unexpected {user_kind=}")
+    raise TypeError(f"Unexpected request from user={request.user.pk}")
