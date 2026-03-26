@@ -2638,26 +2638,39 @@
 # ---
 # name: TestCreateAssessmentView.test_create_assessment_multiple_antennas[Assessment already exists for main & 1 antenna]
   '''
-  <div class="alert alert-danger alert-dismissible fade show" role="status">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          
               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+          
+          
               <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
-                  </div>
+                  
+                      <div class="col-auto pe-0">
+                          
+                              <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger"></i>
+                          
+                      </div>
+                  
                   <div class="col">
-                      <p class="mb-2">
-                          <strong>
-                              
-                                  Ces structures ont déjà été ajoutées à un bilan d’exécution, nous ne pouvez pas les sélectionner pour créer ce bilan.
-                              
-                          </strong>
-                      </p>
-                      <ul class="mb-0">
-                          <li>Un Joli GEIQ</li><li>Une autre antenne</li>
-                      </ul>
+                      
+                          <p class="mb-2">
+                              <strong>
+                  
+                      Ces structures ont déjà été ajoutées à un bilan d’exécution, nous ne pouvez pas les sélectionner pour créer ce bilan.
+                  
+              </strong>
+                          </p>
+                      
+                      
+                  <ul class="mb-0">
+                      <li>Un Joli GEIQ</li><li>Une autre antenne</li>
+                  </ul>
+              
                   </div>
+                  
               </div>
-          </div>
+          
+      </div>
   '''
 # ---
 # name: TestCreateAssessmentView.test_create_assessment_multiple_antennas[Create form with disabled choices]
@@ -2880,26 +2893,39 @@
 # ---
 # name: TestCreateAssessmentView.test_create_assessment_no_antenna[Assessment already exists]
   '''
-  <div class="alert alert-danger alert-dismissible fade show" role="status">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          
               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+          
+          
               <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
-                  </div>
+                  
+                      <div class="col-auto pe-0">
+                          
+                              <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger"></i>
+                          
+                      </div>
+                  
                   <div class="col">
-                      <p class="mb-2">
-                          <strong>
-                              
-                                  Cette structure a déjà été ajoutée à un bilan d’exécution, vous ne pouvez pas la sélectionner pour créer ce bilan.
-                              
-                          </strong>
-                      </p>
-                      <ul class="mb-0">
-                          <li>Un Joli GEIQ</li>
-                      </ul>
+                      
+                          <p class="mb-2">
+                              <strong>
+                  
+                      Cette structure a déjà été ajoutée à un bilan d’exécution, vous ne pouvez pas la sélectionner pour créer ce bilan.
+                  
+              </strong>
+                          </p>
+                      
+                      
+                  <ul class="mb-0">
+                      <li>Un Joli GEIQ</li>
+                  </ul>
+              
                   </div>
+                  
               </div>
-          </div>
+          
+      </div>
   '''
 # ---
 # name: TestCreateAssessmentView.test_create_assessment_no_antenna[No antenna]
