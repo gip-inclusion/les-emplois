@@ -5,12 +5,12 @@ from tests.users import factories as users_factories
 
 
 def test_datum_name_value():
-    assert models.DatumCode.USER_COUNT.value == "US-001"
-    assert models.DatumCode.USER_JOB_SEEKER_COUNT.value == "US-011"
-    assert models.DatumCode.USER_PRESCRIBER_COUNT.value == "US-012"
-    assert models.DatumCode.USER_EMPLOYER_COUNT.value == "US-013"
-    assert models.DatumCode.USER_LABOR_INSPECTOR_COUNT.value == "US-014"
-    assert models.DatumCode.USER_ITOU_STAFF_COUNT.value == "US-015"
+    assert models.DatumCode.USER_COUNT.value == "US-101"
+    assert models.DatumCode.USER_JOB_SEEKER_COUNT.value == "US-111"
+    assert models.DatumCode.USER_PRESCRIBER_COUNT.value == "US-112"
+    assert models.DatumCode.USER_EMPLOYER_COUNT.value == "US-113"
+    assert models.DatumCode.USER_LABOR_INSPECTOR_COUNT.value == "US-114"
+    assert models.DatumCode.USER_ITOU_STAFF_COUNT.value == "US-115"
 
 
 def test_collect_analytics_data_return_all_codes():
