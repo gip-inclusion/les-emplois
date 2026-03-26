@@ -37,10 +37,7 @@ from tests.employee_record.factories import (
     EmployeeRecordFactory,
     EmployeeRecordWithProfileFactory,
 )
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationWithCompleteJobSeekerProfileFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import EmployerFactory
 
 
@@ -79,7 +76,9 @@ class TestEmployeeRecordModel:
 
     def test_creation_with_same_job_application(self):
         # Job application is duplicated (already existing with same approval and SIAE)
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        job_application = JobApplicationFactory(
+            for_employee_record=True,
+        )
 
         # Must be ok
         EmployeeRecord.from_job_application(job_application).save()
@@ -100,7 +99,9 @@ class TestEmployeeRecordModel:
         """
 
         # Standard / normal case
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        job_application = JobApplicationFactory(
+            for_employee_record=True,
+        )
         employee_record = EmployeeRecord.from_job_application(job_application)
         assert employee_record is not None
 
@@ -112,7 +113,9 @@ class TestEmployeeRecordModel:
         """
         Mainly format the job seeker address to Hexa format
         """
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        job_application = JobApplicationFactory(
+            for_employee_record=True,
+        )
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.ready()
 
@@ -138,7 +141,9 @@ class TestEmployeeRecordModel:
             employee_record.ready()
 
     def test_ready_fill_denormalized_fields(self):
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        job_application = JobApplicationFactory(
+            for_employee_record=True,
+        )
         employee_record = EmployeeRecord.from_job_application(job_application)
 
         old_siae, old_approval = job_application.to_company, job_application.approval
@@ -420,7 +425,9 @@ class TestEmployeeRecordLifeCycle:
             "itou.common_apps.address.format.get_geocoding_data",
             side_effect=mock_get_geocoding_data,
         )
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        job_application = JobApplicationFactory(
+            for_employee_record=True,
+        )
         employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record = employee_record
         self.employee_record.ready()
@@ -672,7 +679,7 @@ class TestEmployeeRecordJobApplicationConstraints:
         # Make job application cancellable
         hiring_date = timezone.localdate() + timedelta(days=7)
 
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(hiring_start_at=hiring_date)
+        self.job_application = JobApplicationFactory(for_employee_record=True, hiring_start_at=hiring_date)
         self.employee_record = EmployeeRecord.from_job_application(self.job_application)
         self.employee_record.ready()
 

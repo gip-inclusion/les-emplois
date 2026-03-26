@@ -123,10 +123,22 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 ),
             ),
         )
+        # other -------------------------------------------------------------------------------------------------------
         was_hired = factory.Trait(
             state=JobApplicationState.ACCEPTED,
             to_company__with_jobs=True,
             hired_job=factory.SubFactory(JobDescriptionFactory, company=factory.SelfAttribute("..to_company")),
+        )
+        for_employee_record = factory.Trait(
+            with_approval=True,
+            sent_by_prescriber=True,
+            job_seeker=factory.SubFactory(
+                JobSeekerFactory,
+                with_mocked_address=True,
+                jobseeker_profile__with_hexa_address=True,
+                jobseeker_profile__with_education_level=True,
+                born_in_france=True,
+            ),
         )
         for_snapshot = factory.Trait(
             pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
@@ -215,24 +227,6 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
             datetime.now(UTC).date() + relativedelta(years=2),
         )
     )
-
-
-class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationFactory):
-    """
-    This job application has a jobseeker with a COMPLETE job seeker profile
-
-    Suitable for employee records tests
-    """
-
-    with_approval = True
-    job_seeker = factory.SubFactory(
-        JobSeekerFactory,
-        with_mocked_address=True,
-        jobseeker_profile__with_hexa_address=True,
-        jobseeker_profile__with_education_level=True,
-        born_in_france=True,
-    )
-    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationFactory, with_membership=True)
 
 
 class JobApplicationCommentFactory(factory.django.DjangoModelFactory):

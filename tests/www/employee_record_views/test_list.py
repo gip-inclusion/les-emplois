@@ -24,7 +24,7 @@ from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from tests.companies.factories import CompanyFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
@@ -45,7 +45,8 @@ class TestListEmployeeRecords:
             subject_to_iae_rules=True,
         )
         self.user = self.company.members.get(first_name="Elliot")
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+        self.job_application = JobApplicationFactory(
+            for_employee_record=True,
             to_company=self.company,
             for_snapshot=True,
             job_seeker__city="",
@@ -169,8 +170,8 @@ class TestListEmployeeRecords:
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
         other_employee_record = EmployeeRecordFactory(job_application__to_company=self.company)
         other_approval_number_formatted = format_filters.format_approval_number(other_employee_record.approval_number)
-        accepted_job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
-            to_company=self.company, was_hired=True
+        accepted_job_application = JobApplicationFactory(
+            for_employee_record=True, to_company=self.company, was_hired=True
         )
         client.force_login(self.user)
 

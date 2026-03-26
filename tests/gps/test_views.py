@@ -27,7 +27,7 @@ from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -616,7 +616,7 @@ class TestGroupDetailsMembershipTab:
 
     @freezegun.freeze_time("2025-01-20")
     def test_display_participant_contact_info_as_job_seeker(self, client, snapshot, caplog):
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(for_snapshot=True)
+        job_application = JobApplicationFactory(for_employee_record=True, for_snapshot=True)
         job_seeker = job_application.job_seeker
         group = FollowUpGroupFactory(beneficiary=job_seeker)
         target_participant = FollowUpGroupMembershipFactory(

@@ -11,7 +11,7 @@ from itou.employee_record.models import (
     EmployeeRecordTransitionLog,
     EmployeeRecordUpdateNotification,
 )
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
@@ -59,7 +59,8 @@ class EmployeeRecordFactory(AutoNowOverrideMixin, BareEmployeeRecordFactory):
         ready_for_transfer = factory.Trait(
             status=Status.READY,
             job_application=factory.SubFactory(
-                JobApplicationWithCompleteJobSeekerProfileFactory,
+                JobApplicationFactory,
+                for_employee_record=True,
                 to_company__use_employee_record=True,
             ),
         )
@@ -70,7 +71,7 @@ class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
     Employee record with a complete job seeker profile
     """
 
-    job_application = factory.SubFactory(JobApplicationWithCompleteJobSeekerProfileFactory)
+    job_application = factory.SubFactory(JobApplicationFactory, for_employee_record=True)
 
 
 class BareEmployeeRecordUpdateNotificationFactory(factory.django.DjangoModelFactory):

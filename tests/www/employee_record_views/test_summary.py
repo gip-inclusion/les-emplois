@@ -18,7 +18,7 @@ from tests.employee_record.factories import (
     EmployeeRecordUpdateNotificationFactory,
     EmployeeRecordWithProfileFactory,
 )
-from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 from tests.www.employee_record_views.test_create import FINANCIAL_ANNEX_FORM_HELPER
 
@@ -35,8 +35,11 @@ class TestSummaryEmployeeRecords:
             kind=CompanyKind.EI,
         )
         self.user = self.company.members.get(first_name="Billy")
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
-            to_company=self.company, job_seeker__first_name="Lauren", job_seeker__last_name="Mata"
+        self.job_application = JobApplicationFactory(
+            for_employee_record=True,
+            to_company=self.company,
+            job_seeker__first_name="Lauren",
+            job_seeker__last_name="Mata",
         )
         if self.job_application.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
             ntt = "".join(
