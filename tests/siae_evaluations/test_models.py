@@ -65,7 +65,7 @@ def create_batch_of_job_applications(company, *, size=evaluation_enums.Evaluatio
             job_seeker=approval.user,
             eligibility_diagnosis=approval.eligibility_diagnosis,
             to_company=company,
-            sent_by_company=True,
+            sent_by_employer=True,
             hiring_start_at=start,
             approval=approval,
         )
@@ -176,7 +176,7 @@ def campaign_eligible_job_app_objects():
         job_seeker=job_seeker,
         approval=approval,
         to_company=company,
-        sent_by_company=True,
+        sent_by_employer=True,
         eligibility_diagnosis=diag,
         hiring_start_at=start,
         state=JobApplicationState.ACCEPTED,

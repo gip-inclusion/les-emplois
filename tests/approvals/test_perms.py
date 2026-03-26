@@ -22,7 +22,7 @@ def test_can_view_approval_details():
             job_seeker=approval.user, sent_by_authorized_prescriber=True
         ).sender,  # linked authorized prescriber
         JobApplicationFactory(job_seeker=approval.user).to_company.members.first(),  # employer whom received a job app
-        JobApplicationFactory(job_seeker=approval.user, sent_by_company=True).sender,  # employer who sent a job app
+        JobApplicationFactory(job_seeker=approval.user, sent_by_employer=True).sender,  # employer who sent a job app
     ]:
         request = get_request(user)
         assert can_view_approval_details(request, approval) == PERMS_READ

@@ -109,7 +109,7 @@ def test_transfer():
 
     # Eligibilty diagnosis not sent by authorized prescriber must be deleted
     job_application = JobApplicationFactory(
-        sent_by_company=True,
+        sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
         eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
@@ -157,7 +157,7 @@ def test_model_fields(snapshot):
     target_company.members.add(origin_user)
 
     job_application = JobApplicationFactory(
-        sent_by_company=True,
+        sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
         eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
@@ -191,7 +191,7 @@ def test_workflow_transitions(subtests):
     # `source` contains possible entry points of transition
     for from_state in JobApplicationWorkflow.transitions["transfer"].source:
         with subtests.test(from_state.name):
-            job_application = JobApplicationFactory(sent_by_company=True, state=from_state)
+            job_application = JobApplicationFactory(sent_by_employer=True, state=from_state)
             job_application.state = JobApplicationState.NEW
             job_application.processed_at = None
             job_application.save()  # Triggers transition check
@@ -209,7 +209,7 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
     target_company.members.add(origin_user)
 
     job_application = JobApplicationFactory(
-        sent_by_company=True,
+        sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
         eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
@@ -310,7 +310,7 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     target_company.members.add(origin_user_1)
 
     job_application = JobApplicationFactory(
-        sent_by_company=True,
+        sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
         eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
@@ -343,7 +343,7 @@ def test_transfer_must_delete_comments(comments_count, caplog):
     target_company.members.add(origin_user)
 
     job_application = JobApplicationFactory(
-        sent_by_company=True,
+        sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
         eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),

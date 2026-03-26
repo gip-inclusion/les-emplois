@@ -330,7 +330,7 @@ class TestEmployeeRecordModel:
             "07",
             id="JobApplicationSentByJobSeekerFactory-07",
         ),
-        (functools.partial(JobApplicationFactory, sent_by_company=True), "07"),
+        (functools.partial(JobApplicationFactory, sent_by_employer=True), "07"),
         (JobApplicationSentByPrescriberFactory, "08"),
         (JobApplicationSentByPrescriberOrganizationFactory, "08"),
     ],

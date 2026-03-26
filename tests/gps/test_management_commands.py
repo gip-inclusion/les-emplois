@@ -44,7 +44,7 @@ class TestSyncGroupsManagementCommand:
         # A job app sent by the employer (we don't check if it's sent to the employer company or another)
         job_app_1 = JobApplicationFactory(
             job_seeker=beneficiary,
-            sent_by_company=True,
+            sent_by_employer=True,
             sender=employer,
         )
         geiq_diag_1 = GEIQEligibilityDiagnosisFactory(

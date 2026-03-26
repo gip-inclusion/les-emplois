@@ -235,7 +235,7 @@ class TestTransferUserData:
         "factory",
         [
             JobApplicationSentByJobSeekerFactory,
-            partial(JobApplicationFactory, sent_by_company=True),
+            partial(JobApplicationFactory, sent_by_employer=True),
             JobApplicationSentByPrescriberFactory,
         ],
     )
