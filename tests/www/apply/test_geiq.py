@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateNotUsed, assertTemplateUsed
 
@@ -135,9 +136,10 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
 
-    def test_accepted_job_app_with_expired_diagnosis(self, client):
+    @pytest.mark.parametrize("role", ["employer", "job_seeker", "prescriber"])
+    def test_accepted_job_app_with_expired_diagnosis(self, client, role):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
-        # Create a valid diangosis to check we don't use this one in the display
+        # Create a valid diagnosis to check we don't use this one in the display
         GEIQEligibilityDiagnosisFactory(
             job_seeker=diagnosis.job_seeker,
             author=diagnosis.author,
@@ -151,25 +153,22 @@ class TestJobApplicationGEIQEligibilityDetails:
             geiq_eligibility_diagnosis=diagnosis,
             was_hired=True,
         )
+        user = {
+            "employer": job_application.to_company.members.first(),
+            "job_seeker": job_application.job_seeker,
+            "prescriber": diagnosis.author,
+        }[role]
 
-        # as employer, I still see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.to_company.members.first())
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertContains(response, self.ALLOWANCE_AND_COMPANY)
-        assert response.context["geiq_eligibility_diagnosis"] == diagnosis
+        response = self.get_response(client, job_application, user)
 
-        # as job seeker, I still see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker)
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-        assert response.context["geiq_eligibility_diagnosis"] == diagnosis
-
-        # as a prescriber, I still see my diagnosis
+        assertTemplateUsed(response, "eligibility/includes/geiq/diagnosis_details.html")
+        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assert diagnosis.author.is_prescriber
-        response = self.get_response(client, job_application, diagnosis.author)
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assert response.context["geiq_eligibility_diagnosis"] == diagnosis
+        if role == "employer":
+            assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        else:
+            assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
 
     def test_with_valid_diagnosis_no_allowance(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
