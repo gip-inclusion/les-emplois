@@ -49,11 +49,7 @@ from tests.eligibility.factories import (
 )
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberOrganizationFactory,
-    PriorActionFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -2921,7 +2917,8 @@ def test_prescriber_details_with_older_valid_approval(client, faker):
     # Ensure that the approval details are displayed for a prescriber
     # when the job seeker has a valid approval created on an older approval
     old_job_application = JobApplicationFactory(with_approval=True, hiring_start_at=faker.past_date(start_date="-3m"))
-    new_job_application = JobApplicationSentByPrescriberOrganizationFactory(
+    new_job_application = JobApplicationFactory(
+        sent_by_prescriber=True,
         job_seeker=old_job_application.job_seeker,
         to_company__subject_to_iae_rules=True,
     )

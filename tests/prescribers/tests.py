@@ -257,10 +257,10 @@ class TestPrescriberOrganizationModel:
 
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_merge_two_organizations(self, wet_run):
-        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        job_application_1 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
         organization_1 = job_application_1.sender_prescriber_organization
 
-        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        job_application_2 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
         organization_2 = job_application_2.sender_prescriber_organization
 
         geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
@@ -282,11 +282,11 @@ class TestPrescriberOrganizationModel:
 
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_merge_two_organizations_with_assignments(self, wet_run):
-        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        job_application_1 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
         prescriber_1 = job_application_1.sender
         organization_1 = job_application_1.sender_prescriber_organization
 
-        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        job_application_2 = job_applications_factories.JobApplicationFactory(sent_by_prescriber=True)
         organization_2 = job_application_2.sender_prescriber_organization
 
         # Assignment without similar assignment in the other organization: will be updated

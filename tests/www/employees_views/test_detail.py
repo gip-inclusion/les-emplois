@@ -16,7 +16,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
 from tests.utils.testing import assert_previous_step, parse_response_to_soup, pretty_indented
 
@@ -59,7 +59,8 @@ class TestEmployeeDetailView:
         )
 
         # Another job application on the same SIAE, by a non authorized prescriber
-        same_siae_job_application = JobApplicationSentByPrescriberOrganizationFactory(
+        same_siae_job_application = JobApplicationFactory(
+            sent_by_prescriber=True,
             job_seeker=job_application.job_seeker,
             to_company=job_application.to_company,
             state=JobApplicationState.NEW,

@@ -3,7 +3,6 @@ from itou.metabase.tables.job_applications import TABLE
 from itou.prescribers.enums import PrescriberOrganizationKind
 from tests.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentByPrescriberPoleEmploiFactory,
 )
 
@@ -39,8 +38,8 @@ def test_ja_sent_by_pe():
 
 
 def test_ja_sent_by_spip():
-    ja = JobApplicationSentByPrescriberOrganizationFactory(
-        sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP
+    ja = JobApplicationFactory(
+        sent_by_prescriber=True, sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP
     )
     assert (
         TABLE.get(column_name="nom_prénom_conseiller", input=ja)
@@ -50,8 +49,8 @@ def test_ja_sent_by_spip():
 
 
 def test_ja_sent_by_exotic_prescriber_organization():
-    ja = JobApplicationSentByPrescriberOrganizationFactory(
-        sender_prescriber_organization__kind=PrescriberOrganizationKind.CHRS
+    ja = JobApplicationFactory(
+        sent_by_prescriber=True, sender_prescriber_organization__kind=PrescriberOrganizationKind.CHRS
     )
     assert ja.sender_prescriber_organization.kind != PrescriberOrganizationKind.FT
     assert TABLE.get(column_name="nom_prénom_conseiller", input=ja) is None

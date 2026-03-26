@@ -48,11 +48,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.files.factories import FileFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberOrganizationFactory,
-    JobApplicationWithApprovalNotCancellableFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalNotCancellableFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
@@ -130,7 +126,7 @@ class TestJobApplicationModel:
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         assert not job_application.is_sent_by_authorized_prescriber
 
-        job_application = JobApplicationSentByPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber=True)
         assert not job_application.is_sent_by_authorized_prescriber
 
         job_application = JobApplicationFactory(sent_by_employer=True)
@@ -161,7 +157,7 @@ class TestJobApplicationModel:
         ]
         items = [
             [JobApplicationFactory(sent_by_authorized_prescriber=True), "Prescripteur"],
-            [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
+            [JobApplicationFactory(sent_by_prescriber=True), "Orienteur"],
             [JobApplicationFactory(sent_by_employer=True), "Employeur"],
             [JobApplicationFactory(sent_by_job_seeker=True), "Demandeur d'emploi"],
         ] + non_siae_items
@@ -1823,7 +1819,8 @@ class TestJobApplicationWorkflow:
         """
         Accept a job application sent by an "orienteur".
         """
-        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_prescriber=True,
             state=JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             with_iae_eligibility_diagnosis=True,
@@ -1948,7 +1945,8 @@ class TestJobApplicationWorkflow:
             eligibility_diagnosis__expired=True,
         )
         assert approval.is_in_waiting_period
-        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_prescriber=True,
             job_seeker=user,
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
@@ -2604,9 +2602,9 @@ class TestJobApplicationAdminForm:
         assert ["SIAE émettrice inattendue."] == form.errors["__all__"]
         job_application.sender_company = sender_company
 
-        job_application.sender_prescriber_organization = (
-            JobApplicationSentByPrescriberOrganizationFactory().sender_prescriber_organization
-        )
+        job_application.sender_prescriber_organization = JobApplicationFactory(
+            sent_by_prescriber=True
+        ).sender_prescriber_organization
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Organisation du prescripteur émettrice inattendue."] == form.errors["__all__"]
@@ -2643,9 +2641,9 @@ class TestJobApplicationAdminForm:
         assert ["Émetteur SIAE manquant."] == form.errors["__all__"]
         job_application.sender = sender
 
-        job_application.sender_prescriber_organization = (
-            JobApplicationSentByPrescriberOrganizationFactory().sender_prescriber_organization
-        )
+        job_application.sender_prescriber_organization = JobApplicationFactory(
+            sent_by_prescriber=True
+        ).sender_prescriber_organization
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert [
@@ -2658,7 +2656,7 @@ class TestJobApplicationAdminForm:
         assert form.is_valid()
 
     def test_applications_sent_by_prescriber_with_organization(self):
-        job_application = JobApplicationSentByPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber=True)
         job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender = job_application.sender
         sender_prescriber_organization = job_application.sender_prescriber_organization
