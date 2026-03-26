@@ -1,0 +1,16 @@
+{% load django_bootstrap5 %}
+
+<div class="dropdown"{% if request.htmx %} hx-swap-oob="true"{% endif %} id="dropdown-potential-allowance-container">
+    <button type="button"
+            class="btn btn-dropdown-filter dropdown-toggle {% if filters_form.potential_allowance_1400.value or filters_form.potential_allowance_814.value or filters_form.potential_allowance_0.value %} has-selected-item{% endif %}"
+            data-bs-toggle="dropdown"
+            data-bs-display="static"
+            data-bs-auto-close="outside"
+            id="btn-filter-potential-allowance">Aide potentielle</button>
+
+    <ul class="dropdown-menu">
+        <li>{% bootstrap_field filters_form.potential_allowance_1400 wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.potential_allowance_814 wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.potential_allowance_0 wrapper_class="dropdown-item" %}</li>
+    </ul>
+</div>
