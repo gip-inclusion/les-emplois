@@ -32,14 +32,16 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body mt-n3">
-                    <div class="alert alert-danger" role="status">
-                        <p class="mb-0">
-                            L'environnement de démonstration des <b>emplois de l'inclusion</b> est limité à des fins de formation.
-                            <br>
-                            Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>.
-                            Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
-                        </p>
-                    </div>
+                    {% component_alert content=content variant="danger" icon=False %}
+                        {% fragment as content %}
+                            <p class="mb-0">
+                                L'environnement de démonstration des <b>emplois de l'inclusion</b> est limité à des fins de formation.
+                                <br>
+                                Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>.
+                                Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
+                            </p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
                     <div>
                         <h4 class="h5">Employeurs</h4>
                         <div class="d-flex flex-column flex-sm-row gap-3">

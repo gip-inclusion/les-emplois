@@ -1,10 +1,15 @@
 {% load buttons_form %}
+{% load components %}
 
 <div class="c-form">
     {% with request.from_employer|yesno:"structure,organisation" as org_display %}
-        <div class="alert alert-warning">
-            Êtes-vous sûr de vouloir retirer <b>{{ target_member.get_inverted_full_name }}</b> de votre {{ org_display }} <b>{{ structure.display_name }}</b> ?
-        </div>
+        {% component_alert content=content variant="warning" icon=False %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Êtes-vous sûr de vouloir retirer <b>{{ target_member.get_inverted_full_name }}</b> de votre {{ org_display }} <b>{{ structure.display_name }}</b> ?
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
 
         <p class="mb-0">Une fois retiré :</p>
         <ul>

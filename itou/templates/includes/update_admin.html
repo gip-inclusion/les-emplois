@@ -1,16 +1,21 @@
 {% load buttons_form %}
+{% load components %}
 
 <div class="c-form">
     {% with request.from_employer|yesno:"structure,organisation" as org_display %}
-        {% if action == "remove" %}
-            <div class="alert alert-warning">
-                Vous allez retirer les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_inverted_full_name }}</b>
-            </div>
-        {% else %}
-            <div class="alert alert-warning">
-                Vous allez ajouter les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_inverted_full_name }}</b>
-            </div>
-        {% endif %}
+        {% component_alert content=content variant="warning" icon=False %}
+            {% fragment as content %}
+                {% if action == "remove" %}
+                    <p class="mb-0">
+                        Vous allez retirer les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_inverted_full_name }}</b>
+                    </p>
+                {% else %}
+                    <p class="mb-0">
+                        Vous allez ajouter les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_inverted_full_name }}</b>
+                    </p>
+                {% endif %}
+            {% endfragment %}
+        {% endcomponent_alert %}
 
         <ul>
             <li>Le role d'administrateur permet d'ajouter ou de retirer des utilisateurs de votre {{ org_display }}.</li>
