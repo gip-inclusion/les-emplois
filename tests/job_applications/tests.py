@@ -287,7 +287,11 @@ class TestJobApplicationModel:
             id="sent_by_other_job_seeker",
         ),
         pytest.param(
-            lambda: JobApplicationFactory(sent_by_company=True, sender_company=None),
+            lambda: JobApplicationFactory(
+                sent_by_company=True,
+                sender_company=None,
+                sender=EmployerFactory(),
+            ),
             "employer_sender_coherence",
             id="sent_by_employer_without_company",
         ),
@@ -301,6 +305,7 @@ class TestJobApplicationModel:
         pytest.param(
             lambda: JobApplicationFactory(
                 sent_by_company=True,
+                sender=EmployerFactory(),
                 sender_company=None,
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
             ),
