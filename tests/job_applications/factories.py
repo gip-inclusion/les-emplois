@@ -217,13 +217,6 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
     )
 
 
-class JobApplicationWithoutApprovalFactory(JobApplicationFactory):
-    """Generates a JobApplication() object without an Approval() object."""
-
-    sent_by_prescriber_alone = True
-    state = JobApplicationState.ACCEPTED
-
-
 class JobApplicationWithApprovalNotCancellableFactory(JobApplicationFactory):
     with_approval = True
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date() - relativedelta(days=5))
