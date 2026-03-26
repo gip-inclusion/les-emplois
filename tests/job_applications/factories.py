@@ -44,6 +44,8 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         skip_postgeneration_save = True
 
     class Params:
+        # attributes used in Traits
+        sender_is_job_seeker = factory.LazyAttribute(lambda o: o.sender_kind == SenderKind.JOB_SEEKER)
         # Sender ------------------------------------------------------------------------------------------------------
         sent_by_job_seeker = factory.Trait(
             sender_kind=SenderKind.JOB_SEEKER,
@@ -73,7 +75,11 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 IAEEligibilityDiagnosisFactory,
                 from_prescriber=True,
                 job_seeker=factory.SelfAttribute("..job_seeker"),
-                author=factory.SelfAttribute("..sender"),
+                author=factory.Maybe(
+                    "..sender_is_job_seeker",
+                    yes_declaration=factory.SubFactory(PrescriberFactory),
+                    no_declaration=factory.SelfAttribute("..sender"),
+                ),
             ),
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, subject_to_iae_rules=True),
         )
