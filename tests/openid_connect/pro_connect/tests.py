@@ -44,7 +44,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
-from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN, OIDC_USERINFO
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
@@ -955,8 +955,10 @@ class TestProConnectLogout:
 
 class TestProConnectMapChannel:
     def test_happy_path(self, client, pro_connect):
-        job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
-            sender_prescriber_organization__code_safir_pole_emploi="95021"
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__france_travail=True,
+            sender_prescriber_organization__code_safir_pole_emploi="95021",
         )
         prescriber = job_application.sender
         prescriber.email = pro_connect.oidc_userinfo["email"]
@@ -987,8 +989,10 @@ class TestProConnectMapChannel:
 
     def test_create_user(self, client, pro_connect):
         # Application sent by a colleague from the same agency but not by the prescriber himself.
-        job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
-            sender_prescriber_organization__code_safir_pole_emploi="95021"
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__france_travail=True,
+            sender_prescriber_organization__code_safir_pole_emploi="95021",
         )
 
         # Prescriber does not belong to this organization on Itou but
@@ -1022,8 +1026,10 @@ class TestProConnectMapChannel:
 
     def test_create_user_organization_not_found(self, client, pro_connect):
         # Application sent by a colleague from the same agency but not by the prescriber himself.
-        job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
-            sender_prescriber_organization__code_safir_pole_emploi=11111
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            sender_prescriber_organization__france_travail=True,
+            sender_prescriber_organization__code_safir_pole_emploi=11111,
         )
 
         # Prescriber does not belong to this organization on Itou but
