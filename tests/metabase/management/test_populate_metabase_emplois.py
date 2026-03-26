@@ -446,7 +446,7 @@ def test_populate_job_applications(snapshot):
     )
     job = JobDescriptionFactory(is_active=True, company=company)
     ja = JobApplicationFactory(
-        with_geiq_eligibility_diagnosis=True,
+        with_geiq_eligibility_diagnosis_from_employer=True,
         contract_type=ContractType.APPRENTICESHIP,
         state=JobApplicationState.ACCEPTED,
     )
@@ -467,9 +467,9 @@ def test_populate_job_applications(snapshot):
                 ja.hiring_start_at,
                 ja.processed_at.date(),
                 "Candidature acceptée",
-                "Orienteur",
-                "Orienteur sans organisation",
-                None,
+                "Employeur",
+                "Employeur GEIQ",
+                ja.sender_company.pk,
                 "default",
                 None,
                 None,

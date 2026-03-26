@@ -356,7 +356,7 @@ class TestGEIQEligibilityDetail:
         if not hiring_start_at:
             hiring_start_at = datetime.date(2024, 8, 3)
         job_application = JobApplicationFactory(
-            with_geiq_eligibility_diagnosis=True,
+            with_geiq_eligibility_diagnosis_from_employer=True,
             geiq_eligibility_diagnosis=diagnosis,
             hiring_start_at=hiring_start_at,
         )

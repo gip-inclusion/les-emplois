@@ -393,7 +393,7 @@ def test_can_be_cancelled_when_an_employee_record_with_blocking_logs_exists(tran
 
 
 def test_diagnoses_coherence_contraint():
-    job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
+    job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis_from_employer=True)
     job_application.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
     # Mind the parens in RE...
@@ -681,7 +681,7 @@ class TestJobApplicationQuerySet:
         assert getattr(obj, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id(self):
-        job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
+        job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis_from_employer=True)
         diagnosis = job_app.geiq_eligibility_diagnosis
         obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
         assert obj.jobseeker_geiq_eligibility_diagnosis_id == diagnosis.pk
@@ -693,7 +693,9 @@ class TestJobApplicationQuerySet:
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_expired(self):
         # If a diagnosis is associated with a job application, return it whatever its validity
-        job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, geiq_eligibility_diagnosis__expired=True)
+        job_app = JobApplicationFactory(
+            with_geiq_eligibility_diagnosis_from_employer=True, geiq_eligibility_diagnosis__expired=True
+        )
         obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
         assert obj.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
         obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
@@ -764,7 +766,9 @@ class TestJobApplicationQuerySet:
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_diagnoses_on_jobapp_and_jobseeker(
         self,
     ):
-        job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, sent_by_employer=True)
+        job_application = JobApplicationFactory(
+            with_geiq_eligibility_diagnosis_from_employer=True, sent_by_employer=True
+        )
         assert job_application.geiq_eligibility_diagnosis.author_kind == AuthorKind.GEIQ
 
         GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
