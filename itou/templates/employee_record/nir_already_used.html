@@ -1,4 +1,5 @@
 {% extends "employee_record/base_add.html" %}
+{% load components %}
 {% load theme_inclusion %}
 
 {% block title_navinfo %}
@@ -11,13 +12,15 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <h2>Vous ne pouvez pas continuer</h2>
-                    <div class="alert alert-warning">
-                        <p>
-                            Cette fiche salarié ne peut pas être créé ou modifiée.
-                            Veuillez d’abord régulariser le numéro de sécurité sociale.
-                        </p>
-                        <a href="{{ fix_nir_url }}" class="btn btn-primary">Régulariser le n⁰ de sécurité sociale</a>
-                    </div>
+                    {% component_alert content=content variant="warning" icon=False %}
+                        {% fragment as content %}
+                            <p>
+                                Cette fiche salarié ne peut pas être créé ou modifiée.
+                                Veuillez d’abord régulariser le numéro de sécurité sociale.
+                            </p>
+                            <a href="{{ fix_nir_url }}" class="btn-link mb-0">Régulariser le n⁰ de sécurité sociale</a>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
                 </div>
             </div>
         </div>

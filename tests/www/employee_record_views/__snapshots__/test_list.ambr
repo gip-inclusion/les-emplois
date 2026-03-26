@@ -32,9 +32,9 @@
 # name: TestListEmployeeRecords.test_missing_employee_records_alert[plural]
   '''
   <div class="alert alert-warning" id="id_missing_employee_records_alert" role="status">
-      <div class="row align-items-center">
+      <div class="row">
           <div class="col-auto pe-0">
-              <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
               </i>
           </div>
           <div class="col">
@@ -50,9 +50,9 @@
 # name: TestListEmployeeRecords.test_missing_employee_records_alert[singular]
   '''
   <div class="alert alert-warning" id="id_missing_employee_records_alert" role="status">
-      <div class="row align-items-center">
+      <div class="row">
           <div class="col-auto pe-0">
-              <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
               </i>
           </div>
           <div class="col">

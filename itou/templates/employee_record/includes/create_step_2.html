@@ -20,19 +20,21 @@
                                 <i class="ri-error-warning-line ri-lg me-1" aria-hidden="true"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
                             </p>
                         {% else %}
-                            <div class="alert alert-danger" role="status">
-                                <p class="mb-2">
-                                    <strong>L'adresse du salarié n'a pu être vérifiée automatiquement.</strong>
-                                </p>
-                                <p class="mb-0">Ceci peut être dû à:</p>
-                                <ul>
-                                    <li>une erreur temporaire de géolocalisation,</li>
-                                    <li>une adresse introuvable (code postal ou voie erronée).</li>
-                                </ul>
-                                <p class="m-0">
-                                    <b>Merci de bien vouloir saisir l'adresse du salarié dans le formulaire ci-dessous.</b>
-                                </p>
-                            </div>
+                            {% component_alert title=title content=content variant="danger" icon=False %}
+                                {% fragment as title %}
+                                    L'adresse du salarié n'a pu être vérifiée automatiquement.
+                                {% endfragment %}
+                                {% fragment as content %}
+                                    <p class="mb-0">Ceci peut être dû à :</p>
+                                    <ul>
+                                        <li>une erreur temporaire de géolocalisation,</li>
+                                        <li>une adresse introuvable (code postal ou voie erronée).</li>
+                                    </ul>
+                                    <p class="mb-0">
+                                        <b>Merci de bien vouloir saisir l'adresse du salarié dans le formulaire ci-dessous.</b>
+                                    </p>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
                         {% endif %}
                     </div>
                     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-5" %}

@@ -1,3 +1,5 @@
+{% load components %}
+
 <div id="employee-records-list-header"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
         <h2 class="mb-0">Fiches salarié ASP</h2>
@@ -9,61 +11,45 @@
         </div>
     </div>
     {% if num_recently_missing_employee_records %}
-        <div class="alert alert-warning" role="status" id="id_missing_employee_records_alert">
-            <div class="row align-items-center">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    {% if num_recently_missing_employee_records == 1 %}
-                        <p class="mb-0">1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.</p>
-                    {% else %}
-                        <p class="mb-0">
-                            {{ num_recently_missing_employee_records }} nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
-                        </p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% component_alert content=content variant="warning" extra_id="id_missing_employee_records_alert" %}
+            {% fragment as content %}
+                {% if num_recently_missing_employee_records == 1 %}
+                    <p class="mb-0">1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.</p>
+                {% else %}
+                    <p class="mb-0">
+                        {{ num_recently_missing_employee_records }} nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
+                    </p>
+                {% endif %}
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
     {% if show_siret_has_changed_warning %}
-        <div id="changed-siret-warning" class="alert alert-warning alert-dismissible-once d-none" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Incohérence de numéro SIRET détectée</strong>
-                    </p>
-                    <p>
-                        Le numéro SIRET associé à certaines fiches salarié "Intégrées" est différent de votre numéro SIRET actuel.
-                        Cela peut empêcher l'affichage de ces fiches dans votre espace Extranet IAE 2.0 de l'ASP.
-                        Si vous avez besoin de les récupérer, cliquez sur "<b>Renvoyer cette fiche salarié</b>".
-                    </p>
-                    <a href="{{ ITOU_HELP_CENTER_URL }}/articles/15266700470289--Mettre-%C3%A0-jour-une-fiche-salari%C3%A9"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Consulter la documentation sur la mise à jour de fiche salarié (ouverture dans un nouvel onglet)"
-                       class="btn-link has-external-link">Consulter le mode d'emploi</a>
-                </div>
-            </div>
-        </div>
+        {% component_alert title=title content=content variant="warning" dismissible_once=True extra_id="changed-siret-warning" %}
+            {% fragment as title %}
+                Incohérence de numéro SIRET détectée
+            {% endfragment %}
+            {% fragment as content %}
+                <p>
+                    Le numéro SIRET associé à certaines fiches salarié "Intégrées" est différent de votre numéro SIRET actuel.
+                    Cela peut empêcher l'affichage de ces fiches dans votre espace Extranet IAE 2.0 de l'ASP.
+                    Si vous avez besoin de les récupérer, cliquez sur "<b>Renvoyer cette fiche salarié</b>".
+                </p>
+                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/15266700470289--Mettre-%C3%A0-jour-une-fiche-salari%C3%A9"
+                   rel="noopener"
+                   target="_blank"
+                   aria-label="Consulter la documentation sur la mise à jour de fiche salarié (ouverture dans un nouvel onglet)"
+                   class="btn-link has-external-link">Consulter le mode d'emploi</a>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
-    <div class="alert alert-info" role="status">
-        <div class="row">
-            <div class="col-auto pe-0">
-                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-            </div>
-            <div class="col">
-                <p class="mb-2">
-                    <strong>Vous ne trouvez pas votre salarié ?</strong>
-                </p>
-                <p class="mb-0">
-                    Vous pouvez faire <a href="{% url 'employee_record_views:missing_employee' %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure">une recherche avancée</a> parmi l’ensemble des candidats ou salariés de votre structure.
-                </p>
-            </div>
-        </div>
-    </div>
+    {% component_alert title=title content=content variant="info" %}
+        {% fragment as title %}
+            Vous ne trouvez pas votre salarié ?
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Vous pouvez faire <a href="{% url 'employee_record_views:missing_employee' %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure">une recherche avancée</a> parmi l’ensemble des candidats ou salariés de votre structure.
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 </div>
