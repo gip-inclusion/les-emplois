@@ -7,7 +7,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
-from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.job_applications.factories import JobApplicationFactory
 
 
 class TestDisableEmployeeRecords:
@@ -24,7 +24,7 @@ class TestDisableEmployeeRecords:
             subject_to_iae_rules=True,
         )
         self.user = self.company.members.get(first_name="Billy")
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.company)
+        self.job_application = JobApplicationFactory(for_employee_record=True, to_company=self.company)
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
         self.url = reverse("employee_record_views:disable", args=(self.employee_record.id,))
 
