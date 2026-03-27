@@ -485,7 +485,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "created_by",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
-                        "external_data_source_history_formatted",
                     ]
                 },
             ),
@@ -528,6 +527,12 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             # Add allow_next_sso_sub_update just after identity_provider
             fieldsets[0][1]["fields"] += ("allow_next_sso_sub_update",)
 
+        fieldsets.append(
+            (
+                "Audit",
+                {"fields": ("external_data_source_history_formatted",)},
+            )
+        )
         return fieldsets
 
     def get_search_fields(self, request):
