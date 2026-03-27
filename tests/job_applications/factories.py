@@ -118,9 +118,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 job_seeker=factory.SelfAttribute("..job_seeker"),
                 author=factory.SelfAttribute("..sender"),
                 author_kind=AuthorKind.PRESCRIBER,
-                author_prescriber_organization=factory.SubFactory(
-                    PrescriberOrganizationFactory, authorized=True, with_membership=True
-                ),
+                author_prescriber_organization=factory.SelfAttribute("..sender_prescriber_organization"),
             ),
         )
         # other -------------------------------------------------------------------------------------------------------
