@@ -35,18 +35,13 @@
                     </div>
 
                     {% if siren_form.cleaned_data and not companies_without_members and not companies_with_members %}
-                        <div class="alert alert-warning mt-3 mt-md-4" role="status">
-                            <div class="row">
-                                <div class="col-auto pe-0">
-                                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                                </div>
-                                <div class="col">
-                                    <p class="mb-2">
-                                        <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        {% component_alert content=content variant="warning" extra_classes="mt-3 mt-md-4" %}
+                            {% fragment as content %}
+                                <p class="mb-0">
+                                    <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>
+                                </p>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
 
                         <div class="mt-3 mt-md-4">
                             <h3>Si vous tentez d'inscrire :</h3>
@@ -122,15 +117,17 @@
                                 </ul>
 
                                 <hr>
-                                <div class="alert alert-info" role="status">
-                                    <p>
-                                        En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
-                                    </p>
-                                    <ul>
-                                        <li>Pour les SIAE, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 de l’ASP,</li>
-                                        <li>Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.</li>
-                                    </ul>
-                                </div>
+                                {% component_alert content=content variant="info" icon=False %}
+                                    {% fragment as content %}
+                                        <p>
+                                            En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
+                                        </p>
+                                        <ul class="mb-0">
+                                            <li>Pour les SIAE, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 de l’ASP,</li>
+                                            <li>Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.</li>
+                                        </ul>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
 
                                 {% itou_buttons_form primary_label="Envoyer ma demande de validation" %}
                             </form>

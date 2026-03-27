@@ -1,5 +1,6 @@
 {% extends "signup/job_seeker_signup_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load redirection_fields %}
@@ -39,19 +40,16 @@
             {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
 
             {% if "nir" in form.errors or form.skip %}
-                <div class="alert alert-info">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
+                {% component_alert content=content variant="info" %}
+                    {% fragment as content %}
+                        <p class="mb-0">Vous ne possédez pas de numéro de sécurité sociale ?</p>
+                        <p class="mb-0">
                             <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
                                 Cliquez ici pour accéder à l'étape suivante.
                             </button>
-                        </div>
-                    </div>
-                </div>
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
             {% endif %}
 
             <p>
