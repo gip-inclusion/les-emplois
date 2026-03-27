@@ -1333,7 +1333,7 @@ class TestCheckPreviousApplicationsForHireView:
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assertContains(response, "Ce candidat a déjà postulé pour votre entreprise")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": hire_session.name}),
             data={"force_new_application": "force"},
@@ -1354,7 +1354,7 @@ class TestCheckPreviousApplicationsForHireView:
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assertContains(response, "Ce candidat a déjà postulé pour votre entreprise")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": hire_session.name}),
             data={"force_new_application": "force"},
@@ -1376,7 +1376,7 @@ class TestCheckPreviousApplicationsForHireView:
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assertContains(response, "Ce candidat a déjà postulé pour votre entreprise")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": hire_session.name}),
             data={"force_new_application": "force"},
@@ -1435,7 +1435,7 @@ class TestCheckPreviousApplicationsForHireView:
         )
         response = client.get(prev_applicaitons_url)
 
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assertContains(response, "Ce candidat a déjà postulé pour votre entreprise")
 
         assertContains(response, date_format(localtime(application_in_period_refused.created_at), DATE_FORMAT))
         assertContains(response, date_format(localtime(application_in_period_processing.created_at), DATE_FORMAT))
