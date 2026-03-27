@@ -2302,10 +2302,11 @@
             (SELECT %s AS "a"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-             WHERE (("users_user"."created_by_id" = %s
-                     AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
-                    OR ("users_user"."created_by_id" = %s
-                        AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s)))
+             WHERE ("users_user"."kind" = %s
+                    AND (("users_user"."created_by_id" = %s
+                          AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
+                         OR ("users_user"."created_by_id" = %s
+                             AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))))
           UNION
             (SELECT %s AS "a"
              FROM "job_applications_jobapplication"
@@ -5001,10 +5002,11 @@
             (SELECT %s AS "a"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-             WHERE (("users_user"."created_by_id" = %s
-                     AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
-                    OR ("users_user"."created_by_id" = %s
-                        AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s)))
+             WHERE ("users_user"."kind" = %s
+                    AND (("users_user"."created_by_id" = %s
+                          AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
+                         OR ("users_user"."created_by_id" = %s
+                             AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))))
           UNION
             (SELECT %s AS "a"
              FROM "job_applications_jobapplication"

@@ -185,6 +185,9 @@ class TestManager:
             from_prescriber=True,
         )
 
+        # In the past (before 2022-04), prescribers and employers could be created by colleagues: don't retrieve them
+        PrescriberFactory(created_by=prescriber)
+
         job_seeker_created_by_organization_coworker = JobSeekerFactory(
             jobseeker_profile__created_by_prescriber_organization=organization
         )
