@@ -159,6 +159,7 @@ class TestExternalDataImport:
 
 class TestJobSeekerExternalData:
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_import_ok(self):
         _mock_status_ok()
 

@@ -36,6 +36,7 @@ from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import ActionKind, IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
@@ -954,7 +955,8 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         geispolsheim_commune = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
         self.job_seeker.jobseeker_profile.birth_place = geispolsheim_commune
         self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
         self._check_only_administrative_allowed(client, self.company.members.first())
 
         # Check that birth place infos are still there
@@ -978,8 +980,8 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
-
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
@@ -1688,7 +1690,8 @@ class TestFillJobSeekerInfosForHire:
         else:
             self.job_seeker.jobseeker_profile.birth_country = None
             self.job_seeker.jobseeker_profile.birth_place = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
 
         client.force_login(self.company.members.first())
         session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
@@ -1778,7 +1781,8 @@ class TestFillJobSeekerInfosForHire:
         assert self.job_seeker.jobseeker_profile.birthdate
         self.job_seeker.jobseeker_profile.birth_country = None
         self.job_seeker.jobseeker_profile.birth_place = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
 
         client.force_login(self.company.members.first())
         session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
@@ -1930,7 +1934,8 @@ class TestFillJobSeekerInfosForHire:
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = random.choice(
             [LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER, ""]
         )
-        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
         client.force_login(self.company.members.first())
         session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
@@ -1987,7 +1992,8 @@ class TestFillJobSeekerInfosForHire:
             )
         else:
             self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["pole_emploi_id", "lack_of_pole_emploi_id_reason"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["pole_emploi_id", "lack_of_pole_emploi_id_reason"])
 
         session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
         fill_job_seeker_infos_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid})
@@ -2072,7 +2078,8 @@ class TestFillJobSeekerInfosForHire:
         self.job_seeker.jobseeker_profile.birth_country = None
         self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.pole_emploi_id = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place", "pole_emploi_id"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place", "pole_emploi_id"])
 
         client.force_login(self.company.members.first())
         hire_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
@@ -2307,7 +2314,8 @@ class TestHireContract:
         hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.birth_country = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": hire_session.name}))
         assertRedirects(
@@ -2328,7 +2336,8 @@ class TestHireContract:
         client.force_login(company.members.first())
         self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.birth_country = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
 
         other_country = Country.objects.exclude(pk=Country.FRANCE_ID).first()
         hire_session = fake_session_initialization(

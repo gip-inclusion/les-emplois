@@ -11,6 +11,7 @@ from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason, Title
+from itou.utils import triggers
 from itou.utils.templatetags.format_filters import format_nir
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import (
@@ -79,7 +80,8 @@ class TestSummaryEmployeeRecords:
 
         profile.nir = ""
         profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        profile.save()
+        with triggers.context():
+            profile.save()
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
         assertContains(response, "L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.")
@@ -128,7 +130,8 @@ class TestSummaryEmployeeRecords:
         job_seeker.jobseeker_profile.mean_monthly_income_before_process = "123.45"
         job_seeker.jobseeker_profile.eiti_contributions = EITIContributions.UNDETERMINED
 
-        job_seeker.jobseeker_profile.save()
+        with triggers.context():
+            job_seeker.jobseeker_profile.save()
 
         self.employee_record.ntt = "1234567890ABC"  # No validation here, just display since NIR is missing
         self.employee_record.save()
@@ -151,7 +154,8 @@ class TestSummaryEmployeeRecords:
             new_nir = ("1" if job_seeker.title == Title.M else "2") + job_seeker.jobseeker_profile.nir[1:-2]
             new_nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
             job_seeker.jobseeker_profile.nir = new_nir
-            job_seeker.jobseeker_profile.save(update_fields=("nir",))
+            with triggers.context():
+                job_seeker.jobseeker_profile.save(update_fields=("nir",))
 
         client.force_login(self.user)
 
@@ -178,7 +182,8 @@ class TestSummaryEmployeeRecords:
 
         # No NIR, NTT but nothing in archived_json
         self.job_application.job_seeker.jobseeker_profile.nir = ""
-        self.job_application.job_seeker.jobseeker_profile.save()
+        with triggers.context():
+            self.job_application.job_seeker.jobseeker_profile.save()
         self.employee_record.archived_json = None
         self.employee_record.save()
         response = client.get(self.url)

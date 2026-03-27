@@ -853,7 +853,12 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     FIELDS_HISTORY_TRIGGER_NAME = "job_seeker_profile_fields_history"
     FIELDS_HISTORY_TRIGGER_FIELDS = [
         "asp_uid",
+        "birth_country",
+        "birth_place",
+        "birthdate",
         "is_not_stalled_anymore",
+        "nir",
+        "pole_emploi_id",
     ]
 
     ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
