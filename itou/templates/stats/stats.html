@@ -28,41 +28,29 @@
 {% block title_messages %}
     {{ block.super }}
     {% for banner in pilotage_webinar_banners %}
-        <div class="alert alert-info alert-dismissible fade show" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>{{ banner.title }}</strong>
-                    </p>
-                    <p class="mb-0">{{ banner.description|safe }}</p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a class="btn btn-sm btn-primary has-external-link" href="{{ banner.url }}" target="_blank" rel="noopener">{{ banner.call_to_action|default:"Je m’inscris" }}</a>
-                </div>
-            </div>
-        </div>
+        {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible=True %}
+            {% fragment as title %}
+                {{ banner.title }}
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">{{ banner.description|safe }}</p>
+            {% endfragment %}
+            {% fragment as call_to_action %}
+                <a class="btn btn-sm btn-primary has-external-link" href="{{ banner.url }}" target="_blank" rel="noopener">{{ banner.call_to_action|default:"Je m’inscris" }}</a>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endfor %}
     {% if tally_suspension_form %}
-        <div class="alert alert-info alert-dismissible fade show" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Ce tableau de bord pourrait disparaître : qu’en pensez-vous ?</strong>
-                    </p>
-                    <p class="mb-0">
-                        L’équipe de pilotage de l’inclusion fait le bilan sur l’utilisation des tableaux de bord qui vous sont proposés. Le tableau de bord que vous consultez enregistre peu de connexions de la part nos utilisateurs. En conséquence, nous envisageons de suspendre la mise à disposition de ce tableau de bord à partir d’avril 2025. Si ce tableau de bord vous est utile dans le cadre de vos missions, nous vous invitons à nous le signaler en cliquant <a href="{{ tally_suspension_form }}" target="_blank" rel="noopener">ici</a> !
-                    </p>
-                </div>
-            </div>
-        </div>
+        {% component_alert title=title content=content variant="info" dismissible=True %}
+            {% fragment as title %}
+                Ce tableau de bord pourrait disparaître : qu’en pensez-vous ?
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    L’équipe de pilotage de l’inclusion fait le bilan sur l’utilisation des tableaux de bord qui vous sont proposés. Le tableau de bord que vous consultez enregistre peu de connexions de la part nos utilisateurs. En conséquence, nous envisageons de suspendre la mise à disposition de ce tableau de bord à partir d’avril 2025. Si ce tableau de bord vous est utile dans le cadre de vos missions, nous vous invitons à nous le signaler en cliquant <a href="{{ tally_suspension_form }}" target="_blank" rel="noopener">ici</a> !
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
     {% endif %}
 {% endblock %}
 
