@@ -77,6 +77,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_user_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."fields_history",
@@ -140,6 +141,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_user_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_identitycertification"."id",
@@ -155,6 +157,7 @@
         'origin': list([
           'ExternalDataImportQuerySet.first[<site-packages>/django/db/models/query.py]',
           'edit_user_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "external_data_externaldataimport"."id",
@@ -178,6 +181,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_user_info.html]',
           'edit_user_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",

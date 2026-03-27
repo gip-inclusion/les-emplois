@@ -13,6 +13,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.views.generic import DetailView, TemplateView, View
 
@@ -518,6 +519,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
         return super().dispatch(request, *args, **kwargs)
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class CheckNIRForJobSeekerView(JobSeekerBaseView):
     template_name = "job_seekers_views/step_check_job_seeker_nir.html"
     EXPECTED_SESSION_KIND = JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER
@@ -634,6 +636,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
         }
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
     template_name = "job_seekers_views/step_search_job_seeker_by_email.html"
     EXPECTED_SESSION_KIND = JobSeekerSessionKinds.GET_OR_CREATE
@@ -903,6 +906,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
         }
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_end.html"
 
@@ -1245,6 +1249,7 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
         }
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_end.html"
 
@@ -1341,6 +1346,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         }
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class CheckJobSeekerInformations(ApplicationBaseView):
     """
     Ensure the job seeker has all required info.

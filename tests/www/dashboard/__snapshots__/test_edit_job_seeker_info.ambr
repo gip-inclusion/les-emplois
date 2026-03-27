@@ -384,6 +384,7 @@
       dict({
         'origin': list([
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -485,6 +486,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_identitycertification"."id",
@@ -502,6 +504,7 @@
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -519,6 +522,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -539,6 +543,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -564,6 +569,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -909,6 +915,7 @@
       dict({
         'origin': list([
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1010,6 +1017,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_commune"."id",
@@ -1034,6 +1042,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -1054,6 +1063,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_identitycertification"."id",
@@ -1071,6 +1081,7 @@
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1089,6 +1100,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_commune"."id",
@@ -1113,6 +1125,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",

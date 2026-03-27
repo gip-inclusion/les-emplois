@@ -34,6 +34,7 @@ from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url, get_zendesk_form_url
+from itou.utils.views import with_triggers_context
 from itou.www.signup import forms
 from itou.www.signup.errors import JobSeekerSignupConflictModalResolver
 
@@ -156,6 +157,7 @@ def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html
     return render(request, template_name, context)
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
     form_class = forms.JobSeekerCredentialsSignupForm
     template_name = "signup/job_seeker_signup_credentials.html"

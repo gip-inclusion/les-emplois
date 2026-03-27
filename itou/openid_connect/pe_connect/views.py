@@ -31,6 +31,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_absolute_url
+from itou.utils.views import with_triggers_context
 
 
 logger = logging.getLogger(__name__)
@@ -65,6 +66,7 @@ def pe_connect_authorize(request):
 # we need a transaction and a postgres context for our triggers
 @login_not_required
 @http_methods(db_write=["GET"])
+@with_triggers_context(methods=["GET"])
 def pe_connect_callback(request):
     code = request.GET.get("code")
     if code is None:

@@ -908,6 +908,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -927,6 +928,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -985,6 +987,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1041,6 +1044,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1090,6 +1094,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -1098,6 +1103,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "_check"
@@ -1116,6 +1122,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -1125,6 +1132,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -1133,6 +1141,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "_check"
@@ -1147,6 +1156,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -2119,6 +2129,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -2138,6 +2149,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -2196,6 +2208,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2252,6 +2265,7 @@
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
+          'wrapper[utils/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
