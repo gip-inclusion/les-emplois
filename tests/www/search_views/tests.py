@@ -561,6 +561,10 @@ class TestSearchCompany:
         )
         assertContains(response, reset_button, html=True)
 
+    def test_handle_nul_bytes(self, client):
+        response = client.get(self.URL, {"city": "something\x00whatever"})
+        assertContains(response, "Aucun résultat avec les filtres actuels.")
+
 
 class TestSearchPrescriber:
     def test_home_anonymous(self, client):
