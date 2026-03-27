@@ -15,15 +15,17 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-info" role="status">
-        <p class="mb-2">
-            <strong>Précision</strong>
-        </p>
-        <p class="mb-0">
-            On entend par auto-prescription toutes les embauches pour lesquelles vous avez validé vous-mêmes
-            les critères administratifs d'éligibilité IAE.
-        </p>
-    </div>
+    {% component_alert title=title content=content variant="info" icon=False %}
+        {% fragment as title %}
+            Précision
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                On entend par auto-prescription toutes les embauches pour lesquelles vous avez validé vous-mêmes
+                les critères administratifs d'éligibilité IAE.
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
 
 {% block content %}

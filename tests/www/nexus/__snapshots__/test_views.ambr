@@ -2733,7 +2733,7 @@
                           Veuillez vous identifier avec ProConnect pour continuer
                       </h2>
                       <div class="text-center">
-                          <a class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion non défini" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=prescriber&previous_url=%2Fportal%2Flogin&channel=nexus&next_url=%2Fportal%2Fhomepage">
+                          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion non défini" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=prescriber&previous_url=%2Fportal%2Flogin&channel=nexus&next_url=%2Fportal%2Fhomepage">
                           </a>
                           <br/>
                           <a class="btn btn-link has-external-link" href="https://proconnect.gouv.fr/" target="_blank">

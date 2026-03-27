@@ -3104,7 +3104,7 @@
                   </div>
                   <div class="mx-4 mb-3">
                       <div class="text-center">
-                          <a class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion non défini" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=prescriber&previous_url=%2Fdashboard%2Factivate-pro-connect-account&next_url=%2Fportal%2Fhomepage">
+                          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion non défini" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=prescriber&previous_url=%2Fdashboard%2Factivate-pro-connect-account&next_url=%2Fportal%2Fhomepage">
                           </a>
                           <br/>
                           <a class="btn btn-link has-external-link" href="https://proconnect.gouv.fr/" target="_blank">
