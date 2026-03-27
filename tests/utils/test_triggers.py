@@ -80,3 +80,16 @@ def test_context_laziness():
         with triggers.context(**{"uuid": str(uuid.uuid4())}), triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")
             assert cursor.fetchone() == (json.dumps(expected),)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_context_on_error():
+    with transaction.atomic(), connection.cursor() as cursor, pytest.raises(RuntimeError), triggers.context():
+        cursor.execute("SELECT current_setting('itou.context')")
+        assert cursor.fetchone() == ("{}",)
+        raise RuntimeError("test")
+    # Here itou.utils.triggers._context must have been reset
+    # So that triggers.context() can be used again with the same context
+    with transaction.atomic(), connection.cursor() as cursor, triggers.context():
+        cursor.execute("SELECT current_setting('itou.context')")
+        assert cursor.fetchone() == ("{}",)
