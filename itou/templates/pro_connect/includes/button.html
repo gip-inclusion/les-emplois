@@ -1,35 +1,42 @@
+{% load components %}
 {% load matomo %}
 {% load static %}
 
 {% if pro_connect_url %}
     <div class="text-center">
-        <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}></a>
+        <a href="{{ pro_connect_url }}" class="proconnect-button" aria-label="Se connecter avec ProConnect" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}></a>
         <br>
         <a href="https://proconnect.gouv.fr/" class="btn btn-link has-external-link" target="_blank">En savoir plus</a>
     </div>
 {% elif SHOW_DEMO_ACCOUNTS_BANNER %}
-    <div class="alert alert-info" role="status">
-        <p class="mb-2">
-            <strong>ProConnect n'est pas disponible sur cet environnement.</strong>
-        </p>
-        {% if activation|default:False %}
-            <p class="mb-2">Vous devez vous deconnecter et utiliser un autre compte.</p>
-        {% else %}
-            <p class="mb-2">Vous pouvez utiliser un des comptes de démonstration pour vous connecter.</p>
-            <button type="button" class="text-decoration-underline" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
-                Voir les comptes de démonstration
-            </button>
-        {% endif %}
-    </div>
+    {% component_alert title=title content=content variant="info" icon=False %}
+        {% fragment as title %}
+            ProConnect n'est pas disponible sur cet environnement.
+        {% endfragment %}
+        {% fragment as content %}
+            {% if activation|default:False %}
+                <p class="mb-0">Vous devez vous déconnecter et utiliser un autre compte.</p>
+            {% else %}
+                <p class="mb-2">Vous pouvez utiliser un des comptes de démonstration pour vous connecter.</p>
+                <p class="mb-0">
+                    <button type="button" class="text-decoration-underline" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
+                        Voir les comptes de démonstration
+                    </button>
+                </p>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% elif login %}
-    <div class="alert alert-info" role="status">
-        <p class="mb-2">
-            <strong>ProConnect est momentanément désactivé.</strong>
-        </p>
-        <p class="mb-0">
-            Afin de demander un PASS IAE en urgence, <a href="https://tally.so/r/nrj0V5" target="_blank" class="has-external-link">remplissez ce formulaire.</a>
-        </p>
-    </div>
+    {% component_alert title=title content=content variant="info" icon=False %}
+        {% fragment as title %}
+            ProConnect est momentanément désactivé.
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Afin de demander un PASS IAE en urgence, <a href="https://tally.so/r/nrj0V5" target="_blank" class="has-external-link">remplissez ce formulaire.</a>
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% else %}
     <p class="fst-italic text-center mt-3">ProConnect est momentanément désactivé.</p>
 {% endif %}

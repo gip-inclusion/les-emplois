@@ -56,23 +56,27 @@
                                 Pour chacune des SIAE à contrôler, nous effectuerons une sélection aléatoire de 20% des recrutements en auto-prescription
                                 (entre 2 et 20 dossiers maximum).
                             </p>
-                            <div class="alert alert-info" role="status">
-                                <p class="mb-2">
-                                    <strong>Exemple</strong>
-                                </p>
-                                <p class="mb-0">
-                                    Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)
-                                </p>
-                            </div>
-                            {% if evaluation_campaign.percent_set_at %}
-                                <div class="alert alert-success" role="status">
+                            {% component_alert title=title content=content variant="info" icon=False %}
+                                {% fragment as title %}
+                                    Exemple
+                                {% endfragment %}
+                                {% fragment as content %}
                                     <p class="mb-0">
-                                        Votre contrôle a posteriori sur la période du {{ evaluation_campaign.evaluated_period_start_at|date:"d F Y" }}
-                                        au {{ evaluation_campaign.evaluated_period_end_at|date:"d F Y" }} concerne {{ evaluation_campaign.chosen_percent }}%
-                                        des SIAE.
-                                        Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera.
+                                        Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)
                                     </p>
-                                </div>
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                            {% if evaluation_campaign.percent_set_at %}
+                                {% component_alert content=content variant="success" icon=False %}
+                                    {% fragment as content %}
+                                        <p class="mb-0">
+                                            Votre contrôle a posteriori sur la période du {{ evaluation_campaign.evaluated_period_start_at|date:"d F Y" }}
+                                            au {{ evaluation_campaign.evaluated_period_end_at|date:"d F Y" }} concerne {{ evaluation_campaign.chosen_percent }}%
+                                            des SIAE.
+                                            Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera.
+                                        </p>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
                             {% else %}
                                 <form id="ratio-form" method="post">
                                     {% csrf_token %}

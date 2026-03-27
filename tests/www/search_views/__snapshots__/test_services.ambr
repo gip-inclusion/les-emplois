@@ -4,10 +4,10 @@
   <div id="services-search-results">
       <div class="c-box c-box--results mb-3 mb-md-4">
           <div class="c-box--results__body">
-              <div class="alert alert-warning show" role="status">
+              <div class="alert alert-warning" role="status">
                   <div class="row">
                       <div class="col-auto pe-0">
-                          <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+                          <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
                           </i>
                       </div>
                       <div class="col">

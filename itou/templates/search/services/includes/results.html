@@ -1,3 +1,4 @@
+{% load components %}
 {% load dora %}
 {% load markdownify %}
 {% load str_filters %}
@@ -69,18 +70,13 @@
         {% if api_error %}
             <div class="c-box c-box--results mb-3 mb-md-4">
                 <div class="c-box--results__body">
-                    <div class="alert alert-warning show" role="status">
-                        <div class="row">
-                            <div class="col-auto pe-0">
-                                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                            </div>
-                            <div class="col">
-                                <p class="mb-0">
-                                    Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/" target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez réessayer ultérieurement.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    {% component_alert content=content variant="warning" %}
+                        {% fragment as content %}
+                            <p class="mb-0">
+                                Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/" target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez réessayer ultérieurement.
+                            </p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
                 </div>
             </div>
         {% else %}
