@@ -235,6 +235,7 @@ class ContractFilterForm(forms.Form):
     FILTER_GROUPS = [
         ["duration_longer_or_equal_90", "duration_strictly_shorter_90"],
         ["start_date_lower", "start_date_upper"],
+        ["potential_allowance_1400", "potential_allowance_814", "potential_allowance_0"],
     ]
 
     start_date_lower = forms.DateField(label="À partir du", required=False, widget=DuetDatePickerWidget())
@@ -245,6 +246,9 @@ class ContractFilterForm(forms.Form):
     )
     duration_longer_or_equal_90 = forms.BooleanField(label="Oui", required=False)
     duration_strictly_shorter_90 = forms.BooleanField(label="Non", required=False)
+    potential_allowance_1400 = forms.BooleanField(label="1 400 €", required=False)
+    potential_allowance_814 = forms.BooleanField(label="814 €", required=False)
+    potential_allowance_0 = forms.BooleanField(label="0 €", required=False)
 
     def clean(self):
         """
@@ -289,6 +293,16 @@ class ContractFilterForm(forms.Form):
             case _:
                 # (True, True) or (False, False) = no filter
                 pass
+
+        # Filter on potential help
+        potential_allowance_MAP = {
+            "potential_allowance_1400": 1_400,
+            "potential_allowance_814": 814,
+            "potential_allowance_0": 0,
+        }
+        checked_amounts = [amount for field, amount in potential_allowance_MAP.items() if self.cleaned_data.get(field)]
+        if checked_amounts:
+            queryset = queryset.filter(employee__allowance_amount__in=checked_amounts)
 
         return queryset
 

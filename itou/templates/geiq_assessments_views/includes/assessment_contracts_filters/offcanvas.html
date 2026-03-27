@@ -13,6 +13,8 @@
             <div id="form-errors-container">{% bootstrap_form_errors filters_form %}</div>
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
             <hr>
+            {% include "geiq_assessments_views/includes/assessment_contracts_filters/potential_allowance.html" with filters_form=filters_form only %}
+            <hr>
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with filters_form=filters_form only %}
         </div>
         {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_counter=filters_counter only %}
