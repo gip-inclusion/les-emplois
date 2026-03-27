@@ -17,9 +17,11 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-warning" role="status">
-        <p class="mb-0">Votre organisation n'est pas encore inscrite.</p>
-    </div>
+    {% component_alert content=content variant="warning" icon=False %}
+        {% fragment as content %}
+            <p class="mb-0">Votre organisation n'est pas encore inscrite.</p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
 
 {% block content %}

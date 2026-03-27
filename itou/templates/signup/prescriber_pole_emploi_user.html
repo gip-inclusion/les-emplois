@@ -15,11 +15,13 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-info" role="status">
-        <p class="mb-0">
-            Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
-        </p>
-    </div>
+    {% component_alert content=content variant="info" icon=False %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
 
 {% block content %}

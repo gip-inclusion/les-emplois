@@ -16,24 +16,26 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-info" role="status">
-        <p class="mb-2">
-            Vous allez rejoindre <b>{{ company.display_name }}</b>
-        </p>
-        <p class="mb-0">
-            {{ company.siret|format_siret }} - {{ company.kind }} {{ company.get_kind_display }}
-            <br>
-            {% if company.address_line_1 %}
-                {{ company.address_line_1 }}
+    {% component_alert content=content variant="info" icon=False %}
+        {% fragment as content %}
+            <p class="mb-2">
+                Vous allez rejoindre <b>{{ company.display_name }}</b>
+            </p>
+            <p class="mb-0">
+                {{ company.siret|format_siret }} - {{ company.kind }} {{ company.get_kind_display }}
                 <br>
-            {% endif %}
-            {% if company.address_line_2 %}
-                {{ company.address_line_2 }}
-                <br>
-            {% endif %}
-            {{ company.post_code }} {{ company.city }}
-        </p>
-    </div>
+                {% if company.address_line_1 %}
+                    {{ company.address_line_1 }}
+                    <br>
+                {% endif %}
+                {% if company.address_line_2 %}
+                    {{ company.address_line_2 }}
+                    <br>
+                {% endif %}
+                {{ company.post_code }} {{ company.city }}
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
 
 {% block content %}

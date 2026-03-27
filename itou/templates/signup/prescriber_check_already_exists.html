@@ -18,11 +18,13 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-info" role="status">
-        <p class="m-0">
-            <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
-        </p>
-    </div>
+    {% component_alert content=content variant="info" icon=False %}
+        {% fragment as content %}
+            <p class="m-0">
+                <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endblock %}
 
 {% block content %}
@@ -86,15 +88,17 @@
                             <h3 class="h2">Ajouter mon organisation</h3>
 
                             {% if prescriber_orgs_with_members_same_siret %}
-                                <div class="alert alert-warning" role="status">
-                                    <p class="small mb-0">
-                                        Attention une ou plusieurs organisations existent déjà avec ce SIRET.
-                                        <br>
-                                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
-                                        vous souhaitez créer un compte avec ce SIRET pour un autre type
-                                        d'organisation, vous avez la possibilité de l'inscrire.
-                                    </p>
-                                </div>
+                                {% component_alert content=content variant="warning" icon=False %}
+                                    {% fragment as content %}
+                                        <p class="small mb-0">
+                                            Attention une ou plusieurs organisations existent déjà avec ce SIRET.
+                                            <br>
+                                            Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
+                                            vous souhaitez créer un compte avec ce SIRET pour un autre type
+                                            d'organisation, vous avez la possibilité de l'inscrire.
+                                        </p>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
                             {% else %}
                                 <p class="mb-0">
                                     <small>
