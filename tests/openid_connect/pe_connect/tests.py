@@ -20,7 +20,7 @@ from itou.openid_connect.pe_connect import constants
 from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
@@ -253,7 +253,8 @@ class TestPoleEmploiConnect:
         assert user.externaldataimport_set.pe_sources().get().status == ExternalDataImport.STATUS_OK
 
         user.jobseeker_profile.birthdate = datetime.date(2001, 1, 1)
-        user.jobseeker_profile.save()
+        with triggers.context():
+            user.jobseeker_profile.save()
 
         # Don't call import_user_pe_data on second login (and don't update user data)
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")

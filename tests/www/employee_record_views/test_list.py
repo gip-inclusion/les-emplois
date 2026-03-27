@@ -19,6 +19,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
+from itou.utils import triggers
 from itou.utils.templatetags import format_filters
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from tests.companies.factories import CompanyFactory
@@ -343,7 +344,8 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         response = client.get(self.URL, data={"status": Status.NEW})
 
