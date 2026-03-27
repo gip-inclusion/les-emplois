@@ -224,7 +224,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
                 job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
                 eligibility_diagnosis_filters.append(Q(author=user, author_prescriber_organization=organization))
 
-        created_job_seekers = self.filter(or_queries(job_seeker_filters))
+        created_job_seekers = self.filter(kind=UserKind.JOB_SEEKER).filter(or_queries(job_seeker_filters))
         job_seekers_applications = job_application_model.objects.filter(or_queries(job_applications_filter))
         job_seekers_iae_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
             or_queries(eligibility_diagnosis_filters)
