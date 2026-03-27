@@ -49,9 +49,6 @@ from tests.users.factories import EmployerFactory
 
 
 class TestEmployeeRecordModel:
-    def setup_method(self):
-        self.employee_record = EmployeeRecordFactory()
-
     # Validation tests
 
     def test_creation_with_jobseeker_without_title(self):
