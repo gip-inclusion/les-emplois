@@ -758,6 +758,8 @@ BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True
 
 DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.gouv.fr")
 
+FEATURE_ENABLE_PROCONNECT_SOFT_MFA = os.getenv("FEATURE_ENABLE_PROCONNECT_SOFT_MFA", "True") == "True"
+
 # GPS
 # ------------------------------------------------------------------------------
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)

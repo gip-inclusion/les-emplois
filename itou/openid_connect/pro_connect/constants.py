@@ -3,7 +3,7 @@ from django.conf import settings
 
 # https://github.com/numerique-gouv/agentconnect-documentation/blob/main/doc_fs/donnees_fournies.md
 # We should not need to add the email, given_name and usual_name but it doesn"t work without them...
-PRO_CONNECT_SCOPES = "openid email given_name usual_name custom"
+PRO_CONNECT_SCOPES = "openid email given_name usual_name custom idp_id"
 
 PRO_CONNECT_CLIENT_ID = settings.PRO_CONNECT_CLIENT_ID
 PRO_CONNECT_CLIENT_SECRET = settings.PRO_CONNECT_CLIENT_SECRET
