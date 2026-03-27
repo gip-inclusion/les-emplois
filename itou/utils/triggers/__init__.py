@@ -37,9 +37,11 @@ def context(**kwargs):
     else:
         cm = contextlib.nullcontext()
 
-    with cm:
-        yield
-    _context.data, _context.last_data_set = previous_data, None
+    try:
+        with cm:
+            yield
+    finally:
+        _context.data, _context.last_data_set = previous_data, None
 
 
 class FieldsHistory(core.Trigger):
