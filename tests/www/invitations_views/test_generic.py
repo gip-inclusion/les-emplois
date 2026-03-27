@@ -27,7 +27,7 @@ from tests.invitations.factories import (
     LaborInspectorInvitationFactory,
     PrescriberWithOrgInvitationFactory,
 )
-from tests.openid_connect.pro_connect.testing import ID_TOKEN
+from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -675,7 +675,7 @@ class ProConnectSignupTestAcceptInvitation:
                 pro_connect.logout_url,
                 {
                     "redirect_url": previous_url,
-                    "token": ID_TOKEN,
+                    "token": ID_TOKEN_ENCODED,
                 },
             ),
         )

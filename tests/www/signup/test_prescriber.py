@@ -25,7 +25,7 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
-from tests.openid_connect.pro_connect.testing import ID_TOKEN
+from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient, accept_legal_terms
@@ -1116,7 +1116,7 @@ class TestProConnectPrescribersViewsExceptions:
                 pro_connect.logout_url,
                 {
                     "redirect_url": previous_url,
-                    "token": ID_TOKEN,
+                    "token": ID_TOKEN_ENCODED,
                 },
             ),
         )
@@ -1186,7 +1186,7 @@ class TestProConnectPrescribersViewsExceptions:
                 pro_connect.logout_url,
                 {
                     "redirect_url": previous_url,
-                    "token": ID_TOKEN,
+                    "token": ID_TOKEN_ENCODED,
                 },
             ),
         )
