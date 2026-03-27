@@ -2,7 +2,9 @@ import dataclasses
 import logging
 from typing import ClassVar
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils import timezone
 
 from itou.openid_connect.models import OIDConnectState, OIDConnectUserData
 from itou.prescribers.models import PrescriberOrganization
@@ -70,3 +72,19 @@ class ProConnectEmployerData(ProConnectUserData):
     # We are confident that the email is enough to identity prescribers and employers
     # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
     allow_sub_update = True
+
+
+class ProConnectAuthentication(models.Model):
+    """A _temporary_ append-only model that stores metadata about each
+    authentication made through ProConnect.
+
+    The goal is to gather statistics about identity providers that do
+    or do not implement MFA.
+
+    Should be removed once we force MFA on ProConnect (mid-2026?).
+    """
+
+    timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+    user_public_id = models.UUIDField(db_index=True)
+    amr = ArrayField(models.TextField(), db_index=True)
+    idp_id = models.TextField(db_index=True)

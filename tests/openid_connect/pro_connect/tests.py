@@ -17,6 +17,7 @@ from django.contrib.messages import Message
 from django.core import signing
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -33,6 +34,7 @@ from itou.openid_connect.models import InvalidKindException, RegisterForbiddenEx
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
+    ProConnectAuthentication,
     ProConnectEmployerData,
     ProConnectPrescriberData,
     ProConnectState,
@@ -381,6 +383,21 @@ class TestProConnectCallbackView:
         assert user.has_sso_provider
         assert user.kind == UserKind.EMPLOYER
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
+
+    def test_callback_record_authentication(self, client, pro_connect):
+        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
+        record = ProConnectAuthentication.objects.get()
+        assert record.user_public_id == user.public_id
+        assert record.amr == ["pwd"]
+        assert record.idp_id == "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7"
+
+    @override_settings(FEATURE_ENABLE_PROCONNECT_SOFT_MFA=False)
+    def test_callback_do_not_record_authentication_if_disabled(self, client, pro_connect):
+        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
+        assert user is not None
+        assert ProConnectAuthentication.objects.count() == 0
 
     def test_callback_existing_django_user(self, client, pro_connect):
         # User created with django already exists on Itou but some attributes differs.
