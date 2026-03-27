@@ -15,7 +15,7 @@
             {% if request.user == job_seeker %}
                 <h2>Vous avez déjà postulé pour cette entreprise</h2>
             {% else %}
-                <h2>Ce candidat a déjà postulé pour cette entreprise</h2>
+                <h2>Ce candidat a déjà postulé pour {{ hire_process|yesno:"votre,cette" }} entreprise</h2>
             {% endif %}
 
             {% if hire_process %}
