@@ -42,6 +42,7 @@ from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.utils import can_edit_personal_information
 from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_safe_url
+from itou.utils.views import with_triggers_context
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditUserEmailForm,
@@ -305,6 +306,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
 
 
 @bypass_terms_acceptance
+@with_triggers_context
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     Edit a user.
@@ -340,6 +342,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     return render(request, template_name, context)
 
 
+@with_triggers_context
 def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard/edit_job_seeker_info.html"):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),

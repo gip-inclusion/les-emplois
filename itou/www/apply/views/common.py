@@ -4,6 +4,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.views.generic import FormView, TemplateView
 from django_htmx.http import HttpResponseClientRedirect
@@ -20,6 +21,7 @@ from itou.job_applications.enums import SenderKind
 from itou.users.enums import ActionKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup, get_safe_url
+from itou.utils.views import with_triggers_context
 from itou.www.apply.forms import (
     AcceptForm,
     BirthDateForm,
@@ -275,6 +277,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
+@method_decorator(with_triggers_context, name="dispatch")
 class BaseConfirmationView(UserPassesTestMixin, JobSeekerAndContractInfosNeededMixin, TemplateView):
     template_name = None
 

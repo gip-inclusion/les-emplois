@@ -27,6 +27,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
+from itou.utils.views import with_triggers_context
 from itou.www.employee_record_views.enums import EmployeeRecordOrder, MissingEmployeeCase
 from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
@@ -320,6 +321,7 @@ def set_session_ntt(request, job_application, ntt_value):
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+@with_triggers_context
 def create(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
