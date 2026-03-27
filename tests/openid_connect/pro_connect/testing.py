@@ -29,6 +29,7 @@ OIDC_USERINFO = {
     "usual_name": "AUDIARD",
     "email": "michel@lestontons.fr",
     "sub": "af6b26f9-85cd-484e-beb9-bea5be13e30f",
+    "idp_id": "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7",
 }
 
 OIDC_USERINFO_FT_WITH_SAFIR = OIDC_USERINFO | {
@@ -40,6 +41,8 @@ OIDC_USERINFO_FT_WITH_SAFIR = OIDC_USERINFO | {
 ID_TOKEN_DATA = {
     "sub": OIDC_USERINFO["sub"],
     "aud": TEST_SETTINGS["PRO_CONNECT_CLIENT_ID"],
+    "acr": "https://proconnect.gouv.fr/assurance/consistency-checked",
+    "amr": ["pwd"],
     # There are other attributes, but they are not needed.
 }
 
