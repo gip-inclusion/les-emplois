@@ -162,6 +162,14 @@ def _get_token(request, code):
     )
     # Contains access_token, token_type, expires_in, id_token
     if response.status_code != 200:
+        if response.status_code == 400:
+            logger.warning(
+                "Bad request in pro_connect_callback",
+                extra={
+                    "error": request.GET.get("error"),
+                    "error_description": request.GET.get("error_description"),
+                },
+            )
         return None, _redirect_to_login_page_on_error(error_msg="Impossible to get token.", request=request)
     return response.json(), None
 
@@ -191,6 +199,13 @@ def pro_connect_callback(request):
     code = request.GET.get("code")
     state = request.GET.get("state")
     if code is None or state is None:
+        logger.warning(
+            "Missing code or state in pro_connect_callback",
+            extra={
+                "error": request.GET.get("error"),
+                "error_description": request.GET.get("error_description"),
+            },
+        )
         return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
 
     # Get access token now to have more data in sentry
