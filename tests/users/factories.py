@@ -417,7 +417,7 @@ def random_user_kind_factory(**kwargs):
         [
             ItouStaffFactory,
             JobSeekerFactory,
-            PrescriberFactory,
+            functools.partial(PrescriberFactory, membership=True),
             functools.partial(EmployerFactory, membership=True),
             functools.partial(LaborInspectorFactory, membership=True),
         ]
@@ -438,5 +438,5 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    professional = factory.SubFactory(PrescriberFactory)
+    professional = factory.SubFactory(PrescriberFactory, membership=True)
     last_action_kind = factory.fuzzy.FuzzyChoice(ActionKind.values)

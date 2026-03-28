@@ -51,7 +51,7 @@ class SavedSearchFactory(factory.django.DjangoModelFactory):
             query_params="city=lyon-69&distance=25&districts_69=69001&districts_69=69003&districts_69=69006"
         )
 
-    user = factory.SubFactory(PrescriberFactory)
+    user = factory.SubFactory(PrescriberFactory, membership=True)
     name = factory.Faker("sentence", nb_words=2)
     query_params = factory.LazyFunction(generate_query_params)
     created_at = factory.LazyFunction(timezone.now)
