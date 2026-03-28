@@ -38,7 +38,10 @@ class EmployeeRecordFactory(AutoNowOverrideMixin, BareEmployeeRecordFactory):
     """
 
     job_application = factory.SubFactory(
-        JobApplicationFactory, with_approval=True, to_company__use_employee_record=True
+        JobApplicationFactory,
+        sent_by_authorized_prescriber=True,
+        with_approval=True,
+        to_company__use_employee_record=True,
     )
     asp_id = factory.SelfAttribute(".job_application.to_company.convention.asp_id")
     asp_measure = factory.LazyAttribute(
