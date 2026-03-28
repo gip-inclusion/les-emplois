@@ -97,6 +97,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
+            "typologiePrescripteur": "PE",
         }
         assert approval.pe_notification_status == "notification_success"
         assert approval.pe_notification_time == timezone.now()
@@ -140,6 +141,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
+            "typologiePrescripteur": "PE",
         }
         assert approval.pe_notification_status == "notification_success"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)

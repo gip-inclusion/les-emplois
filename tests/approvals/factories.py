@@ -82,8 +82,10 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
 
             state = kwargs.pop("state", JobApplicationState.ACCEPTED)
             eligibility_diagnosis = kwargs.pop("eligibility_diagnosis", self.eligibility_diagnosis)
+            sent_by_authorized_prescriber = kwargs.pop("sent_by_authorized_prescriber", True)
             self.jobapplication_set.add(
                 JobApplicationFactory(
+                    sent_by_authorized_prescriber=sent_by_authorized_prescriber,
                     state=state,
                     job_seeker=self.user,
                     with_iae_eligibility_diagnosis=True,
