@@ -78,6 +78,7 @@ class TestEvaluationCampaignAdmin:
             reviewed_at=timezone.now() - relativedelta(days=2),
             final_reviewed_at=timezone.now() - relativedelta(days=1),
         )
+        CompanyMembershipFactory(company=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
         EvaluatedSiaeFactory(
             evaluation_campaign=campaign4,
             siae__with_membership=False,  # Created manually.
@@ -86,14 +87,13 @@ class TestEvaluationCampaignAdmin:
             siae__convention__siret_signature="22222222200033",
             siae__phone="0633333333",
         )
-        campaign4_jobapp = EvaluatedJobApplicationFactory.create(evaluated_siae=campaign4_siae)
+        campaign4_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=campaign4_siae)
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=campaign4_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=1),
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        CompanyMembershipFactory(company=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
         # Not selected.
         EvaluatedSiaeFactory(
             evaluation_campaign__name="Contrôle 02/02/2020",
