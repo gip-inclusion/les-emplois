@@ -18,6 +18,23 @@ class CompanyTokenAdmin(ItouModelAdmin):
     readonly_fields = ["key", "created_at"]
     autocomplete_fields = ["companies"]
 
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return (
+                (
+                    None,
+                    {
+                        "classes": ("wide",),
+                        "fields": (
+                            "label",
+                            "companies",
+                        ),
+                    },
+                ),
+            )
+        else:
+            return super().get_fieldsets(request, obj=obj)
+
 
 @admin.register(DepartmentToken)
 class DepartmentTokenAdmin(ItouModelAdmin):
@@ -31,9 +48,43 @@ class DepartmentTokenAdmin(ItouModelAdmin):
             return ["department"] + self.readonly_fields
         return self.readonly_fields
 
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return (
+                (
+                    None,
+                    {
+                        "classes": ("wide",),
+                        "fields": (
+                            "label",
+                            "department",
+                        ),
+                    },
+                ),
+            )
+        else:
+            return super().get_fieldsets(request, obj=obj)
+
 
 @admin.register(ServiceToken)
 class ServiceTokenAdmin(ItouModelAdmin):
     list_display = ["service", "created_at"]
     ordering = ["-created_at"]
     readonly_fields = ["key", "created_at"]
+
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return (
+                (
+                    None,
+                    {
+                        "classes": ("wide",),
+                        "fields": (
+                            "service",
+                            "purpose",
+                        ),
+                    },
+                ),
+            )
+        else:
+            return super().get_fieldsets(request, obj=obj)
