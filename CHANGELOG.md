@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2026-03-30
+
+### Ajouté
+
+- [Inscription : Pré-remplir les champs de lieu de naissance à partir du NIR](https://github.com/gip-inclusion/les-emplois/pull/7731)
+- [Interface : Ajout d'une alerte avec un lien vers la recherche avancée de fiche salarié](https://github.com/gip-inclusion/les-emplois/pull/7760)
+
+### Modifié
+
+- [Fiches salarié : Empêcher la création d'une fiche salarié sans tenir compte de la mesure de l'entreprise](https://github.com/gip-inclusion/les-emplois/pull/7770)
+- [GEIQ : Refonte des filtres de la sélection des contrats du bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7728)
+- [Nexus : Suppression du boutons des emplois dans le dropdown](https://github.com/gip-inclusion/les-emplois/pull/7764)
+- [Tech : Mise à jour des liens de commande Mon Récap](https://github.com/gip-inclusion/les-emplois/pull/7753)
+
+### Supprimé
+
+- [Interface : Suppression ou remplacement de tous les liens vers la Communauté](https://github.com/gip-inclusion/les-emplois/pull/7754)
+
 ## 2026-03-23
 
 ### Ajouté
