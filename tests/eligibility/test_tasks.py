@@ -151,6 +151,20 @@ class TestCertifyCriteriaApiParticulier:
 
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
+    @pytest.mark.parametrize("status_code", [422, 502])
+    def test_retry_task_on_non_json_http_error(self, status_code, factory, respx_mock):
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        criterion = eligibility_diagnosis.selected_administrative_criteria.get()
+        respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+            status_code,
+            text="Bad Gateway (non-JSON response)",
+        )
+        with pytest.raises(httpx.HTTPStatusError):
+            certify_criterion_with_api_particulier(criterion)
+
+        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
+
     def test_ignores_api_particulier_internal_error(self, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
