@@ -12,6 +12,10 @@
         <div class="offcanvas-body">
             <div id="form-errors-container">{% bootstrap_form_errors filters_form %}</div>
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/duration.html" with assessment=assessment request=request filters_form=filters_form only %}
+            {% if request.from_employer %}
+                <hr>
+                {% include "geiq_assessments_views/includes/assessment_contracts_filters/allowance_requested.html" with filters_form=filters_form only %}
+            {% endif %}
             <hr>
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with filters_form=filters_form only %}
         </div>

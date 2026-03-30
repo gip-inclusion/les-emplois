@@ -1495,6 +1495,7 @@ class TestAssessmentContractsListView:
             "start_date_lower": "2024-06-01",
             "start_date_upper": "2024-06-30",
             "duration_longer_or_equal_90": "on",
+            "allowance_requested_off": "on",
         }
 
         response = client.get(self.url, filter_data)
@@ -1594,3 +1595,40 @@ class TestAssessmentContractsListView:
 
         assertContains(response, "La date de fin doit être postérieure à la date de début.")
         assertContains(response, 'id="form-errors-container"')
+
+    @pytest.mark.parametrize(
+        "query_params, expected_in, expected_not_in",
+        [
+            ({"allowance_requested_on": "on"}, ["contract_allowance_requested"], ["contract_non_allowance_requested"]),
+            (
+                {"allowance_requested_off": "on"},
+                ["contract_non_allowance_requested"],
+                ["contract_allowance_requested"],
+            ),
+            (
+                {"allowance_requested_on": "on", "allowance_requested_off": "on"},
+                ["contract_allowance_requested", "contract_non_allowance_requested"],
+                [],
+            ),
+        ],
+    )
+    def test_contract_list_filter_by_allowance_requested(self, client, query_params, expected_in, expected_not_in):
+        contract_allowance_requested = EmployeeContractFactory(
+            employee__assessment=self.assessment, allowance_requested=True
+        )
+        contract_non_allowance_requested = EmployeeContractFactory(
+            employee__assessment=self.assessment, allowance_requested=False
+        )
+
+        contracts_map = {
+            "contract_allowance_requested": contract_allowance_requested,
+            "contract_non_allowance_requested": contract_non_allowance_requested,
+        }
+        response = client.get(self.url, query_params)
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        for key in expected_in:
+            assert contracts_map[key] in contracts_in_page
+        for key in expected_not_in:
+            assert contracts_map[key] not in contracts_in_page
