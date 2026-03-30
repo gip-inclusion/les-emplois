@@ -32,6 +32,32 @@ def test_context_stacking():
             assert cursor.fetchone() == (json.dumps(context_1),)
 
 
+def test_context_stacking_with_different_data():
+    expected = {"uuid": str(uuid.uuid4()), "foo": "bar"}
+    # 5 different contexts defined and queried: 10 queries
+    with assertNumQueries(10), connection.cursor() as cursor:
+        with triggers.context(**expected):
+            cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps(expected),)
+
+            new_uuid = str(uuid.uuid4())
+            with triggers.context(uuid=new_uuid):
+                cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps({"uuid": new_uuid, "foo": "bar"}),)
+
+            with triggers.context(uuid=new_uuid, replace_existing=True):
+                cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps({"uuid": new_uuid}),)
+
+            with triggers.context():
+                cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps(expected),)
+
+            with triggers.context(replace_existing=True):
+                cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == ("{}",)
+
+
 def test_context_stacking_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
     with assertNumQueries(3), connection.cursor() as cursor:

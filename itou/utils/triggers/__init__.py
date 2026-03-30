@@ -29,8 +29,10 @@ def _set_context_connection_wrapper(execute, *args, **kwargs):
 
 
 @contextlib.contextmanager
-def context(**kwargs):
+def context(*, replace_existing: bool = False, **kwargs):
     previous_data, _context.data = getattr(_context, "data", None), kwargs
+    if not replace_existing and previous_data:
+        _context.data = {**previous_data, **_context.data}
 
     if _set_context_connection_wrapper not in connection.execute_wrappers:
         cm = connection.execute_wrapper(_set_context_connection_wrapper)
