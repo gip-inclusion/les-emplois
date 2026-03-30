@@ -126,30 +126,14 @@ class ItouCurrentOrganizationMiddleware:
                 request.session,
             )
 
-            # ------------------------------------------
-            # TODO: Refactor this block
             # FT users must have at least one FT organization
             if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
                 m.organization.kind == PrescriberOrganizationKind.FT for m in prescriber_memberships
             ):
                 logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
+            elif not request.current_organization:
+                logout_warning = LogoutWarning.NO_ORGANIZATION
 
-            if not request.current_organization:
-                # SIAE user has no active SIAE and thus must not be able to access any page,
-                # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
-                if has_inactive_company_membership:
-                    request.from_employer = True
-                    logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
-                else:
-                    if request.user.is_employer:
-                        request.from_employer = True
-                        logout_warning = LogoutWarning.EMPLOYER_NO_COMPANY
-                    elif request.user.is_labor_inspector:
-                        request.is_labor_inspector = True
-                        logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
-                    else:
-                        request.from_prescriber = True
-            # ------------------------------------------
             else:
                 if isinstance(request.current_organization, PrescriberOrganization):
                     request.from_prescriber = True

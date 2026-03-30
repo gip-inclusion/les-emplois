@@ -2423,7 +2423,7 @@ class TestJobApplicationXlsxExport:
             with_iae_eligibility_diagnosis=True,
         )
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_application.accept(user=job_application.to_company.members.first())
 
         # The accept transition above will create a valid PASS IAE for the job seeker.

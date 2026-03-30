@@ -126,7 +126,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_seeker = approval.user
 
         # In progress
@@ -186,7 +186,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
 
         # Valid
         current_suspension = SuspensionFactory(
@@ -280,7 +280,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
 
         # Valid
         first = ProlongationFactory(
@@ -389,7 +389,7 @@ class TestApprovalDetailView:
         siae = job_application.to_company
         employer = siae.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_seeker = approval.user
 
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -450,7 +450,7 @@ class TestApprovalDetailView:
         siae = job_application.to_company
         employer = siae.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_seeker = approval.user
 
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})

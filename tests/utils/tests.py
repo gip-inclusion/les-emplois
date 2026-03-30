@@ -143,7 +143,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(
             response,
-            reverse("logout:warning", kwargs={"kind": "employer_no_company"}),
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
             fetch_redirect_response=False,
         )
         # Session untouched
@@ -212,7 +212,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(
             response,
-            reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}),
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
             fetch_redirect_response=False,
         )
         # Session untouched
@@ -433,7 +433,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(
             response,
-            reverse("logout:warning", kwargs={"kind": "labor_inspector_no_institution"}),
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
             fetch_redirect_response=False,
         )
         # Session untouched

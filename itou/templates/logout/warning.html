@@ -20,45 +20,40 @@
                     <img class="img-fluid" src="{% static 'img/illustration-error.png' %}" alt="" loading="lazy">
                 </div>
                 <div class="s-section__col col-12 col-lg-10 bg-lg-white">
-                    {% if warning == LogoutWarning.EMPLOYER_NO_COMPANY %}
-                        <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
+                    {% if warning == LogoutWarning.FT_NO_FT_ORGANIZATION %}
+                        <p>
+                            En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.
+                        </p>
+                        <p>Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.</p>
+                    {% elif warning == LogoutWarning.NO_ORGANIZATION %}
+                        <p>L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.</p>
+
                         <ul>
                             <li>
-                                Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                                Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a class="btn-link" href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                            </li>
+                            <li>
+                                Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
+                            </li>
+                            <li>
+                                Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
                             </li>
                             <li>
                                 Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
                             </li>
                             <li>
-                                Si votre structure ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, merci d’utiliser
-                                <a href="{% url 'signup:company_select' %}">le formulaire d'inscription</a>.
+                                <form method="post" action="{% url 'account_logout' %}?next={% url 'signup:choose_user_kind' %}" class="js-prevent-multiple-submit">
+                                    {% csrf_token %}
+                                    Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
+                                    <button type="submit" class="btn-link" aria-label="Se déconnecter">cliquez-ici</button>
+                                    .
+                                </form>
                             </li>
                         </ul>
+                        <p>
+                            En cas de besoin, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}" class="btn-link has-external-link" target="_blank">contacter notre support technique</a>.
+                        </p>
                         <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
-                    {% elif warning == LogoutWarning.EMPLOYER_INACTIVE_COMPANY %}
-                        <p>Votre compte est actuellement inactif.</p>
-                        <ul>
-                            <li>
-                                <strong>Si vous êtes employeur en SIAE</strong> : votre compte n’est pas ou plus rattaché à une structure conventionnée.
-                            </li>
-                            <li>
-                                <strong>Si vous êtes facilitateur de la clause sociale</strong> : votre compte est en attente de vérification par nos équipes et le réseau Alliances Villes Emploi.
-                            </li>
-                            <li>
-                                <strong>Si vous êtes employeur en GEIQ ou en EA/EATT</strong> : votre compte n’est pas ou plus rattaché à une structure active.
-                            </li>
-                        </ul>
-                        <p>
-                            En cas de besoin, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}" class="has-external-link" target="_blank">contacter notre support technique</a>.
-                        </p>
-                    {% elif warning == LogoutWarning.FT_NO_FT_ORGANIZATION %}
-                        <p>
-                            En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.
-                        </p>
-                        <p>Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.</p>
-                    {% elif warning == LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION %}
-                        <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
-                        <p>Veuillez vous faire inviter par un collaborateur de votre institution afin de pouvoir accéder au service.</p>
                     {% endif %}
                     <div class="row">
                         <div class="col-2">

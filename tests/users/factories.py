@@ -417,7 +417,7 @@ def random_user_kind_factory(**kwargs):
         [
             ItouStaffFactory,
             JobSeekerFactory,
-            PrescriberFactory,
+            functools.partial(PrescriberFactory, membership=True),
             functools.partial(EmployerFactory, membership=True),
             functools.partial(LaborInspectorFactory, membership=True),
         ]

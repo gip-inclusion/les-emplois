@@ -92,7 +92,7 @@ class TestGroupLists:
         [
             [partial(JobSeekerFactory, for_snapshot=True), 403],
             [partial(EmployerFactory, membership=True), 200],
-            [PrescriberFactory, 200],  # we don't need authorized organizations as of today
+            [partial(PrescriberFactory, membership=True), 200],
             [partial(LaborInspectorFactory, membership=True), 403],
         ],
         ids=[
@@ -315,7 +315,7 @@ class TestGroupLists:
 
 
 def test_backward_compat_urls(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     client.force_login(prescriber)
 
     response = client.get("/gps", follow=True)  # there is a first redirection to /gps/
@@ -334,7 +334,7 @@ class TestGroupDetailsMembershipTab:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             [partial(EmployerFactory, membership=True), True],
-            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(PrescriberFactory, membership=True), 200],
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -684,7 +684,7 @@ class TestGroupDetailsMembershipTab:
         assert pretty_indented(simulated_page) == snapshot
 
     def test_ask_access(self, client, mocker, snapshot, caplog):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         job_seeker = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=job_seeker, memberships=1, memberships__member=user)
         membership = group.memberships.get()
@@ -743,7 +743,7 @@ class TestGroupDetailsBeneficiaryTab:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             [partial(EmployerFactory, membership=True), True],
-            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(PrescriberFactory, membership=True), 200],
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -870,7 +870,7 @@ class TestGroupDetailsContributionTab:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             [partial(EmployerFactory, membership=True), True],
-            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(PrescriberFactory, membership=True), 200],
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -937,7 +937,7 @@ class TestGroupDetailsEditionTab:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             [partial(EmployerFactory, membership=True), True],
-            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(PrescriberFactory, membership=True), 200],
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -1172,14 +1172,6 @@ class TestJoinGroup:
         assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
         assert gps_logs(caplog) == []
 
-    def test_view_without_org(self, client, caplog):
-        url = reverse("gps:join_group")
-        user = PrescriberFactory()
-        client.force_login(user)
-        response = client.get(url)
-        assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
-        assert gps_logs(caplog) == []
-
 
 class TestBeneficiariesAutocomplete:
     @pytest.mark.parametrize(
@@ -1189,7 +1181,6 @@ class TestBeneficiariesAutocomplete:
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), True),
-            (PrescriberFactory, False),
             (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -1197,8 +1188,7 @@ class TestBeneficiariesAutocomplete:
             "job_seeker",
             "authorized_prescriber",
             "gps_authorized_prescriber",
-            "prescriber_with_org",
-            "prescriber_no_org",
+            "prescriber",
             "employer",
             "labor_inspector",
         ],
@@ -1349,7 +1339,6 @@ class TestJoinGroupFromCoworker:
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), True),
-            (PrescriberFactory, False),
             (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -1357,8 +1346,7 @@ class TestJoinGroupFromCoworker:
             "job_seeker",
             "authorized_prescriber",
             "gps_authorized_prescriber",
-            "prescriber_with_org",
-            "prescriber_no_org",
+            "prescriber",
             "employer",
             "labor_inspector",
         ],
@@ -1431,7 +1419,6 @@ class TestJoinGroupFromNir:
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), False),
-            (PrescriberFactory, False),
             (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -1439,8 +1426,7 @@ class TestJoinGroupFromNir:
             "job_seeker",
             "authorized_prescriber",
             "gps_authorized_prescriber",
-            "prescriber_with_org",
-            "prescriber_no_org",
+            "prescriber",
             "employer",
             "labor_inspector",
         ],
@@ -1809,7 +1795,6 @@ class TestJoinGroupFromNameAndEmail:
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), True),
-            (PrescriberFactory, True),
             (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -1817,8 +1802,7 @@ class TestJoinGroupFromNameAndEmail:
             "job_seeker",
             "authorized_prescriber",
             "gps_authorized_prescriber",
-            "prescriber_with_org",
-            "prescriber_no_org",
+            "prescriber",
             "employer",
             "labor_inspector",
         ],
@@ -1835,7 +1819,7 @@ class TestJoinGroupFromNameAndEmail:
     @pytest.mark.parametrize("known_name", [True, False])
     def test_unknown_email(self, client, settings, mocker, known_name, caplog, mailoutbox):
         # This process is the same with or without gps advanced features
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         slack_mock = mocker.patch("itou.www.gps.utils.send_slack_message_for_gps")  # mock the imported link
 
         client.force_login(user)
