@@ -37,7 +37,7 @@
                   <div class="d-flex align-items-center">
                       <div>
                           <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                              <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
                                   Plaquiste
                               </a>
                           </div>
@@ -96,7 +96,7 @@
                   <div class="d-flex align-items-center">
                       <div>
                           <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                              <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
                                   Plaquiste
                               </a>
                           </div>
@@ -121,7 +121,7 @@
                   <div class="d-flex align-items-center">
                       <div>
                           <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                              <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
                                   Peintre
                               </a>
                           </div>
@@ -216,7 +216,7 @@
                   <div class="d-flex align-items-center">
                       <div>
                           <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                              <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
                                   Plaquiste
                               </a>
                           </div>
@@ -428,7 +428,7 @@
                   <div class="d-flex align-items-center">
                       <div>
                           <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                              <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
                                   Plaquiste
                               </a>
                           </div>
