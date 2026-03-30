@@ -235,6 +235,7 @@ class ContractFilterForm(forms.Form):
     FILTER_GROUPS = [
         ["duration_longer_or_equal_90", "duration_strictly_shorter_90"],
         ["start_date_lower", "start_date_upper"],
+        ["allowance_requested_on", "allowance_requested_off"],
     ]
 
     start_date_lower = forms.DateField(label="À partir du", required=False, widget=DuetDatePickerWidget())
@@ -245,6 +246,8 @@ class ContractFilterForm(forms.Form):
     )
     duration_longer_or_equal_90 = forms.BooleanField(label="Oui", required=False)
     duration_strictly_shorter_90 = forms.BooleanField(label="Non", required=False)
+    allowance_requested_on = forms.BooleanField(label="Oui", required=False)
+    allowance_requested_off = forms.BooleanField(label="Non", required=False)
 
     def clean(self):
         """
@@ -288,6 +291,17 @@ class ContractFilterForm(forms.Form):
                 queryset = queryset.filter(nb_days_in_campaign_year__lt=90)
             case _:
                 # (True, True) or (False, False) = no filter
+                pass
+
+        match (
+            self.cleaned_data.get("allowance_requested_on"),
+            self.cleaned_data.get("allowance_requested_off"),
+        ):
+            case (True, False):
+                queryset = queryset.filter(allowance_requested=True)
+            case (False, True):
+                queryset = queryset.filter(allowance_requested=False)
+            case _:
                 pass
 
         return queryset
