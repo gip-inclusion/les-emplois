@@ -1,0 +1,10 @@
+{% if formatted_opening_hours %}
+    {% for entry in formatted_opening_hours %}
+        <p class="mb-1">
+            {{ entry.label }}, {{ entry.hours }}
+            {% if entry.comment %}<small class="text-muted">({{ entry.comment }})</small>{% endif %}
+        </p>
+    {% endfor %}
+{% else %}
+    {{ service.opening_hours }}
+{% endif %}

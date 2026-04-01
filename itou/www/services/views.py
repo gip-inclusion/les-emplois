@@ -3,6 +3,7 @@ from django.db import models
 from django.views.generic import DetailView
 
 from itou.dora.models import ReferenceDatum, Service
+from itou.dora.opening_hours import format_osm_hours
 
 
 class ServiceDetailView(LoginRequiredMixin, DetailView):
@@ -25,3 +26,8 @@ class ServiceDetailView(LoginRequiredMixin, DetailView):
     slug_url_kwarg = "uid"
     template_name = "services/detail.html"
     context_object_name = "service"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
+        return context

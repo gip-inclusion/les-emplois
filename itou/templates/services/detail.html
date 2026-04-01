@@ -104,7 +104,7 @@
                             {% if service.opening_hours %}
                                 <dt class="col-sm-4">Fréquence et horaires</dt>
                                 <dd class="col-sm-8">
-                                    {{ service.opening_hours }}
+                                    {% include "dora/opening_hours.html" %}
                                 </dd>
                             {% endif %}
 
