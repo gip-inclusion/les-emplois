@@ -16,15 +16,17 @@
 {% block title_extra %}
     <div class="c-box c-box--action d-flex align-items-center justify-content-between">
         <div class="form-row align-items-center gx-3">
+            {% if service.is_orientable_with_form %}
+                <div class="form-group col-12 col-lg-auto">
+                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="https://dora.inclusion.gouv.fr">
+                        <span>Orienter le bénéficiaire</span>
+                    </a>
+                </div>
+            {% endif %}
             <div class="form-group col-12 col-lg-auto">
-                <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="https://dora.inclusion.gouv.fr">
-                    <span>Orienter le bénéficiaire</span>
-                </a>
-            </div>
-            <div class="form-group col-12 col-lg-auto">
-                <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="https://dora.inclusion.gouv.fr">
+                <button class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#js-contact-modal">
                     <span>Voir les coordonnées de contact du service</span>
-                </a>
+                </button>
             </div>
         </div>
         <div>
@@ -174,6 +176,39 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="js-contact-modal" tabindex="-1" aria-labelledby="js-contact-modal-label" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="js-contact-modal-label">Coordonnées de contact</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    {% if service.contact_email %}
+                        <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                            <div>
+                                <i class="ri-mail-line me-2" aria-hidden="true"></i>
+                                {{ service.contact_email }}
+                            </div>
+                            <button id="js-copy-email" class="btn btn-link btn-ico-only" type="button" aria-label="Copier l'adresse e-mail" data-email="{{ service.contact_email }}">
+                                <i class="ri-file-copy-line" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    {% endif %}
+                    {% if service.contact_phone %}
+                        <div class="border rounded p-3">
+                            <i class="ri-phone-line me-2" aria-hidden="true"></i>
+                            {{ service.contact_phone }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block script %}
