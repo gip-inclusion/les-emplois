@@ -51,10 +51,9 @@
                         <h2 class="h4">Informations du service</h2>
 
                         {% if service.average_orientation_response_delay_days is not None %}
-                            <p class="text-success mb-3">
-                                <i class="ri-time-line" aria-hidden="true"></i>
-                                Délai de réponse : {{ service.average_orientation_response_delay_days }} jour{{ service.average_orientation_response_delay_days|pluralize }}
-                            </p>
+                            <div class="mb-3">
+                                {% include "dora/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
+                            </div>
                         {% endif %}
 
                         {% if service.description_short %}<p>{{ service.description_short }}</p>{% endif %}
