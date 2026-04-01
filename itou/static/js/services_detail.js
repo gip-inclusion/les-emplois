@@ -18,3 +18,13 @@ function initDescriptionToggle() {
 }
 
 initDescriptionToggle();
+
+function initCopyLink() {
+    const btn = document.getElementById("js-copy-link");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+        navigator.clipboard.writeText(window.location.href);
+    });
+}
+
+initCopyLink();
