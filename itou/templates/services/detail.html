@@ -1,0 +1,175 @@
+{% extends "layout/base.html" %}
+
+{% block title %}{{ service.name }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    <div class="d-flex align-items-center flex-wrap gap-2">
+        <h1 class="mb-0">{{ service.name }}</h1>
+        <span class="badge rounded-pill text-bg-success fs-sm">Mise à jour {{ service.updated_on|date:"d/m/Y" }}</span>
+    </div>
+{% endblock %}
+
+{% block title_extra %}
+    <div class="c-box c-box--action">
+        <div class="form-row align-items-center gx-3">
+            <div class="form-group col-12 col-lg-auto">
+                <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="https://dora.inclusion.gouv.fr">
+                    <span>Orienter le bénéficiaire</span>
+                </a>
+            </div>
+            <div class="form-group col-12 col-lg-auto">
+                <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="https://dora.inclusion.gouv.fr">
+                    <span>Voir les coordonnées de contact du service</span>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+
+                {# Main column #}
+                <div class="col-12 col-lg-8">
+
+                    {# Service information card #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Informations du service</h2>
+
+                        {% if service.average_orientation_response_delay_days is not None %}
+                            <p class="text-success mb-3">
+                                <i class="ri-time-line" aria-hidden="true"></i>
+                                Délai de réponse : {{ service.average_orientation_response_delay_days }} jour{{ service.average_orientation_response_delay_days|pluralize }}
+                            </p>
+                        {% endif %}
+
+                        {% if service.description_short %}<p>{{ service.description_short }}</p>{% endif %}
+
+                        <dl class="row mb-0">
+                            {% if service.publics.exists %}
+                                <dt class="col-sm-4">Public concerné</dt>
+                                <dd class="col-sm-8">
+                                    {% for public in service.publics.all %}
+                                        {{ public.label }}
+                                        {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                    {% if service.publics_details %}
+                                        <br>
+                                        <small class="text-muted">{{ service.publics_details }}</small>
+                                    {% endif %}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.receptions.exists or service.address_line_1 %}
+                                <dt class="col-sm-4">Lieu d'accueil</dt>
+                                <dd class="col-sm-8">
+                                    {% for reception in service.receptions.all %}
+                                        {# fmt: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# fmt: on #}
+                                    {% endfor %}
+                                    {% if service.address_line_1 and service.has_in_person_reception %}
+                                        {% if service.receptions.exists %}—{% endif %}
+                                        {{ service.address_line_1 }}
+                                        {% if service.address_line_2 %}, {{ service.address_line_2 }}{% endif %}
+                                        — {{ service.post_code }} {{ service.city }}
+                                    {% endif %}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.fee %}
+                                <dt class="col-sm-4">Frais à charge</dt>
+                                <dd class="col-sm-8">
+                                    {{ service.fee.label }}
+                                    {% if service.fee_details %}
+                                        <br>
+                                        <small class="text-muted">{{ service.fee_details }}</small>
+                                    {% endif %}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.opening_hours %}
+                                <dt class="col-sm-4">Fréquence et horaires</dt>
+                                <dd class="col-sm-8">
+                                    {{ service.opening_hours }}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.insee_city %}
+                                <dt class="col-sm-4">Périmètre géographique</dt>
+                                <dd class="col-sm-8">
+                                    {{ service.insee_city.get_department_display }}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.access_conditions %}
+                                <dt class="col-sm-4">Les critères d'admission</dt>
+                                <dd class="col-sm-8">
+                                    {{ service.access_conditions }}
+                                </dd>
+                            {% endif %}
+                        </dl>
+
+                        <p class="mb-0 mt-3">
+                            <small class="text-muted">Source : {{ service.source.label }}</small>
+                        </p>
+                    </div>
+
+                    {# Description #}
+                    {% if service.description %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h4">Description du service</h2>
+                            <div id="js-description-wrapper" style="max-height: 150px; overflow: hidden; position: relative;">
+                                <p class="mb-0">{{ service.description }}</p>
+                                <div id="js-description-fade" style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, white);">
+                                </div>
+                            </div>
+                            <a href="#" id="js-description-toggle" class="fw-bold d-none">Lire la suite</a>
+                        </div>
+                    {% endif %}
+
+                    {# Thematics #}
+                    {% if service.thematics.exists %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h4">Thématique et besoins associés</h2>
+                            <ul class="mb-0">
+                                {% for thematic in service.thematics.all %}<li>{{ thematic.label }}</li>{% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {# Mobilizations #}
+                    {% if service.mobilizations.exists %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h4">Les démarches à réaliser</h2>
+                            <ul class="mb-0">
+                                {% for mobilization in service.mobilizations.all %}<li>{{ mobilization.label }}</li>{% endfor %}
+                            </ul>
+                            {% if service.mobilizations_details %}<p class="mt-2 mb-0">{{ service.mobilizations_details }}</p>{% endif %}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                {# Sidebar #}
+                <div class="col-12 col-lg-4">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Informations de la structure</h2>
+                        <p>{{ service.structure.name }}</p>
+                        <button type="button" class="btn btn-secondary w-100">Voir la fiche structure</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {% load static %}
+    <script src="{% static 'js/services_detail.js' %}"></script>
+{% endblock %}
