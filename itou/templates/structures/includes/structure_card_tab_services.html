@@ -1,0 +1,26 @@
+<div id="structure-services-results">
+    <section class="s-section">
+        <div class="s-section__container container px-0">
+            {% for service in services_page %}
+                <article class="border-bottom py-3">
+                    <div class="d-flex align-items-center justify-content-between gap-3">
+                        <div>
+                            <h3 class="h4 mb-2 text-uppercase">{{ service.name }}</h3>
+                            {% if service.city or structure.city %}
+                                <p class="text-secondary fs-sm mb-0">
+                                    <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
+                                    Périmètre : {{ service.city|default:structure.city }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <i class="ri-arrow-right-s-line text-disabled" aria-hidden="true"></i>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="mb-0">Cette structure ne comporte pas de service.</p>
+            {% endfor %}
+
+            {% include "includes/pagination.html" with page=services_page boost=True boost_target="#structure-services-results" boost_indicator="#structure-services-results" request=request only %}
+        </div>
+    </section>
+</div>
