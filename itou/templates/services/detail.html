@@ -132,8 +132,9 @@
                     {% if service.description %}
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h4">Description du service</h2>
+                            {% load markdownify %}
                             <div id="js-description-wrapper" style="max-height: 150px; overflow: hidden; position: relative;">
-                                <p class="mb-0">{{ service.description }}</p>
+                                <div class="mb-0">{{ service.description|markdownify }}</div>
                                 <div id="js-description-fade" style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, white);">
                                 </div>
                             </div>
@@ -169,7 +170,8 @@
                     <div class="c-box mb-3 mb-md-4">
                         <h2 class="h4">Informations de la structure</h2>
                         <p>{{ service.structure.name }}</p>
-                        <button type="button" class="btn btn-secondary w-100">Voir la fiche structure</button>
+                        {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
+                        <a href="#" type="button" class="btn btn-secondary w-100">Voir la fiche structure</a>
                     </div>
                 </div>
 
