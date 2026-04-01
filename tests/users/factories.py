@@ -432,6 +432,7 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
     class Params:
         for_snapshot = factory.Trait(
             job_seeker__for_snapshot=True,
+            professional__for_snapshot=True,
             created_at=datetime.datetime(2024, 6, 21, 0, 0, 0, tzinfo=datetime.UTC),
             updated_at=datetime.datetime(2024, 6, 24, 0, 0, 0, tzinfo=datetime.UTC),
         )
