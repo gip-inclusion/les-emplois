@@ -545,6 +545,40 @@ def test_membership_inline_includes_inactive(admin_client):
     )
 
 
+class TestJobSeekerAssignments:
+    def test_job_seeker_assignments_search(self, admin_client):
+        assignment = JobSeekerAssignmentFactory(
+            for_snapshot=True, prescriber_organization=PrescriberOrganizationFactory(for_snapshot=True)
+        )
+
+        for search in [
+            assignment.job_seeker.email,
+            assignment.job_seeker.last_name,
+            assignment.professional.email,
+            assignment.prescriber_organization.name,
+        ]:
+            response = admin_client.get(reverse("admin:users_jobseekerassignment_changelist", query={"q": search}))
+            assert list(response.context["cl"].result_list) == [assignment]
+
+        search = "nothing should match now"
+        response = admin_client.get(reverse("admin:users_jobseekerprofile_changelist", query={"q": search}))
+        assert list(response.context["cl"].result_list) == []
+
+    def test_job_seeker_assignment_organization_name(self, admin_client):
+        JobSeekerAssignmentFactory(
+            prescriber_organization=PrescriberOrganizationFactory(
+                name="Organisme d'orientation dans un but d'insertion par l'activité économique"
+            )
+        )
+        JobSeekerAssignmentFactory(
+            company=CompanyFactory(name="Entreprise proposant des services effectués par des personnes en IAE")
+        )
+
+        response = admin_client.get(reverse("admin:users_jobseekerassignment_changelist"))
+        assertContains(response, "Organisme d'orientation dans … (org. prescr.)", html=True)
+        assertContains(response, "Entreprise proposant des serv… (entr.)", html=True)
+
+
 class TestDeactivateView:
     def test_deactivate_button(self, client):
         user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()

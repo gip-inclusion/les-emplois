@@ -18,6 +18,7 @@ from django.urls import NoReverseMatch, path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.text import Truncator
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
@@ -1081,6 +1082,47 @@ class NirModificationRequestAdmin(ItouModelAdmin):
     @admin.display(description="Type de compte de l'auteur")
     def requested_by_type(self, obj):
         return obj.requested_by.get_kind_display()
+
+
+@admin.register(models.JobSeekerAssignment)
+class JobSeekerAssignmentAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = [
+        "job_seeker_display",
+        "professional_display",
+        "organization",
+        "updated_at",
+        "last_action_kind",
+    ]
+    list_display_links = ("job_seeker_display",)
+    list_filter = ("last_action_kind",)
+    search_fields = (
+        "job_seeker__first_name",
+        "job_seeker__last_name",
+        "job_seeker__email",
+        "professional__first_name",
+        "professional__last_name",
+        "professional__email",
+        "prescriber_organization__name",
+        "company__name",
+        "company__brand",
+    )
+    ordering = ("-updated_at",)
+
+    @admin.display(description="candidat")
+    def job_seeker_display(self, obj):
+        return obj.job_seeker.get_inverted_full_name()
+
+    @admin.display(description="accompagnateur")
+    def professional_display(self, obj):
+        return obj.professional.get_full_name()
+
+    @admin.display(description="entreprise ou org. prescr.")
+    def organization(self, obj):
+        if obj.prescriber_organization:
+            return f"{Truncator(obj.prescriber_organization.name).chars(30)} (org. prescr.)"
+        if obj.company:
+            return f"{Truncator(obj.company.name).chars(30)} (entr.)"
+        return "-"
 
 
 admin.site.unregister(EmailAddress)
