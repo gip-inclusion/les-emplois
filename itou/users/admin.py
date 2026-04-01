@@ -411,6 +411,18 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
         return ""
 
+    @admin.display(description="affectations candidat")
+    def job_seeker_assignments(self, obj):
+        key = None
+        if obj.is_job_seeker:
+            key = "job_seeker"
+        elif obj.is_professional:
+            key = "professional"
+        if key and (count := models.JobSeekerAssignment.objects.filter(**{key: obj}).count()):
+            url = reverse("admin:users_jobseekerassignment_changelist", query={key: obj.pk})
+            return format_html('<a href="{}">Liste des affectations candidat ({})</a>', url, count)
+        return self.get_empty_value_display()
+
     @admin.display(description="Historique des valeurs provenant de systèmes externes")
     def external_data_source_history_formatted(self, obj):
         return format_html("<pre><code>{}</code></pre>", pformat(obj.external_data_source_history, width=120))
@@ -446,6 +458,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "jobseeker_profile_link",
                 "disabled_notifications",
                 "follow_up_groups_or_members",
+                "job_seeker_assignments",
                 "upcoming_deletion_notified_at",
                 "external_data_source_history_formatted",
                 "first_login",
@@ -486,6 +499,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "created_by",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
+                        "job_seeker_assignments",
                         "external_data_source_history_formatted",
                     ]
                 },

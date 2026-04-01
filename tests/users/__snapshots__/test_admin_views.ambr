@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_num_queries
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -567,6 +567,28 @@
           INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
                  AND "gps_followupgroupmembership"."member_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouUserAdmin.job_seeker_assignments[users/admin.py]',
+          'VariableNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'IncludeNode[admin/change_form.html]',
+          'ForNode[admin/change_form.html]',
+          'BlockNode[admin/change_form.html]',
+          'BlockNode[admin/base.html]',
+          'ExtendsNode[admin/base_site.html]',
+          'ExtendsNode[admin/change_form.html]',
+          'ExtendsNode[admin/users/change_user_form.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."professional_id" = %s
         ''',
       }),
       dict({
