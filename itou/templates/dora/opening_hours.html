@@ -1,10 +1,14 @@
 {% if formatted_opening_hours %}
-    {% for entry in formatted_opening_hours %}
-        <p class="mb-1">
-            {{ entry.label }}, {{ entry.hours }}
-            {% if entry.comment %}<small class="text-muted">({{ entry.comment }})</small>{% endif %}
-        </p>
-    {% endfor %}
+    <dl class="row mb-0">
+        {% for entry in formatted_opening_hours.entries %}
+            <dt class="col-sm-3 fw-normal pe-0">{{ entry.label }} :</dt>
+            <dd class="col-sm-9 mb-1 ps-0">
+                {{ entry.hours }}
+                {% if entry.comment %}<span class="text-muted">({{ entry.comment|lower }})</span>{% endif %}
+            </dd>
+        {% endfor %}
+    </dl>
+    {% if formatted_opening_hours.has_ph_off %}<p class="mb-0 mt-1 text-muted">Hors jours fériés</p>{% endif %}
 {% else %}
     {{ service.opening_hours }}
 {% endif %}

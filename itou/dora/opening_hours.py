@@ -1,13 +1,29 @@
 import re
+from typing import TypedDict
 
 
 DAYS = {"Mo": 0, "Tu": 1, "We": 2, "Th": 3, "Fr": 4, "Sa": 5, "Su": 6}
 
-DAY_NAMES_SHORT = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."]
-DAY_NAMES_LONG = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
+DAY_NAMES_LONG = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
 
 
-def _expand_day_selector(selector):
+class DaySchedule(TypedDict):
+    times: list[str]
+    comment: str | None
+
+
+class OpeningHoursEntry(TypedDict):
+    label: str
+    hours: str
+    comment: str | None
+
+
+class FormattedOpeningHours(TypedDict):
+    entries: list[OpeningHoursEntry]
+    has_ph_off: bool
+
+
+def _expand_day_selector(selector: str) -> list[int]:
     days = []
     for part in selector.split(","):
         if "-" in part:
@@ -18,69 +34,27 @@ def _expand_day_selector(selector):
     return days
 
 
-def _format_time(time_str):
+def _format_time(time_str: str) -> str:
     h, m = time_str.split(":")
-    return f"{h}h" if m == "00" else f"{h}h{m}"
+    return f"{int(h)}h{m}"
 
 
-def _format_time_range(time_range):
+def _format_time_range(time_range: str) -> str:
     start, end = time_range.split("-")
-    return f"de {_format_time(start)} à {_format_time(end)}"
+    return f"{_format_time(start)} à {_format_time(end)}"
 
 
-def _format_hours(time_ranges):
-    return " et ".join(_format_time_range(tr) for tr in sorted(time_ranges))
-
-
-def _day_label(start, end, only_group):
-    prefix = "Tous les jours " if only_group and start != end else ""
-    if start == end:
-        return f"{prefix}{DAY_NAMES_SHORT[start]}"
-    return f"{prefix}du {DAY_NAMES_LONG[start]} au {DAY_NAMES_LONG[end]}"
-
-
-def _group_days(schedule):
-    active = [{"idx": i, **schedule[i]} for i in range(7) if i in schedule]
-    if not active:
-        return []
-
-    groups = []
-    i = 0
-    while i < len(active):
-        current = active[i]
-        j = i + 1
-        while (
-            j < len(active)
-            and active[j]["idx"] == active[j - 1]["idx"] + 1
-            and active[j]["times"] == current["times"]
-            and active[j]["comment"] == current["comment"]
-        ):
-            j += 1
-        groups.append({
-            "start": current["idx"],
-            "end": active[j - 1]["idx"],
-            "hours": _format_hours(current["times"]),
-            "comment": current["comment"],
-        })
-        i = j
-
-    only_group = len(groups) == 1
-    return [
-        {
-            "label": _day_label(g["start"], g["end"], only_group),
-            "hours": g["hours"],
-            "comment": g["comment"],
-        }
-        for g in groups
-    ]
-
-
-def parse_osm_hours(value):
-    schedule = {}
+def parse_osm_hours(value: str) -> tuple[dict[int, DaySchedule], bool]:
+    schedule: dict[int, DaySchedule] = {}
+    has_ph_off = False
 
     for rule in value.split(";"):
         rule = rule.strip()
-        if not rule or rule.startswith("PH"):
+        if not rule:
+            continue
+
+        if "PH off" in rule:
+            has_ph_off = True
             continue
 
         comment_match = re.search(r'"([^"]*)"', rule)
@@ -109,14 +83,25 @@ def parse_osm_hours(value):
                 schedule[day] = {"times": [], "comment": comment}
             schedule[day]["times"].extend(time_ranges)
 
-    return schedule
+    return schedule, has_ph_off
 
 
-def format_osm_hours(value):
+def format_osm_hours(value: str) -> FormattedOpeningHours | None:
     if not value:
         return None
     try:
-        schedule = parse_osm_hours(value)
-        return _group_days(schedule) or None
+        schedule, has_ph_off = parse_osm_hours(value)
+        if not schedule:
+            return None
+        entries: list[OpeningHoursEntry] = [
+            {
+                "label": DAY_NAMES_LONG[day_idx],
+                "hours": " - ".join(_format_time_range(tr) for tr in sorted(schedule[day_idx]["times"])),
+                "comment": schedule[day_idx]["comment"],
+            }
+            for day_idx in sorted(schedule.keys())
+        ]
+        return {"entries": entries, "has_ph_off": has_ph_off}
     except Exception:
+        # todo: log the error?
         return None
