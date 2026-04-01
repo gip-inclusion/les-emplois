@@ -153,3 +153,7 @@ class Service(GeolocatedAddressMixin, models.Model):
     average_orientation_response_delay_days = models.PositiveIntegerField(null=True)
 
     updated_on = models.DateField()
+
+    @property
+    def has_in_person_reception(self):
+        return self.receptions.filter(value="en-presentiel").exists()
