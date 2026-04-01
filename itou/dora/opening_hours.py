@@ -95,14 +95,19 @@ def parse_osm_hours(value):
         if "off" in parts:
             continue
 
-        time_range = next((p for p in parts[1:] if re.match(r"\d{2}:\d{2}-\d{2}:\d{2}", p)), None)
-        if not time_range:
+        time_ranges = []
+        for p in parts[1:]:
+            for tr in p.split(","):
+                if re.match(r"\d{2}:\d{2}-\d{2}:\d{2}$", tr):
+                    time_ranges.append(tr)
+
+        if not time_ranges:
             continue
 
         for day in _expand_day_selector(parts[0]):
             if day not in schedule:
                 schedule[day] = {"times": [], "comment": comment}
-            schedule[day]["times"].append(time_range)
+            schedule[day]["times"].extend(time_ranges)
 
     return schedule
 
