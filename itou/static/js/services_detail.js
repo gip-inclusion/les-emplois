@@ -28,3 +28,20 @@ function initCopyLink() {
 }
 
 initCopyLink();
+
+function initCopyEmail() {
+    const btn = document.getElementById("js-copy-email");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+        navigator.clipboard.writeText(btn.dataset.email);
+        const icon = btn.querySelector("i");
+        icon.classList.replace("ri-file-copy-line", "ri-check-line");
+        icon.classList.add("text-success");
+        setTimeout(function () {
+            icon.classList.replace("ri-check-line", "ri-file-copy-line");
+            icon.classList.remove("text-success");
+        }, 2000);
+    });
+}
+
+initCopyEmail();
