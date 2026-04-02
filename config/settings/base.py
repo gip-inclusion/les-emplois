@@ -235,7 +235,7 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-PASSWORD_MIN_LENGTH = 14
+PASSWORD_MIN_LENGTH = 16
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {

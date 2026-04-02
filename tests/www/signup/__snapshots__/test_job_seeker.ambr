@@ -265,7 +265,7 @@
           </p>
           <ul class="mb-0">
               <li>
-                  Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
+                  Ce mot de passe est trop court. Il doit contenir au minimum 16 caractères.
               </li>
               <li>
                   Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
@@ -356,14 +356,14 @@
           </div>
           <div class="w-100" id="id_password1_error">
               <div class="invalid-feedback d-block">
-                  Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
+                  Ce mot de passe est trop court. Il doit contenir au minimum 16 caractères.
               </div>
               <div class="invalid-feedback d-block">
                   Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
               </div>
           </div>
           <div class="form-text" id="id_password1_helptext">
-              Le mot de passe doit contenir au moins 14 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
+              Le mot de passe doit contenir au moins 16 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
           </div>
       </div>
       <div class="form-group form-group-input-w-lg-66 mb-0 form-group-required">
