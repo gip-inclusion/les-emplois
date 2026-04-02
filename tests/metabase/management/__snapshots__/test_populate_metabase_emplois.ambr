@@ -7304,8 +7304,14 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
+          LEFT OUTER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          LEFT OUTER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
-          WHERE ("users_user"."kind" = %s
+          WHERE ("companies_companymembership"."id" IS NULL
+                 AND "institutions_institutionmembership"."id" IS NULL
+                 AND "users_user"."kind" IN (%s,
+                                             %s,
+                                             %s)
                  AND "prescribers_prescribermembership"."id" IS NULL)
         ''',
       }),

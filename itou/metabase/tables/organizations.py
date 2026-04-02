@@ -37,7 +37,12 @@ def get_org_first_join_date(org):
 def get_org_members_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of prescriber users without org.
-        return User.objects.filter(kind=UserKind.PRESCRIBER, prescribermembership=None).count()
+        return User.objects.filter(
+            kind__in=UserKind.professionals(),
+            prescribermembership=None,
+            companymembership=None,
+            institutionmembership=None,
+        ).count()
     return org.active_memberships_count or 0
 
 
