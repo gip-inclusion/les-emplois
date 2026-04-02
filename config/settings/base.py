@@ -756,7 +756,7 @@ FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"
 
-DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr")
+DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.gouv.fr")
 
 # GPS
 # ------------------------------------------------------------------------------
