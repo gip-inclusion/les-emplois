@@ -32,6 +32,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -84,6 +85,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -130,6 +132,7 @@
                  T3."is_staff",
                  T3."is_active",
                  T3."date_joined",
+                 T3."fields_history",
                  T3."address_line_1",
                  T3."address_line_2",
                  T3."post_code",
@@ -156,6 +159,7 @@
                  T3."first_login",
                  T3."upcoming_deletion_notified_at",
                  T3."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -202,8 +206,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "cities_city" ON ("users_user"."insee_city_id" = "cities_city"."id")
           LEFT OUTER JOIN "users_user" T3 ON ("users_user"."created_by_id" = T3."id")
@@ -300,6 +303,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -453,6 +457,7 @@
                  T3."is_staff",
                  T3."is_active",
                  T3."date_joined",
+                 T3."fields_history",
                  T3."address_line_1",
                  T3."address_line_2",
                  T3."post_code",

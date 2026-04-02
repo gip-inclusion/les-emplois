@@ -9,7 +9,6 @@ from citext import CIEmailField
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
@@ -56,8 +55,8 @@ from itou.utils.db import or_queries
 from itou.utils.emails import get_email_message
 from itou.utils.france_standards import NIR
 from itou.utils.legal_terms import get_latest_terms_datetime
+from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.templatetags.str_filters import mask_unless
-from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
@@ -264,7 +263,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         return users_qs
 
 
-class User(AbstractUser, AddressMixin):
+class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     """
     Custom user model.
 
@@ -290,6 +289,20 @@ class User(AbstractUser, AddressMixin):
 
     More details in `itou.external_data.models` module
     """
+
+    # Configuration for AbstractHistoryModel
+    FIELDS_HISTORY_TRIGGER_NAME = "user_fields_history"
+    FIELDS_HISTORY_TRIGGER_FIELDS = [
+        "first_name",
+        "last_name",
+        "title",
+        "email",
+        "phone",
+        "address_line_1",
+        "address_line_2",
+        "post_code",
+        "city",
+    ]
 
     ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
 
@@ -811,7 +824,7 @@ class JobSeekerProfileManager(models.Manager.from_queryset(JobSeekerProfileQuery
         return super().get_queryset().defer("fields_history")
 
 
-class JobSeekerProfile(models.Model):
+class JobSeekerProfile(AbstractFieldsHistoryModel):
     """
     Specific information about the job seeker
 
@@ -849,6 +862,18 @@ class JobSeekerProfile(models.Model):
     Note that despite the name, addresses of this model are not fully compliant
     with Hexa norms (but compliant enough to be accepted by ASP backend).
     """
+
+    # Configuration for AbstractFieldsHistoryModel
+    FIELDS_HISTORY_TRIGGER_NAME = "job_seeker_profile_fields_history"
+    FIELDS_HISTORY_TRIGGER_FIELDS = [
+        "asp_uid",
+        "birth_country",
+        "birth_place",
+        "birthdate",
+        "is_not_stalled_anymore",
+        "nir",
+        "pole_emploi_id",
+    ]
 
     ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
     ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = (
@@ -1193,18 +1218,9 @@ class JobSeekerProfile(models.Model):
     )
     is_not_stalled_anymore = models.BooleanField(null=True, blank=True, db_default=None)
 
-    fields_history = ArrayField(
-        models.JSONField(
-            encoder=DjangoJSONEncoder,
-        ),
-        verbose_name="historique des champs modifiés sur le modèle",
-        default=list,
-        db_default=[],
-    )
-
     objects = JobSeekerProfileManager()
 
-    class Meta:
+    class Meta(AbstractFieldsHistoryModel.Meta):
         verbose_name = "profil demandeur d'emploi"
         verbose_name_plural = "profils demandeur d'emploi"
 
@@ -1263,9 +1279,6 @@ class JobSeekerProfile(models.Model):
                 name="users_jobseeker_stalled_idx",
                 condition=Q(is_stalled=True),
             ),
-        ]
-        triggers = [
-            FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid", "is_not_stalled_anymore"])
         ]
         permissions = [
             ("import_fs_3437_from_asp", "Can import FS 3437 return file from ASP and update asp_uid field"),

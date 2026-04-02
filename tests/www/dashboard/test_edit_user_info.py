@@ -13,6 +13,7 @@ from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.urls import get_zendesk_form_url
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
@@ -727,14 +728,16 @@ class TestEditUserInfoView:
         # Phone but no title and no birthdate
         user.phone = "0123456789"
         user.address_line_1 = "123 rue de"
-        user.save(
-            update_fields=(
-                "address_line_1",
-                "phone",
+        with triggers.context():
+            user.save(
+                update_fields=(
+                    "address_line_1",
+                    "phone",
+                )
             )
-        )
         user.jobseeker_profile.birthdate = None
-        user.jobseeker_profile.save(update_fields={"birthdate"})
+        with triggers.context():
+            user.jobseeker_profile.save(update_fields={"birthdate"})
         response = client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
         assert pretty_indented(warning_text) == snapshot(name="missing title warning without phone and with birthdate")
@@ -742,7 +745,8 @@ class TestEditUserInfoView:
         # No phone but title
         user.phone = ""
         user.title = Title.MME
-        user.save(update_fields=("phone", "title"))
+        with triggers.context():
+            user.save(update_fields=("phone", "title"))
         response = client.get(url)
         assertNotContains(response, MISSING_INFOS_WARNING_ID)
 

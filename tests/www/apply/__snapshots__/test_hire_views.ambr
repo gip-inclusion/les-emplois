@@ -1168,6 +1168,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1589,6 +1590,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1692,6 +1694,7 @@
                  T3."is_staff",
                  T3."is_active",
                  T3."date_joined",
+                 T3."fields_history",
                  T3."address_line_1",
                  T3."address_line_2",
                  T3."post_code",
@@ -1829,6 +1832,7 @@
                  T4."is_staff",
                  T4."is_active",
                  T4."date_joined",
+                 T4."fields_history",
                  T4."address_line_1",
                  T4."address_line_2",
                  T4."post_code",
@@ -1981,7 +1985,8 @@
           'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
+          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -2027,8 +2032,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
@@ -2119,6 +2123,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2540,6 +2545,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2643,6 +2649,7 @@
                  T3."is_staff",
                  T3."is_active",
                  T3."date_joined",
+                 T3."fields_history",
                  T3."address_line_1",
                  T3."address_line_2",
                  T3."post_code",
@@ -2775,6 +2782,7 @@
                  T5."is_staff",
                  T5."is_active",
                  T5."date_joined",
+                 T5."fields_history",
                  T5."address_line_1",
                  T5."address_line_2",
                  T5."post_code",
@@ -2958,7 +2966,8 @@
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
+          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -3004,8 +3013,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
@@ -3274,6 +3282,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -3695,6 +3704,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -3798,6 +3808,7 @@
                  T3."is_staff",
                  T3."is_active",
                  T3."date_joined",
+                 T3."fields_history",
                  T3."address_line_1",
                  T3."address_line_2",
                  T3."post_code",
@@ -3935,6 +3946,7 @@
                  T4."is_staff",
                  T4."is_active",
                  T4."date_joined",
+                 T4."fields_history",
                  T4."address_line_1",
                  T4."address_line_2",
                  T4."post_code",
@@ -4090,7 +4102,8 @@
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
+          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -4136,8 +4149,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
@@ -4334,6 +4346,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -4755,6 +4768,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -4858,6 +4872,7 @@
                  T3."is_staff",
                  T3."is_active",
                  T3."date_joined",
+                 T3."fields_history",
                  T3."address_line_1",
                  T3."address_line_2",
                  T3."post_code",
@@ -4995,6 +5010,7 @@
                  T4."is_staff",
                  T4."is_active",
                  T4."date_joined",
+                 T4."fields_history",
                  T4."address_line_1",
                  T4."address_line_2",
                  T4."post_code",
@@ -5148,7 +5164,8 @@
           'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
+          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -5194,8 +5211,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
@@ -5388,6 +5404,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -5666,6 +5683,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -5780,6 +5798,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -6059,6 +6078,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -6085,6 +6105,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -6131,8 +6152,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -6258,6 +6278,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -6537,6 +6558,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -6625,6 +6647,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -6904,6 +6927,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -6930,6 +6954,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -6976,8 +7001,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -7027,6 +7051,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -7391,6 +7416,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -7505,6 +7531,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -7870,6 +7897,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -7896,6 +7924,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -7942,8 +7971,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -8114,6 +8142,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -8479,6 +8508,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -8612,6 +8642,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -8977,6 +9008,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -9003,6 +9035,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -9049,8 +9082,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -9145,6 +9177,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -9423,6 +9456,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -9537,6 +9571,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -9816,6 +9851,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -9842,6 +9878,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -9888,8 +9925,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -10015,6 +10051,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -10294,6 +10331,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -10382,6 +10420,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -10661,6 +10700,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -10687,6 +10727,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -10733,8 +10774,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -10784,6 +10824,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -11148,6 +11189,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -11262,6 +11304,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -11627,6 +11670,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -11653,6 +11697,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -11699,8 +11744,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -11871,6 +11915,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -12236,6 +12281,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -12369,6 +12415,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -12734,6 +12781,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -12760,6 +12808,7 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -12806,8 +12855,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s

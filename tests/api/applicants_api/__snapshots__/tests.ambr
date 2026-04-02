@@ -127,6 +127,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -156,6 +157,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -203,7 +205,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -376,6 +377,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -405,6 +407,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s, %s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -452,7 +455,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -747,6 +749,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -776,6 +779,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s, %s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -823,7 +827,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -996,6 +999,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1025,6 +1029,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1072,7 +1077,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -1245,6 +1249,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1274,6 +1279,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1321,7 +1327,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -1494,6 +1499,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1523,6 +1529,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s, %s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1570,7 +1577,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -1977,6 +1983,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2006,6 +2013,7 @@
                  ARRAY_AGG(DISTINCT "companies_company"."uid"
                            ORDER BY "companies_company"."uid") FILTER (
                                                                        WHERE "job_applications_jobapplication"."to_company_id" IN (%s)) AS "companies_uids",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2053,7 +2061,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",

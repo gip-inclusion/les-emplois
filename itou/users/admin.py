@@ -347,6 +347,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         ),
     ]
 
+    @admin.display(description="historique des champs modifiés sur le modèle")
+    def fields_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
+
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
         return obj.jobseeker_profile.birthdate if obj.is_job_seeker else None
@@ -449,6 +453,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "external_data_source_history_formatted",
                 "first_login",
                 "terms_accepted_at",
+                "fields_history_formatted",
             ]
         )
         if not request.user.is_superuser:
@@ -485,7 +490,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "created_by",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
-                        "external_data_source_history_formatted",
                     ]
                 },
             ),
@@ -527,6 +531,18 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         if obj and obj.identity_provider != IdentityProvider.DJANGO:
             # Add allow_next_sso_sub_update just after identity_provider
             fieldsets[0][1]["fields"] += ("allow_next_sso_sub_update",)
+
+        fieldsets.append(
+            (
+                "Audit",
+                {
+                    "fields": (
+                        "fields_history_formatted",
+                        "external_data_source_history_formatted",
+                    )
+                },
+            )
+        )
 
         return fieldsets
 

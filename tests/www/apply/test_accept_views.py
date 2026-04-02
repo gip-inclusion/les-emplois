@@ -42,6 +42,7 @@ from itou.users.enums import (
     UserKind,
 )
 from itou.users.models import IdentityCertification, JobSeekerAssignment, User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
@@ -674,7 +675,8 @@ class TestProcessAcceptViewsInWizard:
             Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
         )
         self.job_seeker.jobseeker_profile.birthdate = datetime.date(1990, 1, 1)
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birthdate"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birthdate"])
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
@@ -813,7 +815,8 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile.pole_emploi_id = ""
         jobseeker_profile.lack_of_pole_emploi_id_reason = LackOfPoleEmploiId.REASON_FORGOTTEN
         jobseeker_profile.birth_country = Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
-        jobseeker_profile.save()
+        with triggers.context():
+            jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
@@ -985,7 +988,8 @@ class TestProcessAcceptViewsInWizard:
     def test_no_nir_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
-        jobseeker_profile.save()
+        with triggers.context():
+            jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
@@ -1029,7 +1033,8 @@ class TestProcessAcceptViewsInWizard:
     def test_no_nir_other_user(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
-        jobseeker_profile.save()
+        with triggers.context():
+            jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         other_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_pole_emploi_id=True,
@@ -1058,7 +1063,8 @@ class TestProcessAcceptViewsInWizard:
     def test_no_nir_update_with_reason(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
-        jobseeker_profile.save()
+        with triggers.context():
+            jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
@@ -1101,7 +1107,8 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        jobseeker_profile.save()
+        with triggers.context():
+            jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
@@ -1146,7 +1153,8 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        jobseeker_profile.save()
+        with triggers.context():
+            jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
@@ -1333,7 +1341,10 @@ class TestProcessAcceptViewsInWizard:
         job_application.job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
             "07141", job_application.job_seeker.jobseeker_profile.birthdate
         )
-        job_application.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+        with triggers.context():
+            job_application.job_seeker.jobseeker_profile.save(
+                update_fields=["birthdate", "birth_country", "birth_place"]
+            )
         to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
             administrative_criteria__kind__in=criteria_kind
         )
@@ -1387,7 +1398,10 @@ class TestProcessAcceptViewsInWizard:
         job_application.job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
             "07141", job_application.job_seeker.jobseeker_profile.birthdate
         )
-        job_application.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+        with triggers.context():
+            job_application.job_seeker.jobseeker_profile.save(
+                update_fields=["birthdate", "birth_country", "birth_place"]
+            )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
             administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
             eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
@@ -1567,7 +1581,8 @@ class TestProcessAcceptViewsInWizard:
         job_seeker = job_application.job_seeker
         # Remove birthdate to have the form available
         job_seeker.jobseeker_profile.birthdate = None
-        job_seeker.jobseeker_profile.save(update_fields=["birthdate"])
+        with triggers.context():
+            job_seeker.jobseeker_profile.save(update_fields=["birthdate"])
         IdentityCertification.objects.create(
             jobseeker_profile=job_seeker.jobseeker_profile,
             certifier=IdentityCertificationAuthorities.API_PARTICULIER,
@@ -1621,7 +1636,8 @@ class TestProcessAcceptViewsInWizard:
         self.job_seeker.jobseeker_profile.birthdate = None
         self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.birth_country = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_place", "birth_country"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_place", "birth_country"])
 
         # required assumptions for the test case
         assert self.company.is_subject_to_iae_rules
@@ -1935,7 +1951,8 @@ class TestFillJobSeekerInfosForAccept:
         # Remove job seeker address
         for key, value in address_kwargs.items():
             setattr(self.job_seeker, key, value)
-        self.job_seeker.save(update_fields=address_kwargs.keys())
+        with triggers.context():
+            self.job_seeker.save(update_fields=address_kwargs.keys())
 
         client.force_login(self.company.members.first())
 
@@ -2023,7 +2040,8 @@ class TestFillJobSeekerInfosForAccept:
         else:
             self.job_seeker.jobseeker_profile.birth_country = None
             self.job_seeker.jobseeker_profile.birth_place = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
 
         url_accept = reverse(
             "apply:start-accept",
@@ -2131,7 +2149,8 @@ class TestFillJobSeekerInfosForAccept:
         assert self.job_seeker.jobseeker_profile.birthdate
         self.job_seeker.jobseeker_profile.birth_country = None
         self.job_seeker.jobseeker_profile.birth_place = None
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
 
         client.force_login(self.company.members.first())
         url_accept = reverse(
@@ -2238,7 +2257,8 @@ class TestFillJobSeekerInfosForAccept:
             )
         else:
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
         url_accept = reverse(
             "apply:start-accept",
@@ -2322,7 +2342,8 @@ class TestFillJobSeekerInfosForAccept:
             )
         else:
             self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["pole_emploi_id", "lack_of_pole_emploi_id_reason"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["pole_emploi_id", "lack_of_pole_emploi_id_reason"])
 
         url_accept = reverse(
             "apply:start-accept",

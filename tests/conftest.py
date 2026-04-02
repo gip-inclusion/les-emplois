@@ -37,7 +37,7 @@ from slippers.templatetags.slippers import AttrsNode
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
-from itou.utils import faker_providers  # noqa: E402
+from itou.utils import faker_providers, triggers  # noqa: E402
 from itou.utils.cache import UnclearableCache  # noqa: E402
 from itou.utils.storage.s3 import (  # noqa: E402
     NoObjectsInBucket,
@@ -797,3 +797,9 @@ def detect_missing_csrf_token():
 @pytest.fixture(autouse=True)
 def do_not_bypass_terms_acceptance(settings):
     settings.BYPASS_TERMS_ACCEPTANCE = False
+
+
+@pytest.fixture(name="trigger_context", scope="function")
+def trigger_context_fixture():
+    with triggers.context():
+        yield

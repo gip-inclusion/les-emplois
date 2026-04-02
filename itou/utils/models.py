@@ -2,10 +2,12 @@ from datetime import timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import DateRangeField, ranges
+from django.contrib.postgres.fields import ArrayField, DateRangeField, ranges
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import F, Func, Q, Transform
 
+from itou.utils.triggers import FieldsHistory
 from itou.utils.types import InclusiveDateRange
 
 
@@ -101,3 +103,57 @@ def check_nullable_date_order_constraint(
         violation_error_code=violation_error_code,
         violation_error_message=violation_error_message,
     )
+
+
+class AbstractFieldsHistoryModel(models.Model):
+    FIELDS_HISTORY_TRIGGER_NAME = None
+    FIELDS_HISTORY_TRIGGER_FIELDS = None
+
+    fields_history = ArrayField(
+        models.JSONField(
+            encoder=DjangoJSONEncoder,
+        ),
+        verbose_name="historique des champs modifiés sur le modèle",
+        default=list,
+        db_default=[],
+    )
+
+    class Meta:
+        abstract = True
+
+    def __init_subclass__(cls, /, **kwargs):
+        triggers = getattr(cls.Meta, "triggers", [])
+        triggers.append(
+            FieldsHistory(
+                name=cls.FIELDS_HISTORY_TRIGGER_NAME,
+                fields=cls.FIELDS_HISTORY_TRIGGER_FIELDS,
+            )
+        )
+        setattr(cls.Meta, "triggers", triggers)
+        super().__init_subclass__(**kwargs)
+
+    def _do_update(
+        self,
+        base_qs,
+        using,
+        pk_val,
+        values,
+        update_fields,
+        forced_update,
+        returning_fields,
+    ):
+        history_field = self._meta.get_field("fields_history")
+        # Prevent Django from trying to update fields_history in a save
+        values = [(f, v1, v2) for f, v1, v2 in values if f != history_field]
+        # Get new history field value in return
+        if history_field not in returning_fields:
+            returning_fields.append(history_field)
+        return super()._do_update(
+            base_qs,
+            using,
+            pk_val,
+            values,
+            update_fields,
+            forced_update,
+            returning_fields,
+        )

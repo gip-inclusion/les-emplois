@@ -25,6 +25,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Calendar, EvaluationCampaign, create_campaigns_and_calendar
 from itou.users.models import User
+from itou.utils import triggers
 
 
 NAMES = [
@@ -90,7 +91,8 @@ def load_data():
             )
             job_seeker.jobseeker_profile.nir = nir
             job_seeker.jobseeker_profile.pole_emploi_id = pe_id
-            job_seeker.jobseeker_profile.save(update_fields=["nir", "pole_emploi_id"])
+            with triggers.context():
+                job_seeker.jobseeker_profile.save(update_fields=["nir", "pole_emploi_id"])
             level = str((i % 2) + 1)
             # See AdministrativeCriteriaForm
             level2_criteria_count = 2 if controlled_siae.kind in [CompanyKind.AI, CompanyKind.ETTI] else 3

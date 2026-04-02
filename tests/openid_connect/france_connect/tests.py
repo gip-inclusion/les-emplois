@@ -25,6 +25,7 @@ from itou.openid_connect.france_connect.models import FranceConnectState, France
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.models import User
+from itou.utils import triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
@@ -165,7 +166,8 @@ class TestFranceConnect:
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         assert not User.objects.filter(username=fc_user_data.username).exists()
         assert not User.objects.filter(email=fc_user_data.email).exists()
-        user, created = fc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = fc_user_data.create_or_update_user()
         assert created
         assert user.last_name == FC_USERINFO["family_name"]
         assert user.first_name == FC_USERINFO["given_name"]
@@ -179,7 +181,8 @@ class TestFranceConnect:
         # Update user
         fc_user_data.last_name = "DUPUIS"
         fc_user_data.birthdate = datetime.date(1926, 7, 9)
-        user, created = fc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = fc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
         assert user.jobseeker_profile.birthdate == datetime.date(1926, 7, 9)
@@ -211,7 +214,8 @@ class TestFranceConnect:
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             title=Title.M,
         )
-        user, created = fc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = fc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == FC_USERINFO["family_name"]
         assert user.first_name == FC_USERINFO["given_name"]
@@ -258,7 +262,8 @@ class TestFranceConnect:
             certifiable_by_api_particulier=True,
         )
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        user, created = fc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = fc_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
         assert user.first_name == job_seeker.first_name
