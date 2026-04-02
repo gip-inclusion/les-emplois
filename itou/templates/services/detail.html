@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load matomo %}
 
 {% block title %}{{ service.name }} {{ block.super }}{% endblock %}
 
@@ -19,13 +20,21 @@
             {% if service.is_orientable_with_form %}
                 <div class="form-group col-12 col-lg-auto">
                     {#                    todo: put the correct link to Dora with the token #}
-                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="https://dora.inclusion.gouv.fr">
+                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                       rel="noopener"
+                       target="_blank"
+                       href="https://dora.inclusion.gouv.fr"
+                       {% matomo_event "dora-service" "clic" "orienter-un-bénéficiaire" %}>
                         <span>Orienter le bénéficiaire</span>
                     </a>
                 </div>
             {% endif %}
             <div class="form-group col-12 col-lg-auto">
-                <button class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#js-contact-modal">
+                <button class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#js-contact-modal"
+                        {% matomo_event "dora-service" "clic" "voir-coordonnees-contact" %}>
                     <span>Voir les coordonnées de contact du service</span>
                 </button>
             </div>
@@ -35,7 +44,9 @@
                 <i class="ri-more-2-fill" aria-hidden="true"></i>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdown_action_menu">
-                <button class="dropdown-item" id="js-copy-link">Copier le lien de cette page</button>
+                <button class="dropdown-item" id="js-copy-link" {% matomo_event "dora-service" "clic" "copier-lien-page" %}>
+                    Copier le lien de cette page
+                </button>
             </div>
         </div>
     </div>
@@ -175,7 +186,7 @@
                         <h2 class="h4">Informations de la structure</h2>
                         <p>{{ service.structure.name }}</p>
                         {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
-                        <a href="#" type="button" class="btn btn-secondary w-100">Voir la fiche structure</a>
+                        <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "dora-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
                     </div>
                 </div>
 
@@ -197,7 +208,12 @@
                                 <i class="ri-mail-line me-2" aria-hidden="true"></i>
                                 {{ service.contact_email }}
                             </div>
-                            <button id="js-copy-email" class="btn btn-link btn-ico-only" type="button" aria-label="Copier l'adresse e-mail" data-email="{{ service.contact_email }}">
+                            <button id="js-copy-email"
+                                    class="btn btn-link btn-ico-only"
+                                    type="button"
+                                    aria-label="Copier l'adresse e-mail"
+                                    data-email="{{ service.contact_email }}"
+                                    {% matomo_event "dora-service" "clic" "copier-email-contact" %}>
                                 <i class="ri-file-copy-line" aria-hidden="true"></i>
                             </button>
                         </div>
