@@ -237,6 +237,7 @@ class ContractFilterForm(forms.Form):
         ["start_date_lower", "start_date_upper"],
         ["potential_allowance_1400", "potential_allowance_814", "potential_allowance_0"],
         ["allowance_requested_on", "allowance_requested_off"],
+        ["allowance_eligibility_on", "allowance_eligibility_off"],
     ]
 
     start_date_lower = forms.DateField(label="À partir du", required=False, widget=DuetDatePickerWidget())
@@ -252,6 +253,8 @@ class ContractFilterForm(forms.Form):
     potential_allowance_0 = forms.BooleanField(label="0 €", required=False)
     allowance_requested_on = forms.BooleanField(label="Oui", required=False)
     allowance_requested_off = forms.BooleanField(label="Non", required=False)
+    allowance_eligibility_on = forms.BooleanField(label="Oui", required=False)
+    allowance_eligibility_off = forms.BooleanField(label="Non", required=False)
 
     def clean(self):
         """
@@ -314,6 +317,14 @@ class ContractFilterForm(forms.Form):
                 queryset = queryset.filter(allowance_requested=True)
             case (False, True):
                 queryset = queryset.filter(allowance_requested=False)
+        match (
+            self.cleaned_data.get("allowance_eligibility_on"),
+            self.cleaned_data.get("allowance_eligibility_off"),
+        ):
+            case (True, False):
+                queryset = queryset.filter(allowance_granted=True)
+            case (False, True):
+                queryset = queryset.filter(allowance_granted=False)
             case _:
                 pass
 

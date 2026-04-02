@@ -15,6 +15,9 @@
             {% if request.from_employer %}
                 <hr>
                 {% include "geiq_assessments_views/includes/assessment_contracts_filters/allowance_requested.html" with filters_form=filters_form only %}
+            {% elif request.from_institution %}
+                <hr>
+                {% include "geiq_assessments_views/includes/assessment_contracts_filters/allowance_eligibility.html" with filters_form=filters_form only %}
             {% endif %}
             <hr>
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/potential_allowance.html" with filters_form=filters_form only %}
