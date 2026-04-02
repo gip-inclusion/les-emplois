@@ -1,89 +1,89 @@
+{% load components %}
+
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 mb-0">Données personnalisées</span>
-        </div>
-        <div class="px-3 px-lg-4">
+    {% component_box_dashboard title=title list=list %}
+        {% fragment as title %}
+            Données personnalisées
+        {% endfragment %}
+        {% fragment as list %}
             {% if not has_view_stats_items %}
-                <p>
+                <li class="mb-3">
                     Vous ne disposez pas pour le moment de statistiques personnalisées.
-                    Faites-nous part de vos besoins éventuels en nous contactant
+                    Faites-nous part de vos besoins éventuels
                     <a href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new"
                        target="_blank"
+                       class="has-external-link"
                        rel="noreferrer noopener"
                        title="Formulaire de contact (ouverture dans un nouvel onglet)"
-                       aria-label="Formulaire de contact (ouverture dans un nouvel onglet)">ici</a>.
-                </p>
+                       aria-label="Formulaire de contact (ouverture dans un nouvel onglet)">en nous contactant</a>.
+                </li>
             {% else %}
-                <ul class="list-unstyled mb-lg-5">
-                    {% if can_view_stats_ddets_log %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_ddets_log_state' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                <span>Prescriptions des acteurs AHI de ma région</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if can_view_stats_dihal %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dihal_state' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                <span>Prescriptions des acteurs AHI</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if can_view_stats_drihl %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_drihl_state' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                <span>Prescriptions des acteurs AHI de ma région</span>
-                            </a>
-
-                        </li>
-                    {% endif %}
-                    {% if can_view_stats_iae_network %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_iae_network_hiring' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
-                            </a>
-
-                        </li>
-                    {% endif %}
-                    {% if can_view_stats_convergence %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_convergence_prescription' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                <span>Prescriptions et parcours</span>
-                            </a>
-                        </li>
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_convergence_job_application' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                <span>Traitement et résultats des candidatures émises</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+                {% if can_view_stats_ddets_log %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ddets_log_state' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Prescriptions des acteurs AHI de ma région</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_dihal %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dihal_state' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Prescriptions des acteurs AHI</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_drihl %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_drihl_state' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Prescriptions des acteurs AHI de ma région</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_iae_network %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_iae_network_hiring' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_convergence %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_convergence_prescription' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Prescriptions et parcours</span>
+                        </a>
+                    </li>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_convergence_job_application' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Traitement et résultats des candidatures émises</span>
+                        </a>
+                    </li>
+                {% endif %}
             {% endif %}
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 mb-0">Données publiques</span>
-        </div>
-        <div class="px-3 px-lg-4">
-            <ul class="list-unstyled mb-lg-5">
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
-                        <i class="ri-dashboard-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                        <span>Accéder aux tableaux de bord publics</span>
-                        <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% component_box_dashboard title=title list=list %}
+        {% fragment as title %}
+            Données publiques
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord"
+                   rel="noopener"
+                   target="_blank"
+                   aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)"
+                   class="btn-link btn-ico has-external-link">
+                    <i class="ri-dashboard-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Accéder aux tableaux de bord publics</span>
+                </a>
+            </li>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>

@@ -1,23 +1,24 @@
+{% load components %}
 {% load matomo %}
 
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 mb-0">Orientations</span>
-        </div>
-        <div class="px-3 px-lg-4">
-            <a href="{% url "search:employers_results" %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
+    {% component_box_dashboard title=title cta=cta list=list %}
+        {% fragment as title %}
+            Orientations
+        {% endfragment %}
+        {% fragment as cta %}
+            <a href="{% url 'search:employers_results' %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
                 <i class="ri-draft-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>Postuler pour un candidat</span>
             </a>
-            <ul class="list-unstyled mb-lg-5">
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url "apply:list_prescriptions" %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-candidatures-envoyées" %}>
-                        <i class="ri-folder-shared-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Candidatures envoyées</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'apply:list_prescriptions' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-candidatures-envoyées" %}>
+                    <i class="ri-folder-shared-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Candidatures envoyées</span>
+                </a>
+            </li>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>

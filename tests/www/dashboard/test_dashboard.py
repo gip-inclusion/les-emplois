@@ -491,8 +491,8 @@ class TestDashboardView:
         assertContains(
             response,
             """
-            <div class="flex-grow-1">
-                <span class="h4 m-0">Contrôle a posteriori</span>
+            <div class="p-3 p-lg-4">
+                <span class="h4 mb-0">Contrôle a posteriori</span>
             </div>
             """,
             html=True,

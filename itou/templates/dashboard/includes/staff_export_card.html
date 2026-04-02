@@ -1,56 +1,55 @@
+{% load components %}
+
 {% if perms.job_applications.export_job_applications_unknown_to_ft or perms.approvals.export_ft_api_rejections or perms.users.export_cta %}
     <div class="col mb-3 mb-md-4">
-        <div class="c-box p-0 h-100">
-            <div class="p-3 p-lg-4">
-                <span class="h4 m-0">Exports de données</span>
-            </div>
-            <div class="px-3 px-lg-4">
-                <ul class="list-unstyled mb-lg-5">
-                    {% if perms.job_applications.export_job_applications_unknown_to_ft %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'itou_staff_views:export_job_applications_unknown_to_ft' %}" class="btn-link btn-ico">
-                                <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
-                                <span>Candidatures inconnues de France Travail</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if perms.approvals.export_ft_api_rejections %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'itou_staff_views:export_ft_api_rejections' %}" class="btn-link btn-ico">
-                                <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                                <span>Rejets de l'API FranceTravail</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if perms.users.export_cta %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'itou_staff_views:export_cta' %}" class="btn-link btn-ico">
-                                <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                                <span>Export des prescripteurs et employeurs</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if perms.employee_record.view_employeerecord %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'itou_staff_views:export_fs_3437' %}" class="btn-link btn-ico">
-                                <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                                <span>Fiches salarié avec une erreur 3437 (IdItou)</span>
-                            </a>
-                        </li>
-                    {% endif %}
+        {% component_box_dashboard title=title list=list %}
+            {% fragment as title %}
+                Exports de données
+            {% endfragment %}
+            {% fragment as list %}
+                {% if perms.job_applications.export_job_applications_unknown_to_ft %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="https://stats.inclusion.beta.gouv.fr/question/7519-utilisateurs-institutionnels"
-                           target="_blank"
-                           rel="noopener"
-                           class="btn-link btn-ico"
-                           aria-label="Liste des utilisateurs institutionnels (ouverture dans un nouvel onglet)">
-                            <i class="ri-list-check-3 ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Liste des utilisateurs institutionnels</span>
-                            <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
+                        <a href="{% url 'itou_staff_views:export_job_applications_unknown_to_ft' %}" class="btn-link btn-ico">
+                            <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Candidatures inconnues de France Travail</span>
                         </a>
                     </li>
-                </ul>
-            </div>
-        </div>
+                {% endif %}
+                {% if perms.approvals.export_ft_api_rejections %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'itou_staff_views:export_ft_api_rejections' %}" class="btn-link btn-ico">
+                            <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Rejets de l'API FranceTravail</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if perms.users.export_cta %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'itou_staff_views:export_cta' %}" class="btn-link btn-ico">
+                            <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Export des prescripteurs et employeurs</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if perms.employee_record.view_employeerecord %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'itou_staff_views:export_fs_3437' %}" class="btn-link btn-ico">
+                            <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Fiches salarié avec une erreur 3437 (IdItou)</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="https://stats.inclusion.beta.gouv.fr/question/7519-utilisateurs-institutionnels"
+                       target="_blank"
+                       rel="noopener"
+                       class="btn-link btn-ico has-external-link"
+                       aria-label="Liste des utilisateurs institutionnels (ouverture dans un nouvel onglet)">
+                        <i class="ri-list-check-3 ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Liste des utilisateurs institutionnels</span>
+                    </a>
+                </li>
+            {% endfragment %}
+        {% endcomponent_box_dashboard %}
     </div>
 {% endif %}

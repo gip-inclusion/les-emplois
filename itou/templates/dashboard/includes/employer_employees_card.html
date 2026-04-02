@@ -1,28 +1,32 @@
+{% load components %}
 {% load matomo %}
 
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 m-0">Salariés</span>
-        </div>
-        <div class="px-3 px-lg-4">
-            <a href="{% url 'approvals:list' %}"  class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-agrements" %}>
+    {% component_box_dashboard title=title cta=cta list=list %}
+        {% fragment as title %}
+            Salariés
+        {% endfragment %}
+        {% fragment as cta %}
+            <a href="{% url 'approvals:list' %}" class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-agrements" %}>
                 <i class="ri-contacts-book-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>Gérer les salariés et PASS IAE</span>
             </a>
-            <ul class="list-unstyled mb-lg-5">
-                {% if can_show_employee_records %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'employee_record_views:list' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-fiches-salaries" %}>
-                            <i class="ri-article-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Fiches salarié ASP</span>
-                        </a>
-                        {% if num_rejected_employee_records %}
-                            <span class="badge rounded-pill badge-xs bg-warning">{{ num_rejected_employee_records }}</span>
-                        {% endif %}
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
+        {% endfragment %}
+        {% if can_show_employee_records %}
+            {% fragment as list %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'employee_record_views:list' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-fiches-salaries" %}>
+                        <i class="ri-article-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Fiches salarié ASP</span>
+                    </a>
+                    {% if num_rejected_employee_records %}
+                        <span class="badge rounded-pill badge-xs bg-warning">{{ num_rejected_employee_records }}</span>
+                    {% endif %}
+                </li>
+            {% endfragment %}
+        {% else %}
+            {% fragment as list %}
+            {% endfragment %}
+        {% endif %}
+    {% endcomponent_box_dashboard %}
 </div>
