@@ -196,14 +196,14 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         Nominal scenario: an approval is **accepted**
         HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae does not raise.
         """
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         # we really don't care about the arguments there
         self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
     @respx.mock
     def test_mise_a_jour_pass_iae_failure(self):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         # non-S001 codeSortie
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         with pytest.raises(PoleEmploiAPIBadResponse):

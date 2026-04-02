@@ -234,13 +234,13 @@ class TestSearchCompany:
 
         # Many job descriptions and job applications.
         company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
         created_companies.append(company)
 
         # Many job descriptions and more job applications than the first one.
         company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_company=company)
-        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
         created_companies.append(company)
 
         # No job description, no job application.
@@ -278,7 +278,11 @@ class TestSearchCompany:
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(
-            JobDescription.UNPOPULAR_THRESHOLD, to_company=company, selected_jobs=[job], state="new"
+            JobDescription.UNPOPULAR_THRESHOLD,
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            selected_jobs=[job],
+            state="new",
         )
         response = client.get(self.URL, {"city": city.slug})
         unpopular_badge = """
@@ -289,7 +293,7 @@ class TestSearchCompany:
             """
         assertContains(response, unpopular_badge, html=True)
 
-        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
         assertNotContains(response, unpopular_badge, html=True)
 
@@ -497,6 +501,7 @@ class TestSearchCompany:
         When applying from "Mes candidats"
         """
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Alain",
             job_seeker__last_name="Zorro",
             job_seeker__public_id="11111111-2222-3333-4444-555566667777",
@@ -901,7 +906,11 @@ class TestJobDescriptionSearchView:
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(
-            JobDescription.UNPOPULAR_THRESHOLD, to_company=company, selected_jobs=[job], state="new"
+            JobDescription.UNPOPULAR_THRESHOLD,
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            selected_jobs=[job],
+            state="new",
         )
         response = client.get(self.URL, {"city": city.slug})
         unpopular_badge = """
@@ -912,7 +921,7 @@ class TestJobDescriptionSearchView:
             """
         assertContains(response, unpopular_badge, html=True)
 
-        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
         assertNotContains(response, unpopular_badge, html=True)
 
@@ -1463,6 +1472,7 @@ class TestJobDescriptionSearchView:
         When applying from "Mes candidats"
         """
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Alain",
             job_seeker__last_name="Zorro",
             job_seeker__public_id="11111111-2222-3333-4444-555566667777",

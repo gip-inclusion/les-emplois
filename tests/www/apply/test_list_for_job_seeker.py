@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
@@ -81,7 +81,9 @@ def test_list_for_job_seeker_filtered_by_dates(client):
     job_seeker = JobSeekerFactory()
     for diff_day in [7, 5, 3, 0]:
         JobApplicationFactory(
-            sent_by_job_seeker=True, created_at=now - timezone.timedelta(days=diff_day), job_seeker=job_seeker
+            sent_by_job_seeker=True,
+            created_at=now - timezone.timedelta(days=diff_day),
+            job_seeker=job_seeker,
         )
     client.force_login(job_seeker)
 
@@ -102,7 +104,7 @@ def test_list_for_job_seeker_filtered_by_dates(client):
 
 def test_list_display_kind(client):
     job_seeker = JobSeekerFactory()
-    JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
+    JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
     client.force_login(job_seeker)
     url = reverse("apply:list_for_job_seeker")
 
@@ -125,7 +127,7 @@ def test_list_display_kind(client):
 
 def test_list_for_job_seeker_htmx_filters(client):
     job_seeker = JobSeekerFactory()
-    JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
+    JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
     client.force_login(job_seeker)
 
     url = reverse("apply:list_for_job_seeker")
@@ -173,17 +175,20 @@ def test_list_snapshot(client, snapshot):
 
     job_applications = [
         JobApplicationFactory(
-            sender_kind=SenderKind.JOB_SEEKER, sender=job_seeker, state=JobApplicationState.ACCEPTED, **common_kwargs
+            sent_by_job_seeker=True,
+            sender=job_seeker,
+            state=JobApplicationState.ACCEPTED,
+            **common_kwargs,
         ),
         JobApplicationFactory(
-            sender_kind=SenderKind.EMPLOYER,
+            sent_by_employer=True,
             sender=company.members.first(),
             sender_company=company,
             state=JobApplicationState.NEW,
             **common_kwargs,
         ),
         JobApplicationFactory(
-            sender_kind=SenderKind.PRESCRIBER,
+            sent_by_prescriber=True,
             sender=prescriber_org.members.first(),
             sender_prescriber_organization=prescriber_org,
             state=JobApplicationState.REFUSED,
@@ -243,7 +248,7 @@ def test_list_snapshot(client, snapshot):
 
 
 def test_reset_filter_button_snapshot(client, snapshot):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.job_seeker)
 
     filter_params = {"states": [job_application.state]}
@@ -269,10 +274,12 @@ def test_reset_filter_button_snapshot(client, snapshot):
 
 
 def test_order(client, subtests):
-    first_application = JobApplicationFactory(pk=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    first_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, pk=uuid.UUID("11111111-1111-1111-1111-111111111111")
+    )
     job_seeker = first_application.job_seeker
     second_application = JobApplicationFactory(
-        job_seeker=job_seeker, pk=uuid.UUID("22222222-2222-2222-2222-222222222222")
+        sent_by_prescriber_alone=True, job_seeker=job_seeker, pk=uuid.UUID("22222222-2222-2222-2222-222222222222")
     )
 
     client.force_login(job_seeker)
@@ -303,9 +310,9 @@ def test_order(client, subtests):
 
 def test_htmx_order(client):
     url = reverse("apply:list_for_job_seeker")
-    first_application = JobApplicationFactory()
+    first_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     job_seeker = first_application.job_seeker
-    JobApplicationFactory(job_seeker=job_seeker)
+    JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker)
 
     client.force_login(job_seeker)
     query_params = {"display": JobApplicationsDisplayKind.TABLE}

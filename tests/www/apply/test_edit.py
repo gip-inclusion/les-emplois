@@ -37,7 +37,11 @@ class TestEditContract:
         # JA with creation of a new approval
         tomorrow = timezone.localdate() + relativedelta(days=1)
         self.job_application_1 = JobApplicationFactory(
-            with_approval=True, to_company=company_1, hiring_start_at=tomorrow, approval__start_at=tomorrow
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            to_company=company_1,
+            hiring_start_at=tomorrow,
+            approval__start_at=tomorrow,
         )
         self.previous_dates = [
             self.job_application_1.hiring_start_at.strftime("%Y-%m-%d"),
@@ -47,12 +51,13 @@ class TestEditContract:
         # JA with an old approval
         delta = relativedelta(months=23)
         self.old_job_application = JobApplicationFactory(
-            with_approval=True, to_company=company_2, created_at=timezone.now() - delta
+            sent_by_prescriber_alone=True, with_approval=True, to_company=company_2, created_at=timezone.now() - delta
         )
         approval = self.old_job_application.approval
         approval.start_at = self.old_job_application.created_at.date()
 
         self.job_application_2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             to_company=company_2,
             job_seeker=self.old_job_application.job_seeker,
@@ -279,7 +284,9 @@ class TestArchiveView:
     def test_access(self, client, archived_at_func, expected_func, viewname):
         archived_at = archived_at_func()
         other_company = CompanyFactory(with_membership=True)
-        job_app = JobApplicationFactory(archived_at=archived_at, state=JobApplicationState.REFUSED)
+        job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, archived_at=archived_at, state=JobApplicationState.REFUSED
+        )
         url = reverse(viewname, args=(job_app.pk,))
 
         # Anonymous users cannot access.
@@ -310,6 +317,7 @@ class TestArchiveView:
         company = CompanyFactory(with_membership=True, with_jobs=True)
         employer = company.members.get()
         job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=company,
             archived_at=target_archived_at,
             archived_by=employer if target_archived_at else None,
@@ -326,6 +334,7 @@ class TestArchiveView:
         company = CompanyFactory(with_membership=True, with_jobs=True)
         [job_app1, job_app2] = JobApplicationFactory.create_batch(
             2,
+            sent_by_prescriber_alone=True,
             to_company=company,
             archived_at=archived_at,
             state=JobApplicationState.REFUSED,
@@ -341,7 +350,7 @@ class TestArchiveView:
 
 @pytest.mark.parametrize("state", JobApplicationState.values)
 def test_archive_view_states(client, state):
-    job_app = JobApplicationFactory(state=state)
+    job_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=state)
     employer = job_app.to_company.members.get()
     client.force_login(employer)
     response = client.post(reverse("apply:archive", args=(job_app.pk,)))

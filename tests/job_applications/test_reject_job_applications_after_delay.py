@@ -20,11 +20,13 @@ def test_reject_job_applications_after_delay(state, django_capture_on_commit_cal
 
     # first job_seeker with the oldest and the most recent job applications
     oldest_expected_job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=state,
         answer="",
         updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY - datetime.timedelta(days=4),
     )
     recent_job_application_of_the_same_job_seeker = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=state,
         answer="",
         job_seeker=oldest_expected_job_application.job_seeker,
@@ -34,6 +36,7 @@ def test_reject_job_applications_after_delay(state, django_capture_on_commit_cal
     job_seeker = JobSeekerFactory()
     other_expected_job_applications = JobApplicationFactory.create_batch(
         limit + 1,
+        sent_by_prescriber_alone=True,
         job_seeker=job_seeker,
         state=state,
         answer="",
@@ -41,6 +44,7 @@ def test_reject_job_applications_after_delay(state, django_capture_on_commit_cal
     )
     # unselected oldish job application of the third job_seeker
     unexpected_job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=state,
         answer="",
         updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY - datetime.timedelta(days=2),

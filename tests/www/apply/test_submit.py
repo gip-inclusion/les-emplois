@@ -3149,7 +3149,7 @@ class TestApplicationView:
 
 class TestApplicationEndView:
     def test_update_job_seeker(self, client):
-        job_application = JobApplicationFactory(job_seeker__with_mocked_address=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker__with_mocked_address=True)
         job_seeker = job_application.job_seeker
         # Ensure sender cannot update job seeker infos
         assert job_seeker.address_line_2 == ""
@@ -3200,7 +3200,7 @@ class TestApplicationEndView:
         assertContains(response, expected_html, html=True)
 
     def test_not_sender(self, client):
-        application = JobApplicationFactory()
+        application = JobApplicationFactory(sent_by_prescriber_alone=True)
         client.force_login(application.job_seeker)  # not the sender
         response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
         assert response.status_code == 404
@@ -4263,7 +4263,9 @@ class TestCheckPreviousApplicationsView:
         self._login_and_setup_session(client, self.job_seeker)
 
         # Create a very recent application
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=self.job_seeker, to_company=self.company
+        )
         response = client.get(self.check_prev_applications_url)
         assert pretty_indented(
             parse_response_to_soup(
@@ -4322,7 +4324,9 @@ class TestCheckPreviousApplicationsView:
         self._login_and_setup_session(client, prescriber)
 
         # Create a very recent application
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=self.job_seeker, to_company=self.company
+        )
         response = client.get(self.check_prev_applications_url)
         assert pretty_indented(
             parse_response_to_soup(
@@ -4371,6 +4375,7 @@ class TestCheckPreviousApplicationsView:
 
         # Create a very recent application
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=self.job_seeker,
             to_company=self.company,
             with_iae_eligibility_diagnosis=True,
@@ -4461,7 +4466,7 @@ class TestCheckPreviousApplicationsView:
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
 
     def test_with_previous_as_employer(self, client):
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker, to_company=self.company)
         self._login_and_setup_session(client, self.company.members.first())
 
         response = client.get(self.check_prev_applications_url)

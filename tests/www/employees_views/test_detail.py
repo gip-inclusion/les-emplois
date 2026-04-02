@@ -8,7 +8,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.enums import JobApplicationState
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.templatetags import format_filters
 from tests.approvals.factories import (
@@ -17,7 +17,7 @@ from tests.approvals.factories import (
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberFactory
 from tests.utils.testing import assert_previous_step, parse_response_to_soup, pretty_indented
 
 
@@ -48,9 +48,7 @@ class TestEmployeeDetailView:
             approval=approval,
             job_seeker=approval.user,
             state=JobApplicationState.ACCEPTED,
-            # Make job application.is_sent_by_authorized_prescriber to be true
-            sender_kind=SenderKind.PRESCRIBER,
-            sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+            sent_by_authorized_prescriber=True,
             with_iae_eligibility_diagnosis=True,
         )
         assert job_application.is_sent_by_authorized_prescriber
@@ -67,7 +65,9 @@ class TestEmployeeDetailView:
         )
         assert not same_siae_job_application.is_sent_by_authorized_prescriber
         # A third job application on another SIAE
-        other_siae_job_application = JobApplicationFactory(job_seeker=job_application.job_seeker)
+        other_siae_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=job_application.job_seeker
+        )
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -145,7 +145,9 @@ class TestEmployeeDetailView:
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
-        job_seeker = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED).job_seeker
+        job_seeker = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+        ).job_seeker
 
         client.force_login(employer)
         url = reverse("employees:detail", kwargs={"public_id": job_seeker.public_id})
@@ -160,13 +162,14 @@ class TestEmployeeDetailView:
         employer = company.members.first()
         expired_approval = ApprovalFactory(expired=True)
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             approval=expired_approval,
             job_seeker=expired_approval.user,
             to_company=company,
             state=JobApplicationState.ACCEPTED,
         )
         new_approval = JobApplicationFactory(
-            job_seeker=expired_approval.user, to_company=company, with_approval=True
+            sent_by_prescriber_alone=True, job_seeker=expired_approval.user, to_company=company, with_approval=True
         ).approval
         new_number = format_filters.format_approval_number(new_approval.number)
         expired_number = format_filters.format_approval_number(expired_approval.number)

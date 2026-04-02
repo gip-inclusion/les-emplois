@@ -23,6 +23,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 def test_create_employee_record(admin_client):
     job_application = factories.JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.ACCEPTED,
         with_approval=True,
     )
@@ -87,7 +88,7 @@ def test_check_sender_kind(admin_client):
 
 
 def test_check_inconsistency_check(admin_client):
-    consistent_application = factories.JobApplicationFactory()
+    consistent_application = factories.JobApplicationFactory(sent_by_prescriber_alone=True)
 
     response = admin_client.post(
         reverse("admin:job_applications_jobapplication_changelist"),
@@ -99,11 +100,11 @@ def test_check_inconsistency_check(admin_client):
     )
     assertContains(response, "Aucune incohérence trouvée")
 
-    inconsistent_application_1 = factories.JobApplicationFactory(with_approval=True)
+    inconsistent_application_1 = factories.JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
     inconsistent_application_1.approval.user = JobSeekerFactory()
     inconsistent_application_1.approval.save()
 
-    inconsistent_application_2 = factories.JobApplicationFactory(with_approval=True)
+    inconsistent_application_2 = factories.JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
     inconsistent_application_2.eligibility_diagnosis.job_seeker = JobSeekerFactory()
     inconsistent_application_2.eligibility_diagnosis.save()
 
@@ -341,6 +342,7 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
 
 def test_accept_job_application_not_subject_to_eligibility(admin_client):
     job_application = factories.JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company__not_subject_to_iae_rules=True,
         state=JobApplicationState.PROCESSING,
     )
@@ -390,7 +392,7 @@ def test_available_transitions(client, state, snapshot):
     superuser = ItouStaffFactory(is_superuser=True)
     ro_user = ItouStaffFactory(is_superuser=False)
     ro_user.user_permissions.add(Permission.objects.get(codename="view_jobapplication"))
-    job_application = factories.JobApplicationFactory(state=state)
+    job_application = factories.JobApplicationFactory(sent_by_prescriber_alone=True, state=state)
     url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
 
     client.force_login(superuser)
@@ -408,6 +410,7 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
     existing_approval = ApprovalFactory(eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True))
     job_seeker = existing_approval.user
     job_application = factories.JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=job_seeker,
         state=JobApplicationState.PROCESSING,
         to_company__subject_to_iae_rules=True,
@@ -480,7 +483,7 @@ def test_create_inconsistent_job_application(admin_client):
 
 
 def test_delete_is_possible_when_transition_logs_exists(snapshot, admin_client):
-    job_application = factories.JobApplicationFactory(for_snapshot=True)
+    job_application = factories.JobApplicationFactory(sent_by_prescriber_alone=True, for_snapshot=True)
 
     response = admin_client.get(reverse("admin:job_applications_jobapplication_delete", args=[job_application.pk]))
     assertNotContains(response, "votre compte ne possède pas la permission de supprimer les types d’objets suivants")

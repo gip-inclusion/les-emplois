@@ -1084,7 +1084,7 @@ class TestCnilCompositionPasswordValidator:
 
 def test_add_support_remark_to_suspension(client):
     today = timezone.localdate()
-    job_app = JobApplicationFactory(with_approval=True)
+    job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
     approval = job_app.approval
 
     suspension = SuspensionFactory(
@@ -1511,12 +1511,14 @@ def test_matomo_context_processor(client, settings, snapshot):
 
 @pytest.mark.parametrize("state", JobApplicationState.values)
 def test_job_application_state_badge_processing(state, snapshot):
-    job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000", state=state)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, id="00000000-0000-0000-0000-000000000000", state=state
+    )
     assert badges.job_application_state_badge(job_application) == snapshot
 
 
 def test_job_application_state_badge_oob_swap(snapshot):
-    job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000")
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, id="00000000-0000-0000-0000-000000000000")
     assert badges.job_application_state_badge(job_application, hx_swap_oob=True) == snapshot
 
 
@@ -1830,7 +1832,10 @@ def test_invalid_variable_in_template():
 
 @pytest.mark.parametrize(
     "remark_model,obj_factory",
-    [(PkSupportRemark, PrescriberFactory), (UUIDSupportRemark, JobApplicationFactory)],
+    [
+        (PkSupportRemark, PrescriberFactory),
+        (UUIDSupportRemark, functools.partial(JobApplicationFactory, sent_by_prescriber_alone=True)),
+    ],
 )
 def test_add_support_remark_to_obj(remark_model, obj_factory):
     obj = obj_factory()

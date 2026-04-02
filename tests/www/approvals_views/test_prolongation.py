@@ -42,6 +42,7 @@ class TestApprovalProlongation:
         # freeze_time does not work inside factories
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
@@ -572,6 +573,7 @@ def test_prolongation_report_file(client, mocker, faker, xlsx_file, mailoutbox):
 
     today = timezone.localdate()
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_approval=True,
         # Ensure that the job_application cannot be canceled.
         hiring_start_at=today - relativedelta(days=1),
