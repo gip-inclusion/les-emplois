@@ -1497,6 +1497,7 @@ class TestAssessmentContractsListView:
             "duration_longer_or_equal_90": "on",
             "potential_allowance_1400": "on",
             "allowance_requested_off": "on",
+            "allowance_eligibility": "on",
         }
 
         response = client.get(self.url, filter_data)

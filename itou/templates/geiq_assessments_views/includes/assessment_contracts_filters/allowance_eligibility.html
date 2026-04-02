@@ -1,0 +1,18 @@
+{% load django_bootstrap5 %}
+
+<fieldset>
+    <legend>
+        <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapse-allowance-eligibility"
+                type="button"
+                aria-expanded="false"
+                aria-controls="collapse-allowance-eligibility">Eligible à l’aide</button>
+    </legend>
+    <div class="my-3 collapse" id="collapse-allowance-eligibility">
+        <ul>
+            <li>{% bootstrap_field filters_form.allowance_eligibility_on wrapper_class="" %}</li>
+            <li>{% bootstrap_field filters_form.allowance_eligibility_off wrapper_class="" %}</li>
+        </ul>
+    </div>
+</fieldset>
