@@ -22,7 +22,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient, accept_legal_terms
 
 
@@ -453,7 +453,7 @@ def test_non_staff_cant_join_a_company(client):
     assert 0 == company.members.count()
 
     user = PrescriberFactory()
-    client.login(email=user.email, password=DEFAULT_PASSWORD)
+    client.force_login(user)
 
     # Skip IC process and jump to joining the company.
     token = company.get_token()

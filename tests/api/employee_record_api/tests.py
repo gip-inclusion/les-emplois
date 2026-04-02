@@ -10,7 +10,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.companies.factories import CompanyMembershipFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
+from tests.users.factories import DEFAULT_PASSWORD, HASHED_DEFAULT_PASSWORD, EmployerFactory
 
 
 class TestEmployeeRecordAPIPermissions:
@@ -25,7 +25,9 @@ class TestEmployeeRecordAPIPermissions:
         )
 
         self.user = self.employee_record_ready.job_application.to_company.members.first()
-        self.unauthorized_user = EmployerFactory()
+        self.user.password = HASHED_DEFAULT_PASSWORD
+        self.user.save(update_fields=["password"])
+        self.unauthorized_user = EmployerFactory(with_password=True)
 
     def test_permissions_ok_with_token(self, api_client):
         """
