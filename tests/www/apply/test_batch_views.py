@@ -7,7 +7,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.enums import JobApplicationState
 from itou.www.apply.views.batch_views import RefuseWizardView
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -17,7 +17,7 @@ from tests.utils.testing import get_session_name
 
 class TestBatchArchive:
     def test_invalid_access(self, client):
-        archivable_app = JobApplicationFactory(state=JobApplicationState.REFUSED)
+        archivable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
         assert archivable_app.can_be_archived
         for user in [archivable_app.job_seeker, archivable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -29,7 +29,9 @@ class TestBatchArchive:
         employer = company.members.first()
         client.force_login(employer)
 
-        archivable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+        archivable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+        )
 
         response = client.post(reverse("apply:batch_archive"), data={"application_ids": [archivable_app.pk]})
         assert response.status_code == 404
@@ -40,7 +42,9 @@ class TestBatchArchive:
         next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
         client.force_login(employer)
 
-        archivable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+        archivable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+        )
 
         response = client.post(
             reverse("apply:batch_archive", query={"next_url": next_url}),
@@ -59,7 +63,9 @@ class TestBatchArchive:
         employer = company.members.first()
         client.force_login(employer)
 
-        archivable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.REFUSED)
+        archivable_apps = JobApplicationFactory.create_batch(
+            2, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+        )
 
         next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
 
@@ -127,6 +133,7 @@ class TestBatchArchive:
         client.force_login(employer)
 
         unarchivable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="John",
             job_seeker__last_name="Rambo",
             to_company=company,
@@ -162,6 +169,7 @@ class TestBatchArchive:
         client.force_login(employer)
 
         archived_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
             to_company=company,
@@ -195,10 +203,15 @@ class TestBatchArchive:
 
         apps = [
             # 2 archivable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.CANCELLED),
-            JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.CANCELLED
+            ),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+            ),
             # 1 unarchivable application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
                 to_company=company,
@@ -206,6 +219,7 @@ class TestBatchArchive:
             ),
             # 1 already archived application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
                 to_company=company,
@@ -254,7 +268,7 @@ class TestBatchAddToPool:
     FAKE_ANSWER = "Lorem ipsum added to poolum"
 
     def test_invalid_access(self, client):
-        addable_app = JobApplicationFactory(state=JobApplicationState.PROCESSING)
+        addable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.PROCESSING)
         assert addable_app.add_to_pool.is_available()
         for user in [addable_app.job_seeker, addable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -269,7 +283,9 @@ class TestBatchAddToPool:
         employer = company.members.first()
         client.force_login(employer)
 
-        addable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+        addable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+        )
         assert addable_app.add_to_pool.is_available()
 
         response = client.post(
@@ -283,7 +299,9 @@ class TestBatchAddToPool:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        addable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+        addable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+        )
 
         response = client.post(
             reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
@@ -306,7 +324,9 @@ class TestBatchAddToPool:
         employer = company.members.first()
         client.force_login(employer)
 
-        addable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.PROCESSING)
+        addable_apps = JobApplicationFactory.create_batch(
+            2, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+        )
 
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
 
@@ -381,7 +401,9 @@ class TestBatchAddToPool:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        addable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING, answer="")
+        addable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING, answer=""
+        )
 
         response = client.post(
             reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
@@ -403,6 +425,7 @@ class TestBatchAddToPool:
         client.force_login(employer)
 
         unaddable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="John",
             job_seeker__last_name="Rambo",
             to_company=company,
@@ -438,6 +461,7 @@ class TestBatchAddToPool:
         client.force_login(employer)
 
         added_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
             to_company=company,
@@ -472,10 +496,13 @@ class TestBatchAddToPool:
 
         apps = [
             # 2 addable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
-            JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
+            JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+            ),
             # 1 unaddable application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
                 to_company=company,
@@ -483,6 +510,7 @@ class TestBatchAddToPool:
             ),
             # 1 already added application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
                 to_company=company,
@@ -538,7 +566,7 @@ class TestBatchPostpone:
     FAKE_ANSWER = "Lorem ipsum postponed"
 
     def test_invalid_access(self, client):
-        postponable_app = JobApplicationFactory(state=JobApplicationState.PROCESSING)
+        postponable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.PROCESSING)
         assert postponable_app.postpone.is_available()
         for user in [postponable_app.job_seeker, postponable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -553,7 +581,9 @@ class TestBatchPostpone:
         employer = company.members.first()
         client.force_login(employer)
 
-        postponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+        postponable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+        )
         assert postponable_app.postpone.is_available()
 
         response = client.post(
@@ -567,7 +597,9 @@ class TestBatchPostpone:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        postponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+        postponable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+        )
 
         response = client.post(
             reverse("apply:batch_postpone", query={"next_url": next_url}),
@@ -591,7 +623,7 @@ class TestBatchPostpone:
         client.force_login(employer)
 
         postponable_apps = JobApplicationFactory.create_batch(
-            2, to_company=company, state=JobApplicationState.PROCESSING
+            2, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
         )
 
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
@@ -663,7 +695,9 @@ class TestBatchPostpone:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        postponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING, answer="")
+        postponable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING, answer=""
+        )
 
         response = client.post(
             reverse("apply:batch_postpone", query={"next_url": next_url}),
@@ -685,6 +719,7 @@ class TestBatchPostpone:
         client.force_login(employer)
 
         unpostponable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="John",
             job_seeker__last_name="Rambo",
             to_company=company,
@@ -720,6 +755,7 @@ class TestBatchPostpone:
         client.force_login(employer)
 
         postponed_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
             to_company=company,
@@ -754,10 +790,13 @@ class TestBatchPostpone:
 
         apps = [
             # 2 postponable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
-            JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
+            JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+            ),
             # 1 unpostponable application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
                 to_company=company,
@@ -765,6 +804,7 @@ class TestBatchPostpone:
             ),
             # 1 already postponed application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
                 to_company=company,
@@ -818,7 +858,7 @@ class TestBatchPostpone:
 
 class TestBatchProcess:
     def test_invalid_access(self, client):
-        processable_app = JobApplicationFactory(state=JobApplicationState.NEW)
+        processable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.NEW)
         assert processable_app.process.is_available()
         for user in [processable_app.job_seeker, processable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -830,7 +870,9 @@ class TestBatchProcess:
         employer = company.members.first()
         client.force_login(employer)
 
-        processable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        processable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
         assert processable_app.process.is_available()
 
         response = client.post(reverse("apply:batch_process"), data={"application_ids": [processable_app.pk]})
@@ -842,7 +884,9 @@ class TestBatchProcess:
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
-        processable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        processable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
 
         response = client.post(
             reverse("apply:batch_process", query={"next_url": next_url}),
@@ -861,7 +905,9 @@ class TestBatchProcess:
         employer = company.members.first()
         client.force_login(employer)
 
-        processable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.NEW)
+        processable_apps = JobApplicationFactory.create_batch(
+            2, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
 
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
 
@@ -929,6 +975,7 @@ class TestBatchProcess:
         client.force_login(employer)
 
         unprocessable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="John",
             job_seeker__last_name="Rambo",
             to_company=company,
@@ -964,6 +1011,7 @@ class TestBatchProcess:
         client.force_login(employer)
 
         processed_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
             to_company=company,
@@ -996,10 +1044,11 @@ class TestBatchProcess:
 
         apps = [
             # 2 processable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
-            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW),
             # 1 unprocessable application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
                 to_company=company,
@@ -1007,6 +1056,7 @@ class TestBatchProcess:
             ),
             # 1 already processing application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
                 to_company=company,
@@ -1058,7 +1108,7 @@ class TestBatchRefuse:
     FAKE_PRESCRIBER_ANSWER = "Lorem ipsum prescribum"
 
     def test_invalid_access(self, client):
-        refusable_app = JobApplicationFactory(state=JobApplicationState.NEW)
+        refusable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.NEW)
         assert refusable_app.refuse.is_available()
         for user in [refusable_app.job_seeker, refusable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -1127,6 +1177,7 @@ class TestBatchRefuse:
         client.force_login(employer)
 
         unrefusable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
             to_company=company,
@@ -1159,6 +1210,7 @@ class TestBatchRefuse:
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
             to_company=company,
@@ -1346,11 +1398,11 @@ class TestBatchRefuse:
         job_seeker = JobSeekerFactory()
         refusable_apps = JobApplicationFactory.create_batch(
             2,
+            sent_by_job_seeker=True,
             to_company=company,
             state=JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
             sender=job_seeker,
-            sender_kind=SenderKind.JOB_SEEKER,
         )
 
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
@@ -1425,6 +1477,7 @@ class TestBatchRefuse:
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
             to_company=company,
@@ -1483,6 +1536,7 @@ class TestBatchRefuse:
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
             to_company=company,
@@ -1644,7 +1698,7 @@ class TestBatchRefuse:
 
 class TestBatchTransfer:
     def test_invalid_access(self, client):
-        transferable_app = JobApplicationFactory(state=JobApplicationState.NEW)
+        transferable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.NEW)
         company = CompanyFactory(with_membership=True)
         assert transferable_app.transfer.is_available()
         for user in [transferable_app.job_seeker, transferable_app.sender, LaborInspectorFactory(membership=True)]:
@@ -1661,7 +1715,9 @@ class TestBatchTransfer:
         other_company = CompanyMembershipFactory(user=employer).company
         client.force_login(employer)
 
-        transferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        transferable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
 
         response = client.post(
             reverse("apply:batch_transfer"),
@@ -1676,7 +1732,9 @@ class TestBatchTransfer:
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
-        transferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        transferable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
 
         response = client.post(
             reverse("apply:batch_transfer", query={"next_url": next_url}),
@@ -1696,7 +1754,9 @@ class TestBatchTransfer:
         other_company = CompanyMembershipFactory(user=employer).company
         client.force_login(employer)
 
-        transferable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.NEW)
+        transferable_apps = JobApplicationFactory.create_batch(
+            2, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
 
         next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
 
@@ -1777,6 +1837,7 @@ class TestBatchTransfer:
         client.force_login(employer)
 
         untransferable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="John",
             job_seeker__last_name="Rambo",
             to_company=company,
@@ -1812,7 +1873,9 @@ class TestBatchTransfer:
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
-        transferable_app = JobApplicationFactory(to_company=other_company, state=JobApplicationState.NEW)
+        transferable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=other_company, state=JobApplicationState.NEW
+        )
 
         response = client.post(
             reverse("apply:batch_transfer", query={"next_url": next_url}),
@@ -1838,7 +1901,9 @@ class TestBatchTransfer:
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
-        transferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        transferable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
 
         response = client.post(
             reverse("apply:batch_transfer", query={"next_url": next_url}),
@@ -1854,10 +1919,13 @@ class TestBatchTransfer:
 
         apps = [
             # 2 transferable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
-            JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED),
+            JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POSTPONED
+            ),
             # 1 untransferable application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
                 to_company=company,
@@ -1865,6 +1933,7 @@ class TestBatchTransfer:
             ),
             # 1 already transferred application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
                 to_company=other_company,
@@ -1910,7 +1979,9 @@ class TestBatchTransfer:
 
 class TestBatchUnarchive:
     def test_invalid_access(self, client):
-        unarchivable_app = JobApplicationFactory(state=JobApplicationState.REFUSED, archived_at=timezone.now())
+        unarchivable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        )
         for user in [unarchivable_app.job_seeker, unarchivable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
             response = client.post(reverse("apply:batch_unarchive"), data={"application_ids": [unarchivable_app.pk]})
@@ -1921,7 +1992,9 @@ class TestBatchUnarchive:
         employer = company.members.first()
         client.force_login(employer)
 
-        unarchivable_app = JobApplicationFactory(state=JobApplicationState.REFUSED, archived_at=timezone.now())
+        unarchivable_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        )
 
         response = client.post(reverse("apply:batch_unarchive"), data={"application_ids": [unarchivable_app.pk]})
         assert response.status_code == 404
@@ -1933,7 +2006,10 @@ class TestBatchUnarchive:
         client.force_login(employer)
 
         unarchivable_app = JobApplicationFactory(
-            to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=JobApplicationState.REFUSED,
+            archived_at=timezone.now(),
         )
 
         response = client.post(
@@ -1954,7 +2030,11 @@ class TestBatchUnarchive:
         client.force_login(employer)
 
         unarchivable_apps = JobApplicationFactory.create_batch(
-            2, to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+            2,
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=JobApplicationState.REFUSED,
+            archived_at=timezone.now(),
         )
         next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
 
@@ -1973,7 +2053,9 @@ class TestBatchUnarchive:
 
     def test_sent_application(self, client):
         unarchivable_app = JobApplicationFactory(
-            sent_by_another_employer=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+            sent_by_another_employer=True,
+            state=JobApplicationState.REFUSED,
+            archived_at=timezone.now(),
         )
         next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
 
@@ -2023,6 +2105,7 @@ class TestBatchUnarchive:
         client.force_login(employer)
 
         archived_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Bond",
             to_company=company,
@@ -2055,10 +2138,21 @@ class TestBatchUnarchive:
 
         apps = [
             # 2 unarchivable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()),
-            JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True,
+                to_company=company,
+                state=JobApplicationState.REFUSED,
+                archived_at=timezone.now(),
+            ),
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True,
+                to_company=company,
+                state=JobApplicationState.REFUSED,
+                archived_at=timezone.now(),
+            ),
             # 1 already archived application:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
                 to_company=company,

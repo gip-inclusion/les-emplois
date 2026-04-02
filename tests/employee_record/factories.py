@@ -19,7 +19,7 @@ from tests.utils.factory_boy import AutoNowOverrideMixin
 class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
     job_application = factory.SubFactory(
         JobApplicationFactory,
-        sender=None,
+        sent_by_job_seeker=True,  # The less expensive option
         to_company__with_membership=False,
         to_company__convention=None,
     )

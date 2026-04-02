@@ -616,7 +616,7 @@ class TestGroupDetailsMembershipTab:
 
     @freezegun.freeze_time("2025-01-20")
     def test_display_participant_contact_info_as_job_seeker(self, client, snapshot, caplog):
-        job_application = JobApplicationFactory(for_snapshot=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_snapshot=True)
         job_seeker = job_application.job_seeker
         group = FollowUpGroupFactory(beneficiary=job_seeker)
         target_participant = FollowUpGroupMembershipFactory(

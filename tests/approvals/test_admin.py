@@ -50,7 +50,9 @@ class TestApprovalAdmin:
     def test_change_approval_with_jobapp_no_hiring_dates(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         approval.jobapplication_set.add(
-            JobApplicationFactory(hiring_start_at=None, hiring_end_at=None, job_seeker=approval.user)
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, hiring_start_at=None, hiring_end_at=None, job_seeker=approval.user
+            )
         )
         client.force_login(ItouStaffFactory(is_superuser=True))
         response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
@@ -84,9 +86,10 @@ class TestApprovalAdmin:
     def test_filter_assigned_company(self, admin_client):
         company = CompanyFactory()
         job_seeker = JobSeekerFactory()
-        JobApplicationFactory(to_company=company, job_seeker=job_seeker)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, job_seeker=job_seeker)
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             approval=approval,
             to_company=company,
             job_seeker=job_seeker,
@@ -878,7 +881,9 @@ class TestCustomApprovalAdminViews:
         job_application.save()
 
         # With a valid approval the form is disabled
-        other_job_application = JobApplicationFactory(job_seeker=job_seeker, with_approval=True)
+        other_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=job_seeker, with_approval=True
+        )
         response = client.get(url, follow=True)
         assertNotContains(response, MANUALLY_DELIVER_BUTTON_TEXT)
         post_data = {
@@ -972,7 +977,9 @@ class TestCustomApprovalAdminViews:
         user.user_permissions.add(permission)
 
         # With a valid approval
-        other_job_application = JobApplicationFactory(job_seeker=job_seeker, with_approval=True)
+        other_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=job_seeker, with_approval=True
+        )
         response = client.post(refuse_url, data=post_data)
         assert response.status_code == 403
         other_job_application.approval.delete()  # Remove the valid approval
@@ -1007,13 +1014,15 @@ class TestCustomApprovalAdminViews:
         assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk})</b></a>'
 
         # When employee record creation is disabled for that job application
-        job_application = JobApplicationFactory(create_employee_record=False, to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, create_employee_record=False, to_company__subject_to_iae_rules=True
+        )
         msg = inline.employee_record_status(job_application)
         assert msg == "Non proposé à la création"
 
         # When hiring start date is before employee record availability date
         job_application = JobApplicationFactory(
-            hiring_start_at=date(2021, 9, 26), to_company__subject_to_iae_rules=True
+            sent_by_prescriber_alone=True, hiring_start_at=date(2021, 9, 26), to_company__subject_to_iae_rules=True
         )
         msg = inline.employee_record_status(job_application)
         assert msg == "Date de début du contrat avant l'interopérabilité"
@@ -1022,7 +1031,9 @@ class TestCustomApprovalAdminViews:
         for kind in CompanyKind:
             with subtests.test("SIAE doesn't use employee records", kind=kind.name):
                 job_application = JobApplicationFactory(
-                    with_approval=kind in CompanyKind.siae_kinds(), to_company__kind=kind
+                    sent_by_prescriber_alone=True,
+                    with_approval=kind in CompanyKind.siae_kinds(),
+                    to_company__kind=kind,
                 )
                 msg = inline.employee_record_status(job_application)
                 if not job_application.to_company.can_use_employee_record:
@@ -1033,6 +1044,7 @@ class TestCustomApprovalAdminViews:
         # When an employee record already exists for the candidate
         employee_record = EmployeeRecordFactory(status=Status.READY)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )

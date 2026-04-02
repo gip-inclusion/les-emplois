@@ -288,6 +288,7 @@ class TestCardView:
         job_description = JobDescriptionFactory(company=company)
         prescriber = PrescriberFactory(membership__organization__authorized=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Alain",
             job_seeker__last_name="Zorro",
             job_seeker__public_id="11111111-2222-3333-4444-555566667777",
@@ -495,6 +496,7 @@ class TestJobDescriptionCardView:
         job_description = JobDescriptionFactory(company=company)
         prescriber = PrescriberFactory(membership__organization__authorized=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Alain",
             job_seeker__last_name="Zorro",
             job_seeker__public_id="11111111-2222-3333-4444-555566667777",

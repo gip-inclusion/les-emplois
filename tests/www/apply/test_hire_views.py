@@ -1328,7 +1328,7 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, next_url)
 
         # with previous job application
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
@@ -1349,7 +1349,7 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, next_url)
 
         # with previous job application
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
@@ -1371,7 +1371,7 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, next_url)
 
         # with previous job application
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")

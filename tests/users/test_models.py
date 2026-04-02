@@ -138,7 +138,9 @@ class TestManager:
 
         # From the prescriber as a member of no organization
         job_seeker_created_by_user_no_organization = JobSeekerFactory(created_by=prescriber)
-        job_seeker_with_sent_job_app_no_organization = JobApplicationFactory(sender=prescriber).job_seeker
+        job_seeker_with_sent_job_app_no_organization = JobApplicationFactory(
+            sent_by_prescriber_alone=True, sender=prescriber
+        ).job_seeker
         # It's not possible to make a eligibility diagnosis with no organization
 
         # From the prescriber as a member of the organization
@@ -147,6 +149,7 @@ class TestManager:
             jobseeker_profile__created_by_prescriber_organization=organization,
         )
         job_seeker_with_sent_job_app_in_organization = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender=prescriber,
             sender_prescriber_organization=organization,
         ).job_seeker
@@ -167,6 +170,7 @@ class TestManager:
             jobseeker_profile__created_by_prescriber_organization=other_organization,
         )
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender=prescriber,
             sender_prescriber_organization=other_organization,
         )
@@ -185,6 +189,7 @@ class TestManager:
             jobseeker_profile__created_by_prescriber_organization=organization
         )
         job_seeker_with_job_app_sent_by_organization_coworker = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender_prescriber_organization=organization,
         ).job_seeker
         job_seeker_with_iae_diagnosis_authored_by_organization_coworker = IAEEligibilityDiagnosisFactory(

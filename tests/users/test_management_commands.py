@@ -62,7 +62,9 @@ class TestDeduplicateJobSeekersManagementCommands:
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs
+        )
         user1 = job_app1.job_seeker
 
         assert user1.jobseeker_profile.nir == ""
@@ -71,7 +73,9 @@ class TestDeduplicateJobSeekersManagementCommands:
         assert 1 == user1.eligibility_diagnoses.count()
 
         # Create `user2`.
-        job_app2 = JobApplicationFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker__jobseeker_profile__nir="", **kwargs
+        )
         user2 = job_app2.job_seeker
 
         assert user2.jobseeker_profile.nir == ""
@@ -80,7 +84,7 @@ class TestDeduplicateJobSeekersManagementCommands:
         assert 1 == user2.eligibility_diagnoses.count()
 
         # Create `user3`.
-        job_app3 = JobApplicationFactory(**kwargs)
+        job_app3 = JobApplicationFactory(sent_by_prescriber_alone=True, **kwargs)
         user3 = job_app3.job_seeker
         expected_nir = user3.jobseeker_profile.nir
 
@@ -138,7 +142,9 @@ class TestDeduplicateJobSeekersManagementCommands:
         assert job_app2.sender == user2
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app3 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker__jobseeker_profile__nir="", **kwargs
+        )
         user3 = job_app3.job_seeker
         assert job_app3.sender != user3
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
@@ -185,7 +191,9 @@ class TestDeduplicateJobSeekersManagementCommands:
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs
+        )
         user1 = job_app1.job_seeker
 
         # Create `user2` through a job application sent by him.
@@ -642,6 +650,7 @@ class TestCommandSendUsersToBrevo:
         )
         # Recent diagnosis but an accepted application: ignored
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             job_seeker=IAEEligibilityDiagnosisFactory(
                 job_seeker__with_verified_email=True,
@@ -1442,12 +1451,17 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             created_by=prescriber, jobseeker_profile__created_by_prescriber_organization=None
         )
         job_app_no_orga = JobApplicationFactory(
-            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=None
+            sent_by_prescriber_alone=True,
+            job_seeker=job_seeker_1,
+            sender=prescriber,
         )
 
         # Prescriber made actions for orga 1
         job_app_orga_1 = JobApplicationFactory(
-            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=organization_1
+            sent_by_prescriber=True,
+            job_seeker=job_seeker_1,
+            sender=prescriber,
+            sender_prescriber_organization=organization_1,
         )
         geiq_diag_orga_1 = GEIQEligibilityDiagnosisFactory(
             job_seeker=job_seeker_1,
@@ -1467,6 +1481,7 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             expires_at=datetime.date.today() - datetime.timedelta(days=1),
         )
         job_app_orga_2 = JobApplicationFactory(
+            sent_by_prescriber=True,
             job_seeker=job_seeker_1,
             sender=prescriber,
             sender_prescriber_organization=organization_2,
@@ -1538,12 +1553,15 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             created_by=prescriber, jobseeker_profile__created_by_prescriber_organization=None
         )  # last action, the assignment will have these informations
         job_app_1_no_orga = JobApplicationFactory(
-            job_seeker=job_seeker_1, sender=employer, sender_company=None
+            sent_by_prescriber_alone=True, job_seeker=job_seeker_1, sender=employer, sender_company=None
         )  # last action, the assignment will have these informations
 
         # Prescriber made actions for orga 1
         job_app_1_orga_1 = JobApplicationFactory(
-            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=organization_1
+            sent_by_prescriber_alone=True,
+            job_seeker=job_seeker_1,
+            sender=prescriber,
+            sender_prescriber_organization=organization_1,
         )
         geiq_diag_1_orga_1 = GEIQEligibilityDiagnosisFactory(
             job_seeker=job_seeker_1,
@@ -1563,13 +1581,16 @@ class TestSyncJobSeekerAssignmentManagementCommand:
             last_action_kind=ActionKind.IAE_ELIGIBILITY,
         )
         job_app_2_orga_2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=job_seeker_2,
             sender=prescriber,
             sender_prescriber_organization=organization_2,
             to_company=company,
         )  # last action, to set updated_at and last_action_kind
         # Another job seeker with the same prescriber and organization should not be disturbing
-        JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization_2)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization_2
+        )
 
         assignment_2_company = JobSeekerAssignmentFactory(
             job_seeker=job_seeker_2,

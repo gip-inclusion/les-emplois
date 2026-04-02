@@ -48,7 +48,7 @@ class TestEmployeeRecordModel:
         with pytest.raises(ValidationError):
             # If the job seeker has no title (optional by default),
             # Then the job seeker profile must not be valid
-            job_application = JobApplicationFactory(with_approval=True)
+            job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
             job_application.job_seeker.title = None
             EmployeeRecord.from_job_application(job_application)
 
@@ -62,14 +62,18 @@ class TestEmployeeRecordModel:
         ]:
             with subtests.test(state):
                 with pytest.raises(ValidationError) as exc:
-                    job_application = JobApplicationFactory(with_approval=True, state=state)
+                    job_application = JobApplicationFactory(
+                        sent_by_prescriber_alone=True, with_approval=True, state=state
+                    )
                     EmployeeRecord.from_job_application(job_application)
                 assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED
 
     def test_creation_without_approval(self):
         with pytest.raises(ValidationError) as exc:
             job_application = JobApplicationFactory(
-                to_company__subject_to_iae_rules=True, state=JobApplicationState.ACCEPTED
+                sent_by_prescriber_alone=True,
+                to_company__subject_to_iae_rules=True,
+                state=JobApplicationState.ACCEPTED,
             )
             EmployeeRecord.from_job_application(job_application)
         assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL
@@ -77,6 +81,7 @@ class TestEmployeeRecordModel:
     def test_creation_with_same_job_application(self):
         # Job application is duplicated (already existing with same approval and SIAE)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
         )
 
@@ -100,6 +105,7 @@ class TestEmployeeRecordModel:
 
         # Standard / normal case
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
         )
         employee_record = EmployeeRecord.from_job_application(job_application)
@@ -114,6 +120,7 @@ class TestEmployeeRecordModel:
         Mainly format the job seeker address to Hexa format
         """
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
         )
         employee_record = EmployeeRecord.from_job_application(job_application)
@@ -134,7 +141,7 @@ class TestEmployeeRecordModel:
         - geoloc issues (no API mock on this test)
         """
         # Complete profile, but geoloc API not reachable
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
 
         with pytest.raises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
@@ -142,6 +149,7 @@ class TestEmployeeRecordModel:
 
     def test_ready_fill_denormalized_fields(self):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
         )
         employee_record = EmployeeRecord.from_job_application(job_application)
@@ -426,6 +434,7 @@ class TestEmployeeRecordLifeCycle:
             side_effect=mock_get_geocoding_data,
         )
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
         )
         employee_record = EmployeeRecord.from_job_application(job_application)
@@ -679,7 +688,9 @@ class TestEmployeeRecordJobApplicationConstraints:
         # Make job application cancellable
         hiring_date = timezone.localdate() + timedelta(days=7)
 
-        self.job_application = JobApplicationFactory(for_employee_record=True, hiring_start_at=hiring_date)
+        self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, for_employee_record=True, hiring_start_at=hiring_date
+        )
         self.employee_record = EmployeeRecord.from_job_application(self.job_application)
         self.employee_record.ready()
 

@@ -157,14 +157,16 @@ class TestDashboardView:
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
-        job_application = JobApplicationFactory(with_approval=True, to_company=company)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, to_company=company)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
         # You can't create 2 employee records with the same job application
         # Factories were allowing it until a recent fix was applied
-        job_application = JobApplicationFactory(with_approval=True, to_company=company)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, to_company=company)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
-        other_job_application = JobApplicationFactory(with_approval=True, to_company=other_company)
+        other_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, to_company=other_company
+        )
         EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
 
         session = client.session
@@ -210,12 +212,22 @@ class TestDashboardView:
 
     def test_dashboard_applications_count(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
-        JobApplicationFactory(to_company=company)
-        JobApplicationFactory(to_company=company, archived_at=timezone.now())
-        JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED)
-        JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED, archived_at=timezone.now())
-        JobApplicationFactory(to_company=company, state=JobApplicationState.POOL)
-        JobApplicationFactory(to_company=company, state=JobApplicationState.POOL, archived_at=timezone.now())
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, archived_at=timezone.now())
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POSTPONED)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=JobApplicationState.POSTPONED,
+            archived_at=timezone.now(),
+        )
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POOL)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=JobApplicationState.POOL,
+            archived_at=timezone.now(),
+        )
         client.force_login(company.members.get())
         response = client.get(reverse("dashboard:index"))
         todo_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
@@ -782,6 +794,7 @@ class TestDashboardView:
 
         # A diagnosis from an employer with an approval and a job application
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             job_seeker=user,
             to_company=diagnosis.author_siae,
@@ -1081,15 +1094,17 @@ def test_stalled_job_seekers_box(client):
     prescriber = PrescriberMembershipFactory(organization__authorized=True).user
     client.force_login(prescriber)
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
     )
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
     )
-    JobApplicationFactory(sender=prescriber)
+    JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
 
     response = client.get(reverse("dashboard:index"))
     assert response.context["stalled_job_seekers_count"] == 1

@@ -194,7 +194,7 @@ class TestProcessTransferJobApplication:
 
 
 def test_anonymous_access(client):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     for viewname in (
         "apply:job_application_external_transfer_step_1",
         "apply:job_application_external_transfer_step_end",
@@ -220,7 +220,7 @@ def test_anonymous_access(client):
 
 @pytest.mark.parametrize("state", JobApplicationState)
 def test_step_1_status_checks(client, state):
-    job_application = JobApplicationFactory(state=state)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=state)
     employer = job_application.to_company.members.get()
     client.force_login(employer)
     response = client.get(
@@ -242,6 +242,7 @@ def test_step_1(client, snapshot):
     CompanyFactory(name=COMPANY_GUERANDE, coords=guerande.coords, post_code="44350")
 
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.REFUSED,
         for_snapshot=True,
         to_company__post_code="56760",
@@ -343,7 +344,9 @@ def test_step_1_same_company(client):
     company = CompanyFactory(coords=vannes.coords, post_code="56760", with_membership=True)
     job = JobDescriptionFactory(company=company)
 
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, to_company=company)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, to_company=company
+    )
     employer = job_application.to_company.members.get()
     client.force_login(employer)
 
@@ -366,7 +369,7 @@ def test_step_1_same_company(client):
 
 
 def test_start_session_same_company(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
     company = job_application.to_company
     client.force_login(company.members.get())
 
@@ -401,7 +404,7 @@ def test_start_session_same_company(client):
 
 
 def test_start_session_internal_transfer(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
     employer = job_application.to_company.members.get()
     other_company = CompanyMembershipFactory(user=employer).company
     client.force_login(employer)
@@ -441,7 +444,7 @@ def test_start_session_internal_transfer(client):
 
 
 def test_start_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True, with_jobs=True)
     job_id = other_company.job_description_through.first().pk
@@ -493,7 +496,9 @@ def test_start_session(client):
 
 
 def test_step_2(client, snapshot):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, for_snapshot=True
+    )
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True, with_jobs=True)
     job_id = other_company.job_description_through.first().pk
@@ -554,7 +559,7 @@ def test_step_2(client, snapshot):
 
 
 def test_step_2_without_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
     employer = job_application.to_company.members.get()
     client.force_login(employer)
 
@@ -575,6 +580,7 @@ def test_step_2_without_session(client):
 @pytest.mark.usefixtures("temporary_bucket")
 def test_step_3(client, snapshot, pdf_file):
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.REFUSED,
         for_snapshot=True,
         resume__key="resume/old_file.pdf",
@@ -627,7 +633,9 @@ def test_step_3(client, snapshot, pdf_file):
 
 @pytest.mark.usefixtures("temporary_bucket")
 def test_step_3_no_previous_CV(client, mocker, pdf_file):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume=None)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, resume=None
+    )
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -668,7 +676,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
 
 
 def test_step_3_remove_previous_CV(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
     assert job_application.resume
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
@@ -710,7 +718,7 @@ def test_step_3_remove_previous_CV(client):
 
 @pytest.mark.usefixtures("temporary_bucket")
 def test_step_3_replace_previous_CV(client, mocker, pdf_file):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
     assert job_application.resume
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
@@ -754,7 +762,9 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
 
 
 def test_access_step_3_without_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume=None)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, resume=None
+    )
     employer = job_application.to_company.members.get()
     client.force_login(employer)
     response = client.get(
@@ -774,6 +784,7 @@ def test_full_process(client, pdf_file):
     other_company = CompanyFactory(name=COMPANY_VANNES, coords=vannes.coords, post_code="56760", with_membership=True)
 
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.REFUSED,
         to_company__post_code="56760",
         to_company__coords=vannes.coords,

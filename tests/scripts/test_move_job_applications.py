@@ -18,6 +18,7 @@ def test_command(wet_run, caplog):
     iae_diag = IAEEligibilityDiagnosisFactory(author=prescriber, from_prescriber=True)
     current_org = iae_diag.author_prescriber_organization
     iae_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         eligibility_diagnosis=iae_diag,
         sender_prescriber_organization=current_org,
@@ -26,7 +27,10 @@ def test_command(wet_run, caplog):
         author=prescriber, from_prescriber=True, author_prescriber_organization=current_org
     )
     geiq_application = JobApplicationFactory(
-        sender=prescriber, geiq_eligibility_diagnosis=geiq_diag, sender_prescriber_organization=current_org
+        sent_by_prescriber_alone=True,
+        sender=prescriber,
+        geiq_eligibility_diagnosis=geiq_diag,
+        sender_prescriber_organization=current_org,
     )
 
     management.call_command(

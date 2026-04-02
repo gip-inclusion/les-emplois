@@ -295,7 +295,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.ACCEPTED)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, approval=approval, state=JobApplicationState.ACCEPTED
+        )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.ERROR
@@ -314,7 +316,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.POSTPONED)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, approval=approval, state=JobApplicationState.POSTPONED
+        )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.PENDING
@@ -335,7 +339,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         siae = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
-        JobApplicationFactory(to_company=siae, approval=approval, state=JobApplicationState.ACCEPTED)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=siae, approval=approval, state=JobApplicationState.ACCEPTED
+        )
         return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         approval.refresh_from_db()
