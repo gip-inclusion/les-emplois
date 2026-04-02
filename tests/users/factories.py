@@ -25,7 +25,7 @@ from tests.geo.factories import QPVFactory, ZRRFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
-DEFAULT_PASSWORD = "P4ssw0rd!*****"
+DEFAULT_PASSWORD = "$up3rP4ssw0rd!*****"
 
 
 @functools.cache

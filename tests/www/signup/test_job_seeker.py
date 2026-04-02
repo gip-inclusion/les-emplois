@@ -305,7 +305,7 @@ class TestJobSeekerSignup:
         assert response.status_code == 200
         assert response.context["form"].errors == {
             "password1": [
-                "Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.",
+                "Ce mot de passe est trop court. Il doit contenir au minimum 16 caractères.",
                 "Le mot de passe doit contenir au moins 3 des 4 types suivants : "
                 "majuscules, minuscules, chiffres, caractères spéciaux.",
             ]
