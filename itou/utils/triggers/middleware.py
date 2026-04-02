@@ -3,7 +3,8 @@ from itou.utils import triggers
 
 def fields_history(get_response):
     def middleware(request):
-        if request.method in ["GET", "HEAD"]:
+        ro_request = getattr(request, "_readonly", None)
+        if (ro_request is None and request.method in ["GET", "HEAD"]) or ro_request:
             return get_response(request)
 
         base_context = {
