@@ -1733,7 +1733,7 @@ class TestAnonymizeCancelledApprovalsManagementCommand:
                 "user_nir": "",
                 "user_id_national_pe": None,
                 "origin_siae_kind": CompanyKind.EATT,
-                "origin_sender_kind": UserKind.PRESCRIBER,
+                "origin_sender_kind": SenderKind.PRESCRIBER,
                 "origin_prescriber_organization_kind": PrescriberOrganizationKind.CHRS,
             },
         ]

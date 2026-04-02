@@ -217,7 +217,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     @classmethod
     def _expiration_date(cls, author_kind):
         now = timezone.localdate()
-        if author_kind == UserKind.EMPLOYER:
+        if author_kind == AuthorKind.EMPLOYER:
             # For siae_evaluations, employers must provide a proof for administrative criteria
             # supporting the hire. A proof is valid for 3 months, align employer diagnosis
             # duration with proof validity duration.
@@ -240,7 +240,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         """
         if author_siae is None and author_prescriber_organization is None:
             raise ValueError("Missing author_siae or author_prescriber_organization")
-        author_kind = UserKind.EMPLOYER if author_siae else UserKind.PRESCRIBER
+        author_kind = AuthorKind.EMPLOYER if author_siae else AuthorKind.PRESCRIBER
         diagnosis = cls.objects.create(
             job_seeker=job_seeker,
             author=author,

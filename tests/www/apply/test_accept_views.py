@@ -39,7 +39,6 @@ from itou.users.enums import (
     IdentityCertificationAuthorities,
     LackOfNIRReason,
     LackOfPoleEmploiId,
-    UserKind,
 )
 from itou.users.models import IdentityCertification, JobSeekerAssignment, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
@@ -1213,7 +1212,7 @@ class TestProcessAcceptViewsInWizard:
         ).exists()
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("from_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1226,7 +1225,7 @@ class TestProcessAcceptViewsInWizard:
         birthdate = datetime.date(1995, 12, 27)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
+            author_siae=self.company if from_kind is AuthorKind.EMPLOYER else None,
             certifiable=True,
             **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
@@ -1309,7 +1308,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("from_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1319,7 +1318,7 @@ class TestProcessAcceptViewsInWizard:
         )
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
+            author_siae=self.company if from_kind is AuthorKind.EMPLOYER else None,
             certifiable=True,
             **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
@@ -1361,7 +1360,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("from_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1373,7 +1372,7 @@ class TestProcessAcceptViewsInWizard:
         self.company.save()
         diagnosis = GEIQEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_geiq=self.company if from_kind is UserKind.EMPLOYER else None,
+            author_geiq=self.company if from_kind is AuthorKind.EMPLOYER else None,
             certifiable=True,
             **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind],
@@ -1416,7 +1415,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("from_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1429,7 +1428,7 @@ class TestProcessAcceptViewsInWizard:
         self.company.save()
         diagnosis = GEIQEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_geiq=self.company if from_kind is UserKind.EMPLOYER else None,
+            author_geiq=self.company if from_kind is AuthorKind.EMPLOYER else None,
             certifiable=True,
             **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind],
@@ -1496,7 +1495,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
 
-    @pytest.mark.parametrize("from_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("from_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
     @freeze_time("2024-09-11")
     def test_accept_not_an_siae_or_geiq_cannot_be_certified(self, client, mocker, from_kind):
         mocker.patch(
@@ -1508,7 +1507,7 @@ class TestProcessAcceptViewsInWizard:
         company = CompanyFactory(kind=kind, with_membership=True, with_jobs=True)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
+            author_siae=self.company if from_kind is AuthorKind.EMPLOYER else None,
             certifiable=True,
             **{f"from_{from_kind}": True},
             criteria_kinds=[AdministrativeCriteriaKind.RSA],
