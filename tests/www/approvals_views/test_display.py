@@ -12,7 +12,7 @@ class TestDisplayApproval:
 
     @freeze_time("2023-04-26")
     def test_display_job_app_approval(self, client):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -31,8 +31,9 @@ class TestDisplayApproval:
         assertContains(response, self.WITH_DIAGNOSIS_STR)
 
     def test_display_approval_multiple_job_applications(self, client):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=job_application.job_seeker,
             approval=job_application.approval,
             to_company=job_application.to_company,
@@ -57,7 +58,10 @@ class TestDisplayApproval:
         # An approval has been delivered but it does not come from Itou.
         # Therefore, the linked diagnosis exists but is not in our database.
         job_application = JobApplicationFactory(
-            with_approval=True, eligibility_diagnosis=None, approval__number="625741810181"
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            eligibility_diagnosis=None,
+            approval__number="625741810181",
         )
 
         employer = job_application.to_company.members.first()

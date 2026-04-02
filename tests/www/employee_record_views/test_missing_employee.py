@@ -45,7 +45,7 @@ class TestMissingEmployee:
     def test_post_never_hired(self, client, snapshot):
         self.setUp(client)
         job_seeker = JobSeekerFactory(first_name="André", last_name="Alonso")
-        JobApplicationFactory(to_company=self.siae, job_seeker=job_seeker)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=self.siae, job_seeker=job_seeker)
 
         response = client.post(self.url, data={"employee": job_seeker.pk})
         assert self._extract_case(response) == MissingEmployeeCase.NO_HIRING
@@ -65,7 +65,11 @@ class TestMissingEmployee:
         self.setUp(client)
         job_seeker = JobSeekerFactory(first_name="Béatrice", last_name="Beauregard")
         JobApplicationFactory(
-            to_company=self.siae, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED, approval=None
+            sent_by_prescriber_alone=True,
+            to_company=self.siae,
+            job_seeker=job_seeker,
+            state=JobApplicationState.ACCEPTED,
+            approval=None,
         )
 
         response = client.post(self.url, data={"employee": job_seeker.pk})
@@ -78,6 +82,7 @@ class TestMissingEmployee:
         job_seeker = JobSeekerFactory(first_name="Fabienne", last_name="Favriseau")
         approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00004")
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=self.siae,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -104,6 +109,7 @@ class TestMissingEmployee:
         job_seeker = JobSeekerFactory(first_name="Damien", last_name="Danone")
         approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00002")
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=self.siae,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -133,6 +139,7 @@ class TestMissingEmployee:
         # Add a dummy application so that the job seeker is in the
         # pool of applicants to `self.siae`.
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=self.siae,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -145,6 +152,7 @@ class TestMissingEmployee:
             source=CompanySource.USER_CREATED,
         )
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=other_siae,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -164,6 +172,7 @@ class TestMissingEmployee:
         # Add a dummy application so that the job seeker is in the
         # pool of applicants to `self.siae`.
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=self.siae,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -177,6 +186,7 @@ class TestMissingEmployee:
         assert other_siae.kind != self.siae.kind
         assert other_siae.convention_id != self.siae.convention_id
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=other_siae,
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,

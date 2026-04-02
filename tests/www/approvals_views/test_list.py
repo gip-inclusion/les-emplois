@@ -451,6 +451,7 @@ class TestApprovalsListView:
             **approval_kwargs,
         )
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=approval_with_multiple_job_apps_same_company.user,
             approval=approval_with_multiple_job_apps_same_company,
             to_company=company,
@@ -528,6 +529,7 @@ class TestApprovalsListView:
             **approval_kwargs,
         )
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=approval_with_multiple_job_apps.user,
             approval=approval_with_multiple_job_apps,
             hiring_end_at=less_than_3_months_ago,  # in another company, will not be looked up

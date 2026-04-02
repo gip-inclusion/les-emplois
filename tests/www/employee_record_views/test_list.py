@@ -46,6 +46,7 @@ class TestListEmployeeRecords:
         )
         self.user = self.company.members.get(first_name="Elliot")
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
             to_company=self.company,
             for_snapshot=True,
@@ -171,7 +172,7 @@ class TestListEmployeeRecords:
         other_employee_record = EmployeeRecordFactory(job_application__to_company=self.company)
         other_approval_number_formatted = format_filters.format_approval_number(other_employee_record.approval_number)
         accepted_job_application = JobApplicationFactory(
-            for_employee_record=True, to_company=self.company, was_hired=True
+            sent_by_prescriber_alone=True, for_employee_record=True, to_company=self.company, was_hired=True
         )
         client.force_login(self.user)
 
@@ -661,9 +662,12 @@ class TestListEmployeeRecords:
     def test_missing_employee_records_alert(self, client, snapshot):
         client.force_login(self.user)
 
-        job_application_1 = JobApplicationFactory(to_company=self.company, with_approval=True)
+        job_application_1 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=self.company, with_approval=True
+        )
         # Another one with the same job seeker to ensure we don't have duplicates
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=self.company,
             job_seeker=job_application_1.job_seeker,
             with_approval=True,
@@ -671,6 +675,7 @@ class TestListEmployeeRecords:
         )
         # Hiring is older, the job seeker will be after job_application_1's one
         job_application_3 = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=self.company,
             with_approval=True,
             hiring_start_at=job_application_1.hiring_start_at - relativedelta(days=1),

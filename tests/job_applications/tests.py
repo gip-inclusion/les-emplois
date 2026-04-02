@@ -76,6 +76,7 @@ class TestJobApplicationModel:
 
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )
@@ -86,6 +87,7 @@ class TestJobApplicationModel:
         assert not job_application.eligibility_diagnosis_by_siae_required()
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
         )
@@ -106,17 +108,13 @@ class TestJobApplicationModel:
         assert job_application.accepted_by == user
 
     def test_refused_by(self):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber=True,
-        )
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         user = job_application.to_company.members.first()
         job_application.refuse(user=user)
         assert job_application.refused_by == user
 
     def test_refused_by_without_user(self):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber=True,
-        )
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         job_application.refuse(user=None)
         assert job_application.refused_by is None
 
@@ -136,7 +134,7 @@ class TestJobApplicationModel:
         assert job_application.is_sent_by_authorized_prescriber
 
     def test_is_refused_for_other_reason(self, subtests):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         for state in JobApplicationState.values:
             for refusal_reason in RefusalReason.values:
                 with subtests.test(
@@ -168,17 +166,25 @@ class TestJobApplicationModel:
 
     def test_application_on_non_job_seeker(self):
         with pytest.raises(ValidationError) as excinfo:
-            JobApplicationFactory(job_seeker=PrescriberFactory()).clean()
+            JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=PrescriberFactory()).clean()
         assert "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat" in str(
             excinfo.value
         )
 
     def test_inverted_vae_contract(self):
-        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=True).clean()
-        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=False).clean()
-        JobApplicationFactory(to_company__kind=CompanyKind.EI, inverted_vae_contract=None).clean()
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=True
+        ).clean()
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=False
+        ).clean()
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company__kind=CompanyKind.EI, inverted_vae_contract=None
+        ).clean()
         with pytest.raises(ValidationError) as excinfo:
-            JobApplicationFactory(to_company__kind=CompanyKind.AI, inverted_vae_contract=True).clean()
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, to_company__kind=CompanyKind.AI, inverted_vae_contract=True
+            ).clean()
         assert "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ" in str(excinfo.value)
 
     def test_accept_follow_up_group(self):
@@ -224,16 +230,19 @@ class TestJobApplicationModel:
         assert not newer_company_diagnosis.is_valid
 
         new_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=geiq,
             job_seeker=job_seeker,
         )
         accepted_job_application_with_company_diagnosis = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=geiq,
             job_seeker=job_seeker,
             geiq_eligibility_diagnosis=expired_company_diagnosis,
             state=JobApplicationState.ACCEPTED,
         )
         accepted_job_application_with_prescriber_diagnosis = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=geiq,
             job_seeker=job_seeker,
             geiq_eligibility_diagnosis=expired_prescriber_diagnosis,
@@ -345,16 +354,16 @@ def test_sender_kind_of_job_application(job_application_factory):
 
 
 def test_can_be_cancelled():
-    assert JobApplicationFactory().can_be_cancelled is True
+    assert JobApplicationFactory(sent_by_prescriber_alone=True).can_be_cancelled is True
 
 
 def test_can_be_cancelled_when_origin_is_ai_stock():
-    assert JobApplicationFactory(origin=Origin.AI_STOCK).can_be_cancelled is False
+    assert JobApplicationFactory(sent_by_prescriber_alone=True, origin=Origin.AI_STOCK).can_be_cancelled is False
 
 
 def test_can_be_cancelled_when_an_employee_record_without_logs_exists():
     employee_record = BareEmployeeRecordFactory(
-        job_application=JobApplicationFactory(),
+        job_application=JobApplicationFactory(sent_by_prescriber_alone=True),
         status=factory.fuzzy.FuzzyChoice(Status),
     )
     assert employee_record.job_application.can_be_cancelled is True
@@ -363,7 +372,7 @@ def test_can_be_cancelled_when_an_employee_record_without_logs_exists():
 @pytest.mark.parametrize("transition", EmployeeRecordTransition.without_asp_exchange())
 def test_can_be_cancelled_when_an_employee_record_with_non_blocking_logs_exists(transition):
     employee_record = BareEmployeeRecordFactory(
-        job_application=JobApplicationFactory(),
+        job_application=JobApplicationFactory(sent_by_prescriber_alone=True),
         status=factory.fuzzy.FuzzyChoice(Status),
     )
 
@@ -379,7 +388,7 @@ def test_can_be_cancelled_when_an_employee_record_with_non_blocking_logs_exists(
 @pytest.mark.parametrize("transition", set(Status) - EmployeeRecordTransition.without_asp_exchange())
 def test_can_be_cancelled_when_an_employee_record_with_blocking_logs_exists(transition):
     employee_record = BareEmployeeRecordFactory(
-        job_application=JobApplicationFactory(),
+        job_application=JobApplicationFactory(sent_by_prescriber_alone=True),
         status=factory.fuzzy.FuzzyChoice(Status),
     )
 
@@ -393,7 +402,9 @@ def test_can_be_cancelled_when_an_employee_record_with_blocking_logs_exists(tran
 
 
 def test_diagnoses_coherence_contraint():
-    job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis_from_employer=True)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, with_geiq_eligibility_diagnosis_from_employer=True
+    )
     job_application.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
     # Mind the parens in RE...
@@ -416,7 +427,7 @@ def test_diagnoses_coherence_contraint():
     ids=repr,
 )
 def test_geiq_fields_validation_error(data, error):
-    job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.EI)
     for name, value in data.items():
         setattr(job_application, name, value)
 
@@ -434,7 +445,7 @@ def test_geiq_fields_validation_error(data, error):
     ids=repr,
 )
 def test_geiq_fields_validation_success(data):
-    JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, **data)
+    JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ, **data)
 
 
 @pytest.mark.parametrize(
@@ -450,7 +461,7 @@ def test_geiq_fields_validation_success(data):
     ids=repr,
 )
 def test_geiq_contract_fields_contraint(data):
-    job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
     for name, value in data.items():
         setattr(job_application, name, value)
 
@@ -463,6 +474,7 @@ def test_geiq_qualification_fields_contraint():
         Exception, match="Incohérence dans les champs concernant la qualification pour le contrat GEIQ"
     ):
         JobApplicationFactory.build(
+            sent_by_prescriber_alone=True,
             to_company__kind=CompanyKind.GEIQ,
             qualification_type=QualificationType.STATE_DIPLOMA,
             qualification_level=QualificationLevel.NOT_RELEVANT,
@@ -470,6 +482,7 @@ def test_geiq_qualification_fields_contraint():
 
     for qualification_type in [QualificationType.CQP, QualificationType.CCN]:
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__kind=CompanyKind.GEIQ,
             qualification_type=qualification_type,
             qualification_level=QualificationLevel.NOT_RELEVANT,
@@ -480,12 +493,22 @@ def test_can_have_prior_action():
     geiq = CompanyFactory.build(kind=CompanyKind.GEIQ)
     non_geiq = CompanyFactory.build(kind=CompanyKind.AI)
 
-    assert JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_have_prior_action is True
     assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POSTPONED).can_have_prior_action is True
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=geiq, state=JobApplicationState.NEW
+        ).can_have_prior_action
+        is True
     )
     assert (
-        JobApplicationFactory.build(to_company=non_geiq, state=JobApplicationState.POSTPONED).can_have_prior_action
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=geiq, state=JobApplicationState.POSTPONED
+        ).can_have_prior_action
+        is True
+    )
+    assert (
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=non_geiq, state=JobApplicationState.POSTPONED
+        ).can_have_prior_action
         is False
     )
 
@@ -494,20 +517,34 @@ def test_can_change_prior_actions():
     geiq = CompanyFactory(kind=CompanyKind.GEIQ)
     non_geiq = CompanyFactory(kind=CompanyKind.ACI)
 
-    assert JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_change_prior_actions is True
     assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POSTPONED).can_change_prior_actions
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=geiq, state=JobApplicationState.NEW
+        ).can_change_prior_actions
         is True
     )
     assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POOL).can_change_prior_actions is True
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=geiq, state=JobApplicationState.POSTPONED
+        ).can_change_prior_actions
+        is True
     )
     assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.ACCEPTED).can_change_prior_actions
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=geiq, state=JobApplicationState.POOL
+        ).can_change_prior_actions
+        is True
+    )
+    assert (
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=geiq, state=JobApplicationState.ACCEPTED
+        ).can_change_prior_actions
         is False
     )
     assert (
-        JobApplicationFactory.build(to_company=non_geiq, state=JobApplicationState.POSTPONED).can_change_prior_actions
+        JobApplicationFactory.build(
+            sent_by_prescriber_alone=True, to_company=non_geiq, state=JobApplicationState.POSTPONED
+        ).can_change_prior_actions
         is False
     )
 
@@ -557,9 +594,9 @@ class TestJobApplicationQuerySet:
 
     def test_get_unique_fk_objects(self):
         # Create 3 job applications and 3 approvals for 2 candidates
-        JobApplicationFactory(with_approval=True)
+        JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = ApprovalFactory(expired=True)
-        JobApplicationFactory(with_approval=True, job_seeker=approval.user)
+        JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, job_seeker=approval.user)
         JobApplicationFactory(sent_by_job_seeker=True, job_seeker=approval.user)
 
         unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")
@@ -590,7 +627,7 @@ class TestJobApplicationQuerySet:
         assert obj.last_change == last_change.timestamp
 
     def test_with_jobseeker_eligibility_diagnosis(self):
-        job_app = JobApplicationFactory(with_approval=True)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         diagnosis = job_app.eligibility_diagnosis
         obj = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
         assert obj.jobseeker_eligibility_diagnosis == diagnosis.pk
@@ -636,7 +673,7 @@ class TestJobApplicationQuerySet:
         assert qs.first().jobseeker_eligibility_diagnosis is None
 
     def test_with_eligibility_diagnosis_criterion(self):
-        job_app = JobApplicationFactory(with_approval=True)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         diagnosis = job_app.eligibility_diagnosis
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
@@ -681,7 +718,9 @@ class TestJobApplicationQuerySet:
         assert getattr(obj, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id(self):
-        job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis_from_employer=True)
+        job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_geiq_eligibility_diagnosis_from_employer=True
+        )
         diagnosis = job_app.geiq_eligibility_diagnosis
         obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
         assert obj.jobseeker_geiq_eligibility_diagnosis_id == diagnosis.pk
@@ -694,7 +733,9 @@ class TestJobApplicationQuerySet:
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_expired(self):
         # If a diagnosis is associated with a job application, return it whatever its validity
         job_app = JobApplicationFactory(
-            with_geiq_eligibility_diagnosis_from_employer=True, geiq_eligibility_diagnosis__expired=True
+            sent_by_prescriber_alone=True,
+            with_geiq_eligibility_diagnosis_from_employer=True,
+            geiq_eligibility_diagnosis__expired=True,
         )
         obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
         assert obj.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
@@ -794,8 +835,10 @@ class TestJobApplicationQuerySet:
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_or_without_allowance(
         self, diagnosis_author, criteria_kinds
     ):
+        extra_kwargs = {"sent_by_employer": True} if diagnosis_author == "employer" else {"sent_by_prescriber": True}
         job_application = JobApplicationFactory(
-            sent_by_employer=diagnosis_author == "employer", to_company__kind=CompanyKind.GEIQ
+            to_company__kind=CompanyKind.GEIQ,
+            **extra_kwargs,
         )
         author_prescriber_organization = (
             PrescriberOrganizationFactory(with_membership=True) if diagnosis_author != "employer" else None
@@ -824,7 +867,7 @@ class TestJobApplicationQuerySet:
         )
 
     def test_with_list_related_data(self):
-        job_app = JobApplicationFactory(with_approval=True)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
@@ -856,7 +899,7 @@ class TestJobApplicationQuerySet:
             assert hasattr(obj, "jobseeker_eligibility_diagnosis")
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_queries(self):
-        geiq_job_app = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        geiq_job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
         GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=geiq_job_app.job_seeker)
 
         obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(
@@ -870,10 +913,12 @@ class TestJobApplicationQuerySet:
     def test_eligible_as_employee_record(self):
         # A valid job application:
         job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
         )
         job_app_with_future_hiring_start_at = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=job_app.to_company,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
@@ -891,6 +936,7 @@ class TestJobApplicationQuerySet:
 
         # Status is not accepted
         job_app_not_accepted = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             with_approval=True,
         )
@@ -898,12 +944,14 @@ class TestJobApplicationQuerySet:
 
         # without an approval
         job_app_without_approval = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
         )
         assert_job_app_not_in_queryset(job_app_without_approval)
 
         # `create_employee_record` is False.
         job_app_blocked_creation = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             create_employee_record=False,
@@ -912,6 +960,7 @@ class TestJobApplicationQuerySet:
 
         # Already has an employee record
         job_app_with_employee_record = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
         )
@@ -929,6 +978,7 @@ class TestJobApplicationQuerySet:
 
         # There's already an employee record for the same SIAE and the same approval (job_app)
         job_app_on_same_siae = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             to_company=job_app_with_employee_record.to_company,
             approval=job_app_with_employee_record.approval,
@@ -937,6 +987,7 @@ class TestJobApplicationQuerySet:
 
         # There's already an employee record for a SIAE of the same convention and the same approval
         job_app_on_same_convention = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             to_company__convention=job_app_with_employee_record.to_company.convention,
             to_company__source=CompanySource.USER_CREATED,
@@ -946,6 +997,7 @@ class TestJobApplicationQuerySet:
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             origin=Origin.PE_APPROVAL,
         )
@@ -1026,14 +1078,14 @@ class TestJobApplicationQuerySet:
         assert job_application.accepted_at == job_application.created_at
 
     def test_with_accepted_at_for_ai_stock(self):
-        JobApplicationFactory(origin=Origin.AI_STOCK)
+        JobApplicationFactory(sent_by_prescriber_alone=True, origin=Origin.AI_STOCK)
 
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at.date() == job_application.hiring_start_at
         assert job_application.accepted_at != job_application.created_at
 
     def test_is_active_company_member(self):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         user = EmployerFactory()
         assert JobApplication.objects.is_active_company_member(user).count() == 0
 
@@ -1051,10 +1103,16 @@ class TestJobApplicationQuerySet:
         TWO_YEARS_AGO = timezone.now() - datetime.timedelta(days=365 * 2)
         LESS_THAN_TWO_YEARS_AGO = timezone.now() - datetime.timedelta(days=365 * 2 - 1)
 
-        JobApplicationFactory(state=random.choice(ALL_BUT_ACCEPTED_STATES), created_at=TWO_YEARS_AGO)  # Too old
-        old_but_accepted = JobApplicationFactory(state=JobApplicationState.ACCEPTED, created_at=TWO_YEARS_AGO)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, state=random.choice(ALL_BUT_ACCEPTED_STATES), created_at=TWO_YEARS_AGO
+        )  # Too old
+        old_but_accepted = JobApplicationFactory(
+            sent_by_prescriber_alone=True, state=JobApplicationState.ACCEPTED, created_at=TWO_YEARS_AGO
+        )
         recent = JobApplicationFactory(
-            state=random.choice(JobApplicationState.values), created_at=LESS_THAN_TWO_YEARS_AGO
+            sent_by_prescriber_alone=True,
+            state=random.choice(JobApplicationState.values),
+            created_at=LESS_THAN_TWO_YEARS_AGO,
         )
 
         assertQuerySetEqual(JobApplication.objects.all().visible_by_employers(), [recent, old_but_accepted])
@@ -1065,16 +1123,19 @@ class TestJobApplicationQuerySet:
     )
     def test_automatically_rejectable_applications(self, state, expected):
         old_job_application = JobApplicationFactory(
-            state=state, updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY
+            sent_by_prescriber_alone=True, state=state, updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY
         )
         if state in ARCHIVABLE_JOB_APPLICATION_STATES:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 state=state,
                 updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY,
                 archived_at=timezone.now(),
             )
         JobApplicationFactory(
-            state=state, updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY + datetime.timedelta(days=1)
+            sent_by_prescriber_alone=True,
+            state=state,
+            updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY + datetime.timedelta(days=1),
         )
 
         qs = JobApplication.objects.automatically_rejectable_applications()
@@ -1121,7 +1182,9 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_new_for_prescriber(self, is_authorized_prescriber):
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
+        extra_kwargs = (
+            {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
+        )
         job_application = JobApplicationFactory(
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
@@ -1207,7 +1270,9 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_accept_for_prescriber(self, is_authorized_prescriber):
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
+        extra_kwargs = (
+            {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
+        )
         job_application = JobApplicationFactory(
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
@@ -1283,15 +1348,16 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_shared_with_job_seeker", [True, False])
     def test_refuse_with_prescriber(self, authorized_prescriber, is_shared_with_job_seeker, snapshot, settings):
         settings.AFPA_DEPARTMENTS = []  # Disable Afpa paragraph
-        extra_kwargs = {}
         if authorized_prescriber:
             extra_kwargs = {
+                "sent_by_authorized_prescriber": True,
                 "sender_prescriber_organization__membership__user__for_snapshot": True,
                 "answer_to_prescriber": "Le candidat n'est pas venu.",
             }
+        else:
+            extra_kwargs = {"sent_by_prescriber_alone": True}
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber=authorized_prescriber,
             refusal_reason_shared_with_job_seeker=is_shared_with_job_seeker,
             refusal_reason=RefusalReason.DID_NOT_COME_TO_INTERVIEW,
             answer="Pas venu",
@@ -1416,7 +1482,9 @@ class TestJobApplicationNotifications:
         assert "Se terminant le : Non renseigné" in email.body
 
     def test_notifications_deliver_approval_when_subject_to_eligibility_rules(self):
-        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, to_company__subject_to_iae_rules=True
+        )
 
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
@@ -1427,7 +1495,9 @@ class TestJobApplicationNotifications:
         assert "PASS IAE" in email.body
 
     def test_notifications_deliver_approval_when_not_subject_to_eligibility_rules(self):
-        job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, to_company__not_subject_to_iae_rules=True
+        )
 
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
@@ -1487,7 +1557,9 @@ class TestJobApplicationNotifications:
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_cancel_sent_by_prescriber(self, is_authorized_prescriber, django_capture_on_commit_callbacks, mailoutbox):
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
+        extra_kwargs = (
+            {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
+        )
 
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
@@ -1600,7 +1672,7 @@ class TestJobApplicationWorkflow:
         kwargs = {
             "job_seeker": job_seeker,
             "sender": job_seeker,
-            "sender_kind": SenderKind.JOB_SEEKER,
+            "sent_by_job_seeker": True,
             "with_iae_eligibility_diagnosis": True,
         }
         JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
@@ -1631,12 +1703,6 @@ class TestJobApplicationWorkflow:
         """
         job_seeker = JobSeekerFactory()
 
-        kwargs = {
-            "job_seeker": job_seeker,
-            "sender": job_seeker,
-            "sender_kind": SenderKind.JOB_SEEKER,
-            "with_iae_eligibility_diagnosis": True,
-        }
         for state in [
             JobApplicationState.NEW,
             JobApplicationState.PROCESSING,
@@ -1645,7 +1711,13 @@ class TestJobApplicationWorkflow:
             JobApplicationState.OBSOLETE,
             JobApplicationState.OBSOLETE,
         ]:
-            JobApplicationFactory(state=state, **kwargs)
+            JobApplicationFactory(
+                state=state,
+                job_seeker=job_seeker,
+                sender=job_seeker,
+                sent_by_job_seeker=True,
+                with_iae_eligibility_diagnosis=True,
+            )
 
         assert job_seeker.job_applications.count() == 6
 
@@ -2010,6 +2082,7 @@ class TestJobApplicationWorkflow:
         """
         today = timezone.localdate()
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             state=JobApplicationState.PROCESSING,
             hiring_start_at=today + relativedelta(days=2),
@@ -2073,7 +2146,11 @@ class TestJobApplicationWorkflow:
 
     def test_refuse(self, django_capture_on_commit_callbacks, mailoutbox):
         user = JobSeekerFactory()
-        kwargs = {"job_seeker": user, "sender": user, "sender_kind": SenderKind.JOB_SEEKER}
+        kwargs = {
+            "job_seeker": user,
+            "sender": user,
+            "sent_by_job_seeker": True,
+        }
 
         JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
         JobApplicationFactory(state=JobApplicationState.POSTPONED, **kwargs)
@@ -2090,7 +2167,7 @@ class TestJobApplicationWorkflow:
             assert "Candidature déclinée" in mailoutbox[0].subject
 
     def test_cancel_delete_linked_approval(self, *args, **kwargs):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         assert job_application.job_seeker.approvals.count() == 1
         assert JobApplication.objects.filter(approval=job_application.approval).count() == 1
 
@@ -2104,9 +2181,11 @@ class TestJobApplicationWorkflow:
 
     def test_cancel_do_not_delete_linked_approval(self, *args, **kwargs):
         # The approval is linked to two accepted job applications
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = job_application.approval
-        JobApplicationFactory(with_approval=True, approval=approval, job_seeker=job_application.job_seeker)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, approval=approval, job_seeker=job_application.job_seeker
+        )
 
         assert job_application.job_seeker.approvals.count() == 1
         assert JobApplication.objects.filter(approval=approval).count() == 2
@@ -2123,7 +2202,9 @@ class TestJobApplicationWorkflow:
         today = timezone.localdate()
 
         # Linked employee record with blocking status
-        job_application = JobApplicationFactory(with_approval=True, hiring_start_at=(today - relativedelta(days=365)))
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=(today - relativedelta(days=365))
+        )
         cancellation_user = job_application.to_company.active_members.first()
         EmployeeRecordTransitionLog.log_transition(
             transition=factory.fuzzy.FuzzyChoice(EmployeeRecordTransition.without_asp_exchange()),
@@ -2138,14 +2219,14 @@ class TestJobApplicationWorkflow:
 
         # Wrong state
         job_application = JobApplicationFactory(
-            with_approval=True, hiring_start_at=today, state=JobApplicationState.NEW
+            sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=today, state=JobApplicationState.NEW
         )
         cancellation_user = job_application.to_company.active_members.first()
         with pytest.raises(xwf_models.AbortTransition):
             job_application.cancel(user=cancellation_user)
 
     def test_cancel_delete_employee_record_that_were_not_sent(self, *args, **kwargs):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         EmployeeRecordTransitionLog.log_transition(
             transition=random.choice(list(EmployeeRecordTransition.without_asp_exchange())),
             from_state=random.choice(list(Status)),
@@ -2166,7 +2247,9 @@ class TestJobApplicationWorkflow:
     ],
 )
 def test_job_application_transitions(transition, from_state):
-    job_application = JobApplicationFactory(state=from_state, with_iae_eligibility_diagnosis=True)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, state=from_state, with_iae_eligibility_diagnosis=True
+    )
     user = job_application.to_company.members.first()
     kwargs = {"user": user}
     if transition.name in ["transfer", "external_transfer"]:
@@ -2197,7 +2280,10 @@ def test_job_application_transitions(transition, from_state):
 )
 def test_job_application_transition_unarchives(transition, from_state):
     job_application = JobApplicationFactory(
-        state=from_state, archived_at=timezone.now(), with_iae_eligibility_diagnosis=True
+        sent_by_prescriber_alone=True,
+        state=from_state,
+        archived_at=timezone.now(),
+        with_iae_eligibility_diagnosis=True,
     )
     user = job_application.to_company.members.first()
     kwargs = {"user": user}
@@ -2312,10 +2398,10 @@ class TestJobApplicationXlsxExport:
         job_seeker = JobSeekerFactory()
 
         job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             state=JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
             sender=job_seeker,
-            sender_kind=SenderKind.JOB_SEEKER,
             refusal_reason=RefusalReason.DID_NOT_COME,
             with_iae_eligibility_diagnosis=True,
         )
@@ -2369,10 +2455,10 @@ class TestJobApplicationXlsxExport:
         )
         approval = ApprovalFactory(start_at=start, user=job_seeker, eligibility_diagnosis=diag)
         JobApplicationFactory(
+            sent_by_employer=True,
             job_seeker=job_seeker,
             to_company=company,
             sender_company=company,
-            sender_kind=SenderKind.EMPLOYER,
             sender=employer,
             eligibility_diagnosis=diag,
             approval=approval,
@@ -2417,6 +2503,7 @@ class TestJobApplicationXlsxExport:
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory(title=Title.MME, first_name="Very Secret", last_name="Name")
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             selected_jobs=Appellation.objects.all(),
@@ -2724,7 +2811,7 @@ class TestJobApplicationAdminForm:
         assert form.is_valid()
 
     def test_application_on_non_job_seeker(self):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         job_application.job_seeker = PrescriberFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
@@ -2733,7 +2820,7 @@ class TestJobApplicationAdminForm:
         ]
 
     def test_application_bad_eligibility_diagnosis_job_seeker(self):
-        job_application = JobApplicationFactory(with_iae_eligibility_diagnosis=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_iae_eligibility_diagnosis=True)
         job_application.job_seeker = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()

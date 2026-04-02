@@ -12,7 +12,7 @@ from tests.job_applications.factories import JobApplicationFactory
 def test_purge_orphaned_support_remarks(caplog, wet_run):
     fake_content_type = ContentType.objects.create(app_label="non_existing_app", model="non_existing_model")
 
-    existing_application = JobApplicationFactory()
+    existing_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     existing_user = existing_application.sender
     user_content_type = ContentType.objects.get_for_model(existing_user.__class__)
     application_content_type = ContentType.objects.get_for_model(existing_application.__class__)

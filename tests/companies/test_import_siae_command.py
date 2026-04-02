@@ -322,12 +322,12 @@ class TestCouldSiaeBeDeleted:
         assert could_siae_be_deleted(company) is False
 
     def test_with_job_app(self):
-        company = JobApplicationFactory().to_company
+        company = JobApplicationFactory(sent_by_prescriber_alone=True).to_company
         assert could_siae_be_deleted(company) is False
 
     def test_transferred_job_apps(self):
         company = CompanyFactory()
-        JobApplicationFactory(transferred_from=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, transferred_from=company)
         assert could_siae_be_deleted(company) is False
 
     def test_sent_job_apps(self):
@@ -347,12 +347,14 @@ def test_cleanup_siaes_after_grace_period(capsys):
         subject_to_iae_rules=True, convention__is_active=False, convention__deactivated_at=old_enough
     )  # Deletable company
     undeletable_company = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company__kind=CompanyKind.EI,
         to_company__convention__is_active=False,
         to_company__convention__deactivated_at=old_enough,
         to_company__is_searchable=True,
     ).to_company
     not_searchable_undeletable_company = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company__subject_to_iae_rules=True,
         to_company__convention__is_active=False,
         to_company__convention__deactivated_at=old_enough,

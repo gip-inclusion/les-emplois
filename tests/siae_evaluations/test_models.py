@@ -81,6 +81,7 @@ class TestEvaluationCampaignMiscMethods:
         def create_job_apps(count):
             return JobApplicationFactory.create_batch(
                 count,
+                sent_by_prescriber_alone=True,
                 to_company=company,
                 job_seeker=job_seeker,
                 eligibility_diagnosis=eligibility_diagnosis,
@@ -396,10 +397,11 @@ class TestEvaluationCampaignManager:
             "eligibility_diagnosis": approval1.eligibility_diagnosis,
             "to_company": company,
             "approval": approval1,
+            "sent_by_prescriber_alone": True,
         }
-        JobApplicationFactory.create(**job_app_approval1_args, hiring_start_at=before_evaluated_period)
+        JobApplicationFactory(**job_app_approval1_args, hiring_start_at=before_evaluated_period)
         # Should be ignored, it did not create the approval.
-        JobApplicationFactory.create(
+        JobApplicationFactory(
             **job_app_approval1_args,
             hiring_start_at=datetime.date(2023, 5, 6),  # Within evaluated period.
         )
@@ -409,7 +411,8 @@ class TestEvaluationCampaignManager:
             with_diagnosis_from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
-        JobApplicationFactory.create(
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             job_seeker=approval2.user,
             eligibility_diagnosis=approval2.eligibility_diagnosis,

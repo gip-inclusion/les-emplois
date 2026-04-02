@@ -524,6 +524,7 @@ class TestStandaloneCreateAsPrescriber:
                     },
                 )
                 JobApplicationFactory(
+                    sent_by_prescriber_alone=True,
                     job_seeker=existing_job_seeker,
                     sender=user,
                     sender_prescriber_organization=None,
@@ -609,6 +610,7 @@ class TestStandaloneCreateAsPrescriber:
                     },
                 )
                 JobApplicationFactory(
+                    sent_by_prescriber_alone=True,
                     job_seeker=existing_job_seeker,
                     sender=user,
                     sender_prescriber_organization=None,

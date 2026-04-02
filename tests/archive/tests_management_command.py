@@ -131,7 +131,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
         JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now())
 
         # jobseeker_with_recent_job_application
-        JobApplicationFactory(job_seeker__joined_days_ago=DAYS_OF_INACTIVITY)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker__joined_days_ago=DAYS_OF_INACTIVITY)
 
         # jobseeker_with_recent_approval
         ApprovalFactory(user__joined_days_ago=DAYS_OF_INACTIVITY)
@@ -189,7 +189,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: JobApplicationFactory(
-                    job_seeker=jobseeker, created_at=timezone.now() - INACTIVITY_PERIOD
+                    sent_by_prescriber_alone=True, job_seeker=jobseeker, created_at=timezone.now() - INACTIVITY_PERIOD
                 ),
                 id="jobseeker_with_job_application_without_recent_activity",
             ),
@@ -354,10 +354,14 @@ class TestNotifyInactiveJobseekersManagementCommand:
         }
 
         # old job application without transition
-        old_job_application_without_log = JobApplicationFactory(**old_job_application_kwargs)
+        old_job_application_without_log = JobApplicationFactory(
+            sent_by_prescriber_alone=True, **old_job_application_kwargs
+        )
 
         # old job application with old transition
-        old_job_application_with_old_log = JobApplicationFactory(**old_job_application_kwargs)
+        old_job_application_with_old_log = JobApplicationFactory(
+            sent_by_prescriber_alone=True, **old_job_application_kwargs
+        )
         JobApplicationTransitionLog.objects.create(
             user=old_job_application_with_old_log.job_seeker,
             job_application=old_job_application_with_old_log,
@@ -366,7 +370,9 @@ class TestNotifyInactiveJobseekersManagementCommand:
         )
 
         # old job application with recent transition
-        old_job_application_with_recent_log = JobApplicationFactory(**old_job_application_kwargs)
+        old_job_application_with_recent_log = JobApplicationFactory(
+            sent_by_prescriber_alone=True, **old_job_application_kwargs
+        )
         JobApplicationTransitionLog.objects.create(
             user=old_job_application_with_recent_log.job_seeker,
             job_application=old_job_application_with_recent_log,
@@ -375,7 +381,9 @@ class TestNotifyInactiveJobseekersManagementCommand:
         )
 
         # old job application with one old and one recent transitions
-        old_job_application_with_multiple_logs = JobApplicationFactory(**old_job_application_kwargs)
+        old_job_application_with_multiple_logs = JobApplicationFactory(
+            sent_by_prescriber_alone=True, **old_job_application_kwargs
+        )
         JobApplicationTransitionLog.objects.create(
             user=old_job_application_with_multiple_logs.job_seeker,
             job_application=old_job_application_with_multiple_logs,
@@ -391,10 +399,14 @@ class TestNotifyInactiveJobseekersManagementCommand:
         )
 
         # recent job application without transition
-        recent_job_application_without_log = JobApplicationFactory(**recent_job_application_kwargs)
+        recent_job_application_without_log = JobApplicationFactory(
+            sent_by_prescriber_alone=True, **recent_job_application_kwargs
+        )
 
         # recent job application with recent transition
-        recent_job_application_with_recent_log = JobApplicationFactory(**recent_job_application_kwargs)
+        recent_job_application_with_recent_log = JobApplicationFactory(
+            sent_by_prescriber_alone=True, **recent_job_application_kwargs
+        )
         JobApplicationTransitionLog.objects.create(
             user=recent_job_application_with_recent_log.job_seeker,
             job_application=recent_job_application_with_recent_log,
@@ -438,7 +450,10 @@ class TestAnonymizeJobseekersManagementCommand:
 
     def test_dry_run(self, respx_mock):
         job_application = JobApplicationFactory(
-            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=30, with_approval=True
+            sent_by_prescriber_alone=True,
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
+            job_seeker__notified_days_ago=30,
+            with_approval=True,
         )
         call_command("anonymize_jobseekers")
 
@@ -494,13 +509,16 @@ class TestAnonymizeJobseekersManagementCommand:
         )
 
         recent_job_application_of_inactive_jobseeker = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=1,
             job_seeker__is_active=False,
         )
 
         recent_job_application_of_notified_jobseeker = JobApplicationFactory(
-            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1
+            sent_by_prescriber_alone=True,
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
+            job_seeker__notified_days_ago=1,
         )
 
         recent_approval_of_notified_jobseeker = ApprovalFactory(
@@ -643,12 +661,13 @@ class TestAnonymizeJobseekersManagementCommand:
     def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, respx_mock):
         resume_file = FileFactory()
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__notified_days_ago=31,
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             created_at=timezone.now() - INACTIVITY_PERIOD,
             resume=resume_file,
         )
-        other_files = [FileFactory(), JobApplicationFactory().resume]
+        other_files = [FileFactory(), JobApplicationFactory(sent_by_prescriber_alone=True).resume]
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
@@ -997,6 +1016,7 @@ class TestAnonymizeJobseekersManagementCommand:
             )
         for state in [JobApplicationState.ACCEPTED, JobApplicationState.NEW]:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker=approval_with_lot_of_datas.user,
                 approval=approval_with_lot_of_datas,
                 eligibility_diagnosis=approval_with_lot_of_datas.eligibility_diagnosis,
@@ -1065,6 +1085,7 @@ class TestAnonymizeJobseekersManagementCommand:
         ).update(certification_period=InclusiveDateRange(timezone.localdate()))
 
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=iae_diagnosis_from_employer_with_approval.job_seeker,
             eligibility_diagnosis=iae_diagnosis_from_employer_with_approval,
             created_at=timezone.make_aware(datetime.datetime(2021, 5, 17)),
@@ -1085,6 +1106,7 @@ class TestAnonymizeJobseekersManagementCommand:
         )
         for state in [JobApplicationState.ACCEPTED, JobApplicationState.POSTPONED]:
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 job_seeker=iae_diagnosis_from_prescriber_with_several_job_applications.job_seeker,
                 to_company__subject_to_iae_rules=True,
                 eligibility_diagnosis=iae_diagnosis_from_prescriber_with_several_job_applications,
@@ -1162,6 +1184,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
     def test_anonymized_at_is_the_first_day_of_the_month(self):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=30,
             created_at=timezone.now() - INACTIVITY_PERIOD,
@@ -1461,7 +1484,7 @@ class TestAnonymizeProfessionalManagementCommand:
             professional = org.user
 
             if has_related_objects:
-                JobApplicationFactory(sender=professional)
+                JobApplicationFactory(sent_by_prescriber_alone=True, sender=professional)
             return professional
 
         anonymized_employer = _create_professional(CompanyMembershipFactory, True, None)
@@ -1519,6 +1542,7 @@ class TestAnonymizeProfessionalManagementCommand:
         prescriber = membership.user
         # The related object prevents deletion.
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender=prescriber,
             with_iae_eligibility_diagnosis=True,
         )

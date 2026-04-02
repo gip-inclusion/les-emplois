@@ -164,8 +164,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2))
     resume = factory.SubFactory(FileFactory)
-    sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
-    sender = factory.SubFactory(PrescriberFactory)
+    sender_kind = None  # Force all calls to use a sent_by_xxx trait as the db doesn't allow null values
     processed_at = factory.LazyAttribute(
         lambda o: (
             datetime.now(UTC)
@@ -183,7 +182,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         Usage:
             appellation1 = Appellation.objects.filter(code='10933')
             appellation2 = Appellation.objects.filter(code='10934')
-            JobApplicationFactory(selected_jobs=(appellation1, appellation2))
+            JobApplicationFactory(sent_by_prescriber_alone=True,selected_jobs=(appellation1, appellation2))
         """
         if not create:
             # Simple build, do nothing.

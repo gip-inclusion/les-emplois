@@ -19,7 +19,6 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.job_applications.enums import SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.utils.templatetags.format_filters import format_approval_number
@@ -571,10 +570,10 @@ class TestSiaeJobApplicationListView:
             criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
+            sent_by_employer=True,
             with_approval=True,
             to_company=self.siae,
             sender_company=self.siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
             for_snapshot=True,
@@ -653,11 +652,11 @@ class TestSiaeJobApplicationListView:
             administrative_criteria=[rsa],
         )
         job_application = JobApplicationFactory(
+            sent_by_employer=True,
             with_approval=True,
             job_seeker=job_seeker,
             to_company=self.siae,
             sender_company=self.siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
@@ -936,11 +935,11 @@ class TestSiaeSelectCriteriaView:
             administrative_criteria=[administrative_criteria],
         )
         job_application = JobApplicationFactory(
+            sent_by_employer=True,
             job_seeker=job_seeker,
             with_approval=True,
             to_company=self.siae,
             sender_company=self.siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
@@ -1151,19 +1150,18 @@ class TestSiaeUploadDocsView:
             administrative_criteria=[administrative_criteria],
         )
         job_application = JobApplicationFactory(
+            sent_by_employer=True,
             job_seeker=job_seeker,
             with_approval=True,
             to_company=self.siae,
             sender_company=self.siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
         evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now())
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(
-            job_application=job_application,
-            evaluated_siae=evaluated_siae,
+            job_application=job_application, evaluated_siae=evaluated_siae
         )
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
@@ -1263,7 +1261,7 @@ class TestSiaeSubmitProofsView:
             submitted_at=None,
         )
         submitted_job_application = EvaluatedJobApplicationFactory(
-            job_application=JobApplicationFactory(to_company=self.company),
+            job_application=JobApplicationFactory(sent_by_prescriber_alone=True, to_company=self.company),
             evaluated_siae=not_yet_submitted_job_application.evaluated_siae,
         )
         EvaluatedAdministrativeCriteriaFactory(
@@ -1439,10 +1437,10 @@ class TestSiaeEvaluatedSiaeDetailView:
             criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
+            sent_by_employer=True,
             with_approval=True,
             to_company=siae,
             sender_company=siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
@@ -1451,8 +1449,7 @@ class TestSiaeEvaluatedSiaeDetailView:
         evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=campaign_start, ended_at=now)
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(
-            job_application=certified_job_app,
-            evaluated_siae=evaluated_siae,
+            job_application=certified_job_app, evaluated_siae=evaluated_siae
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application,
@@ -1547,10 +1544,10 @@ class TestSiaeEvaluatedJobApplicationView:
             criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
+            sent_by_employer=True,
             with_approval=True,
             to_company=siae,
             sender_company=siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
@@ -1559,8 +1556,7 @@ class TestSiaeEvaluatedJobApplicationView:
         evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=campaign_start, ended_at=now)
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(
-            job_application=certified_job_app,
-            evaluated_siae=evaluated_siae,
+            job_application=certified_job_app, evaluated_siae=evaluated_siae
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application,
