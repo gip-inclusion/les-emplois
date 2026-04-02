@@ -26,11 +26,14 @@ from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
 DEFAULT_PASSWORD = "$up3rP4ssw0rd!*****"
+HASHED_DEFAULT_PASSWORD = make_password(DEFAULT_PASSWORD)
+UNUSABLE_PASSWORD = make_password(None)
 
 
-@functools.cache
-def default_password():
-    return make_password(DEFAULT_PASSWORD)
+def default_password(obj):
+    if obj.identity_provider == IdentityProvider.DJANGO:
+        return HASHED_DEFAULT_PASSWORD
+    return UNUSABLE_PASSWORD
 
 
 def _verify_emails_for_user(self, create, extracted, **kwargs):
@@ -59,6 +62,9 @@ class UserFactory(factory.django.DjangoModelFactory):
             is_active=True,
             emails=factory.PostGeneration(_verify_emails_for_user),
         )
+        with_password = factory.Trait(
+            password=factory.LazyFunction(lambda: HASHED_DEFAULT_PASSWORD),
+        )
         for_snapshot = factory.Trait(
             first_name="John",
             last_name="Doe",
@@ -71,7 +77,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.Sequence("email{}@domain.com".format)
-    password = factory.LazyFunction(default_password)
+    identity_provider = IdentityProvider.DJANGO
+    password = factory.LazyAttribute(default_password)
     phone = factory.Faker("phone_number", locale="fr_FR")
 
     @factory.post_generation

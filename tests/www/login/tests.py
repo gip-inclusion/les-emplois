@@ -114,7 +114,7 @@ class TestPrescriberLogin:
         assertRedirects(response, reverse("account_email_verification_sent"))
 
     def test_login_using_django_with_sso_provider(self, client, pro_connect, settings):
-        user = PrescriberFactory()
+        user = PrescriberFactory(with_password=True)
         url = reverse("login:prescriber")
         response = client.get(url)
         assert response.status_code == 200
@@ -188,7 +188,7 @@ class TestEmployerLogin:
         assertRedirects(response, reverse("account_email_verification_sent"))
 
     def test_login_using_django_with_sso_provider(self, client, pro_connect, settings):
-        user = EmployerFactory()
+        user = EmployerFactory(with_password=True)
         url = reverse("login:employer")
         response = client.get(url)
         assert response.status_code == 200
@@ -411,7 +411,7 @@ class TestExistingUserLogin:
     def test_login_email_prefilled(self, client, snapshot):
         # Login is not pre-filled just by visiting the page.
         # The user must prove they know this information
-        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO, for_snapshot=True)
+        user = JobSeekerFactory(for_snapshot=True)
         url = reverse("login:existing_user", args=(user.public_id,))
         response = client.get(url)
         assert response.status_code == 200

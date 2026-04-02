@@ -228,7 +228,6 @@ class TestFranceConnect:
         JobSeekerFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
-            identity_provider=IdentityProvider.DJANGO,
             email="random@email.com",
         )
         with pytest.raises(ValidationError):

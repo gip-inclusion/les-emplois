@@ -5,7 +5,7 @@ from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
 
 
 def test_token_auth_with_login_password(client):
-    user = EmployerFactory()
+    user = EmployerFactory(with_password=True)
     assert Token.objects.count() == 0
 
     url = reverse("v1:token-auth")

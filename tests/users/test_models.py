@@ -409,9 +409,6 @@ class TestModel:
         user = JobSeekerFactory()
         assert not user.has_sso_provider
 
-        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO)
-        assert not user.has_sso_provider
-
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         assert user.has_sso_provider
 
