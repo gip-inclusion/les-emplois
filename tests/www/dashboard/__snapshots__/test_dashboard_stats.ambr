@@ -2146,26 +2146,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -2174,14 +2176,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -2205,26 +2205,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -2233,14 +2235,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -2264,7 +2264,7 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
@@ -2274,7 +2274,7 @@
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/convergence/prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Prescriptions et parcours
@@ -2283,7 +2283,7 @@
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/convergence/job_application">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Traitement et résultats des candidatures émises
@@ -2295,7 +2295,7 @@
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -2304,14 +2304,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -2335,26 +2333,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -2363,14 +2363,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -2504,7 +2502,7 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
@@ -2514,7 +2512,7 @@
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/ddets_log/state">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Prescriptions des acteurs AHI de ma région
@@ -2526,7 +2524,7 @@
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -2535,14 +2533,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -2566,26 +2562,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -2594,14 +2592,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -3061,7 +3057,7 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
@@ -3071,7 +3067,7 @@
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/dihal/state">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Prescriptions des acteurs AHI
@@ -3083,7 +3079,7 @@
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -3092,14 +3088,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -3123,26 +3117,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -3151,14 +3147,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -3292,7 +3286,7 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
@@ -3302,7 +3296,7 @@
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/drihl/state">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Prescriptions des acteurs AHI de ma région
@@ -3314,7 +3308,7 @@
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -3323,14 +3317,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -3354,26 +3346,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -3382,14 +3376,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -3413,7 +3405,7 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
@@ -3423,7 +3415,7 @@
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/iae_network/hiring">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Traitement et résultats des candidatures orientées par mes adhérents
@@ -3435,7 +3427,7 @@
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -3444,14 +3436,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>
@@ -3475,26 +3465,28 @@
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données personnalisées
                               </span>
                           </div>
                           <div class="px-3 px-lg-4">
-                              <p>
-                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
-                      Faites-nous part de vos besoins éventuels en nous contactant
-                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
-                                      ici
-                                  </a>
-                                  .
-                              </p>
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="mb-3">
+                                      Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels
+                                      <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                          en nous contactant
+                                      </a>
+                                      .
+                                  </li>
+                              </ul>
                           </div>
                       </div>
                   </div>
                   <div class="col mb-3 mb-md-4">
-                      <div class="c-box p-0 h-100">
+                      <div class="c-box c-box--dashboard p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
                                   Données publiques
@@ -3503,14 +3495,12 @@
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Accéder aux tableaux de bord publics
                                           </span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                          </i>
                                       </a>
                                   </li>
                               </ul>

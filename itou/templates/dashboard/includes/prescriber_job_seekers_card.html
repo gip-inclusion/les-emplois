@@ -1,39 +1,43 @@
+{% load components %}
 {% load enums %}
 {% load matomo %}
 {% load str_filters %}
 
 {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
+
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4 d-flex">
-            <span class="h4 mb-0">Candidats</span>
-        </div>
-        <div class="px-3 px-lg-4">
+    {% component_box_dashboard title=title cta=cta list=list extra_boxes=extra_boxes %}
+        {% fragment as title %}
+            Candidats
+        {% endfragment %}
+        {% fragment as cta %}
             <a href="{% url 'job_seekers_views:list' %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
                 <i class="ri-user-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>Liste de mes candidats</span>
             </a>
-            <ul class="list-unstyled mb-lg-5">
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'approvals:prolongation_requests_list' %}?only_pending=on" class="btn-link btn-ico">
-                        <i class="ri-list-check-3 ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Gérer mes prolongations de PASS IAE</span>
-                    </a>
-                    {% if pending_prolongation_requests %}
-                        <span class="badge rounded-pill badge-xs bg-info-lighter text-info">{{ pending_prolongation_requests }}</span>
-                    {% endif %}
-                </li>
-                {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico has-external-link">
-                            <i class="ri-pause-circle-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Suspendre un PASS IAE</span>
-                        </a>
-                    </li>
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'approvals:prolongation_requests_list' %}?only_pending=on" class="btn-link btn-ico">
+                    <i class="ri-list-check-3 ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Gérer mes prolongations de PASS IAE</span>
+                </a>
+                {% if pending_prolongation_requests %}
+                    <span class="badge rounded-pill badge-xs bg-info-lighter text-info">{{ pending_prolongation_requests }}</span>
                 {% endif %}
-            </ul>
-            {% if stalled_job_seekers_count %}
-                <div class="c-box bg-warning-lightest border-warning mt-lg-n3 mb-3 mb-lg-5">
+            </li>
+            {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico has-external-link">
+                        <i class="ri-pause-circle-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Suspendre un PASS IAE</span>
+                    </a>
+                </li>
+            {% endif %}
+        {% endfragment %}
+        {% if stalled_job_seekers_count %}
+            {% fragment as extra_boxes %}
+                <div class="c-box bg-warning-lightest border-warning">
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="{% url "job_seekers_views:list" %}?is_stalled=on" class="text-warning fw-bold text-decoration-none btn-ico" {% matomo_event "dashboard" "clic" "candidats-sans-solution" %}>
                             <i class="ri-user-forbid-line fw-normal" aria-hidden="true"></i>
@@ -42,7 +46,10 @@
                         <span class="badge rounded-pill badge-xs bg-warning-light text-warning">{{ stalled_job_seekers_count }}</span>
                     </div>
                 </div>
-            {% endif %}
-        </div>
-    </div>
+            {% endfragment %}
+        {% else %}
+            {% fragment as extra_boxes %}
+            {% endfragment %}
+        {% endif %}
+    {% endcomponent_box_dashboard %}
 </div>
