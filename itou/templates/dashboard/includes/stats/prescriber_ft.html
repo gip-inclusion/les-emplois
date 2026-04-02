@@ -1,14 +1,16 @@
-<section class="s-section mb-3 mb-lg-5">
+{% load components %}
+
+<section class="s-section mb-3 mb-md-4">
     <div class="s-section__container">
-        <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
-            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+        <div class="row row-cols-1 row-cols-md-2">
+            <div class="col mb-3 mb-md-4">
                 <h3>Mes données</h3>
-                <div class="c-box p-0 flex-grow-1">
-                    <div class="p-3 p-lg-4">
-                        <h4 class="mb-0">Recrutement</h4>
-                    </div>
-                    <div class="px-3 px-lg-4">
-                        <ul class="list-unstyled mb-lg-5">
+                <div class="d-flex flex-column row-gap-3 row-gap-md-4">
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Recrutement
+                        {% endfragment %}
+                        {% fragment as list %}
                             <li class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="{% url "stats:stats_ft_state_main" %}" class="btn-link btn-ico">
                                     <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
@@ -27,23 +29,21 @@
                                     <span>Analyse de l'ensemble des candidatures reçues par les SIAE</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
-                    <div class="p-3 p-lg-4">
-                        <h4 class="mb-0">Parcours en IAE</h4>
-                    </div>
-                    <div class="px-3 px-lg-4">
-                        <ul class="list-unstyled mb-lg-5">
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Parcours en IAE
+                        {% endfragment %}
+                        {% fragment as list %}
                             <li class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="{% url "stats:stats_ft_beneficiaries" %}" class="btn-link btn-ico">
                                     <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
                                     <span>Suivi des bénéficiaires, taux d’encadrement et présence en emploi</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
                 </div>
             </div>
             {% include 'dashboard/includes/stats/_prescriber_public_links.html' %}
