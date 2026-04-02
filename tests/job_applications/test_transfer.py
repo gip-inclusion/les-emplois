@@ -55,8 +55,8 @@ def test_can_be_transferred():
 
     job_application = JobApplicationFactory(to_company=origin_company, state=JobApplicationState.ACCEPTED)
 
-    assert origin_user.kind == UserKind.EMPLOYER
-    assert target_user.kind == UserKind.EMPLOYER
+    assert origin_user.kind in UserKind.professionals()
+    assert target_user.kind in UserKind.professionals()
     assert not job_application.can_be_transferred(target_user, job_application.to_company)
     assert not job_application.can_be_transferred(lambda_user, target_company)
     assert not job_application.can_be_transferred(target_user, target_company)
