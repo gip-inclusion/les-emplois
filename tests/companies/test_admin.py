@@ -330,7 +330,7 @@ class TestTransferCompanyData:
 
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data(self, admin_client, snapshot, caplog):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
 
         from_company = job_application.to_company
         to_company = CompanyFactory()
@@ -384,7 +384,7 @@ class TestTransferCompanyData:
 
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data_is_searchable_and_disable_from_company(self, admin_client, snapshot):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
 
         from_company = job_application.to_company
         assert from_company.is_searchable

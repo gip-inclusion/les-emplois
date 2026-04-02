@@ -28,6 +28,7 @@ class TestApprovalSuspendView:
         today = timezone.localdate()
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             hiring_start_at=today - relativedelta(days=1),
         )
@@ -94,6 +95,7 @@ class TestApprovalSuspendView:
         today = timezone.localdate()
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             hiring_start_at=today - relativedelta(days=1),
         )
@@ -130,6 +132,7 @@ class TestApprovalSuspendView:
         start_at = today + relativedelta(days=1)
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             hiring_start_at=today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1),
         )
@@ -153,6 +156,7 @@ class TestApprovalSuspendView:
         today = timezone.localdate()
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
@@ -213,6 +217,7 @@ class TestApprovalSuspendView:
         today = timezone.localdate()
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
@@ -272,6 +277,7 @@ class TestApprovalSuspendActionChoiceView:
     def setup_method(self):
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
@@ -374,6 +380,7 @@ class TestApprovalSuspendUpdateEndDateView:
     def setup_method(self):
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=20),

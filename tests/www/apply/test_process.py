@@ -27,7 +27,7 @@ from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteri
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.prescribers.enums import PrescriberAuthorizationStatus
@@ -371,6 +371,7 @@ class TestProcessViews:
         )
         eligibility_diagnosis = selected_criteria.eligibility_diagnosis
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=company,
             job_seeker=job_seeker,
             hiring_start_at=today,
@@ -398,6 +399,7 @@ class TestProcessViews:
 
     def test_details_archived(self, client):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             archived_at=datetime.datetime(2024, 9, 2, 11, 11, 11, tzinfo=timezone.get_current_timezone()),
         )
         to_company = job_application.to_company
@@ -653,7 +655,7 @@ class TestProcessViews:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         job_application = JobApplicationFactory(
-            sender_kind=SenderKind.EMPLOYER,
+            sent_by_employer=True,
             sender=employer,
             sender_company=company,
         )
@@ -667,12 +669,12 @@ class TestProcessViews:
         """As an unauthorized prescriber I cannot access personal information of arbitrary job seekers"""
         prescriber = PrescriberFactory(phone="0612345678", email="prescriber@mailinator.com")
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Supersecretname",
             job_seeker__last_name="Unknown",
             job_seeker__jobseeker_profile__nir="11111111111111",
             job_seeker__post_code="59140",
             sender=prescriber,
-            sender_kind=job_applications_enums.SenderKind.PRESCRIBER,
         )
         client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
@@ -691,7 +693,9 @@ class TestProcessViews:
         """As a job seeker, I can access the job_applications details for job seekers."""
         job_seeker = JobSeekerFactory()
 
-        job_application = JobApplicationFactory(job_seeker=job_seeker, with_iae_eligibility_diagnosis=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=job_seeker, with_iae_eligibility_diagnosis=True
+        )
         job_application.process()
 
         client.force_login(job_seeker)
@@ -740,7 +744,7 @@ class TestProcessViews:
         assertContains(response, SENDER_LEFT_ORG_ALERT)
 
     def test_details_for_job_seeker_as_other_user(self, client, subtests):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
 
         for user in [
@@ -1089,7 +1093,7 @@ class TestProcessViews:
     def test_refuse_session_prefix(self, client):
         """Ensure that each refusal session is isolated from each other."""
 
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -1127,7 +1131,7 @@ class TestProcessViews:
         assert client.session[refuse_session_name] == expected_session
 
         # Check that the user can start and other refusal wizard/session
-        job_application_2 = JobApplicationFactory(to_company=job_application.to_company)
+        job_application_2 = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=job_application.to_company)
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application_2.pk})
         response = client.get(url)
 
@@ -1455,7 +1459,9 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
+        extra_kwargs = (
+            {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
+        )
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
@@ -1492,9 +1498,9 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             to_company=company,
-            sender_kind=SenderKind.JOB_SEEKER,
             sender=job_seeker,
             state=initial_state,
         )
@@ -1562,7 +1568,9 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         # Unauthorized prescriber is the default sender
-        extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
+        extra_kwargs = (
+            {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
+        )
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
@@ -1600,9 +1608,9 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         job_application = JobApplicationFactory(
+            sent_by_job_seeker=True,
             job_seeker=job_seeker,
             to_company=company,
-            sender_kind=SenderKind.JOB_SEEKER,
             sender=job_seeker,
             state=initial_state,
         )
@@ -1667,7 +1675,9 @@ class TestProcessViews:
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         job_application = JobApplicationFactory(
-            sent_by_job_seeker=True, to_company=company, job_seeker=JobSeekerFactory(with_address=True)
+            sent_by_job_seeker=True,
+            to_company=company,
+            job_seeker=JobSeekerFactory(with_address=True),
         )
 
         # Right states
@@ -1701,7 +1711,9 @@ class TestProcessViews:
     )
     def test_cancel(self, client, eligibility_trait, expected_msg):
         # Hiring date is today: cancellation should be possible.
-        job_application = JobApplicationFactory(with_approval=True, **{f"to_company__{eligibility_trait}": True})
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, **{f"to_company__{eligibility_trait}": True}
+        )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
         detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -1725,7 +1737,9 @@ class TestProcessViews:
 
     def test_cancel_old_job_application(self, client):
         job_application = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED, created_at=timezone.now() - datetime.timedelta(365 * 2)
+            sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
+            created_at=timezone.now() - datetime.timedelta(365 * 2),
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -1743,7 +1757,9 @@ class TestProcessViews:
         assertMessages(response, [messages.Message(messages.SUCCESS, "L'embauche a bien été annulée.")])
 
     def test_cancel_clean_back_url(self, client):
-        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, to_company__subject_to_iae_rules=True
+        )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -1767,6 +1783,7 @@ class TestProcessViews:
 
     def test_cannot_cancel(self, client):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             hiring_start_at=timezone.localdate() + relativedelta(days=1),
         )
@@ -1796,7 +1813,7 @@ class TestProcessViews:
         assertMessages(response, [messages.Message(messages.ERROR, "Vous ne pouvez pas annuler cette embauche.")])
 
     def test_diagoriente_section_as_job_seeker(self, client):
-        job_application = JobApplicationFactory(with_approval=True, resume=None)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, resume=None)
 
         client.force_login(job_application.job_seeker)
         response = client.get(
@@ -1852,9 +1869,7 @@ class TestProcessViews:
         assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
 
     def test_diagoriente_section_as_employee_for_prescriber(self, client):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber=True,
-        )
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
         company = job_application.to_company
         employee = company.members.first()
         client.force_login(employee)
@@ -1876,6 +1891,7 @@ class TestProcessViews:
 
     def test_diagoriente_section_as_employee_for_job_seeker(self, client):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             sender=factory.SelfAttribute(".job_seeker"),
         )
@@ -1899,7 +1915,7 @@ class TestProcessViews:
         assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
 
     def test_diagoriente_invite_as_job_seeker(self, client, mailoutbox):
-        job_application = JobApplicationFactory(with_approval=True, resume=None)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, resume=None)
 
         client.force_login(job_application.job_seeker)
         response = client.post(
@@ -2002,7 +2018,7 @@ class TestProcessViews:
             assert len(mailoutbox) == 1
 
     def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self, client, mailoutbox):
-        job_application = JobApplicationFactory(resume=None)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, resume=None)
         company = job_application.to_company
         employee = company.members.first()
         client.force_login(employee)
@@ -2043,6 +2059,7 @@ class TestProcessViews:
 
     def test_diagoriente_invite_as_employee_for_job_seeker(self, client, mailoutbox):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             resume=None,
             sender=factory.SelfAttribute(".job_seeker"),
@@ -2166,7 +2183,9 @@ class TestProcessViews:
             membership__organization__name="Les Olivades",
             membership__organization__authorized=True,
         )
-        job_application = JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=job_seeker, sender=prescriber
+        )
         membership = FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary=job_seeker,
             member=prescriber,
@@ -2221,7 +2240,9 @@ class TestProcessViews:
             membership__organization__name="Les Olivades",
             membership__organization__authorized=True,
         )
-        job_application = JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker=job_seeker, sender=prescriber
+        )
         membership = FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary=job_seeker,
             member=prescriber,
@@ -2265,7 +2286,9 @@ class TestProcessTemplates:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_application = JobApplicationFactory(to_company__subject_to_iae_rules=True)
+        self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company__subject_to_iae_rules=True
+        )
         self.employer = self.job_application.to_company.members.first()
         self.url_details = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 
@@ -2530,6 +2553,7 @@ def test_details_sender_email_display_for_job_seeker(client):
 
 def test_accept_button(client):
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
     )
     accept_url = reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk})
@@ -2550,6 +2574,7 @@ def test_accept_button(client):
 @freeze_time("2023-12-12 13:37:00", tz_offset=-1)
 def test_add_prior_action(client, snapshot):
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -2590,7 +2615,9 @@ def test_add_prior_action(client, snapshot):
 
     # State is processing but company is not a GEIQ
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.AI, state=job_applications_enums.JobApplicationState.PROCESSING
+        sent_by_prescriber_alone=True,
+        to_company__kind=CompanyKind.AI,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
     )
     client.force_login(job_application.to_company.members.first())
     response = add_prior_action()
@@ -2600,7 +2627,9 @@ def test_add_prior_action(client, snapshot):
 
 def test_modify_prior_action(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.POSTPONED
+        sent_by_prescriber_alone=True,
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.POSTPONED,
     )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
@@ -2644,7 +2673,9 @@ def test_modify_prior_action(client):
 
 def test_delete_prior_action_accepted(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.ACCEPTED
+        sent_by_prescriber_alone=True,
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.ACCEPTED,
     )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
@@ -2664,6 +2695,7 @@ def test_delete_prior_action_accepted(client):
 @freeze_time("2023-12-12 13:37:00", tz_offset=-1)
 def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -2736,7 +2768,9 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
 
 def test_htmx_add_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
+        sent_by_prescriber_alone=True,
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
     )
     client.force_login(job_application.to_company.members.first())
     details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -2766,7 +2800,9 @@ def test_htmx_add_prior_action_and_cancel(client):
 
 def test_htmx_modify_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
+        sent_by_prescriber_alone=True,
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
     )
     prior_action = PriorActionFactory(job_application=job_application)
     client.force_login(job_application.to_company.members.first())
@@ -2796,6 +2832,7 @@ def test_htmx_modify_prior_action_and_cancel(client):
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
 def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company__kind=CompanyKind.GEIQ,
         to_company__not_in_territorial_experimentation=True,
     )
@@ -2916,7 +2953,9 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
 def test_prescriber_details_with_older_valid_approval(client, faker):
     # Ensure that the approval details are displayed for a prescriber
     # when the job seeker has a valid approval created on an older approval
-    old_job_application = JobApplicationFactory(with_approval=True, hiring_start_at=faker.past_date(start_date="-3m"))
+    old_job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=faker.past_date(start_date="-3m")
+    )
     new_job_application = JobApplicationFactory(
         sent_by_prescriber=True,
         job_seeker=old_job_application.job_seeker,
@@ -2937,6 +2976,7 @@ def test_prescriber_details_with_older_valid_approval(client, faker):
 def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contract, expected_predicate):
     # GEIQ: check that contract type is displayed in details
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=job_applications_enums.JobApplicationState.ACCEPTED,
         to_company__kind=CompanyKind.GEIQ,
         contract_type=ContractType.PROFESSIONAL_TRAINING,
@@ -2958,7 +2998,9 @@ class TestJobApplicationSenderLeftOrg:
     def test_sender_left_org_prescriber(self):
         prescriber_membership = PrescriberMembershipFactory()
         job_app = JobApplicationFactory(
-            sender=prescriber_membership.user, sender_prescriber_organization=prescriber_membership.organization
+            sent_by_prescriber=True,
+            sender=prescriber_membership.user,
+            sender_prescriber_organization=prescriber_membership.organization,
         )
         assert job_application_sender_left_org(job_app) is False
 

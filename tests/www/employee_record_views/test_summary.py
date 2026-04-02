@@ -36,6 +36,7 @@ class TestSummaryEmployeeRecords:
         )
         self.user = self.company.members.get(first_name="Billy")
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_employee_record=True,
             to_company=self.company,
             job_seeker__first_name="Lauren",

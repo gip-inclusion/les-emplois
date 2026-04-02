@@ -274,7 +274,7 @@ class TestRdvInsertionView:
     def test_rdv_insertion_configured_invalid_job_application(self, client, snapshot):
         self.job_application.to_company.rdv_solidarites_id = None
         self.job_application.to_company.save()
-        other_job_application = JobApplicationFactory()
+        other_job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
 
         client.force_login(self.job_application.to_company.members.get())
         response = client.post(

@@ -19,7 +19,7 @@ from tests.users.factories import JobSeekerFactory
 class TestAcceptForm:
     def test_accept_form_without_geiq(self):
         # Job application accept form for a "standard" SIAE
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.EI)
         form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
 
         assert sorted(form.fields.keys()) == [
@@ -50,13 +50,13 @@ class TestAcceptForm:
             "qualification_type",
         ]
         # Job application accept form for a GEIQ: more fields
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
         form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
 
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
         # Dynamic contract type details field
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
             job_seeker=job_application.job_seeker,
@@ -67,7 +67,7 @@ class TestAcceptForm:
     def test_accept_form_geiq_required_fields_validation(self, faker):
         [city] = create_test_cities(["54"], num_per_department=1)
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
         job_description = JobDescriptionFactory(company=job_application.to_company, location=None)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
         form = apply_forms.AcceptForm(
@@ -127,7 +127,7 @@ class TestAcceptForm:
 
     def test_accept_form_geiq_contract_type_field_validation(self, faker):
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
         job_description = JobDescriptionFactory(company=job_application.to_company)
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
@@ -215,6 +215,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         create_test_cities(["54", "57"], num_per_department=2)
 
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
             job_seeker__with_address=True,
@@ -279,6 +280,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
     def test_geiq_inverted_vae_fields(self, client, faker):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
             job_seeker__with_address=True,
@@ -340,6 +342,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
 
         # with a SIAE
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__kind=CompanyKind.EI,
             state="processing",
             # Make sure all mandatory infos are present to skip the job seeker info step
@@ -376,6 +379,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
 
         # with a GEIQ
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
             # Make sure all mandatory infos are present to skip the job seeker info step
@@ -421,6 +425,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
     def test_specific_iae_mentions_in_accept_form(self, client):
         def _response(kind):
             job_application = JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 to_company__kind=kind,
                 state="processing",
                 # Make sure all mandatory infos are present to skip the job seeker info step
@@ -455,7 +460,7 @@ class TestJobApplicationRefusalReasonForm:
     @pytest.mark.parametrize(
         "factory_kwargs,expected_reason_label",
         [
-            ({}, "Choisir le motif de refus envoyé à l’orienteur"),
+            ({"sent_by_prescriber_alone": True}, "Choisir le motif de refus envoyé à l’orienteur"),
             ({"sent_by_authorized_prescriber": True}, "Choisir le motif de refus envoyé au prescripteur"),
             ({"sent_by_another_employer": True}, "Choisir le motif de refus"),
         ],
@@ -472,7 +477,7 @@ class TestJobApplicationRefusalReasonForm:
     def test_labels_mutiple_apps(self):
         # Orienter only
         company = CompanyFactory()
-        orienter_apps = JobApplicationFactory.create_batch(2, to_company=company)
+        orienter_apps = JobApplicationFactory.create_batch(2, sent_by_prescriber_alone=True, to_company=company)
         form = apply_forms.JobApplicationRefusalReasonForm(orienter_apps)
         assert (
             form.fields["refusal_reason_shared_with_job_seeker"].label
@@ -482,7 +487,10 @@ class TestJobApplicationRefusalReasonForm:
 
         # Prescriber only
         prescriber_apps_with_same_job_seeker = JobApplicationFactory.create_batch(
-            2, job_seeker=JobSeekerFactory(), to_company=company, sent_by_authorized_prescriber=True
+            2,
+            job_seeker=JobSeekerFactory(),
+            to_company=company,
+            sent_by_authorized_prescriber=True,
         )
         form = apply_forms.JobApplicationRefusalReasonForm(prescriber_apps_with_same_job_seeker)
         assert (
@@ -502,9 +510,9 @@ class TestJobApplicationRefusalReasonForm:
 
 class TestJobApplicationRefusalJobSeekerAnswerForm:
     def test_labels(self):
-        job_app = JobApplicationFactory()
-        other_app = JobApplicationFactory()
-        same_job_seeker_app = JobApplicationFactory(job_seeker=job_app.job_seeker)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True)
+        other_app = JobApplicationFactory(sent_by_prescriber_alone=True)
+        same_job_seeker_app = JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_app.job_seeker)
 
         form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app])
         assert form.fields["job_seeker_answer"].label == "Commentaire envoyé au candidat"

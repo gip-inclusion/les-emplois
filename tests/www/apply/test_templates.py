@@ -202,6 +202,7 @@ class TestIAEEligibilityDetail:
 
     def default_params(self, diagnosis):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=diagnosis,
             hiring_start_at=datetime.date(2024, 8, 3),
         )
@@ -356,6 +357,7 @@ class TestGEIQEligibilityDetail:
         if not hiring_start_at:
             hiring_start_at = datetime.date(2024, 8, 3)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_geiq_eligibility_diagnosis_from_employer=True,
             geiq_eligibility_diagnosis=diagnosis,
             hiring_start_at=hiring_start_at,

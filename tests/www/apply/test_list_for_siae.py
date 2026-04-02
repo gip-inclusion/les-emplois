@@ -15,7 +15,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
-from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.widgets import DuetDatePickerWidget
@@ -54,17 +54,20 @@ class TestProcessListSiae:
         job2 = JobDescriptionFactory(company=company, appellation=appellations[1], location=city)
 
         # A job application without eligibility diagnosis
-        job_app = JobApplicationFactory(to_company=company, selected_jobs=[job1, job2], with_approval=True)
+        job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, selected_jobs=[job1, job2], with_approval=True
+        )
         # Two with it (ensure there are no 1+N queries)
         JobApplicationFactory.create_batch(
             2,
+            sent_by_prescriber_alone=True,
             to_company=company,
             selected_jobs=[job1, job2],
             with_iae_eligibility_diagnosis=True,
             with_approval=True,
         )
         # A job application for another company
-        JobApplicationFactory()
+        JobApplicationFactory(sent_by_prescriber_alone=True)
 
         client.force_login(employer)
         with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
@@ -155,6 +158,7 @@ class TestProcessListSiae:
         assert len(criteria) == 4
         diagnosis.administrative_criteria.add(*criteria)
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=diagnosis.job_seeker,
             to_company=company,
             # fallback on the jobseeker's iae eligibility diagnosis
@@ -196,6 +200,7 @@ class TestProcessListSiae:
         # Level 1 criteria
         diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH))
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=diagnosis.job_seeker,
             to_company=company,
             # fallback on the jobseeker's iae eligibility diagnosis
@@ -235,8 +240,10 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        accepted_job_application = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
-        JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        accepted_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+        )
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"states": [JobApplicationState.ACCEPTED]})
@@ -249,8 +256,10 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True, not_geiq_kind=True)
         employer = company.members.first()
 
-        JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
-        prior_to_hire_job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PRIOR_TO_HIRE)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED)
+        prior_to_hire_job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PRIOR_TO_HIRE
+        )
 
         # prior_to_hire filter doesn't exist for non-GEIQ companies and is ignored
         client.force_login(employer)
@@ -274,9 +283,13 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
-        new_job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
-        processing_job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED)
+        new_job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+        )
+        processing_job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.PROCESSING
+        )
 
         client.force_login(employer)
         job_applications_states = [JobApplicationState.NEW, JobApplicationState.PROCESSING]
@@ -291,7 +304,11 @@ class TestProcessListSiae:
 
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
         for i in range(4):
-            JobApplicationFactory(to_company=company, created_at=timezone.now() - timezone.timedelta(days=i))
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True,
+                to_company=company,
+                created_at=timezone.now() - timezone.timedelta(days=i),
+            )
         job_applications = list(company.job_applications_received.order_by("created_at"))
 
         client.force_login(employer)
@@ -318,7 +335,7 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        job_app = JobApplicationFactory(to_company=company)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae", query={"start_date": "", "end_date": ""}))
@@ -363,8 +380,8 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        job_app = JobApplicationFactory(to_company=company)
-        _another_job_app = JobApplicationFactory(to_company=company)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+        _another_job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"senders": [job_app.sender.id]})
@@ -382,11 +399,16 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
-        _another_job_app = JobApplicationFactory(
-            to_company=company, job_seeker=job_app.job_seeker, state=JobApplicationState.NEW
+        job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
         )
-        _job_app_from_other_job_seeker = JobApplicationFactory(to_company=company)
+        _another_job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            job_seeker=job_app.job_seeker,
+            state=JobApplicationState.NEW,
+        )
+        _job_app_from_other_job_seeker = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"job_seeker": job_app.job_seeker.pk})
@@ -414,7 +436,7 @@ class TestProcessListSiae:
         yesterday = today - timezone.timedelta(days=1)
         client.force_login(employer)
 
-        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         # Without approval
         response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True})
@@ -422,6 +444,7 @@ class TestProcessListSiae:
 
         # With a job_application with an approval
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             state=JobApplicationState.ACCEPTED,
             hiring_start_at=yesterday,
@@ -457,6 +480,7 @@ class TestProcessListSiae:
         assert response.context["job_applications_page"].object_list == []
 
         jobapp_with_expired_pass = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             state=JobApplicationState.ACCEPTED,
             hiring_start_at=yesterday - timezone.timedelta(days=365),
@@ -473,8 +497,8 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
-        job_app = JobApplicationFactory(to_company=company)
-        _another_job_app = JobApplicationFactory(to_company=company)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+        _another_job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
@@ -549,7 +573,7 @@ class TestProcessListSiae:
         employer = company.members.first()
         client.force_login(employer)
 
-        job_app = JobApplicationFactory(to_company=company)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
@@ -583,11 +607,13 @@ class TestProcessListSiae:
         employer = company.members.first()
 
         job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=company,
             job_seeker__with_address=True,
             job_seeker__post_code="37000",
         )
         _another_job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=company,
             job_seeker__with_address=True,
             job_seeker__post_code="75002",
@@ -698,7 +724,7 @@ class TestProcessListSiae:
 def test_list_display_kind(client):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
-    JobApplicationFactory(to_company=company)
+    JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
 
@@ -733,7 +759,7 @@ def test_list_for_siae_message_when_company_got_new_or_processing_or_postponed_a
     client, state, filter_state
 ):
     company = CompanyFactory(with_membership=True, kind=CompanyKind.GEIQ)
-    ja = JobApplicationFactory(to_company=company, state=state)
+    ja = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=state)
     client.force_login(company.members.get())
 
     response = client.get(reverse("apply:list_for_siae"), {"states": [filter_state.name]})
@@ -781,8 +807,8 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
 
 def test_archived(client):
     company = CompanyFactory(with_membership=True)
-    active = JobApplicationFactory(to_company=company)
-    archived = JobApplicationFactory(to_company=company, archived_at=timezone.now())
+    active = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+    archived = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, archived_at=timezone.now())
     archived_badge_html = """\
     <span class="badge rounded-pill badge-sm mb-1 bg-light text-primary"
           aria-label="candidature archivée"
@@ -834,7 +860,7 @@ def test_archived(client):
 
 def test_list_for_siae_htmx_filters(client):
     company = CompanyFactory(with_membership=True)
-    JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED)
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
     response = client.get(url)
@@ -881,6 +907,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
     # Level 1 criteria
     diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH))
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=diagnosis.job_seeker,
         to_company=company,
         # fallback on the jobseeker's iae eligibility diagnosis
@@ -936,17 +963,20 @@ def test_list_snapshot(client, snapshot):
 
     job_applications = [
         JobApplicationFactory(
-            sender_kind=SenderKind.JOB_SEEKER, state=JobApplicationState.ACCEPTED, sender=job_seeker, **common_kwargs
+            sent_by_job_seeker=True,
+            state=JobApplicationState.ACCEPTED,
+            sender=job_seeker,
+            **common_kwargs,
         ),
         JobApplicationFactory(
-            sender_kind=SenderKind.EMPLOYER,
+            sent_by_employer=True,
             sender=company.members.first(),
             sender_company=company,
             state=JobApplicationState.NEW,
             **common_kwargs,
         ),
         JobApplicationFactory(
-            sender_kind=SenderKind.PRESCRIBER,
+            sent_by_prescriber=True,
             sender=prescriber_org.members.first(),
             sender_prescriber_organization=prescriber_org,
             state=JobApplicationState.REFUSED,
@@ -1022,9 +1052,10 @@ def test_list_snapshot(client, snapshot):
 
 @freeze_time("2026-02-01")
 def test_list_for_siae_exports(client, snapshot):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     company = job_application.to_company
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company=company,
         created_at=timezone.now() - datetime.timedelta(days=365 * 2 + 1),
         state=JobApplicationState.CANCELLED,
@@ -1043,7 +1074,7 @@ def test_list_for_siae_exports(client, snapshot):
 
 
 def test_list_for_siae_exports_as_prescriber(client):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.sender)
 
     response = client.get(reverse("apply:list_for_siae_exports"))
@@ -1051,7 +1082,7 @@ def test_list_for_siae_exports_as_prescriber(client):
 
 
 def test_list_for_siae_exports_back_to_list(client):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.to_company.members.get())
 
     response = client.get(reverse("apply:list_for_siae_exports"), {"back_url": reverse("apply:list_for_siae")})
@@ -1083,7 +1114,7 @@ def test_list_for_siae_exports_back_to_list(client):
 )
 @freeze_time("2024-08-18")
 def test_list_for_siae_exports_download(client, job_app_kwargs, snapshot):
-    job_application = JobApplicationFactory(**job_app_kwargs)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, **job_app_kwargs)
     client.force_login(job_application.to_company.members.get())
 
     # Download all job applications
@@ -1095,7 +1126,7 @@ def test_list_for_siae_exports_download(client, job_app_kwargs, snapshot):
 
 
 def test_list_for_siae_exports_download_as_prescriber(client):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.sender)
 
     response = client.get(
@@ -1108,7 +1139,7 @@ def test_list_for_siae_exports_download_as_prescriber(client):
 
 
 def test_list_for_siae_exports_download_by_month(client):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.to_company.members.get())
 
     # When job applications exists
@@ -1141,7 +1172,7 @@ def test_list_for_siae_exports_download_by_month(client):
     ],
 )
 def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
-    job_application = JobApplicationFactory(**job_app_kwargs)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, **job_app_kwargs)
     client.force_login(job_application.to_company.members.get())
     response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
     badge = parse_response_to_soup(response, selector=".c-box--results__summary span.badge")
@@ -1149,7 +1180,7 @@ def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
 
 
 def test_reset_filter_button_snapshot(client, snapshot):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.to_company.members.get())
 
     filter_params = {"states": [job_application.state], "display": JobApplicationsDisplayKind.LIST}
@@ -1175,7 +1206,7 @@ def test_reset_filter_button_snapshot(client, snapshot):
 
 
 def test_list_for_siae_actions_forced_refresh(client):
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.to_company.members.get())
     response = client.get(reverse("apply:list_for_siae_actions"), {"selected-application": []})
     assert not response.headers.get("HX-Refresh")
@@ -1191,7 +1222,9 @@ def test_list_for_siae_select_applications_htmx(client):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
 
-    job_apps = JobApplicationFactory.create_batch(3, to_company=company, state=JobApplicationState.NEW)
+    job_apps = JobApplicationFactory.create_batch(
+        3, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+    )
     client.force_login(employer)
     table_url = reverse("apply:list_for_siae", query={"display": "table"})
 
@@ -1247,18 +1280,29 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
     employer = company.members.first()
 
     archivable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.REFUSED
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.REFUSED,
     )
     assert archivable_app_1.can_be_archived
     archivable_app_2 = JobApplicationFactory(
-        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.REFUSED
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.REFUSED,
     )
     assert archivable_app_2.can_be_archived
     archived_app = JobApplicationFactory(
-        to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        sent_by_prescriber_alone=True,
+        to_company=company,
+        state=JobApplicationState.REFUSED,
+        archived_at=timezone.now(),
     )
     assert not archived_app.can_be_archived
-    unarchivable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+    unarchivable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
+    )
     assert not unarchivable_app.can_be_archived
 
     client.force_login(employer)
@@ -1358,6 +1402,7 @@ def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
     employer = company.members.first()
 
     archived_app_1 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         to_company=company,
         state=JobApplicationState.REFUSED,
@@ -1365,13 +1410,16 @@ def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
         archived_by=employer,
     )
     archived_app_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.REFUSED,
         archived_at=timezone.now(),
         archived_by=employer,
     )
-    not_archived_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+    not_archived_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+    )
 
     client.force_login(employer)
     table_url = reverse(
@@ -1461,19 +1509,30 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     employer = company.members.first()
 
     internal_transferable_app = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.NEW
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.NEW,
     )
     assert internal_transferable_app.transfer.is_available()
     both_transferable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.REFUSED
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.REFUSED,
     )
     assert both_transferable_app_1.transfer.is_available()
     both_transferable_app_2 = JobApplicationFactory(
-        pk=uuid.UUID("33333333-3333-3333-3333-333333333333"), to_company=company, state=JobApplicationState.REFUSED
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
+        to_company=company,
+        state=JobApplicationState.REFUSED,
     )
     assert both_transferable_app_2.transfer.is_available()
 
-    untransferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    untransferable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+    )
     assert not untransferable_app.transfer.is_available()
 
     client.force_login(employer)
@@ -1581,19 +1640,27 @@ def test_list_for_siae_select_applications_batch_add_to_pool(client, snapshot):
     employer = company.members.first()
 
     addable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.PROCESSING
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
     )
     assert addable_app_1.add_to_pool.is_available()
     addable_app_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.POSTPONED,
     )
     assert addable_app_2.add_to_pool.is_available()
-    added_app = JobApplicationFactory(to_company=company, state=JobApplicationState.POOL, archived_at=timezone.now())
+    added_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POOL, archived_at=timezone.now()
+    )
     assert not added_app.add_to_pool.is_available()
 
-    unaddable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+    unaddable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+    )
     assert not unaddable_app.add_to_pool.is_available()
 
     client.force_login(employer)
@@ -1684,21 +1751,30 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     employer = company.members.first()
 
     postponable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.PROCESSING
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
     )
     assert postponable_app_1.postpone.is_available()
     postponable_app_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
     )
     assert postponable_app_2.postpone.is_available()
     postponed_app = JobApplicationFactory(
-        to_company=company, state=JobApplicationState.POSTPONED, archived_at=timezone.now()
+        sent_by_prescriber_alone=True,
+        to_company=company,
+        state=JobApplicationState.POSTPONED,
+        archived_at=timezone.now(),
     )
     assert not postponed_app.postpone.is_available()
 
-    unpostponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+    unpostponable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.REFUSED
+    )
     assert not unpostponable_app.postpone.is_available()
 
     client.force_login(employer)
@@ -1795,19 +1871,30 @@ def test_list_for_siae_select_applications_batch_process(client, snapshot):
     employer = company.members.first()
 
     processable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.NEW
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.NEW,
     )
     assert processable_app_1.process.is_available()
     processable_app_2 = JobApplicationFactory(
-        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.NEW
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.NEW,
     )
     assert processable_app_2.process.is_available()
     processed_app = JobApplicationFactory(
-        to_company=company, state=JobApplicationState.PROCESSING, archived_at=timezone.now()
+        sent_by_prescriber_alone=True,
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+        archived_at=timezone.now(),
     )
     assert not processed_app.process.is_available()
 
-    unprocessable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    unprocessable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+    )
     assert not unprocessable_app.process.is_available()
 
     client.force_login(employer)
@@ -1896,21 +1983,30 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     employer = company.members.first()
 
     refusable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.NEW
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.NEW,
     )
     assert refusable_app_1.refuse.is_available()
     refusable_app_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
     )
     assert refusable_app_2.refuse.is_available()
     refused_app = JobApplicationFactory(
-        to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        sent_by_prescriber_alone=True,
+        to_company=company,
+        state=JobApplicationState.REFUSED,
+        archived_at=timezone.now(),
     )
     assert not refused_app.refuse.is_available()
 
-    unrefusable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    unrefusable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+    )
     assert not unrefusable_app.refuse.is_available()
 
     client.force_login(employer)
@@ -1991,6 +2087,7 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     employer = company.members.first()
 
     acceptable_app_1 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         to_company=company,
         state=JobApplicationState.PROCESSING,
@@ -1998,6 +2095,7 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     )
     assert acceptable_app_1.accept.is_available()
     acceptable_app_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
@@ -2005,6 +2103,7 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     )
     assert acceptable_app_2.accept.is_available()
     acceptable_app_3 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=company,
         state=JobApplicationState.NEW,
@@ -2012,7 +2111,9 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     )
     assert acceptable_app_3.accept.is_available()
 
-    unacceptable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    unacceptable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+    )
     assert not unacceptable_app.accept.is_available()
 
     client.force_login(employer)
@@ -2085,25 +2186,30 @@ def test_list_for_siae_select_applications_batch_accept_geiq(client, snapshot):
     employer = company.members.first()
 
     acceptable_app_1 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         to_company=company,
         state=JobApplicationState.PROCESSING,
     )
     assert acceptable_app_1.accept.is_available()
     acceptable_app_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
     )
     assert acceptable_app_2.accept.is_available()
     acceptable_app_3 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=company,
         state=JobApplicationState.NEW,
     )
     assert acceptable_app_3.accept.is_available()
 
-    unacceptable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    unacceptable_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.ACCEPTED
+    )
     assert not unacceptable_app.accept.is_available()
 
     client.force_login(employer)
@@ -2175,17 +2281,20 @@ def test_order(client, subtests):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
     zorro_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker__first_name="Zorro",
         job_seeker__last_name="Don Diego",
         to_company=company,
     )
     alice_first_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker__first_name="Alice",
         job_seeker__last_name="Lewis",
         to_company=company,
         pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
     )
     alice_second_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker__first_name="Alice",
         job_seeker__last_name="Lewis",
         to_company=company,
@@ -2223,7 +2332,7 @@ def test_htmx_order(client):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
 
-    JobApplicationFactory.create_batch(2, to_company=company)
+    JobApplicationFactory.create_batch(2, sent_by_prescriber_alone=True, to_company=company)
     client.force_login(employer)
     query_params = {"display": JobApplicationsDisplayKind.TABLE}
     response = client.get(url, query_params)
@@ -2260,7 +2369,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {
         "to_company": company,
-        "sender_kind": SenderKind.EMPLOYER,
+        "sent_by_employer": True,
         "sender": employer,
         "sender_company": company,
     }
@@ -2413,7 +2522,7 @@ class TestAutocomplete:
                 assert response.status_code == 403
 
     def test_as_prescriber(self, client):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
         client.force_login(job_application.sender)
         for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
             response = client.get(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))
@@ -2423,6 +2532,7 @@ class TestAutocomplete:
         company = CompanyFactory()
         employer = CompanyMembershipFactory(company=company).user
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=company,
             sender__first_name="Alice",
             sender__last_name="Lewis",
@@ -2430,6 +2540,7 @@ class TestAutocomplete:
             job_seeker__last_name="Coolidge",
         )
         other_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company=company,
             sender__first_name="Bob",
             sender__last_name="Alice",
@@ -2450,7 +2561,9 @@ class TestAutocomplete:
             job_seeker__first_name="Samantha",
             job_seeker__last_name="Brown",
         )
-        JobApplicationFactory(to_company=company, sender__first_name="John", sender__last_name="Smith")
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, sender__first_name="John", sender__last_name="Smith"
+        )
         client.force_login(employer)
 
         for field_name in self.FORBIDDEN_FIELDS:

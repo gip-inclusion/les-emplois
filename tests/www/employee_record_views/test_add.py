@@ -18,6 +18,7 @@ def test_wizard(snapshot, client):
     company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     approval = ApprovalFactory(for_snapshot=True)
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company=company,
         job_seeker=approval.user,
         with_approval=True,
@@ -117,9 +118,10 @@ def test_wizard(snapshot, client):
 
 def test_employee_list(client):
     company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
-    job_application_1 = JobApplicationFactory(to_company=company, with_approval=True)
+    job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, with_approval=True)
     # Another one with the same job seeker to ensure we don't have duplicates
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company=company,
         job_seeker=job_application_1.job_seeker,
         with_approval=True,
@@ -127,12 +129,13 @@ def test_employee_list(client):
     )
     # Hiring is older, the job seeker will be after job_application_1's one
     job_application_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company=company,
         with_approval=True,
         hiring_start_at=job_application_1.hiring_start_at - relativedelta(days=1),
     )
     # Has an employee record : we won't display it
-    job_application_3 = JobApplicationFactory(to_company=company, with_approval=True)
+    job_application_3 = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, with_approval=True)
     EmployeeRecordFactory(job_application=job_application_3, status=Status.NEW)
 
     client.force_login(company.members.first())
@@ -157,6 +160,7 @@ def test_employee_list(client):
 def test_choose_employee_step_with_a_bad_choice(client):
     company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company=company,
         to_company__use_employee_record=True,
         with_approval=True,
@@ -184,6 +188,7 @@ def test_choose_employee_step_with_a_bad_choice(client):
 def test_employee_with_nir_already_used(client, snapshot):
     company = CompanyFactory(use_employee_record=True, with_membership=True)
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company=company,
         to_company__use_employee_record=True,
         with_approval=True,

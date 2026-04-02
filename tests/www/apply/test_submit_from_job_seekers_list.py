@@ -45,7 +45,7 @@ class TestApplyAsPrescriber:
             jobseeker_profile__birthdate=timezone.localdate() - relativedelta(years=30),  # Avoid auto-filled criteria
         )
         # This is to have a job seeker in "Mes candidats" (job_seekers_views:list)
-        JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, sender=prescriber)
 
         client.force_login(prescriber)
 
@@ -210,6 +210,7 @@ class TestApplyAsPrescriber:
         )
         # This is to have a job seeker in "Mes candidats" (job_seekers_views:list)
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=job_seeker,
             sender=prescriber,
         )
