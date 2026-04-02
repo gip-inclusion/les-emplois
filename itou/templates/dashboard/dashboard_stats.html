@@ -43,12 +43,12 @@
                         <div class="tab-pane fade show active" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
                             <h2>Pilotage de mon activité</h2>
                             {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
-                                <section class="s-section mb-3 mb-md-5">
+                                <section class="s-section">
                                     <div class="s-section__container">
                                         {% if stats_kpi %}
                                             {% include "dashboard/includes/stats/_institution_kpi.html" %}
                                         {% endif %}
-                                        <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                                        <div class="row row-cols-1 row-cols-md-2">{% include "dashboard/includes/stats.html" %}</div>
                                     </div>
                                 </section>
                             {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
