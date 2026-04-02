@@ -1,17 +1,17 @@
+{% load components %}
+
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 m-0">Statistiques</span>
-        </div>
-        <div class="px-3 px-lg-4">
-            <ul class="list-unstyled mb-lg-5">
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'stats:stats_staff_service_indicators' %}" class="btn-link btn-ico">
-                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                        <span>Indicateurs à suivre</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% component_box_dashboard title=title list=list %}
+        {% fragment as title %}
+            Statistiques
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'stats:stats_staff_service_indicators' %}" class="btn-link btn-ico">
+                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Indicateurs à suivre</span>
+                </a>
+            </li>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>

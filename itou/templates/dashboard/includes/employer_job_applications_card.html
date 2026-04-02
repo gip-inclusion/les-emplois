@@ -1,30 +1,33 @@
+{% load components %}
 {% load enums %}
 {% load matomo %}
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
 
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 mb-0">Candidatures</span>
-        </div>
-        <div class="px-3 px-lg-4">
+    {% component_box_dashboard title=title cta=cta list=list %}
+        {% fragment as title %}
+            Candidatures
+        {% endfragment %}
+        {% fragment as cta %}
             <a href="{% url 'apply:list_for_siae' %}" class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-candidatures" %}>
                 <i class="ri-file-user-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>Voir toutes les candidatures</span>
             </a>
-            <ul class="list-unstyled mb-lg-5">
-                {% for category in job_applications_categories %}
+        {% endfragment %}
+        {% fragment as list %}
+            {% for category in job_applications_categories %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{{ category.url }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-candidatures-"|add:category.name %}>
+                        <i class="{{ category.icon }} ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>{{ category.name }}</span>
+                    </a>
+                    <span class="badge rounded-pill badge-xs {{ category.badge }} text-info">{{ category.counter }}</span>
+                </li>
+            {% endfor %}
+            {% if request.current_organization.is_subject_to_iae_rules or request.current_organization.kind == CompanyKind.GEIQ %}
+                {% if siae_suspension_text_with_dates %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{{ category.url }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-candidatures-"|add:category.name %}>
-                            <i class="{{ category.icon }} ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>{{ category.name }}</span>
-                        </a>
-                        <span class="badge rounded-pill badge-xs {{ category.badge }} text-info">{{ category.counter }}</span>
-                    </li>
-                {% endfor %}
-                {% if request.current_organization.is_subject_to_iae_rules or request.current_organization.kind == CompanyKind.GEIQ %}
-                    {% if siae_suspension_text_with_dates %}
                         <button type="button"
                                 class="btn-link btn-ico"
                                 data-bs-toggle="tooltip"
@@ -34,22 +37,22 @@
                             <i class="ri-user-follow-line ri-lg fw-normal disabled" aria-hidden="true"></i>
                             <span class="disabled">Enregistrer une candidature</span>
                         </button>
-                    {% else %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>
-                                <i class="ri-draft-line ri-lg fw-normal" aria-hidden="true"></i>
-                                <span>Enregistrer une candidature</span>
-                            </a>
-                        </li>
-                    {% endif %}
+                    </li>
+                {% else %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>
+                            <i class="ri-draft-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Enregistrer une candidature</span>
+                        </a>
+                    </li>
                 {% endif %}
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'apply:list_for_siae_exports' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "export-candidatures" %}>
-                        <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Exporter toutes les candidatures</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+            {% endif %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'apply:list_for_siae_exports' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "export-candidatures" %}>
+                    <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Exporter toutes les candidatures</span>
+                </a>
+            </li>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>
