@@ -1495,6 +1495,7 @@ class TestAssessmentContractsListView:
             "start_date_lower": "2024-06-01",
             "start_date_upper": "2024-06-30",
             "duration_longer_or_equal_90": "on",
+            "allowance_eligibility": "on",
         }
 
         response = client.get(self.url, filter_data)
