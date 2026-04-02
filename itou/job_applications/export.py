@@ -3,9 +3,10 @@ import functools
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.eligibility.enums import AuthorKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.users.enums import Title, UserKind
+from itou.users.enums import Title
 from itou.utils import iso_standards
 from itou.utils.export import Format, to_streaming_response
 from itou.utils.france_standards import NIR
@@ -79,7 +80,7 @@ def _eligible_to_siae_evaluations(job_application):
         and job_application.to_company.kind in evaluation_enums.EvaluationSiaesKind.Evaluable
         and job_application.state == JobApplicationState.ACCEPTED
         and job_application.eligibility_diagnosis
-        and job_application.eligibility_diagnosis.author_kind == UserKind.EMPLOYER
+        and job_application.eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
         and job_application.eligibility_diagnosis.author_siae_id == job_application.to_company_id
         and job_application.approval.start_at == job_application.hiring_start_at
         and job_application.approval.number.startswith(Approval.ASP_ITOU_PREFIX)

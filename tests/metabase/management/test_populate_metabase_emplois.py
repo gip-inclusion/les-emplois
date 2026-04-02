@@ -12,13 +12,13 @@ from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription, SiaeACIConvergencePHC
-from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.tables import gps
 from itou.metabase.tables.utils import hash_content
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.utils.db import dictfetchall
 from itou.utils.types import InclusiveDateRange
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -195,7 +195,7 @@ def test_populate_job_seekers(snapshot):
         created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC),
         with_approval=True,
         with_iae_eligibility_diagnosis=True,
-        eligibility_diagnosis__author_kind=UserKind.EMPLOYER,
+        eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
         eligibility_diagnosis__author_prescriber_organization=None,
         eligibility_diagnosis__author_siae=CompanyFactory(kind=CompanyKind.EI),
         eligibility_diagnosis__certifiable=True,
