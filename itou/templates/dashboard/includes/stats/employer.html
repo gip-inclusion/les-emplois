@@ -1,18 +1,18 @@
+{% load components %}
 {% load pilotage %}
 {% load theme_inclusion %}
 
-
-<section class="s-section mb-3 mb-lg-5">
+<section class="s-section mb-3 mb-md-4">
     <div class="s-section__container">
-        <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
-            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+        <div class="row row-cols-1 row-cols-md-2">
+            <div class="col mb-3 mb-md-4">
                 <h3>Mes données</h3>
-                <div class="c-box p-0 flex-grow-1">
-                    <div class="p-3 p-lg-4">
-                        <h4 class="mb-0">Conventionnement</h4>
-                    </div>
-                    <div class="px-3 px-lg-4">
-                        <ul class="list-unstyled mb-lg-5">
+                <div class="d-flex flex-column row-gap-3 row-gap-md-4">
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Conventionnement
+                        {% endfragment %}
+                        {% fragment as list %}
                             {% if can_view_stats_siae_etp %}
                                 <li class="d-flex justify-content-between align-items-center mb-3">
                                     <a href="{% url "stats:stats_siae_etp" %}" class="btn-link btn-ico">
@@ -27,15 +27,13 @@
                                     <span>Suivi des effectifs annuels et mensuels (ETP)</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="c-box p-0 mt-3 mt-lg-4">
-                    <div class="p-3 p-lg-4">
-                        <h4 class="mb-0">Recrutement</h4>
-                    </div>
-                    <div class="px-3 px-lg-4">
-                        <ul class="list-unstyled mb-lg-5">
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Recrutement
+                        {% endfragment %}
+                        {% fragment as list %}
                             <li class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="{% url "stats:stats_siae_hiring" %}" class="btn-link btn-ico">
                                     <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
@@ -48,48 +46,49 @@
                                     <span>Suivi de l’activité d’auto-prescription et du contrôle à posteriori</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                </div>
-                {% if can_view_stats_siae_beneficiaries %}
-                    <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
-                        <div class="p-3 p-lg-4">
-                            <h4 class="mb-0">Parcours en IAE</h4>
-                        </div>
-                        <div class="px-3 px-lg-4">
-                            <ul class="list-unstyled mb-lg-5">
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
+                    {% if can_view_stats_siae_beneficiaries %}
+                        {% component_box_dashboard title=title list=list %}
+                            {% fragment as title %}
+                                Parcours en IAE
+                            {% endfragment %}
+                            {% fragment as list %}
                                 <li class="d-flex justify-content-between align-items-center mb-3">
                                     <a href="{% url "stats:stats_siae_beneficiaries" %}" class="btn-link btn-ico">
                                         <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
                                         <span>Suivi des bénéficiaires, taux d'encadrement et présence en emploi</span>
                                     </a>
                                 </li>
-                            </ul>
-                        </div>
-                    </div>
-                {% endif %}
+                            {% endfragment %}
+                        {% endcomponent_box_dashboard %}
+                    {% endif %}
+                </div>
             </div>
-            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+            <div class="col mb-3 mb-md-4">
                 <h3>Données brutes</h3>
-                <div class="c-box p-0">
-                    <div class="p-3 p-lg-4">
-                        <h4 class="mb-0">Export de vos données</h4>
-                    </div>
-                    <div class="px-3 px-lg-4">
-                        <ul class="list-unstyled mb-lg-5">
+                <div class="d-flex flex-column row-gap-3 row-gap-md-4">
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Export de vos données
+                        {% endfragment %}
+                        {% fragment as list %}
                             <li class="d-flex align-items-center mb-3">
                                 <a href="{% url "stats:stats_siae_raw" %}" class="btn-link btn-ico">
                                     <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
                                     <span>Découvrir mes jeux de données</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
                 </div>
-                <h3 class="mt-3 mt-lg-4">Données nationales publiques</h3>
-                <div class="c-box p-0 flex-grow-1">
-                    <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                        <ul class="list-unstyled mb-lg-5">
+                <h3 class="mt-3 mt-md-4">Données nationales publiques</h3>
+                <div class="d-flex flex-column row-gap-3 row-gap-md-4">
+                    {% component_box_dashboard title=title list=list %}
+                        {% fragment as title %}
+                            Tableaux de bord publics
+                        {% endfragment %}
+                        {% fragment as list %}
                             <li class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="{% pilotage_public_dashboard "conventionnements-iae" %}" class="btn-link btn-ico">
                                     <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
@@ -114,8 +113,8 @@
                                     <span>Profil des prescripteurs</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_box_dashboard %}
                 </div>
             </div>
         </div>
