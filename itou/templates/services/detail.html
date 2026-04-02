@@ -24,7 +24,7 @@
                        rel="noopener"
                        target="_blank"
                        href="https://dora.inclusion.gouv.fr"
-                       {% matomo_event "dora-service" "clic" "orienter-un-bénéficiaire" %}>
+                       {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
                         <span>Orienter le bénéficiaire</span>
                     </a>
                 </div>
@@ -34,7 +34,7 @@
                         type="button"
                         data-bs-toggle="modal"
                         data-bs-target="#js-contact-modal"
-                        {% matomo_event "dora-service" "clic" "voir-coordonnees-contact" %}>
+                        {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
                     <span>Voir les coordonnées de contact du service</span>
                 </button>
             </div>
@@ -44,7 +44,7 @@
                 <i class="ri-more-2-fill" aria-hidden="true"></i>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdown_action_menu">
-                <button class="dropdown-item" id="js-copy-link" {% matomo_event "dora-service" "clic" "copier-lien-page" %}>
+                <button class="dropdown-item" id="js-copy-link" {% matomo_event "fiche-service" "clic" "copier-lien-page" %}>
                     Copier le lien de cette page
                 </button>
             </div>
@@ -77,12 +77,7 @@
                                 <dt class="fw-normal col-sm-4">
                                     Public concerné
                                     {% if service.publics_details %}
-                                        <i class="ri-information-line ri-xl text-info"
-                                           aria-label="{{ service.publics_details }}"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-title="{{ service.publics_details }}"
-                                           role="button"
-                                           tabindex="0"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
                                     {% endif %}
                                 </dt>
                                 <dd class="col-sm-8">
@@ -113,12 +108,7 @@
                                 <dt class="fw-normal col-sm-4">
                                     Frais à charge
                                     {% if service.fee_details %}
-                                        <i class="ri-information-line ri-xl text-info"
-                                           aria-label="{{ service.fee_details }}"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-title="{{ service.fee_details }}"
-                                           role="button"
-                                           tabindex="0"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
                                     {% endif %}
                                 </dt>
                                 <dd class="col-sm-8">
@@ -130,12 +120,7 @@
                                 <dt class="fw-normal col-sm-4">
                                     Fréquence et horaires
                                     {% if formatted_opening_hours.has_ph_off %}
-                                        <i class="ri-information-line ri-xl text-info"
-                                           aria-label="Hors jours fériés"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-title="Hors jours fériés"
-                                           role="button"
-                                           tabindex="0"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
                                     {% endif %}
                                 </dt>
                                 <dd class="col-sm-8">
@@ -208,7 +193,7 @@
                         <h2 class="h4">Informations de la structure</h2>
                         <p>{{ service.structure.name }}</p>
                         {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
-                        <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "dora-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
+                        <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "fiche-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
                     </div>
                 </div>
 
@@ -235,7 +220,7 @@
                                     type="button"
                                     aria-label="Copier l'adresse e-mail"
                                     data-email="{{ service.contact_email }}"
-                                    {% matomo_event "dora-service" "clic" "copier-email-contact" %}>
+                                    {% matomo_event "fiche-service" "clic" "copier-email-contact" %}>
                                 <i class="ri-file-copy-line" aria-hidden="true"></i>
                             </button>
                         </div>
