@@ -3,6 +3,12 @@
 
 {% block title %}{{ service.name }} {{ block.super }}{% endblock %}
 
+{% block head_extra %}
+    {% if service.source_link %}
+        <link rel="canonical" href="{{ service.source_link }}">
+    {% endif %}
+{% endblock %}
+
 {% block title_navinfo %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
