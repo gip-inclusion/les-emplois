@@ -1,55 +1,54 @@
+{% load components %}
 {% load matomo %}
 
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="d-flex p-3 p-lg-4">
-            <div class="flex-grow-1">
-                <span class="h4 m-0">Structure</span>
-            </div>
-            <div class="ms-2">
-                <span class="badge rounded-pill badge-sm bg-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
-            </div>
-        </div>
-        <div class="px-3 px-lg-4">
+    {% component_box_dashboard title=title title_badge=title_badge cta=cta list=list %}
+        {% fragment as title %}
+            Structure
+        {% endfragment %}
+        {% fragment as title_badge %}
+            <span class="badge rounded-pill badge-sm bg-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
+        {% endfragment %}
+        {% fragment as cta %}
             <a href="{% url 'companies_views:job_description_list' %}" class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
                 <i class="ri-briefcase-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>Gérer les métiers et recrutements</span>
             </a>
-            <ul class="list-unstyled mb-lg-5">
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
+                    <i class="ri-eye-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Voir la fiche publique</span>
+                </a>
+            </li>
+            {% if request.is_current_organization_admin %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
-                        <i class="ri-eye-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Voir la fiche publique</span>
+                    <a href="{% url 'companies_views:edit_company_step_contact_infos' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "modifier-infos-entreprise" %}>
+                        <i class="ri-pencil-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Modifier les informations</span>
                     </a>
                 </li>
-                {% if request.is_current_organization_admin %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'companies_views:edit_company_step_contact_infos' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "modifier-infos-entreprise" %}>
-                            <i class="ri-pencil-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Modifier les informations</span>
-                        </a>
-                    </li>
-                {% endif %}
-                {% if request.current_organization.is_active %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'companies_views:members' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
-                            <i class="ri-team-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Gérer les collaborateurs</span>
-                        </a>
-                    </li>
-                {% endif %}
-                {% if can_show_financial_annexes %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'companies_views:show_financial_annexes' %}" class="btn-link btn-ico">
-                            <i class="ri-folder-chart-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Voir les annexes financières</span>
-                        </a>
-                        {% if not request.current_organization.is_active %}
-                            <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>
-                        {% endif %}
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
+            {% endif %}
+            {% if request.current_organization.is_active %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'companies_views:members' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
+                        <i class="ri-team-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Gérer les collaborateurs</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% if can_show_financial_annexes %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'companies_views:show_financial_annexes' %}" class="btn-link btn-ico">
+                        <i class="ri-folder-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Voir les annexes financières</span>
+                    </a>
+                    {% if not request.current_organization.is_active %}
+                        <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>
