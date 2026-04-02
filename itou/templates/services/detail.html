@@ -66,12 +66,12 @@
                                 <dt class="col-sm-4">Public concerné</dt>
                                 <dd class="col-sm-8">
                                     {% for public in service.publics.all %}
-                                        {{ public.label }}
+                                        <strong>{{ public.label }}</strong>
                                         {% if not forloop.last %},{% endif %}
                                     {% endfor %}
                                     {% if service.publics_details %}
-                                        <br>
-                                        <small class="text-muted">{{ service.publics_details }}</small>
+                                        <br />
+                                        <span class="text-muted">{{ service.publics_details }}</span>
                                     {% endif %}
                                 </dd>
                             {% endif %}
@@ -80,13 +80,14 @@
                                 <dt class="col-sm-4">Lieu d'accueil</dt>
                                 <dd class="col-sm-8">
                                     {% for reception in service.receptions.all %}
-                                        {# fmt: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# fmt: on #}
+                                        <strong>{# djlint: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# djlint: on #}</strong>
                                     {% endfor %}
                                     {% if service.address_line_1 and service.has_in_person_reception %}
-                                        {% if service.receptions.exists %}—{% endif %}
-                                        {{ service.address_line_1 }}
-                                        {% if service.address_line_2 %}, {{ service.address_line_2 }}{% endif %}
-                                        — {{ service.post_code }} {{ service.city }}
+                                        <strong>
+                                            {% if service.receptions.exists %}—{% endif %}
+                                            {{ service.address_line_1 }}
+                                            {% if service.address_line_2 %}, {{ service.address_line_2 }}{% endif %}
+                                        — {{ service.post_code }} {{ service.city }}</strong>
                                     {% endif %}
                                 </dd>
                             {% endif %}
@@ -94,10 +95,10 @@
                             {% if service.fee %}
                                 <dt class="col-sm-4">Frais à charge</dt>
                                 <dd class="col-sm-8">
-                                    {{ service.fee.label }}
+                                    <strong>{{ service.fee.label }}</strong>
                                     {% if service.fee_details %}
                                         <br>
-                                        <small class="text-muted">{{ service.fee_details }}</small>
+                                        <span class="text-muted">{{ service.fee_details }}</span>
                                     {% endif %}
                                 </dd>
                             {% endif %}
@@ -112,19 +113,19 @@
                             {% if service.insee_city %}
                                 <dt class="col-sm-4">Périmètre géographique</dt>
                                 <dd class="col-sm-8">
-                                    {{ service.insee_city.get_department_display }}
+                                    <strong>{{ service.insee_city.get_department_display }}</strong>
                                 </dd>
                             {% endif %}
 
                             {% if service.access_conditions %}
                                 <dt class="col-sm-4">Les critères d'admission</dt>
                                 <dd class="col-sm-8">
-                                    {{ service.access_conditions }}
+                                    <strong>{{ service.access_conditions }}</strong>
                                 </dd>
                             {% endif %}
                         </dl>
 
-                        <p class="mb-0 mt-3">
+                        <p class="badge rounded-pill bg-disabled-color-light mb-0 mt-3">
                             <small class="text-muted">Source : {{ service.source.label }}</small>
                         </p>
                     </div>
