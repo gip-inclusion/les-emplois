@@ -19,6 +19,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.geiq_assessments.factories import (
     AssessmentCampaignFactory,
     AssessmentFactory,
+    EmployeeContractFactory,
 )
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
@@ -561,6 +562,95 @@ class TestAssessmentDetailsForInstitutionView:
             assert assessment.final_reviewed_at == timezone.now()
             assert assessment.final_reviewed_by == dreets_membership.user
             assert assessment.final_reviewed_by_institution == dreets_membership.institution
+
+
+class TestAssessmentContractsListForInstitutionView:
+    @pytest.fixture
+    def setup_data(self):
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            created_by__first_name="Jean",
+            created_by__last_name="Dupont",
+            created_by__email="jean.dupont@example.com",
+            label_geiq_name="Un Joli GEIQ",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
+            with_submission_requirements=True,
+        )
+        assessment.submitted_at = timezone.now()
+        assessment.submitted_by = geiq_membership.user
+        assessment.save()
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+
+        contract_without_eligibility = EmployeeContractFactory(
+            id=uuid.UUID("11111111-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+            allowance_granted=False,
+        )
+        contract_with_eligibility = EmployeeContractFactory(
+            id=uuid.UUID("22222222-5555-5555-5555-555555555555"),
+            employee__assessment=assessment,
+            employee__last_name="Richard",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 2, 1),
+            end_at=datetime.date(2024, 3, 30),
+            planned_end_at=datetime.date(2024, 6, 30),
+            allowance_requested=True,
+            allowance_granted=True,
+        )
+
+        return {
+            "ddets_membership": ddets_membership,
+            "assessment": assessment,
+            "contract_with_eligibility": contract_with_eligibility,
+            "contract_without_eligibility": contract_without_eligibility,
+        }
+
+    @pytest.mark.parametrize(
+        "query_params, expected_in, expected_not_in",
+        [
+            ({"allowance_eligibility_on": "on"}, ["contract_with_eligibility"], ["contract_without_eligibility"]),
+            ({"allowance_eligibility_off": "on"}, ["contract_without_eligibility"], ["contract_with_eligibility"]),
+            (
+                {"allowance_eligibility_on": "on", "allowance_eligibility_off": "on"},
+                ["contract_with_eligibility", "contract_without_eligibility"],
+                [],
+            ),
+        ],
+    )
+    def test_contract_list_filter_by_allowance_eligibility(
+        self, client, setup_data, query_params, expected_in, expected_not_in
+    ):
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": setup_data["assessment"].pk})
+        client.force_login(setup_data["ddets_membership"].user)
+        response = client.get(url, query_params)
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        for key in expected_in:
+            assert setup_data[key] in contracts_in_page
+        for key in expected_not_in:
+            assert setup_data[key] not in contracts_in_page
 
 
 class TestAssessmentReviewView:
