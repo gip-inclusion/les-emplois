@@ -74,21 +74,27 @@
 
                         <dl class="row mb-0">
                             {% if service.publics.exists %}
-                                <dt class="col-sm-4">Public concerné</dt>
+                                <dt class="fw-normal col-sm-4">
+                                    Public concerné
+                                    {% if service.publics_details %}
+                                        <i class="ri-information-line ri-xl text-info"
+                                           aria-label="{{ service.publics_details }}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="{{ service.publics_details }}"
+                                           role="button"
+                                           tabindex="0"></i>
+                                    {% endif %}
+                                </dt>
                                 <dd class="col-sm-8">
                                     {% for public in service.publics.all %}
                                         <strong>{{ public.label }}</strong>
                                         {% if not forloop.last %},{% endif %}
                                     {% endfor %}
-                                    {% if service.publics_details %}
-                                        <br />
-                                        <span class="text-muted">{{ service.publics_details }}</span>
-                                    {% endif %}
                                 </dd>
                             {% endif %}
 
                             {% if service.receptions.exists or service.address_line_1 %}
-                                <dt class="col-sm-4">Lieu d'accueil</dt>
+                                <dt class="fw-normal col-sm-4">Lieu d'accueil</dt>
                                 <dd class="col-sm-8">
                                     {% for reception in service.receptions.all %}
                                         <strong>{# djlint: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# djlint: on #}</strong>
@@ -104,32 +110,48 @@
                             {% endif %}
 
                             {% if service.fee %}
-                                <dt class="col-sm-4">Frais à charge</dt>
+                                <dt class="fw-normal col-sm-4">
+                                    Frais à charge
+                                    {% if service.fee_details %}
+                                        <i class="ri-information-line ri-xl text-info"
+                                           aria-label="{{ service.fee_details }}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="{{ service.fee_details }}"
+                                           role="button"
+                                           tabindex="0"></i>
+                                    {% endif %}
+                                </dt>
                                 <dd class="col-sm-8">
                                     <strong>{{ service.fee.label }}</strong>
-                                    {% if service.fee_details %}
-                                        <br>
-                                        <span class="text-muted">{{ service.fee_details }}</span>
-                                    {% endif %}
                                 </dd>
                             {% endif %}
 
                             {% if service.opening_hours %}
-                                <dt class="col-sm-4">Fréquence et horaires</dt>
+                                <dt class="fw-normal col-sm-4">
+                                    Fréquence et horaires
+                                    {% if formatted_opening_hours.has_ph_off %}
+                                        <i class="ri-information-line ri-xl text-info"
+                                           aria-label="Hors jours fériés"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Hors jours fériés"
+                                           role="button"
+                                           tabindex="0"></i>
+                                    {% endif %}
+                                </dt>
                                 <dd class="col-sm-8">
                                     {% include "dora/opening_hours.html" %}
                                 </dd>
                             {% endif %}
 
                             {% if service.insee_city %}
-                                <dt class="col-sm-4">Périmètre géographique</dt>
+                                <dt class="fw-normal col-sm-4">Périmètre géographique</dt>
                                 <dd class="col-sm-8">
                                     <strong>{{ service.insee_city.get_department_display }}</strong>
                                 </dd>
                             {% endif %}
 
                             {% if service.access_conditions %}
-                                <dt class="col-sm-4">Les critères d'admission</dt>
+                                <dt class="fw-normal col-sm-4">Les critères d'admission</dt>
                                 <dd class="col-sm-8">
                                     <strong>{{ service.access_conditions }}</strong>
                                 </dd>

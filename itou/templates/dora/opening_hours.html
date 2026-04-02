@@ -11,11 +11,7 @@
             </li>
         </ul>
     {% endfor %}
-    {% if formatted_opening_hours.has_ph_off %}
-        <p class="my-1">
-            <span class="text-muted">Hors jours fériés</span>
-        </p>
-    {% endif %}
+
 {% else %}
     {{ service.opening_hours }}
 {% endif %}
