@@ -86,12 +86,14 @@ class TestSyncGroupsManagementCommand:
         # non authorized prescriber sent job application are ignored
         non_authorized_prescriber = PrescriberFactory()
         job_app_3 = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=beneficiary,
             sender=non_authorized_prescriber,
         )
 
         # self sent job application are ignored
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=beneficiary,
             sender=beneficiary,
         )
@@ -141,10 +143,12 @@ class TestSyncGroupsManagementCommand:
 
         # Simple contacts with only sent job application
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender=follower_1,
             job_seeker=beneficiary_1,
         )
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender=follower_1,
             job_seeker=beneficiary_1,
         )

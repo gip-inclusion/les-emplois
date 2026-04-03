@@ -61,10 +61,10 @@ class TestJobApplicationSearchApi:
             with_approval=True,
             was_hired=True,
         )
-        JobApplicationFactory(job_seeker=self.job_seeker_1)
-        JobApplicationFactory(job_seeker=self.job_seeker_1)
-        JobApplicationFactory(job_seeker=self.job_seeker_2)
-        JobApplicationFactory(job_seeker=self.job_seeker_2)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker_1)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker_1)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker_2)
+        JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=self.job_seeker_2)
 
         self.token = DepartmentToken.objects.create(department="01", label="Token tests département 01")
 

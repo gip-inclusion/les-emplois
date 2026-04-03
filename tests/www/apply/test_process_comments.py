@@ -17,7 +17,9 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 def test_display_in_sidebar_and_tab(client, snapshot):
     company = CompanyWith2MembershipsFactory(subject_to_iae_rules=True)
-    job_app = JobApplicationFactory(to_company=company, with_iae_eligibility_diagnosis=True)
+    job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=company, with_iae_eligibility_diagnosis=True
+    )
     url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.id})
     client.force_login(company.members.first())
 
@@ -81,7 +83,9 @@ def test_add_comment_htmx(client, snapshot, caplog):
     )
     user = company.members.last()
 
-    job_app = JobApplicationFactory(for_snapshot=True, to_company=company, resume=None, answer="👋")
+    job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, for_snapshot=True, to_company=company, resume=None, answer="👋"
+    )
     # Create a bunch of comments to have different comments and last_comments counts.
     other_comments = JobApplicationCommentFactory.create_batch(
         LAST_COMMENTS_COUNT + 1,
@@ -197,7 +201,7 @@ def test_add_comment_too_long(client, is_too_long, assertion, expected_comments_
 
     company = CompanyWith2MembershipsFactory()
     user = company.members.last()
-    job_app = JobApplicationFactory(to_company=company)
+    job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
     comment_length = JobApplicationComment.MAX_LENGTH + int(is_too_long)
 
     client.force_login(user)
@@ -217,7 +221,7 @@ def test_cannot_delete_somebody_else_comment(client, snapshot):
     company = CompanyWith2MembershipsFactory()
     user = company.members.last()
     client.force_login(user)
-    job_app = JobApplicationFactory(to_company=company)
+    job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
     other_user_comment = JobApplicationCommentFactory(job_application=job_app, created_by=company.members.first())
     comment = JobApplicationCommentFactory(job_application=job_app, created_by=user)
 
@@ -250,7 +254,7 @@ def test_cannot_view_other_company_comments_on_delete(client):
     other_membership = CompanyMembershipFactory()
     other_user = other_membership.user
     other_company = other_membership.company
-    other_job_app = JobApplicationFactory(to_company=other_company)
+    other_job_app = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=other_company)
     JobApplicationCommentFactory(job_application=other_job_app, created_by=other_user)
 
     client.force_login(user)
@@ -272,7 +276,9 @@ def test_delete_comment_htmx(client, caplog):
     )
     user = company.members.last()
 
-    job_app = JobApplicationFactory(for_snapshot=True, to_company=company, resume=None, answer="👋")
+    job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, for_snapshot=True, to_company=company, resume=None, answer="👋"
+    )
     # Create a bunch of comments to have different comments and last_comments counts.
     other_user_comments = JobApplicationCommentFactory.create_batch(
         LAST_COMMENTS_COUNT + 2, job_application=job_app, created_by=company.members.first()

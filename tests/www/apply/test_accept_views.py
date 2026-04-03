@@ -107,13 +107,14 @@ class TestProcessAcceptViewsInWizard:
 
     def create_job_application(self, **kwargs):
         kwargs = {
+            "sent_by_job_seeker": True,
             "selected_jobs": self.company.jobs.all(),
             "state": JobApplicationState.PROCESSING,
             "job_seeker": self.job_seeker,
             "to_company": self.company,
             "hiring_end_at": None,
         } | kwargs
-        return JobApplicationFactory(sent_by_job_seeker=True, **kwargs)
+        return JobApplicationFactory(**kwargs)
 
     def _accept_jobseeker_post_data(self, job_application, post_data=None):
         if post_data is not None:
@@ -621,6 +622,7 @@ class TestProcessAcceptViewsInWizard:
         job_application = self.create_job_application(
             job_seeker=self.job_seeker,
             to_company=self.company,
+            sent_by_job_seeker=False,
             sent_by_authorized_prescriber=True,
             approval=approval,
             hiring_start_at=approval.end_at + datetime.timedelta(days=1),
@@ -766,6 +768,7 @@ class TestProcessAcceptViewsInWizard:
         # Now, another company wants to hire the job seeker
         other_company = CompanyFactory(with_membership=True, with_jobs=True, subject_to_iae_rules=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             approval=approval,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
@@ -850,6 +853,7 @@ class TestProcessAcceptViewsInWizard:
 
         wall_e = CompanyFactory(with_membership=True, with_jobs=True, name="WALL-E", subject_to_iae_rules=True)
         job_app_starting_earlier = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=job_seeker,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company=wall_e,
@@ -857,6 +861,7 @@ class TestProcessAcceptViewsInWizard:
         )
         vice_versa = CompanyFactory(with_membership=True, with_jobs=True, name="Vice-versa", subject_to_iae_rules=True)
         job_app_starting_later = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker=job_seeker,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company=vice_versa,
@@ -3009,6 +3014,7 @@ def test_reload_contract_type_and_options_404(client, missing_field):
 
 def test_htmx_reload_contract_type_and_options_in_wizard(client):
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         job_seeker__for_snapshot=True,

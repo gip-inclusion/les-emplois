@@ -190,6 +190,7 @@ class TestCriterionCertificationBadge:
     def test_accepted_job_app_certified(self):
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -206,6 +207,7 @@ class TestCriterionCertificationBadge:
             eligibility_diagnosis__created_at=datetime(2025, 8, 31, tzinfo=UTC),
         )
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
             hiring_start_at=date(2025, 12, 31),
@@ -219,6 +221,7 @@ class TestCriterionCertificationBadge:
     def test_accepted_job_app_not_certified(self):
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_not_certified=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
             state=JobApplicationState.ACCEPTED,
@@ -231,6 +234,7 @@ class TestCriterionCertificationBadge:
     def test_certified_complete_eligibility_diagnosis_duration(self):
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -245,6 +249,7 @@ class TestCriterionCertificationBadge:
             certification_period=InclusiveDateRange(date(2026, 1, 1), date(2026, 1, 31)),
         )
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -264,6 +269,7 @@ class TestCriterionCertificationBadge:
             certification_period=InclusiveDateRange(date(2026, 2, 1), date(2026, 2, 28)),
         )
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -280,6 +286,7 @@ class TestCriterionCertificationBadge:
     def test_not_certified(self):
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_not_certified=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -291,6 +298,7 @@ class TestCriterionCertificationBadge:
     def test_certification_error(self):
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certification_error=True)
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -302,6 +310,7 @@ class TestCriterionCertificationBadge:
     def test_certification_in_progress(self):
         criterion = IAESelectedAdministrativeCriteriaFactory()
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )

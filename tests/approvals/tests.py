@@ -82,21 +82,26 @@ class TestCommonApprovalQuerySet:
         assert not approval.can_be_deleted()
 
     def test_can_be_deleted_one_app(self):
-        job_app = JobApplicationFactory(with_approval=True)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = job_app.approval
         assert approval.can_be_deleted()
 
     def test_can_be_deleted_even_if_other_applications(self):
-        job_app = JobApplicationFactory(with_approval=True)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         JobApplicationFactory(
-            job_seeker=job_app.job_seeker, approval=job_app.approval, state=JobApplicationState.CANCELLED
+            sent_by_prescriber_alone=True,
+            job_seeker=job_app.job_seeker,
+            approval=job_app.approval,
+            state=JobApplicationState.CANCELLED,
         )
         approval = job_app.approval
         assert approval.can_be_deleted()
 
     def test_can_be_deleted_multiple_apps(self):
-        job_app = JobApplicationFactory(with_approval=True)
-        JobApplicationFactory(with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval)
+        job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval
+        )
         assert not job_app.approval.can_be_deleted()
 
     def test_starts_date_filters_for_approval_model(self):
@@ -607,7 +612,7 @@ class TestApprovalModel:
                 ApprovalFactory(eligibility_diagnosis=None, origin=Origin.ADMIN)
 
     def test_deleting_an_approval_creates_a_deleted_one(self):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         user = job_application.job_seeker
         approval = job_application.approval
 
@@ -626,6 +631,7 @@ class TestApprovalModel:
 
     def test_deleting_an_approval_prefer_origin_values(self):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
             with_iae_eligibility_diagnosis=True,
@@ -637,6 +643,7 @@ class TestApprovalModel:
         assert approval.origin_siae_siret == job_application.to_company.siret
 
         other_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.ETTI,
             with_iae_eligibility_diagnosis=True,
@@ -658,6 +665,7 @@ class TestApprovalModel:
 
     def test_deleting_an_approval_without_application_linked(self):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
         )
@@ -820,12 +828,18 @@ class TestSuspensionModel:
         today = timezone.localdate()
         start_at = today - relativedelta(days=10)
 
-        job_application_1 = JobApplicationFactory(with_approval=True, hiring_start_at=today)
-        job_application_2 = JobApplicationFactory(with_approval=True, hiring_start_at=start_at)
-        job_application_3 = JobApplicationFactory(
-            with_approval=True, hiring_start_at=start_at, origin=Origin.PE_APPROVAL
+        job_application_1 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=today
         )
-        job_application_4 = JobApplicationFactory(with_approval=True, hiring_start_at=None, origin=Origin.PE_APPROVAL)
+        job_application_2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=start_at
+        )
+        job_application_3 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=start_at, origin=Origin.PE_APPROVAL
+        )
+        job_application_4 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, hiring_start_at=None, origin=Origin.PE_APPROVAL
+        )
 
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
         assert min_start_at == today
@@ -1552,7 +1566,7 @@ def test_approval_can_be_unsuspended(reason, outcome):
     today = timezone.localdate()
     approval_start_at = today - relativedelta(months=3)
 
-    ja = JobApplicationFactory(with_approval=True, approval__start_at=approval_start_at)
+    ja = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True, approval__start_at=approval_start_at)
     SuspensionFactory(
         approval=ja.approval,
         start_at=today - relativedelta(days=1),
@@ -1569,6 +1583,7 @@ def test_get_user_last_accepted_siae_job_application():
     # `last_accepted_job_application` is the one with the greater `created_at`
     now = timezone.now()
     job_application_1 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.ACCEPTED,
         to_company__subject_to_iae_rules=True,
         origin=Origin.PE_APPROVAL,
@@ -1578,6 +1593,7 @@ def test_get_user_last_accepted_siae_job_application():
     user = job_application_1.job_seeker
 
     job_application_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=user,
         state=JobApplicationState.ACCEPTED,
         to_company__subject_to_iae_rules=True,
@@ -1597,6 +1613,7 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
     # `last_accepted_job_application` is the one with the greater `hiring_start_at`
     now = timezone.now()
     job_application_1 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.ACCEPTED,
         to_company__subject_to_iae_rules=True,
         origin=Origin.PE_APPROVAL,
@@ -1607,6 +1624,7 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
     user = job_application_1.job_seeker
 
     job_application_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=user,
         state=JobApplicationState.ACCEPTED,
         to_company__subject_to_iae_rules=True,

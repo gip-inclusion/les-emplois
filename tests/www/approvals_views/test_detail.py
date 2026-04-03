@@ -32,13 +32,13 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 class TestApprovalDetailView:
     def test_anonymous_user(self, client):
-        approval = JobApplicationFactory(with_approval=True).approval
+        approval = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True).approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_wrong_user_type(self, client):
-        approval = JobApplicationFactory(with_approval=True).approval
+        approval = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True).approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         user = LaborInspectorFactory(membership=True)
         client.force_login(user)
@@ -46,7 +46,7 @@ class TestApprovalDetailView:
         assert response.status_code == 403
 
     def test_job_seeker_access(self, client):
-        approval = JobApplicationFactory(with_approval=True).approval
+        approval = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True).approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
 
         user = JobSeekerFactory()
@@ -60,7 +60,7 @@ class TestApprovalDetailView:
         assertNotContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
 
     def test_non_authorized_prescriber_access(self, client):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
 
         client.force_login(job_application.sender)
@@ -80,6 +80,7 @@ class TestApprovalDetailView:
 
     def test_employer_access(self, client):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
         )
@@ -233,6 +234,7 @@ class TestApprovalDetailView:
 
         # As employer without modification rights: an other SIAE handles the approval now
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             approval=approval,
@@ -497,6 +499,7 @@ class TestApprovalDetailView:
 
         # New accepted job application: the approval is now handled by an other SIAE
         JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             approval=approval,
@@ -519,13 +522,13 @@ class TestApprovalDetailView:
 
 class TestContractView:
     def test_anonymous_user(self, client):
-        approval = JobApplicationFactory(with_approval=True).approval
+        approval = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True).approval
         url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_no_access(self, client):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = job_application.approval
         url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
 
@@ -556,6 +559,7 @@ class TestContractView:
     @freeze_time("2025-08-07")
     def test_view(self, client, snapshot):
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             for_snapshot=True,
             with_approval=True,
             approval__start_at="2025-01-01",
@@ -625,6 +629,7 @@ def test_remove_approval_button(client, snapshot):
         company__subject_to_iae_rules=True,
     )
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         hiring_start_at=datetime.date(2021, 3, 1),
         to_company=membership.company,
         job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
@@ -635,6 +640,7 @@ def test_remove_approval_button(client, snapshot):
     # Create another accepted application lacking a proper hiring_start_at (like most old applications):
     # it should not impact the button display, and it should not crash
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         hiring_start_at=None,
         to_company=membership.company,
         job_seeker=job_application.job_seeker,
@@ -675,6 +681,7 @@ def test_remove_approval_button(client, snapshot):
 
     # An accepted job application exists after suspension end
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         state=JobApplicationState.ACCEPTED,
         job_seeker=job_application.job_seeker,
         with_approval=True,

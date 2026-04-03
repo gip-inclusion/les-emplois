@@ -103,14 +103,14 @@ def test_copy(pdf_file):
 @pytest.mark.usefixtures("temporary_bucket")
 def test_delete_unused_files_from_database(caplog):
     old_orphan = FileFactory()
-    job_application = JobApplicationFactory()
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
     ProlongationFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
     scan = Scan.objects.create(file=FileFactory(), clamav_signature="toto")
     AnnouncementItemFactory(with_image=True)
     AssessmentFactory(with_submission_requirements=True)
     evaluated_job_application = EvaluatedJobApplicationFactory(
-        job_application=job_application  # Don't create a new resume
+        job_application=job_application,  # Don't create a new resume
     )
     EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
     # Make all files at least one day old
@@ -145,8 +145,8 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
     existing_file = FileFactory()
     missing_file = FileFactory()
     # Create job applications so that these files are not orphans
-    JobApplicationFactory(resume=existing_file)
-    JobApplicationFactory(resume=missing_file)
+    JobApplicationFactory(sent_by_prescriber_alone=True, resume=existing_file)
+    JobApplicationFactory(sent_by_prescriber_alone=True, resume=missing_file)
 
     # create unknown files in the s3
     keys = [

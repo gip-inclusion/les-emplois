@@ -102,7 +102,7 @@ def test_all_admin(admin_client, mocker, subtests):
     )
     JobApplicationTransitionLog.objects.create(
         user=admin_user,
-        job_application=JobApplicationFactory(job_seeker=job_seeker),
+        job_application=JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker),
         to_state=JobApplicationState.PROCESSING,
     )
     ActivatedService.objects.create(user=EmployerFactory(), service=Service.PILOTAGE)

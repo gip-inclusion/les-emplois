@@ -161,7 +161,7 @@ class TestTransferUserData:
 
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data(self, admin_client, snapshot):
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = job_application.approval
 
         from_user = job_application.job_seeker
@@ -332,13 +332,13 @@ def test_app_model_change_url(admin_client):
 def test_num_queries(admin_client, snapshot):
     prescriber = PrescriberFactory()
     sent_job_application1 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
-        sender_kind=SenderKind.PRESCRIBER,
     )
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=sent_job_application1.job_seeker,
         sender=prescriber,
-        sender_kind=SenderKind.PRESCRIBER,
     )
     with assertSnapshotQueries(snapshot):
         response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))
@@ -359,6 +359,7 @@ def test_check_inconsistency_check(admin_client):
     assertContains(response, "Aucune incohérence trouvée")
 
     inconsistent_job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_approval=True,
         approval__user=job_seeker,
     )

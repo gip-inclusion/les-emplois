@@ -322,7 +322,9 @@ def test_create_duplicate_diagnosis_in_same_geiq():
 def test_invalidate_obsolete_diagnosis():
     # job seeker must have a hiring (accepted job application) in GEIQ of the diagnosis
     # and hiring must occur during validity period of the diagnosis
-    job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis_from_employer=True)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, with_geiq_eligibility_diagnosis_from_employer=True
+    )
     diagnosis_with_hiring = job_application.geiq_eligibility_diagnosis
     diagnosis_without_hiring = GEIQEligibilityDiagnosisFactory(
         from_employer=True, job_seeker=job_application.job_seeker
@@ -402,6 +404,7 @@ def test_prescriber_geiq_diagnosis_priority():
     job_seeker = geiq_diagnosis.job_seeker
     geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_geiq_eligibility_diagnosis_from_employer=True,
         job_seeker=job_seeker,
         geiq_eligibility_diagnosis=geiq_diagnosis_with_hiring,
@@ -422,6 +425,7 @@ def test_prescriber_geiq_diagnosis_priority():
 def test_authored_by_prescriber_or_geiq():
     geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(from_employer=True)
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_geiq_eligibility_diagnosis_from_employer=True,
         geiq_eligibility_diagnosis=geiq_diagnosis_with_hiring,
     )

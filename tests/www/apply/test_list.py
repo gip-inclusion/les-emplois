@@ -30,6 +30,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         first_name="Jacques", last_name="Henry", public_id=uuid.UUID("00000000-1111-2222-3333-444444444444")
     )
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         to_company=hit_pit,
         job_seeker=job_seeker,
@@ -38,6 +39,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         created_at=now - relativedelta(weeks=2),
     )
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         id=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=hit_pit,
         job_seeker=job_seeker,
@@ -46,6 +48,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         created_at=now - relativedelta(weeks=3, days=5),
     )
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         id=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=hit_pit,
         job_seeker=job_seeker,

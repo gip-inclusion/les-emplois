@@ -206,7 +206,7 @@ class TestMoveCompanyData:
 
 def test_update_companies_job_app_score(caplog):
     company_1 = companies_factories.CompanyFactory()
-    company_2 = JobApplicationFactory(to_company__with_jobs=True).to_company
+    company_2 = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__with_jobs=True).to_company
 
     assert company_1.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
     assert company_2.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE

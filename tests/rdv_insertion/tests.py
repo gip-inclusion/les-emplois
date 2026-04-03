@@ -130,6 +130,7 @@ class TestInvitationRequestModel:
             membership__user__first_name="Max", membership__user__last_name="Throughput", with_membership=True
         )
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,
@@ -214,6 +215,7 @@ class TestParticipationModel:
             membership__user__first_name="Max", membership__user__last_name="Throughput", with_membership=True
         )
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,

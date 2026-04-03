@@ -78,6 +78,7 @@ class CreateEmployeeRecordTestMixin:
         self.user_siae_bad_kind = self.company_bad_kind.members.get(first_name="Barracus")
 
         self.job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             to_company=self.company,
             job_seeker__with_mocked_address=True,
@@ -603,7 +604,9 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_job_seeker_without_address(self, client):
         # Job seeker has no address filled (which should not happen without an admin operation)
-        job_application = JobApplicationFactory(with_approval=True, to_company=self.company)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, to_company=self.company
+        )
 
         response = client.get(reverse(self.URL_NAME, args=(job_application.pk,)))
 
@@ -614,6 +617,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
     def test_job_seeker_with_hexa_address(self, client):
         # Job seeker has already an address filled
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             to_company=self.company,
             job_seeker__jobseeker_profile__with_hexa_address=True,
@@ -638,6 +642,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
             with_mocked_address=BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
         )
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             to_company=self.company,
             job_seeker=job_seeker,
@@ -687,6 +692,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
     def test_job_seeker_address_not_geolocated(self, client):
         # Job seeker has an address filled but can't be geolocated
         job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             to_company=self.company,
             job_seeker=JobSeekerFactory(with_address=True),
@@ -992,6 +998,7 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         # Incorrect context:
         # create another employee record with similar features
         dup_job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             with_approval=True,
             to_company=self.company,
             job_seeker=self.job_seeker,

@@ -85,14 +85,18 @@ class TestApplicantsAPI:
         self, api_client, mode_multi_structures, uid_structures, expected_first_names, snapshot
     ):
         # Populate database with extra data to make sure filters work.
-        JobApplicationFactory.create_batch(2, to_company_id=CompanyFactory().pk)
+        JobApplicationFactory.create_batch(2, sent_by_prescriber_alone=True, to_company_id=CompanyFactory().pk)
 
         # First company: 2 applicants, 3 job applications.
         company_1 = CompanyFactory(uid="76c51a19-0ae9-420c-b2e3-0ab33836bd50", with_membership=True)
         employer = company_1.members.first()
-        JobApplicationFactory(job_seeker__first_name="Bob", to_company=company_1).job_seeker
-        dylan = JobApplicationFactory(job_seeker__first_name="Dylan", to_company=company_1).job_seeker
-        JobApplicationFactory(to_company_id=company_1.pk, job_seeker_id=dylan.pk)
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker__first_name="Bob", to_company=company_1
+        ).job_seeker
+        dylan = JobApplicationFactory(
+            sent_by_prescriber_alone=True, job_seeker__first_name="Dylan", to_company=company_1
+        ).job_seeker
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company_id=company_1.pk, job_seeker_id=dylan.pk)
 
         # Second company: 3 applicants, including one that is already in company_1.
         company_2 = CompanyFactory(
@@ -102,9 +106,12 @@ class TestApplicantsAPI:
             membership__user=employer,
         )
         JobApplicationFactory.create_batch(
-            2, to_company_id=company_2.pk, job_seeker__first_name=factory.Iterator(["Casper", "Nicholas"])
+            2,
+            sent_by_prescriber_alone=True,
+            to_company_id=company_2.pk,
+            job_seeker__first_name=factory.Iterator(["Casper", "Nicholas"]),
         )
-        JobApplicationFactory(to_company_id=company_2.pk, job_seeker_id=dylan.pk)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company_id=company_2.pk, job_seeker_id=dylan.pk)
 
         api_client.force_authenticate(employer)
 
@@ -127,16 +134,18 @@ class TestApplicantsAPI:
         company_1 = CompanyFactory(with_membership=True)
         employer = company_1.members.first()
         bob = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Bob",
             job_seeker__born_in_france=True,
             to_company=company_1,
         ).job_seeker
         dylan = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             job_seeker__first_name="Dylan",
             job_seeker__born_in_france=True,
             to_company=company_1,
         ).job_seeker
-        JobApplicationFactory(to_company_id=company_1.pk, job_seeker_id=dylan.pk)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company_id=company_1.pk, job_seeker_id=dylan.pk)
 
         # Second company: 1 applicant, 1 job application.
         company_2 = CompanyFactory(
@@ -144,12 +153,12 @@ class TestApplicantsAPI:
             membership__is_admin=True,
             membership__user=employer,
         )
-        JobApplicationFactory(to_company_id=company_2.pk, job_seeker_id=dylan.pk)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company_id=company_2.pk, job_seeker_id=dylan.pk)
 
         # Third company, which the api users doesn't belong to but has a job application
         # for an applicant in the 2 others companies
         company_3 = CompanyFactory()
-        JobApplicationFactory(to_company_id=company_3.pk, job_seeker_id=dylan.pk)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company_id=company_3.pk, job_seeker_id=dylan.pk)
 
         api_client.force_authenticate(employer)
 
@@ -195,7 +204,9 @@ class TestApplicantsAPI:
 
     def test_applicant_data(self, api_client, snapshot):
         company = CompanyFactory(with_membership=True)
-        job_seeker1 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker
+        job_seeker1 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, job_seeker__born_in_france=True
+        ).job_seeker
         # Will not refactor ASP factories:
         # - too long,
         # - not the point
@@ -206,7 +217,9 @@ class TestApplicantsAPI:
         job_seeker1.post_code = "37000"
         job_seeker1.city = "TOURS"
         job_seeker1.save()
-        job_seeker2 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker
+        job_seeker2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, to_company=company, job_seeker__born_in_france=True
+        ).job_seeker
         job_seeker2.address_line_1 = "2nd address test"
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"
