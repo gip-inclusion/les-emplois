@@ -2,8 +2,12 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
+{% load matomo %}
+{% load str_filters %}
 
 {% block content_extend %}
+    {% enums "job_applications" "SenderKind" as SenderKind %}
     <form method="post" class="js-prevent-multiple-submit">
         {% csrf_token %}
 
@@ -11,14 +15,52 @@
             {% if request.user == job_seeker %}
                 <h2>Vous avez déjà postulé pour cette entreprise</h2>
             {% else %}
-                <h2>Ce candidat a déjà postulé pour cette entreprise</h2>
+                <h2>Ce candidat a déjà postulé pour {{ hire_process|yesno:"votre,cette" }} entreprise</h2>
             {% endif %}
 
-            <p>
-                Entreprise : <b>{{ company.display_name }}</b>
-                <br>
-                Date de la dernière candidature : <b>{{ prev_application.created_at|date:"d F Y à H\hi" }}</b>
-            </p>
+            {% if hire_process %}
+                <p>
+                    Nous vous recommandons d'accepter une candidature existante plutôt que d'en créer une nouvelle avec la déclaration d'embauche.
+                </p>
+                {% if prev_applications %}
+                    <p>
+                        <strong>
+                            {% with counter=prev_applications|length %}
+                                Candidature{{ counter|pluralizefr }} existante{{ counter|pluralizefr }} dans votre entreprise :
+                            {% endwith %}
+                        </strong>
+                    </p>
+                    <ul class="list-group list-group-flush mb-3 mb-md-4">
+                        {% for prev_app in prev_applications %}
+                            <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+                                <span>
+                                    Émise le {{ prev_app.created_at|date:"d F Y à H\\hi" }} par
+                                    <b>
+                                        {% if prev_app.sender == job_seeker %}
+                                            le candidat
+                                        {% elif prev_app.sender_kind == SenderKind.EMPLOYER %}
+                                            {{ prev_app.sender_company.display_name }}
+                                        {% elif prev_app.sender_kind == SenderKind.PRESCRIBER %}
+                                            {% if prev_app.sender_prescriber_organization %}
+                                                {{ prev_app.sender_prescriber_organization.display_name }}
+                                            {% else %}
+                                                {{ prev_app.sender.get_inverted_full_name }}
+                                            {% endif %}
+                                        {% endif %}
+                                    </b>
+                                </span>
+                                <a href="{% url 'apply:start-accept' prev_app.pk %}" class="btn btn-link btn-sm stretched-link" {% matomo_event "candidature" "clic" "acceptation-candidature" %}>Accepter la candidature</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% else %}
+                <p>
+                    Entreprise : <b>{{ company.display_name }}</b>
+                    <br>
+                    Date de la dernière candidature : <b>{{ prev_application.created_at|date:"d F Y à H\hi" }}</b>
+                </p>
+            {% endif %}
 
             {% if block_apply %}
                 {% component_alert content=content variant="warning" icon=False %}
@@ -32,26 +74,28 @@
 
             <input type="hidden" name="force_new_application" value="force">
 
-            {% if iae_eligibility_url %}
-                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
-                    {% fragment as c_info__summary %}
-                        Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
-                    {% endfragment %}
-                    {% fragment as c_info__detail %}
-                        Vous pouvez simplement valider ou mettre à jour l’éligibilité.
-                        <br>
-                        Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
-                    {% endfragment %}
-                {% endcomponent_info %}
+            {% with primary_label=hire_process|yesno:"Poursuivre la déclaration d'embauche,Postuler à nouveau" %}
+                {% if iae_eligibility_url %}
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
+                            Vous pouvez simplement valider ou mettre à jour l’éligibilité.
+                            <br>
+                            Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
+                        {% endfragment %}
+                    {% endcomponent_info %}
 
-                {% if block_apply %}
-                    {% itou_buttons_form primary_label=iae_eligibility_label primary_url=iae_eligibility_url primary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}
+                    {% if block_apply %}
+                        {% itou_buttons_form primary_label=iae_eligibility_label primary_url=iae_eligibility_url primary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}
+                    {% else %}
+                        {% itou_buttons_form primary_label=primary_label secondary_label=iae_eligibility_label secondary_url=iae_eligibility_url secondary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}
+                    {% endif %}
                 {% else %}
-                    {% itou_buttons_form primary_label="Postuler à nouveau" secondary_label=iae_eligibility_label secondary_url=iae_eligibility_url secondary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}
+                    {% itou_buttons_form primary_label=primary_label primary_disabled=block_apply show_mandatory_fields_mention=False reset_url=reset_url %}
                 {% endif %}
-            {% else %}
-                {% itou_buttons_form primary_label="Postuler à nouveau" primary_disabled=block_apply show_mandatory_fields_mention=False reset_url=reset_url %}
-            {% endif %}
+            {% endwith %}
 
         </div>
     </form>

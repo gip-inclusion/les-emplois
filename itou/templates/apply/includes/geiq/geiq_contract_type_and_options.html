@@ -1,10 +1,10 @@
 {% load django_bootstrap5 %}
 <div id="geiq_contract_type_and_options_block">
-    {% bootstrap_field form_accept.prehiring_guidance_days %}
+    {% bootstrap_field form_accept.prehiring_guidance_days wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form_accept.contract_type %}
     {% bootstrap_field form_accept.inverted_vae_contract %}
     {% if form_accept.contract_type.value == hide_value %}
         <div id="contractTypeDetails">{% bootstrap_field form_accept.contract_type_details %}</div>
     {% endif %}
-    {% bootstrap_field form_accept.nb_hours_per_week %}
+    {% bootstrap_field form_accept.nb_hours_per_week wrapper_class="form-group form-group-input-w-lg-33" %}
 </div>
