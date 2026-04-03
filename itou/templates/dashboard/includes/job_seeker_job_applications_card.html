@@ -1,35 +1,37 @@
+{% load components %}
 {% load matomo %}
 
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 mb-0">Candidatures</span>
-        </div>
-        <div class="px-3 px-lg-4">
-            <ul class="list-unstyled">
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'apply:list_for_job_seeker' %}" class="btn-link btn-ico">
-                        <i class="ri-file-user-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Voir mes candidatures</span>
-                    </a>
-                </li>
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'search:employers_results' %}" class="btn-link btn-ico">
-                        <i class="ri-briefcase-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Rechercher un emploi inclusif</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="c-info p-3 m-3 m-lg-4 mb-lg-5">
-            <p class="fw-bold fs-sm mb-1">Vous n’avez pas encore de CV ?</p>
-            <p class="fs-sm">Créez-en un grâce à notre partenaire Diagoriente.</p>
+    {% component_box_dashboard title=title list=list info=info %}
+        {% fragment as title %}
+            Candidatures
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'apply:list_for_job_seeker' %}" class="btn-link btn-ico">
+                    <i class="ri-file-user-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Voir mes candidatures</span>
+                </a>
+            </li>
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{% url 'search:employers_results' %}" class="btn-link btn-ico">
+                    <i class="ri-briefcase-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Rechercher un emploi inclusif</span>
+                </a>
+            </li>
+        {% endfragment %}
+        {% fragment as info %}
+            <p class="mb-2">
+                <strong>Vous n’avez pas encore de CV ?</strong>
+                <br>
+                Créez-en un grâce à notre partenaire Diagoriente.
+            </p>
             <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-candidat"
                rel="noopener"
                target="_blank"
                aria-label="Créer un CV avec Diagoriente (ouverture dans un nouvel onglet)"
-               class="btn btn-partner btn-partner--diagoriente fs-sm"
+               class="btn btn-partner btn-partner--diagoriente"
                {% matomo_event "partners" "clic" "open_diagoriente" %}>Créer un CV avec Diagoriente</a>
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>

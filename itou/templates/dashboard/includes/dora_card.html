@@ -1,29 +1,34 @@
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
+    <div class="c-box c-box--dashboard p-0 h-100">
         <div class="c-box__header--dora p-3 p-lg-4">
             <span class="h4 m-0">DORA</span>
         </div>
         <div class="px-3 px-lg-4 pt-3 pt-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ DORA_BASE_URL }}?{{ tracker }}" rel="noopener" target="_blank" aria-label="Consulter les services d'insertion de votre territoire (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
-                        <i class="ri-search-eye-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                    <a href="{{ DORA_BASE_URL }}?{{ tracker }}"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Consulter les services d'insertion de votre territoire (ouverture dans un nouvel onglet)"
+                       class="btn-link btn-ico has-external-link">
+                        <i class="ri-search-eye-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Consulter les services d'insertion de votre territoire</span>
-                        <i class="ri-external-link-line fw-normal ms-2"></i>
                     </a>
                 </li>
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ DORA_BASE_URL }}?siret={{ siret }}&{{ tracker }}" rel="noopener" target="_blank" aria-label="Référencer vos services (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
+                    <a href="{{ DORA_BASE_URL }}?siret={{ siret }}&{{ tracker }}"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Référencer vos services (ouverture dans un nouvel onglet)"
+                       class="btn-link btn-ico has-external-link">
                         <i class="ri-file-add-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Référencer vos services</span>
-                        <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
                     </a>
                 </li>
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ DORA_BASE_URL }}?{{ tracker }}" rel="noopener" target="_blank" aria-label="Suggérer un service partenaire (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
+                    <a href="{{ DORA_BASE_URL }}?{{ tracker }}" rel="noopener" target="_blank" aria-label="Suggérer un service partenaire (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link">
                         <i class="ri-lightbulb-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Suggérer un service partenaire</span>
-                        <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
                     </a>
                 </li>
             </ul>

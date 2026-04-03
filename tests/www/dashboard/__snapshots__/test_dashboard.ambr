@@ -1520,29 +1520,31 @@
                           </div>
                           <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
                               <div class="col mb-3 mb-md-4">
-                                  <div class="c-box p-0 h-100">
+                                  <div class="c-box c-box--dashboard p-0 h-100">
                                       <div class="p-3 p-lg-4">
-                                          <span class="h4 m-0">
+                                          <span class="h4 mb-0">
                                               Admin
                                           </span>
                                       </div>
                                       <div class="px-3 px-lg-4">
-                                          <p class="d-flex justify-content-between align-items-center mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/admin/">
-                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Admin
-                                                  </span>
-                                              </a>
-                                          </p>
+                                          <ul class="list-unstyled mb-lg-5">
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/admin/">
+                                                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Admin
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
                               <div class="col mb-3 mb-md-4">
-                                  <div class="c-box p-0 h-100">
+                                  <div class="c-box c-box--dashboard p-0 h-100">
                                       <div class="p-3 p-lg-4">
-                                          <span class="h4 m-0">
+                                          <span class="h4 mb-0">
                                               Exports de données
                                           </span>
                                       </div>
@@ -1585,14 +1587,12 @@
                                                   </a>
                                               </li>
                                               <li class="d-flex justify-content-between align-items-center mb-3">
-                                                  <a aria-label="Liste des utilisateurs institutionnels (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://stats.inclusion.beta.gouv.fr/question/7519-utilisateurs-institutionnels" rel="noopener" target="_blank">
+                                                  <a aria-label="Liste des utilisateurs institutionnels (ouverture dans un nouvel onglet)" class="btn-link btn-ico has-external-link" href="https://stats.inclusion.beta.gouv.fr/question/7519-utilisateurs-institutionnels" rel="noopener" target="_blank">
                                                       <i aria-hidden="true" class="ri-list-check-3 ri-lg fw-normal">
                                                       </i>
                                                       <span>
                                                           Liste des utilisateurs institutionnels
                                                       </span>
-                                                      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
-                                                      </i>
                                                   </a>
                                               </li>
                                           </ul>
@@ -1600,9 +1600,9 @@
                                   </div>
                               </div>
                               <div class="col mb-3 mb-md-4">
-                                  <div class="c-box p-0 h-100">
+                                  <div class="c-box c-box--dashboard p-0 h-100">
                                       <div class="p-3 p-lg-4">
-                                          <span class="h4 m-0">
+                                          <span class="h4 mb-0">
                                               Actions
                                           </span>
                                       </div>
@@ -1640,9 +1640,9 @@
                                   </div>
                               </div>
                               <div class="col mb-3 mb-md-4">
-                                  <div class="c-box p-0 h-100">
+                                  <div class="c-box c-box--dashboard p-0 h-100">
                                       <div class="p-3 p-lg-4">
-                                          <span class="h4 m-0">
+                                          <span class="h4 mb-0">
                                               Statistiques
                                           </span>
                                       </div>
@@ -1650,7 +1650,7 @@
                                           <ul class="list-unstyled mb-lg-5">
                                               <li class="d-flex justify-content-between align-items-center mb-3">
                                                   <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
-                                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                                       </i>
                                                       <span>
                                                           Indicateurs à suivre
@@ -1712,29 +1712,31 @@
                           </div>
                           <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
                               <div class="col mb-3 mb-md-4">
-                                  <div class="c-box p-0 h-100">
+                                  <div class="c-box c-box--dashboard p-0 h-100">
                                       <div class="p-3 p-lg-4">
-                                          <span class="h4 m-0">
+                                          <span class="h4 mb-0">
                                               Admin
                                           </span>
                                       </div>
                                       <div class="px-3 px-lg-4">
-                                          <p class="d-flex justify-content-between align-items-center mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/admin/">
-                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Admin
-                                                  </span>
-                                              </a>
-                                          </p>
+                                          <ul class="list-unstyled mb-lg-5">
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/admin/">
+                                                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Admin
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
                               <div class="col mb-3 mb-md-4">
-                                  <div class="c-box p-0 h-100">
+                                  <div class="c-box c-box--dashboard p-0 h-100">
                                       <div class="p-3 p-lg-4">
-                                          <span class="h4 m-0">
+                                          <span class="h4 mb-0">
                                               Statistiques
                                           </span>
                                       </div>
@@ -1742,7 +1744,7 @@
                                           <ul class="list-unstyled mb-lg-5">
                                               <li class="d-flex justify-content-between align-items-center mb-3">
                                                   <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
-                                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                                       </i>
                                                       <span>
                                                           Indicateurs à suivre
