@@ -74,6 +74,7 @@ def test_unused_templates():
         "404.html",
         "429.html",
         "500.html",
+        "admin/pagination.html",
         "django/forms/widgets/password.html",
         # Django allauth
         "account/account_inactive.html",
