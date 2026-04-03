@@ -11,7 +11,7 @@ class ReferenceDatumFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("kind", "value")
 
     kind = ReferenceDatumKind.SOURCE
-    value = factory.Sequence(lambda n: f"source-{n}")
+    value = "Dora"
     label = factory.LazyAttribute(lambda o: o.value.title())
 
 
