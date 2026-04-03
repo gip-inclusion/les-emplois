@@ -1,10 +1,12 @@
 import logging
+from datetime import timedelta
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import TemplateView, View
 
 from itou.companies.enums import CompanyKind
@@ -17,10 +19,7 @@ from itou.utils.perms.utils import can_edit_personal_information, can_view_perso
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
-from itou.www.apply.views.submit_views import (
-    CheckPreviousApplicationsBaseMixin,
-    _check_job_seeker_approval,
-)
+from itou.www.apply.views.submit_views import _check_job_seeker_approval
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
@@ -150,9 +149,38 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
         }
 
 
-class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, HireBaseView):
+class CheckPreviousApplicationsForHireView(HireBaseView):
+    template_name = "apply/submit_step_check_prev_applications.html"
+    SKIP_PREV_APPLICATIONS_CHECK = True
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.prev_application = (
+            common_views.previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
+        )
+
     def get_next_url(self):
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
+
+    def get(self, request, *args, **kwargs):
+        if self.prev_application is None:
+            return HttpResponseRedirect(self.get_next_url())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
+        # Allow a new job application if the user confirm it despite the duplication warning.
+        if request.POST.get("force_new_application") == "force":
+            return HttpResponseRedirect(self.get_next_url())
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["prev_application"] = self.prev_application
+        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["iae_eligibility_url"] = None
+        return context
 
 
 class IAEEligibilityForHireView(

@@ -378,11 +378,7 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}
 
 
-class CheckPreviousApplicationsBaseMixin:
-    """
-    Check previous job applications to avoid duplicates.
-    """
-
+class CheckPreviousApplicationsForSubmitView(ApplicationBaseView):
     template_name = "apply/submit_step_check_prev_applications.html"
     SKIP_PREV_APPLICATIONS_CHECK = True
 
@@ -393,7 +389,7 @@ class CheckPreviousApplicationsBaseMixin:
         )
 
     def get_next_url(self):
-        raise NotImplementedError
+        return reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
 
     def get(self, request, *args, **kwargs):
         if self.prev_application is None:
@@ -410,18 +406,6 @@ class CheckPreviousApplicationsBaseMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["prev_application"] = self.prev_application
-        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
-        context["iae_eligibility_url"] = None
-        return context
-
-
-class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseMixin, ApplicationBaseView):
-    def get_next_url(self):
-        return reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
         if (
             self.request.from_authorized_prescriber
             and self.company.is_subject_to_iae_rules
@@ -435,6 +419,10 @@ class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseMixin,
             context["iae_eligibility_label"] = (
                 "Mettre à jour l’éligibilité IAE" if self.eligibility_diagnosis else "Valider l’éligibilité IAE"
             )
+        else:
+            context["iae_eligibility_url"] = None
+        context["prev_application"] = self.prev_application
+        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
         return context
 
 

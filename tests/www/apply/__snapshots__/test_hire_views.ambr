@@ -1334,7 +1334,7 @@
       dict({
         'origin': list([
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/submit_views.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1390,7 +1390,7 @@
       dict({
         'origin': list([
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/submit_views.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1444,7 +1444,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/submit_views.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1480,7 +1480,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/submit_views.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1617,7 +1617,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/submit_views.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1751,7 +1751,7 @@
       }),
       dict({
         'origin': list([
-          'CheckPreviousApplicationsForHireView.setup[www/apply/views/submit_views.py]',
+          'CheckPreviousApplicationsForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
