@@ -788,6 +788,7 @@
                  "geiq_assessments_assessment"."final_reviewed_by_institution_id",
                  "geiq_assessments_assessmentcampaign"."id",
                  "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."opening_date",
                  "geiq_assessments_assessmentcampaign"."submission_deadline",
                  "geiq_assessments_assessmentcampaign"."review_deadline"
           FROM "geiq_assessments_assessment"
@@ -3023,9 +3024,9 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
-                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                  <div class="s-section__col col-12">
                       
-                          La campagne actuelle n'est pas encore ouverte ou les données LABEL ne sont pas encore disponibles.
+                          <h2>Accès refusé</h2>
                       
                   </div>
               </div>
@@ -3038,9 +3039,9 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
-                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                  <div class="s-section__col col-12">
                       
-                          Le SIRET (12345678901234) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                          <h2>Accès refusé</h2>
                       
                   </div>
               </div>
@@ -3050,7 +3051,7 @@
 # ---
 # name: TestListAssessmentsView.test_complex_list[SQL queries]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -3432,6 +3433,24 @@
       }),
       dict({
         'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'list_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."opening_date",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessmentcampaign"
+          WHERE "geiq_assessments_assessmentcampaign"."year" = %s
+          ORDER BY "geiq_assessments_assessmentcampaign"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -3555,6 +3574,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "geiq_assessments_assessmentcampaign"."id",
                  "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."opening_date",
                  "geiq_assessments_assessmentcampaign"."submission_deadline",
                  "geiq_assessments_assessmentcampaign"."review_deadline"
           FROM "geiq_assessments_assessment"
@@ -3649,7 +3669,11 @@
                       <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                           <h2 class="mb-0">Mes bilans</h2>
                           <div aria-label="Actions sur les bilans d’exécution" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
-                              <a class="btn btn-primary" href="/geiq-assessments/create">Créer un bilan d’exécution</a>
+                              
+                                  <span data-bs-title="La création d’un bilan est autorisée uniquement lorsque la phase de transmission des bilans d’exécution est ouverte." data-bs-toggle="tooltip" tabindex="0">
+                                      <button class="btn btn-primary disabled">Créer un bilan d’exécution</button>
+                                  </span>
+                              
                           </div>
                       </div>
                       
@@ -3729,7 +3753,9 @@
                       <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                           <h2 class="mb-0">Mes bilans</h2>
                           <div aria-label="Actions sur les bilans d’exécution" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
-                              <a class="btn btn-primary" href="/geiq-assessments/create">Créer un bilan d’exécution</a>
+                              
+                                  <a class="btn btn-primary" href="/geiq-assessments/create">Créer un bilan d’exécution</a>
+                              
                           </div>
                       </div>
                       

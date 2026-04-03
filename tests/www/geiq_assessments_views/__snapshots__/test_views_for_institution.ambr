@@ -2614,6 +2614,7 @@
                                                                          WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_nb",
                  "geiq_assessments_assessmentcampaign"."id",
                  "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."opening_date",
                  "geiq_assessments_assessmentcampaign"."submission_deadline",
                  "geiq_assessments_assessmentcampaign"."review_deadline"
           FROM "geiq_assessments_assessment"
