@@ -3,6 +3,7 @@
 {% load static %}
 {% load str_filters %}
 {% load url_add_query %}
+{% load theme_inclusion %}
 
 {% block title %}
     {% if city and category %}
@@ -17,7 +18,10 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Rechercher un service d'insertion</h1>
+            <div class="d-flex align-items-center pb-4">
+                <h1 class="mb-0">Rechercher un service d'insertion</h1>
+                {% beta_badge extra_classes="badge-sm ms-3" %}
+            </div>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}

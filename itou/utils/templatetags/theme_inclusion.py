@@ -97,3 +97,11 @@ def collapse_field(bound_field, *, target_id, **kwargs):
 @register.simple_tag
 def new_badge(extra_classes="badge-sm ms-2"):
     return format_html('<span class="badge rounded-pill bg-important text-white {}">Nouveau</span>', extra_classes)
+
+
+@register.simple_tag
+def beta_badge(extra_classes="badge-sm ms-2"):
+    return format_html(
+        '<span class="badge rounded-pill bg-important-lightest text-important {}"><i class="ri-flask-line" aria-hidden="true"></i>Beta</span>',
+        extra_classes,
+    )
