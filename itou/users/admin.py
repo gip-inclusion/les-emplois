@@ -7,6 +7,7 @@ from typing import NamedTuple
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
+from django.contrib.admin import models as admin_models
 from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
@@ -16,7 +17,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, path, reverse
 from django.utils import timezone
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 
@@ -38,6 +39,7 @@ from itou.users.admin_forms import (
     UserAdminForm,
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
+from itou.users.notifications import DisablePasswordAuthNotification
 from itou.users.utils import NIR_RE, merge_job_seeker_assignments
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
@@ -52,6 +54,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_organization_view_link,
 )
+from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import is_france_travail_id_format
 
 
@@ -840,6 +843,65 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             "admin/users/transfer_user.html",
             context,
         )
+
+    @admin.action(description="Désactiver l'authentification par mot de passe")
+    def disable_password_auth(self, request, queryset):
+        users_to_update = {
+            user
+            for user in queryset
+            if user.identity_provider == IdentityProvider.DJANGO and user.has_usable_password()
+        }
+        skipped_users = set(queryset) - users_to_update
+
+        for user in users_to_update:
+            user.set_unusable_password()
+            user.save(update_fields=["password"])
+            DisablePasswordAuthNotification(user).send()
+
+        def _user_list(users):
+            def _user_info(user):
+                last_login = user.last_login.strftime("%d/%m/%Y") if user.last_login else "jamais connecté"
+                return (user.email or "N/A", user.pk, user.get_kind_display(), last_login)
+
+            return format_html_join(
+                "\n",
+                "<br>- {} (PK : {}, {}, dernière connexion : {})",
+                (_user_info(user) for user in sorted(users, key=lambda user: (user.email or "", user.pk))),
+            )
+
+        if users_to_update:
+            admin_models.LogEntry.objects.log_actions(
+                user_id=request.user.pk,
+                queryset=models.User.objects.filter(pk__in=[user.pk for user in users_to_update]),
+                action_flag=admin_models.CHANGE,
+                change_message="Désactivation de l’authentification par mot de passe",
+            )
+            count = len(users_to_update)
+            messages.success(
+                request,
+                format_html(
+                    "Désactivation de l’authentification par mot de passe pour {} utilisateur{} :{}",
+                    count,
+                    pluralizefr(count),
+                    _user_list(users_to_update),
+                ),
+            )
+        if skipped_users:
+            count = len(skipped_users)
+            messages.warning(
+                request,
+                format_html(
+                    (
+                        "Impossible de désactiver l’authentification par mot de passe pour {} utilisateur{} :{}"
+                        "<br><i>(Fournisseur d’identité non-Django ou mot de passe déjà inutilisable)</i>"
+                    ),
+                    count,
+                    pluralizefr(count),
+                    _user_list(skipped_users),
+                ),
+            )
+
+    actions = [disable_password_auth]
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
