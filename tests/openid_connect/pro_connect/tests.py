@@ -17,6 +17,7 @@ from django.contrib.messages import Message
 from django.core import signing
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -33,6 +34,7 @@ from itou.openid_connect.models import InvalidKindException, RegisterForbiddenEx
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
+    ProConnectAuthentication,
     ProConnectEmployerData,
     ProConnectPrescriberData,
     ProConnectState,
@@ -45,7 +47,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
-from tests.openid_connect.pro_connect.testing import ID_TOKEN, OIDC_USERINFO
+from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED, OIDC_USERINFO
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -338,7 +340,12 @@ class TestProConnectAuthorizeView:
 
 class TestProConnectCallbackView:
     def test_callback_invalid_state(self, client, pro_connect):
-        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
+        token_json = {
+            "access_token": "access_token",
+            "token_type": "Bearer",
+            "expires_in": 60,
+            "id_token": ID_TOKEN_ENCODED,
+        }
         respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
         url = reverse("pro_connect:callback")
@@ -377,6 +384,21 @@ class TestProConnectCallbackView:
         assert user.kind == UserKind.EMPLOYER
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
+    def test_callback_record_authentication(self, client, pro_connect):
+        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
+        record = ProConnectAuthentication.objects.get()
+        assert record.user_public_id == user.public_id
+        assert record.amr == ["pwd"]
+        assert record.idp_id == "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7"
+
+    @override_settings(FEATURE_ENABLE_PROCONNECT_SOFT_MFA=False)
+    def test_callback_do_not_record_authentication_if_disabled(self, client, pro_connect):
+        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
+        assert user is not None
+        assert ProConnectAuthentication.objects.count() == 0
+
     def test_callback_existing_django_user(self, client, pro_connect):
         # User created with django already exists on Itou but some attributes differs.
         # Update all fields
@@ -406,7 +428,7 @@ class TestProConnectCallbackView:
                 "pro_connect:logout",
                 query={
                     "redirect_url": reverse("search:employers_home"),
-                    "token": ID_TOKEN,
+                    "token": ID_TOKEN_ENCODED,
                 },
             ),
         )
@@ -431,7 +453,7 @@ class TestProConnectCallbackView:
                 "pro_connect:logout",
                 query={
                     "redirect_url": reverse("search:employers_home"),
-                    "token": ID_TOKEN,
+                    "token": ID_TOKEN_ENCODED,
                 },
             ),
         )
@@ -453,7 +475,7 @@ class TestProConnectCallbackView:
             "pro_connect:logout",
             query={
                 "redirect_url": reverse("search:employers_home"),
-                "token": ID_TOKEN,
+                "token": ID_TOKEN_ENCODED,
             },
         )
 
@@ -493,7 +515,7 @@ class TestProConnectCallbackView:
                     "pro_connect:logout",
                     query={
                         "redirect_url": reverse("search:employers_home"),
-                        "token": ID_TOKEN,
+                        "token": ID_TOKEN_ENCODED,
                     },
                 ),
             )
@@ -518,7 +540,7 @@ class TestProConnectCallbackView:
                 "pro_connect:logout",
                 query={
                     "redirect_url": reverse("search:employers_home"),
-                    "token": ID_TOKEN,
+                    "token": ID_TOKEN_ENCODED,
                 },
             ),
         )
@@ -550,7 +572,7 @@ class TestProConnectCallbackView:
                     "pro_connect:logout",
                     query={
                         "redirect_url": reverse("search:employers_home"),
-                        "token": ID_TOKEN,
+                        "token": ID_TOKEN_ENCODED,
                     },
                 ),
             )
@@ -749,7 +771,12 @@ class TestProConnectCallbackView:
         state.data["is_login"] = True
         state.save()
 
-        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
+        token_json = {
+            "access_token": "access_token",
+            "token_type": "Bearer",
+            "expires_in": 60,
+            "id_token": ID_TOKEN_ENCODED,
+        }
         respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
         # Put a issued at in the future to ensure we don't check it
@@ -874,7 +901,7 @@ class TestProConnectLogout:
             add_url_params(
                 constants.PRO_CONNECT_ENDPOINT_LOGOUT,
                 {
-                    "id_token_hint": ID_TOKEN,
+                    "id_token_hint": ID_TOKEN_ENCODED,
                     "state": signed_state,
                     "post_logout_redirect_uri": post_logout_redirect_uri,
                 },
@@ -899,7 +926,7 @@ class TestProConnectLogout:
             add_url_params(
                 constants.PRO_CONNECT_ENDPOINT_LOGOUT,
                 {
-                    "id_token_hint": ID_TOKEN,
+                    "id_token_hint": ID_TOKEN_ENCODED,
                     "state": signed_state,
                     "post_logout_redirect_uri": post_logout_redirect_uri,
                 },

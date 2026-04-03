@@ -1,4 +1,5 @@
 import dataclasses
+import json
 import logging
 
 import httpx
@@ -25,7 +26,12 @@ from itou.openid_connect.models import (
 )
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.openid_connect.pro_connect.models import ProConnectEmployerData, ProConnectPrescriberData, ProConnectState
+from itou.openid_connect.pro_connect.models import (
+    ProConnectAuthentication,
+    ProConnectEmployerData,
+    ProConnectPrescriberData,
+    ProConnectState,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
@@ -86,6 +92,39 @@ def _generate_pro_params_from_session(pc_data):
         "state": state,
         "nonce": nonce,
     }
+    if settings.FEATURE_ENABLE_PROCONNECT_SOFT_MFA:
+        data.update(
+            {
+                "claims": json.dumps(
+                    {
+                        "id_token": {
+                            # Ask ProConnect to return the `amr` claim, which
+                            # tells us which authentication methods have been
+                            # used.
+                            "amr": {"essential": True},
+                            # Request the use of 2FA _if possible_. Until all
+                            # identity providers implement 2FA, we must NOT
+                            # mention `"essential": True`. If we do, we'll get
+                            # an error in `pro_connect_callback` (missing
+                            # "code" ) that says that the requested ACRs could
+                            # not be satisfied.
+                            "acr": {
+                                "essential": False,
+                                "values": [
+                                    "eidas2",
+                                    "eidas3",
+                                    "https://proconnect.gouv.fr/assurance/self-asserted-2fa",
+                                    "https://proconnect.gouv.fr/assurance/consistency-checked-2fa",
+                                ],
+                            },
+                        },
+                    }
+                )
+            }
+        )
+    else:
+        data["acr_values"] = "eidas1"
+
     if pc_data.get("channel") == ProConnectChannel.MAP_CONSEILLER:
         data["idp_hint"] = constants.PRO_CONNECT_FT_IDP_HINT
     if user_email := pc_data.get("user_email"):
@@ -162,8 +201,27 @@ def _get_token(request, code):
     )
     # Contains access_token, token_type, expires_in, id_token
     if response.status_code != 200:
+        if response.status_code == 400:
+            logger.warning(
+                "Bad request in pro_connect_callback",
+                extra={
+                    "error": request.GET.get("error"),
+                    "error_description": request.GET.get("error_description"),
+                },
+            )
         return None, _redirect_to_login_page_on_error(error_msg="Impossible to get token.", request=request)
     return response.json(), None
+
+
+def _decode_token(token):
+    return jwt.decode(
+        token,
+        key=constants.PRO_CONNECT_CLIENT_SECRET,
+        algorithms=["HS256"],
+        audience=constants.PRO_CONNECT_CLIENT_ID,
+        # TODO: Remove once https://github.com/jpadilla/pyjwt/issues/939 is fixed
+        options={"verify_iat": False},
+    )
 
 
 def _get_user_info(request, access_token):
@@ -175,15 +233,7 @@ def _get_user_info(request, access_token):
     )
     if response.status_code != 200:
         return None, _redirect_to_login_page_on_error(error_msg="Impossible to get user infos.", request=request)
-    decoded_id_token = jwt.decode(
-        response.content,
-        key=constants.PRO_CONNECT_CLIENT_SECRET,
-        algorithms=["HS256"],
-        audience=constants.PRO_CONNECT_CLIENT_ID,
-        # TODO: Remove once https://github.com/jpadilla/pyjwt/issues/939 is fixed
-        options={"verify_iat": False},
-    )
-    return decoded_id_token, None
+    return _decode_token(response.content), None
 
 
 @login_not_required
@@ -191,6 +241,13 @@ def pro_connect_callback(request):
     code = request.GET.get("code")
     state = request.GET.get("state")
     if code is None or state is None:
+        logger.warning(
+            "Missing code or state in pro_connect_callback",
+            extra={
+                "error": request.GET.get("error"),
+                "error_description": request.GET.get("error_description"),
+            },
+        )
         return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
 
     # Get access token now to have more data in sentry
@@ -313,6 +370,27 @@ def pro_connect_callback(request):
         }
         next_url = f"{reverse('pro_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
+
+    if settings.FEATURE_ENABLE_PROCONNECT_SOFT_MFA:
+        amr = idp_id = None
+        try:
+            id_token_data = _decode_token(token_data["id_token"])
+            amr = id_token_data.get("amr", ())
+            idp_id = user_data.get("idp_id", "")
+            ProConnectAuthentication.objects.create(
+                user_public_id=user.public_id,
+                amr=amr,
+                idp_id=idp_id,
+            )
+        except Exception:
+            logger.exception(
+                "Could not record ProConnect authentication",
+                extra={
+                    "user_public_id": user.public_id,
+                    "amr": amr,
+                    "idp_id": idp_id,
+                },
+            )
 
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login
