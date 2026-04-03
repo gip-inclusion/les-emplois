@@ -1,14 +1,30 @@
 import random
+from functools import partial
 
+import pytest
+from django.contrib import messages
+from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
 from itou.users import admin
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.models import IdentityCertification, JobSeekerProfile, NirModificationRequest, User
-from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from tests.users.factories import (
+    UNUSABLE_PASSWORD,
+    EmployerFactory,
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    PrescriberFactory,
+)
 from tests.utils.testing import normalize_fields_history
 
 
@@ -383,4 +399,140 @@ def test_change_birth_information(admin_client):
     )
     assertContains(
         response, "La commune de naissance doit être spécifiée si et seulement si le pays de naissance est la France."
+    )
+
+
+def _user_list(users):
+    def _user_info(user):
+        last_login = user.last_login.strftime("%d/%m/%Y") if user.last_login else "jamais connecté"
+        return (
+            f"<br>- {user.email or 'N/A'} (PK : {user.pk}, {user.get_kind_display()}, "
+            f"dernière connexion : {last_login})"
+        )
+
+    return "\n".join(_user_info(user) for user in sorted(users, key=lambda user: (user.email or "", user.pk)))
+
+
+@pytest.mark.parametrize(
+    "factory,should_reset",
+    [
+        (JobSeekerFactory, True),
+        (partial(JobSeekerFactory, password=UNUSABLE_PASSWORD), False),
+        (partial(JobSeekerFactory, identity_provider=IdentityProvider.FRANCE_CONNECT), False),
+        (partial(PrescriberFactory, identity_provider=IdentityProvider.DJANGO), True),
+        (PrescriberFactory, False),
+        (partial(EmployerFactory, identity_provider=IdentityProvider.DJANGO), True),
+        (EmployerFactory, False),
+    ],
+    ids=[
+        "job_seeker_with_django",
+        "job_seeker_with_django_but_unusable_password",
+        "job_seeker_with_franceconnect",
+        "prescriber_with_django",
+        "prescriber_with_proconnect",
+        "employer_with_django",
+        "employer_with_proconnect",
+    ],
+)
+def test_disable_password_auth(admin_client, mailoutbox, factory, should_reset):
+    user = factory()
+
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "disable_password_auth",
+            "select_across": "0",
+            "index": "0",
+            "_selected_action": [user.pk],
+        },
+    )
+    assert response.status_code == 302
+    user.refresh_from_db()
+
+    if should_reset:
+        assert not user.has_usable_password()
+        log_entry = LogEntry.objects.get(object_id=str(user.pk), action_flag=CHANGE)
+        assert log_entry.change_message == "Désactivation de l’authentification par mot de passe"
+        assert log_entry.user_id == get_user(admin_client).pk
+        [email] = mailoutbox
+        assert email.to == [user.email]
+        assert "[TEST] Désactivation de votre mot de passe" in email.subject
+        assert reverse("account_reset_password") in email.body
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    f"Désactivation de l’authentification par mot de passe pour 1 utilisateur :{_user_list([user])}",
+                ),
+            ],
+        )
+    else:
+        assert not LogEntry.objects.filter(action_flag=CHANGE, object_id=str(user.pk)).exists()
+        assert len(mailoutbox) == 0
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    f"Impossible de désactiver l’authentification par mot de passe pour 1 utilisateur :"
+                    f"{_user_list([user])}"
+                    "<br><i>(Fournisseur d’identité non-Django ou mot de passe déjà inutilisable)</i>",
+                ),
+            ],
+        )
+
+
+def test_disable_password_auth_mixed_batch(admin_client, mailoutbox):
+    job_seeker_django = JobSeekerFactory()
+    job_seeker_fc = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+    prescriber_django = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+    prescriber_pc = PrescriberFactory()
+    employer_django = EmployerFactory(identity_provider=IdentityProvider.DJANGO)
+    employer_pc = EmployerFactory()
+
+    all_users = [job_seeker_django, job_seeker_fc, prescriber_django, prescriber_pc, employer_django, employer_pc]
+    expected_updated = {job_seeker_django, prescriber_django, employer_django}
+    expected_skipped = {job_seeker_fc, prescriber_pc, employer_pc}
+    passwords_before = {user.pk: user.password for user in expected_skipped}
+
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "disable_password_auth",
+            "select_across": "0",
+            "index": "0",
+            "_selected_action": [u.pk for u in all_users],
+        },
+    )
+    assert response.status_code == 302
+
+    for user in all_users:
+        user.refresh_from_db()
+
+    for user in expected_updated:
+        assert not user.has_usable_password()
+        assert LogEntry.objects.filter(action_flag=CHANGE, object_id=str(user.pk)).exists()
+    for user in expected_skipped:
+        assert user.password == passwords_before[user.pk]
+        assert not LogEntry.objects.filter(action_flag=CHANGE, object_id=str(user.pk)).exists()
+
+    assert len(mailoutbox) == len(expected_updated)
+    assert {email.to[0] for email in mailoutbox} == {u.email for u in expected_updated}
+
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.SUCCESS,
+                "Désactivation de l’authentification par mot de passe pour "
+                f"3 utilisateurs :{_user_list(expected_updated)}",
+            ),
+            messages.Message(
+                messages.WARNING,
+                "Impossible de désactiver l’authentification par mot de passe pour "
+                f"3 utilisateurs :{_user_list(expected_skipped)}"
+                "<br><i>(Fournisseur d’identité non-Django ou mot de passe déjà inutilisable)</i>",
+            ),
+        ],
     )
