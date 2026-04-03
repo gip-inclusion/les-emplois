@@ -1381,6 +1381,19 @@ class TestCheckPreviousApplicationsForHireView:
         )
         assertRedirects(response, next_url)
 
+    def test_num_queries(self, client, snapshot):
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        job_seeker = JobSeekerFactory()
+        employer = company.members.first()
+        client.force_login(employer)
+        hire_session = fake_session_initialization(client, company, job_seeker, {})
+        JobApplicationFactory(job_seeker=job_seeker, to_company=company)
+
+        url = reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": hire_session.name})
+
+        with assertSnapshotQueries(snapshot(name="get_with_previous_application")):
+            client.get(url)
+
 
 class TestEligibilityForHire:
     @pytest.fixture(autouse=True)
