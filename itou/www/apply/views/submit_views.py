@@ -1,6 +1,5 @@
 import enum
 import logging
-from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -30,7 +29,7 @@ from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import constants as apply_view_constants
-from itou.www.apply.views.common import previous_applications_queryset
+from itou.www.apply.views.common import CheckPreviousApplicationsBaseMixin, previous_applications_queryset
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForPrescriber
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
@@ -376,44 +375,6 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}
-
-
-class CheckPreviousApplicationsBaseMixin:
-    """
-    Check previous job applications to avoid duplicates.
-    """
-
-    template_name = "apply/submit_step_check_prev_applications.html"
-    SKIP_PREV_APPLICATIONS_CHECK = True
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.prev_application = (
-            previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
-        )
-
-    def get_next_url(self):
-        raise NotImplementedError
-
-    def get(self, request, *args, **kwargs):
-        if self.prev_application is None:
-            return HttpResponseRedirect(self.get_next_url())
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
-        # Allow a new job application if the user confirm it despite the duplication warning.
-        if request.POST.get("force_new_application") == "force":
-            return HttpResponseRedirect(self.get_next_url())
-
-        return self.render_to_response(self.get_context_data(**kwargs))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["prev_application"] = self.prev_application
-        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
-        context["iae_eligibility_url"] = None
-        return context
 
 
 class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseMixin, ApplicationBaseView):

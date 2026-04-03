@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db import transaction
@@ -504,4 +506,42 @@ class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
         context["geo_criteria_detected"] = geo_criteria_detected
         if geo_criteria_detected:
             context["job_seeker"] = self.job_seeker
+        return context
+
+
+class CheckPreviousApplicationsBaseMixin:
+    """
+    Check previous job applications to avoid duplicates.
+    """
+
+    template_name = "apply/submit_step_check_prev_applications.html"
+    SKIP_PREV_APPLICATIONS_CHECK = True
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.prev_application = (
+            previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
+        )
+
+    def get_next_url(self):
+        raise NotImplementedError
+
+    def get(self, request, *args, **kwargs):
+        if self.prev_application is None:
+            return HttpResponseRedirect(self.get_next_url())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
+        # Allow a new job application if the user confirm it despite the duplication warning.
+        if request.POST.get("force_new_application") == "force":
+            return HttpResponseRedirect(self.get_next_url())
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["prev_application"] = self.prev_application
+        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["iae_eligibility_url"] = None
         return context

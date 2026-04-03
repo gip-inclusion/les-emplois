@@ -17,10 +17,7 @@ from itou.utils.perms.utils import can_edit_personal_information, can_view_perso
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
-from itou.www.apply.views.submit_views import (
-    CheckPreviousApplicationsBaseMixin,
-    _check_job_seeker_approval,
-)
+from itou.www.apply.views.submit_views import _check_job_seeker_approval
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
@@ -150,7 +147,7 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
         }
 
 
-class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, HireBaseView):
+class CheckPreviousApplicationsForHireView(common_views.CheckPreviousApplicationsBaseMixin, HireBaseView):
     def get_next_url(self):
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
 
