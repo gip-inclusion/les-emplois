@@ -173,6 +173,24 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
     )
 
+    @classmethod
+    def _generate(cls, strategy, params):
+        kinds = [
+            "sent_by_job_seeker",
+            "sent_by_prescriber",
+            "sent_by_prescriber_alone",
+            "sent_by_employer",
+            "sent_by_another_employer",
+            "sent_by_authorized_prescriber",
+        ]
+        given_kinds = [kind for kind in kinds if params.get(kind)]
+        if len(given_kinds) != 1:
+            raise ValueError(f"Bad sent_by_xxx trait count {given_kinds}")
+
+        if "sender_kind" in params:
+            raise ValueError("sender_kind is not allowed in params")
+        return super()._generate(strategy, params)
+
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):
         """
