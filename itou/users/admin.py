@@ -18,6 +18,7 @@ from django.urls import NoReverseMatch, path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.text import Truncator
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
@@ -410,6 +411,18 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
         return ""
 
+    @admin.display(description="affectations candidat")
+    def job_seeker_assignments(self, obj):
+        key = None
+        if obj.is_job_seeker:
+            key = "job_seeker"
+        elif obj.is_professional:
+            key = "professional"
+        if key and (count := models.JobSeekerAssignment.objects.filter(**{key: obj}).count()):
+            url = reverse("admin:users_jobseekerassignment_changelist", query={key: obj.pk})
+            return format_html('<a href="{}">Liste des affectations candidat ({})</a>', url, count)
+        return self.get_empty_value_display()
+
     @admin.display(description="Historique des valeurs provenant de systèmes externes")
     def external_data_source_history_formatted(self, obj):
         return format_html("<pre><code>{}</code></pre>", pformat(obj.external_data_source_history, width=120))
@@ -445,6 +458,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "jobseeker_profile_link",
                 "disabled_notifications",
                 "follow_up_groups_or_members",
+                "job_seeker_assignments",
                 "upcoming_deletion_notified_at",
                 "external_data_source_history_formatted",
                 "first_login",
@@ -485,6 +499,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "created_by",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
+                        "job_seeker_assignments",
                         "external_data_source_history_formatted",
                     ]
                 },
@@ -1081,6 +1096,47 @@ class NirModificationRequestAdmin(ItouModelAdmin):
     @admin.display(description="Type de compte de l'auteur")
     def requested_by_type(self, obj):
         return obj.requested_by.get_kind_display()
+
+
+@admin.register(models.JobSeekerAssignment)
+class JobSeekerAssignmentAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = [
+        "job_seeker_display",
+        "professional_display",
+        "organization",
+        "updated_at",
+        "last_action_kind",
+    ]
+    list_display_links = ("job_seeker_display",)
+    list_filter = ("last_action_kind",)
+    search_fields = (
+        "job_seeker__first_name",
+        "job_seeker__last_name",
+        "job_seeker__email",
+        "professional__first_name",
+        "professional__last_name",
+        "professional__email",
+        "prescriber_organization__name",
+        "company__name",
+        "company__brand",
+    )
+    ordering = ("-updated_at",)
+
+    @admin.display(description="candidat")
+    def job_seeker_display(self, obj):
+        return obj.job_seeker.get_inverted_full_name()
+
+    @admin.display(description="accompagnateur")
+    def professional_display(self, obj):
+        return obj.professional.get_full_name()
+
+    @admin.display(description="entreprise ou org. prescr.")
+    def organization(self, obj):
+        if obj.prescriber_organization:
+            return f"{Truncator(obj.prescriber_organization.name).chars(30)} (org. prescr.)"
+        if obj.company:
+            return f"{Truncator(obj.company.name).chars(30)} (entr.)"
+        return "-"
 
 
 admin.site.unregister(EmailAddress)

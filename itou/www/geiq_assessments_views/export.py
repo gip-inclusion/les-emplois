@@ -1,4 +1,3 @@
-from itou.users.enums import UserKind
 from itou.utils.export import Format
 
 
@@ -174,13 +173,13 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
 }
 
 
-def export_format_for_user_kind(user_kind):
+def get_export_format(request):
     user_fields = {}
-    if user_kind == UserKind.EMPLOYER:
+    if request.from_employer:
         user_fields["Demande d’aide"] = with_format(
             Format.TEXT, lambda contract: oui_non(contract.allowance_requested)
         )
-    elif user_kind == UserKind.LABOR_INSPECTOR:
+    elif request.from_institution:
         user_fields["Éligible à l’aide"] = with_format(
             Format.TEXT, lambda contract: oui_non(contract.allowance_granted)
         )

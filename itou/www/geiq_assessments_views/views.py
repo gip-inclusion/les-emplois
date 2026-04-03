@@ -42,7 +42,7 @@ from itou.utils.auth import check_request
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
 from itou.www.geiq_assessments_views.export import (
-    export_format_for_user_kind,
+    get_export_format,
     serialize_employee_contract,
 )
 from itou.www.geiq_assessments_views.forms import (
@@ -621,7 +621,7 @@ def assessment_contracts_export(request, pk):
         .prefetch_related("employee__prequalifications")
         .order_by("employee__last_name", "employee__first_name", "start_at", "pk")
     )
-    export_format = export_format_for_user_kind(request.user.kind)
+    export_format = get_export_format(request)
     return to_streaming_response(
         contracts_qs,
         f"Contrats - {assessment.label_geiq_name} - {timezone.localdate().isoformat()}",

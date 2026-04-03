@@ -16,7 +16,8 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
-from itou.users.enums import ActionKind, UserKind
+from itou.job_applications.enums import SenderKind
+from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup, get_safe_url
@@ -343,7 +344,7 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
                     job_application.job_seeker = self.job_seeker
                     job_application.to_company = self.company
                     job_application.sender = request.user
-                    job_application.sender_kind = UserKind.EMPLOYER
+                    job_application.sender_kind = SenderKind.EMPLOYER
                     job_application.sender_company = self.company
                     job_application.process(user=request.user)
                     self.job_application = job_application  # store in class to have access later

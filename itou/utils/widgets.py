@@ -112,6 +112,14 @@ class RemoteAutocompleteSelect2WidgetMixin:
         if not isinstance(self.choices, ModelChoiceIterator):
             return super().optgroups(name, value, attrs=attrs)
         selected_choices = {c for c in selected_choices if c not in self.choices.field.empty_values}
+        # Bing bot sends NUL characters to some search forms. The
+        # value is rejected by the form (ValidationError). But it
+        # still ends up here to populate the field for redisplay,
+        # where we build an SQL query that contains a NUL character,
+        # which causes an exception: "PostgreSQL text fields cannot
+        # contain NUL (0x00) bytes".
+        if any("\x00" in c for c in selected_choices):
+            return groups
         field_name = self.choices.field.to_field_name or "pk"
         query = Q(**{f"{field_name}__in": selected_choices})
         for obj in self.choices.queryset.filter(query):

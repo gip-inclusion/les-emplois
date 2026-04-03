@@ -42,7 +42,10 @@ def certify_criterion_with_api_particulier(criterion):
             data = api_particulier.certify_criteria(criterion.administrative_criteria.kind, client, job_seeker)
         except httpx.HTTPStatusError as exc:
             user_found = False
-            criterion.data_returned_by_api = exc.response.json()
+            try:
+                criterion.data_returned_by_api = exc.response.json()
+            except JSONDecodeError:
+                criterion.data_returned_by_api = {}
             match exc.response.status_code:
                 case 404:
                     # No "caisse de rattachement" ⇒ no subsidiary.
@@ -52,6 +55,8 @@ def certify_criterion_with_api_particulier(criterion):
                     criterion.certification_period = InclusiveDateRange(empty=True)
                     criterion.certified_at = timezone.now()
                 case 422:
+                    if "errors" not in criterion.data_returned_by_api:
+                        raise
                     # Identity not found, change the query parameters.
                     criterion.certified_at = timezone.now()
                 case 409:
@@ -61,9 +66,9 @@ def certify_criterion_with_api_particulier(criterion):
                     # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie
                     raise RetryTask(delay=int(exc.response.headers["Retry-After"])) from exc
                 case 502:
-                    if len(criterion.data_returned_by_api["errors"]) == 1 and criterion.data_returned_by_api["errors"][
-                        0
-                    ]["code"] in {
+                    if len(criterion.data_returned_by_api.get("errors", [])) == 1 and criterion.data_returned_by_api[
+                        "errors"
+                    ][0]["code"] in {
                         api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE,
                         api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_SECURITE_SOCIALE_ERROR_CODE,
                     }:

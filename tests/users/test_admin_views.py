@@ -545,6 +545,70 @@ def test_membership_inline_includes_inactive(admin_client):
     )
 
 
+class TestJobSeekerAssignments:
+    ASSIGNMENT_LIST_LINK = "Liste des affectations candidat"
+
+    def test_job_seeker_assignments_search(self, admin_client):
+        assignment = JobSeekerAssignmentFactory(
+            for_snapshot=True, prescriber_organization=PrescriberOrganizationFactory(for_snapshot=True)
+        )
+
+        for search in [
+            assignment.job_seeker.email,
+            assignment.job_seeker.last_name,
+            assignment.professional.email,
+            assignment.prescriber_organization.name,
+        ]:
+            response = admin_client.get(reverse("admin:users_jobseekerassignment_changelist", query={"q": search}))
+            assert list(response.context["cl"].result_list) == [assignment]
+
+        search = "nothing should match now"
+        response = admin_client.get(reverse("admin:users_jobseekerprofile_changelist", query={"q": search}))
+        assert list(response.context["cl"].result_list) == []
+
+    def test_job_seeker_assignment_organization_name(self, admin_client):
+        JobSeekerAssignmentFactory(
+            prescriber_organization=PrescriberOrganizationFactory(
+                name="Organisme d'orientation dans un but d'insertion par l'activité économique"
+            )
+        )
+        JobSeekerAssignmentFactory(
+            company=CompanyFactory(name="Entreprise proposant des services effectués par des personnes en IAE")
+        )
+
+        response = admin_client.get(reverse("admin:users_jobseekerassignment_changelist"))
+        assertContains(response, "Organisme d'orientation dans … (org. prescr.)", html=True)
+        assertContains(response, "Entreprise proposant des serv… (entr.)", html=True)
+
+    def test_job_seeker_assignments_link_in_user_admin(self, admin_client):
+        job_seeker = JobSeekerFactory()
+        expected_url = reverse("admin:users_jobseekerassignment_changelist", query={"job_seeker": job_seeker.pk})
+        response = admin_client.get(reverse("admin:users_user_change", args=(job_seeker.pk,)))
+        assertNotContains(response, self.ASSIGNMENT_LIST_LINK)
+        assertNotContains(response, expected_url)
+
+        JobSeekerAssignmentFactory.create_batch(2, job_seeker=job_seeker)
+        response = admin_client.get(reverse("admin:users_user_change", args=(job_seeker.pk,)))
+        assertContains(response, self.ASSIGNMENT_LIST_LINK + " (2)")
+        assertContains(response, expected_url)
+
+        assert admin_client.get(expected_url).status_code == 200
+
+    def test_professional_assignments_link_in_user_admin(self, admin_client):
+        professional = PrescriberFactory()
+        expected_url = reverse("admin:users_jobseekerassignment_changelist", query={"professional": professional.pk})
+        response = admin_client.get(reverse("admin:users_user_change", args=(professional.pk,)))
+        assertNotContains(response, self.ASSIGNMENT_LIST_LINK)
+        assertNotContains(response, expected_url)
+
+        JobSeekerAssignmentFactory.create_batch(2, professional=professional)
+        response = admin_client.get(reverse("admin:users_user_change", args=(professional.pk,)))
+        assertContains(response, self.ASSIGNMENT_LIST_LINK + " (2)")
+        assertContains(response, expected_url)
+
+        assert admin_client.get(expected_url).status_code == 200
+
+
 class TestDeactivateView:
     def test_deactivate_button(self, client):
         user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()

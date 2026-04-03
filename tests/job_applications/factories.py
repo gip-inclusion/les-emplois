@@ -20,13 +20,14 @@ from itou.jobs.models import Appellation
 from itou.users.enums import ActionKind
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
@@ -57,7 +58,12 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
         sent_by_prescriber = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(PrescriberOrganizationFactory, with_membership=True),
-            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
+            sender=factory.LazyAttribute(
+                lambda obj: (
+                    obj.sender_prescriber_organization.members.first()
+                    or PrescriberMembershipFactory(organization=obj.sender_presciber_organization).user
+                )
+            ),
             sender_kind=SenderKind.PRESCRIBER,
         )
         sent_by_authorized_prescriber = factory.Trait(
@@ -67,7 +73,11 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         sent_by_employer = factory.Trait(
             sender_kind=SenderKind.EMPLOYER,
             sender_company=factory.SelfAttribute("to_company"),
-            sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
+            sender=factory.LazyAttribute(
+                lambda obj: (
+                    obj.sender_company.members.first() or CompanyMembershipFactory(company=obj.sender_company).user
+                )
+            ),
         )
         sent_by_another_employer = factory.Trait(
             sent_by_employer=True,

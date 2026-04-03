@@ -1567,14 +1567,14 @@ class TestAnonymizeProfessionalManagementCommand:
         assert JobSeekerAssignment.objects.exists() == any([with_prescriber_organization, with_company])
 
         # The previous assignment blocked the actual deletion, even if there was no organization or company…
-        assert User.objects.filter(kind=UserKind.PRESCRIBER).exists()
+        assert User.objects.filter(kind__in=UserKind.professionals()).exists()
 
         # …but running again the command deletes it for real, if there was no organization or company.
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
 
         assert caplog.messages.count("Anonymized professionals after grace period, count: 1") == 2
-        assert User.objects.filter(kind=UserKind.PRESCRIBER).exists() == any(
+        assert User.objects.filter(kind__in=UserKind.professionals()).exists() == any(
             [with_prescriber_organization, with_company]
         )
 
@@ -1733,7 +1733,7 @@ class TestAnonymizeCancelledApprovalsManagementCommand:
                 "user_nir": "",
                 "user_id_national_pe": None,
                 "origin_siae_kind": CompanyKind.EATT,
-                "origin_sender_kind": UserKind.PRESCRIBER,
+                "origin_sender_kind": SenderKind.PRESCRIBER,
                 "origin_prescriber_organization_kind": PrescriberOrganizationKind.CHRS,
             },
         ]

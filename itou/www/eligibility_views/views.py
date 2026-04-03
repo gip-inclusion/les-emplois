@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic import FormView
 
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -87,7 +88,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
         context["ITOU_DIAGNOSTIC_URL"] = ITOU_DIAGNOSTIC_URL
         if self.eligibility_diagnosis:
             # self.request.from_authorized_prescriber is True so the user is a prescriber
-            context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(UserKind.PRESCRIBER)
+            context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(AuthorKind.PRESCRIBER)
         return context
 
 

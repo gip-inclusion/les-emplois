@@ -2,8 +2,7 @@ import itertools
 
 import pytest
 
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.users.enums import UserKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 
 
@@ -17,7 +16,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
         ),
     ],
 )
-@pytest.mark.parametrize("from_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+@pytest.mark.parametrize("from_kind", [AuthorKind.EMPLOYER, AuthorKind.PRESCRIBER])
 @pytest.mark.parametrize("factory", {IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory})
 def test_criteria_can_be_certified(factory, from_kind, criteria, expected):
     diagnosis = factory(certifiable=True, criteria_kinds=[criteria], **{f"from_{from_kind}": True})

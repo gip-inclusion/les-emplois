@@ -114,6 +114,7 @@ def get_permissions_dict():
         siae_evaluations_models.Sanctions: PERMS_READ,
         users_models.User: PERMS_ALL | PERMS_HIJACK | PERMS_EXPORT_CTA | PERMS_MERGE_USERS,
         users_models.JobSeekerProfile: PERMS_EDIT | PERMS_DELETE | PERMS_IMPORT_FS_3437_FROM_ASP,
+        users_models.JobSeekerAssignment: PERMS_READ,
         users_models.NirModificationRequest: PERMS_EDIT | PERMS_DELETE,
         utils_models.PkSupportRemark: PERMS_ADD,
         utils_models.UUIDSupportRemark: PERMS_ADD,
