@@ -69,6 +69,7 @@ API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 API_INSEE_METADATA_URL = os.getenv("API_INSEE_METADATA_URL", "https://api.insee.fr/metadonnees/")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
 MATOMO_SITE_ID = 220
+MATOMO_TAG_MANAGER_CONTAINER_ID = "ZZ7LPpec"
 SECURE_CSP["img-src"].append(MATOMO_BASE_URL)  # noqa: F405
 SECURE_CSP["script-src"].append(MATOMO_BASE_URL)  # noqa: F405
 SECURE_CSP["connect-src"].append(MATOMO_BASE_URL)  # noqa: F405
