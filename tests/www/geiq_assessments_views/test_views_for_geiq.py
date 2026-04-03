@@ -75,11 +75,19 @@ class TestListAssessmentsView:
         assert response.status_code == 200
 
     def test_empty_list(self, client, settings, snapshot):
+        url_list = reverse("geiq_assessments_views:list_for_geiq")
+        url_create = reverse("geiq_assessments_views:create")
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
-        response = client.get(reverse("geiq_assessments_views:list_for_geiq"))
-        assertContains(response, reverse("geiq_assessments_views:create"))
+        response = client.get(url_list)
+        # Assessment creation link/button is removed/disabled from the page without an ongoing open campaign.
+        assertNotContains(response, url_create)
+        campaign = AssessmentCampaignFactory(year=2025, is_open=True)
+        assert campaign.is_currently_open
+        response = client.get(url_list)
+        assertContains(response, url_create)
+        response = client.get(url_list)
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="assessments empty list")
 
     @freeze_time("2025-05-21 12:00", tick=True)
@@ -181,6 +189,12 @@ class TestCreateAssessmentView:
 
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:create"))
+        assert response.status_code == 403  # Cannot create without an ongoing open campaign.
+
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        campaign = AssessmentCampaignFactory(year=2025, is_open=True)
+        assert campaign.is_currently_open
+        response = client.get(reverse("geiq_assessments_views:create"))
         assert response.status_code == 200
 
     def test_info_missing_for_creation(self, client, settings, snapshot):
@@ -188,7 +202,7 @@ class TestCreateAssessmentView:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
         response = client.get(reverse("geiq_assessments_views:create"))
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no campaign or data")
+        assert response.status_code == 403  # Cannot create an assessment without an ongoing open campaign.
         campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
         response = client.get(reverse("geiq_assessments_views:create"))
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no campaign or data")
@@ -214,7 +228,7 @@ class TestCreateAssessmentView:
             department=35,  # The DREETS matching deets
         )
         client.force_login(membership.user)
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1, is_open=True)
         LabelInfos.objects.create(
             campaign=campaign,
             data=[
@@ -265,7 +279,7 @@ class TestCreateAssessmentView:
             department=35,  # The DREETS matching deets
         )
         client.force_login(membership.user)
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1, is_open=True)
         other_antenna = CompanyFactory(siret="12345678903456", kind=CompanyKind.GEIQ)
         non_geiq_antenna = CompanyFactory(siret="12345678902345", kind=CompanyKind.ACI)
         LabelInfos.objects.create(

@@ -156,24 +156,28 @@ def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.h
     )
     context = {
         "assessments": assessments,
+        "current_campaign": AssessmentCampaign.objects.filter(year=timezone.localdate().year - 1).first(),
     }
     return render(request, template_name, context)
 
 
 @check_request(employer_has_access_to_assessments)
 def create_assessment(request, template_name="geiq_assessments_views/create.html"):
-    current_siret = request.current_organization.siret
-    campaign_label_infos = LabelInfos.objects.filter(campaign__year=timezone.localdate().year - 1).first()
+    organization_siret = request.current_organization.siret
+    current_campaign = AssessmentCampaign.objects.filter(year=timezone.localdate().year - 1).first()
+    if not current_campaign or not current_campaign.is_currently_open:
+        raise PermissionDenied
+    campaign_label_infos = LabelInfos.objects.filter(campaign=current_campaign).first()
     label_data = campaign_label_infos.data if campaign_label_infos else []
     for geiq_data in label_data:
-        if current_siret in [geiq_data["siret"], *(antenna["siret"] for antenna in geiq_data["antennes"])]:
+        if organization_siret in [geiq_data["siret"], *(antenna["siret"] for antenna in geiq_data["antennes"])]:
             geiq_info = geiq_data
             break
     else:
         geiq_info = None
 
     context = {
-        "siret": current_siret,
+        "siret": organization_siret,
         "campaign_label_infos": campaign_label_infos,
         "geiq_info": geiq_info,
         "conflicting_antennas": [],

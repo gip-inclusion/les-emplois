@@ -32,8 +32,17 @@ class AssessmentCampaignFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("year",)
 
     year = factory.fuzzy.FuzzyInteger(2020, 2023)
+    opening_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 6, 1))
     submission_deadline = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 7, 1))
     review_deadline = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 8, 1))
+
+    class Params:
+        is_open = factory.Trait(
+            year=datetime.date.today().year,
+            opening_date=datetime.date.today() - datetime.timedelta(days=30),
+            submission_deadline=datetime.date.today() + datetime.timedelta(days=30),
+            review_deadline=datetime.date.today() + datetime.timedelta(days=60),
+        )
 
 
 class AssessmentFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
