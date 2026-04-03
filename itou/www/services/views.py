@@ -30,4 +30,6 @@ class ServiceDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
+        context["back_url"] = "#"  # TODO: link to the service list once it exists
+        context["matomo_custom_title"] = "Fiche de la service d'insértion"
         return context
