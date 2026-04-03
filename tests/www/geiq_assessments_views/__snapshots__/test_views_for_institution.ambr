@@ -623,7 +623,7 @@
                       </div>
                       <div class="c-box--summary__footer">
                           <div class="d-flex justify-content-end">
-                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                              <a class="btn btn-primary btn-block btn-ico w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/print" rel="noopener" target="_blank">
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>
                                   <span>
@@ -936,7 +936,7 @@
                       </div>
                       <div class="c-box--summary__footer">
                           <div class="d-flex justify-content-end">
-                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                              <a class="btn btn-primary btn-block btn-ico w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/print" rel="noopener" target="_blank">
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>
                                   <span>
@@ -955,8 +955,12 @@
                       <p>
                           La décision a été envoyée au GEIQ.
                       </p>
-                      <a class="btn btn-primary btn-block" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
-                          Afficher la décision
+                      <a class="btn btn-primary btn-block btn-ico" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/print" rel="noopener" target="_blank">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
+                          </i>
+                          <span>
+                              Consulter la décision
+                          </span>
                       </a>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -1562,7 +1566,7 @@
                       </div>
                       <div class="c-box--summary__footer">
                           <div class="d-flex justify-content-end">
-                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                              <a class="btn btn-primary btn-block btn-ico w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/print" rel="noopener" target="_blank">
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>
                                   <span>
@@ -2201,6 +2205,208 @@
           </div>
       </div>
   </section>
+  
+  '''
+# ---
+# name: TestAssessmentReviewView.test_review_already_reviewed_assessment[print assessment with final review]
+  '''
+  <main>
+      <div class="container py-4 px-5">
+          <div class="row justify-content-center d-print-none">
+              <div class="mt-5">
+                  <button aria-label="Imprimer cette décision" class="btn btn-primary btn-ico" data-it-action="print" type="button">
+                      <i aria-hidden="true" class="ri-printer-line">
+                      </i>
+                      <span>
+                          Imprimer cette décision
+                      </span>
+                  </button>
+              </div>
+          </div>
+          <h1 class="mt-5">
+              Décision -
+          </h1>
+          <section class="mt-5">
+              <h2>
+                  Structures concernées par la convention
+              </h2>
+              <ul>
+                  <li>
+                      Siège (29)
+                  </li>
+                  <li>
+                      Une antenne (29)
+                  </li>
+              </ul>
+          </section>
+          <section class="mt-5">
+              <h2>
+                  Récapitulatif
+              </h2>
+              <dl class="list-data col-6 mb-3">
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Nombre d’aides à 814 €
+                      </dt>
+                      <dd>
+                          <strong>
+                              0
+                          </strong>
+                      </dd>
+                  </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Nombre d’aides à 1 400 €
+                      </dt>
+                      <dd>
+                          <strong>
+                              0
+                          </strong>
+                      </dd>
+                  </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Nombre d’aides refusées
+                      </dt>
+                      <dd>
+                          <strong>
+                              0
+                          </strong>
+                      </dd>
+                  </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Montant total potentiel
+                      </dt>
+                      <dd>
+                          <strong>
+                              -
+                          </strong>
+                      </dd>
+                  </div>
+              </dl>
+              <p class="small">
+                  Ces données ont été calculées suite à la sélection que vous avez effectuée.
+              </p>
+          </section>
+          <section class="mt-5">
+              <h2>
+                  Conventionnement
+              </h2>
+              <dl class="list-data col-6">
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Montant conventionné (convention initiale + avenants)
+                      </dt>
+                      <dd>
+                          <strong>
+                              100 000 €
+                          </strong>
+                      </dd>
+                  </div>
+              </dl>
+          </section>
+          <section class="mt-5">
+              <h2>
+                  Décision
+              </h2>
+              <dl class="list-data col-6">
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Montant total accordé
+                      </dt>
+                      <dd>
+                          <strong>
+                              80 000 €
+                          </strong>
+                      </dd>
+                  </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Premier versement déjà réalisé
+                      </dt>
+                      <dd>
+                          <strong>
+                              50 000 €
+                          </strong>
+                      </dd>
+                  </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Deuxième versement à prévoir
+                      </dt>
+                      <dd>
+                          <strong>
+                              30 000 €
+                          </strong>
+                      </dd>
+                  </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Ordre de reversement
+                      </dt>
+                      <dd>
+                          <strong>
+                              -
+                          </strong>
+                      </dd>
+                  </div>
+              </dl>
+          </section>
+          <section class="mt-5">
+              <h2>
+                  Commentaire
+              </h2>
+              <div>
+                  <p>
+                      Bravo !
+                  </p>
+              </div>
+          </section>
+          <section class="mt-5">
+              <h2>
+                  Historique
+              </h2>
+              <ul class="list-step">
+                  <li>
+                      <time datetime="2025-05-21T19:00:00+00:00">
+                          Le 21/05/2025
+                      </time>
+                      <span>
+                          Décision validée par Julia THOMAS - Un DREETS GEIQ
+                      </span>
+                  </li>
+                  <li>
+                      <time datetime="2025-05-21T18:00:00+00:00">
+                          Le 21/05/2025
+                      </time>
+                      <span>
+                          Contrôle réalisé par Jean DUPONT - Un DDETS GEIQ
+                      </span>
+                  </li>
+                  <li>
+                      <time datetime="2025-05-21T15:00:00+00:00">
+                          Le 21/05/2025
+                      </time>
+                      <span>
+                          Bilan transmis par Paul MARTIN - GEIQ
+                      </span>
+                  </li>
+              </ul>
+          </section>
+          <div class="row justify-content-center d-print-none">
+              <div class="mt-5 mb-2">
+                  <button aria-label="Imprimer cette décision" class="btn btn-primary btn-ico" data-it-action="print" type="button">
+                      <i aria-hidden="true" class="ri-printer-line">
+                      </i>
+                      <span>
+                          Imprimer cette décision
+                      </span>
+                  </button>
+              </div>
+          </div>
+      </div>
+  </main>
   
   '''
 # ---

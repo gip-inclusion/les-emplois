@@ -199,7 +199,7 @@
                             <div class="c-box--summary__footer">
                                 <div class="d-flex justify-content-end">
                                     {% if assessment.decision_validated_at %}
-                                        <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                        <a class="btn btn-primary btn-block btn-ico w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_print" pk=assessment.pk %}" rel="noopener" target="_blank">
                                             <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                                             <span>Consulter la décision</span>
                                         </a>
