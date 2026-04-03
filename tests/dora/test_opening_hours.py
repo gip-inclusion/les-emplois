@@ -75,7 +75,11 @@ def test_time_formatting():
 
 def test_complex_case():
     result = format_osm_hours(
-        'Mo 08:30-12:00,13:30-16:00 open "Sans rendez-vous"; Tu-Th 08:30-12:00; Fr 10:00-11:00 open "Sans rendez-vous"; PH off'
+        """
+        Mo 08:30-12:00,13:30-16:00 open "Sans rendez-vous";
+        Tu-Th 08:30-12:00; Fr 10:00-11:00 open "Sans rendez-vous";
+        PH off"
+        """
     )
 
     assert len(result["entries"]) == 5
