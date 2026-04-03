@@ -855,7 +855,7 @@ def test_employee_record_ntt_constraint(subtests):
 
 
 def test_has_valid_data_filled():
-    employee_record = EmployeeRecordFactory.build(
+    employee_record = EmployeeRecordFactory(
         job_application__job_seeker__jobseeker_profile__with_hexa_address=True,
         job_application__job_seeker__jobseeker_profile__with_education_level=True,
         job_application__job_seeker__jobseeker_profile__with_classic_nir=True,
