@@ -45,14 +45,24 @@ class Command(BaseCommand):
 
     @functools.cached_property
     def disabled_dora_form_di_structures(self):
-        return DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN).disabled_dora_form_di_structures()
+        try:
+            return DoraAPIClient(
+                settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN
+            ).disabled_dora_form_di_structures()
+        except Exception:
+            self.logger.exception("Ignoring DoraAPIClient error")
+            return set()
 
     @functools.cached_property
     def dora_services(self):
-        return {
-            "dora--" + r["id"]: {**r, "uid": "dora--" + r["id"]}
-            for r in DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN).emplois_services()
-        }
+        try:
+            return {
+                "dora--" + r["id"]: {**r, "uid": "dora--" + r["id"]}
+                for r in DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN).emplois_services()
+            }
+        except Exception:
+            self.logger.exception("Ignoring DoraAPIClient error")
+            return {}
 
     def import_reference_data(self, client):
         self.logger.info("Importing references data")
