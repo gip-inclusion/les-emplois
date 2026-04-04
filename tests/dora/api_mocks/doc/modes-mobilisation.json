@@ -1,0 +1,22 @@
+[
+  {
+    "value": "envoyer-un-courriel",
+    "label": "Envoyer un courriel",
+    "description": "Envoyer un courriel \u00e0 l\u2019adresse \u00e9lectronique associ\u00e9e au service, ou \u00e0 d\u00e9faut, \u00e0 la structure."
+  },
+  {
+    "value": "se-presenter",
+    "label": "Se pr\u00e9senter",
+    "description": "Se pr\u00e9senter directement \u00e0 l\u2019adresse associ\u00e9e au service ou, \u00e0 d\u00e9faut, \u00e0 la structure."
+  },
+  {
+    "value": "telephoner",
+    "label": "T\u00e9l\u00e9phoner",
+    "description": "T\u00e9l\u00e9phoner au num\u00e9ro associ\u00e9 au service, ou \u00e0 d\u00e9faut, \u00e0 la structure."
+  },
+  {
+    "value": "utiliser-lien-mobilisation",
+    "label": "Utiliser le lien de mobilisation",
+    "description": "Utiliser le lien de mobilisation du service."
+  }
+]

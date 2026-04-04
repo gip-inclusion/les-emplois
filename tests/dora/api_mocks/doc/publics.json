@@ -1,0 +1,72 @@
+[
+  {
+    "value": "actifs",
+    "label": "Actifs",
+    "description": "Toute personne ayant un emploi, qu\u2019il soit salari\u00e9, lib\u00e9ral ou \u00e0 son compte"
+  },
+  {
+    "value": "beneficiaires-des-minimas-sociaux",
+    "label": "B\u00e9n\u00e9ficiaires des minimas sociaux",
+    "description": "Personnes touchant des aides financi\u00e8res telles que RSA, SMIC, allocations familiales, bourses, etc"
+  },
+  {
+    "value": "demandeurs-emploi",
+    "label": "Demandeurs d\u2019emploi",
+    "description": "Demandeurs d\u2019emploi de tout type"
+  },
+  {
+    "value": "etudiants",
+    "label": "\u00c9tudiants",
+    "description": "\u00c9tudiants"
+  },
+  {
+    "value": "familles",
+    "label": "Familles",
+    "description": "Familles, parents, enfants, etc"
+  },
+  {
+    "value": "femmes",
+    "label": "Femmes",
+    "description": "Femmes isol\u00e9es, victimes de violence, etc"
+  },
+  {
+    "value": "jeunes",
+    "label": "Jeunes",
+    "description": "Jeunes au sens large, jeunes adultes, adolescents, etc"
+  },
+  {
+    "value": "personnes-en-situation-de-handicap",
+    "label": "Personnes en situation de handicap",
+    "description": "Personnes en situation de handicap de tout type"
+  },
+  {
+    "value": "personnes-en-situation-durgence",
+    "label": "Personnes en situation d\u2019urgence",
+    "description": "SDF, victimes de violence, grande pr\u00e9carit\u00e9, etc"
+  },
+  {
+    "value": "personnes-en-situation-juridique-specifique",
+    "label": "Personnes en situation juridique sp\u00e9cifique",
+    "description": "Personnes sortant de d\u00e9tention, d\u00e9tenus ou autre statut juridique sp\u00e9cifique"
+  },
+  {
+    "value": "personnes-exilees",
+    "label": "Personnes exil\u00e9es",
+    "description": "R\u00e9fugi\u00e9s, demandeurs d\u2019asile, personnes immigr\u00e9es, etc"
+  },
+  {
+    "value": "residents-qpv-frr",
+    "label": "R\u00e9sidents en QPV ou FRR",
+    "description": "Personnes r\u00e9sidentes en zone Quartier Prioritaire de la Ville ou France Ruralit\u00e9s Revitalisation (anciennement ZRR)"
+  },
+  {
+    "value": "seniors",
+    "label": "S\u00e9niors",
+    "description": "Personnes \u00e2g\u00e9es, retrait\u00e9s, etc"
+  },
+  {
+    "value": "tous-publics",
+    "label": "Tous publics",
+    "description": "Tous publics"
+  }
+]

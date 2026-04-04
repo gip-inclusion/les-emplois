@@ -1,0 +1,347 @@
+[
+  {
+    "value": "choisir-un-metier--confirmer-son-choix-de-metier",
+    "label": "Confirmer son choix de m\u00e9tier",
+    "description": null
+  },
+  {
+    "value": "choisir-un-metier--connaitre-les-opportunites-demploi",
+    "label": "Conna\u00eetre les opportunit\u00e9s d\u2019emploi",
+    "description": null
+  },
+  {
+    "value": "choisir-un-metier--decouvrir-un-metier-ou-un-secteur-dactivite",
+    "label": "D\u00e9couvrir un m\u00e9tier ou un secteur d\u2019activit\u00e9",
+    "description": null
+  },
+  {
+    "value": "choisir-un-metier--identifier-ses-points-forts-et-ses-competences",
+    "label": "Identifier ses points forts et ses comp\u00e9tences",
+    "description": null
+  },
+  {
+    "value": "creer-une-entreprise--definir-son-projet-de-creation-dentreprise",
+    "label": "D\u00e9finir son projet de cr\u00e9ation d\u2019entreprise",
+    "description": null
+  },
+  {
+    "value": "creer-une-entreprise--developper-son-entreprise",
+    "label": "D\u00e9velopper son entreprise",
+    "description": null
+  },
+  {
+    "value": "creer-une-entreprise--structurer-son-projet-de-creation-dentreprise",
+    "label": "Structurer son projet de cr\u00e9ation d\u2019entreprise",
+    "description": null
+  },
+  {
+    "value": "difficultes-administratives-ou-juridiques--accompagnement-aux-demarches-administratives",
+    "label": "Accompagnement aux d\u00e9marches administratives",
+    "description": null
+  },
+  {
+    "value": "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete",
+    "label": "Accompagnement pour l\u2019acc\u00e8s \u00e0 la citoyennet\u00e9",
+    "description": null
+  },
+  {
+    "value": "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-aux-droits",
+    "label": "Accompagnement pour l\u2019acc\u00e8s aux droits",
+    "description": null
+  },
+  {
+    "value": "difficultes-administratives-ou-juridiques--beneficier-dune-mesure-daccompagnement-adapte",
+    "label": "B\u00e9n\u00e9ficier d\u2019une mesure d\u2019accompagnement adapt\u00e9",
+    "description": null
+  },
+  {
+    "value": "difficultes-administratives-ou-juridiques--connaitre-ses-droits-face-a-une-discrimination",
+    "label": "Conna\u00eetre ses droits face \u00e0 une discrimination",
+    "description": null
+  },
+  {
+    "value": "difficultes-administratives-ou-juridiques--prendre-en-compte-une-problematique-judiciaire",
+    "label": "Prendre en compte une probl\u00e9matique judiciaire",
+    "description": null
+  },
+  {
+    "value": "difficultes-financieres--acquerir-une-autonomie-budgetaire",
+    "label": "Acqu\u00e9rir une autonomie budg\u00e9taire",
+    "description": null
+  },
+  {
+    "value": "difficultes-financieres--ameliorer-sa-gestion-budgetaire",
+    "label": "Am\u00e9liorer sa gestion budg\u00e9taire",
+    "description": null
+  },
+  {
+    "value": "difficultes-financieres--mettre-en-place-une-mesure-de-protection-financiere",
+    "label": "Mettre en place une mesure de protection financi\u00e8re",
+    "description": null
+  },
+  {
+    "value": "difficultes-financieres--prevenir-une-degradation-de-la-situation-financiere",
+    "label": "Pr\u00e9venir une d\u00e9gradation de la situation financi\u00e8re",
+    "description": null
+  },
+  {
+    "value": "difficultes-financieres--situation-dendettement-surendettement",
+    "label": "Situation d\u2019endettement ou de surendettement",
+    "description": null
+  },
+  {
+    "value": "equipement-et-alimentation--aide-menagere",
+    "label": "Aide m\u00e9nag\u00e8re",
+    "description": null
+  },
+  {
+    "value": "equipement-et-alimentation--alimentation",
+    "label": "Alimentation",
+    "description": null
+  },
+  {
+    "value": "equipement-et-alimentation--electromenager",
+    "label": "\u00c9lectrom\u00e9nager",
+    "description": null
+  },
+  {
+    "value": "equipement-et-alimentation--habillement",
+    "label": "Habillement",
+    "description": null
+  },
+  {
+    "value": "famille--garde-denfants",
+    "label": "Garde d\u2019enfants",
+    "description": null
+  },
+  {
+    "value": "famille--prise-en-charge-personne-dependante",
+    "label": "Prise en charge d\u2019une personne d\u00e9pendante",
+    "description": null
+  },
+  {
+    "value": "famille--soutien-a-la-parentalite-et-a-leducation",
+    "label": "Soutien \u00e0 la parentalit\u00e9 et \u00e0 l\u2019\u00e9ducation",
+    "description": null
+  },
+  {
+    "value": "famille--soutien-aidants",
+    "label": "Soutien aux aidants",
+    "description": null
+  },
+  {
+    "value": "famille--surmonter-conflits-separation-violence",
+    "label": "Surmonter les conflits li\u00e9s \u00e0 la s\u00e9paration ou \u00e0 la violence",
+    "description": null
+  },
+  {
+    "value": "lecture-ecriture-calcul--maitriser-le-calcul",
+    "label": "Ma\u00eetriser le calcul",
+    "description": null
+  },
+  {
+    "value": "lecture-ecriture-calcul--maitriser-le-francais",
+    "label": "Ma\u00eetriser le fran\u00e7ais",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--acheter-un-logement",
+    "label": "Acheter un logement",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--changer-de-logement",
+    "label": "Changer de logement",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--louer-un-logement",
+    "label": "Louer un logement",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--rechercher-une-solution-dhebergement-temporaire",
+    "label": "Rechercher une solution d\u2019h\u00e9bergement temporaire",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--reduire-les-impayes-de-loyer",
+    "label": "R\u00e9duire les impay\u00e9s de loyer",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--se-maintenir-dans-le-logement",
+    "label": "Se maintenir dans le logement",
+    "description": null
+  },
+  {
+    "value": "logement-hebergement--sinformer-sur-les-demarches-liees-a-lacces-au-logement",
+    "label": "S\u2019informer sur les d\u00e9marches li\u00e9es \u00e0 l\u2019acc\u00e8s au logement",
+    "description": null
+  },
+  {
+    "value": "mobilite--acceder-a-un-vehicule",
+    "label": "Acc\u00e9der \u00e0 un v\u00e9hicule",
+    "description": null
+  },
+  {
+    "value": "mobilite--entretenir-reparer-son-vehicule",
+    "label": "Entretenir et r\u00e9parer son v\u00e9hicule",
+    "description": null
+  },
+  {
+    "value": "mobilite--etre-accompagne-dans-son-parcours-mobilite",
+    "label": "\u00catre accompagn\u00e9 dans son parcours mobilit\u00e9",
+    "description": null
+  },
+  {
+    "value": "mobilite--financer-ma-mobilite",
+    "label": "Financer ma mobilit\u00e9",
+    "description": null
+  },
+  {
+    "value": "mobilite--mobilite-douce-partagee-collective",
+    "label": "Utiliser des services de mobilit\u00e9 douce, partag\u00e9e ou collective",
+    "description": null
+  },
+  {
+    "value": "mobilite--preparer-un-permis",
+    "label": "Pr\u00e9parer un permis",
+    "description": null
+  },
+  {
+    "value": "numerique--acceder-a-des-services-en-ligne",
+    "label": "Acc\u00e9der \u00e0 des services en ligne",
+    "description": null
+  },
+  {
+    "value": "numerique--acceder-a-une-connexion-internet",
+    "label": "Acc\u00e9der \u00e0 une connexion Internet",
+    "description": null
+  },
+  {
+    "value": "numerique--acquerir-un-equipement",
+    "label": "Acqu\u00e9rir un \u00e9quipement",
+    "description": null
+  },
+  {
+    "value": "numerique--maitriser-les-fondamentaux-du-numerique",
+    "label": "Ma\u00eetriser les fondamentaux du num\u00e9rique",
+    "description": null
+  },
+  {
+    "value": "preparer-sa-candidature--developper-son-reseau",
+    "label": "D\u00e9velopper son r\u00e9seau",
+    "description": null
+  },
+  {
+    "value": "preparer-sa-candidature--organiser-ses-demarches-de-recherche-demploi",
+    "label": "Organiser ses d\u00e9marches de recherche d\u2019emploi",
+    "description": null
+  },
+  {
+    "value": "preparer-sa-candidature--realiser-un-cv-et-ou-une-lettre-de-motivation",
+    "label": "R\u00e9aliser un CV et/ou une lettre de motivation",
+    "description": null
+  },
+  {
+    "value": "preparer-sa-candidature--valoriser-ses-competences",
+    "label": "Valoriser ses comp\u00e9tences",
+    "description": null
+  },
+  {
+    "value": "remobilisation--activites-sportives-et-culturelles",
+    "label": "Activit\u00e9s sportives et culturelles",
+    "description": null
+  },
+  {
+    "value": "remobilisation--benevolat-action-citoyenne",
+    "label": "B\u00e9n\u00e9volat et action citoyenne",
+    "description": null
+  },
+  {
+    "value": "remobilisation--bien-etre-confiance-en-soi",
+    "label": "Bien-\u00eatre et confiance en soi",
+    "description": null
+  },
+  {
+    "value": "remobilisation--lien-social",
+    "label": "Lien social",
+    "description": null
+  },
+  {
+    "value": "sante--acces-aux-soins",
+    "label": "Acc\u00e8s aux soins",
+    "description": null
+  },
+  {
+    "value": "sante--addictions",
+    "label": "Addictions",
+    "description": null
+  },
+  {
+    "value": "sante--constituer-un-dossier-mdph-invalidite",
+    "label": "Constituer un dossier MDPH pour invalidit\u00e9",
+    "description": null
+  },
+  {
+    "value": "sante--sante-mentale",
+    "label": "Sant\u00e9 mentale",
+    "description": null
+  },
+  {
+    "value": "sante--sante-sexuelle",
+    "label": "Sant\u00e9 sexuelle",
+    "description": null
+  },
+  {
+    "value": "se-former--monter-son-dossier-de-formation",
+    "label": "Monter son dossier de formation",
+    "description": null
+  },
+  {
+    "value": "se-former--trouver-sa-formation",
+    "label": "Trouver sa formation",
+    "description": null
+  },
+  {
+    "value": "souvrir-a-linternational--connaitre-les-opportunites-demploi-a-letranger",
+    "label": "Conna\u00eetre les opportunit\u00e9s d\u2019emploi \u00e0 l\u2019\u00e9tranger",
+    "description": null
+  },
+  {
+    "value": "souvrir-a-linternational--sinformer-sur-les-aides-pour-travailler-a-letranger",
+    "label": "S\u2019informer sur les aides pour travailler \u00e0 l\u2019\u00e9tranger",
+    "description": null
+  },
+  {
+    "value": "souvrir-a-linternational--sorganiser-suite-a-son-retour-en-france",
+    "label": "S\u2019organiser suite \u00e0 son retour en France",
+    "description": null
+  },
+  {
+    "value": "trouver-un-emploi--convaincre-un-recruteur-en-entretien",
+    "label": "Convaincre un recruteur en entretien",
+    "description": null
+  },
+  {
+    "value": "trouver-un-emploi--faire-des-candidatures-spontanees",
+    "label": "Faire des candidatures spontan\u00e9es",
+    "description": null
+  },
+  {
+    "value": "trouver-un-emploi--maintien-dans-lemploi",
+    "label": "Maintien dans l\u2019emploi",
+    "description": null
+  },
+  {
+    "value": "trouver-un-emploi--repondre-a-des-offres-demploi",
+    "label": "R\u00e9pondre \u00e0 des offres d\u2019emploi",
+    "description": null
+  },
+  {
+    "value": "trouver-un-emploi--suivre-ses-candidatures-et-relancer-les-employeurs",
+    "label": "Suivre ses candidatures et relancer les employeurs",
+    "description": null
+  }
+]
