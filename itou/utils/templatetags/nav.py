@@ -21,6 +21,7 @@ class NavItem:
         target,
         active_view_names,
         is_new=False,
+        is_beta=False,
         matomo_event_category=None,
         matomo_event_name=None,
         matomo_event_option=None,
@@ -30,6 +31,7 @@ class NavItem:
         self.target = target
         self.active_view_names = active_view_names
         self.is_new = is_new
+        self.is_beta = is_beta
         self.matomo_event_category = matomo_event_category
         self.matomo_event_name = matomo_event_name
         self.matomo_event_option = matomo_event_option
@@ -53,6 +55,10 @@ class NavGroup:
     @property
     def is_new(self):
         return any(item.is_new for item in self.items)
+
+    @property
+    def is_beta(self):
+        return any(item.is_beta for item in self.items)
 
     def __repr__(self):
         return f"NavGroup(label={self.label})"
@@ -106,7 +112,7 @@ NAV_ENTRIES = {
         label="Un service d'insertion",
         target=reverse("search:services_results"),
         active_view_names=["search:services_home", "search:services_results"],
-        is_new=True,
+        is_beta=True,
     ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(

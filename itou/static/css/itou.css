@@ -399,7 +399,8 @@ table.table td > .modal .modal-content {
 
 /* offcanvasNav Menu */
 #offcanvasNav .offcanvas-body .nav-link[aria-expanded=true] {
-    .badge.bg-important {
+    .badge.bg-important,
+    .badge.bg-important-lighter {
         display: none !important;
     }
 }
