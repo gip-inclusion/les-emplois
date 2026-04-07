@@ -571,14 +571,14 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     elif request.from_institution:
         stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
 
-    # Initializing the filter form with the raw parameters
-    filters_form = ContractFilterForm(request.GET or None)
-
     contracts_qs = (
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
         .select_related("employee__assessment")
         .order_by("employee__last_name", "employee__first_name")
     )
+
+    # Initializing the filter form with the raw parameters
+    filters_form = ContractFilterForm(data=request.GET, employee_contracts_qs=contracts_qs)
 
     contracts_qs = filters_form.filter(contracts_qs)
 

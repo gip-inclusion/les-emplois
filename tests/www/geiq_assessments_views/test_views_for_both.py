@@ -85,6 +85,7 @@ class TestAssessmentContractsListAndToggle:
         )
         EmployeeContractFactory(
             id=uuid.UUID("11111111-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("11111111-eeee-4444-8888-111111111111"),
             employee__assessment=assessment,
             employee__last_name="Dupont",
             employee__first_name="Jean",
@@ -96,6 +97,7 @@ class TestAssessmentContractsListAndToggle:
         )
         EmployeeContractFactory(
             id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("22222222-eeee-4444-8888-222222222222"),
             employee__assessment=assessment,
             employee__last_name="Martin",
             employee__first_name="Cécile",
@@ -107,6 +109,7 @@ class TestAssessmentContractsListAndToggle:
         )
         EmployeeContractFactory(
             id=uuid.UUID("33333333-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("33333333-eeee-4444-8888-333333333333"),
             employee__assessment=assessment,
             employee__last_name="Dupond",
             employee__first_name="Jean-Pierre",
@@ -196,6 +199,7 @@ class TestAssessmentContractsListAndToggle:
         )
         EmployeeContractFactory(
             id=uuid.UUID("11111111-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("11111111-eeee-4444-8888-111111111111"),
             employee__assessment=assessment,
             employee__last_name="Dupont",
             employee__first_name="Jean",
@@ -208,6 +212,7 @@ class TestAssessmentContractsListAndToggle:
         )
         EmployeeContractFactory(
             id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("22222222-eeee-4444-8888-222222222222"),
             employee__assessment=assessment,
             employee__last_name="Martin",
             employee__first_name="Cécile",
@@ -304,6 +309,7 @@ class TestAssessmentContractsListAndToggle:
         )
         EmployeeContractFactory(
             id=uuid.UUID("33333333-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("33333333-eeee-4444-8888-333333333333"),
             employee__assessment=assessment,
             employee__last_name="Dupond",
             employee__first_name="Jean-Pierre",

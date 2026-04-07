@@ -1,9 +1,10 @@
 from django import forms
 from django.forms import widgets
 from django.utils import timezone
+from django_select2.forms import Select2Widget
 
 from itou.files.forms import ItouFileField
-from itou.geiq_assessments.models import Assessment
+from itou.geiq_assessments.models import Assessment, Employee
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
@@ -255,6 +256,25 @@ class ContractFilterForm(forms.Form):
     allowance_requested_off = forms.BooleanField(label="Non", required=False)
     allowance_eligibility_on = forms.BooleanField(label="Oui", required=False)
     allowance_eligibility_off = forms.BooleanField(label="Non", required=False)
+    employee = forms.ModelChoiceField(
+        queryset=Employee.objects.all(),
+        label="Nom du salarié",
+        required=False,
+        widget=Select2Widget(
+            attrs={
+                "data-placeholder": "Nom du salarié",
+            }
+        ),
+    )
+
+    def __init__(self, employee_contracts_qs, *args, **kwargs):
+        self.employee_contracts_qs = employee_contracts_qs
+        super().__init__(*args, **kwargs)
+
+        self.fields["employee"].queryset = Employee.objects.filter(
+            pk__in=self.employee_contracts_qs.values_list("employee_id", flat=True).distinct()
+        ).order_by("last_name", "first_name")
+        self.fields["employee"].label_from_instance = lambda obj: obj.get_full_name()
 
     def clean(self):
         """
@@ -327,6 +347,10 @@ class ContractFilterForm(forms.Form):
                 queryset = queryset.filter(allowance_granted=False)
             case _:
                 pass
+
+        employee = self.cleaned_data.get("employee")
+        if employee:
+            queryset = queryset.filter(employee=employee)
 
         return queryset
 

@@ -1489,7 +1489,7 @@ class TestAssessmentContractsListView:
         assert trigger_btn.get("type") == "button"
 
     def test_contract_list_htmx_consistency(self, client):
-        EmployeeContractFactory(employee__assessment=self.assessment)
+        contract = EmployeeContractFactory(employee__assessment=self.assessment)
 
         filter_data = {
             "start_date_lower": "2024-06-01",
@@ -1498,6 +1498,7 @@ class TestAssessmentContractsListView:
             "potential_allowance_1400": "on",
             "allowance_requested_off": "on",
             "allowance_eligibility": "on",
+            "employee": contract.employee.pk,
         }
 
         response = client.get(self.url, filter_data)
@@ -1672,3 +1673,22 @@ class TestAssessmentContractsListView:
             assert contracts_map[key] in contracts_in_page
         for key in expected_not_in:
             assert contracts_map[key] not in contracts_in_page
+
+    def test_contract_list_filter_by_employee_name(self, client):
+        target_contract = EmployeeContractFactory(
+            employee__assessment=self.assessment,
+            employee__first_name="Jean",
+            employee__last_name="Dupont",
+        )
+        other_contract = EmployeeContractFactory(
+            employee__assessment=self.assessment,
+            employee__first_name="Marie",
+            employee__last_name="Martin",
+        )
+
+        response = client.get(self.url, {"employee": target_contract.employee.pk})
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        assert target_contract in contracts_in_page
+        assert other_contract not in contracts_in_page

@@ -92,6 +92,9 @@
                         <div class="flex-md-grow-1">
                             {% include "geiq_assessments_views/includes/list_counter.html" with contracts_page=contracts_page request=request only %}
                         </div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">
+                            {% bootstrap_field filters_form.employee wrapper_class="w-lg-400px" show_label=False %}
+                        </div>
                     </div>
                     {% partialdef contracts-results-table inline %}
                         {% if request.htmx and not request.htmx.boosted %}
@@ -218,4 +221,5 @@
 
 {% block script %}
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}
