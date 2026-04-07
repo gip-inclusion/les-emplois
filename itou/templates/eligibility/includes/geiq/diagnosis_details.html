@@ -1,7 +1,7 @@
 {% load badges %}
 {% load components %}
 
-{% if diagnosis.is_valid or job_application.state.is_accepted and diagnosis %}
+{% if diagnosis and diagnosis.is_valid or diagnosis and job_application.geiq_eligibility_diagnosis == diagnosis %}
     <div class="c-box mb-3 mb-md-4">
         <div class="row">
             <div class="col-12 col-md">
@@ -76,7 +76,7 @@
         {% endif %}
     </div>
 {% else %}
-    {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
+    {# Either there has never been a diagnosis, or it has expired and is no longer valid. #}
     <div class="c-box mb-3 mb-md-4">
         <div class="row align-items-center">
             <div class="col-12 col-md">
@@ -92,7 +92,7 @@
             </div>
         </div>
         {% if request.from_employer %}
-            {# GEIQ eligibility diagnosis expired #}
+            {# GEIQ eligibility diagnosis has expired #}
             {% if diagnosis and not diagnosis.is_valid %}
                 {% component_alert title=title content=content variant="warning" extra_classes="mt-4" %}
                     {% fragment as title %}
