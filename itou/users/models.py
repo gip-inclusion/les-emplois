@@ -6,7 +6,6 @@ from collections import Counter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import ArrayField
@@ -178,82 +177,6 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
             del result[pe_id]
 
         return result
-
-    # FIXME: deprecated method
-    def linked_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None):
-        """
-        Return the ids of job seekers that appear in the user's job seekers list view
-
-        With from_all_coworkers=False :
-        - job seekers created by the user as a member of organization
-        - job seekers created by the user as a member of no organization
-        - job seekers for whom the user applied as a member of organization
-        - job seekers for whom the user applied as a member of no organization
-        - job seekers for whom the current user made a EligibilityDiagnosis as a member of organization
-        - job seekers for whom the current user made a EligibilityDiagnosis as a member of no organization
-        - job seekers for whom the current user made a GEIQEligibilityDiagnosis as a member of organization
-        - job seekers for whom the current user made a GEIQEligibilityDiagnosis as a member of no organization
-
-        With from_all_coworkers=True:
-        - all the previous
-        - job seekers created by a member of the organization
-        - job seekers for whom a member of the organization applied
-        - job seekers for whom a member of the organization made a EligibilityDiagnosis
-        - job seekers for whom a member of the organization made a GEIQEligibilityDiagnosis
-        """
-        from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
-
-        job_application_model = apps.get_model("job_applications", "JobApplication")
-
-        # First the links for the user as a member of no organisation
-        job_seeker_filters = [
-            Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=None),
-        ]
-        job_applications_filter = [Q(sender=user, sender_prescriber_organization=None)]
-        eligibility_diagnosis_filters = [Q(author=user, author_prescriber_organization=None)]
-
-        # then the links for the organization either only for the user, or for all members
-        if organization:
-            if from_all_coworkers:
-                job_seeker_filters.append(Q(jobseeker_profile__created_by_prescriber_organization=organization))
-                job_applications_filter.append(Q(sender_prescriber_organization=organization))
-                eligibility_diagnosis_filters.append(Q(author_prescriber_organization=organization))
-            else:
-                job_seeker_filters.append(
-                    Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=organization)
-                )
-                job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
-                eligibility_diagnosis_filters.append(Q(author=user, author_prescriber_organization=organization))
-
-        created_job_seekers = self.filter(kind=UserKind.JOB_SEEKER).filter(or_queries(job_seeker_filters))
-        job_seekers_applications = job_application_model.objects.filter(or_queries(job_applications_filter))
-        job_seekers_iae_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
-            or_queries(eligibility_diagnosis_filters)
-        )
-        job_seekers_geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
-            or_queries(eligibility_diagnosis_filters)
-        )
-
-        if stalled is not None:
-            created_job_seekers = created_job_seekers.filter(
-                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "jobseeker_profile__")
-            )
-            job_seekers_applications = job_seekers_applications.filter(
-                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
-            )
-            job_seekers_iae_eligibility_diagnosis = job_seekers_iae_eligibility_diagnosis.filter(
-                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
-            )
-            job_seekers_geiq_eligibility_diagnosis = job_seekers_geiq_eligibility_diagnosis.filter(
-                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
-            )
-
-        return self.none().union(
-            created_job_seekers.values_list("id", flat=True),
-            job_seekers_applications.values_list("job_seeker_id", flat=True),
-            job_seekers_iae_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
-            job_seekers_geiq_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
-        )
 
     def assigned_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None):
         """
