@@ -237,10 +237,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         if not request.current_organization:
             raise Http404
         job_seekers_ids = list(
-            User.objects.linked_job_seeker_ids(request.user, request.current_organization, from_all_coworkers=True)
+            User.objects.assigned_job_seeker_ids(request.user, request.current_organization, from_all_coworkers=True)
         )
     else:
-        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+        job_seekers_ids = list(User.objects.assigned_job_seeker_ids(request.user, request.current_organization))
 
     user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
         job_seeker=OuterRef("pk")

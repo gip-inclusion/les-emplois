@@ -43,6 +43,8 @@ class TestApplyAsPrescriber:
             public_id="11111111-2222-3333-4444-555566667777",
             jobseeker_profile__with_education_level_above_cap_bep=True,  # Avoid auto-filled criteria
             jobseeker_profile__birthdate=timezone.localdate() - relativedelta(years=30),  # Avoid auto-filled criteria
+            created_by=prescriber,
+            with_job_seeker_assignment=True,
         )
         # This is to have a job seeker in "Mes candidats" (job_seekers_views:list)
         JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, sender=prescriber)
@@ -213,6 +215,7 @@ class TestApplyAsPrescriber:
             sent_by_prescriber_alone=True,
             job_seeker=job_seeker,
             sender=prescriber,
+            with_job_seeker_assignment=True,
         )
 
         client.force_login(prescriber)
