@@ -19,6 +19,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason, Title
 from itou.users.models import User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
@@ -198,7 +199,8 @@ class CreateEmployeeRecordTestMixin:
         self.job_seeker = self.job_application.job_seeker
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
         response = client.get(self.url)
@@ -401,7 +403,8 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
 
@@ -434,7 +437,8 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
         JobSeekerFactory(jobseeker_profile__nir=valid_nir_for_birthdate)
 
         client.force_login(self.user)
@@ -456,7 +460,8 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
     def test_lack_of_nir_with_ntt(self, client):
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
         client.get(self.url)
@@ -542,7 +547,8 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
 

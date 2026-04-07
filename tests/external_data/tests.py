@@ -110,6 +110,7 @@ def mock_api_esd(settings):
 
 class TestExternalDataImport:
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_status_ok(self):
         user = JobSeekerFactory()
 
@@ -128,6 +129,7 @@ class TestExternalDataImport:
         assert 12 == len(report.get("fields_fetched"))
 
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_status_partial(self):
         user = JobSeekerFactory()
         _mock_status_partial()
@@ -159,6 +161,7 @@ class TestExternalDataImport:
 
 class TestJobSeekerExternalData:
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_import_ok(self):
         _mock_status_ok()
 
@@ -196,6 +199,7 @@ class TestJobSeekerExternalData:
         assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_import_partial(self):
         _mock_status_partial()
 
@@ -228,6 +232,7 @@ class TestJobSeekerExternalData:
         assert data.has_minimal_social_allowance is None
 
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_has_external_data(self):
         _mock_status_ok()
 

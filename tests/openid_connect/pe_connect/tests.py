@@ -20,7 +20,7 @@ from itou.openid_connect.pe_connect import constants
 from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
@@ -148,7 +148,8 @@ class TestPoleEmploiConnect:
 
         # Update user
         peamu_user_data.last_name = "DUPUIS"
-        user, created = peamu_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = peamu_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
@@ -164,7 +165,8 @@ class TestPoleEmploiConnect:
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.PE_CONNECT,
         )
-        user, created = peamu_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = peamu_user_data.create_or_update_user()
         assert not created
         assert user.last_name == PEAMU_USERINFO["family_name"]
         assert user.first_name == PEAMU_USERINFO["given_name"]
@@ -209,7 +211,8 @@ class TestPoleEmploiConnect:
             certifiable_by_api_particulier=True,
         )
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        user, created = peamu_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = peamu_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
         assert user.first_name == job_seeker.first_name
@@ -237,7 +240,6 @@ class TestPoleEmploiConnect:
         response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302
 
-    @pytest.mark.django_db(transaction=True)
     @respx.mock
     def test_callback(self, client):
         # New created job seeker has no title and is redirected to complete its infos
@@ -254,7 +256,8 @@ class TestPoleEmploiConnect:
         assert user.externaldataimport_set.pe_sources().get().status == ExternalDataImport.STATUS_OK
 
         user.jobseeker_profile.birthdate = datetime.date(2001, 1, 1)
-        user.jobseeker_profile.save()
+        with triggers.context():
+            user.jobseeker_profile.save()
 
         # Don't call import_user_pe_data on second login (and don't update user data)
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")

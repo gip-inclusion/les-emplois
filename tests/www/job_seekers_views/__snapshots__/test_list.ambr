@@ -636,6 +636,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -958,6 +959,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1011,6 +1013,7 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1057,8 +1060,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -1068,9 +1070,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
@@ -1129,6 +1131,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1182,6 +1185,7 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1228,8 +1232,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -1239,9 +1242,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -1299,6 +1302,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1396,6 +1400,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1449,6 +1454,7 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1495,8 +1501,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -1506,11 +1511,11 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 37 ASC,
+          ORDER BY 38 ASC,
                    "users_user"."id" ASC
           LIMIT 4
         ''',
@@ -1861,6 +1866,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2179,6 +2185,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2232,6 +2239,7 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2278,8 +2286,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -2288,9 +2295,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
@@ -2348,6 +2355,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2401,6 +2409,7 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2447,8 +2456,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -2457,9 +2465,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -2516,6 +2524,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2614,6 +2623,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2667,6 +2677,7 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2713,8 +2724,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -2723,11 +2733,11 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 37 ASC,
+          ORDER BY 38 ASC,
                    "users_user"."id" ASC
           LIMIT 3
         ''',

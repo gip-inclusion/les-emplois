@@ -31,6 +31,7 @@ from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import ActionKind, LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
@@ -3706,9 +3707,11 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         geispolsheim = create_city_geispolsheim()
         birthdate = self.job_seeker.jobseeker_profile.birthdate
         geispolsheim_commune = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
+
         self.job_seeker.jobseeker_profile.birth_place = geispolsheim_commune
         self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
-        self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
         self._check_only_administrative_allowed(client, self.company.members.first())
 
         # Check that birth place infos are still there
@@ -3732,7 +3735,8 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+        with triggers.context():
+            self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None

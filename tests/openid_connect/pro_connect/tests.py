@@ -42,7 +42,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN, OIDC_USERINFO
@@ -131,7 +131,8 @@ class TestProConnectModel:
             last_name="will_be_forgotten",
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
         )
-        user, created = pc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = pc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
@@ -163,7 +164,8 @@ class TestProConnectModel:
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
             email=pc_user_data.email,
         )
-        user, created = pc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = pc_user_data.create_or_update_user()
         assert not created
         assert user.username == pro_connect.oidc_userinfo["sub"]
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
@@ -202,7 +204,8 @@ class TestProConnectModel:
         """
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
-        user, created = pc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = pc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
@@ -216,7 +219,8 @@ class TestProConnectModel:
         """
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
-        user, created = pc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = pc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
@@ -236,7 +240,7 @@ class TestProConnectModel:
         # Because external_data_source_history is a JSONField
         # dates are actually stored as strings in the database
         now_str = json.loads(DjangoJSONEncoder().encode(now))
-        with mock.patch("django.utils.timezone.now", return_value=now):
+        with mock.patch("django.utils.timezone.now", return_value=now), triggers.context():
             user, created = new_pc_user.create_or_update_user()
         assert not created
 
@@ -278,7 +282,7 @@ class TestProConnectModel:
 
     def test_login_only(self, pro_connect):
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
-        with pytest.raises(RegisterForbiddenException):
+        with pytest.raises(RegisterForbiddenException), triggers.context():
             pc_user_data.create_or_update_user(login_only=True)
 
         PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
@@ -963,7 +967,8 @@ class TestProConnectMapChannel:
         prescriber = job_application.sender
         prescriber.email = pro_connect.oidc_userinfo["email"]
         prescriber.username = pro_connect.oidc_userinfo["sub"]
-        prescriber.save()
+        with triggers.context():
+            prescriber.save()
         url_from_map = "{path}?channel={channel}".format(
             path=reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}),
             channel=ProConnectChannel.MAP_CONSEILLER.value,

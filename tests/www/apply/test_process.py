@@ -33,7 +33,7 @@ from itou.jobs.models import Appellation
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.templatetags.str_filters import mask_unless
@@ -189,10 +189,12 @@ class TestProcessViews:
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.save()
+        with triggers.context():
+            job_application.job_seeker.save()
         job_application.job_seeker.jobseeker_profile.nir = ""
         job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
-        job_application.job_seeker.jobseeker_profile.save()
+        with triggers.context():
+            job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
@@ -274,10 +276,12 @@ class TestProcessViews:
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.save()
+        with triggers.context():
+            job_application.job_seeker.save()
         job_application.job_seeker.jobseeker_profile.nir = ""
         job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
-        job_application.job_seeker.jobseeker_profile.save()
+        with triggers.context():
+            job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
@@ -537,7 +541,8 @@ class TestProcessViews:
         assertContains(response, job_description_url)
 
         job_application.job_seeker.jobseeker_profile.nir = ""
-        job_application.job_seeker.jobseeker_profile.save()
+        with triggers.context():
+            job_application.job_seeker.jobseeker_profile.save()
         response = client.get(url)
         assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
