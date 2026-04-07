@@ -235,7 +235,12 @@ class TestDirectHireFullProcess:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(
+            # Avoid redirect to fill user infos
+            jobseeker_profile__with_pole_emploi_id=True,
+            with_address=True,
+            born_in_france=True,
+        )
         user = company.members.first()
         client.force_login(user)
         hire_session = fake_session_initialization(
@@ -1385,7 +1390,14 @@ class TestCheckPreviousApplicationsForHireView:
 class TestEligibilityForHire:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
+        self.job_seeker = JobSeekerFactory(
+            first_name="Ellie",
+            last_name="Gibilitay",
+            # Avoid redirect to fill user infos
+            jobseeker_profile__with_pole_emploi_id=True,
+            with_address=True,
+            born_in_france=True,
+        )
 
     def test_not_subject_to_eligibility(self, client):
         company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)  # We don't want a GEIQ here
@@ -1489,7 +1501,14 @@ class TestEligibilityForHire:
 class TestGEIQEligibilityForHire:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
+        self.job_seeker = JobSeekerFactory(
+            first_name="Ellie",
+            last_name="Gibilitay",
+            # Avoid redirect to fill user infos
+            jobseeker_profile__with_pole_emploi_id=True,
+            with_address=True,
+            born_in_france=True,
+        )
 
     def test_not_geiq(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
@@ -1591,7 +1610,7 @@ class TestGEIQEligibilityForHire:
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertRedirects(
             response,
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": hire_session.name}),
+            reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": hire_session.name}),
             fetch_redirect_response=False,
         )
 

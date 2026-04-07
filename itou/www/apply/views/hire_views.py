@@ -156,7 +156,7 @@ class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, H
 
 
 class IAEEligibilityForHireView(
-    common_views.ContractInfosNeededMixin, HireBaseView, BaseIAEEligibilityViewForEmployer
+    common_views.JobSeekerAndContractInfosNeededMixin, HireBaseView, BaseIAEEligibilityViewForEmployer
 ):
     template_name = "apply/submit/eligibility_for_hire.html"
 
@@ -174,6 +174,9 @@ class IAEEligibilityForHireView(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.hire_session.name}
         )
 
+    def get_back_url(self):
+        return self.get_contract_infos_url()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["hire_process"] = True
@@ -181,7 +184,7 @@ class IAEEligibilityForHireView(
 
 
 class GEIQEligibilityForHireView(
-    common_views.ContractInfosNeededMixin, HireBaseView, common_views.BaseGEIQEligibilityView
+    common_views.JobSeekerAndContractInfosNeededMixin, HireBaseView, common_views.BaseGEIQEligibilityView
 ):
     template_name = "apply/submit/geiq_eligibility_for_hire.html"
 
