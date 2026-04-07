@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateNotUsed, assertTemplateUsed
 
@@ -27,13 +28,18 @@ class TestJobApplicationGEIQEligibilityDetails:
       </span>"""
     EXPIRED_DIAGNOSIS_EXPLANATION = "Le diagnostic du candidat a expiré"
 
-    def get_response(self, client, job_application, user, *, viewer_kind="jobseeker"):
+    def get_response(self, client, job_application, viewer_kind, *, diagnosis=None):
+        user = {
+            "company": job_application.to_company.members.first(),
+            "jobseeker": job_application.job_seeker,
+            "prescriber": diagnosis.author if diagnosis else job_application.sender,
+        }[viewer_kind]
         client.force_login(user)
-        url_name = f"apply:details_for_{viewer_kind}"
-        url = reverse(url_name, kwargs={"job_application_id": job_application.pk})
+        url = reverse(f"apply:details_for_{viewer_kind}", kwargs={"job_application_id": job_application.pk})
         return client.get(url)
 
-    def test_with_valid_diagnosis(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
+    def test_with_valid_diagnosis(self, client, viewer_kind):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -42,28 +48,17 @@ class TestJobApplicationGEIQEligibilityDetails:
             sender=diagnosis.author,
         )
 
-        # as employer, I see the prescriber diagnosis
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertContains(response, self.ALLOWANCE_AND_COMPANY)
-        assertNotContains(response, self.NO_ALLOWANCE)
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=diagnosis)
 
-        # as job seeker, I see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assertNotContains(response, self.NO_ALLOWANCE)
+        if viewer_kind == "company":
+            assertContains(response, self.ALLOWANCE_AND_COMPANY)
+        else:
+            assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
 
-        # as a prescriber, I see my diagnosis
-        assert diagnosis.author.is_prescriber
-        response = self.get_response(client, job_application, diagnosis.author, viewer_kind="prescriber")
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-        assertNotContains(response, self.NO_ALLOWANCE)
-
-    def test_with_expired_diagnosis(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
+    def test_with_expired_diagnosis(self, client, viewer_kind):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -72,47 +67,28 @@ class TestJobApplicationGEIQEligibilityDetails:
             sender=diagnosis.author,
         )
 
-        # as employer, I see the prescriber diagnosis isn't valid anymore
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
-        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.NO_ALLOWANCE)
-        assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=diagnosis)
 
-        # as job seeker, I see the prescriber diagnosis isn't valid anymore without further details
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-
-        # as a prescriber, I see the prescriber diagnosis isn't valid anymore
-        assert diagnosis.author.is_prescriber
-        response = self.get_response(client, job_application, diagnosis.author, viewer_kind="prescriber")
-        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.NO_ALLOWANCE)
-        assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        if viewer_kind == "company":
+            assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        else:
+            assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
 
-    def test_without_diagnosis(self, client):
-        # No GEIQ diagnosis for this job seeker / job application
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
+    def test_without_diagnosis(self, client, viewer_kind):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
 
-        # as employer, I see there's no diagnosis
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
-        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
+        response = self.get_response(client, job_application, viewer_kind)
 
-        # as job seeker, I see there's no diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
+        if viewer_kind == "prescriber":
+            assert job_application.sender.is_prescriber
 
-        # as a prescriber, I see there's no diagnosis
-        assert job_application.sender.is_prescriber
-        response = self.get_response(client, job_application, job_application.sender, viewer_kind="prescriber")
-        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-
-    def test_accepted_job_app_with_valid_diagnosis(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
+    def test_accepted_job_app_with_valid_diagnosis(self, client, viewer_kind):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -123,27 +99,18 @@ class TestJobApplicationGEIQEligibilityDetails:
             was_hired=True,
         )
 
-        # as employer, I see the prescriber diagnosis
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertContains(response, self.ALLOWANCE_AND_COMPANY)
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=diagnosis)
 
-        # as job seeker, I see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
+        if viewer_kind == "company":
+            assertContains(response, self.ALLOWANCE_AND_COMPANY)
+        else:
+            assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
 
-        # as a prescriber, I see my diagnosis
-        assert diagnosis.author.is_prescriber
-        response = self.get_response(client, job_application, diagnosis.author, viewer_kind="prescriber")
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-
-    def test_accepted_job_app_with_expired_diagnosis(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
+    def test_accepted_job_app_with_expired_diagnosis(self, client, viewer_kind):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
-        # Create a valid diangosis to check we don't use this one in the display
+        # Create a valid diagnosis to check we don't use this one in the display
         GEIQEligibilityDiagnosisFactory(
             job_seeker=diagnosis.job_seeker,
             author=diagnosis.author,
@@ -159,28 +126,20 @@ class TestJobApplicationGEIQEligibilityDetails:
             was_hired=True,
         )
 
-        # as employer, I still see the prescriber diagnosis
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertContains(response, self.ALLOWANCE_AND_COMPANY)
-        assert response.context["geiq_eligibility_diagnosis"] == diagnosis
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=diagnosis)
 
-        # as job seeker, I still see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
+        assertTemplateUsed(response, "eligibility/includes/geiq/diagnosis_details.html")
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
+        assertNotContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assert response.context["geiq_eligibility_diagnosis"] == diagnosis
+        assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        if viewer_kind == "company":
+            assertContains(response, self.ALLOWANCE_AND_COMPANY)
+        else:
+            assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
 
-        # as a prescriber, I still see my diagnosis
-        assert diagnosis.author.is_prescriber
-        response = self.get_response(client, job_application, diagnosis.author, viewer_kind="prescriber")
-        assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-        assert response.context["geiq_eligibility_diagnosis"] == diagnosis
-
-    def test_with_valid_diagnosis_no_allowance(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker"])
+    def test_with_valid_diagnosis_no_allowance(self, client, viewer_kind):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -189,23 +148,18 @@ class TestJobApplicationGEIQEligibilityDetails:
             sender=diagnosis.author,
         )
 
-        # as employer, I see the prescriber diagnosis
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=diagnosis)
+
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertContains(response, self.NO_ALLOWANCE)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        if viewer_kind == "company":
+            assertContains(response, self.NO_ALLOWANCE)
+        else:
+            assertNotContains(response, self.NO_ALLOWANCE)
 
-        # as job seeker, I see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
-        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.NO_ALLOWANCE)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-        assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-
-    def test_with_expired_diagnosis_no_allowance(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker"])
+    def test_with_expired_diagnosis_no_allowance(self, client, viewer_kind):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, expired=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
@@ -214,21 +168,15 @@ class TestJobApplicationGEIQEligibilityDetails:
             sender=diagnosis.author,
         )
 
-        # as employer, I see the prescriber diagnosis
-        response = self.get_response(
-            client, job_application, job_application.to_company.members.first(), viewer_kind="company"
-        )
-        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.NO_ALLOWANCE)
-        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-        assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=diagnosis)
 
-        # as job seeker, I see the prescriber diagnosis
-        response = self.get_response(client, job_application, job_application.job_seeker, viewer_kind="jobseeker")
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.NO_ALLOWANCE)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
-        assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        if viewer_kind == "company":
+            assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
+        else:
+            assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
 
     def test_accepted_without_diagnosis(self, client):
         job_application = JobApplicationFactory(

@@ -2426,31 +2426,14 @@ def test_details_for_prescriber_geiq_without_prior_actions(client):
     assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
 
-def test_details_for_prescriber_geiq_with_prior_actions(client):
-    job_application = JobApplicationFactory(
-        sent_by_authorized_prescriber=True,
-        state=job_applications_enums.JobApplicationState.PROCESSING,
-        with_geiq_eligibility_diagnosis_from_prescriber=True,
-    )
-    prior_action = PriorActionFactory(
-        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
-    )
-    prescriber = job_application.sender_prescriber_organization.members.first()
-    delete_button = (
-        '<button class="btn btn-link" data-bs-toggle="modal" '
-        f'data-bs-target="#delete_prior_action_{prior_action.id}_modal">'
-    )
-    client.force_login(prescriber)
-
-    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-    response = client.get(url)
-
-    assertContains(response, PRIOR_ACTION_SECTION_TITLE)
-    assertContains(response, prior_action.action.label)
-    assertNotContains(response, delete_button)
-
-
-def test_details_for_jobseeker_geiq_with_prior_actions(client):
+@pytest.mark.parametrize(
+    "viewer_kind,details_route",
+    [
+        ("prescriber", "apply:details_for_prescriber"),
+        ("jobseeker", "apply:details_for_jobseeker"),
+    ],
+)
+def test_details_geiq_with_prior_actions_for_non_employer_viewers(client, viewer_kind, details_route):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -2465,9 +2448,12 @@ def test_details_for_jobseeker_geiq_with_prior_actions(client):
         f'data-bs-target="#delete_prior_action_{prior_action.id}_modal">'
     )
 
-    client.force_login(job_seeker)
+    if viewer_kind == "prescriber":
+        client.force_login(job_application.sender_prescriber_organization.members.first())
+    else:
+        client.force_login(job_seeker)
 
-    url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+    url = reverse(details_route, kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
 
     assertContains(response, PRIOR_ACTION_SECTION_TITLE)
