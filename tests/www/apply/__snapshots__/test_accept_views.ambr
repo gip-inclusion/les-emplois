@@ -908,7 +908,7 @@
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -927,7 +927,7 @@
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -983,7 +983,7 @@
           'JobApplication.clean[job_applications/models.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1032,7 +1032,7 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -1040,7 +1040,7 @@
         'origin': list([
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT %s AS "_check"
@@ -1058,7 +1058,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -1067,7 +1067,7 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -1075,7 +1075,7 @@
         'origin': list([
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT %s AS "_check"
@@ -1089,7 +1089,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -2062,7 +2062,7 @@
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -2081,7 +2081,7 @@
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -2137,7 +2137,7 @@
           'JobApplication.clean[job_applications/models.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
-          'ConfirmationForAcceptView.get[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
