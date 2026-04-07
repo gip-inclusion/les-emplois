@@ -345,6 +345,20 @@ class JobSeekerFactory(UserFactory):
         if create:
             self.save()
 
+    @factory.post_generation
+    def with_job_seeker_assignment(self, create, extracted, **kwargs):
+        if not create:  # build only, do nothing
+            return
+        if extracted:
+            if self.created_by:
+                JobSeekerAssignmentFactory(
+                    updated_at=self.date_joined,
+                    job_seeker=self,
+                    professional=self.created_by,
+                    prescriber_organization=self.jobseeker_profile.created_by_prescriber_organization,
+                    last_action_kind=ActionKind.CREATE,
+                )
+
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:

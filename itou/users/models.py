@@ -179,6 +179,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
         return result
 
+    # FIXME: deprecated method
     def linked_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None):
         """
         Return the ids of job seekers that appear in the user's job seekers list view
@@ -253,6 +254,38 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
             job_seekers_iae_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
             job_seekers_geiq_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
         )
+
+    def assigned_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None):
+        """
+        Return the ids of job seekers that appear in the user's job seekers list view, using
+        JobSeekerAssignment objects.
+
+        With from_all_coworkers=False :
+        - job seekers assigned to the user with the given organization
+        - job seekers assigned to the user with no organization
+
+        With from_all_coworkers=True:
+        - all the previous
+        - job seekers created by a member of the given organization
+        """
+
+        filters = [Q(professional=user, prescriber_organization__isnull=True, company__isnull=True)]
+        if organization:
+            prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
+            company = None  # For now, we do not support employers
+            if from_all_coworkers:
+                filters.append(Q(prescriber_organization=prescriber_organization, company=company))
+            else:
+                filters.append(Q(professional=user, prescriber_organization=prescriber_organization, company=company))
+
+        assignments_qs = JobSeekerAssignment.objects.filter(or_queries(filters))
+
+        if stalled is not None:
+            assignments_qs = assignments_qs.filter(
+                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__")
+            )
+
+        return self.filter(Exists(assignments_qs.filter(job_seeker=OuterRef("pk")))).values_list("pk", flat=True)
 
     def search_by_full_name(self, name):
         """

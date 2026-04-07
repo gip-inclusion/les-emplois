@@ -10,14 +10,14 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility import models
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models.common import AbstractEligibilityDiagnosisModel
-from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import AdministrativeCriteria
-from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
@@ -61,6 +61,27 @@ class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.dja
         )
     )
     job_seeker = factory.SubFactory(JobSeekerFactory)
+
+    @factory.post_generation
+    def with_job_seeker_assignment(self, create, extracted, **kwargs):
+        # Hook that creates a JobSeekerAssignment. We want to keep it
+        # simple, but bear in mind that there is a unique constraint
+        # on the job seeker/prescriber couple. If you create multiple
+        # matching eligibility diagnoses `with_job_seeker_assignment=True`,
+        # that will break.
+        if not create:  # build only, do nothing
+            return
+        if extracted:
+            JobSeekerAssignmentFactory(
+                updated_at=self.created_at,
+                job_seeker=self.job_seeker,
+                professional=self.author,
+                prescriber_organization=self.author_prescriber_organization,
+                company=self.author_geiq if isinstance(self, GEIQEligibilityDiagnosis) else self.author_siae,
+                last_action_kind=ActionKind.GEIQ_ELIGIBILITY
+                if isinstance(self, GEIQEligibilityDiagnosis)
+                else ActionKind.IAE_ELIGIBILITY,
+            )
 
 
 class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
