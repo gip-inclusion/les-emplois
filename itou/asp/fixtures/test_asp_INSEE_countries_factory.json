@@ -98,5 +98,15 @@
       "group": 1,
       "department": 98
     }
-  }
+  },
+   {
+      "model": "asp.Country",
+      "pk": 74,
+      "fields": {
+         "code": 818,
+         "name": "NOUMEA",
+         "group": 1,
+         "department": 98
+      }
+   }
 ]
