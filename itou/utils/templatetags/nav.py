@@ -85,7 +85,7 @@ NAV_ENTRIES = {
         label="Rechercher un service d'insertion",
         target=reverse("search:services_home"),
         active_view_names=["search:services_home", "search:services_results"],
-        is_new=True,
+        is_beta=True,
     ),
     # Logged in users.
     "home": NavItem(

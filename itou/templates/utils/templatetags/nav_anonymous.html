@@ -22,6 +22,9 @@
                         {% if item.is_new %}
                             {% new_badge %}
                         {% endif %}
+                        {% if item.is_beta %}
+                            {% beta_badge %}
+                        {% endif %}
                     </a>
                 </li>
             {% endfor %}
