@@ -14,5 +14,5 @@ def dora_service_url(service, *, source):
     if service["source"] == "dora" and service["lien_source"]:
         url = service["lien_source"]
     else:
-        url = urljoin(settings.DORA_BASE_URL, f"/services/di--{service['id']}")
+        url = urljoin(settings.DORA_WWW_BASE_URL, f"/services/di--{service['id']}")
     return add_url_params(url, params={"mtm_campaign": "lesemplois", "mtm_kwd": "rechservice-" + source})
