@@ -181,6 +181,7 @@ def test_multiple(client, snapshot):
         job_seeker__city="Brest",
         job_seeker__jobseeker_profile__is_stalled=True,
         sent_by_authorized_prescriber=True,
+        with_job_seeker_assignment=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
         with_iae_eligibility_diagnosis=True,
     )
@@ -190,6 +191,7 @@ def test_multiple(client, snapshot):
         sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker=job_app.job_seeker,
+        with_job_seeker_assignment=True,
         updated_at=timezone.now() - datetime.timedelta(days=2),
     )
     # Other app without diagnosis
@@ -202,6 +204,7 @@ def test_multiple(client, snapshot):
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
         job_seeker__jobseeker_profile__is_stalled=True,
+        with_job_seeker_assignment=True,
     )
     # Other app with approval
     job_app3 = JobApplicationFactory(
@@ -215,6 +218,7 @@ def test_multiple(client, snapshot):
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
         with_approval=True,
+        with_job_seeker_assignment=True,
     )
 
     # Other app without address/city
@@ -225,6 +229,7 @@ def test_multiple(client, snapshot):
         job_seeker__last_name="Waterford",
         job_seeker__public_id="44444444-4444-4444-4444-444444444444",
         with_iae_eligibility_diagnosis=True,
+        with_job_seeker_assignment=True,
     )
     # Other app for which the current user cannot see the personal information
     unauthorized_prescriber = PrescriberFactory(membership=False)
@@ -236,6 +241,7 @@ def test_multiple(client, snapshot):
         job_seeker__public_id="55555555-5555-5555-5555-555555555555",
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
+        with_job_seeker_assignment=True,
     )
 
     client.force_login(prescriber)
@@ -270,6 +276,7 @@ def test_pagination(client):
         2,
         sent_by_prescriber_alone=True,
         sender=prescriber,
+        with_job_seeker_assignment=True,
     )
     client.force_login(prescriber)
     response = client.get(url)
@@ -292,6 +299,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
 
     # Job seeker created by another member of the organization
@@ -303,6 +311,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=other_prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
 
     # Job seeker created by a member of the organization, but not in the organization anymore
@@ -317,6 +326,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=prescriber_not_in_org_anymore,
         jobseeker_profile__created_by_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
 
     # When applying for a job seeker already in the list, he's not shown twice
@@ -326,6 +336,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         sent_by_authorized_prescriber=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
         with_iae_eligibility_diagnosis=True,
+        with_job_seeker_assignment=True,
     )
 
     # Job seeker created by the prescriber but for another organization; will not be shown
@@ -338,6 +349,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=other_organization,
+        with_job_seeker_assignment=True,
     )
 
     # Job seeker created by someone else, for another organization
@@ -349,6 +361,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=other_prescriber,
         jobseeker_profile__created_by_prescriber_organization=other_organization,
+        with_job_seeker_assignment=True,
     )
 
     client.force_login(prescriber)
@@ -479,6 +492,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
         city="Brest",
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
 
     # Job seeker created by another member of the organization
@@ -490,6 +504,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
         city="Brest",
         created_by=other_prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
 
     response = client.get(url_user)
@@ -528,6 +543,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         post_code="29200",
         city="Brest",
         created_by=other_prescriber,
+        with_job_seeker_assignment=True,
     )
     # Job seeker created by this prescriber
     bernard = JobSeekerFactory(
@@ -537,6 +553,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         post_code="29200",
         city="Brest",
         created_by=prescriber,
+        with_job_seeker_assignment=True,
     )
     # Job seeker created by this prescriber when he was in an organization.
     # He is not member of it anymore, it won't be shown anymore
@@ -548,6 +565,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         city="Brest",
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
 
     client.force_login(prescriber)
@@ -570,10 +588,16 @@ def test_htmx_job_seeker_filter(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
     prescriber = organization.members.first()
     job_app = JobApplicationFactory(
-        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+        sent_by_prescriber=True,
+        sender=prescriber,
+        sender_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
     other_app = JobApplicationFactory(
-        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+        sent_by_prescriber=True,
+        sender=prescriber,
+        sender_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
     client.force_login(prescriber)
     response = client.get(url)
@@ -607,6 +631,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
         sender=prescriber,
         job_seeker__first_name="A_something",
         job_seeker__last_name="B_something",
+        with_job_seeker_assignment=True,
     ).job_seeker
     created_job_seeker = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -614,6 +639,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
         job_seeker__created_by=prescriber,
         job_seeker__first_name="Zorro",
         job_seeker__last_name="Martin",
+        with_job_seeker_assignment=True,
     ).job_seeker
     c_d_job_seeker = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -622,6 +648,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
         job_seeker__last_login=timezone.now(),
         job_seeker__first_name="C_something",
         job_seeker__last_name="D_something",
+        with_job_seeker_assignment=True,
     ).job_seeker
     client.force_login(prescriber)
 
@@ -654,44 +681,49 @@ def test_filtered_by_eligibility_state(client, url):
     # Eligibility validated
     job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, no approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     job_seeker_valid_geiq_eligibility_no_approval = GEIQEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         job_seeker__first_name="valid geiq eligibility, no approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, valid approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
     job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, valid approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     ApprovalFactory(user=job_seeker_valid_eligibility_valid_approval)
 
     # Eligibility to validate
     job_seeker_expired_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, no approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
 
     response = client.get(url, {"eligibility_validated": "on"})
@@ -725,30 +757,33 @@ def test_filtered_by_approval_state(client, url):
 
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, valid approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
 
     job_seeker_expired_eligibility_expired_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, expired approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_expired_approval, expired=True)
 
     job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        author=prescriber,
+        author_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, no approval",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
 
     response = client.get(url, {"pass_iae_active": "on"})
@@ -782,6 +817,7 @@ def test_filtered_by_is_stalled(client):
         created_at=timezone.now() - datetime.timedelta(days=90),
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
+        with_job_seeker_assignment=True,
     )
     not_stalled_anymore = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -789,8 +825,9 @@ def test_filtered_by_is_stalled(client):
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
+        with_job_seeker_assignment=True,
     )
-    other = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
+    other = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, with_job_seeker_assignment=True)
     response = client.get(reverse("job_seekers_views:list"))
     assert Counter(response.context["page_obj"].object_list) == Counter(
         [stalled.job_seeker, not_stalled_anymore.job_seeker, other.job_seeker]
@@ -815,18 +852,21 @@ def test_filtered_by_organization_members(client):
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="created_by_user",
         last_name="Zorro",
+        with_job_seeker_assignment=True,
     )
     job_seeker_created_by_member = JobSeekerFactory(
         created_by=member,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="created_by_member",
         last_name="Zorro",
+        with_job_seeker_assignment=True,
     )
     job_seeker_created_by_old_member = JobSeekerFactory(
         created_by=old_member,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="created_by_old_member",
         last_name="Zorro",
+        with_job_seeker_assignment=True,
     )
 
     job_seeker_applied_by_user = JobApplicationFactory(
@@ -835,6 +875,7 @@ def test_filtered_by_organization_members(client):
         sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_user",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     job_seeker_applied_by_member = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -843,6 +884,7 @@ def test_filtered_by_organization_members(client):
         job_seeker__first_name="applied_by_member",
         job_seeker__last_name="Zorro",
         updated_at=timezone.now() - datetime.timedelta(days=1),
+        with_job_seeker_assignment=True,
     ).job_seeker
     job_seeker_applied_by_old_member = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -850,6 +892,7 @@ def test_filtered_by_organization_members(client):
         sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_old_member",
         job_seeker__last_name="Zorro",
+        with_job_seeker_assignment=True,
     ).job_seeker
     job_seeker_applied_by_user_created_by_user_not_in_orga = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -858,6 +901,7 @@ def test_filtered_by_organization_members(client):
         job_seeker__first_name="applied_by_user_created_by_other_user_not_in_orga",
         job_seeker__last_name="Zorro",
         job_seeker__created_by=other_prescriber_not_in_orga,
+        with_job_seeker_assignment=True,
     ).job_seeker
 
     client.force_login(prescriber)
@@ -899,6 +943,7 @@ def test_htmx_filters(client, url):
     IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        with_job_seeker_assignment=True,
     )
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
@@ -928,18 +973,22 @@ def test_job_seekers_order(client, url, subtests):
         job_seeker__first_name="Charles",
         job_seeker__last_name="Deux candidatures",
     ).job_seeker
-    JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, job_seeker=c_d_job_seeker)
+    JobApplicationFactory(
+        sent_by_prescriber_alone=True, sender=prescriber, job_seeker=c_d_job_seeker, with_job_seeker_assignment=True
+    )
     created_job_seeker = JobSeekerFactory(
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="Zorro",
         last_name="Martin",
+        with_job_seeker_assignment=True,
     )
     second_created_job_seeker = JobSeekerFactory(
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="Zorro",
         last_name="Martin",
+        with_job_seeker_assignment=True,
     )
     a_b_job_seeker = JobApplicationFactory(
         sent_by_prescriber_alone=True,
@@ -947,6 +996,7 @@ def test_job_seekers_order(client, url, subtests):
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="Alice",
         job_seeker__last_name="Berger",
+        with_job_seeker_assignment=True,
     ).job_seeker
 
     client.force_login(prescriber)
@@ -979,10 +1029,16 @@ def test_htmx_order(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
     prescriber = organization.members.first()
     job_app = JobApplicationFactory(
-        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+        sent_by_prescriber=True,
+        sender=prescriber,
+        sender_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
     other_app = JobApplicationFactory(
-        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+        sent_by_prescriber=True,
+        sender=prescriber,
+        sender_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
     )
     client.force_login(prescriber)
     response = client.get(url)
