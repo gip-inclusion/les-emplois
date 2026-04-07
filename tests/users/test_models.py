@@ -39,8 +39,7 @@ from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.job_applications.factories import JobApplicationFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -131,6 +130,7 @@ class TestManager:
         assert User.objects.search_by_full_name("Jean").count() == 2
         assert User.objects.search_by_full_name("Jean II").get() == user_1
 
+    # FIXME: deprecated method
     def test_linked_job_seeker_ids(self):
         organization = PrescriberOrganizationFactory()
         other_organization = PrescriberOrganizationFactory()
@@ -251,6 +251,58 @@ class TestManager:
                 job_seeker_with_job_app_sent_by_organization_coworker.pk,
                 job_seeker_with_iae_diagnosis_authored_by_organization_coworker.pk,
                 job_seeker_with_geiq_diagnosis_authored_by_organization_coworker.pk,
+            ],
+            ordered=False,
+        )
+
+    def test_assigned_job_seeker_ids(self):
+        organization = PrescriberOrganizationFactory()
+        prescriber = PrescriberMembershipFactory(organization=organization).user
+
+        # From the prescriber as a member of no organization
+        assignment_no_organization = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=None, company=None
+        )
+
+        # From the prescriber as a member of the organization
+        assignment_with_organization = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=organization
+        )
+
+        # From the prescriber as a member of another organization or company. We won't display those
+        JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=PrescriberOrganizationFactory())
+        JobSeekerAssignmentFactory(professional=prescriber, company=CompanyFactory())
+
+        assignment_coworker_organization = JobSeekerAssignmentFactory(prescriber_organization=organization)
+
+        assertQuerySetEqual(
+            User.objects.assigned_job_seeker_ids(prescriber, organization=None),
+            [assignment_no_organization.job_seeker.pk],
+            ordered=False,
+        )
+
+        # NB: Nothing changes as there's no organization
+        assertQuerySetEqual(
+            User.objects.assigned_job_seeker_ids(prescriber, organization=None, from_all_coworkers=True),
+            [assignment_no_organization.job_seeker.pk],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            User.objects.assigned_job_seeker_ids(prescriber, organization=organization),
+            [
+                assignment_no_organization.job_seeker.pk,
+                assignment_with_organization.job_seeker.pk,
+            ],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            User.objects.assigned_job_seeker_ids(prescriber, organization=organization, from_all_coworkers=True),
+            [
+                assignment_no_organization.job_seeker.pk,
+                assignment_with_organization.job_seeker.pk,
+                assignment_coworker_organization.job_seeker.pk,
             ],
             ordered=False,
         )
