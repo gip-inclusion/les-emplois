@@ -3,9 +3,17 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
-from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, LaneExtension, LaneType, SiaeMeasure
+from itou.asp.models import (
+    AllocationDuration,
+    EducationLevel,
+    EITIContributions,
+    LaneExtension,
+    LaneType,
+    SiaeMeasure,
+)
+from itou.asp.typing import CodeComInsee
+from itou.asp.utils import asp_birth_place
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
-from itou.employee_record.typing import CodeComInsee
 from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
 from itou.users.models import User
@@ -25,9 +33,7 @@ class _PersonSerializer(serializers.Serializer):
     )  # Required
 
     codeComInsee = serializers.SerializerMethodField()  # Required if the birth country is France
-    codeInseePays = serializers.CharField(
-        source="job_application.job_seeker.jobseeker_profile.birth_country.code"
-    )  # Required
+    codeInseePays = serializers.SerializerMethodField(allow_null=True)  # Required
     codeGroupePays = serializers.CharField(
         source="job_application.job_seeker.jobseeker_profile.birth_country.group"
     )  # Required
@@ -38,7 +44,6 @@ class _PersonSerializer(serializers.Serializer):
 
     # TODO: Remove to fields after confirmation as they are not mentioned in CC V1.05, § 2.4.1
     sufPassIae = NullField()
-    codeDpt = serializers.CharField(source="job_application.job_seeker.birth_place.department_code", required=False)
 
     def get_civilite(self, obj: EmployeeRecord) -> str | None:
         if title := obj.job_application.job_seeker.title:
@@ -58,20 +63,12 @@ class _PersonSerializer(serializers.Serializer):
         return first_names
 
     def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
-        # Another ASP subtlety, making top-level and children with the same name
-        # The commune can be empty if the job seeker is not born in France
-        if birth_place := obj.job_application.job_seeker.jobseeker_profile.birth_place:
-            return {
-                "codeComInsee": birth_place.code,
-                "codeDpt": birth_place.department_code,
-            }
+        birth_place = asp_birth_place(obj.job_application.job_seeker.jobseeker_profile)
+        return birth_place["codeComInsee"]
 
-        # However, if the employee is not born in France
-        # the department code must be '099' (error 3411)
-        return {
-            "codeComInsee": None,
-            "codeDpt": "099",
-        }
+    def get_codeInseePays(self, obj: EmployeeRecord) -> str:
+        birth_place = asp_birth_place(obj.job_application.job_seeker.jobseeker_profile)
+        return birth_place["codeInseePays"]
 
     def get_salarieNIR(self, obj: EmployeeRecord) -> str:
         nir = obj.job_application.job_seeker.jobseeker_profile.nir

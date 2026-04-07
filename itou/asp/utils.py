@@ -1,6 +1,9 @@
 from django.forms import ValidationError
 
+from itou.asp.constants import ASP_COMMUNES_AS_COUNTRIES
 from itou.asp.models import Commune, Country
+from itou.asp.typing import AspBirthPlace
+from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_nir
 
 
@@ -33,3 +36,38 @@ def guess_birth_place_from_nir(nir: str) -> tuple[Commune | None, Country | None
         country = Country.objects.get(id=Country.FRANCE_ID)
 
     return city, country
+
+
+def asp_birth_place(job_seeker_profile: JobSeekerProfile) -> AspBirthPlace:
+    birth_place = job_seeker_profile.birth_place
+    birth_country = job_seeker_profile.birth_country
+    # The birth_place is empty if the candidate is not born in
+    # France. In that case, send special department code "099"
+    # (error 3411).
+    if not birth_place:
+        return {
+            "codeComInsee": {
+                "codeComInsee": None,
+                "codeDpt": "099",
+            },
+            "codeInseePays": birth_country.code if birth_country else None,
+        }
+
+    # ASP has a special rule for some places in Nouvelle-Calédonie,
+    # Polynésie, etc.
+    if code_of_commune_as_country := ASP_COMMUNES_AS_COUNTRIES.get(birth_place.name):
+        return {
+            "codeComInsee": {
+                "codeComInsee": None,
+                "codeDpt": "099",
+            },
+            "codeInseePays": code_of_commune_as_country,
+        }
+
+    return {
+        "codeComInsee": {
+            "codeComInsee": birth_place.code,
+            "codeDpt": birth_place.department_code,
+        },
+        "codeInseePays": birth_country.code,
+    }

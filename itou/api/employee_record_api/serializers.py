@@ -3,8 +3,9 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
+from itou.asp.typing import CodeComInsee
+from itou.asp.utils import asp_birth_place
 from itou.employee_record.models import EmployeeRecord
-from itou.employee_record.typing import CodeComInsee
 from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
 from itou.users.models import User
@@ -14,7 +15,7 @@ from itou.utils.serializers import NullField, NullIfEmptyCharField
 # Employee record serializers are mostly the same as the ones used
 # for serialization transfers, except some fields are "unobfuscated"
 # and added for third-party software connecting to the API.
-# For now, we are going to duplicate everything:
+# For now, we are going to duplicate (almost) everything:
 #   - We want to make some changes when serializing for transfer but not break the API
 #   - We could then remove some transfert specific formatting rules
 #   - We rarely ever touch those, so probably not too PITA to maintain, and we can refactor later
@@ -88,10 +89,7 @@ class _API_PersonSerializer(serializers.Serializer):
         format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
     )
 
-    codeDpt = serializers.CharField(source="job_application.job_seeker.birth_place.department_code", required=False)
-    codeInseePays = serializers.CharField(
-        source="job_application.job_seeker.jobseeker_profile.birth_country.code", allow_null=True
-    )
+    codeInseePays = serializers.SerializerMethodField(allow_null=True)
     codeGroupePays = serializers.CharField(
         source="job_application.job_seeker.jobseeker_profile.birth_country.group", allow_null=True
     )
@@ -113,20 +111,12 @@ class _API_PersonSerializer(serializers.Serializer):
         return unidecode(obj.job_application.job_seeker.first_name).upper()
 
     def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
-        # Another ASP subtlety, making top-level and children with the same name
-        # The commune can be empty if the job seeker is not born in France
-        if birth_place := obj.job_application.job_seeker.jobseeker_profile.birth_place:
-            return {
-                "codeComInsee": birth_place.code,
-                "codeDpt": birth_place.department_code,
-            }
+        birth_place = asp_birth_place(obj.job_application.job_seeker.jobseeker_profile)
+        return birth_place["codeComInsee"]
 
-        # However, if the employee is not born in France
-        # the department code must be '099' (error 3411)
-        return {
-            "codeComInsee": None,
-            "codeDpt": "099",
-        }
+    def get_codeInseePays(self, obj: EmployeeRecord) -> str:
+        birth_place = asp_birth_place(obj.job_application.job_seeker.jobseeker_profile)
+        return birth_place["codeInseePays"]
 
     def get_salarieNIR(self, obj: EmployeeRecord) -> str:
         nir = obj.job_application.job_seeker.jobseeker_profile.nir
