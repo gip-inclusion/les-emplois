@@ -27,7 +27,7 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWith2MembershipFactory
 from tests.users import constants as users_test_constants
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_hire_views import fake_session_initialization as fake_hire_session_initialization
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP, fake_session_initialization
@@ -496,6 +496,11 @@ class TestStandaloneCreateAsPrescriber:
         match case:
             case "in_list_user":
                 existing_job_seeker.created_by = user
+                JobSeekerAssignmentFactory(
+                    job_seeker=existing_job_seeker,
+                    professional=user,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
+                )
                 next_url = reverse(
                     "search:employers_results",
                     query={
@@ -506,6 +511,12 @@ class TestStandaloneCreateAsPrescriber:
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
+                JobSeekerAssignmentFactory(
+                    job_seeker=existing_job_seeker,
+                    professional=user,
+                    prescriber_organization=prescriber_organization,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
+                )
                 next_url = reverse(
                     "search:employers_results",
                     query={
@@ -529,17 +540,26 @@ class TestStandaloneCreateAsPrescriber:
                     sender=user,
                     sender_prescriber_organization=None,
                     updated_at=timezone.now() - datetime.timedelta(days=1),
+                    created_at=timezone.now() - datetime.timedelta(days=1),  # to set assignment's updated at
+                    with_job_seeker_assignment=True,
                 )
             case _:
                 # Not in list
                 existing_job_seeker.created_by = other_user_in_other_organization
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
+                JobSeekerAssignmentFactory(
+                    job_seeker=existing_job_seeker,
+                    professional=other_user_in_other_organization,
+                    prescriber_organization=other_organization,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
+                )
                 next_url = reverse(
                     "job_seekers_views:details",
                     kwargs={"public_id": existing_job_seeker.public_id},
                 )
         existing_job_seeker.save()
         existing_job_seeker.jobseeker_profile.save()
+        existing_assignment = JobSeekerAssignment.objects.get()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -562,9 +582,16 @@ class TestStandaloneCreateAsPrescriber:
         response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assertRedirects(response, next_url)
 
-        # Check JobSeekerAssignment: no assignment is created when a job seeker is retrieved
+        # Check JobSeekerAssignment: the assignment was not updated
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=existing_assignment.job_seeker,
+            professional=existing_assignment.professional,
+            prescriber_organization=existing_assignment.prescriber_organization,
+            company=None,
+            updated_at=existing_assignment.updated_at,
+            last_action_kind=existing_assignment.last_action_kind,
+        ).exists()
 
     @freeze_time("2024-08-30")
     @pytest.mark.parametrize("case", ["not_in_list", "in_list_user", "in_list_organization", "in_list_application"])
@@ -582,6 +609,11 @@ class TestStandaloneCreateAsPrescriber:
         match case:
             case "in_list_user":
                 existing_job_seeker.created_by = user
+                JobSeekerAssignmentFactory(
+                    job_seeker=existing_job_seeker,
+                    professional=user,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
+                )
                 next_url = reverse(
                     "search:employers_results",
                     query={
@@ -592,6 +624,12 @@ class TestStandaloneCreateAsPrescriber:
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
+                JobSeekerAssignmentFactory(
+                    job_seeker=existing_job_seeker,
+                    professional=user,
+                    prescriber_organization=prescriber_organization,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
+                )
                 next_url = reverse(
                     "search:employers_results",
                     query={
@@ -615,17 +653,26 @@ class TestStandaloneCreateAsPrescriber:
                     sender=user,
                     sender_prescriber_organization=None,
                     updated_at=timezone.now() - datetime.timedelta(days=1),
+                    created_at=timezone.now() - datetime.timedelta(days=1),  # to set assignment's updated at
+                    with_job_seeker_assignment=True,
                 )
             case _:
                 # Not in list
                 existing_job_seeker.created_by = other_user_in_other_organization
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
+                JobSeekerAssignmentFactory(
+                    job_seeker=existing_job_seeker,
+                    professional=other_user_in_other_organization,
+                    prescriber_organization=other_organization,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
+                )
                 next_url = reverse(
                     "job_seekers_views:details",
                     kwargs={"public_id": existing_job_seeker.public_id},
                 )
         existing_job_seeker.save()
         existing_job_seeker.jobseeker_profile.save()
+        existing_assignment = JobSeekerAssignment.objects.get()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -648,9 +695,16 @@ class TestStandaloneCreateAsPrescriber:
         response = client.post(search_by_email_url, data={"email": existing_job_seeker.email, "confirm": 1})
         assertRedirects(response, next_url)
 
-        # Check JobSeekerAssignment: no assignment is created when a job seeker is retrieved
+        # Check JobSeekerAssignment: the assignment was not updated
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=existing_assignment.job_seeker,
+            professional=existing_assignment.professional,
+            prescriber_organization=existing_assignment.prescriber_organization,
+            company=None,
+            updated_at=existing_assignment.updated_at,
+            last_action_kind=existing_assignment.last_action_kind,
+        ).exists()
 
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")
