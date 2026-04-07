@@ -4,7 +4,7 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, EITIContributions, SiaeMeasure
+from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, EITIContributions, SiaeMeasure
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import NotificationStatus, Status
@@ -67,6 +67,47 @@ class TestEmployeeRecordPersonSerializer:
         # NIR starting with 7 or 8 and NTT
         employee_record.ntt = "11234567890001"
         assert serializer.get_salarieNIR(employee_record) == "11234567890001"
+
+    def test_birth_place_serialization_france_metropolitaine(self):
+        commune = Commune.objects.filter(code="86194").first()
+        france = Country.objects.get(pk=Country.FRANCE_ID)
+        employee_record = EmployeeRecordWithProfileFactory(
+            job_application__job_seeker__jobseeker_profile__birth_place=commune,
+            job_application__job_seeker__jobseeker_profile__birth_country_id=france.id,
+        )
+        serialized = _PersonSerializer(employee_record).data
+        assert serialized["codeInseePays"] == france.code
+        assert serialized["codeComInsee"] == {
+            "codeDpt": "086",
+            "codeComInsee": "86194",
+        }
+
+    def test_birth_place_serialization_nouvelle_caledonie(self):
+        noumea_commune = Commune.objects.get(code="98818")
+        france = Country.objects.get(pk=Country.FRANCE_ID)
+        employee_record = EmployeeRecordWithProfileFactory(
+            job_application__job_seeker__jobseeker_profile__birth_place=noumea_commune,
+            job_application__job_seeker__jobseeker_profile__birth_country_id=Country.FRANCE_ID,
+        )
+        serialized = _PersonSerializer(employee_record).data
+        assert serialized["codeInseePays"] == france.code
+        assert serialized["codeComInsee"] == {
+            "codeDpt": "988",
+            "codeComInsee": "98818",
+        }
+
+    def test_birth_place_serialization_foreign_country(self):
+        denmark = Country.objects.get(name="DANEMARK")
+        employee_record = EmployeeRecordWithProfileFactory(
+            job_application__job_seeker__jobseeker_profile__birth_place=None,
+            job_application__job_seeker__jobseeker_profile__birth_country=denmark,
+        )
+        serialized = _PersonSerializer(employee_record).data
+        assert serialized["codeInseePays"] == denmark.code
+        assert serialized["codeComInsee"] == {
+            "codeDpt": "099",
+            "codeComInsee": None,
+        }
 
 
 class TestEmployeeRecordAddressSerializer:

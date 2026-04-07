@@ -539,5 +539,15 @@
       "end_date": null,
       "ignore": true
     }
-  }
+  },
+  {
+      "model": "asp.Commune",
+      "pk": 76303,
+      "fields": {
+         "code": "98818",
+         "name": "NOUMEA",
+         "start_date": "1900-01-01",
+         "end_date": null
+      }
+   }
 ]

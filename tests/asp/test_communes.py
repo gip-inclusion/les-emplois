@@ -9,9 +9,9 @@ from itou.asp.models import Commune
 
 class TestCommunesFixture:
     # INSEE commune with a single entry (1 history entry)
-    _CODES_WITHOUT_HISTORY = ["97108", "13200", "97801"]
+    _CODES_WITHOUT_HISTORY = ["97108", "13200", "97801", "98818"]
     ## Total number of entries in the file
-    _NUMBER_OF_ENTRIES = 53
+    _NUMBER_OF_ENTRIES = 54
     # No commune registered before this date (end_date)
     _PERIOD_MIN_DATE = datetime.date(1900, 1, 1)
 
@@ -40,7 +40,7 @@ class TestCommunesFixture:
 
     def test_current_entries(self):
         communes = Commune.objects.filter(end_date__isnull=True)
-        assert 28 == communes.count()
+        assert 29 == communes.count()
 
     def test_lowest_period_date(self):
         communes = Commune.objects.filter(start_date__lt=self._PERIOD_MIN_DATE)
