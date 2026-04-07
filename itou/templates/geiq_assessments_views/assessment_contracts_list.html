@@ -90,6 +90,9 @@
                     </div>
                     <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
                         <div class="flex-md-grow-1">{% include "geiq_assessments_views/includes/list_counter.html" %}</div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">
+                            {% bootstrap_field filters_form.employee wrapper_class="w-lg-400px" show_label=False %}
+                        </div>
                     </div>
                     {% partialdef contracts-results-table inline %}
                         {% if request.htmx and not request.htmx.boosted %}
@@ -212,4 +215,8 @@
             </div>
         </div>
     {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}

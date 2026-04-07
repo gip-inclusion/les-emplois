@@ -1343,6 +1343,17 @@
                               3 résultats
                           </p>
                       </div>
+                      <div class="flex-column flex-md-row mt-3 mt-md-0">
+                          <div class="w-lg-400px">
+                              <label class="visually-hidden" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2 is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/geiq-assessments/00000000-1111-2222-3333-444444444444/employee/filters/employee/" data-allow-clear="true" data-minimum-input-length="1" data-placeholder="Nom du salarié" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee">
+                                  <option value="">
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
                   </div>
                   <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
@@ -1551,6 +1562,17 @@
                           <p class="mb-0" id="contract-list-count">
                               3 résultats
                           </p>
+                      </div>
+                      <div class="flex-column flex-md-row mt-3 mt-md-0">
+                          <div class="w-lg-400px">
+                              <label class="visually-hidden" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2 is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/geiq-assessments/00000000-1111-2222-3333-444444444444/employee/filters/employee/" data-allow-clear="true" data-minimum-input-length="1" data-placeholder="Nom du salarié" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee">
+                                  <option value="">
+                                  </option>
+                              </select>
+                          </div>
                       </div>
                   </div>
                   <div id="contracts-results-table">
@@ -1786,6 +1808,17 @@
                           <p class="mb-0" id="contract-list-count">
                               0 résultat
                           </p>
+                      </div>
+                      <div class="flex-column flex-md-row mt-3 mt-md-0">
+                          <div class="w-lg-400px">
+                              <label class="visually-hidden" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2 is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/geiq-assessments/00000000-1111-2222-3333-444444444444/employee/filters/employee/" data-allow-clear="true" data-minimum-input-length="1" data-placeholder="Nom du salarié" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee">
+                                  <option value="">
+                                  </option>
+                              </select>
+                          </div>
                       </div>
                   </div>
                   <div id="contracts-results-table">
@@ -2267,6 +2300,17 @@
                               2 résultats
                           </p>
                       </div>
+                      <div class="flex-column flex-md-row mt-3 mt-md-0">
+                          <div class="w-lg-400px">
+                              <label class="visually-hidden" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2 is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/geiq-assessments/00000000-1111-2222-3333-444444444444/employee/filters/employee/" data-allow-clear="true" data-minimum-input-length="1" data-placeholder="Nom du salarié" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee">
+                                  <option value="">
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
                   </div>
                   <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
@@ -2443,6 +2487,17 @@
                           <p class="mb-0" id="contract-list-count">
                               2 résultats
                           </p>
+                      </div>
+                      <div class="flex-column flex-md-row mt-3 mt-md-0">
+                          <div class="w-lg-400px">
+                              <label class="visually-hidden" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2 is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/geiq-assessments/00000000-1111-2222-3333-444444444444/employee/filters/employee/" data-allow-clear="true" data-minimum-input-length="1" data-placeholder="Nom du salarié" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee">
+                                  <option value="">
+                                  </option>
+                              </select>
+                          </div>
                       </div>
                   </div>
                   <div id="contracts-results-table">
@@ -2646,6 +2701,17 @@
                           <p class="mb-0" id="contract-list-count">
                               0 résultat
                           </p>
+                      </div>
+                      <div class="flex-column flex-md-row mt-3 mt-md-0">
+                          <div class="w-lg-400px">
+                              <label class="visually-hidden" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2 is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/geiq-assessments/00000000-1111-2222-3333-444444444444/employee/filters/employee/" data-allow-clear="true" data-minimum-input-length="1" data-placeholder="Nom du salarié" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee">
+                                  <option value="">
+                                  </option>
+                              </select>
+                          </div>
                       </div>
                   </div>
                   <div id="contracts-results-table">

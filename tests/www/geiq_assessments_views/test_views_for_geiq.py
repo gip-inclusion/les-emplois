@@ -1489,7 +1489,7 @@ class TestAssessmentContractsListView:
         assert trigger_btn.get("type") == "button"
 
     def test_contract_list_htmx_consistency(self, client):
-        EmployeeContractFactory(employee__assessment=self.assessment)
+        contract = EmployeeContractFactory(employee__assessment=self.assessment)
 
         filter_data = {
             "start_date_lower": "2024-06-01",
@@ -1498,6 +1498,7 @@ class TestAssessmentContractsListView:
             "potential_allowance_1400": "on",
             "allowance_requested_off": "on",
             "allowance_eligibility": "on",
+            "employee": contract.employee.pk,
         }
 
         response = client.get(self.url, filter_data)
@@ -1671,3 +1672,92 @@ class TestAssessmentContractsListView:
             assert contracts_map[key] in contracts_in_page
         for key in expected_not_in:
             assert contracts_map[key] not in contracts_in_page
+
+    def test_contract_list_filter_by_employee_name(self, client):
+        target_contract = EmployeeContractFactory(
+            employee__assessment=self.assessment,
+            employee__first_name="Jean",
+            employee__last_name="Dupont",
+        )
+        other_contract = EmployeeContractFactory(
+            employee__assessment=self.assessment,
+            employee__first_name="Marie",
+            employee__last_name="Martin",
+        )
+
+        response = client.get(self.url, {"employee": target_contract.employee.pk})
+
+        assert response.status_code == 200
+        contracts_in_page = response.context["contracts_page"].object_list
+        assert target_contract in contracts_in_page
+        assert other_contract not in contracts_in_page
+
+
+class TestEmployeeAutocomplete:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        self.user = membership.user
+        self.company = membership.company
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [self.company.post_code[:2]]
+        self.assessment = AssessmentFactory(companies=[self.company])
+        self.autocomplete_url = reverse(
+            "geiq_assessments_views:employee_autocomplete",
+            kwargs={"field_name": "employee", "assessment_pk": self.assessment.pk},
+        )
+        client.force_login(self.user)
+
+    def test_forbidden_field(self, client):
+        response = client.get(
+            reverse(
+                "geiq_assessments_views:employee_autocomplete",
+                kwargs={"field_name": "unknown_field", "assessment_pk": self.assessment.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    def test_empty_term_returns_no_results(self, client):
+        EmployeeContractFactory(employee__assessment=self.assessment)
+
+        response = client.get(self.autocomplete_url)
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+    def test_unrelated_term_returns_no_results(self, client):
+        EmployeeContractFactory(employee__assessment=self.assessment)
+
+        response = client.get(self.autocomplete_url, {"term": "Nom sans aucun rapport"})
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+    def test_matching_term_returns_employee(self, client, snapshot):
+        contract = EmployeeContractFactory(
+            employee__assessment=self.assessment,
+            employee__first_name="Jean",
+            employee__last_name="Dupont",
+        )
+
+        with assertSnapshotQueries(snapshot(name="SQL queries for employee autocomplete")):
+            response = client.get(self.autocomplete_url, {"term": "Dup"})
+        assert response.status_code == 200
+        assert response.json() == {"results": [{"id": str(contract.employee.pk), "text": "DUPONT Jean"}]}
+
+    def test_only_returns_employees_from_own_campaign(self, client):
+        EmployeeContractFactory(
+            employee__assessment=self.assessment,
+            employee__first_name="Jean",
+            employee__last_name="Dupont",
+        )
+        # same company, other assessment
+        other_assessment = AssessmentFactory(companies=[self.company])
+        EmployeeContractFactory(
+            employee__assessment=other_assessment,
+            employee__first_name="Jean",
+            employee__last_name="Durand",
+        )
+
+        response = client.get(self.autocomplete_url, {"term": "Jean"})
+        assert response.status_code == 200
+        results = response.json()["results"]
+        assert len(results) == 1
+        assert results[0]["text"] == "DUPONT Jean"

@@ -63,6 +63,11 @@ urlpatterns = [
         name="assessment_contracts_list",
     ),
     path(
+        "<uuid:assessment_pk>/employee/filters/<str:field_name>/",
+        views.employee_autocomplete,
+        name="employee_autocomplete",
+    ),
+    path(
         "<uuid:pk>/export",
         views.assessment_contracts_export,
         name="assessment_contracts_export",
