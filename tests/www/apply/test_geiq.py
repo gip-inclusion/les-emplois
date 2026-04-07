@@ -178,15 +178,26 @@ class TestJobApplicationGEIQEligibilityDetails:
         else:
             assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
 
-    def test_accepted_without_diagnosis(self, client):
+    @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
+    def test_accepted_without_diagnosis(self, client, viewer_kind):
+        """An accepted application without a diagnosis should not display an unlinked expired diagnosis as valid."""
+        expired_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             to_company__kind=CompanyKind.GEIQ,
+            job_seeker=expired_diagnosis.job_seeker,
+            sender=expired_diagnosis.author,
+            geiq_eligibility_diagnosis=None,
         )
 
-        response = self.get_response(client, job_application, job_application.sender, viewer_kind="prescriber")
-        assert response.status_code == 200
+        response = self.get_response(client, job_application, viewer_kind, diagnosis=expired_diagnosis)
+
+        # The expired diagnosis exists for the job seeker but is NOT linked
+        # to the job application, so it must not be shown as valid.
+        assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
+        assertNotContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
+        assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
 
 
 class TestJobSeekerGeoDetailsForGEIQDiagnosis:
