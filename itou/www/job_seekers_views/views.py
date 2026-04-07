@@ -470,7 +470,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if not self.request.from_prescriber:
             return False
 
-        return job_seeker.pk in User.objects.linked_job_seeker_ids(
+        return job_seeker.pk in User.objects.assigned_job_seeker_ids(
             self.request.user, self.request.current_organization, from_all_coworkers=True
         )
 
