@@ -1086,14 +1086,16 @@ def test_stalled_job_seekers_box(client):
         sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
+        with_job_seeker_assignment=True,
     )
     JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
+        with_job_seeker_assignment=True,
     )
-    JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
+    JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, with_job_seeker_assignment=True)
 
     response = client.get(reverse("dashboard:index"))
     assert response.context["stalled_job_seekers_count"] == 1
