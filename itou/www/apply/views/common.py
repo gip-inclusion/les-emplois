@@ -43,18 +43,7 @@ class IsIAEEligibilityDiagnosisNeededMixin:
         )
 
 
-class ContractInfosNeededMixin:
-    def dispatch(self, request, *args, **kwargs):
-        # hiring_start_at is mandatory for all company kinds
-        if not self.get_session().get("contract_form_data", {}).get("hiring_start_at"):
-            return HttpResponseRedirect(self.get_contract_infos_url())
-        return super().dispatch(request, *args, **kwargs)
-
-
 class CommonUserInfoFormsMixin:
-    def get_session(self):
-        raise NotImplementedError
-
     def get_forms(self):
         forms = {}
         session = self.get_session()

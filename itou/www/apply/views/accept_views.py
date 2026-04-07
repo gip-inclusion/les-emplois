@@ -183,7 +183,7 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
 
 
 class IAEEligibilityForAcceptView(
-    AcceptWizardMixin, common_views.ContractInfosNeededMixin, BaseIAEEligibilityViewForEmployer
+    AcceptWizardMixin, common_views.JobSeekerAndContractInfosNeededMixin, BaseIAEEligibilityViewForEmployer
 ):
     template_name = "apply/process_eligibility.html"
 
