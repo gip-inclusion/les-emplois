@@ -60,7 +60,9 @@ class TestApprovalDetailView:
         assertNotContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
 
     def test_non_authorized_prescriber_access(self, client):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, with_job_seeker_assignment=True
+        )
         url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
 
         client.force_login(job_application.sender)
@@ -68,7 +70,9 @@ class TestApprovalDetailView:
         assert response.status_code == 403
 
     def test_authorized_prescriber_access(self, client):
-        job_application = JobApplicationFactory(with_approval=True, sent_by_authorized_prescriber=True)
+        job_application = JobApplicationFactory(
+            with_approval=True, sent_by_authorized_prescriber=True, with_job_seeker_assignment=True
+        )
         url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
 
         client.force_login(job_application.sender)
@@ -123,6 +127,7 @@ class TestApprovalDetailView:
             approval=approval,
             job_seeker=approval.user,
             sent_by_authorized_prescriber=True,
+            with_job_seeker_assignment=True,
         )
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
@@ -182,6 +187,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            with_job_seeker_assignment=True,
         )
         approval = job_application.approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -277,6 +283,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            with_job_seeker_assignment=True,
         )
         approval = job_application.approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -386,6 +393,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            with_job_seeker_assignment=True,
         )
         approval = job_application.approval
         siae = job_application.to_company
@@ -447,6 +455,7 @@ class TestApprovalDetailView:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
             sent_by_authorized_prescriber=True,
+            with_job_seeker_assignment=True,
         )
         approval = job_application.approval
         siae = job_application.to_company
@@ -528,7 +537,9 @@ class TestContractView:
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_no_access(self, client):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, with_approval=True, with_job_seeker_assignment=True
+        )
         approval = job_application.approval
         url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
 

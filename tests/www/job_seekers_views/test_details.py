@@ -166,6 +166,7 @@ def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
         number="XXXXX1212345",
         eligibility_diagnosis__author=authorized_prescriber,
         eligibility_diagnosis__author_prescriber_organization=authorized_prescriber.prescriberorganization_set.first(),
+        eligibility_diagnosis__with_job_seeker_assignment=True,
     )
 
     client.force_login(authorized_prescriber)
