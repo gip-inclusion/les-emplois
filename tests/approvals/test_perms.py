@@ -19,7 +19,9 @@ def test_can_view_approval_details():
     for user in [
         approval.user,
         JobApplicationFactory(
-            job_seeker=approval.user, sent_by_authorized_prescriber=True
+            job_seeker=approval.user,
+            sent_by_authorized_prescriber=True,
+            with_job_seeker_assignment=True,
         ).sender,  # linked authorized prescriber
         JobApplicationFactory(
             sent_by_prescriber_alone=True, job_seeker=approval.user
@@ -33,7 +35,7 @@ def test_can_view_approval_details():
         JobSeekerFactory(),  # another job seeker
         PrescriberMembershipFactory(organization__authorized=True).user,  # a random authorized prescriber
         JobApplicationFactory(
-            sent_by_prescriber_alone=True, job_seeker=approval.user
+            sent_by_prescriber_alone=True, job_seeker=approval.user, with_job_seeker_assignment=True
         ).sender,  # a non authorized prescriber linked to the job seeker
         EmployerFactory(membership=True),
     ]:
