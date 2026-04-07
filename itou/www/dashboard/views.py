@@ -155,7 +155,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         context.update(_employer_dashboard_context(request))
     elif request.from_prescriber:
         if current_org := request.current_organization:
-            context["stalled_job_seekers_count"] = User.objects.linked_job_seeker_ids(
+            context["stalled_job_seekers_count"] = User.objects.assigned_job_seeker_ids(
                 request.user,
                 request.current_organization,
                 stalled=True,
