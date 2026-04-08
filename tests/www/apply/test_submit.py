@@ -3958,9 +3958,6 @@ class TestApplicationGEIQEligibilityView:
     def setup_method(self):
         self.geiq = CompanyFactory(with_membership=True, with_jobs=True, kind=CompanyKind.GEIQ)
         self.prescriber_org = PrescriberOrganizationFactory(authorized=True, with_membership=True)
-        self.orienter = PrescriberFactory()
-        self.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True).job_seeker
-        self.company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
 
     def test_bypass_geiq_eligibility_diagnosis_form_for_orienter(self, client):
         # When creating a job application, should bypass GEIQ eligibility form step:
@@ -3968,8 +3965,7 @@ class TestApplicationGEIQEligibilityView:
         # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
         job_seeker = JobSeekerFactory()
 
-        # Redirect orienter
-        client.force_login(self.orienter)
+        client.force_login(PrescriberFactory())
         apply_session = fake_session_initialization(
             client, self.geiq, job_seeker, {"selected_jobs": self.geiq.job_description_through.all()}
         )
@@ -3977,7 +3973,7 @@ class TestApplicationGEIQEligibilityView:
             reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name})
         )
 
-        # Must redirect to resume
+        # Redirect non authorized prescriber to resume view
         assertRedirects(
             response,
             reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name}),
@@ -4026,9 +4022,10 @@ class TestApplicationGEIQEligibilityView:
         job_seeker = JobSeekerFactory()
         # See comment im previous test:
         # assert we're not somewhere we don't belong to (non-GEIQ)
-        client.force_login(self.company.members.first())
+        company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
+        client.force_login(company.members.first())
         apply_session = fake_session_initialization(
-            client, self.company, job_seeker, {"selected_jobs": self.geiq.job_description_through.all()}
+            client, company, job_seeker, {"selected_jobs": self.geiq.job_description_through.all()}
         )
 
         response = client.get(
@@ -4112,10 +4109,11 @@ class TestApplicationGEIQEligibilityView:
         client.force_login(self.prescriber_org.members.first())
 
         # Badge OK if job seeker has a valid eligibility diagnosis
+        job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True).job_seeker
         apply_session = fake_session_initialization(
             client,
             self.geiq,
-            self.job_seeker_with_geiq_diagnosis,
+            job_seeker_with_geiq_diagnosis,
             {"selected_jobs": self.geiq.job_description_through.all()},
         )
         response = client.get(
@@ -4177,11 +4175,12 @@ class TestApplicationGEIQEligibilityView:
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_geiq_diagnosis_form_validation(self, client, subtests):
+        job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True).job_seeker
         client.force_login(self.prescriber_org.members.first())
         apply_session = fake_session_initialization(
             client,
             self.geiq,
-            self.job_seeker_with_geiq_diagnosis,
+            job_seeker_with_geiq_diagnosis,
             {"selected_jobs": self.geiq.job_description_through.all()},
         )
 
