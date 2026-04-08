@@ -29,6 +29,7 @@ from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEm
 from itou.openid_connect.utils import init_user_nir_from_session
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
+from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_absolute_url
 
 
@@ -60,7 +61,10 @@ def pe_connect_authorize(request):
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
+# This view expects a GET but is not readonly (it is likely to create/update an user):
+# we need a transaction and a postgres context for our triggers
 @login_not_required
+@readonly_view(except_methods=["GET"])
 def pe_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
