@@ -1,20 +1,41 @@
 {% load i18n %}
 {% load static %}
+{% get_current_language as LANGUAGE_CODE %}
 <!-- hijack/notification.html -->
-<link rel="stylesheet" href="{% static 'hijack/hijack.css' %}" media="screen">
+<link rel="stylesheet" href="{% static 'css/hijack.css' %}" media="screen">
 <div class="djhj" id="djhj">
-    <div class="djhj-notification">
+    <div class="djhj-notification alert alert-danger">
         <div class="djhj-message">
-            {% blocktrans trimmed with user=request.user %}
-                You are currently working on behalf of <em>{{ user }}</em>.
-            {% endblocktrans %}
+            {% if LANGUAGE_CODE == "fr-fr" %}
+                Connecté en tant que
+                <b>{{ user.first_name }} {{ user.last_name }}</b>, <em>{{ user.kind }}</em>, pk=<span class="font-monospace">{{ user.pk }}</span>
+            {% else %}
+                {% blocktrans trimmed with user=request.user %}
+                    You are currently working on behalf of <em>{{ user }}</em>.
+                {% endblocktrans %}
+            {% endif %}
         </div>
         <form action="{% url 'hijack:release' %}" method="post" class="djhj-actions">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.path }}">
-            <button id="hide-btn" class="djhj-button" type="button">{% trans 'hide' %}</button>
-            <button class="djhj-button">{% trans 'release' %}</button>
-        </form>
+            <button
+                class="djhj-button text-danger" type="submit"
+                data-bs-toggle="tooltip"
+                data-bs-title="{% trans 'release'|title %}"
+                aria-label="{% trans 'release'|title %}"
+            >
+                <i class="ri-logout-circle-r-line"></i>
+                <span class="visually-hidden">{% trans 'release'|title %}</span>
+            </button>
+            <button
+                id="hide-btn" class="djhj-button" type="button"
+                data-bs-toggle="tooltip"
+                data-bs-title="{% trans 'hide'|title %}"
+                aria-label="{% trans 'hide'|title %}"
+            >
+                <i class="ri-close-fill"></i>
+                <span class="visually-hidden">{% trans 'hide'|title %}</span>
+            </button>
     </div>
 </div>
 
