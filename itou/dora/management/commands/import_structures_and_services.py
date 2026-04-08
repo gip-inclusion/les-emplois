@@ -172,13 +172,14 @@ class Command(BaseCommand):
         structure.uid = data["id"]
 
         structure.source = self.reference_data_by_value(ReferenceDatumKind.SOURCE)[data["source"]]
-        structure.source_link = data["lien_source"] or ""
-        self._truncate_field_if_greater_than_max_length(structure, "source_link")
 
         structure.siret = data["siret"] or ""
 
         structure.name = data["nom"]
         structure.description = data["description"] or ""
+
+        structure.website = data["site_web"] or ""
+        self._truncate_field_if_greater_than_max_length(structure, "website")
 
         structure.email = data["courriel"] or ""
         structure.phone = data["telephone"] or ""

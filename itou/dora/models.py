@@ -62,12 +62,12 @@ class Structure(GeolocatedAddressMixin, models.Model):
         limit_choices_to={"kind": ReferenceDatumKind.SOURCE},
         related_name="+",
     )
-    source_link = models.URLField(blank=True, max_length=512)
 
     siret = models.CharField(blank=True)
 
     name = models.CharField()
     description = models.TextField(blank=True)
+    website = models.URLField(verbose_name="site web", max_length=512, blank=True)
 
     email = models.EmailField(verbose_name="e-mail", blank=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
