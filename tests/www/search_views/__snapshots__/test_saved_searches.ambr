@@ -48,7 +48,7 @@
 # ---
 # name: TestSavedSearches.test_display_saved_searches_and_delete_modal[/dashboard/][SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -338,14 +338,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'add_city_name_attr[search/models.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "search_savedsearch"."id",
@@ -362,6 +357,7 @@
         'origin': list([
           'add_city_name_attr[search/models.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -378,12 +374,6 @@
           WHERE "cities_city"."slug" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
