@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_not_required
-from django.db import transaction
 from django.db.models import F, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
@@ -10,6 +9,7 @@ from unidecode import unidecode
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
+from itou.utils.readonly import readonly_view
 
 
 # Consider that after 50 matches the user should refine its search.
@@ -42,7 +42,7 @@ def autocomplete_name(qs, term, extra_ordering_by):
 
 
 @login_not_required
-@transaction.non_atomic_requests
+@readonly_view
 def cities_autocomplete(request):
     """
     Returns JSON data compliant with Select2
@@ -67,7 +67,7 @@ def cities_autocomplete(request):
 
 
 @login_not_required
-@transaction.non_atomic_requests
+@readonly_view
 def jobs_autocomplete(request):
     """
     Returns JSON data compliant with Select2
@@ -89,7 +89,7 @@ def jobs_autocomplete(request):
 
 
 @login_not_required
-@transaction.non_atomic_requests
+@readonly_view
 def communes_autocomplete(request):
     """
     Autocomplete endpoint for INSEE communes (ASP ref. files)

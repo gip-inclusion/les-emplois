@@ -33,6 +33,7 @@ from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclus
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
+from itou.utils.readonly import ReadonlyViewMixin, readonly_view
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.search_views.forms import (
     JobDescriptionSearchForm,
@@ -60,7 +61,7 @@ def employer_search_home(request, template_name="search/siaes_search_home.html")
     return render(request, template_name, {"siae_search_form": SiaeSearchForm()})
 
 
-class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, FormView):
+class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJobSeekerMixin, FormView):
     form_class = SiaeSearchForm
     initial = {"distance": SiaeSearchForm.DISTANCE_DEFAULT}
 
@@ -334,6 +335,7 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
 
 
 @login_not_required
+@readonly_view
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
     city = None
     distance = None
@@ -407,6 +409,7 @@ def _api_results_sorter(result):
 
 
 @login_not_required
+@readonly_view
 def search_services_results(request, template_name="search/services/results.html"):
     city, category = None, None
     form = ServiceSearchForm(data=request.GET or None)

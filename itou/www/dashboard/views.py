@@ -40,6 +40,7 @@ from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.utils import can_edit_personal_information
+from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
@@ -132,6 +133,7 @@ def _employer_dashboard_context(request):
     }
 
 
+@readonly_view
 def dashboard(request, template_name="dashboard/dashboard.html"):
     saved_searches = SavedSearch.add_city_name_attr(request.user.saved_searches.all())
     context = {
