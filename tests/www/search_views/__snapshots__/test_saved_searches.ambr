@@ -390,7 +390,7 @@
 # ---
 # name: TestSavedSearches.test_display_saved_searches_and_delete_modal[/search/employers/results][SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -680,15 +680,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'add_city_name_attr[search/models.py]',
           'EmployerSearchView.get_context_data[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "search_savedsearch"."id",
@@ -706,6 +701,7 @@
           'add_city_name_attr[search/models.py]',
           'EmployerSearchView.get_context_data[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -722,19 +718,13 @@
           WHERE "cities_city"."slug" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestSavedSearches.test_display_saved_searches_and_delete_modal[/search/job-descriptions/results][SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1024,15 +1014,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'add_city_name_attr[search/models.py]',
           'JobDescriptionSearchView.get_context_data[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "search_savedsearch"."id",
@@ -1050,6 +1035,7 @@
           'add_city_name_attr[search/models.py]',
           'JobDescriptionSearchView.get_context_data[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -1066,12 +1052,6 @@
           WHERE "cities_city"."slug" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

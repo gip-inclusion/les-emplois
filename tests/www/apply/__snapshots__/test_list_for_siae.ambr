@@ -379,6 +379,7 @@
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -859,6 +860,7 @@
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."first_name",
@@ -1339,6 +1341,7 @@
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("sender_company_display_name",
@@ -1819,6 +1822,7 @@
         'origin': list([
           'autocomplete[www/apply/views/list_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("prescribers_prescriberorganization"."name",
@@ -2292,7 +2296,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 29,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -2668,13 +2672,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -2693,6 +2692,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -2716,6 +2716,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
@@ -2732,6 +2733,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -2754,6 +2756,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -2845,6 +2848,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -3250,6 +3254,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -3292,6 +3297,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "jobs_appellation"."updated_at",
@@ -3307,6 +3313,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -3327,6 +3334,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -3374,6 +3382,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -3416,6 +3425,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -3440,6 +3450,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -3476,6 +3487,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3496,6 +3508,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3513,12 +3526,6 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -3551,7 +3558,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 26,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -3927,13 +3934,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -3952,6 +3954,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -3975,6 +3978,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
@@ -3991,6 +3995,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -4013,6 +4018,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -4067,6 +4073,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -4435,6 +4442,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -4477,6 +4485,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "jobs_appellation"."updated_at",
@@ -4492,6 +4501,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -4512,6 +4522,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -4559,6 +4570,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -4601,6 +4613,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -4625,6 +4638,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -4661,6 +4675,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -4681,6 +4696,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -4699,18 +4715,12 @@
           LIMIT 1
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with all filters but job_seeker]
   dict({
-    'num_queries': 30,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -5086,13 +5096,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -5111,6 +5116,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -5134,6 +5140,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
@@ -5150,6 +5157,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -5170,6 +5178,7 @@
       dict({
         'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -5223,6 +5232,7 @@
       dict({
         'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -5272,6 +5282,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -5405,6 +5416,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -5851,6 +5863,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -5891,6 +5904,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -5931,6 +5945,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -5953,6 +5968,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -5987,6 +6003,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -6007,6 +6024,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -6038,6 +6056,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -6101,6 +6120,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -6147,12 +6167,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -6182,7 +6196,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with only job_seeker filter]
   dict({
-    'num_queries': 25,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -6558,13 +6572,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -6583,6 +6592,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -6606,6 +6616,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
@@ -6622,6 +6633,7 @@
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT DISTINCT "jobs_appellation"."code" AS "code",
@@ -6642,6 +6654,7 @@
       dict({
         'origin': list([
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -6698,6 +6711,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -6752,6 +6766,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -7120,6 +7135,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -7160,6 +7176,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -7200,6 +7217,7 @@
         'origin': list([
           '_add_pending_for_weeks[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -7222,6 +7240,7 @@
         'origin': list([
           '_add_administrative_criteria[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -7256,6 +7275,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -7276,6 +7296,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -7301,6 +7322,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_for_siae.html]',
           'list_for_siae[www/apply/views/list_views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -7351,12 +7373,6 @@
                  AND "users_user"."id" IN (%s))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
