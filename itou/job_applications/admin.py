@@ -199,7 +199,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             {
                 "fields": [
                     "geiq_eligibility_diagnosis",
-                    "prehiring_guidance_days",
                     "nb_hours_per_week",
                     "contract_type",
                     "contract_type_details",

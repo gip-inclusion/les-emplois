@@ -329,7 +329,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -664,11 +663,11 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
+                   46,
                    47,
-                   48,
+                   50,
                    51,
                    52,
-                   53,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -967,7 +966,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -1274,9 +1272,9 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
+                   46,
                    47,
-                   48,
-                   50,
+                   49,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",

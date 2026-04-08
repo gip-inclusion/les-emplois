@@ -45,7 +45,6 @@ class TestAcceptForm:
             "location",
             "nb_hours_per_week",
             "planned_training_hours",
-            "prehiring_guidance_days",
             "qualification_level",
             "qualification_type",
         ]
@@ -70,21 +69,6 @@ class TestAcceptForm:
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
         job_description = JobDescriptionFactory(company=job_application.to_company, location=None)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
-        form = apply_forms.AcceptForm(
-            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
-        )
-        sorted_errors = dict(sorted(form.errors.items()))
-        assert sorted_errors == {
-            "contract_type": ["Ce champ est obligatoire."],
-            "nb_hours_per_week": ["Ce champ est obligatoire."],
-            "hired_job": ["Ce champ est obligatoire."],
-            "planned_training_hours": ["Ce champ est obligatoire."],
-            "prehiring_guidance_days": ["Ce champ est obligatoire."],
-            "qualification_level": ["Ce champ est obligatoire."],
-            "qualification_type": ["Ce champ est obligatoire."],
-        }
-
-        post_data |= {"prehiring_guidance_days": faker.pyint()}
         form = apply_forms.AcceptForm(
             company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
         )
@@ -131,7 +115,6 @@ class TestAcceptForm:
         job_description = JobDescriptionFactory(company=job_application.to_company)
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
-            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 35,
             "hired_job": job_description.pk,
         }
@@ -236,7 +219,6 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
-            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 4,
             "contract_type_details": "contract details",
             "contract_type": str(ContractType.OTHER),
@@ -302,7 +284,6 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
             "hired_job": job_description.pk,
-            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 4,
             "contract_type_details": "",
             "contract_type": str(ContractType.PROFESSIONAL_TRAINING),
@@ -359,7 +340,6 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         post_data = {
             "hiring_start_at": f"{faker.past_date(start_date='-1d'):%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
-            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 5,
             "contract_type_details": "contract details",
             "contract_type": str(ContractType.OTHER),

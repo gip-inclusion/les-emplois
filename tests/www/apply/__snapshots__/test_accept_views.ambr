@@ -422,7 +422,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -1598,7 +1597,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -2686,7 +2684,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -3593,7 +3590,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -4283,15 +4279,6 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
-      <div id="id_prehiring_guidance_days_error" class="w-100">
-          
-              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
-          
-      </div>
-  
-  <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
-  </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select is-valid" required id="id_contract_type">
     <option value="">---------</option>
   
@@ -4313,15 +4300,6 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
-      <div id="id_prehiring_guidance_days_error" class="w-100">
-          
-              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
-          
-      </div>
-  
-  <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
-  </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select is-valid" required id="id_contract_type">
     <option value="">---------</option>
   
@@ -4347,15 +4325,6 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
-      <div id="id_prehiring_guidance_days_error" class="w-100">
-          
-              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
-          
-      </div>
-  
-  <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
-  </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select is-valid" required id="id_contract_type">
     <option value="">---------</option>
   

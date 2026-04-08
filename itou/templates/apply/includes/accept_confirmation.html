@@ -19,10 +19,6 @@
         </li>
         {% if form_accept.is_geiq %}
             <li>
-                <small>Durée d’accompagnement avant contrat</small>
-                <strong>{{ form_accept.cleaned_data.prehiring_guidance_days }} {{ form_accept.cleaned_data.prehiring_guidance_days|pluralizefr:"jour,jours" }}</strong>
-            </li>
-            <li>
                 <small>Type de contrat</small>
                 <strong>{{ form_accept.get_display_for_choices.contract_type }}</strong>
             </li>

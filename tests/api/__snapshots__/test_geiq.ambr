@@ -129,7 +129,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -494,7 +493,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -848,7 +846,6 @@
         'est_vae_inversee': True,
         'id_embauche': 'bf657b69-3245-430c-b461-09c6792b9504',
         'id_utilisateur': '7614fc4b-aef9-4694-ab17-12324300180a',
-        'jours_accompagnement': 42,
         'mises_en_situation_pro': list([
           dict({
             'code': 'PMSMP',
@@ -892,7 +889,6 @@
         'est_vae_inversee': False,
         'id_embauche': 'bf657b69-3245-430c-b461-09c6792b9505',
         'id_utilisateur': '7614fc4b-aef9-4694-ab17-12324300180a',
-        'jours_accompagnement': 28,
         'mises_en_situation_pro': list([
         ]),
         'nb_heures_formation': 12,

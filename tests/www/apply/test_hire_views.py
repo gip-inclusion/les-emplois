@@ -758,7 +758,6 @@ class TestDirectHireFullProcess:
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
             "answer": "",
-            "prehiring_guidance_days": 3,
             "nb_hours_per_week": 4,
             "planned_training_hours": 5,
             "contract_type": ContractType.APPRENTICESHIP,
@@ -1548,7 +1547,6 @@ class TestGEIQEligibilityForHire:
                 "contract_form_data": {
                     "hiring_start_at": timezone.localdate(),
                     "hired_job": company.job_description_through.first().pk,
-                    "prehiring_guidance_days": 3,
                     "nb_hours_per_week": 4,
                     "planned_training_hours": 5,
                     "contract_type": ContractType.APPRENTICESHIP.value,
@@ -1652,7 +1650,6 @@ class TestFillJobSeekerInfosForHire:
             create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)  # For hired_job field
             post_data.update(
                 {
-                    "prehiring_guidance_days": 10,
                     "contract_type": ContractType.APPRENTICESHIP,
                     "nb_hours_per_week": 10,
                     "qualification_type": QualificationType.CQP,
@@ -2286,7 +2283,6 @@ class TestHireContract:
             "answer": "",
             # GEIQ specific fields
             "hired_job": company.job_description_through.first().pk,
-            "prehiring_guidance_days": 3,
             "nb_hours_per_week": 4,
             "planned_training_hours": 5,
             "contract_type": ContractType.APPRENTICESHIP,
@@ -2559,7 +2555,6 @@ class TestHireConfirmation:
                     "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "answer": "OK",
-                    "prehiring_guidance_days": 4,
                     "nb_hours_per_week": 5,
                     "planned_training_hours": 6,
                     "contract_type": ContractType.OTHER,
@@ -2595,7 +2590,6 @@ class TestHireConfirmation:
         assert job_application.resume is None
         assert job_application.hiring_start_at == hiring_start_at
         assert job_application.hiring_end_at == hiring_end_at
-        assert job_application.prehiring_guidance_days == 4
         assert job_application.nb_hours_per_week == 5
         assert job_application.planned_training_hours == 6
         assert job_application.contract_type == ContractType.OTHER
@@ -2622,7 +2616,6 @@ class TestHireConfirmation:
                     "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "answer": "OK",
-                    "prehiring_guidance_days": 4,
                     "nb_hours_per_week": 5,
                     "planned_training_hours": 6,
                     "contract_type": "",  # Missing

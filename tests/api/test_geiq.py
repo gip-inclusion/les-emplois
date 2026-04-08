@@ -114,7 +114,6 @@ def test_candidatures_geiq_nominal(snapshot):
         job_seeker=job_seeker,
         to_company__siret="11832575966666",
         to_company__kind=CompanyKind.GEIQ,
-        prehiring_guidance_days=28,
         contract_type="APPRENTICESHIP",
         nb_hours_per_week=35,
         qualification_type="CCN",
@@ -133,7 +132,6 @@ def test_candidatures_geiq_nominal(snapshot):
         sender_prescriber_organization__kind="HUDA",
         to_company__siret="11832575900001",  # same SIREN, different SIRET
         to_company__kind=CompanyKind.GEIQ,
-        prehiring_guidance_days=42,
         contract_type="PROFESSIONAL_TRAINING",
         nb_hours_per_week=47,
         qualification_type="CQP",

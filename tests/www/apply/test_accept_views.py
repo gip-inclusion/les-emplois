@@ -150,7 +150,6 @@ class TestProcessAcceptViewsInWizard:
         # GEIQ-only mandatory fields
         if job_application.to_company.kind == CompanyKind.GEIQ:
             accept_default_fields |= {
-                "prehiring_guidance_days": 10,
                 "contract_type": ContractType.APPRENTICESHIP,
                 "nb_hours_per_week": 10,
                 "qualification_type": QualificationType.CQP,
@@ -1860,7 +1859,6 @@ class TestFillJobSeekerInfosForAccept:
             create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)  # For hired_job field
             post_data.update(
                 {
-                    "prehiring_guidance_days": 10,
                     "contract_type": ContractType.APPRENTICESHIP,
                     "nb_hours_per_week": 10,
                     "qualification_type": QualificationType.CQP,
@@ -2553,7 +2551,6 @@ class TestIAEEligibility:
             reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
             data={
                 "hiring_start_at": timezone.localdate(),
-                "prehiring_guidance_days": 10,
                 "contract_type": ContractType.APPRENTICESHIP,
                 "nb_hours_per_week": 10,
                 "qualification_type": QualificationType.CQP,
@@ -2806,7 +2803,6 @@ class TestAcceptConfirmation:
                     "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "answer": "OK",
-                    "prehiring_guidance_days": 4,
                     "nb_hours_per_week": 5,
                     "planned_training_hours": 6,
                     "contract_type": ContractType.OTHER,
@@ -2836,7 +2832,6 @@ class TestAcceptConfirmation:
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.hiring_start_at == hiring_start_at
         assert job_application.hiring_end_at == hiring_end_at
-        assert job_application.prehiring_guidance_days == 4
         assert job_application.nb_hours_per_week == 5
         assert job_application.planned_training_hours == 6
         assert job_application.contract_type == ContractType.OTHER
@@ -2878,7 +2873,6 @@ class TestAcceptConfirmation:
                     "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "answer": "OK",
-                    "prehiring_guidance_days": 4,
                     "nb_hours_per_week": 5,
                     "planned_training_hours": 6,
                     "contract_type": ContractType.OTHER,
@@ -3041,7 +3035,6 @@ def test_htmx_reload_contract_type_and_options_in_wizard(client):
         "hiring_start_at": "",  # No date to ensure error
         "qualification_type": "CQP",
         "qualification_level": job_applications_enums.QualificationLevel.LEVEL_3,
-        "prehiring_guidance_days": "0",
         "planned_training_hours": "0",
         "hiring_end_at": "",
         "answer": "",

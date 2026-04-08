@@ -258,7 +258,6 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     )
 
     GEIQ_REQUIRED_FIELDS = (
-        "prehiring_guidance_days",
         "contract_type",
         "contract_type_details",
         "nb_hours_per_week",
@@ -280,7 +279,6 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = [
-            "prehiring_guidance_days",
             "location",
             "contract_type",
             "contract_type_details",
@@ -304,7 +302,6 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             "hiring_end_at": "Au format JJ/MM/AAAA, par exemple {}.".format(
                 (timezone.localdate() + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)).strftime("%d/%m/%Y")
             ),
-            "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
             "contract_type_details": (
                 "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
             ),
@@ -350,9 +347,8 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         if self.is_geiq:
             # Change default size (too large)
             self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
-            for field in ["prehiring_guidance_days", "planned_training_hours"]:
-                if initial is None or field not in initial:
-                    self.initial[field] = 0
+            if initial is None or "planned_training_hours" not in initial:
+                self.initial["planned_training_hours"] = 0
             self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple {}.".format(
                 timezone.localdate().strftime("%d/%m/%Y"),
             )
