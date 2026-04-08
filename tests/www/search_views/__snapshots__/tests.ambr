@@ -1,17 +1,12 @@
 # serializer version: 1
 # name: TestJobDescriptionSearchView.test_district
   dict({
-    'num_queries': 8,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -36,6 +31,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -72,6 +68,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -208,6 +205,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobdescription_id") AS "_prefetch_related_val_jobdescription_id",
@@ -269,6 +267,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -300,6 +299,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -316,29 +316,18 @@
           WHERE "cities_city"."slug" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestJobDescriptionSearchView.test_results
   dict({
-    'num_queries': 8,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -363,6 +352,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -399,6 +389,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -535,6 +526,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobdescription_id") AS "_prefetch_related_val_jobdescription_id",
@@ -596,6 +588,7 @@
           'JobDescriptionSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -627,6 +620,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'JobDescriptionSearchView.form_valid[www/search_views/views.py]',
           'JobDescriptionSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -644,28 +638,17 @@
           ORDER BY RANDOM() ASC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestSearchCompany.test_company[SQL queries with company filter]
   dict({
-    'num_queries': 9,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -688,6 +671,7 @@
           'EmployerSearchView.add_form_choices[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -754,6 +738,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -782,6 +767,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -822,6 +808,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -848,6 +835,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -948,6 +936,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -1068,28 +1057,17 @@
                    "cities_city"."id"
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestSearchCompany.test_company[SQL queries without company filter]
   dict({
-    'num_queries': 9,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -1112,6 +1090,7 @@
           'EmployerSearchView.add_form_choices[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1178,6 +1157,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1205,6 +1185,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1245,6 +1226,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -1271,6 +1253,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1370,6 +1353,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -1491,28 +1475,17 @@
                    "cities_city"."id"
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestSearchCompany.test_district
   dict({
-    'num_queries': 9,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -1535,6 +1508,7 @@
           'EmployerSearchView.add_form_choices[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1601,6 +1575,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1628,6 +1603,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1668,6 +1644,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -1694,6 +1671,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1793,6 +1771,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -1913,28 +1892,17 @@
                    "cities_city"."id"
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestSearchCompany.test_order_by
   dict({
-    'num_queries': 9,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -1957,6 +1925,7 @@
           'EmployerSearchView.add_form_choices[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2023,6 +1992,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -2050,6 +2020,7 @@
           'EmployerSearchView.get_results_page_and_counts[www/search_views/views.py]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -2090,6 +2061,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "cities_city"."id",
@@ -2116,6 +2088,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2215,6 +2188,7 @@
           'ExtendsNode[search/siaes_search_results.html]',
           'EmployerSearchView.form_valid[www/search_views/views.py]',
           'EmployerSearchView.get[www/search_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -2337,12 +2311,6 @@
                    "companies_company"."id",
                    "cities_city"."id"
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
