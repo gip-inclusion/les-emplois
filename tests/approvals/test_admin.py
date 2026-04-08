@@ -83,6 +83,35 @@ class TestApprovalAdmin:
         response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
         assertContains(response, get_admin_view_link(siae, content=siae.display_name), count=2)
 
+    def test_assigned_company_excludes_non_siae(self):
+        """The field 'Entreprise gérant le PASS' should only consider SIAE companies."""
+        job_seeker = JobSeekerFactory()
+        siae = CompanyFactory(kind=CompanyKind.EI)
+        geiq = CompanyFactory(kind=CompanyKind.GEIQ)
+        approval = ApprovalFactory(user=job_seeker)
+
+        # create an older accepted job application at a SIAE
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            approval=approval,
+            to_company=siae,
+            job_seeker=job_seeker,
+            state=JobApplicationState.ACCEPTED,
+            hiring_start_at=date(2025, 1, 1),
+        )
+        # create a more recent accepted job application at a GEIQ, which should be ignored
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            approval=approval,
+            to_company=geiq,
+            job_seeker=job_seeker,
+            state=JobApplicationState.ACCEPTED,
+            hiring_start_at=date(2026, 1, 1),
+        )
+
+        approval = Approval.objects.filter(pk=approval.pk).with_assigned_company().get()
+        assert approval.assigned_company == siae.pk
+
     def test_filter_assigned_company(self, admin_client):
         company = CompanyFactory()
         job_seeker = JobSeekerFactory()

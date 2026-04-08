@@ -138,7 +138,10 @@ class ApprovalQuerySet(models.QuerySet):
             assigned_company=Subquery(
                 job_application_model.objects.accepted()
                 .with_accepted_at()
-                .filter(job_seeker=OuterRef("user"))
+                .filter(
+                    job_seeker=OuterRef("user"),
+                    to_company__kind__in=companies_enums.CompanyKind.siae_kinds(),
+                )
                 .order_by("-accepted_at", "-hiring_start_at")
                 .values("to_company")[:1],
             )
