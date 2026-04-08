@@ -1668,40 +1668,6 @@ class TestProcessViews:
         assert mail_to_other_employer.subject == snapshot(name="postpone_email_to_proxy_subject")
         assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
 
-    # TODO(xfernandez): drop test with apply:eligibility view
-    def test_eligibility_state_for_job_application(self, client):
-        """The eligibility diagnosis page must only be accessible
-        in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
-        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
-        employer = company.members.first()
-        job_application = JobApplicationFactory(
-            sent_by_job_seeker=True,
-            to_company=company,
-            job_seeker=JobSeekerFactory(with_address=True),
-        )
-
-        # Right states
-        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
-            job_application.state = state
-            if state in JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES:
-                job_application.processed_at = timezone.now()
-            job_application.save()
-            client.force_login(employer)
-            url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-            response = client.get(url)
-            assert response.status_code == 200
-            client.logout()
-
-        # Wrong state
-        job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
-        job_application.processed_at = timezone.now()
-        job_application.save()
-        client.force_login(employer)
-        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
-        assert response.status_code == 404
-        client.logout()
-
     @pytest.mark.parametrize(
         "eligibility_trait,expected_msg",
         [

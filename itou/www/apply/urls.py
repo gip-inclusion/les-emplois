@@ -178,7 +178,6 @@ urlpatterns = [
         name="delete_comment_for_company",
     ),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
-    path("<uuid:job_application_id>/siae/eligibility", process_views.IAEEligibilityView.as_view(), name="eligibility"),
     path(
         "<uuid:job_application_id>/siae/geiq_eligibility",
         process_views.GEIQEligibilityView.as_view(),

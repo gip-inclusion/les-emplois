@@ -23,7 +23,6 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import (
     JobApplication,
     JobApplicationComment,
-    JobApplicationWorkflow,
     PriorAction,
 )
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
@@ -41,7 +40,6 @@ from itou.www.apply.forms import (
 )
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.constants import APPLICATIONS_VISIBILITY_FOR_EMPLOYERS
-from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
 logger = logging.getLogger(__name__)
@@ -571,44 +569,6 @@ def send_diagoriente_invite(request, job_application_id):
 
     redirect_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id})
     return HttpResponseRedirect(redirect_url)
-
-
-# TODO(xfernandez): drop now unused view
-class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
-    template_name = "apply/process_eligibility.html"
-
-    def setup(self, request, job_application_id, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        queryset = JobApplication.objects.is_active_company_member(request.user)
-        self.job_application = get_object_or_404(
-            queryset,
-            id=job_application_id,
-            state__in=JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
-        )
-        self.company = self.job_application.to_company
-        self.job_seeker = self.job_application.job_seeker
-
-        self.next_url = get_safe_url(
-            request,
-            "next_url",
-            fallback_url=reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
-        )
-
-    def get_success_url(self):
-        return self.next_url
-
-    def get_back_url(self):
-        return get_safe_url(self.request, "back_url", fallback_url=None)
-
-    def get_cancel_url(self):
-        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["job_application"] = self.job_application
-        context["back_url"] = self.get_back_url()
-        return context
 
 
 class GEIQEligibilityView(common_views.BaseGEIQEligibilityView):
