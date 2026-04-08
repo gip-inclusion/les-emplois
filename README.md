@@ -71,11 +71,12 @@ https://www.psycopg.org/docs/install.html#runtime-requirements
 Par ailleurs, le projet utilise [GDAL](https://gdal.org/index.html), et nécessite
 son installation préalable.
 
-Sur MacOS :
+Sur macOS :
 
 ```sh
 $ brew install gdal
 ```
+Si besoin, les chemins des binaires des libraries GDAL/GEOS peuvent être définis grâce des [variables d'environnement](docs/developing.md#apple-silicon).
 
 Sur Ubuntu :
 

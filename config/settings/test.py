@@ -93,3 +93,8 @@ ASSERT_SNAPSHOT_QUERIES_EXTRA_PACKAGES_ALLOWLIST = [
     ("rest_framework/mixins.py", "list"),
     ("xlsx_streaming/streaming.py", "serialize_queryset_by_batch"),
 ]
+
+# Custom paths for GDAL and GEOS libraries.
+# ------------------------------------------------------------------------------
+GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
+GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
