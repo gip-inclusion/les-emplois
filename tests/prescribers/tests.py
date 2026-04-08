@@ -132,20 +132,20 @@ class TestPrescriberOrganizationModel:
             )
             org.clean_code_safir_pole_emploi()
 
-    def test_has_pending_authorization_proof(self):
+    def test_requires_authorization_proof(self):
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.OTHER,
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
         assert org.has_pending_authorization()
-        assert org.has_pending_authorization_proof()
+        assert org.requires_authorization_proof()
 
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.CAP_EMPLOI,
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
         assert org.has_pending_authorization()
-        assert not org.has_pending_authorization_proof()
+        assert not org.requires_authorization_proof()
 
     def test_active_admin_members(self):
         """

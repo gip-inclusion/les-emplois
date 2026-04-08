@@ -293,14 +293,11 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         """
         return self.authorization_status == PrescriberAuthorizationStatus.NOT_SET
 
-    def has_pending_authorization_proof(self):
+    def requires_authorization_proof(self):
         """
         An unknown organization claiming to be authorized must provide a written proof.
         """
-        return (
-            self.kind == PrescriberOrganizationKind.OTHER
-            and self.authorization_status == PrescriberAuthorizationStatus.NOT_SET
-        )
+        return self.kind == PrescriberOrganizationKind.OTHER and self.has_pending_authorization()
 
     def validated_prescriber_organization_email(self):
         """
