@@ -435,9 +435,9 @@ data-inclusion-schema==1.0.6 \
     --hash=sha256:764076fc5170e122f3cc3680c7cea399da7f33ff3bc276abe4848389bfb5cfca \
     --hash=sha256:901344858a4f20fdfa815c529c86920d9500ad13e4b76e4a8e0e59858ab135e1
     # via -r base.in
-django==6.0.3 \
-    --hash=sha256:2e5974441491ddb34c3f13d5e7a9f97b07ba03bf70234c0a9c68b79bbb235bc3 \
-    --hash=sha256:90be765ee756af8a6cbd6693e56452404b5ad15294f4d5e40c0a55a0f4870fe1
+django==6.0.4 \
+    --hash=sha256:14359c809fc16e8f81fd2b59d7d348e4d2d799da6840b10522b6edf7b8afc1da \
+    --hash=sha256:8cfa2572b3f2768b2e84983cf3c4811877a01edb64e817986ec5d60751c113ac
     # via
     #   -r base.in
     #   django-allauth
