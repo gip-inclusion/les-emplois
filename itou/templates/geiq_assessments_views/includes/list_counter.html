@@ -1,0 +1,5 @@
+{% load str_filters %}
+
+<p class="mb-0" id="contract-list-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% with contracts_page.paginator.count as counter %}{{ counter }} résultat{{ counter|pluralizefr }}{% endwith %}
+</p>
