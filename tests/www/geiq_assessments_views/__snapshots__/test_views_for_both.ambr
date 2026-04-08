@@ -1337,14 +1337,14 @@
                       <div class="ms-md-auto" id="reset-button-container">
                       </div>
                   </div>
-                  <div id="contracts-results-table">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                          <div class="flex-md-grow-1">
-                              <p class="mb-0">
-                                  3 résultats
-                              </p>
-                          </div>
+                  <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                      <div class="flex-md-grow-1">
+                          <p class="mb-0" id="contract-list-count">
+                              3 résultats
+                          </p>
                       </div>
+                  </div>
+                  <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -1546,14 +1546,14 @@
                       <div class="ms-md-auto" id="reset-button-container">
                       </div>
                   </div>
-                  <div id="contracts-results-table">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                          <div class="flex-md-grow-1">
-                              <p class="mb-0">
-                                  3 résultats
-                              </p>
-                          </div>
+                  <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                      <div class="flex-md-grow-1">
+                          <p class="mb-0" id="contract-list-count">
+                              3 résultats
+                          </p>
                       </div>
+                  </div>
+                  <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -1781,14 +1781,14 @@
                       <div class="ms-md-auto" id="reset-button-container">
                       </div>
                   </div>
-                  <div id="contracts-results-table">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                          <div class="flex-md-grow-1">
-                              <p class="mb-0">
-                                  0 résultat
-                              </p>
-                          </div>
+                  <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                      <div class="flex-md-grow-1">
+                          <p class="mb-0" id="contract-list-count">
+                              0 résultat
+                          </p>
                       </div>
+                  </div>
+                  <div id="contracts-results-table">
                       <div class="text-center my-3 my-md-4">
                           <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
                           <p class="mb-1 mt-3">
@@ -2261,14 +2261,14 @@
                       <div class="ms-md-auto" id="reset-button-container">
                       </div>
                   </div>
-                  <div id="contracts-results-table">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                          <div class="flex-md-grow-1">
-                              <p class="mb-0">
-                                  2 résultats
-                              </p>
-                          </div>
+                  <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                      <div class="flex-md-grow-1">
+                          <p class="mb-0" id="contract-list-count">
+                              2 résultats
+                          </p>
                       </div>
+                  </div>
+                  <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -2438,14 +2438,14 @@
                       <div class="ms-md-auto" id="reset-button-container">
                       </div>
                   </div>
-                  <div id="contracts-results-table">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                          <div class="flex-md-grow-1">
-                              <p class="mb-0">
-                                  2 résultats
-                              </p>
-                          </div>
+                  <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                      <div class="flex-md-grow-1">
+                          <p class="mb-0" id="contract-list-count">
+                              2 résultats
+                          </p>
                       </div>
+                  </div>
+                  <div id="contracts-results-table">
                       <div class="table-responsive mt-3 mt-md-4">
                           <table class="table table-hover">
                               <caption class="visually-hidden">
@@ -2641,14 +2641,14 @@
                       <div class="ms-md-auto" id="reset-button-container">
                       </div>
                   </div>
-                  <div id="contracts-results-table">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                          <div class="flex-md-grow-1">
-                              <p class="mb-0">
-                                  0 résultat
-                              </p>
-                          </div>
+                  <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                      <div class="flex-md-grow-1">
+                          <p class="mb-0" id="contract-list-count">
+                              0 résultat
+                          </p>
                       </div>
+                  </div>
+                  <div id="contracts-results-table">
                       <div class="text-center my-3 my-md-4">
                           <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
                           <p class="mb-1 mt-3">

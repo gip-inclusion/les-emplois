@@ -88,20 +88,17 @@
                         {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_button.html" %}
                         {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter top_filter=True only %}
                     </div>
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        <div class="flex-md-grow-1">{% include "geiq_assessments_views/includes/list_counter.html" %}</div>
+                    </div>
                     {% partialdef contracts-results-table inline %}
                         {% if request.htmx and not request.htmx.boosted %}
                             <div id="form-errors-container" hx-swap-oob="true">{% bootstrap_form_errors filters_form %}</div>
+                            {% include "geiq_assessments_views/includes/list_counter.html" %}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter top_filter=True only %}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/offcanvas_footer.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
                         {% endif %}
                         <div id="contracts-results-table">
-                            <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
-                                <div class="flex-md-grow-1">
-                                    <p class="mb-0">
-                                        {% with contracts_page.paginator.count as counter %}{{ counter }} résultat{{ counter|pluralizefr }}{% endwith %}
-                                    </p>
-                                </div>
-                            </div>
                             {% if filters_form.errors %}
                                 <div class="text-center my-3 my-md-4">
                                     <img class="img-fluid" src="{% static 'img/illustration-error.png' %}" alt="" loading="lazy">
