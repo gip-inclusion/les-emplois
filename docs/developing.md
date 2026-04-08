@@ -55,3 +55,19 @@ Parmi les comptes créées en peuplant la base de données pour le développemen
 - **mot de passe** : password
 
 Ces identifiants sont utilisables pour se connecter à la console d'administration de Django en local : [http://localhost:8000/admin](http://localhost:8000/admin).
+
+
+## macOS et puces Apple Silicon
+
+Si la librairie GDAL a été installée avec [brew](https://formulae.brew.sh/formula/gdal) et que vous tentez de lancer l'application Django en local, l'erreur suivante peut se produire :
+```
+django.core.exceptions.ImproperlyConfigured: Could not find the GDAL library...
+```
+Celle-ci indique que Django ne trouve pas les binaires de la librairie.
+
+Les chemins des binaires des libraries GDAL et GEOS peuvent être définis grâce aux variables d'environnement `GDAL_LIBRARY_PATH` et `GEOS_LIBRARY_PATH`.
+Il est possible de définir celles-ci via le fichier `.envrc` si vous utilisez direnv :
+```sh
+export GDAL_LIBRARY_PATH="$(brew --prefix gdal)/lib/libgdal.dylib"
+export GEOS_LIBRARY_PATH="$(brew --prefix geos)/lib/libgeos_c.dylib"
+```
