@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 
+from itou.common_apps.address.display import format_address_on_one_line
 from itou.utils.validators import validate_post_code
 
 
@@ -24,6 +25,10 @@ class GeolocatedAddressMixin(models.Model):
     insee_city = models.ForeignKey("cities.City", on_delete=models.RESTRICT, null=True)
 
     coordinates = gis_models.PointField(geography=True, null=True, blank=True)
+
+    @property
+    def address_on_one_line(self):
+        return format_address_on_one_line(self)
 
     class Meta:
         abstract = True

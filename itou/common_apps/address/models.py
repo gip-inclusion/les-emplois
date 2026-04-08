@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, department_from_postcode
+from itou.common_apps.address.display import format_address_on_one_line
 from itou.geo.models import QPV, ZRR
 from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
 from itou.utils.apis.geocoding import batch as batch_geocode, get_geocoding_data
@@ -205,14 +206,7 @@ class AddressMixin(models.Model):
 
     @property
     def address_on_one_line(self):
-        if not all([self.address_line_1, self.post_code, self.city]):
-            return None
-        fields = [
-            self.address_line_1,
-            self.address_line_2,
-            f"{self.post_code} {self.city}",
-        ]
-        return ", ".join([field for field in fields if field])
+        return format_address_on_one_line(self)
 
     @property
     def geocoding_address(self):

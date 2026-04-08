@@ -1,0 +1,28 @@
+{% extends "layout/base.html" %}
+{% load matomo %}
+{% load components %}
+{% load static %}
+
+{% block title %}{{ structure.name }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ structure.name }}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    {% include "structures/includes/structure_card_tabs.html" %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,18 @@
+<section id="structure-content-tabs" class="s-tabs-01 mt-0 pt-0">
+    <div class="s-tabs-01__container container">
+        <div class="s-tabs-01__row row">
+            <div class="s-tabs-01__col col-12">
+                <h2 class="visually-hidden" id="structure-tabs-title">Contenu de la fiche structure</h2>
+                {% include "structures/includes/structure_card_tabs_nav.html" %}
+                <div class="tab-content">
+                    <div id="structure-description" class="tab-pane fade{% if active_tab == "description" %} active show{% endif %}" aria-labelledby="structure-description-tab" role="tabpanel">
+                        {% include "structures/includes/structure_card_tab_description.html" %}
+                    </div>
+                    <div id="structure-services" class="tab-pane fade{% if active_tab == "services" %} active show{% endif %}" aria-labelledby="structure-services-tab" role="tabpanel">
+                        {% include "structures/includes/structure_card_tab_services.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

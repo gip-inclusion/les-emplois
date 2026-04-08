@@ -1,7 +1,10 @@
+from types import SimpleNamespace
+
 import pytest
 from django.contrib.gis.geos import Point
 
 from itou.common_apps.address.departments import department_from_postcode
+from itou.common_apps.address.display import format_address_on_one_line
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -76,6 +79,35 @@ class TestUtilsDepartments:
         post_codes = ["13150", "30210", "17000"]
         for post_code in post_codes:
             assert department_from_postcode(post_code) == post_code[:2]
+
+
+class TestFormatAddressOnOneLine:
+    def test_complete_address(self):
+        obj = SimpleNamespace(
+            address_line_1="12 rue des terreaux",
+            address_line_2="",
+            post_code="38110",
+            city="La Tour du Pin",
+        )
+        assert format_address_on_one_line(obj) == "12 rue des terreaux, 38110 La Tour du Pin"
+
+    def test_with_address_line_2(self):
+        obj = SimpleNamespace(
+            address_line_1="12 rue des terreaux",
+            address_line_2="Bât. B",
+            post_code="38110",
+            city="La Tour du Pin",
+        )
+        assert format_address_on_one_line(obj) == "12 rue des terreaux, Bât. B, 38110 La Tour du Pin"
+
+    def test_incomplete_returns_none(self):
+        obj = SimpleNamespace(
+            address_line_1="12 rue des terreaux",
+            address_line_2="",
+            post_code="",
+            city="La Tour du Pin",
+        )
+        assert format_address_on_one_line(obj) is None
 
 
 class TestUtilsMisc:

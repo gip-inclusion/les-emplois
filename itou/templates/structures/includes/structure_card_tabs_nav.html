@@ -1,0 +1,25 @@
+<ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-4 mb-0" role="tablist" data-it-sliding-tabs="true" aria-labelledby="structure-tabs-title">
+    <li class="nav-item" role="presentation">
+        <a id="structure-description-tab"
+           class="nav-link{% if active_tab == "description" %} active{% endif %}"
+           role="tab"
+           href="#structure-description"
+           data-bs-toggle="tab"
+           aria-selected="{% if active_tab == "description" %}true{% else %}false{% endif %}"
+           aria-controls="structure-description">
+            <span>Description de la structure</span>
+        </a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a id="structure-services-tab"
+           class="nav-link{% if active_tab == "services" %} active{% endif %}"
+           role="tab"
+           href="#structure-services"
+           data-bs-toggle="tab"
+           aria-selected="{% if active_tab == "services" %}true{% else %}false{% endif %}"
+           aria-controls="structure-services">
+            <span>Services</span>
+            <span class="badge badge-sm rounded-pill ms-2">{{ services_page.paginator.count }}</span>
+        </a>
+    </li>
+</ul>

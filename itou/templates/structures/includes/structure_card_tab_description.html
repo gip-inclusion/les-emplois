@@ -1,0 +1,84 @@
+{% load matomo %}
+{% load markdownify %}
+{% load format_filters %}
+<section class="s-section">
+    <div class="s-section__container container px-0">
+        <div class="s-section__row row">
+            <div class="s-section__col col-12 col-xxl-8 order-2 order-xxl-1 mt-3 mt-xxl-0">
+                <div class="c-box h-100">
+                    <article>
+                        <h3 class="h3 mb-3">Présentation de la structure</h3>
+                        {{ structure.description|markdownify }}
+                    </article>
+                </div>
+            </div>
+            <div class="s-section__col col-12 col-xxl-4 order-1 order-xxl-2 d-flex flex-column">
+                <div class="c-box">
+                    <h3 class="h3 mb-3">Informations pratiques</h3>
+                    <button class="btn btn-secondary btn-block" type="button" data-bs-toggle="modal" data-bs-target="#js-contact-modal" {% matomo_event "structures" "clic" "voir-coordonnees-structure" %}>
+                        Voir les coordonnées de la structure
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="js-contact-modal" tabindex="-1" aria-labelledby="js-contact-modal-label" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="js-contact-modal-label">Coordonnées de contact</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                {% if structure.email %}
+                    <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                        <div>
+                            <i class="ri-mail-line me-2" aria-hidden="true"></i>
+                            {{ structure.email }}
+                        </div>
+                        <button id="js-copy-email"
+                                class="btn btn-link btn-ico-only"
+                                type="button"
+                                aria-label="Copier l’adresse e-mail"
+                                data-email="{{ structure.email }}"
+                                {% matomo_event "dora-structure" "clic" "copier-email-contact" %}>
+                            <i class="ri-file-copy-line" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                {% endif %}
+                {% if structure.phone %}
+                    <div class="border rounded p-3{% if structure.address_on_one_line or structure.website %} mb-3{% endif %}">
+                        <i class="ri-phone-line me-2" aria-hidden="true"></i>
+                        <a href="tel:{{ structure.phone }}">{{ structure.phone|format_phone }}</a>
+                    </div>
+                {% endif %}
+                {% if structure.address_on_one_line %}
+                    <div class="border rounded p-3{% if structure.website %} mb-3{% endif %}">
+                        <div class="d-flex text-secondary fs-sm">
+                            <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
+                            <address class="m-0">{{ structure.address_on_one_line }}</address>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if structure.website %}
+                    <div class="border rounded p-3">
+                        <a class="d-inline-flex align-items-center text-decoration-none"
+                           aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)"
+                           href="{{ structure.website }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           {% matomo_event "dora-structure" "clic" "lien-source-contact" %}>
+                            <i class="ri-global-line me-2" aria-hidden="true"></i>
+                            <span class="text-break">{{ structure.website }}<i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i></span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+            </div>
+        </div>
+    </div>
+</div>

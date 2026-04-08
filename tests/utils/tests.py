@@ -853,6 +853,8 @@ class TestUtilsTemplateFilters:
         """Test `format_phone` template filter."""
         assert format_filters.format_phone("") == ""
         assert format_filters.format_phone("0102030405") == "01 02 03 04 05"
+        assert format_filters.format_phone("+33612345678") == "06 12 34 56 78"
+        assert format_filters.format_phone("+33 6 12 34 56 78") == "06 12 34 56 78"
 
     def test_get_dict_item(self):
         """Test `get_dict_item` template filter."""
