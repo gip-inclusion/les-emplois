@@ -69,6 +69,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     kind = PrescriberOrganizationKind.FT
     post_code = factory.LazyFunction(create_fake_postcode)
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
+    authorization_status = PrescriberAuthorizationStatus.NOT_REQUIRED
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
