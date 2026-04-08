@@ -236,7 +236,6 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     niveau_formation = serializers.SerializerMethodField()
     mises_en_situation_pro = MSPPriorActionSerializer(many=True)
     prequalifications = PrequalPriorActionSerializer(many=True)
-    jours_accompagnement = serializers.IntegerField(source="prehiring_guidance_days", min_value=0)
     type_contrat = serializers.SerializerMethodField()
     poste_occupe = serializers.CharField(source="hired_job.appellation.rome.code", default=None)
     duree_hebdo = serializers.IntegerField(
@@ -272,7 +271,6 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
             "niveau_formation",
             "mises_en_situation_pro",
             "prequalifications",
-            "jours_accompagnement",
             "type_contrat",
             "poste_occupe",
             "duree_hebdo",

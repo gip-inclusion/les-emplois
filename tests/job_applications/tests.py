@@ -2639,7 +2639,6 @@ class TestJobApplicationAdminForm:
             "transferred_from",
             "created_at",
             "processed_at",
-            "prehiring_guidance_days",
             "contract_type",
             "nb_hours_per_week",
             "contract_type_details",

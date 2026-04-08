@@ -419,7 +419,6 @@
                              "job_applications_jobapplication"."created_at",
                              "job_applications_jobapplication"."updated_at",
                              "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
                              "job_applications_jobapplication"."contract_type",
                              "job_applications_jobapplication"."nb_hours_per_week",
                              "job_applications_jobapplication"."contract_type_details",
@@ -898,7 +897,6 @@
                              "job_applications_jobapplication"."created_at",
                              "job_applications_jobapplication"."updated_at",
                              "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
                              "job_applications_jobapplication"."contract_type",
                              "job_applications_jobapplication"."nb_hours_per_week",
                              "job_applications_jobapplication"."contract_type_details",
@@ -1376,7 +1374,6 @@
                              "job_applications_jobapplication"."created_at",
                              "job_applications_jobapplication"."updated_at",
                              "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
                              "job_applications_jobapplication"."contract_type",
                              "job_applications_jobapplication"."nb_hours_per_week",
                              "job_applications_jobapplication"."contract_type_details",
@@ -1428,7 +1425,7 @@
           WHERE ("job_applications_jobapplication"."sender_company_id" = %s
             AND NOT ("job_applications_jobapplication"."to_company_id" = %s)
             AND UPPER(UNACCENT(COALESCE(NULLIF(T3."brand", %s), T3."name"))::text) LIKE '%%' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' AND UPPER(UNACCENT(COALESCE(NULLIF(T3."brand", %s), T3."name"))::text) LIKE ' %% ' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ')
-          ORDER BY 46 ASC,
+          ORDER BY 45 ASC,
                    "job_applications_jobapplication"."to_company_id" ASC
           LIMIT 20
         ''',
@@ -2149,7 +2146,6 @@
                              "job_applications_jobapplication"."created_at",
                              "job_applications_jobapplication"."updated_at",
                              "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
                              "job_applications_jobapplication"."contract_type",
                              "job_applications_jobapplication"."nb_hours_per_week",
                              "job_applications_jobapplication"."contract_type_details",
@@ -2543,7 +2539,6 @@
                              "job_applications_jobapplication"."created_at",
                              "job_applications_jobapplication"."updated_at",
                              "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
                              "job_applications_jobapplication"."contract_type",
                              "job_applications_jobapplication"."nb_hours_per_week",
                              "job_applications_jobapplication"."contract_type_details",
@@ -2936,7 +2931,6 @@
                              "job_applications_jobapplication"."created_at",
                              "job_applications_jobapplication"."updated_at",
                              "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
                              "job_applications_jobapplication"."contract_type",
                              "job_applications_jobapplication"."nb_hours_per_week",
                              "job_applications_jobapplication"."contract_type_details",
@@ -2989,7 +2983,7 @@
                    AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
             AND UPPER(UNACCENT(COALESCE(NULLIF("companies_company"."brand", %s), "companies_company"."name"))::text) LIKE '%%' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' AND UPPER(UNACCENT(COALESCE(NULLIF("companies_company"."brand", %s), "companies_company"."name"))::text) LIKE ' %% ' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ')
-          ORDER BY 46 ASC,
+          ORDER BY 45 ASC,
                    "job_applications_jobapplication"."to_company_id" ASC
           LIMIT 20
         ''',
@@ -3794,7 +3788,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -4148,13 +4141,13 @@
           WHERE ("job_applications_jobapplication"."sender_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   46,
                    47,
-                   48,
+                   49,
                    50,
                    51,
-                   52,
+                   53,
                    54,
-                   55,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -4692,7 +4685,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -4998,8 +4990,8 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
+                   46,
                    47,
-                   48,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -6344,7 +6336,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -6700,13 +6691,13 @@
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   46,
                    47,
-                   48,
+                   49,
                    50,
                    51,
-                   52,
+                   53,
                    54,
-                   55,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -7470,7 +7461,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -7798,11 +7788,11 @@
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   46,
                    47,
-                   48,
+                   49,
                    50,
                    51,
-                   52,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",

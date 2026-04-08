@@ -1,6 +1,5 @@
 {% load django_bootstrap5 %}
 <div id="geiq_contract_type_and_options_block">
-    {% bootstrap_field form_accept.prehiring_guidance_days %}
     {% bootstrap_field form_accept.contract_type %}
     {% bootstrap_field form_accept.inverted_vae_contract %}
     {% if form_accept.contract_type.value == hide_value %}

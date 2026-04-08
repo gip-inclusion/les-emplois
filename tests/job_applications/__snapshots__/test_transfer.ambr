@@ -338,7 +338,6 @@
               "created_at" = %s,
               "updated_at" = %s,
               "processed_at" = NULL,
-              "prehiring_guidance_days" = NULL,
               "contract_type" = %s,
               "nb_hours_per_week" = NULL,
               "contract_type_details" = %s,

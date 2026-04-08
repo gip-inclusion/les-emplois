@@ -756,11 +756,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     processed_at = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
 
     # GEIQ only
-    prehiring_guidance_days = models.PositiveSmallIntegerField(
-        verbose_name="nombre de jours d’accompagnement avant contrat",
-        blank=True,
-        null=True,
-    )
     contract_type = models.CharField(
         verbose_name="type de contrat",
         max_length=30,

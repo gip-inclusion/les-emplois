@@ -1139,7 +1139,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -1175,7 +1174,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 46 DESC,
+          ORDER BY 45 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -3556,7 +3555,6 @@
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."updated_at",
                  "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
                  "job_applications_jobapplication"."contract_type",
                  "job_applications_jobapplication"."nb_hours_per_week",
                  "job_applications_jobapplication"."contract_type_details",
@@ -3592,7 +3590,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 46 DESC,
+          ORDER BY 45 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
