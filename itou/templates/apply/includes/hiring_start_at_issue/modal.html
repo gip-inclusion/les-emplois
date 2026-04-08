@@ -1,4 +1,4 @@
-{% if hiring_start_at_issue %}
+{% if hiring_start_at_issue_code %}
     <div class="modal" id="hiring_start_at_issue-modal" tabindex="-1" role="dialog" aria-labelledby="hiring_start_at_issue-label" aria-modal="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -7,7 +7,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <p>{{ hiring_start_at_issue }}</p>
+                    {% if hiring_start_at_issue_code == hiring_start_at_issue_code.OUTSIDE_APPROVAL_BOUNDS_ERROR_CODE %}
+                        <p>
+                            La date de début de contrat prévue n’est pas couverte par la période de validité du PASS IAE,
+                            par conséquent l’embauche n’est pas possible. Si la situation du candidat le nécessite vous
+                            pouvez faire appel à un prescripteur habilité afin qu’il valide l’éligibilité du candidat.
+                            <br>
+                            La validation de l’éligibilité doit être réalisée au plus tôt le lendemain de la date de
+                            fin de validité du PASS IAE."
+                        </p>
+                    {% elif hiring_start_at_issue_code == hiring_start_at_issue_code.AFTER_MORE_THAN_92_DAYS_ERROR_CODE %}
+                        <p>
+                            Il n’est pas possible de valider une embauche si la date de début de contrat est prévue dans plus
+                            de 92 jours.
+                        </p>
+
+                        {% if job_application and job_application.postpone.is_available %}
+                            <p>
+                                Veuillez mettre cette candidature en attente pour la traiter plus tard ou modifier la
+                                date de début de contrat."
+                            </p>
+                        {% endif %}
+                    {% endif %}
                 </div>
                 <div class="modal-footer">
                     {% if job_application and job_application.postpone.is_available %}

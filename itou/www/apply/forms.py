@@ -1,4 +1,5 @@
 import datetime
+import enum
 import logging
 from functools import wraps
 from operator import itemgetter
@@ -6,6 +7,7 @@ from operator import itemgetter
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse, reverse_lazy
@@ -17,7 +19,9 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import Company, JobDescription
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
@@ -245,6 +249,11 @@ class AnswerForm(forms.Form):
     )
 
 
+class HiringStartAtErrorCodes(enum.StrEnum):
+    AFTER_MORE_THAN_92_DAYS_ERROR_CODE = "hiring_start_at_after_more_than_92_days"
+    OUTSIDE_APPROVAL_BOUNDS_ERROR_CODE = "hiring_start_at_outside_approval_bounds"
+
+
 class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     """
     Allow a company to accept a job application.
@@ -310,11 +319,12 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, company, job_seeker, initial=None, **kwargs):
+    def __init__(self, *args, company, job_seeker, iae_eligibility_diagnosis=None, initial=None, **kwargs):
         super().__init__(*args, initial=initial, **kwargs)
         self.company = company
         self.is_geiq = company.kind == CompanyKind.GEIQ
         self.job_seeker = job_seeker
+        self.iae_eligibility_diagnosis = iae_eligibility_diagnosis
         attrs_min = {}
         attrs_max = {}
         if not self.is_geiq:
@@ -485,6 +495,30 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         if hiring_end_at and hiring_start_at and hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
+        # Detect errors for hiring_start_at_issue modal
+        if hiring_start_at and self.company.is_subject_to_iae_rules:
+            if self.job_seeker.has_valid_approval:
+                if hiring_start_at > self.job_seeker.latest_approval.end_at:
+                    self.add_error(
+                        None,
+                        forms.ValidationError(
+                            message=HiringStartAtErrorCodes.OUTSIDE_APPROVAL_BOUNDS_ERROR_CODE,
+                            code=HiringStartAtErrorCodes.OUTSIDE_APPROVAL_BOUNDS_ERROR_CODE,
+                        ),
+                    )
+            elif hiring_start_at > timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA:
+                if (
+                    self.iae_eligibility_diagnosis is None
+                    or self.iae_eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
+                ):
+                    self.add_error(
+                        None,
+                        forms.ValidationError(
+                            message=HiringStartAtErrorCodes.AFTER_MORE_THAN_92_DAYS_ERROR_CODE,
+                            code=HiringStartAtErrorCodes.AFTER_MORE_THAN_92_DAYS_ERROR_CODE,
+                        ),
+                    )
+
         if self.is_geiq:
             # This validation is enforced by database constraints,
             # but we are nice enough to display a warning message to the user
@@ -510,6 +544,32 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                     "location",
                     forms.ValidationError("La localisation du poste est obligatoire en cas de création"),
                 )
+
+    def non_field_errors(self):
+        errors = super().non_field_errors()
+        # Hide modal specific errors for bootstrap default error rendering
+        hiring_start_at_errors = [error for error in errors.data if error.code in HiringStartAtErrorCodes]
+        if hiring_start_at_errors:
+            # Do not modify self.errors
+            errors = errors.copy()
+            for error in hiring_start_at_errors:
+                errors.remove(error)
+        return errors
+
+    def has_non_modal_form_error(self):
+        for field, errors in self.errors.items():
+            if field == NON_FIELD_ERRORS:
+                if any([error for error in errors.as_data() if error.code not in HiringStartAtErrorCodes]):
+                    return True
+            elif errors:
+                return True
+        return False
+
+    def hiring_start_at_issue_code(self):
+        for code in HiringStartAtErrorCodes:
+            if self.has_error(NON_FIELD_ERRORS, code=code):
+                return code
+        return None
 
     def save(self, commit):
         # We might create a JobDescription here even with atomic==False
