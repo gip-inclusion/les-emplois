@@ -192,16 +192,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         - job seekers created by a member of the given organization
         """
 
-        filters = [Q(professional=user, prescriber_organization__isnull=True, company__isnull=True)]
-        if organization:
-            prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
-            company = None  # For now, we do not support employers
-            if from_all_coworkers:
-                filters.append(Q(prescriber_organization=prescriber_organization, company=company))
-            else:
-                filters.append(Q(professional=user, prescriber_organization=prescriber_organization, company=company))
-
-        assignments_qs = JobSeekerAssignment.objects.filter(or_queries(filters))
+        assignments_qs = JobSeekerAssignment.objects.assigned_to(user, organization, from_all_coworkers)
 
         if stalled is not None:
             assignments_qs = assignments_qs.filter(
@@ -1603,6 +1594,20 @@ class JobSeekerAssignmentManager(models.Manager):
             update_fields=["updated_at", "last_action_kind"],
             unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
         )
+
+    def assigned_to(self, professional, organization, from_all_coworkers=False):
+        filters = [Q(professional=professional, prescriber_organization__isnull=True, company__isnull=True)]
+        if organization:
+            prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
+            company = None  # For now, we do not support employers
+            if from_all_coworkers:
+                filters.append(Q(prescriber_organization=prescriber_organization, company=company))
+            else:
+                filters.append(
+                    Q(professional=professional, prescriber_organization=prescriber_organization, company=company)
+                )
+
+        return JobSeekerAssignment.objects.filter(or_queries(filters))
 
 
 class JobSeekerAssignment(models.Model):
