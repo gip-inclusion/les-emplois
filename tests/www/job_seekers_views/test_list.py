@@ -13,7 +13,8 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune
-from itou.users.models import User, UserKind
+from itou.users.enums import ActionKind
+from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -998,13 +999,20 @@ def test_job_seekers_order(client, url, subtests):
         job_seeker__last_name="Berger",
         with_job_seeker_assignment=True,
     ).job_seeker
+    # Simulate IAE eligibility diagnosis done by prescriber
+    JobSeekerAssignment.objects.upsert_assignment(
+        job_seeker=second_created_job_seeker,
+        professional=prescriber,
+        organization=organization,
+        last_action_kind=ActionKind.IAE_ELIGIBILITY,
+    )
 
     client.force_login(prescriber)
 
     expected_order = {
         "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker, second_created_job_seeker],
         "job_applications_nb": [created_job_seeker, second_created_job_seeker, a_b_job_seeker, c_d_job_seeker],
-        "last_updated_at": [c_d_job_seeker, a_b_job_seeker, created_job_seeker, second_created_job_seeker],
+        "last_updated_at": [c_d_job_seeker, created_job_seeker, a_b_job_seeker, second_created_job_seeker],
     }
 
     with subtests.test(order="<missing_value>"):
