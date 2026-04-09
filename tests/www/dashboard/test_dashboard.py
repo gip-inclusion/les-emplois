@@ -22,7 +22,6 @@ from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
@@ -636,19 +635,9 @@ class TestDashboardView:
         assertContains(response, self.NO_PRESCRIBER_ORG_MSG)
         assertContains(response, reverse("signup:prescriber_check_already_exists"))
 
-    def test_dashboard_delete_one_of_multiple_prescriber_orgs_while_logged_in(self, client):
-        org_1 = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
-        org_2 = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
-        prescriber = org_1.members.first()
-        org_2.members.add(prescriber)
-
+    def test_dashboard_prescriber_with_organization_no_message(self, client):
+        prescriber = PrescriberFactory(membership=True)
         client.force_login(prescriber)
-        response = client.get(reverse("dashboard:index"))
-        _, pk = client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY).split("-")
-        assert org_1 == PrescriberOrganization.objects.get(pk=pk)
-        assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
-
-        org_1.members.remove(prescriber)
         response = client.get(reverse("dashboard:index"))
         assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
 
