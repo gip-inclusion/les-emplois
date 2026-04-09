@@ -274,7 +274,7 @@
                           </div>
                       </div>
                   </div>
-                  <input id="id_order" name="order" type="hidden" value="full_name"/>
+                  <input id="id_order" name="order" type="hidden" value="-last_updated_at"/>
               </form>
               <div class="s-section__row row">
                   <div class="col-12">
@@ -563,7 +563,7 @@
                           </div>
                       </div>
                   </div>
-                  <input id="id_order" name="order" type="hidden" value="full_name"/>
+                  <input id="id_order" name="order" type="hidden" value="-last_updated_at"/>
               </form>
               <div class="s-section__row row">
                   <div class="col-12">
@@ -1507,8 +1507,8 @@
                    38,
                    40,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 37 ASC,
-                   "users_user"."id" ASC
+          ORDER BY 39 DESC,
+                   "users_user"."id" DESC
           LIMIT 4
         ''',
       }),
@@ -1631,8 +1631,8 @@
       </caption>
       <thead>
           <tr>
-              <th aria-sort="ascending" scope="col">
-                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="-full_name" type="button">
+              <th aria-sort="none" scope="col">
+                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="full_name" type="button">
                       Nom Prénom
                   </button>
               </th>
@@ -1644,7 +1644,7 @@
                       Nombre de candidatures
                   </button>
               </th>
-              <th aria-sort="none" scope="col">
+              <th aria-sort="descending" scope="col">
                   <button data-emplois-setter-target="#id_order" data-emplois-setter-value="last_updated_at" type="button">
                       Dernière action
                   </button>
@@ -2720,8 +2720,8 @@
                    38,
                    40,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 37 ASC,
-                   "users_user"."id" ASC
+          ORDER BY 39 DESC,
+                   "users_user"."id" DESC
           LIMIT 3
         ''',
       }),
