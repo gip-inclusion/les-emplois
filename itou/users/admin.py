@@ -655,6 +655,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             ),
         ] + urls
 
+    def get_change_view_title(self, obj) -> str:
+        return f"Modifier l’utilisateur {obj.get_full_name()} · {obj._meta.object_name}(pk={obj.pk})"
+
     def deactivate_view(self, request, user_pk):
         if not self.has_change_permission(request):
             raise PermissionDenied
@@ -1122,6 +1125,12 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             if is_france_travail_id_format(search_term):
                 search_fields.append("pole_emploi_id__iexact")
         return search_fields
+
+    def get_change_view_title(self, obj) -> str:
+        return (
+            f"Modifier le profil demandeur d’emploi de {obj.user.get_full_name()} · "
+            f"{obj._meta.object_name}(pk={obj.pk})"
+        )
 
 
 class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):

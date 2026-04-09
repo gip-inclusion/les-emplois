@@ -259,6 +259,9 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
             return False
         return super().has_change_permission(request, obj)
 
+    def get_change_view_title(self, obj) -> str:
+        return f"Modifier l’entreprise {obj.name} · {obj._meta.object_name}(pk={obj.pk})"
+
     @admin.display(description="Liste des PASS IAE pour cette entreprise")
     def approvals_list(self, obj):
         if obj.pk is None:
