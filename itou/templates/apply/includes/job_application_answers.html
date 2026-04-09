@@ -8,14 +8,12 @@
             {% if job_application.refusal_reason %}
                 {% if not request.user.is_job_seeker or job_application.refusal_reason_shared_with_job_seeker %}
                     <li>
-                        <div>
-                            {% if request.user.is_job_seeker %}
-                                <small>Motif de refus</small>
-                            {% else %}
-                                <small>Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"partagé,non partagé" }} avec le candidat</small>
-                            {% endif %}
-                            <strong>{{ job_application.get_refusal_reason_display|default:"Non renseigné" }}</strong>
-                        </div>
+                        {% if request.user.is_job_seeker %}
+                            <small>Motif de refus</small>
+                        {% else %}
+                            <small>Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"partagé,non partagé" }} avec le candidat</small>
+                        {% endif %}
+                        <strong>{{ job_application.get_refusal_reason_display|default:"Non renseigné" }}</strong>
                     </li>
                 {% endif %}
             {% endif %}
