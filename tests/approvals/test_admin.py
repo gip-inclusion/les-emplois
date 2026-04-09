@@ -113,7 +113,7 @@ class TestApprovalAdmin:
         assert approval.assigned_company == siae.pk
 
     def test_filter_assigned_company(self, admin_client):
-        company = CompanyFactory()
+        company = CompanyFactory(subject_to_iae_rules=True)
         job_seeker = JobSeekerFactory()
         JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, job_seeker=job_seeker)
         approval = ApprovalFactory(user=job_seeker)
