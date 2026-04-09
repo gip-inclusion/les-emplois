@@ -18,6 +18,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.tables import gps
 from itou.metabase.tables.utils import hash_content
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider
 from itou.utils.db import dictfetchall
 from itou.utils.types import InclusiveDateRange
@@ -172,6 +173,7 @@ def test_populate_job_seekers(snapshot):
         with_approval=True,
         with_iae_eligibility_diagnosis=True,
         eligibility_diagnosis__expired=True,
+        eligibility_diagnosis__author_prescriber_organization__kind=PrescriberOrganizationKind.FT,
         approval__eligibility_diagnosis=None,
         job_seeker=user_2,
         approval__origin=Origin.AI_STOCK,
@@ -1169,8 +1171,8 @@ def test_populate_organizations(snapshot):
             "id": first_organisation.pk,
             "siret": first_organisation.siret,
             "nom": first_organisation.name,
-            "type": "FT",
-            "type_complet": "France Travail",
+            "type": first_organisation.kind,
+            "type_complet": first_organisation.get_kind_display(),
             "habilitée": 1,
             "adresse_ligne_1": "",
             "adresse_ligne_2": "",
@@ -1197,8 +1199,8 @@ def test_populate_organizations(snapshot):
             "id": second_organisation.pk,
             "siret": second_organisation.siret,
             "nom": second_organisation.name,
-            "type": "FT",
-            "type_complet": "France Travail",
+            "type": second_organisation.kind,
+            "type_complet": second_organisation.get_kind_display(),
             "habilitée": 1,
             "adresse_ligne_1": "",
             "adresse_ligne_2": "",
