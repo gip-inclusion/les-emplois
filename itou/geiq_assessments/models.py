@@ -21,6 +21,7 @@ MIN_DAYS_IN_YEAR_FOR_ALLOWANCE = 90
 
 class AssessmentCampaign(models.Model):
     year = models.IntegerField(verbose_name="année", unique=True)
+    opening_date = models.DateField(verbose_name="date de début de la campagne")
     submission_deadline = models.DateField(verbose_name="date limite de transmission du bilan d’exécution")
     review_deadline = models.DateField(verbose_name="date limite de contrôle du bilan d’exécution")
 
@@ -35,10 +36,22 @@ class AssessmentCampaign(models.Model):
                 ),
                 condition=(models.Q(review_deadline__gte=models.F("submission_deadline"))),
             ),
+            models.CheckConstraint(
+                name="geiq_opening_before_submission",
+                violation_error_message=(
+                    "Impossible d'avoir une date de transmission antérieure à la date de début de campagne"
+                ),
+                condition=(models.Q(opening_date__lte=models.F("submission_deadline"))),
+            ),
         ]
 
     def __str__(self):
         return f"Campagne des bilans d’exécution GEIQ de {self.year}"
+
+    @property
+    def is_open(self):
+        """Whether reviews can currently be submitted (by GEIQ users) for this campaign."""
+        return self.opening_date <= timezone.localdate() <= self.submission_deadline
 
 
 class LabelInfos(models.Model):

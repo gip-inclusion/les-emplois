@@ -46,6 +46,7 @@ class AssessmentCampaignAdmin(ItouModelAdmin):
     actions = [download_label_infos]
     fields = [
         "year",
+        "opening_date",
         "submission_deadline",
         "review_deadline",
         "label_infos_link",
@@ -54,6 +55,7 @@ class AssessmentCampaignAdmin(ItouModelAdmin):
     list_display = (
         "pk",
         "year",
+        "opening_date",
         "submission_deadline",
         "review_deadline",
     )

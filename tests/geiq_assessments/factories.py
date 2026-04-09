@@ -27,13 +27,25 @@ from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
 class AssessmentCampaignFactory(factory.django.DjangoModelFactory):
+    """Create an open campaign for the current year by default. Refer to the model for the open logic."""
+
     class Meta:
         model = AssessmentCampaign
         django_get_or_create = ("year",)
 
-    year = factory.fuzzy.FuzzyInteger(2020, 2023)
-    submission_deadline = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 7, 1))
-    review_deadline = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 8, 1))
+    year = factory.LazyFunction(lambda: timezone.localdate().year - 1)
+    opening_date = factory.LazyAttribute(
+        lambda obj: timezone.localdate().replace(year=obj.year + 1) - datetime.timedelta(days=1)
+    )
+    submission_deadline = factory.LazyAttribute(
+        lambda obj: timezone.localdate().replace(year=obj.year + 1) + datetime.timedelta(days=30)
+    )
+    review_deadline = factory.LazyAttribute(
+        lambda obj: timezone.localdate().replace(year=obj.year + 1) + datetime.timedelta(days=60)
+    )
+
+    class Params:
+        is_closed = factory.Trait(year=timezone.localdate().year + 2)
 
 
 class AssessmentFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
