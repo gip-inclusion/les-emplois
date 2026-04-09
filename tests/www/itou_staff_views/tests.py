@@ -31,6 +31,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.nexus.enums import Service
 from itou.nexus.models import ActivatedService
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
@@ -111,6 +112,7 @@ class TestExportJobApplications:
             )
             eligibility_diag = IAEEligibilityDiagnosisFactory(
                 from_prescriber=True,
+                author_prescriber_organization__kind=PrescriberOrganizationKind.FT,
                 job_seeker=job_seeker,
                 author_prescriber_organization__siret="12345678900012",
             )

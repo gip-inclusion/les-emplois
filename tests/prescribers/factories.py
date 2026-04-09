@@ -21,6 +21,9 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
 
     class Params:
         authorized = factory.Trait(
+            kind=factory.fuzzy.FuzzyChoice(
+                [kind for kind in PrescriberOrganizationKind if kind != PrescriberOrganizationKind.OTHER]
+            ),
             authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         with_membership = factory.Trait(
@@ -29,6 +32,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
             ),
         )
         with_pending_authorization = factory.Trait(
+            authorized=True,
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
         not_in_territorial_experimentation = factory.Trait(
@@ -53,6 +57,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
             uid="0260ad4f-2008-48bd-88cc-b41c0211e219",
             name="Pres. Org.",
             address_line_1="39 rue d'Artois",
+            kind=PrescriberOrganizationKind.FT,
             post_code="75008",
             department="75",
             city="Paris",
@@ -66,9 +71,11 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
-    kind = PrescriberOrganizationKind.FT
     post_code = factory.LazyFunction(create_fake_postcode)
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
+    # Default organization is not authorized, and does not require a authorization validation
+    kind = PrescriberOrganizationKind.OTHER
+    authorization_status = PrescriberAuthorizationStatus.NOT_REQUIRED
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):

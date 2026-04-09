@@ -83,6 +83,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
+            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
         )
         return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
@@ -120,6 +121,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
+            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
         )
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()

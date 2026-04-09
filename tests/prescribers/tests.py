@@ -418,11 +418,11 @@ class TestPrescriberOrganizationAdmin:
 
         post_data = {
             "id": prescriber_organization.pk,
-            "siret": prescriber_organization.siret,
             "post_code": prescriber_organization.post_code,
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_refuse": "Refuser+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -442,7 +442,7 @@ class TestPrescriberOrganizationAdmin:
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
         assert updated_prescriber_organization.is_authorized
-        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.FT
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
         assert updated_prescriber_organization.authorization_updated_by is None
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
@@ -450,12 +450,11 @@ class TestPrescriberOrganizationAdmin:
         client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
-            authorized=True,
+            with_pending_authorization=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
             authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
-            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -468,6 +467,7 @@ class TestPrescriberOrganizationAdmin:
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_refuse": "Refuser+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -502,6 +502,7 @@ class TestPrescriberOrganizationAdmin:
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_refuse": "Refuser+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -536,6 +537,7 @@ class TestPrescriberOrganizationAdmin:
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_validate": "Valider+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -571,6 +573,7 @@ class TestPrescriberOrganizationAdmin:
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_validate": "Valider+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -606,6 +609,7 @@ class TestPrescriberOrganizationAdmin:
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_validate": "Valider+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -640,6 +644,7 @@ class TestPrescriberOrganizationAdmin:
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_refuse": "Refuser+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }
@@ -810,7 +815,10 @@ class TestUpdateRefusedPrescriberOrganizationKindManagementCommands:
         # One refused prescriber organizations without duplicated siret which will be
         # updated in this subset
         for authorization_status in list(PrescriberAuthorizationStatus):
-            PrescriberOrganizationFactory(authorization_status=authorization_status)
+            PrescriberOrganizationFactory(
+                authorization_status=authorization_status,
+                kind=PrescriberOrganizationKind.FT,
+            )
 
         # Prescriber organization - Authorization Status = Refused - with duplicated siret
         # These Prescriber organization kind won't be updated into Other, because

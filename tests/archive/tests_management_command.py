@@ -835,6 +835,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 "to_company__kind": CompanyKind.EITI,
                 "to_company__naf": "4573A",
                 "sent_by_authorized_prescriber": True,
+                "sender_prescriber_organization__kind": "FT",
                 "state": JobApplicationState.PRIOR_TO_HIRE,
                 "hiring_start_at": None,
             },
@@ -977,6 +978,7 @@ class TestAnonymizeJobseekersManagementCommand:
         )
         EmployeeRecordFactory(
             job_application__job_seeker=approval_with_few_datas.user,
+            job_application__sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
             job_application__approval=approval_with_few_datas,
             job_application__eligibility_diagnosis=approval_with_few_datas.eligibility_diagnosis,
             job_application__created_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
@@ -1098,6 +1100,7 @@ class TestAnonymizeJobseekersManagementCommand:
         iae_diagnosis_from_prescriber_with_several_job_applications = IAEEligibilityDiagnosisFactory(
             created_at=timezone.make_aware(datetime.datetime(2020, 5, 23, 0, 0, 0)),
             from_prescriber=True,
+            author_prescriber_organization__kind=PrescriberOrganizationKind.FT,
             job_seeker__post_code="14390",
             job_seeker__jobseeker_profile__birthdate=datetime.date(1980, 5, 5),
             job_seeker__jobseeker_profile__nir="1801461235267",
@@ -1156,6 +1159,7 @@ class TestAnonymizeJobseekersManagementCommand:
             eligibility_factory(
                 job_seeker=jobseeker,
                 from_prescriber=True,
+                author_prescriber_organization__kind=PrescriberOrganizationKind.FT,
                 created_at=timezone.make_aware(datetime.datetime(2022, 11, 11)),
                 expires_at=datetime.date(2023, 1, 18),
             )
