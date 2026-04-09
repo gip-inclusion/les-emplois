@@ -351,6 +351,17 @@ class TestPrescriberOrganizationAdmin:
         "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
     }
 
+    def _get_post_data(self, prescriber_organization):
+        return {
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
+            **self.FORMSETS_PAYLOAD,
+        }
+
     @pytest.fixture(autouse=True)
     def setup_method(self):
         # super user
@@ -377,16 +388,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.REFUSE_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_refuse": "Refuser+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_refuse"] = "Refuser+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -416,16 +419,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.REFUSE_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_refuse": "Refuser+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_refuse"] = "Refuser+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -461,16 +456,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.REFUSE_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_refuse": "Refuser+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_refuse"] = "Refuser+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -496,16 +483,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertNotContains(response, self.REFUSE_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_refuse": "Refuser+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_refuse"] = "Refuser+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 403
@@ -531,16 +510,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_validate": "Valider+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_validate"] = "Valider+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -567,16 +538,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_validate": "Valider+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_validate"] = "Valider+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -603,16 +566,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_validate": "Valider+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_validate"] = "Valider+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -638,16 +593,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assert response.status_code == 200
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_refuse": "Refuser+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_refuse"] = "Refuser+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 403
@@ -705,16 +652,9 @@ class TestPrescriberOrganizationAdmin:
         assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
         assert not prescriber_organization.is_brsa
-        post_data = {
-            "id": prescriber_organization.pk,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "siret": prescriber_organization.siret,
-            "_authorization_action_validate": "Valider+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_validate"] = "Valider+l'habilitation"
 
         response = client.post(url, data=post_data)
         assert response.status_code == 302
@@ -742,16 +682,8 @@ class TestPrescriberOrganizationAdmin:
         response = client.get(url)
         assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
-        post_data = {
-            "id": prescriber_organization.pk,
-            "siret": prescriber_organization.siret,
-            "post_code": prescriber_organization.post_code,
-            "department": prescriber_organization.department,
-            "kind": prescriber_organization.kind,
-            "name": prescriber_organization.name,
-            "_authorization_action_validate": "Valider+l'habilitation",
-            **self.FORMSETS_PAYLOAD,
-        }
+        post_data = self._get_post_data(prescriber_organization)
+        post_data["_authorization_action_validate"] = "Valider+l'habilitation"
 
         # cannot validate an organization typed "Other"
         response = client.post(url, data=post_data)
