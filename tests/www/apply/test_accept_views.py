@@ -44,6 +44,7 @@ from itou.users.models import IdentityCertification, JobSeekerAssignment, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
+from itou.utils.templatetags.badges import job_application_state_badge
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
@@ -1824,6 +1825,38 @@ class TestProcessAcceptViewsInWizard:
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         assert refreshed_job_seeker.jobseeker_profile.birth_place_id == birth_place.pk
         assert refreshed_job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+
+    def test_job_application_state_badge_not_shown_when_accepting_application(self, client):
+        job_application = self.create_job_application(
+            state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=False
+        )
+        badge = job_application_state_badge(job_application, extra_classes="badge-base")
+
+        employer = self.company.members.first()
+        client.force_login(employer)
+
+        post_data = {"hiring_end_at": ""}
+
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertTemplateUsed(response, "apply/process_accept_base.html", count=1)
+        assertNotContains(response, badge, html=True)
+
+        response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
+        response = self.fill_contract_info_step(
+            client, job_application, session_uuid, post_data=post_data, assert_successful=False
+        )
+
+        eligibility_url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
+
+        response = client.get(eligibility_url)
+        assertTemplateUsed(response, "apply/process_eligibility.html", count=1)
+        assertNotContains(response, badge, html=True)
+
+        details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = client.get(details_url)
+        assertTemplateUsed(response, "apply/process_details_company.html", count=1)
+        assertContains(response, badge, html=True)
 
 
 class TestFillJobSeekerInfosForAccept:
