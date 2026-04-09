@@ -133,7 +133,7 @@
 
                             {# Job seeker referent ------------------------------------------------------------------------- #}
                             {% if job_application.sender.pk != group.referent.member_id %}
-                                {% include "gps/includes/membership_referent.html" with job_seeker=job_application.job_seeker alternative_title="Qui d'autre accompagne cet usager ?" %}
+                                {% include "gps/includes/membership_referent.html" with job_seeker=job_application.job_seeker %}
                             {% endif %}
                         </div>
                         <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
