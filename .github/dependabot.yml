@@ -7,7 +7,9 @@ updates:
       - "/.github/actions/*"
       - "/.github/actions/setup/*"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    cooldown:
+      default-days: 5
 
   - package-ecosystem: "pip"
     directory: "/requirements/"
