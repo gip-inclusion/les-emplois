@@ -1192,7 +1192,7 @@ def test_populate_organizations(snapshot):
             "date_dernière_candidature": None,
             "date_dernière_connexion": None,
             "active": 0,
-            "brsa": 0,
+            "brsa": first_organisation.is_brsa,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
         {
@@ -1220,7 +1220,7 @@ def test_populate_organizations(snapshot):
             "date_dernière_candidature": None,
             "date_dernière_connexion": None,
             "active": 0,
-            "brsa": 0,
+            "brsa": second_organisation.is_brsa,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
