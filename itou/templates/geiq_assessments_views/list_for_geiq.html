@@ -24,7 +24,13 @@
                     <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                         <h2 class="mb-0">Mes bilans</h2>
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les bilans d’exécution">
-                            <a class="btn btn-primary" href="{% url "geiq_assessments_views:create" %}">Créer un bilan d’exécution</a>
+                            {% if current_campaign.is_open %}
+                                <a class="btn btn-primary" href="{% url "geiq_assessments_views:create" %}">Créer un bilan d’exécution</a>
+                            {% else %}
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="La création d’un bilan est autorisée uniquement lorsque la phase de transmission des bilans d’exécution est ouverte.">
+                                    <button class="btn btn-primary disabled">Créer un bilan d’exécution</button>
+                                </span>
+                            {% endif %}
                         </div>
                     </div>
                     {% if assessments %}

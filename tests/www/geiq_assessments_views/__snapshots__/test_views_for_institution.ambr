@@ -263,7 +263,7 @@
                           Bilan d’exécution à contrôler
                       </h3>
                       <p>
-                          Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
+                          Vous avez jusqu’au 26/07/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
                       <p class="mb-0">
                           Actions restantes :
@@ -394,7 +394,7 @@
                           Bilan d’exécution à valider
                       </h3>
                       <p class="mb-0">
-                          Le GEIQ a jusqu’au 01/07/2025 pour importer son rapport d’activité et valider le bilan.
+                          Le GEIQ a jusqu’au 26/06/2025 pour importer son rapport d’activité et valider le bilan.
                       </p>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -640,7 +640,7 @@
                           Bilan d’exécution à contrôler
                       </h3>
                       <p>
-                          Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
+                          Vous avez jusqu’au 26/07/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -1259,7 +1259,7 @@
                           Bilan d’exécution à contrôler
                       </h3>
                       <p>
-                          Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
+                          Vous avez jusqu’au 26/07/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
                       <p class="mb-0">
                           Actions restantes :
@@ -2614,6 +2614,7 @@
                                                                          WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_nb",
                  "geiq_assessments_assessmentcampaign"."id",
                  "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."opening_date",
                  "geiq_assessments_assessmentcampaign"."submission_deadline",
                  "geiq_assessments_assessmentcampaign"."review_deadline"
           FROM "geiq_assessments_assessment"
