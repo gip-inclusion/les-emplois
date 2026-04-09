@@ -131,49 +131,20 @@ class TestManager:
         assert User.objects.search_by_full_name("Jean II").get() == user_1
 
     def test_assigned_job_seeker_ids(self):
+        """The main logic is in JobSeekerAssignment.objects.assigned_to, which is tested more thoroughly."""
+
         organization = PrescriberOrganizationFactory()
         prescriber = PrescriberMembershipFactory(organization=organization).user
 
-        # From the prescriber as a member of no organization
         assignment_no_organization = JobSeekerAssignmentFactory(
             professional=prescriber, prescriber_organization=None, company=None
         )
-
-        # From the prescriber as a member of the organization
         assignment_with_organization = JobSeekerAssignmentFactory(
             professional=prescriber, prescriber_organization=organization
         )
-
-        # From the prescriber as a member of another organization or company. We won't display those
-        JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=PrescriberOrganizationFactory())
-        JobSeekerAssignmentFactory(professional=prescriber, company=CompanyFactory())
-
         assignment_coworker_organization = JobSeekerAssignmentFactory(prescriber_organization=organization)
-
         assertQuerySetEqual(
-            User.objects.assigned_job_seeker_ids(prescriber, organization=None),
-            [assignment_no_organization.job_seeker.pk],
-            ordered=False,
-        )
-
-        # NB: Nothing changes as there's no organization
-        assertQuerySetEqual(
-            User.objects.assigned_job_seeker_ids(prescriber, organization=None, from_all_coworkers=True),
-            [assignment_no_organization.job_seeker.pk],
-            ordered=False,
-        )
-
-        assertQuerySetEqual(
-            User.objects.assigned_job_seeker_ids(prescriber, organization=organization),
-            [
-                assignment_no_organization.job_seeker.pk,
-                assignment_with_organization.job_seeker.pk,
-            ],
-            ordered=False,
-        )
-
-        assertQuerySetEqual(
-            User.objects.assigned_job_seeker_ids(prescriber, organization=organization, from_all_coworkers=True),
+            User.objects.assigned_job_seeker_ids(prescriber, organization, from_all_coworkers=True),
             [
                 assignment_no_organization.job_seeker.pk,
                 assignment_with_organization.job_seeker.pk,
@@ -1383,3 +1354,48 @@ class TestJobSeekerAssignment:
         assert assignment.last_action_kind == ActionKind.APPLY
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
+
+    def test_assigned_to(self):
+        organization = PrescriberOrganizationFactory()
+        prescriber = PrescriberMembershipFactory(organization=organization).user
+
+        # From the prescriber as a member of no organization
+        assignment_no_organization = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=None, company=None
+        )
+
+        # From the prescriber as a member of the organization
+        assignment_with_organization = JobSeekerAssignmentFactory(
+            professional=prescriber, prescriber_organization=organization
+        )
+
+        # From the prescriber as a member of another organization or company. We won't display those
+        JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=PrescriberOrganizationFactory())
+        JobSeekerAssignmentFactory(professional=prescriber, company=CompanyFactory())
+
+        assignment_coworker_organization = JobSeekerAssignmentFactory(prescriber_organization=organization)
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(prescriber, organization=None),
+            [assignment_no_organization],
+            ordered=False,
+        )
+
+        # NB: Nothing changes as there's no organization
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(prescriber, organization=None, from_all_coworkers=True),
+            [assignment_no_organization],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(prescriber, organization=organization),
+            [assignment_no_organization, assignment_with_organization],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            JobSeekerAssignment.objects.assigned_to(prescriber, organization=organization, from_all_coworkers=True),
+            [assignment_no_organization, assignment_with_organization, assignment_coworker_organization],
+            ordered=False,
+        )
