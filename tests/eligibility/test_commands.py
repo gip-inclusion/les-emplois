@@ -40,6 +40,7 @@ class TestRetryCertifyCriteria:
             factory(criteria_certification_error=True, eligibility_diagnosis__expires_at=date(2023, 1, 1))
             crit_with_accepted_job_app = factory(criteria_certification_error=True)
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 eligibility_diagnosis=crit_with_accepted_job_app.eligibility_diagnosis,
                 hiring_start_at=timezone.localdate(),
                 state=JobApplicationState.ACCEPTED,
@@ -52,10 +53,13 @@ class TestRetryCertifyCriteria:
             # Criteria to retry:
             to_retry.append(factory(criteria_certification_error=True))
             crit_with_job_app = factory(criteria_certification_error=True)
-            JobApplicationFactory(eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis)
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis
+            )
             to_retry.append(crit_with_job_app)
             crit_with_accepted_job_app_in_the_future = factory(criteria_certification_error=True)
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 eligibility_diagnosis=crit_with_accepted_job_app_in_the_future.eligibility_diagnosis,
                 hiring_start_at=timezone.localdate() + timedelta(days=7),
                 state=JobApplicationState.ACCEPTED,
@@ -91,6 +95,7 @@ class TestRetryCertifyCriteria:
             factory(criteria_certification_error=True, eligibility_diagnosis__expires_at=date(2023, 1, 1))
             crit_with_accepted_job_app = factory(criteria_certification_error=True)
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 eligibility_diagnosis=crit_with_accepted_job_app.eligibility_diagnosis,
                 hiring_start_at=timezone.localdate(),
                 state=JobApplicationState.ACCEPTED,
@@ -122,10 +127,13 @@ class TestRetryCertifyCriteria:
                 )
             )
             crit_with_job_app = factory(criteria_certification_error=True)
-            JobApplicationFactory(eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis)
+            JobApplicationFactory(
+                sent_by_prescriber_alone=True, eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis
+            )
             to_retry.append(crit_with_job_app)
             crit_with_accepted_job_app_in_the_future = factory(criteria_certification_error=True)
             JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 eligibility_diagnosis=crit_with_accepted_job_app_in_the_future.eligibility_diagnosis,
                 hiring_start_at=timezone.localdate() + timedelta(days=7),
                 state=JobApplicationState.ACCEPTED,

@@ -410,11 +410,13 @@ def test_apply_for_button_as_authorized_prescriber(client):
     authorized_prescriber = PrescriberMembershipFactory(organization__authorized=True).user
 
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=authorized_prescriber,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
         job_seeker__with_mocked_address=True,
     )
     job_application_without_address = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=authorized_prescriber,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
     )
@@ -461,6 +463,7 @@ def test_apply_for_button_as_unauthorized_prescriber(client):
     unauthorized_prescriber = PrescriberMembershipFactory(organization__authorized=False).user
 
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=unauthorized_prescriber,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
         job_seeker__with_mocked_address=True,
@@ -598,6 +601,7 @@ def test_job_application_tab_shows_external_application_to_authorized_prescriber
         organization__name="L'Autre Organisation",
     )
     job_application_2 = JobApplicationFactory(
+        sent_by_prescriber=True,
         pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
         job_seeker=job_application_1.job_seeker,
         to_company__name="Autre Entreprise",

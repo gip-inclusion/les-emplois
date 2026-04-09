@@ -43,18 +43,7 @@ class IsIAEEligibilityDiagnosisNeededMixin:
         )
 
 
-class ContractInfosNeededMixin:
-    def dispatch(self, request, *args, **kwargs):
-        # hiring_start_at is mandatory for all company kinds
-        if not self.get_session().get("contract_form_data", {}).get("hiring_start_at"):
-            return HttpResponseRedirect(self.get_contract_infos_url())
-        return super().dispatch(request, *args, **kwargs)
-
-
 class CommonUserInfoFormsMixin:
-    def get_session(self):
-        raise NotImplementedError
-
     def get_forms(self):
         forms = {}
         session = self.get_session()
@@ -249,19 +238,7 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
         return HttpResponseRedirect(self.get_success_url())
 
 
-class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
-    template_name = None
-
-    def test_func(self):
-        return self.request.from_employer
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        self.eligibility_diagnosis = None
-        self.geiq_eligibility_diagnosis = None
-        self.forms = None
-
+class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
     def get_forms(self):
         forms = super().get_forms()
 
@@ -277,13 +254,39 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
             contract_form_data = session.get("contract_form_data", {})
 
         forms["accept"] = AcceptForm(
-            instance=self.job_application,
+            instance=getattr(self, "job_application", None),
             company=self.company,
             job_seeker=self.job_seeker,
             data=contract_form_data,
         )
 
         return forms
+
+    def missing_steps_redirect(self):
+        self.forms = self.get_forms()
+        if not all([form.is_valid() for form in self.forms.values()]):
+            messages.error(self.request, "Certaines informations sont manquantes ou invalides")
+            return HttpResponseRedirect(self.get_back_url())
+        return None
+
+    def dispatch(self, request, *args, **kwargs):
+        if redirect := self.missing_steps_redirect():
+            return redirect
+        return super().dispatch(request, *args, **kwargs)
+
+
+class BaseConfirmationView(UserPassesTestMixin, JobSeekerAndContractInfosNeededMixin, TemplateView):
+    template_name = None
+
+    def test_func(self):
+        return self.request.from_employer
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
+        self.forms = None
 
     def get_back_url(self):
         raise NotImplementedError
@@ -307,21 +310,7 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
         context["reset_url"] = self.get_reset_url()
         return context
 
-    def missing_steps_redirect(self):
-        self.forms = self.get_forms()
-        if not all([form.is_valid() for form in self.forms.values()]):
-            messages.error(self.request, "Certaines informations sont manquantes ou invalides")
-            return HttpResponseRedirect(self.get_back_url())
-        return None
-
-    def get(self, request, *args, **kwargs):
-        if redirect := self.missing_steps_redirect():
-            return redirect
-        return super().get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
-        if redirect := self.missing_steps_redirect():
-            return redirect
 
         return self.confirm_acceptance(creating=self.job_application is None, request=request)
 

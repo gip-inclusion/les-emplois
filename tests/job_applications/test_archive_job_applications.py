@@ -12,19 +12,28 @@ from tests.job_applications.factories import JobApplicationFactory
 def test_archive(caplog):
     real_now = timezone.now()
     for state in JobApplicationState.values:
-        JobApplicationFactory(state=state)
-    already_archived_job_app = JobApplicationFactory(archived_at=real_now - datetime.timedelta(days=365))
-    recently_archived_job_app = JobApplicationFactory(archived_at=real_now - datetime.timedelta(days=1))
+        JobApplicationFactory(sent_by_prescriber_alone=True, state=state)
+    already_archived_job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, archived_at=real_now - datetime.timedelta(days=365)
+    )
+    recently_archived_job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, archived_at=real_now - datetime.timedelta(days=1)
+    )
     cutoff = real_now - datetime.timedelta(days=180)
     old_job_apps = {
         state: JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             state=state,
             updated_at=cutoff,
         )
         for state in JobApplicationState.values
     }
     # Updated job application.
-    JobApplicationFactory(state=JobApplicationState.PROCESSING, updated_at=cutoff + datetime.timedelta(hours=1))
+    JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        state=JobApplicationState.PROCESSING,
+        updated_at=cutoff + datetime.timedelta(hours=1),
+    )
 
     call_command("archive_job_applications")
 

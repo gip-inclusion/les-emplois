@@ -394,11 +394,11 @@ class TestCompanyQuerySet:
         company = CompanyFactory()
         model = JobApplicationFactory._meta.model
         old_date = timezone.now() - timedelta(weeks=model.WEEKS_BEFORE_CONSIDERED_OLD, days=1)
-        JobApplicationFactory(to_company=company, created_at=old_date)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, created_at=old_date)
 
         expected = 3
         for _ in range(expected):
-            JobApplicationFactory(to_company=company)
+            JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         result = Company.objects.with_count_recent_received_job_apps().get(pk=company.pk)
 
@@ -407,8 +407,8 @@ class TestCompanyQuerySet:
     def test_with_computed_job_app_score(self):
         company = CompanyFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
         company.job_description_through.first()
-        JobApplicationFactory(to_company=company)
-        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         assert company.spontaneous_applications_open_since is not None
         expected_score = company.job_applications_received.count() / (1 + company.job_description_through.count())
@@ -429,8 +429,8 @@ class TestCompanyQuerySet:
         # No job opening means closed spontaneous applications and no active job description.
         # See `with_computed_job_app_score`.
         company = CompanyFactory(spontaneous_applications_open_since=None)
-        JobApplicationFactory(to_company=company)
-        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         expected_score = 2.0
         result = Company.objects.with_computed_job_app_score().get(pk=company.pk)
@@ -484,6 +484,7 @@ class TestJobDescriptionQuerySet:
         unpopular_job_description = siae_job_descriptions[0]
         JobApplicationFactory.create_batch(
             popular_threshold - 1,
+            sent_by_prescriber_alone=True,
             to_company=company,
             selected_jobs=[unpopular_job_description],
             job_seeker=job_seeker,
@@ -494,6 +495,7 @@ class TestJobDescriptionQuerySet:
         # Test old job applications do not count towards popularity
         JobApplicationFactory.create_batch(
             popular_threshold,
+            sent_by_prescriber_alone=True,
             to_company=company,
             selected_jobs=[unpopular_job_description],
             job_seeker=job_seeker,
@@ -506,6 +508,7 @@ class TestJobDescriptionQuerySet:
         popular_job_description = siae_job_descriptions[1]
         JobApplicationFactory.create_batch(
             popular_threshold,
+            sent_by_prescriber_alone=True,
             to_company=company,
             selected_jobs=[popular_job_description],
             job_seeker=job_seeker,
@@ -518,7 +521,7 @@ class TestJobDescriptionQuerySet:
     def test_with_job_applications_count(self):
         company = CompanyFactory(with_jobs=True)
         job_description = company.job_description_through.first()
-        JobApplicationFactory(to_company=company, selected_jobs=[job_description])
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, selected_jobs=[job_description])
         siae_job_description = JobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
         assert hasattr(siae_job_description, "job_applications_count")
         assert siae_job_description.job_applications_count == 1

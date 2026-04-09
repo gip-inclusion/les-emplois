@@ -19,7 +19,7 @@ class TestEmployeeRecordAPIPermissions:
 
     def setup_method(self):
         # We only care about status filtering: no coherence check on ASP return values
-        job_application = JobApplicationFactory(for_employee_record=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         self.employee_record_ready = EmployeeRecordWithProfileFactory(
             job_application=job_application, status=Status.READY
         )
@@ -82,7 +82,7 @@ class TestEmployeeRecordAPIFetchList:
 
     def setup_method(self):
         # We only care about status filtering: no coherence check on ASP return values
-        job_application = JobApplicationFactory(for_employee_record=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         self.employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record.ready()
 
@@ -123,7 +123,9 @@ class TestEmployeeRecordAPIFetchList:
         assertContains(response, self.siae.siret)
 
         # status = SENT
-        job_application = JobApplicationFactory(for_employee_record=True, to_company=self.siae)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, for_employee_record=True, to_company=self.siae
+        )
         employee_record_sent = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_sent.ready()
 
@@ -143,7 +145,9 @@ class TestEmployeeRecordAPIFetchList:
         assertContains(response, self.siae.siret)
 
         # status = REJECTED
-        job_application = JobApplicationFactory(for_employee_record=True, to_company=self.siae)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True, for_employee_record=True, to_company=self.siae
+        )
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.ready()
         employee_record_rejected.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
@@ -171,7 +175,7 @@ class TestEmployeeRecordAPIFetchList:
         An employer admin of a company must not see employee records from another company.
         """
         # setup_method already created and employee record visible by self.employer
-        job_application = JobApplicationFactory(for_employee_record=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.ready()
 
@@ -215,7 +219,7 @@ class TestEmployeeRecordAPIParameters:
             "itou.common_apps.address.format.get_geocoding_data",
             side_effect=mock_get_geocoding_data,
         )
-        job_application = JobApplicationFactory(for_employee_record=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.ready()
 
@@ -240,12 +244,14 @@ class TestEmployeeRecordAPIParameters:
             "itou.common_apps.address.format.get_geocoding_data",
             side_effect=mock_get_geocoding_data,
         )
-        job_application_1 = JobApplicationFactory(for_employee_record=True)
+        job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application_1)
         employee_record.ready()
 
         job_application_2 = JobApplicationFactory(
-            for_employee_record=True, to_company=employee_record.job_application.to_company
+            sent_by_prescriber_alone=True,
+            for_employee_record=True,
+            to_company=employee_record.job_application.to_company,
         )
         employee_record = EmployeeRecord.from_job_application(job_application_2)
         employee_record.ready()
@@ -276,7 +282,7 @@ class TestEmployeeRecordAPIParameters:
             "itou.common_apps.address.format.get_geocoding_data",
             side_effect=mock_get_geocoding_data,
         )
-        job_application = JobApplicationFactory(for_employee_record=True)
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.status = Status.PROCESSED  # Default status if no `status` params present
         employee_record.save()
@@ -312,13 +318,15 @@ class TestEmployeeRecordAPIParameters:
         ancient_ts = timezone.localtime() - relativedelta(months=2)
         ancient = f"{ancient_ts:%Y-%m-%d}"
 
-        job_application_1 = JobApplicationFactory(for_employee_record=True)
+        job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record_1 = EmployeeRecord.from_job_application(job_application_1)
         employee_record_1.created_at = sooner_ts
         employee_record_1.status = Status.PROCESSED  # Default status if no `status` params present
         employee_record_1.save()
 
-        job_application_2 = JobApplicationFactory(for_employee_record=True, to_company=job_application_1.to_company)
+        job_application_2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, for_employee_record=True, to_company=job_application_1.to_company
+        )
         employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
         employee_record_2.created_at = ancient_ts
         employee_record_2.status = Status.PROCESSED  # Default status if no `status` params present
@@ -356,12 +364,14 @@ class TestEmployeeRecordAPIParameters:
         ancient_ts = timezone.now() - relativedelta(months=2)
         ancient = f"{ancient_ts:%Y-%m-%d}"
 
-        job_application_1 = JobApplicationFactory(for_employee_record=True)
+        job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record_1 = EmployeeRecord.from_job_application(job_application_1)
         employee_record_1.created_at = sooner_ts
         employee_record_1.save()  # in state NEW
 
-        job_application_2 = JobApplicationFactory(for_employee_record=True, to_company=job_application_1.to_company)
+        job_application_2 = JobApplicationFactory(
+            sent_by_prescriber_alone=True, for_employee_record=True, to_company=job_application_1.to_company
+        )
         employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
         employee_record_2.created_at = ancient_ts
         employee_record_2.ready()

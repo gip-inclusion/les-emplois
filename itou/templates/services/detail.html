@@ -1,0 +1,252 @@
+{% extends "layout/base.html" %}
+{% load matomo %}
+
+{% block title %}{{ service.name }} {{ block.super }}{% endblock %}
+
+{% block head_extra %}
+    {% if service.source_link %}
+        <link rel="canonical" href="{{ service.source_link }}">
+    {% endif %}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    <div class="d-flex align-items-center flex-wrap gap-2">
+        <h1 class="mb-0">{{ service.name }}</h1>
+        <span class="badge rounded-pill text-bg-success fs-sm">Mise à jour {{ service.updated_on|date:"d/m/Y" }}</span>
+    </div>
+{% endblock %}
+
+{% block title_extra %}
+    <div class="c-box c-box--action d-flex align-items-center justify-content-between">
+        <div class="form-row align-items-center gx-3">
+            {% if service.is_orientable_with_form %}
+                <div class="form-group col-12 col-lg-auto">
+                    {#                    todo: put the correct link to Dora with the token #}
+                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                       rel="noopener"
+                       target="_blank"
+                       href="https://dora.inclusion.gouv.fr"
+                       {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
+                        <span>Orienter le bénéficiaire</span>
+                    </a>
+                </div>
+            {% endif %}
+            <div class="form-group col-12 col-lg-auto">
+                <button class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#js-contact-modal"
+                        {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
+                    <span>Voir les coordonnées de contact du service</span>
+                </button>
+            </div>
+        </div>
+        <div>
+            <button id="dropdown_action_menu" class="btn btn-sm btn-link btn-ico-only text-white" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                <i class="ri-more-2-fill" aria-hidden="true"></i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdown_action_menu">
+                <button class="dropdown-item" id="js-copy-link" {% matomo_event "fiche-service" "clic" "copier-lien-page" %}>
+                    Copier le lien de cette page
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+
+                {# Main column #}
+                <div class="col-12 col-lg-8">
+
+                    {# Service information card #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Informations du service</h2>
+
+                        {% if service.average_orientation_response_delay_days is not None %}
+                            <div class="mb-3">
+                                {% include "dora/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
+                            </div>
+                        {% endif %}
+
+                        {% if service.description_short %}<p>{{ service.description_short }}</p>{% endif %}
+
+                        <dl class="row mb-0">
+                            {% if service.publics.exists %}
+                                <dt class="fw-normal col-sm-4">
+                                    Public concerné
+                                    {% if service.publics_details %}
+                                        <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
+                                    {% endif %}
+                                </dt>
+                                <dd class="col-sm-8">
+                                    {% for public in service.publics.all %}
+                                        <strong>{{ public.label }}</strong>
+                                        {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.receptions.exists or service.address_line_1 %}
+                                <dt class="fw-normal col-sm-4">Lieu d'accueil</dt>
+                                <dd class="col-sm-8">
+                                    {% for reception in service.receptions.all %}
+                                        <strong>{# djlint: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# djlint: on #}</strong>
+                                    {% endfor %}
+                                    {% if service.address_line_1 and service.has_in_person_reception %}
+                                        <strong>
+                                            {% if service.receptions.exists %}—{% endif %}
+                                            {{ service.address_line_1 }}
+                                            {% if service.address_line_2 %}, {{ service.address_line_2 }}{% endif %}
+                                        — {{ service.post_code }} {{ service.city }}</strong>
+                                    {% endif %}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.fee %}
+                                <dt class="fw-normal col-sm-4">
+                                    Frais à charge
+                                    {% if service.fee_details %}
+                                        <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
+                                    {% endif %}
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <strong>{{ service.fee.label }}</strong>
+                                </dd>
+                            {% endif %}
+
+                            {% if service.opening_hours %}
+                                <dt class="fw-normal col-sm-4">
+                                    Fréquence et horaires
+                                    {% if formatted_opening_hours.has_ph_off %}
+                                        <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
+                                    {% endif %}
+                                </dt>
+                                <dd class="col-sm-8">
+                                    {% include "dora/opening_hours.html" %}
+                                </dd>
+                            {% endif %}
+
+                            {% if service.insee_city %}
+                                <dt class="fw-normal col-sm-4">Périmètre géographique</dt>
+                                <dd class="col-sm-8">
+                                    <strong>{{ service.insee_city.get_department_display }}</strong>
+                                </dd>
+                            {% endif %}
+
+                            {% if service.access_conditions %}
+                                <dt class="fw-normal col-sm-4">Les critères d'admission</dt>
+                                <dd class="col-sm-8">
+                                    <strong>{{ service.access_conditions }}</strong>
+                                </dd>
+                            {% endif %}
+                        </dl>
+
+                        <p class="badge rounded-pill bg-disabled-color-light mb-0 mt-3">
+                            <small class="text-muted">Source : {{ service.source.label }}</small>
+                        </p>
+                    </div>
+
+                    {# Description #}
+                    {% if service.description %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h4">Description du service</h2>
+                            {% load markdownify %}
+                            <div id="js-description-wrapper" style="max-height: 150px; overflow: hidden; position: relative;">
+                                <div class="mb-0">{{ service.description|markdownify }}</div>
+                                <div id="js-description-fade" style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, white);">
+                                </div>
+                            </div>
+                            <a href="#" id="js-description-toggle" class="fw-bold d-none">Lire la suite</a>
+                        </div>
+                    {% endif %}
+
+                    {# Thematics #}
+                    {% if service.thematics.exists %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h4">Thématique et besoins associés</h2>
+                            <ul class="mb-0">
+                                {% for thematic in service.thematics.all %}<li>{{ thematic.label }}</li>{% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {# Mobilizations #}
+                    {% if service.mobilizations.exists %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h4">Les démarches à réaliser</h2>
+                            <ul class="mb-0">
+                                {% for mobilization in service.mobilizations.all %}<li>{{ mobilization.label }}</li>{% endfor %}
+                            </ul>
+                            {% if service.mobilizations_details %}<p class="mt-2 mb-0">{{ service.mobilizations_details }}</p>{% endif %}
+                        </div>
+                    {% endif %}
+
+                    {#                    todo: add section for "Les documents à fournir"#}
+
+                </div>
+
+                {# Sidebar #}
+                <div class="col-12 col-lg-4">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Informations de la structure</h2>
+                        <p>{{ service.structure.name }}</p>
+                        {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
+                        <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "fiche-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade" id="js-contact-modal" tabindex="-1" aria-labelledby="js-contact-modal-label" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="js-contact-modal-label">Coordonnées de contact</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    {% if service.contact_email %}
+                        <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                            <div>
+                                <i class="ri-mail-line me-2" aria-hidden="true"></i>
+                                {{ service.contact_email }}
+                            </div>
+                            <button id="js-copy-email"
+                                    class="btn btn-link btn-ico-only"
+                                    type="button"
+                                    aria-label="Copier l'adresse e-mail"
+                                    data-email="{{ service.contact_email }}"
+                                    {% matomo_event "fiche-service" "clic" "copier-email-contact" %}>
+                                <i class="ri-file-copy-line" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    {% endif %}
+                    {% if service.contact_phone %}
+                        <div class="border rounded p-3">
+                            <i class="ri-phone-line me-2" aria-hidden="true"></i>
+                            {{ service.contact_phone }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% load static %}
+    <script src="{% static 'js/services_detail.js' %}"></script>
+{% endblock %}

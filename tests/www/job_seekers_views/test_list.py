@@ -187,12 +187,14 @@ def test_multiple(client, snapshot):
     prescriber = job_app.sender
     # Other app for the same job seeker
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker=job_app.job_seeker,
         updated_at=timezone.now() - datetime.timedelta(days=2),
     )
     # Other app without diagnosis
     job_app2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__first_name="Bernard",
         job_seeker__last_name="Ygrec",
@@ -203,6 +205,7 @@ def test_multiple(client, snapshot):
     )
     # Other app with approval
     job_app3 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__first_name="Charlotte",
         job_seeker__last_name="Xerus",
@@ -216,6 +219,7 @@ def test_multiple(client, snapshot):
 
     # Other app without address/city
     job_app4 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__first_name="David",
         job_seeker__last_name="Waterford",
@@ -225,6 +229,7 @@ def test_multiple(client, snapshot):
     # Other app for which the current user cannot see the personal information
     unauthorized_prescriber = PrescriberFactory(membership=False)
     job_app5 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=unauthorized_prescriber,
         job_seeker__first_name="Edouard",
         job_seeker__last_name="Vivant",
@@ -263,6 +268,7 @@ def test_pagination(client):
     prescriber = organization.members.first()
     JobApplicationFactory.create_batch(
         2,
+        sent_by_prescriber_alone=True,
         sender=prescriber,
     )
     client.force_login(prescriber)
@@ -563,8 +569,12 @@ def test_job_seeker_created_by_prescriber_without_org(client):
 def test_htmx_job_seeker_filter(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
     prescriber = organization.members.first()
-    job_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
-    other_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
+    job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+    )
+    other_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+    )
     client.force_login(prescriber)
     response = client.get(url)
 
@@ -593,15 +603,20 @@ def test_htmx_job_seeker_filter(client, url):
 def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
     a_b_job_seeker = JobApplicationFactory(
-        sender=prescriber, job_seeker__first_name="A_something", job_seeker__last_name="B_something"
+        sent_by_prescriber_alone=True,
+        sender=prescriber,
+        job_seeker__first_name="A_something",
+        job_seeker__last_name="B_something",
     ).job_seeker
     created_job_seeker = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__created_by=prescriber,
         job_seeker__first_name="Zorro",
         job_seeker__last_name="Martin",
     ).job_seeker
     c_d_job_seeker = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__created_by=prescriber,
         job_seeker__last_login=timezone.now(),
@@ -763,17 +778,19 @@ def test_filtered_by_is_stalled(client):
     prescriber = PrescriberMembershipFactory().user
     client.force_login(prescriber)
     stalled = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         created_at=timezone.now() - datetime.timedelta(days=90),
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
     )
     not_stalled_anymore = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         created_at=timezone.now() - datetime.timedelta(days=90),
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
     )
-    other = JobApplicationFactory(sender=prescriber)
+    other = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
     response = client.get(reverse("job_seekers_views:list"))
     assert Counter(response.context["page_obj"].object_list) == Counter(
         [stalled.job_seeker, not_stalled_anymore.job_seeker, other.job_seeker]
@@ -813,12 +830,14 @@ def test_filtered_by_organization_members(client):
     )
 
     job_seeker_applied_by_user = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_user",
         job_seeker__last_name="Zorro",
     ).job_seeker
     job_seeker_applied_by_member = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=member,
         sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_member",
@@ -826,12 +845,14 @@ def test_filtered_by_organization_members(client):
         updated_at=timezone.now() - datetime.timedelta(days=1),
     ).job_seeker
     job_seeker_applied_by_old_member = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=old_member,
         sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_old_member",
         job_seeker__last_name="Zorro",
     ).job_seeker
     job_seeker_applied_by_user_created_by_user_not_in_orga = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_user_created_by_other_user_not_in_orga",
@@ -900,13 +921,14 @@ def test_job_seekers_order(client, url, subtests):
     organization = PrescriberOrganizationWith2MembershipFactory()
     prescriber = organization.members.first()
     c_d_job_seeker = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__created_by=prescriber,
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="Charles",
         job_seeker__last_name="Deux candidatures",
     ).job_seeker
-    JobApplicationFactory(sender=prescriber, job_seeker=c_d_job_seeker)
+    JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, job_seeker=c_d_job_seeker)
     created_job_seeker = JobSeekerFactory(
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
@@ -920,6 +942,7 @@ def test_job_seekers_order(client, url, subtests):
         last_name="Martin",
     )
     a_b_job_seeker = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         sender=prescriber,
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="Alice",
@@ -955,8 +978,12 @@ def test_job_seekers_order(client, url, subtests):
 def test_htmx_order(client, url):
     organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
     prescriber = organization.members.first()
-    job_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
-    other_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
+    job_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+    )
+    other_app = JobApplicationFactory(
+        sent_by_prescriber_alone=True, sender=prescriber, sender_prescriber_organization=organization
+    )
     client.force_login(prescriber)
     response = client.get(url)
 

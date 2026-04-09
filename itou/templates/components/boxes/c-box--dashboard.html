@@ -1,0 +1,52 @@
+{% load should_not_happen %}
+
+{% comment %}
+	.c-box variant for dashboard action blocks.
+
+	Required:
+	- title: string
+
+	Optional:
+	- title_badge: HTML fragment (displayed on the right side of title. usually a <span class="badge rounded-pill badge-sm ...">)
+    - cta: HTML fragment (main CTA displayed above actions. usually <a class="btn btn-outline-primary btn-block btn-ico mb-3"...>)
+	- list: HTML fragment (usually a <li class="d-flex justify-content-between align-items-center mb-3">...)
+    - extra_boxes: string (optional) : extra box
+	- info: HTML fragment (displayed below an <hr>)
+
+	Documentation -> https://gip-inclusion.github.io/itou-theme/doc/?path=/docs/components-box-dashboard--docs
+{% endcomment %}
+
+{% with has_cta=cta|default:"" has_list=list|default:""|wordcount has_extra_boxes=extra_boxes|default:""|wordcount has_info=info|default:""|wordcount %}
+    {% if not has_cta and not has_list and not has_info %}
+        {% should_not_happen "component_box_dashboard requires at least one of cta or list or info" %}
+    {% endif %}
+    <div class="c-box c-box--dashboard p-0 h-100">
+        {% if title_badge|default:"" %}
+            <div class="d-flex p-3 p-lg-4">
+                <div class="flex-grow-1">
+                    <span class="h4 m-0">{{ title }}</span>
+                </div>
+                <div class="ms-2">{{ title_badge }}</div>
+            </div>
+        {% else %}
+            <div class="p-3 p-lg-4">
+                <span class="h4 mb-0">{{ title }}</span>
+            </div>
+        {% endif %}
+        <div class="px-3 px-lg-4">
+            {% if has_cta %}{{ cta }}{% endif %}
+            {% if has_list %}
+                <ul class="list-unstyled{% if not has_info and not has_extra_boxes %} mb-lg-5{% endif %}">
+                    {{ list }}
+                </ul>
+            {% endif %}
+            {% if has_extra_boxes %}
+                <div class="mb-3{% if not has_info %} mb-lg-5{% endif %}">{{ extra_boxes }}</div>
+            {% endif %}
+            {% if has_info %}
+                <hr class="mb-3">
+                <div class="fs-sm lh-sm mb-3 mb-lg-5">{{ info }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endwith %}

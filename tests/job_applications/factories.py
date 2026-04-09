@@ -164,8 +164,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2))
     resume = factory.SubFactory(FileFactory)
-    sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
-    sender = factory.SubFactory(PrescriberFactory)
+    sender_kind = None  # Force all calls to use a sent_by_xxx trait as the db doesn't allow null values
     processed_at = factory.LazyAttribute(
         lambda o: (
             datetime.now(UTC)
@@ -173,6 +172,24 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             else None
         )
     )
+
+    @classmethod
+    def _generate(cls, strategy, params):
+        kinds = [
+            "sent_by_job_seeker",
+            "sent_by_prescriber",
+            "sent_by_prescriber_alone",
+            "sent_by_employer",
+            "sent_by_another_employer",
+            "sent_by_authorized_prescriber",
+        ]
+        given_kinds = [kind for kind in kinds if params.get(kind)]
+        if len(given_kinds) != 1:
+            raise ValueError(f"Bad sent_by_xxx trait count {given_kinds}")
+
+        if "sender_kind" in params:
+            raise ValueError("sender_kind is not allowed in params")
+        return super()._generate(strategy, params)
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):
@@ -183,7 +200,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         Usage:
             appellation1 = Appellation.objects.filter(code='10933')
             appellation2 = Appellation.objects.filter(code='10934')
-            JobApplicationFactory(selected_jobs=(appellation1, appellation2))
+            JobApplicationFactory(sent_by_prescriber_alone=True,selected_jobs=(appellation1, appellation2))
         """
         if not create:
             # Simple build, do nothing.

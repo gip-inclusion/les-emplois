@@ -32,12 +32,12 @@ def test_transferable_states(subtests):
 
     for evil_state in evil_states:
         with subtests.test(evil_state.name):
-            job_application = JobApplicationFactory(state=evil_state)
+            job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=evil_state)
             assert not job_application.transfer.is_available()
 
     for good_state in good_states:
         with subtests.test(good_state.name):
-            job_application = JobApplicationFactory(state=good_state)
+            job_application = JobApplicationFactory(sent_by_prescriber_alone=True, state=good_state)
             assert job_application.transfer.is_available()
 
 
@@ -53,7 +53,9 @@ def test_can_be_transferred():
     lambda_user = JobSeekerFactory()
     target_company.members.add(origin_user)
 
-    job_application = JobApplicationFactory(to_company=origin_company, state=JobApplicationState.ACCEPTED)
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True, to_company=origin_company, state=JobApplicationState.ACCEPTED
+    )
 
     assert origin_user.kind in UserKind.professionals()
     assert target_user.kind in UserKind.professionals()
@@ -251,7 +253,9 @@ def test_transfer_must_notify_unauthorized_prescriber(
     target_company.members.add(origin_user)
 
     # Unauthorized prescriber is the default sender
-    extra_kwargs = {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {}
+    extra_kwargs = (
+        {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
+    )
     job_application = JobApplicationFactory(
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",

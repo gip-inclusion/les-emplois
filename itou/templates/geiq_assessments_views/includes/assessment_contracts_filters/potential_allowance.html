@@ -1,0 +1,16 @@
+{% load django_bootstrap5 %}
+
+<fieldset>
+    <legend>
+        <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-allowance" type="button" aria-expanded="false" aria-controls="collapse-allowance">
+            Aide potentielle
+        </button>
+    </legend>
+    <div class="my-3 collapse" id="collapse-allowance">
+        <ul>
+            <li>{% bootstrap_field filters_form.potential_allowance_1400 wrapper_class="" %}</li>
+            <li>{% bootstrap_field filters_form.potential_allowance_814 wrapper_class="" %}</li>
+            <li>{% bootstrap_field filters_form.potential_allowance_0 wrapper_class="" %}</li>
+        </ul>
+    </div>
+</fieldset>

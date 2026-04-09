@@ -1,20 +1,20 @@
+{% load components %}
+
 <div class="col mb-3 mb-md-4">
-    <div class="c-box p-0 h-100">
-        <div class="d-flex p-3 p-lg-4">
-            <div class="flex-grow-1">
-                <span class="h4 m-0">Organisation</span>
-            </div>
-            <div class="ms-2">
-                <span class="badge rounded-pill badge-sm bg-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
-            </div>
-        </div>
-        <div class="px-3 px-lg-4">
-            <p class="mb-3 mb-lg-5">
+    {% component_box_dashboard title=title title_badge=title_badge list=list %}
+        {% fragment as title %}
+            Organisation
+        {% endfragment %}
+        {% fragment as title_badge %}
+            <span class="badge rounded-pill badge-sm bg-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
+        {% endfragment %}
+        {% fragment as list %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
                 <a href="{% url 'institutions_views:members' %}" class="btn-link btn-ico">
-                    <i class="ri-group-line ri-lg" aria-hidden="true"></i>
+                    <i class="ri-group-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>Gérer les collaborateurs</span>
                 </a>
-            </p>
-        </div>
-    </div>
+            </li>
+        {% endfragment %}
+    {% endcomponent_box_dashboard %}
 </div>

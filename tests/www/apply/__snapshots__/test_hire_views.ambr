@@ -2954,7 +2954,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -3017,7 +3017,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -3037,7 +3037,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -3094,7 +3094,7 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -3103,7 +3103,7 @@
         'origin': list([
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -3122,7 +3122,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -3132,7 +3132,7 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -3141,7 +3141,7 @@
         'origin': list([
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -3156,7 +3156,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -4086,7 +4086,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -4149,7 +4149,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -4169,7 +4169,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
-          'ConfirmationForHireView.get[www/apply/views/common.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''

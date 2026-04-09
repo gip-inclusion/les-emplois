@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2026-04-06
+
+### Ajouté
+
+- [Admin : Ajout des affectations candidats (JobSeekerAssignments)](https://github.com/gip-inclusion/les-emplois/pull/7812)
+
+### Modifié
+
+- [Admin : Action pour désactiver l'authentification par mot de passe](https://github.com/gip-inclusion/les-emplois/pull/7818)
+- [Admin : Amélioration de la page d'ajout de jeton d'API pour les service de la PDI](https://github.com/gip-inclusion/les-emplois/pull/7804)
+- [Tech : Changer la longueur minimale du mot de passe de 14 à 16 caractères](https://github.com/gip-inclusion/les-emplois/pull/7816)
+- [Tech : Utilisation du domaine `inclusion.gouv.fr` pour les liens vers DORA](https://github.com/gip-inclusion/les-emplois/pull/7814)
+
+### Tech
+
+- [Tech : Ajout d'un fichier CODEOWNERS (sécurité)](https://github.com/gip-inclusion/les-emplois/pull/7819)
+
 ## 2026-03-30
 
 ### Ajouté

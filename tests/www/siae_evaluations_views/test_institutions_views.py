@@ -17,7 +17,6 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.job_applications.enums import SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import (
@@ -3646,10 +3645,10 @@ class TestInstitutionEvaluatedJobApplicationView:
             criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
+            sent_by_employer=True,
             with_approval=True,
             to_company=siae,
             sender_company=siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
@@ -4058,10 +4057,10 @@ class TestInstitutionEvaluatedAdministrativeCriteriaView:
             administrative_criteria=[administrative_criteria],
         )
         job_application = JobApplicationFactory(
+            sent_by_employer=True,
             with_approval=True,
             to_company=siae,
             sender_company=siae,
-            sender_kind=SenderKind.EMPLOYER,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )

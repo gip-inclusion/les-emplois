@@ -168,6 +168,7 @@ def test_populate_job_seekers(snapshot):
         jobseeker_profile__with_pole_emploi_id=True,
     )
     job_application_2 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_approval=True,
         with_iae_eligibility_diagnosis=True,
         eligibility_diagnosis__expired=True,
@@ -191,6 +192,7 @@ def test_populate_job_seekers(snapshot):
         coords=Point(0, 0),  # QPV utils is mocked
     )
     job_application_3 = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=user_3,
         created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC),
         with_approval=True,
@@ -211,6 +213,7 @@ def test_populate_job_seekers(snapshot):
     # Older accepted job_application with no eligibility diagnosis
     # Allow to check last_hiring_company_pk
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         job_seeker=user_3,
         with_approval=True,
         approval=job_application_3.approval,
@@ -446,6 +449,7 @@ def test_populate_job_applications(snapshot):
     )
     job = JobDescriptionFactory(is_active=True, company=company)
     ja = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_geiq_eligibility_diagnosis_from_employer=True,
         contract_type=ContractType.APPRENTICESHIP,
         state=JobApplicationState.ACCEPTED,

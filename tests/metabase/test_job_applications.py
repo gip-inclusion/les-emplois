@@ -5,19 +5,19 @@ from tests.job_applications.factories import JobApplicationFactory
 
 
 def test_refusal_reason_old_value():
-    ja = JobApplicationFactory(refusal_reason=RefusalReason.ELIGIBILITY_DOUBT.value)
+    ja = JobApplicationFactory(sent_by_prescriber_alone=True, refusal_reason=RefusalReason.ELIGIBILITY_DOUBT.value)
     assert ja.refusal_reason in RefusalReason.hidden()
     assert TABLE.get(column_name="motif_de_refus", input=ja) == str(ja.refusal_reason)
 
 
 def test_refusal_reason_current_value():
-    ja = JobApplicationFactory(refusal_reason=RefusalReason.DID_NOT_COME.value)
+    ja = JobApplicationFactory(sent_by_prescriber_alone=True, refusal_reason=RefusalReason.DID_NOT_COME.value)
     assert ja.refusal_reason not in RefusalReason.hidden()
     assert TABLE.get(column_name="motif_de_refus", input=ja) == str(ja.refusal_reason)
 
 
 def test_refusal_reason_empty_value():
-    ja = JobApplicationFactory(refusal_reason="")
+    ja = JobApplicationFactory(sent_by_prescriber_alone=True, refusal_reason="")
     assert TABLE.get(column_name="motif_de_refus", input=ja) is None
 
 

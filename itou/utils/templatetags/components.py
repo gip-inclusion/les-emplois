@@ -47,7 +47,9 @@ register.tag("component_alert", create_component_tag("components/alerts/alert.ht
 register.tag("component_alert_global", create_component_tag("components/alerts/alert_global.html"))
 register.tag("component_title", create_component_tag("components/c-title.html"))
 register.tag("component_navinfo", create_component_tag("components/c-navinfo.html"))
+register.tag("component_box_dashboard", create_component_tag("components/boxes/c-box--dashboard.html"))
 register.tag(
-    "component_box_nexus_activated_service", create_component_tag("components/c-box_nexus_activated_service.html")
+    "component_box_nexus_activated_service",
+    create_component_tag("components/boxes/c-box_nexus_activated_service.html"),
 )
 register.tag("component_info", create_component_tag("components/c-info.html"))

@@ -44,8 +44,8 @@ def test_candidatures_geiq_token_authentication():
     antenna = CompanyFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=CompanySource.USER_CREATED)
     token.companies.add(geiq)
 
-    JobApplicationFactory(state="accepted", to_company=geiq)
-    JobApplicationFactory(state="accepted", to_company=antenna)
+    JobApplicationFactory(sent_by_prescriber_alone=True, state="accepted", to_company=geiq)
+    JobApplicationFactory(sent_by_prescriber_alone=True, state="accepted", to_company=antenna)
 
     api_client = APIClient(headers={"Authorization": "Token invalid"})
     response = api_client.get(reverse("v1:geiq_jobapplication_list"))
@@ -85,6 +85,7 @@ def test_candidatures_geiq_is_empty(snapshot, job_application_status):
     client = _api_client()
 
     ja = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_geiq_eligibility_diagnosis_from_employer=True,
         state=job_application_status,
     )
@@ -105,6 +106,7 @@ def test_candidatures_geiq_nominal(snapshot):
     job_seeker = JobSeekerFactory(for_snapshot=True, jobseeker_profile__education_level="51")
 
     JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9505"),
         with_geiq_eligibility_diagnosis_from_employer=True,
         was_hired=True,
@@ -128,7 +130,6 @@ def test_candidatures_geiq_nominal(snapshot):
         was_hired=True,
         to_company__romes=["N1101"],
         job_seeker=job_seeker,
-        sender_kind="prescriber",
         sender_prescriber_organization__kind="HUDA",
         to_company__siret="11832575900001",  # same SIREN, different SIRET
         to_company__kind=CompanyKind.GEIQ,
@@ -169,6 +170,7 @@ def test_candidatures_geiq_nominal(snapshot):
 
 def test_serializer_method_defaults():
     ja = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_geiq_eligibility_diagnosis_from_employer=False,
         job_seeker__jobseeker_profile__education_level="",
     )
@@ -183,7 +185,7 @@ def test_serializer_method_defaults():
 )
 def test_civilite_mapping(title, outcome):
     serializer = serializers.GeiqJobApplicationSerializer()
-    ja = JobApplicationFactory.build(job_seeker__title=title)
+    ja = JobApplicationFactory.build(sent_by_prescriber_alone=True, job_seeker__title=title)
     assert serializer.get_civilite(ja) == outcome
 
 
@@ -207,6 +209,7 @@ def test_label_mappings(choices_class, mapping):
 @freeze_time("2023-07-21")
 def test_criteres_eligibilite():
     job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
         with_geiq_eligibility_diagnosis_from_employer=True,
         was_hired=True,
     )

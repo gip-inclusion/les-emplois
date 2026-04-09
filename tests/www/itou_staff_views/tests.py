@@ -115,6 +115,7 @@ class TestExportJobApplications:
                 author_prescriber_organization__siret="12345678900012",
             )
             job_app = JobApplicationFactory(
+                sent_by_prescriber_alone=True,
                 for_snapshot=True,
                 job_seeker=job_seeker,
                 to_company=siae,
@@ -732,6 +733,7 @@ class TestMergeUsers:
     def test_merge_other_relations(self, factory, client, caplog):
         user_1, user_2 = factory.create_batch(2)
         job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             sender=user_2,
             approval_manually_refused_by=user_2,
             archived_by=user_2,
