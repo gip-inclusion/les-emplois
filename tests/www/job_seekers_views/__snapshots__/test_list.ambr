@@ -975,13 +975,17 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_update"
-             FROM "job_applications_jobapplication" U0
-             WHERE (((U0."sender_id" = %s
-                      AND U0."sender_prescriber_organization_id" IS NULL)
-                     OR U0."sender_prescriber_organization_id" = %s)
+            (SELECT MAX(U0."updated_at") AS "last_action_at"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s
+                         AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+             GROUP BY U0."id"
+             LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -1146,13 +1150,17 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_update"
-             FROM "job_applications_jobapplication" U0
-             WHERE (((U0."sender_id" = %s
-                      AND U0."sender_prescriber_organization_id" IS NULL)
-                     OR U0."sender_prescriber_organization_id" = %s)
+            (SELECT MAX(U0."updated_at") AS "last_action_at"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s
+                         AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+             GROUP BY U0."id"
+             LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -1333,13 +1341,17 @@
                                        AND U0."job_seeker_id" = ("users_user"."id"))
                                 GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-               (SELECT MAX(U0."updated_at") AS "last_update"
-                FROM "job_applications_jobapplication" U0
-                WHERE (((U0."sender_id" = %s
-                         AND U0."sender_prescriber_organization_id" IS NULL)
-                        OR U0."sender_prescriber_organization_id" = %s)
+               (SELECT MAX(U0."updated_at") AS "last_action_at"
+                FROM "users_jobseekerassignment" U0
+                WHERE (((U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" IS NULL
+                         AND U0."professional_id" = %s)
+                        OR (U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" = %s
+                            AND U0."professional_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."job_seeker_id") AS "last_updated_at",
+                GROUP BY U0."id"
+                LIMIT 1) AS "last_updated_at",
           
                (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -1413,13 +1425,17 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_update"
-             FROM "job_applications_jobapplication" U0
-             WHERE (((U0."sender_id" = %s
-                      AND U0."sender_prescriber_organization_id" IS NULL)
-                     OR U0."sender_prescriber_organization_id" = %s)
+            (SELECT MAX(U0."updated_at") AS "last_action_at"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s
+                         AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+             GROUP BY U0."id"
+             LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -1630,7 +1646,7 @@
               </th>
               <th aria-sort="none" scope="col">
                   <button data-emplois-setter-target="#id_order" data-emplois-setter-value="last_updated_at" type="button">
-                      Dernière mise à jour de candidature
+                      Dernière action
                   </button>
               </th>
               <th class="text-end w-100px" scope="col">
@@ -1779,7 +1795,7 @@
                   2
               </td>
               <td>
-                  29/08/2024
+                  30/08/2024
               </td>
               <td class="text-end w-100px">
                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
@@ -2180,13 +2196,16 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_update"
-             FROM "job_applications_jobapplication" U0
-             WHERE (((U0."sender_id" = %s
-                      AND U0."sender_prescriber_organization_id" IS NULL)
-                     OR U0."sender_prescriber_organization_id" = %s)
+            (SELECT MAX(U0."updated_at") AS "last_action_at"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+             GROUP BY U0."id"
+             LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -2349,13 +2368,16 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_update"
-             FROM "job_applications_jobapplication" U0
-             WHERE (((U0."sender_id" = %s
-                      AND U0."sender_prescriber_organization_id" IS NULL)
-                     OR U0."sender_prescriber_organization_id" = %s)
+            (SELECT MAX(U0."updated_at") AS "last_action_at"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+             GROUP BY U0."id"
+             LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -2536,13 +2558,16 @@
                                        AND U0."job_seeker_id" = ("users_user"."id"))
                                 GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-               (SELECT MAX(U0."updated_at") AS "last_update"
-                FROM "job_applications_jobapplication" U0
-                WHERE (((U0."sender_id" = %s
-                         AND U0."sender_prescriber_organization_id" IS NULL)
-                        OR U0."sender_prescriber_organization_id" = %s)
+               (SELECT MAX(U0."updated_at") AS "last_action_at"
+                FROM "users_jobseekerassignment" U0
+                WHERE (((U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" IS NULL
+                         AND U0."professional_id" = %s)
+                        OR (U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."job_seeker_id") AS "last_updated_at",
+                GROUP BY U0."id"
+                LIMIT 1) AS "last_updated_at",
           
                (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -2615,13 +2640,16 @@
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
           
-            (SELECT MAX(U0."updated_at") AS "last_update"
-             FROM "job_applications_jobapplication" U0
-             WHERE (((U0."sender_id" = %s
-                      AND U0."sender_prescriber_organization_id" IS NULL)
-                     OR U0."sender_prescriber_organization_id" = %s)
+            (SELECT MAX(U0."updated_at") AS "last_action_at"
+             FROM "users_jobseekerassignment" U0
+             WHERE (((U0."company_id" IS NULL
+                      AND U0."prescriber_organization_id" IS NULL
+                      AND U0."professional_id" = %s)
+                     OR (U0."company_id" IS NULL
+                         AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+             GROUP BY U0."id"
+             LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
@@ -2801,6 +2829,7 @@
               0
           </td>
           <td>
+              30/08/2024
           </td>
           <td class="text-end w-100px">
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
@@ -2835,6 +2864,7 @@
               0
           </td>
           <td>
+              30/08/2024
           </td>
           <td class="text-end w-100px">
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
@@ -2869,6 +2899,7 @@
               0
           </td>
           <td>
+              30/08/2024
           </td>
           <td class="text-end w-100px">
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">

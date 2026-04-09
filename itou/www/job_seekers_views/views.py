@@ -249,8 +249,13 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         user_applications.values("job_seeker").annotate(count=Count("pk")).values("count"),
         output_field=IntegerField(),
     )
-    subquery_last_update = Subquery(
-        user_applications.values("job_seeker").annotate(last_update=Max("updated_at")).values("last_update"),
+    subquery_last_action_at = Subquery(
+        JobSeekerAssignment.objects.assigned_to(
+            request.user, organization=request.current_organization, from_all_coworkers=list_organization
+        )
+        .filter(job_seeker=OuterRef("pk"))
+        .annotate(last_action_at=Max("updated_at"))
+        .values("last_action_at")[:1],
         output_field=DateTimeField(),
     )
     subquery_diagnosis = Subquery(
@@ -268,7 +273,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         .annotate(
             full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
             job_applications_nb=Coalesce(subquery_count, 0),
-            last_updated_at=subquery_last_update,
+            last_updated_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,
             application_sent_by=ArrayAgg(
                 "job_applications__sender", distinct=True, filter=Q(job_applications__sender__isnull=False)
