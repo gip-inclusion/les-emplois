@@ -8,7 +8,7 @@ from itou.utils.constants import ITOU_CONTACT_FORM_URL
 @pytest.mark.parametrize(
     "view_name,expected_title",
     [
-        ("accessibility", "<h1>Accessibilité</h1>"),
+        ("accessibility", "<h1>Déclaration d'accessibilité</h1>"),
         ("legal-notice", "<h1>Mentions légales</h1>"),
         ("legal-privacy", "<h1>Politique de confidentialité</h1>"),
     ],
