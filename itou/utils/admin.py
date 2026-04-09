@@ -13,6 +13,7 @@ from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
+from django.utils.text import capfirst
 
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from itou.utils.templatetags.str_filters import pluralizefr
@@ -183,8 +184,12 @@ class ItouModelMixin:
             )
 
     def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
-        if obj is not None and hasattr(obj, "display_with_pii"):
-            context["subtitle"] = obj.display_with_pii
+        if obj is not None:
+            # Set the title of the page when editing an object, using the overridable `get_change_view_title` method.
+            if self.has_change_permission(request, obj):
+                context["title"] = self.get_change_view_title(obj)
+            if hasattr(obj, "display_with_pii"):
+                context["subtitle"] = obj.display_with_pii
         return super().render_change_form(request, context, add=add, change=change, form_url=form_url, obj=obj)
 
     def _get_queryset_with_relations(self, request):
@@ -236,6 +241,9 @@ class ItouModelMixin:
             if field_name in fields_with_pii:
                 new_list[i] = f"{field_name}_display_with_pii"
         return tuple(new_list)
+
+    def get_change_view_title(self, obj) -> str:
+        return f"Modifier l’objet {capfirst(obj._meta.verbose_name)} · {obj._meta.object_name}(pk={obj.pk})"
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         # Make sure this view has the trigger context available

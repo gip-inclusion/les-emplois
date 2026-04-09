@@ -414,6 +414,9 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
             return get_organization_view_link(company, display_attr="display_name")
         return self.get_empty_value_display()
 
+    def get_change_view_title(self, obj) -> str:
+        return f"Modifier le PASS IAE {obj.number} · {obj._meta.object_name}(pk={obj.pk})"
+
 
 class IsInProgressFilter(admin.SimpleListFilter):
     title = "En cours"

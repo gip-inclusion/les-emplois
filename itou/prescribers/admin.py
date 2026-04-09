@@ -260,6 +260,9 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
 
         return super().response_change(request, obj)
 
+    def get_change_view_title(self, obj) -> str:
+        return f"Modifier l’organisation prescriptrice {obj.name} · {obj._meta.object_name}(pk={obj.pk})"
+
     @admin.display(boolean=True, description="Habilitation")
     def is_authorized(self, obj):
         return obj.is_authorized
