@@ -80,7 +80,7 @@ from tests.institutions.factories import (
     InstitutionMembershipFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -366,6 +366,24 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.organizations == []
         assert not request.is_current_organization_admin
         assert not request.from_authorized_prescriber
+
+    def test_prescriber_wrong_org_in_session_with_other_org(self, mocked_get_response_for_middlewaremixin):
+        prescriber = PrescriberFactory()
+        request = get_request(prescriber, with_perms_middleware=False)
+        bad_organization = PrescriberOrganizationFactory()
+        organization = PrescriberMembershipFactory(user=prescriber).organization
+
+        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+            bad_organization.organization_switch_key
+        )
+        request.session.save()
+        with assertNumQueries(3):  # retrieve user memberships
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == organization.organization_switch_key
+        )
 
     def test_ft_prescriber_with_no_ft_organization(self, mocked_get_response_for_middlewaremixin):
         request = get_request(PrescriberFactory(email="prenom.nom@francetravail.fr"), with_perms_middleware=False)
