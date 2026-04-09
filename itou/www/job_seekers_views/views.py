@@ -295,7 +295,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     try:
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
-        order = JobSeekerOrder.FULL_NAME_ASC
+        order = JobSeekerOrder.LAST_UPDATED_AT_DESC
     queryset = queryset.order_by(*order.order_by)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
