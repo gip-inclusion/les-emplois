@@ -467,10 +467,12 @@
                                           </div>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -751,10 +753,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -999,10 +1003,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -1347,10 +1353,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -1595,11 +1603,13 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
-                                              <div>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
                                                   <a class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap" href="/gps/groups/[PK of FollowUpGroup]/edition">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
@@ -4471,10 +4481,12 @@
                                           </div>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -4774,10 +4786,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -5010,10 +5024,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -5301,10 +5317,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -5604,10 +5622,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -5840,10 +5860,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -6081,10 +6103,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
@@ -7493,10 +7517,12 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                              <h3>
-                                                  Qui accompagne ce candidat ?
-                                              </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
                                           </div>
                                           <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
                                               <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">

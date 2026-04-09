@@ -101,22 +101,3 @@ def test_hide_old_applications_to_employers(client, subtests):
     for job_app in [hidden_application] + visible_applications:
         response = client.get(reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_app.pk}))
         assertContains(response, company.display_name)
-
-
-def test_job_seeker_referent_heading(client):
-    DEFAULT_HEADING = "<h3>Qui accompagne ce candidat ?</h3>"
-    JOB_SEEKER_HEADING = "<h3>Qui m'accompagne ?</h3>"
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
-    client.force_login(job_application.sender)
-    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-    response = client.get(url)
-
-    assertContains(response, DEFAULT_HEADING, html=True)
-    assertNotContains(response, JOB_SEEKER_HEADING, html=True)
-
-    client.force_login(job_application.job_seeker)
-    url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
-    response = client.get(url)
-
-    assertNotContains(response, DEFAULT_HEADING, html=True)
-    assertContains(response, JOB_SEEKER_HEADING, html=True)
