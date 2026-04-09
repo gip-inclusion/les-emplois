@@ -1,6 +1,7 @@
 [
   {
     "fields": {
+      "opening_date": "2025-06-01",
       "review_deadline": "2025-08-01",
       "submission_deadline": "2025-07-01",
       "year": 2024
