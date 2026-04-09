@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestCompanySignup.test_company_select_does_not_die_under_requests
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -225,9 +225,16 @@
                              "companies_company"."convention_id",
                              "companies_company"."job_app_score",
                              "companies_company"."is_searchable",
-                             "companies_company"."rdv_solidarites_id"
+                             "companies_company"."rdv_solidarites_id",
+                             EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_companymembership" U0
+             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+             WHERE (U1."is_active"
+                    AND U0."is_active"
+                    AND U0."company_id" = ("companies_company"."id"))
+             LIMIT 1) AS "has_active_members"
           FROM "companies_company"
-          LEFT OUTER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND ("companies_company"."kind" IN (%s,
                                                      %s,
@@ -245,7 +252,14 @@
                  AND "companies_company"."siret"::text LIKE %s
                  AND NOT ("companies_company"."kind" IN (%s,
                                                          %s))
-                 AND "companies_companymembership"."user_id" IS NULL)
+                 AND NOT EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = ("companies_company"."id"))
+                    LIMIT 1))
         ''',
       }),
       dict({
@@ -291,10 +305,16 @@
                              "companies_company"."convention_id",
                              "companies_company"."job_app_score",
                              "companies_company"."is_searchable",
-                             "companies_company"."rdv_solidarites_id"
+                             "companies_company"."rdv_solidarites_id",
+                             EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_companymembership" U0
+             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+             WHERE (U1."is_active"
+                    AND U0."is_active"
+                    AND U0."company_id" = ("companies_company"."id"))
+             LIMIT 1) AS "has_active_members"
           FROM "companies_company"
-          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
-          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND ("companies_company"."kind" IN (%s,
                                                      %s,
@@ -312,16 +332,14 @@
                  AND "companies_company"."siret"::text LIKE %s
                  AND NOT ("companies_company"."kind" IN (%s,
                                                          %s))
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "companies_company" U0
-                             LEFT OUTER JOIN "companies_companymembership" U1 ON (U0."id" = U1."company_id")
-                             WHERE (U1."user_id" IS NULL
-                                    AND U0."id" = ("companies_company"."id"))
-                             LIMIT 1))
-                 AND "companies_companymembership"."is_active"
-                 AND "companies_companymembership"."is_admin"
-                 AND "users_user"."is_active")
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = ("companies_company"."id"))
+                    LIMIT 1))
         ''',
       }),
       dict({
@@ -340,29 +358,8 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id"
-          FROM "companies_companymembership"
-          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "companies_companymembership"."is_active"
-                 AND "companies_companymembership"."company_id" IN (%s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s))
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[signup/company_select.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[signup/company_select.html]',
-          'company_select[www/signup/views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id",
+                 "companies_companymembership"."updated_by_id",
+                 "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
                  "users_user"."is_superuser",
@@ -398,8 +395,18 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update"
-          FROM "users_user"
-          WHERE ("users_user"."id") IN ((%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s))
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s))
+          ORDER BY "companies_companymembership"."is_admin" DESC,
+                   "companies_companymembership"."joined_at" ASC
         ''',
       }),
       dict({

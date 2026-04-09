@@ -45,7 +45,7 @@
                         </form>
                     </div>
 
-                    {% if siren_form.cleaned_data and not companies_without_members and not companies_with_members %}
+                    {% if siren_form.cleaned_data and not companies_without_active_members and not companies_with_active_members %}
                         {% component_alert content=content variant="warning" extra_classes="mt-3 mt-md-4" %}
                             {% fragment as content %}
                                 <p class="mb-0">
@@ -92,9 +92,11 @@
                     {% endif %}
 
 
-                    {% if companies_without_members and company_select_form %}
+                    {% if companies_without_active_members and company_select_form %}
                         <div class="c-form mt-3 mt-md-5">
-                            <h3 class="mb-1">{{ companies_without_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}</h3>
+                            <h3 class="mb-1">
+                                {{ companies_without_active_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}
+                            </h3>
                             <p>Les données sont fournies par la DGEFP et l’extranet IAE 2.0 de l’ASP.</p>
 
                             <form method="post" class="js-prevent-multiple-submit">
@@ -111,17 +113,17 @@
                             label is to manually render the inputs.
                                 {% endcomment %}
                                 <ul class="list-group list-group-flush">
-                                    {% for siae in companies_without_members %}
+                                    {% for company in companies_without_active_members %}
                                         <li class="list-group-item list-group-item-action">
-                                            <input class="form-check-input me-1" type="radio" name="{{ company_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
+                                            <input class="form-check-input me-1" type="radio" name="{{ company_select_form.siaes.html_name }}" value="{{ company.pk }}" id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
                                             <label class="form-check-label" for="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}">
-                                                <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                                <b>{{ company.siren }} {{ company.siret_nic }}</b> - {{ company.kind }}
                                                 <br>
-                                                {{ siae.display_name }}
+                                                {{ company.display_name }}
                                                 <br>
-                                                {{ siae.address_line_1 }},
-                                                {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                                                {{ siae.post_code }} {{ siae.city }}
+                                                {{ company.address_line_1 }},
+                                                {% if company.address_line_2 %}{{ company.address_line_2 }},{% endif %}
+                                                {{ company.post_code }} {{ company.city }}
                                             </label>
                                         </li>
                                     {% endfor %}
@@ -146,32 +148,32 @@
                     {% endif %}
 
 
-                    {% if companies_with_members %}
+                    {% if companies_with_active_members %}
                         <div class="c-form mt-3 mt-md-5">
-                            <h3 class="mb-1">{{ companies_with_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}</h3>
+                            <h3 class="mb-1">
+                                {{ companies_with_active_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}
+                            </h3>
                             <p>
-                                Par mesure de sécurité, seuls les membres déjà inscrits dans {{ companies_with_members|pluralizefr:"cette structure,ces structures" }} peuvent ajouter de nouveaux collaborateurs.
+                                Par mesure de sécurité, seuls les membres déjà inscrits dans {{ companies_with_active_members|pluralizefr:"cette structure,ces structures" }} peuvent ajouter de nouveaux collaborateurs.
                             </p>
 
                             <ul class="list-group list-group-flush">
-                                {% for siae in companies_with_members %}
+                                {% for company in companies_with_active_members %}
                                     <li class="list-group-item">
                                         <p class="mb-0">
-                                            <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                            <b>{{ company.siren }} {{ company.siret_nic }}</b> - {{ company.kind }}
                                         </p>
                                         <p>
-                                            {{ siae.display_name }}
+                                            {{ company.display_name }}
                                             <br>
-                                            {{ siae.address_line_1 }},
-                                            {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                                            {{ siae.post_code }} {{ siae.city }}
+                                            {{ company.address_line_1 }},
+                                            {% if company.address_line_2 %}{{ company.address_line_2 }},{% endif %}
+                                            {{ company.post_code }} {{ company.city }}
                                         </p>
                                         <p class="mb-0">
-                                            {# note: memberships.first does not work, it does not take the prefetch into account. #}
-                                            {% with siae.memberships.all.0.user as admin %}
-                                                {# For security, display only the first char of the last name. #}
-                                                Pour rejoindre cette structure, <b>veuillez contacter {{ admin.get_truncated_full_name }}</b>
-                                            {% endwith %}
+                                            {# Memberships.first does not work, it does not take the prefetch into account. #}
+                                            {# For security, display only the first char of the last name. #}
+                                            Pour rejoindre cette structure, <b>veuillez contacter {{ company.memberships.all.0.user.get_truncated_full_name }}</b>
                                         </p>
                                     </li>
                                 {% endfor %}
@@ -180,7 +182,7 @@
                     {% endif %}
 
 
-                    {% if companies_without_members or companies_with_members %}
+                    {% if companies_without_active_members or companies_with_active_members %}
                         <div class="mt-3 mt-md-4 text-end">
                             <p>
                                 En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}"  class="has-external-link" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.

@@ -13,7 +13,7 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.models import Company, CompanyMembership
 from itou.users.enums import KIND_EMPLOYER, IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -33,18 +33,38 @@ class TestCompanySignup:
             f"{admin_user.first_name.title()} {admin_user.last_name[0].upper()}.</b>"
         )
 
+    @pytest.mark.parametrize(
+        "scenario",
+        ["no_member", "no_active_member"],
+    )
     @freeze_time("2024-09-15 15:53:54")
-    def test_join_a_company_without_members(self, client, mailoutbox):
+    def test_join_an_company_without_active_members(self, client, mailoutbox, pro_connect, scenario):
         """
-        A user joins a company without members.
+        A user joins a company without active members.
+
+        There are two ways for a user to be an inactive member of a company:
+        - as a user (see AbstractUser.is_active).
+        - as a member of a company (see MembershipAbstract.is_active).
+
         """
         user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
         company = CompanyFactory(kind=CompanyKind.ETTI)
-        assert 0 == company.members.count()
-
+        company_active_members_qs = CompanyMembership.objects.filter(company=company.pk)
         url = reverse("signup:company_select")
+
+        if scenario == "no_member":
+            assert company.members.count() == 0
+        elif scenario == "no_active_member":
+            # Active member but we make the membership inactive.
+            CompanyMembershipFactory(company=company, is_active=False, user__is_active=True)
+            # Active membership but we make the member inactive.
+            CompanyMembershipFactory(company=company, is_active=True, user__is_active=False)
+            assert company.members.count() == 2
+
+        assert company_active_members_qs.count() == 0  # Make sure there is no active user.
+
         response = client.get(url)
         assert response.status_code == 200
 
@@ -78,7 +98,7 @@ class TestCompanySignup:
         user.refresh_from_db()
         assert user.is_active
         assert company.has_admin(user)
-        assert 1 == company.members.count()
+        assert company_active_members_qs.count() == 1  # Make sure there is one active user after registration.
 
         # No new sent email.
         assert len(mailoutbox) == 1
@@ -126,7 +146,7 @@ class TestCompanySignup:
         )
         assert len(mailoutbox) == 0
 
-    def test_join_a_company_with_member(self, client):
+    def test_join_company_with_active_member(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
 
@@ -353,11 +373,25 @@ class TestCompanySignup:
     def test_ignores_inactive_members(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
-
         company = CompanyFactory(siret="40219166200001", with_jobs=True, not_ea_eatt_kind=True)
-        membership = CompanyMembershipFactory.create(company=company, is_active=False)
+        membership_1 = CompanyMembershipFactory(company=company, is_active=False, user__is_active=True)
+        membership_2 = CompanyMembershipFactory(company=company, is_active=True, user__is_active=False)
         response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
-        assertNotContains(response, self.to_join_msg(membership.user))
+        assertNotContains(response, self.to_join_msg(membership_1.user))
+        assertNotContains(response, self.to_join_msg(membership_2.user))
+
+    def test_admin_users_appears_first(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+        company = CompanyFactory(siret="40219166200001", not_ea_eatt_kind=True)
+        membership_1 = CompanyMembershipFactory(company=company, is_admin=False)
+        response = client.get(reverse("signup:company_select"), {"siren": company.siret[:9]})
+        assertContains(response, self.to_join_msg(membership_1.user))
+        membership_2 = CompanyMembershipFactory(company=company, is_admin=True)
+        assert company.memberships.count() == 2
+        response = client.get(reverse("signup:company_select"), {"siren": company.siret[:9]})
+        assertNotContains(response, self.to_join_msg(membership_1.user))
+        assertContains(response, self.to_join_msg(membership_2.user))
 
     def test_with_next_param(self, client):
         user = random_pro_user_factory()

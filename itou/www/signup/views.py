@@ -12,6 +12,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, login
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
+from django.db.models import Exists, OuterRef, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -241,13 +242,18 @@ class ChooseMembershipKindView(FormView):
 
 def company_select(request, template_name="signup/company_select.html"):
     """
-    Entry point of the signup process for SIAEs which consists of 2 steps.
+    Entry point of the signup process for companies.
 
-    The user is asked to select an SIAE based on a selection that match a given SIREN number.
+    Registering user is asked to select a company from those matching a given SIREN number.
+    We distinguish between companies with and without active members because:
+    - if a company has no active member, one can register autonomously by selecting (in the form) the company to which
+    an email will be sent (cf. Company.auth_email).
+    - if a company has at least one active member, one can register only by reaching to another member of that company.
+    In the latter case, the template displays the first (admin if any) member of the company as its contact person.
     """
 
-    companies_without_members = None
-    companies_with_members = None
+    companies_without_active_members = None
+    companies_with_active_members = None
 
     next_url = get_safe_url(request, "next")
     data = request.GET.copy()
@@ -258,28 +264,26 @@ def company_select(request, template_name="signup/company_select.html"):
     siren_form = forms.CompanySearchBySirenForm(data=data or None)
     company_select_form = None
 
-    # The SIREN, when available, is always passed in the querystring.
+    # The SIREN, when available, is always passed as a URL parameter.
     if request.method in ["GET", "POST"] and siren_form.is_valid():
-        # Make sure to look only for active structures.
+        # We make admin members (if any) from the company appear at the beginning of the final QuerySet so the contact
+        # person is more likely to be an admin when displaying the results.
+        memberships_qs = CompanyMembership.objects.select_related("user").order_by("-is_admin", "joined_at")
         companies_for_siren = (
+            # Make sure to look only for active companies.
             Company.objects.active()
             .filter(siret__startswith=siren_form.cleaned_data["siren"])
             .exclude(kind__in=[CompanyKind.EA, CompanyKind.EATT])  # Dropping EA/EATT companies support
             .distinct("pk")
+            .annotate(has_active_members=Exists(CompanyMembership.objects.filter(company=OuterRef("pk"))))
+            # Prevents the template from reissuing a request for each member/user.
+            .prefetch_related(Prefetch("memberships", queryset=memberships_qs))
         )
-        # A user cannot join structures that already have members.
-        # Show these structures in the template to make that clear.
-        companies_with_members = (
-            companies_for_siren.exclude(members=None)
-            # the template directly displays the first membership's user "as the admin".
-            # that's why we only select SIAEs that have at least an active admin user.
-            # it should always be the case, but lets enforce it anyway.
-            .filter(memberships__is_admin=True, memberships__is_active=True, memberships__user__is_active=True)
-            # avoid the template issuing requests for every member and user.
-            .prefetch_related("memberships__user")
+        companies_without_active_members = companies_for_siren.filter(has_active_members=False)
+        companies_with_active_members = companies_for_siren.filter(has_active_members=True)
+        company_select_form = forms.CompanySiaeSelectForm(
+            data=request.POST or None, siaes=companies_without_active_members
         )
-        companies_without_members = companies_for_siren.filter(members=None)
-        company_select_form = forms.CompanySiaeSelectForm(data=request.POST or None, siaes=companies_without_members)
 
     if request.method == "POST" and company_select_form and company_select_form.is_valid():
         company_selected = company_select_form.cleaned_data["siaes"]
@@ -304,8 +308,8 @@ def company_select(request, template_name="signup/company_select.html"):
 
     context = {
         "next_url": next_url,
-        "companies_without_members": companies_without_members,
-        "companies_with_members": companies_with_members,
+        "companies_without_active_members": companies_without_active_members,
+        "companies_with_active_members": companies_with_active_members,
         "company_select_form": company_select_form,
         "siren_form": siren_form,
         "prev_url": reverse("signup:choose_pro_membership_kind"),
