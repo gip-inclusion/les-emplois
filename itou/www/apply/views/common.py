@@ -323,10 +323,6 @@ class BaseConfirmationView(UserPassesTestMixin, JobSeekerAndContractInfosNeededM
                     form_user_address.save()
                 if form_birth_data := self.forms.get("birth_data"):
                     form_birth_data.save()
-                if self.eligibility_diagnosis:
-                    self.eligibility_diagnosis.schedule_certification()
-                if self.geiq_eligibility_diagnosis:
-                    self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = self.forms["accept"].save(commit=False)
                 if creating:
@@ -374,12 +370,6 @@ class BaseConfirmationView(UserPassesTestMixin, JobSeekerAndContractInfosNeededM
                         f"{external_link}."
                     ),
                 )
-        elif self.geiq_eligibility_diagnosis:
-            # If job seeker has as valid GEIQ diagnosis issued by a GEIQ or a prescriber
-            # link this diagnosis to the current job application
-            job_application.geiq_eligibility_diagnosis = self.geiq_eligibility_diagnosis
-            job_application.save(update_fields=["geiq_eligibility_diagnosis", "updated_at"])
-
         self.clean_session()
         return HttpResponseRedirect(self.get_success_url())
 
