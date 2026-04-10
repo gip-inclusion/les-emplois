@@ -1532,6 +1532,7 @@ class TestAssessmentContractsListView:
 
     def test_contract_list_reset_button_visibility(self, client):
         response = client.get(self.url)
+        assertContains(response, 'id="all-filters-btn"')
         assertNotContains(response, self.RESET_BTN_LABEL)
 
         response = client.get(self.url, {"start_date_lower": "2024-01-01"})
