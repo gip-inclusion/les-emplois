@@ -14,7 +14,9 @@ updates:
   - package-ecosystem: "pip"
     directory: "/requirements/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    cooldown:
+      default-days: 5
     commit-message:
       prefix: "requirement"
       prefix-development: "dev requirement"
