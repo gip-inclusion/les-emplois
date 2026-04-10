@@ -181,8 +181,8 @@ def company_select(request, template_name="signup/company_select.html"):
     The user is asked to select an SIAE based on a selection that match a given SIREN number.
     """
 
-    companies_without_members = None
-    companies_with_members = None
+    companies_with_active_admin_members = None
+    companies_without_active_members = None
 
     next_url = get_safe_url(request, "next")
     data = request.GET.copy()
@@ -204,17 +204,23 @@ def company_select(request, template_name="signup/company_select.html"):
         )
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.
-        companies_with_members = (
+        companies_with_active_admin_members = (
             companies_for_siren.exclude(members=None)
             # the template directly displays the first membership's user "as the admin".
             # that's why we only select SIAEs that have at least an active admin user.
-            # it should always be the case, but lets enforce it anyway.
+            # it should always be the case, but let's enforce it anyway.
             .filter(memberships__is_admin=True, memberships__is_active=True, memberships__user__is_active=True)
             # avoid the template issuing requests for every member and user.
             .prefetch_related("memberships__user")
         )
-        companies_without_members = companies_for_siren.filter(members=None)
-        company_select_form = forms.CompanySiaeSelectForm(data=request.POST or None, siaes=companies_without_members)
+        companies_without_active_members = (
+            companies_for_siren.exclude(members=None)
+            .exclude(memberships__is_active=True)
+            .exclude(memberships__user__is_active=True)
+        )
+        company_select_form = forms.CompanySiaeSelectForm(
+            data=request.POST or None, siaes=companies_without_active_members
+        )
 
     if request.method == "POST" and company_select_form and company_select_form.is_valid():
         company_selected = company_select_form.cleaned_data["siaes"]
@@ -239,8 +245,8 @@ def company_select(request, template_name="signup/company_select.html"):
 
     context = {
         "next_url": next_url,
-        "companies_without_members": companies_without_members,
-        "companies_with_members": companies_with_members,
+        "companies_without_active_members": companies_without_active_members,
+        "companies_with_active_admin_members": companies_with_active_admin_members,
         "company_select_form": company_select_form,
         "siren_form": siren_form,
     }
