@@ -1193,6 +1193,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     self.job_seeker, for_siae=self.to_company
                 )
 
+        # Link to the job seeker's GEIQ eligibility diagnosis.
+        if self.to_company.kind == CompanyKind.GEIQ:
+            self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                self.job_seeker, self.to_company
+            ).first()
+
         # Approval issuance logic.
         if self.to_company.is_subject_to_iae_rules:
             if self.job_seeker.has_latest_approval_in_waiting_period:
@@ -1260,6 +1266,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
+
+        # Schedule certification of administrative criteria.
+        if self.eligibility_diagnosis:
+            self.eligibility_diagnosis.schedule_certification()
+        if self.geiq_eligibility_diagnosis:
+            self.geiq_eligibility_diagnosis.schedule_certification()
 
     @xwf_models.transition()
     def add_to_pool(self, *, user):

@@ -81,7 +81,6 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
         self.accept_session = None
         self.job_seeker = None
         self.eligibility_diagnosis = None
-        self.geiq_eligibility_diagnosis = None
         self.geiq_eligibility_missing = False
 
     def setup(self, request, *args, session_uuid, **kwargs):
@@ -100,10 +99,9 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
         self.job_seeker = self.job_application.job_seeker
         check_waiting_period(self.job_application)
         if self.company.kind == CompanyKind.GEIQ:
-            self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                self.job_seeker, self.company
-            ).first()
-            self.geiq_eligibility_missing = self.geiq_eligibility_diagnosis is None
+            self.geiq_eligibility_missing = not (
+                GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists()
+            )
         elif self.company.is_subject_to_iae_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, self.company
