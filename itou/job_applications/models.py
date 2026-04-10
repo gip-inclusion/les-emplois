@@ -1142,14 +1142,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Consider job application as new : don't keep answers
         self.answer = self.answer_to_prescriber = ""
 
-        # Delete eligibility diagnosis if not provided by an authorized prescriber
+        # Clear accepted-only FK fields (DB constraint: non-accepted ⇒ FKs NULL).
         eligibility_diagnosis = self.eligibility_diagnosis
-        is_eligibility_diagnosis_made_by_siae = (
-            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
-        )
-        if is_eligibility_diagnosis_made_by_siae:
-            self.eligibility_diagnosis = None
-            self.save(update_fields={"eligibility_diagnosis", "updated_at"})
+        self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
+        self.approval = None
+
+        # Delete eligibility diagnosis authored by SIAE (not reusable after transfer).
+        if eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER:
+            self.save(update_fields={"eligibility_diagnosis", "geiq_eligibility_diagnosis", "approval", "updated_at"})
             eligibility_diagnosis.delete()
 
         # Delete comments
@@ -1304,13 +1305,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         if self.approval and self.approval.can_be_deleted():
             self.approval.delete()
-            self.approval = None
 
-            # Remove flags on the job application about approval
-            self.approval_number_sent_by_email = False
-            self.approval_number_sent_at = None
-            self.approval_delivery_mode = ""
-            self.approval_manually_delivered_by = None
+        # Unconditionally clear all accepted-only fields.
+        self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
+        self.approval = None
+        self.approval_number_sent_by_email = False
+        self.approval_number_sent_at = None
+        self.approval_delivery_mode = ""
+        self.approval_manually_delivered_by = None
+        self.approval_manually_refused_by = None
+        self.approval_manually_refused_at = None
 
         for employee_record in self.employee_record.all():
             if not employee_record.was_sent():

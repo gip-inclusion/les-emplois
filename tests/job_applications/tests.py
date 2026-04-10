@@ -2214,7 +2214,9 @@ class TestJobApplicationWorkflow:
         assert job_application.state == JobApplicationState.CANCELLED
 
         job_application.refresh_from_db()
-        assert job_application.approval
+        # approval FK is cleared but the Approval object still exists in DB
+        assert not job_application.approval
+        assert Approval.objects.filter(pk=approval.pk).exists()
 
     def test_cancellation_not_allowed(self, *args, **kwargs):
         today = timezone.localdate()
@@ -2254,6 +2256,27 @@ class TestJobApplicationWorkflow:
 
         job_application.cancel(user=job_application.to_company.active_members.first())
         assertQuerySetEqual(EmployeeRecord.objects.filter(job_application=job_application), [])
+
+    def test_cancel_clears_eligibility_diagnosis(self, *args, **kwargs):
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+        )
+        assert job_application.eligibility_diagnosis is not None
+        cancellation_user = job_application.to_company.active_members.first()
+        job_application.cancel(user=cancellation_user)
+        job_application.refresh_from_db()
+        assert job_application.eligibility_diagnosis is None
+
+    def test_cancel_clears_geiq_eligibility_diagnosis(self, *args, **kwargs):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True, with_geiq_eligibility_diagnosis_from_prescriber=True
+        )
+        assert job_application.geiq_eligibility_diagnosis is not None
+        cancellation_user = job_application.to_company.active_members.first()
+        job_application.cancel(user=cancellation_user)
+        job_application.refresh_from_db()
+        assert job_application.geiq_eligibility_diagnosis is None
 
 
 @pytest.mark.parametrize(
