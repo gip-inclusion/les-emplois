@@ -175,6 +175,7 @@ class TestApplyAsPrescriber:
             next_url,
             data={
                 "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "prescriber_advisor": prescriber.id,
             },
         )
 
@@ -322,6 +323,7 @@ class TestApplyAsPrescriber:
             next_url,
             data={
                 "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "prescriber_advisor": prescriber.id,
             },
         )
 
