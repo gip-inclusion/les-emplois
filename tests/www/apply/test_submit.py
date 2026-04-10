@@ -45,7 +45,11 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWith2MembershipFactory,
+)
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -1102,6 +1106,7 @@ class TestApplyAsAuthorizedPrescriber:
                 next_url,
                 data={
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "prescriber_advisor": user.id,
                     "resume": pdf_file,
                 },
             )
@@ -1475,6 +1480,7 @@ class TestApplyAsAuthorizedPrescriber:
                 next_url,
                 data={
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "prescriber_advisor": user.id,
                     "resume": pdf_file,
                 },
             )
@@ -1970,6 +1976,7 @@ class TestApplyAsPrescriber:
                 next_url,
                 data={
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "prescriber_advisor": user.id,
                     "resume": pdf_file,
                 },
             )
@@ -2205,6 +2212,58 @@ class TestApplyAsPrescriber:
                 status_code=403,
                 html=True,
             )
+
+    @pytest.mark.parametrize("with_default_advisor", [True, False])
+    @pytest.mark.usefixtures("temporary_bucket")
+    def test_submit_application_with_prescriber_advisor(self, client, pdf_file, with_default_advisor):
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
+        assert company.job_description_through.first() is not None
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        user, other_prescriber = organization.members.all()
+        job_seeker = JobSeekerFactory()
+        selected_job = company.job_description_through.first()
+        FollowUpGroup.objects.follow_beneficiary(job_seeker, user)
+
+        client.force_login(user)
+
+        apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": [selected_job]})
+        next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name})
+        response = client.get(next_url)
+
+        assertContains(response, "Postuler")
+
+        # check if the default advisor is the currently logged in user
+        assertContains(
+            response,
+            f"""
+            <option value="{user.pk}" selected>{user.get_full_name()}</option>
+            """,
+            html=True,
+        )
+
+        data = {
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "prescriber_advisor": user.id if with_default_advisor else other_prescriber.id,
+            "resume": pdf_file,
+        }
+
+        with mock.patch(
+            "itou.files.models.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = client.post(next_url, data=data)
+
+        assignment = JobSeekerAssignment.objects.get()
+        job_application = JobApplication.objects.get()
+
+        assert assignment.job_seeker == job_seeker
+        if with_default_advisor:
+            assert assignment.professional == user
+        else:
+            assert assignment.professional == other_prescriber
+        assert assignment.professional == job_application.prescriber_advisor
+        assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.APPLY
 
 
 class TestApplyAsPrescriberNirExceptions:
@@ -3026,6 +3085,36 @@ class TestApplicationView:
         assertContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
         assertContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
         assertContains(response, f"{self.DIAGORIENTE_URL}?utm_source=emploi-inclusion-prescripteur")
+
+    def test_application_resume_prescriber_advisor(self, client):
+        company = CompanyFactory(with_membership=True, with_jobs=True)
+        organization = PrescriberOrganizationFactory(authorized=True)
+        active_prescriber = PrescriberFactory()
+        active_prescriber_2 = PrescriberFactory()
+        active_prescriber_inactive_membership = PrescriberFactory()
+        inactive_prescriber = PrescriberFactory(is_active=False)
+        PrescriberMembershipFactory(user=active_prescriber, organization=organization)
+        PrescriberMembershipFactory(user=active_prescriber_2, organization=organization)
+        PrescriberMembershipFactory(
+            user=active_prescriber_inactive_membership, organization=organization, is_active=False
+        )
+        PrescriberMembershipFactory(user=inactive_prescriber, organization=organization)
+        job_seeker = JobSeekerFactory()
+
+        client.force_login(active_prescriber)
+        apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
+
+        response = client.get(reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name}))
+
+        assertContains(
+            response,
+            f"Accompagnateur de {job_seeker.get_inverted_full_name()} au sein de votre structure",
+        )
+
+        assertNotContains(response, inactive_prescriber.get_full_name())
+        assertNotContains(response, active_prescriber_inactive_membership.get_full_name())
+        assertContains(response, active_prescriber.get_full_name())
+        assertContains(response, active_prescriber_2.get_full_name())
 
     def test_application_eligibility_is_bypassed_for_company_not_subject_to_eligibility_rules(self, client):
         company = CompanyFactory(not_subject_to_iae_rules=True, with_membership=True)

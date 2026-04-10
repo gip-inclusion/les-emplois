@@ -109,6 +109,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "sender",
         "sender_company",
         "sender_prescriber_organization",
+        "prescriber_advisor",
         "to_company",
         "approval",
         "transferred_by",
@@ -176,6 +177,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "sender_kind",
                     "sender_company",
                     "sender_prescriber_organization",
+                    "prescriber_advisor",
                 ]
             },
         ),

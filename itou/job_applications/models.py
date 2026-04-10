@@ -646,6 +646,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         on_delete=models.RESTRICT,  # For traceability and accountability
     )
 
+    # prescriber supporting a beneficiary on this job application
+    prescriber_advisor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="prescripteur accompagnant du candidat",
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        related_name="job_applications_recommended",
+        limit_choices_to={"kind__in": UserKind.professionals()},
+    )
+
     to_company = models.ForeignKey(
         "companies.Company",
         verbose_name="entreprise destinataire",

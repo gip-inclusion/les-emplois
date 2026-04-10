@@ -27,6 +27,7 @@ from itou.users.models import JobSeekerAssignment, User
 from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import constants as apply_view_constants
@@ -590,10 +591,16 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         self.form = None
 
     def get_form_kwargs(self):
+        job_seeker_name = mask_unless(
+            self.job_seeker.get_inverted_full_name(),
+            predicate=can_view_personal_information(self.request, self.job_seeker),
+        )
         return {
             "company": self.company,
             "user": self.request.user,
             "auto_prescription_process": self.tunnel == ApplyTunnel.AUTO_PRESCRIPTION,
+            "job_seeker_name": job_seeker_name,
+            "current_organization": self.request.current_organization if self.request.from_prescriber else None,
             "data": self.request.POST or None,
             "files": self.request.FILES or None,
         }
@@ -613,6 +620,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             sender=self.request.user,
             sender_kind=self.request.user.kind,
             message=self.form.cleaned_data["message"],
+            prescriber_advisor=self.form.cleaned_data.get("prescriber_advisor"),
         )
         if self.request.from_prescriber:
             job_application.sender_prescriber_organization = self.request.current_organization
@@ -638,8 +646,12 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
             # Sync job seeker assignment
+            advisor = self.form.cleaned_data.get("prescriber_advisor") or self.request.user
             JobSeekerAssignment.objects.upsert_assignment(
-                self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
+                self.job_seeker,
+                advisor,
+                self.request.current_organization,
+                ActionKind.APPLY,
             )
 
         # Send notifications

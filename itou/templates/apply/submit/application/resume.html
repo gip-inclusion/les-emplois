@@ -107,6 +107,9 @@
 {% endblock %}
 
 {% block form_content %}
+    {% if request.from_prescriber and request.current_organization %}
+        {% bootstrap_field form.prescriber_advisor %}
+    {% endif %}
     {% bootstrap_field form.message %}
     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-4" %}
         {% fragment as c_info__summary %}

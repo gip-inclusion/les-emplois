@@ -2613,6 +2613,7 @@ class TestJobApplicationAdminForm:
             "sender_kind",
             "sender_company",
             "sender_prescriber_organization",
+            "prescriber_advisor",
             "to_company",
             "state",
             "archived_at",

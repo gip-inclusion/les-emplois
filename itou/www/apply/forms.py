@@ -22,7 +22,7 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
 from itou.jobs.models import Appellation
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, PoleEmploiFieldsMixin
 from itou.users.models import JobSeekerProfile, User
@@ -81,6 +81,11 @@ class ApplicationJobsForm(forms.ModelForm):
         return self.fields.get("spontaneous_application") or self.fields["selected_jobs"].choices
 
 
+class PrescriberAdvisorChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_full_name()
+
+
 class SubmitJobApplicationForm(forms.Form):
     """
     Submit a job application to a company.
@@ -93,7 +98,9 @@ class SubmitJobApplicationForm(forms.Form):
         max_upload_size=5 * global_constants.MB,
     )
 
-    def __init__(self, company, user, auto_prescription_process, *args, **kwargs):
+    def __init__(
+        self, company, user, auto_prescription_process, job_seeker_name, current_organization, *args, **kwargs
+    ):
         self.company = company
         super().__init__(*args, **kwargs)
         self.fields.update(forms.fields_for_model(JobApplication, fields=["message"]))
@@ -110,6 +117,17 @@ class SubmitJobApplicationForm(forms.Form):
             message.label = "Message à l’employeur (avec copie transmise au candidat)"
             help_text = "Message obligatoire et non modifiable après l’envoi."
         message.help_text = help_text
+
+        if user.is_prescriber and current_organization:
+            self.fields["prescriber_advisor"] = PrescriberAdvisorChoiceField(
+                label=f"Accompagnateur de {job_seeker_name} au sein de votre structure",
+                help_text="Renseignez le professionnel qui accompagnera le candidat pendant son contrat.",
+                queryset=User.objects.filter(
+                    Exists(PrescriberMembership.objects.filter(user=OuterRef("pk"), organization=current_organization))
+                ).filter(is_active=True),
+                empty_label=None,
+                initial=user,
+            )
 
 
 class TransferJobApplicationForm(SubmitJobApplicationForm):

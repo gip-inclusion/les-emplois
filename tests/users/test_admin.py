@@ -123,6 +123,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "job_applications_sent",  # JobApplication.sender, but might be replaced when transferring application
         # sent by the job seeker
         "jobapplication",  # JobApplication.transferred_by
+        "job_applications_recommended",  # JobApplication.prescriber_advisor
         "jobapplicationcomment",  # JobApplicationComment.created_by
         "jobapplicationtransitionlog",  # JobApplicationTransitionLog.user
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
