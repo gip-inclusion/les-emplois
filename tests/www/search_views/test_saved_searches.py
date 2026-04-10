@@ -67,12 +67,12 @@ class TestSavedSearches:
     @pytest.mark.parametrize("url", [EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])
     def test_add_button_valid_or_invalid_data(self, client, url, params, assertion):
         """When a search is invalid, do not show the Save search button."""
-        client.force_login(PrescriberFactory())
+        client.force_login(PrescriberFactory(membership=True))
         response = client.get(url, params)
         assertion(response, self.ADD_BUTTON_MARKUP, html=True)
 
     def test_query_params_field_is_set(self, client):
-        client.force_login(PrescriberFactory())
+        client.force_login(PrescriberFactory(membership=True))
         params = {
             "city": self.lyon.slug,
             "distance": "50",
@@ -93,7 +93,7 @@ class TestSavedSearches:
 
     @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_disabled_add_button(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
         response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
         assertNotContains(response, self.DISABLED_ADD_BUTTON_MARKUP, html=True)
@@ -105,7 +105,7 @@ class TestSavedSearches:
     @pytest.mark.parametrize("url", [DASHBOARD_URL, EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])
     def test_display_saved_searches_and_delete_modal(self, client, url, snapshot):
         SEARCH_LIST_MARKUP = """<div class="c-search__list__title">Recherches enregistrées :</div>"""
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         response = client.get(url)
@@ -151,7 +151,7 @@ class TestSavedSearches:
 
     @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_add_saved_search(self, client, caplog):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         data = {"saved_search-name": "Grand Lyon", "saved_search-query_params": "city=lyon-69"}
@@ -182,7 +182,7 @@ class TestSavedSearches:
 
     @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_add_saved_search_htmx_reload(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
@@ -200,7 +200,7 @@ class TestSavedSearches:
         assertSoupEqual(fresh_page, simulated_page)
 
     def test_cannot_add_saved_search_same_name(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
         SavedSearchFactory(name="Lyon", user=user)
 
@@ -211,7 +211,7 @@ class TestSavedSearches:
 
     @patch.object(forms, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_cannot_add_saved_search_too_many(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
         SavedSearchFactory(name="Brest", user=user)
 
@@ -221,7 +221,7 @@ class TestSavedSearches:
         assert SavedSearch.objects.count() == 1
 
     def test_add_saved_search_strip_unwanted_params(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         data = {
@@ -233,7 +233,7 @@ class TestSavedSearches:
         assert SavedSearch.objects.first().query_params == "distance=25&domains=M&city=argenteuil-95"
 
     def test_details_delete_modal_content(self, client, snapshot):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         saved_search = SavedSearchFactory(user=user, for_snapshot=True)
@@ -246,7 +246,7 @@ class TestSavedSearches:
         assert pretty_indented(modal) == snapshot
 
     def test_details_delete_modal_content_with_bad_data(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         SavedSearchFactory(user=user, name="", query_params="distance=50&kinds=ACI")
@@ -259,7 +259,7 @@ class TestSavedSearches:
         assertContains(response, '<i class="ri-star-line" aria-hidden="true"></i><span>Not existing</span>', html=True)
 
     def test_delete_saved_search(self, client, caplog):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         saved_search = SavedSearchFactory(user=user)
@@ -286,7 +286,7 @@ class TestSavedSearches:
 
     @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_delete_saved_search_htmx_reload(self, client):
-        user = PrescriberFactory()
+        user = PrescriberFactory(membership=True)
         client.force_login(user)
 
         saved_search = SavedSearchFactory(user=user)

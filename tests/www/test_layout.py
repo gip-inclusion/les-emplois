@@ -38,7 +38,6 @@ def test_navigation_not_authenticated(snapshot, client):
             ),
             id="LaborInspector",
         ),
-        pytest.param(PrescriberFactory, id="PrescriberWithoutOrganization"),
         pytest.param(
             partial(
                 PrescriberFactory,
@@ -95,13 +94,14 @@ def test_nexus_dropdown(snapshot, client, case, pro_connect):
         for_snapshot=True,
         identity_provider=IdentityProvider.DJANGO if case == "enabled_no_proconnect" else IdentityProvider.PRO_CONNECT,
     )
-    if case in ["enabled_no_proconnect", "enabled", "enabled_all_activated"]:
-        PrescriberMembershipFactory(
-            user=user,
-            organization__name="On vous aide",
-            organization__siret="012345678910",
-            organization__post_code="31",
-        )
+    PrescriberMembershipFactory(
+        user=user,
+        organization__name="On vous aide",
+        organization__siret="012345678910",
+        organization__post_code="31"
+        if case in ["enabled_no_proconnect", "enabled", "enabled_all_activated"]
+        else "32",
+    )
     if case == "enabled_all_activated":
         ActivatedService.objects.create(user=user, service=Service.PILOTAGE)
         ActivatedService.objects.create(user=user, service=Service.MON_RECAP)

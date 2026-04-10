@@ -2082,13 +2082,13 @@
       <div class="offcanvas-header offcanvas-header--organization">
           <div class="dropdown dropdown-organization flex-grow-1 py-4">
               <div class="dropdown-toggle dropdown-toggle__summary">
-                  <i aria-hidden="true" class="ri-user-line">
+                  <i aria-hidden="true" class="ri-group-line">
                   </i>
                   <span>
-                      Orienteur seul
+                      Autre
                   </span>
                   <strong>
-                      Pierre DUPONT
+                      On vous aide
                   </strong>
               </div>
           </div>
@@ -2135,6 +2135,11 @@
                                       Mes candidats
                                   </a>
                               </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
+                                      Tous les candidats de la structure
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </li>
@@ -2146,6 +2151,29 @@
                               Réseau d'intervenants
                           </span>
                       </a>
+                  </li>
+                  <li class="nav-item">
+                      <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-team-line fw-medium">
+                          </i>
+                          <span>
+                              Organisation
+                          </span>
+                      </button>
+                      <div class="collapse" id="collapse-nav-organisation">
+                          <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="prescriber-edit-organization" href="/prescribers/edit_organization">
+                                      Modifier les informations
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
+                                      Collaborateurs
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
@@ -2256,7 +2284,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=pierre.dupont%40test.local&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=pierre.dupont%40test.local&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur&tf_16096272057233=autre&tf_16096639918353=012345678910&tf_16096931518225=On+vous+aide" rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>

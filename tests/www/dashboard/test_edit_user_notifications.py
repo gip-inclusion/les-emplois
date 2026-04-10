@@ -49,15 +49,6 @@ def test_prescriber_allowed(client, snapshot):
     assert response.status_code == 200
 
 
-def test_solo_adviser_allowed(client, snapshot):
-    solo_adviser = PrescriberFactory(membership=False)
-    client.force_login(solo_adviser)
-    url = reverse("dashboard:edit_user_notifications")
-    with assertSnapshotQueries(snapshot(name="view queries")):
-        response = client.get(url)
-    assert response.status_code == 200
-
-
 def test_job_seeker_allowed(client, snapshot):
     job_seeker = JobSeekerFactory()
     client.force_login(job_seeker)
@@ -171,57 +162,6 @@ def test_prescriber_create_update_notification_settings(client, snapshot):
                 user=prescriber,
                 structure_type=ContentType.objects.get_for_model(organization),
                 structure_pk=organization.pk,
-                disabled_notifications__count=len(available_notifications),
-            )
-        ],
-    )
-    assert DisabledNotification.objects.count() == len(available_notifications)
-
-
-def test_solo_adviser_create_update_notification_settings(client, snapshot):
-    solo_adviser = PrescriberFactory(membership=False)
-    client.force_login(solo_adviser)
-    url = reverse("dashboard:edit_user_notifications")
-
-    # Fetch available notifications for this user
-    available_notifications = [
-        notification for notification in notifications_registry if notification(solo_adviser).is_manageable_by_user()
-    ]
-
-    # No notification settings defined by default
-    assert not NotificationSettings.objects.exists()
-    assert not DisabledNotification.objects.exists()
-
-    with assertSnapshotQueries(snapshot(name="view queries - enable all notifications")):
-        response = client.post(url, data={notification.__name__: "on" for notification in available_notifications})
-    assert response.status_code == 302
-    assert response["Location"] == "/dashboard/"
-    assertQuerySetEqual(
-        NotificationSettings.objects.all(),
-        [
-            NotificationSettings.objects.get(
-                user=solo_adviser,
-                structure_type=None,
-                structure_pk=None,
-                disabled_notifications__isnull=True,
-            )
-        ],
-    )
-    assert not DisabledNotification.objects.exists()
-
-    # Update, disable all notifications
-    with assertSnapshotQueries(snapshot(name="view queries - disable all notifications")):
-        # Send data to bind to the form, otherwise is_valid() returns False
-        response = client.post(url, {"foo": "bar"})
-    assert response.status_code == 302
-    assert response["Location"] == "/dashboard/"
-    assertQuerySetEqual(
-        NotificationSettings.objects.all(),
-        [
-            NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
-                user=solo_adviser,
-                structure_type=None,
-                structure_pk=None,
                 disabled_notifications__count=len(available_notifications),
             )
         ],

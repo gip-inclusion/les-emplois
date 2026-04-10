@@ -26,7 +26,6 @@ ACTIVITY_MARKUP = "<h3>Son activité</h3>"
         pytest.param(JobSeekerFactory, 403, id="JobSeeker"),
         pytest.param(partial(EmployerFactory, membership=True), 403, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), 403, id="LaborInspector"),
-        pytest.param(PrescriberFactory, 404, id="PrescriberWithoutOrganization"),
         pytest.param(
             partial(PrescriberFactory, membership__organization__authorized=False),
             404,

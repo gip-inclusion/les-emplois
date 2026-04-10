@@ -106,7 +106,7 @@ def test_hide_old_applications_to_employers(client, subtests):
 def test_job_seeker_referent_heading(client):
     DEFAULT_HEADING = "<h3>Qui accompagne ce candidat ?</h3>"
     JOB_SEEKER_HEADING = "<h3>Qui m'accompagne ?</h3>"
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+    job_application = JobApplicationFactory(sent_by_prescriber=True)
     client.force_login(job_application.sender)
     url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)

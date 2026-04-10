@@ -1073,7 +1073,7 @@ def test_list_for_siae_exports(client, snapshot):
 
 
 def test_list_for_siae_exports_as_prescriber(client):
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+    job_application = JobApplicationFactory(sent_by_prescriber=True)
     client.force_login(job_application.sender)
 
     response = client.get(reverse("apply:list_for_siae_exports"))
@@ -1125,7 +1125,7 @@ def test_list_for_siae_exports_download(client, job_app_kwargs, snapshot):
 
 
 def test_list_for_siae_exports_download_as_prescriber(client):
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+    job_application = JobApplicationFactory(sent_by_prescriber=True)
     client.force_login(job_application.sender)
 
     response = client.get(
@@ -2438,7 +2438,7 @@ class TestAutocomplete:
                 assert response.status_code == 403
 
     def test_as_prescriber(self, client):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+        job_application = JobApplicationFactory(sent_by_prescriber=True)
         client.force_login(job_application.sender)
         for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
             response = client.get(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))

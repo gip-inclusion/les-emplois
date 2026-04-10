@@ -17,7 +17,11 @@ from tests.users.factories import (
 
 
 def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect):
-    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"])
+    user = PrescriberFactory(
+        identity_provider=IdentityProvider.DJANGO,
+        email=pro_connect.oidc_userinfo["email"],
+        membership=True,
+    )
     client.force_login(user)
     url = reverse("dashboard:index")
     response = client.get(url, follow=True)
@@ -69,7 +73,7 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     [
         (ItouStaffFactory, True),
         (JobSeekerFactory, True),
-        (PrescriberFactory, False),
+        (partial(PrescriberFactory, membership=True), False),
         (partial(EmployerFactory, membership=True), False),
         (partial(LaborInspectorFactory, membership=True), True),
     ],

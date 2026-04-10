@@ -23,7 +23,7 @@ from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import ItouStaffFactory, PrescriberFactory
+from tests.users.factories import ItouStaffFactory
 
 
 def has_activated_pilotage_in_nexus(user):
@@ -535,13 +535,6 @@ def test_stats_redirect_for_institution(client, institution_kind, dashboard_name
 
     response = client.get(reverse("stats:redirect", kwargs={"dashboard_name": dashboard_name}), follow=True)
     assert response.status_code == 200
-
-
-def test_stats_ph_state_main_for_prescriber_without_organization(client):
-    client.force_login(PrescriberFactory())
-
-    response = client.get(reverse("stats:stats_ph_state_main"))
-    assert response.status_code == 403
 
 
 @freeze_time("2023-03-10")
