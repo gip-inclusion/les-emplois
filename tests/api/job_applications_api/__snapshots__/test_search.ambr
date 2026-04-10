@@ -54,6 +54,7 @@
                  "job_applications_jobapplication"."sender_kind",
                  "job_applications_jobapplication"."sender_company_id",
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."prescriber_advisor_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
@@ -337,7 +338,7 @@
                                  FROM "job_applications_jobapplicationtransitionlog" U0
                                  ORDER BY 1 DESC
                                  LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
-          ORDER BY 45 DESC
+          ORDER BY 46 DESC
           LIMIT 3
         ''',
       }),

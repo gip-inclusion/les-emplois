@@ -16,6 +16,7 @@
     'final_reviewed_assessments__isnull': True,
     'geiqeligibilitydiagnosis__isnull': True,
     'job_applications__isnull': True,
+    'job_applications_recommended__isnull': True,
     'job_applications_sent__isnull': True,
     'jobapplication__isnull': True,
     'jobapplicationcomment__isnull': True,

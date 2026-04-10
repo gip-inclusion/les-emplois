@@ -312,6 +312,7 @@
               "sender_kind" = %s,
               "sender_company_id" = %s,
               "sender_prescriber_organization_id" = NULL,
+              "prescriber_advisor_id" = NULL,
               "to_company_id" = %s,
               "state" = %s,
               "archived_at" = NULL,

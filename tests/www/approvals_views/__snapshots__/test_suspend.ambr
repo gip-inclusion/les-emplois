@@ -499,6 +499,7 @@
                  "job_applications_jobapplication"."sender_kind",
                  "job_applications_jobapplication"."sender_company_id",
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."prescriber_advisor_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
@@ -560,7 +561,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -1145,6 +1146,7 @@
                  "job_applications_jobapplication"."sender_kind",
                  "job_applications_jobapplication"."sender_company_id",
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."prescriber_advisor_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
@@ -1206,7 +1208,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -1891,6 +1893,7 @@
                  "job_applications_jobapplication"."sender_kind",
                  "job_applications_jobapplication"."sender_company_id",
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."prescriber_advisor_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
@@ -1952,7 +1955,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -2537,6 +2540,7 @@
                  "job_applications_jobapplication"."sender_kind",
                  "job_applications_jobapplication"."sender_company_id",
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."prescriber_advisor_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
@@ -2598,7 +2602,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -2622,6 +2626,7 @@
                  "job_applications_jobapplication"."sender_kind",
                  "job_applications_jobapplication"."sender_company_id",
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."prescriber_advisor_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
@@ -2683,7 +2688,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 45 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
