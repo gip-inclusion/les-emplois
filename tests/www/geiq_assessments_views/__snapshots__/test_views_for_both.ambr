@@ -1332,6 +1332,8 @@
                           </i>
                           <span>
                               Filtrer
+                              <span id="all-filters-btn">
+                              </span>
                           </span>
                       </button>
                       <div class="ms-md-auto" id="reset-button-container">
@@ -1541,6 +1543,8 @@
                           </i>
                           <span>
                               Filtrer
+                              <span id="all-filters-btn">
+                              </span>
                           </span>
                       </button>
                       <div class="ms-md-auto" id="reset-button-container">
@@ -1776,6 +1780,8 @@
                           </i>
                           <span>
                               Filtrer
+                              <span id="all-filters-btn">
+                              </span>
                           </span>
                       </button>
                       <div class="ms-md-auto" id="reset-button-container">
@@ -2256,6 +2262,8 @@
                           </i>
                           <span>
                               Filtrer
+                              <span id="all-filters-btn">
+                              </span>
                           </span>
                       </button>
                       <div class="ms-md-auto" id="reset-button-container">
@@ -2433,6 +2441,8 @@
                           </i>
                           <span>
                               Filtrer
+                              <span id="all-filters-btn">
+                              </span>
                           </span>
                       </button>
                       <div class="ms-md-auto" id="reset-button-container">
@@ -2636,6 +2646,8 @@
                           </i>
                           <span>
                               Filtrer
+                              <span id="all-filters-btn">
+                              </span>
                           </span>
                       </button>
                       <div class="ms-md-auto" id="reset-button-container">
