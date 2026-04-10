@@ -13,7 +13,8 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune
-from itou.users.models import User, UserKind
+from itou.users.enums import ActionKind
+from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -700,9 +701,11 @@ def test_filtered_by_eligibility_state(client, url):
         author=prescriber,
         author_prescriber_organization=organization,
         expired=True,
+        # assignment.updated_at is set to diagnosis created_at, which is flaky when expired=True
+        created_at=timezone.now() - datetime.timedelta(days=2),
         job_seeker__first_name="expired eligibility, valid approval",
         job_seeker__last_name="Zorro",
-        with_job_seeker_assignment=True,
+        with_job_seeker_assignment=True,  # assignment.updated_at is one day earlier as expired=True changes created_at
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
     job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
@@ -721,6 +724,8 @@ def test_filtered_by_eligibility_state(client, url):
         author=prescriber,
         author_prescriber_organization=organization,
         expired=True,
+        # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
+        created_at=timezone.now() - datetime.timedelta(days=1),
         job_seeker__first_name="expired eligibility, no approval",
         job_seeker__last_name="Zorro",
         with_job_seeker_assignment=True,
@@ -728,24 +733,24 @@ def test_filtered_by_eligibility_state(client, url):
 
     response = client.get(url, {"eligibility_validated": "on"})
     assert response.context["page_obj"].object_list == [
-        job_seeker_expired_eligibility_valid_approval,
-        job_seeker_valid_eligibility_no_approval,
         job_seeker_valid_eligibility_valid_approval,
+        job_seeker_valid_eligibility_no_approval,
+        job_seeker_expired_eligibility_valid_approval,
     ]
 
     response = client.get(url, {"eligibility_pending": "on"})
     assert response.context["page_obj"].object_list == [
-        job_seeker_expired_eligibility_no_approval,
         job_seeker_valid_geiq_eligibility_no_approval,
+        job_seeker_expired_eligibility_no_approval,
     ]
 
     response = client.get(url, {"eligibility_validated": "on", "eligibility_pending": "on"})
     assert response.context["page_obj"].object_list == [
-        job_seeker_expired_eligibility_no_approval,
-        job_seeker_expired_eligibility_valid_approval,
-        job_seeker_valid_eligibility_no_approval,
         job_seeker_valid_eligibility_valid_approval,
         job_seeker_valid_geiq_eligibility_no_approval,
+        job_seeker_valid_eligibility_no_approval,
+        job_seeker_expired_eligibility_no_approval,
+        job_seeker_expired_eligibility_valid_approval,
     ]
 
 
@@ -760,6 +765,8 @@ def test_filtered_by_approval_state(client, url):
         author=prescriber,
         author_prescriber_organization=organization,
         expired=True,
+        # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
+        created_at=timezone.now() - datetime.timedelta(days=2),
         job_seeker__first_name="expired eligibility, valid approval",
         job_seeker__last_name="Zorro",
         with_job_seeker_assignment=True,
@@ -771,6 +778,8 @@ def test_filtered_by_approval_state(client, url):
         author=prescriber,
         author_prescriber_organization=organization,
         expired=True,
+        # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
+        created_at=timezone.now() - datetime.timedelta(days=1),
         job_seeker__first_name="expired eligibility, expired approval",
         job_seeker__last_name="Zorro",
         with_job_seeker_assignment=True,
@@ -797,15 +806,15 @@ def test_filtered_by_approval_state(client, url):
 
     response = client.get(url, {"pass_iae_expired": "on", "no_pass_iae": "on"})
     assert response.context["page_obj"].object_list == [
-        job_seeker_expired_eligibility_expired_approval,
         job_seeker_valid_eligibility_no_approval,
+        job_seeker_expired_eligibility_expired_approval,
     ]
 
     response = client.get(url, {"pass_iae_active": "on", "pass_iae_expired": "on", "no_pass_iae": "on"})
     assert response.context["page_obj"].object_list == [
+        job_seeker_valid_eligibility_no_approval,
         job_seeker_expired_eligibility_expired_approval,
         job_seeker_expired_eligibility_valid_approval,
-        job_seeker_valid_eligibility_no_approval,
     ]
 
 
@@ -909,12 +918,12 @@ def test_filtered_by_organization_members(client):
 
     response = client.get(url)
     assert response.context["page_obj"].object_list == [
-        job_seeker_applied_by_member,
-        job_seeker_applied_by_old_member,
-        job_seeker_applied_by_user,
         job_seeker_applied_by_user_created_by_user_not_in_orga,
-        job_seeker_created_by_member,
+        job_seeker_applied_by_old_member,
+        job_seeker_applied_by_member,
+        job_seeker_applied_by_user,
         job_seeker_created_by_old_member,
+        job_seeker_created_by_member,
         job_seeker_created_by_user,
     ]
 
@@ -998,29 +1007,37 @@ def test_job_seekers_order(client, url, subtests):
         job_seeker__last_name="Berger",
         with_job_seeker_assignment=True,
     ).job_seeker
+    # Simulate IAE eligibility diagnosis done by prescriber
+    JobSeekerAssignment.objects.upsert_assignment(
+        job_seeker=second_created_job_seeker,
+        professional=prescriber,
+        organization=organization,
+        last_action_kind=ActionKind.IAE_ELIGIBILITY,
+    )
 
     client.force_login(prescriber)
 
     expected_order = {
+        "-last_updated_at": [second_created_job_seeker, a_b_job_seeker, created_job_seeker, c_d_job_seeker],
         "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker, second_created_job_seeker],
         "job_applications_nb": [created_job_seeker, second_created_job_seeker, a_b_job_seeker, c_d_job_seeker],
-        "last_updated_at": [c_d_job_seeker, a_b_job_seeker, created_job_seeker, second_created_job_seeker],
     }
 
     with subtests.test(order="<missing_value>"):
         response = client.get(url)
-        assert response.context["page_obj"].object_list == expected_order["full_name"]
+        assert response.context["page_obj"].object_list == expected_order["-last_updated_at"]
 
     with subtests.test(order="<invalid_value>"):
         response = client.get(url, {"order": "invalid_value"})
-        assert response.context["page_obj"].object_list == expected_order["full_name"]
+        assert response.context["page_obj"].object_list == expected_order["-last_updated_at"]
 
     for order, job_seekers in expected_order.items():
         with subtests.test(order=order):
             response = client.get(url, {"order": order})
             assert response.context["page_obj"].object_list == job_seekers
 
-            response = client.get(url, {"order": f"-{order}"})
+            inverse_order = order[1:] if order[0] == "-" else f"-{order}"
+            response = client.get(url, {"order": inverse_order})
             assert response.context["page_obj"].object_list == list(reversed(job_seekers))
 
 
