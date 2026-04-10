@@ -193,8 +193,11 @@ class TestEmployeeRecordModel:
         """
         employee_record = EmployeeRecordFactory(with_batch_information=True, __sequence=1)
 
-        assert EmployeeRecord.objects.find_by_batch("X", employee_record.asp_batch_line_number).count() == 0
-        assert EmployeeRecord.objects.find_by_batch(employee_record.asp_batch_file, 0).count() == 0
+        # wrong file name
+        assert not EmployeeRecord.objects.find_by_batch("X", employee_record.asp_batch_line_number).exists()
+        # now, the file name is valid, but the line number is not
+        line_number = employee_record.asp_batch_line_number + 1
+        assert not EmployeeRecord.objects.find_by_batch(employee_record.asp_batch_file, line_number).exists()
 
         result = EmployeeRecord.objects.find_by_batch(
             employee_record.asp_batch_file, employee_record.asp_batch_line_number
