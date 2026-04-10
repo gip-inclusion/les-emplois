@@ -111,7 +111,7 @@ def test_queries(client, snapshot):
 
 
 def test_as_unauthorized_prescriber(client, snapshot):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     JobApplicationFactory(
         sent_by_prescriber_alone=True,
         job_seeker__first_name="Supersecretname",
@@ -151,7 +151,7 @@ def test_filtered_by_state(client):
     Thibault wants to filter a list of job applications
     by the default initial state.
     """
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     job_application, *others = JobApplicationFactory.create_batch(
         3, sent_by_prescriber_alone=True, sender=prescriber, state=factory.Iterator(JobApplicationWorkflow.states)
     )
@@ -215,7 +215,7 @@ def test_filtered_by_job_seeker(client):
 
 
 def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     application = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
@@ -251,7 +251,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
 
 
 def test_filtered_by_company(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     job_application, *others = JobApplicationFactory.create_batch(3, sent_by_prescriber_alone=True, sender=prescriber)
     client.force_login(prescriber)
 
@@ -271,9 +271,7 @@ def test_filtered_by_company(client):
 
 
 def test_filtered_by_eligibility_state_prescriber(client):
-    eligibility_validated_jobapp = JobApplicationFactory(
-        sent_by_prescriber_alone=True, with_iae_eligibility_diagnosis=True
-    )
+    eligibility_validated_jobapp = JobApplicationFactory(sent_by_prescriber=True, with_iae_eligibility_diagnosis=True)
     eligibility_pending_jobapp = JobApplicationFactory(
         sent_by_prescriber_alone=True, sender=eligibility_validated_jobapp.sender
     )
@@ -287,7 +285,7 @@ def test_filtered_by_eligibility_state_prescriber(client):
 
 
 def test_list_display_kind(client):
-    prescriber_jobapp = JobApplicationFactory(sent_by_prescriber_alone=True)
+    prescriber_jobapp = JobApplicationFactory(sent_by_prescriber=True)
     client.force_login(prescriber_jobapp.sender)
     url = reverse("apply:list_prescriptions")
 
@@ -309,7 +307,7 @@ def test_list_display_kind(client):
 
 
 def test_filters(client, snapshot):
-    client.force_login(PrescriberFactory())
+    client.force_login(PrescriberFactory(membership=True))
 
     response = client.get(reverse("apply:list_prescriptions"))
     assert response.status_code == 200
@@ -318,7 +316,7 @@ def test_filters(client, snapshot):
 
 
 def test_archived(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     active = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
     archived = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, archived_at=timezone.now())
     archived_badge_html = """\
@@ -371,7 +369,7 @@ def test_archived(client):
 
 
 def test_htmx_filters(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
     JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, state=JobApplicationState.ACCEPTED)
     client.force_login(prescriber)
 
@@ -431,15 +429,7 @@ def test_list_and_table_empty_snapshot(client, snapshot):
         assert pretty_indented(page) == snapshot(name="empty")
 
 
-def test_exports_without_organization(client):
-    client.force_login(PrescriberFactory())
-
-    response = client.get(reverse("apply:list_prescriptions_exports"))
-    assert_previous_step(response, reverse("dashboard:index"))
-    assertNotContains(response, BESOIN_DUN_CHIFFRE)
-
-
-def test_exports_with_organization(client):
+def test_exports_as_prescriber(client):
     client.force_login(PrescriberFactory(membership=True))
 
     response = client.get(reverse("apply:list_prescriptions_exports"))
@@ -470,7 +460,7 @@ def test_exports_as_employer(client):
 
 
 def test_exports_back_to_list(client):
-    client.force_login(PrescriberFactory())
+    client.force_login(PrescriberFactory(membership=True))
 
     response = client.get(
         reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
@@ -482,7 +472,9 @@ def test_exports_back_to_list(client):
 @freeze_time("2024-08-18")
 def test_exports_download(client, snapshot):
     job_application = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
+        sent_by_prescriber=True,
+        sender_prescriber_organization__for_snapshot=True,
+        sender_prescriber_organization__membership__user__for_snapshot=True,
         for_snapshot=True,
         with_iae_eligibility_diagnosis=True,
         to_company__kind=CompanyKind.EI,
@@ -526,7 +518,7 @@ def test_exports_download_as_employer(client):
 
 
 def test_exports_download_by_month(client):
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+    job_application = JobApplicationFactory(sent_by_prescriber=True)
     client.force_login(job_application.sender)
 
     response = client.get(
@@ -540,7 +532,7 @@ def test_exports_download_by_month(client):
 
 
 def test_reset_filter_button_snapshot(client, snapshot):
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+    job_application = JobApplicationFactory(sent_by_prescriber=True)
     client.force_login(job_application.sender)
 
     filter_params = {"states": [job_application.state]}
@@ -567,7 +559,7 @@ def test_reset_filter_button_snapshot(client, snapshot):
 
 def test_order(client, subtests):
     zorro_application = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
+        sent_by_prescriber=True,
         job_seeker__first_name="Zorro",
         job_seeker__last_name="Don Diego",
     )

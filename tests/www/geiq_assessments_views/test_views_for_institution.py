@@ -36,7 +36,7 @@ class TestListAssessmentsView:
         url = reverse("geiq_assessments_views:list_for_institution")
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
@@ -226,7 +226,7 @@ class TestAssessmentDetailsForInstitutionView:
         url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
@@ -680,7 +680,7 @@ class TestAssessmentReviewView:
         url = reverse("geiq_assessments_views:assessment_review", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
@@ -691,7 +691,7 @@ class TestAssessmentReviewView:
         url = reverse("geiq_assessments_views:assessment_print", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:

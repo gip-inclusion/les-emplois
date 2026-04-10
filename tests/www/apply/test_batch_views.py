@@ -17,7 +17,7 @@ from tests.utils.testing import get_session_name
 
 class TestBatchArchive:
     def test_invalid_access(self, client):
-        archivable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED)
+        archivable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.REFUSED)
         assert archivable_app.can_be_archived
         for user in [archivable_app.job_seeker, archivable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -268,7 +268,7 @@ class TestBatchAddToPool:
     FAKE_ANSWER = "Lorem ipsum added to poolum"
 
     def test_invalid_access(self, client):
-        addable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.PROCESSING)
+        addable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.PROCESSING)
         assert addable_app.add_to_pool.is_available()
         for user in [addable_app.job_seeker, addable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -566,7 +566,7 @@ class TestBatchPostpone:
     FAKE_ANSWER = "Lorem ipsum postponed"
 
     def test_invalid_access(self, client):
-        postponable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.PROCESSING)
+        postponable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.PROCESSING)
         assert postponable_app.postpone.is_available()
         for user in [postponable_app.job_seeker, postponable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -858,7 +858,7 @@ class TestBatchPostpone:
 
 class TestBatchProcess:
     def test_invalid_access(self, client):
-        processable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.NEW)
+        processable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         assert processable_app.process.is_available()
         for user in [processable_app.job_seeker, processable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -1108,7 +1108,7 @@ class TestBatchRefuse:
     FAKE_PRESCRIBER_ANSWER = "Lorem ipsum prescribum"
 
     def test_invalid_access(self, client):
-        refusable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.NEW)
+        refusable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         assert refusable_app.refuse.is_available()
         for user in [refusable_app.job_seeker, refusable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)
@@ -1698,7 +1698,7 @@ class TestBatchRefuse:
 
 class TestBatchTransfer:
     def test_invalid_access(self, client):
-        transferable_app = JobApplicationFactory(sent_by_prescriber_alone=True, state=JobApplicationState.NEW)
+        transferable_app = JobApplicationFactory(sent_by_prescriber=True, state=JobApplicationState.NEW)
         company = CompanyFactory(with_membership=True)
         assert transferable_app.transfer.is_available()
         for user in [transferable_app.job_seeker, transferable_app.sender, LaborInspectorFactory(membership=True)]:
@@ -1980,7 +1980,7 @@ class TestBatchTransfer:
 class TestBatchUnarchive:
     def test_invalid_access(self, client):
         unarchivable_app = JobApplicationFactory(
-            sent_by_prescriber_alone=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+            sent_by_prescriber=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
         )
         for user in [unarchivable_app.job_seeker, unarchivable_app.sender, LaborInspectorFactory(membership=True)]:
             client.force_login(user)

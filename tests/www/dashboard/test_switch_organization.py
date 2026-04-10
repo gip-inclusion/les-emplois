@@ -144,7 +144,7 @@ class TestSwitchOrganization:
 
         for user in (
             JobSeekerFactory(),
-            PrescriberFactory(),
+            PrescriberFactory(membership=True),
         ):
             client.force_login(user)
             url = reverse("dashboard:switch_organization")

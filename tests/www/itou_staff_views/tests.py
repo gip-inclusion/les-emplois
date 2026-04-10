@@ -69,7 +69,7 @@ class TestExportJobApplications:
         [
             (JobSeekerFactory, {}, 403),
             (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {}, 403),
+            (PrescriberFactory, {"membership": True}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
@@ -180,7 +180,7 @@ class TestExportPEApiRejections:
         [
             (JobSeekerFactory, {}, 403),
             (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {}, 403),
+            (PrescriberFactory, {"membership": True}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 302),  # redirects to dashboard if no file
@@ -244,7 +244,7 @@ class TestExportCTA:
         [
             (JobSeekerFactory, {}, 403),
             (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {}, 403),
+            (PrescriberFactory, {"membership": True}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
@@ -290,7 +290,7 @@ class TestImportAciConvergencePHC:
         [
             (JobSeekerFactory, {}, 403),
             (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {}, 403),
+            (PrescriberFactory, {"membership": True}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
@@ -376,7 +376,7 @@ class TestMergeUsers:
         [
             (JobSeekerFactory, {"for_snapshot": True}, 403),
             (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {}, 403),
+            (PrescriberFactory, {"membership": True}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
@@ -1148,7 +1148,7 @@ class TestOTP:
         [
             (JobSeekerFactory, 403),
             (partial(EmployerFactory, membership=True), 403),
-            (PrescriberFactory, 403),
+            (partial(PrescriberFactory, membership=True), 403),
             (partial(LaborInspectorFactory, membership=True), 403),
             (ItouStaffFactory, 200),
         ],
@@ -1321,7 +1321,7 @@ class TestExportFS3437:
         [
             pytest.param(JobSeekerFactory, {}, 403, id="job_seeker"),
             pytest.param(EmployerFactory, {"membership": True}, 403, id="employer"),
-            pytest.param(PrescriberFactory, {}, 403, id="prescriber"),
+            pytest.param(PrescriberFactory, {"membership": True}, 403, id="prescriber"),
             pytest.param(LaborInspectorFactory, {"membership": True}, 403, id="labor_inspector"),
             pytest.param(ItouStaffFactory, {}, 302, id="staff"),
             pytest.param(ItouStaffFactory, {"is_superuser": True}, 200, id="superuser"),
@@ -1379,7 +1379,7 @@ class TestImportFS3437FromAsp:
         [
             (JobSeekerFactory, {}, 403),
             (EmployerFactory, {"membership": True}, 403),
-            (PrescriberFactory, {}, 403),
+            (PrescriberFactory, {"membership": True}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),

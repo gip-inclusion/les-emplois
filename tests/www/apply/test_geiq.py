@@ -79,7 +79,7 @@ class TestJobApplicationGEIQEligibilityDetails:
 
     @pytest.mark.parametrize("viewer_kind", ["company", "jobseeker", "prescriber"])
     def test_without_diagnosis(self, client, viewer_kind):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, to_company__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(sent_by_prescriber=True, to_company__kind=CompanyKind.GEIQ)
 
         response = self.get_response(client, job_application, viewer_kind)
 
@@ -183,7 +183,8 @@ class TestJobApplicationGEIQEligibilityDetails:
         """An accepted application without a diagnosis should not display an unlinked expired diagnosis as valid."""
         expired_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True,
+            sent_by_prescriber=True,
+            sender_prescriber_organization=expired_diagnosis.author_prescriber_organization,
             state=JobApplicationState.ACCEPTED,
             to_company__kind=CompanyKind.GEIQ,
             job_seeker=expired_diagnosis.job_seeker,

@@ -214,7 +214,7 @@ class TestApply:
 
     def test_404_when_trying_to_apply_for_a_prescriber(self, client):
         company = CompanyFactory(with_jobs=True)
-        prescriber = PrescriberFactory()
+        prescriber = PrescriberFactory(membership=True)
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, company, prescriber, {})
         for viewname in (
@@ -370,7 +370,7 @@ class TestApply:
             params |= {"job_description_id": job_description.pk}
             expected_session |= {"selected_jobs": [job_description.pk]}
 
-        client.force_login(PrescriberFactory())
+        client.force_login(PrescriberFactory(membership=True))
         url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(url, params)
 
@@ -1631,8 +1631,7 @@ class TestApplyAsPrescriber:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        user = PrescriberFactory()
-        client.force_login(user)
+        client.force_login(PrescriberFactory(membership=True))
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
@@ -1651,8 +1650,9 @@ class TestApplyAsPrescriber:
         reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
-        user = PrescriberFactory()
-        client.force_login(user)
+        prescriber = PrescriberFactory()
+        organization = PrescriberMembershipFactory(user=prescriber).organization
+        client.force_login(prescriber)
 
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
@@ -1911,7 +1911,7 @@ class TestApplyAsPrescriber:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
 
-        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization is None
+        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == organization
 
         next_url = reverse(
             "apply:application_jobs",
@@ -1923,7 +1923,7 @@ class TestApplyAsPrescriber:
         # Check GPS group
         # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
+            follow_up_group__beneficiary=new_job_seeker, member=prescriber
         ).get()
         membership.delete()  # delete it to check it is created again when applying
 
@@ -1931,8 +1931,8 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            professional=user,
-            prescriber_organization=None,
+            professional=prescriber,
+            prescriber_organization=organization,
             last_action_kind=ActionKind.CREATE,
         ).get()
         assignment.delete()  # delete it to check it is created again when applying
@@ -1974,11 +1974,11 @@ class TestApplyAsPrescriber:
                 },
             )
 
-        job_application = JobApplication.objects.get(sender=user, to_company=company)
+        job_application = JobApplication.objects.get(sender=prescriber, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_company is None
-        assert job_application.sender_prescriber_organization is None
+        assert job_application.sender_prescriber_organization == organization
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
@@ -1998,15 +1998,15 @@ class TestApplyAsPrescriber:
         # Check GPS group again
         # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
+            follow_up_group__beneficiary=new_job_seeker, member=prescriber
         ).exists()
 
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            professional=user,
-            prescriber_organization=None,
+            professional=prescriber,
+            prescriber_organization=organization,
             last_action_kind=ActionKind.APPLY,
         ).exists()
 
@@ -2044,7 +2044,7 @@ class TestApplyAsPrescriber:
     @pytest.mark.parametrize("handled_by_proxy", [True, False])
     def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_birthdate(self, client, handled_by_proxy):
         company = CompanyFactory(with_membership=True)
-        prescriber = PrescriberFactory()
+        prescriber = PrescriberFactory(membership=True)
         client.force_login(prescriber)
         job_seeker = JobSeekerFactory(
             jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
@@ -2096,7 +2096,7 @@ class TestApplyAsPrescriber:
     @pytest.mark.parametrize("handled_by_proxy", [True, False])
     def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_pole_emploi_id(self, client, handled_by_proxy):
         company = CompanyFactory(with_membership=True)
-        prescriber = PrescriberFactory()
+        prescriber = PrescriberFactory(membership=True)
         client.force_login(prescriber)
         job_seeker = JobSeekerFactory(
             jobseeker_profile__birthdate=None,  # Make sure the view is accessible
@@ -3149,7 +3149,7 @@ class TestApplicationView:
 
 class TestApplicationEndView:
     def test_update_job_seeker(self, client):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker__with_mocked_address=True)
+        job_application = JobApplicationFactory(sent_by_prescriber=True, job_seeker__with_mocked_address=True)
         job_seeker = job_application.job_seeker
         # Ensure sender cannot update job seeker infos
         assert job_seeker.address_line_2 == ""
@@ -3965,7 +3965,7 @@ class TestApplicationGEIQEligibilityView:
         # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
         job_seeker = JobSeekerFactory()
 
-        client.force_login(PrescriberFactory())
+        client.force_login(PrescriberFactory(membership=True))
         apply_session = fake_session_initialization(
             client, self.geiq, job_seeker, {"selected_jobs": self.geiq.job_description_through.all()}
         )
@@ -4319,7 +4319,7 @@ class TestCheckPreviousApplicationsView:
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_prescriber(self, client, snapshot):
-        prescriber = PrescriberFactory()
+        prescriber = PrescriberFactory(membership=True)
         self._login_and_setup_session(client, prescriber)
 
         # Create a very recent application

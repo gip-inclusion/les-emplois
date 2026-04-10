@@ -43,7 +43,7 @@ class TestAssessmentContractsListAndToggle:
         url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
@@ -458,7 +458,7 @@ class TestAssessmentContractsDetails:
         )
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
@@ -720,7 +720,7 @@ class TestAssessmentContractsExportView:
         url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:

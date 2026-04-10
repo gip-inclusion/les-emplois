@@ -399,7 +399,7 @@ class TestProcessViews:
 
     def test_details_archived(self, client):
         job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True,
+            sent_by_prescriber=True,
             archived_at=datetime.datetime(2024, 9, 2, 11, 11, 11, tzinfo=timezone.get_current_timezone()),
         )
         to_company = job_application.to_company
@@ -667,7 +667,7 @@ class TestProcessViews:
 
     def test_details_for_unauthorized_prescriber(self, client):
         """As an unauthorized prescriber I cannot access personal information of arbitrary job seekers"""
-        prescriber = PrescriberFactory(phone="0612345678", email="prescriber@mailinator.com")
+        prescriber = PrescriberFactory(phone="0612345678", email="prescriber@mailinator.com", membership=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Supersecretname",
@@ -750,7 +750,7 @@ class TestProcessViews:
         for user in [
             JobSeekerFactory(),
             EmployerFactory(membership=True),
-            PrescriberFactory(),
+            PrescriberFactory(membership=True),
             LaborInspectorFactory(membership=True),
         ]:
             with subtests.test(user_kind=user.kind.label):
@@ -1812,19 +1812,6 @@ class TestProcessViews:
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
         job_application.sender_prescriber_organization.save(update_fields=["authorization_status", "updated_at"])
-        response = client.get(
-            reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        )
-        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-
-        # Remove prescriber's organization membership (ie. considered as "orienteur solo")
-        job_application.sender_prescriber_organization.members.clear()
-        job_application.sender_prescriber_organization = None
-        job_application.save(update_fields=["sender_prescriber_organization", "updated_at"])
         response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )
