@@ -694,17 +694,12 @@
 # ---
 # name: TestJobDescriptionCardView.test_job_description_card
   dict({
-    'num_queries': 4,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'JobDescriptionCardView.setup[www/companies_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -792,12 +787,6 @@
                  AND "companies_jobdescription"."id" = %s)
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

@@ -24,6 +24,7 @@ from itou.openid_connect.models import (
 from itou.openid_connect.utils import init_user_nir_from_session
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
+from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_absolute_url
 
 
@@ -63,7 +64,10 @@ def france_connect_authorize(request):
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
+# This view expects a GET but is not readonly (it is likely to create/update an user):
+# we need a transaction and a postgres context for our triggers
 @login_not_required
+@readonly_view(except_methods=["GET"])
 def france_connect_callback(request):
     state = request.GET.get("state")
     fc_state = FranceConnectState.get_from_state(state)

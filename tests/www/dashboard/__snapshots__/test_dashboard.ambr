@@ -50,7 +50,7 @@
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 26,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -426,14 +426,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'add_city_name_attr[search/models.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "search_savedsearch"."id",
@@ -450,6 +445,7 @@
         'origin': list([
           '_employer_dashboard_context[www/dashboard/views.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."state" AS "state"
@@ -465,6 +461,7 @@
           'Company.convention_can_be_accessed_by[companies/models.py]',
           '_employer_dashboard_context[www/dashboard/views.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -487,6 +484,7 @@
         'origin': list([
           '_employer_dashboard_context[www/dashboard/views.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -502,6 +500,7 @@
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
           '_employer_dashboard_context[www/dashboard/views.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
@@ -520,6 +519,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -540,6 +540,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -564,6 +565,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -580,6 +582,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -622,6 +625,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -640,6 +644,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -668,6 +673,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -709,12 +715,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -744,7 +744,7 @@
 # ---
 # name: TestDashboardView.test_jobseeker_approval_card[job seeker with approval queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -808,14 +808,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'add_city_name_attr[search/models.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "search_savedsearch"."id",
@@ -833,6 +828,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_for_job_seeker[eligibility/models/iae.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1014,6 +1010,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_for_job_seeker[eligibility/models/iae.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1045,6 +1042,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_for_job_seeker[eligibility/models/iae.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -1066,6 +1064,7 @@
         'origin': list([
           'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id",
@@ -1198,6 +1197,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1236,6 +1236,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1260,6 +1261,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -1292,6 +1294,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1336,6 +1339,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
           'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1362,12 +1366,6 @@
           ORDER BY "approvals_approval"."created_at" ASC
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

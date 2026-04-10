@@ -36,6 +36,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_absolute_url, get_safe_url, get_zendesk_form_url
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
@@ -236,7 +237,10 @@ def _get_user_info(request, access_token):
     return _decode_token(response.content), None
 
 
+# This view expects a GET but is not readonly (it is likely to create/update an user):
+# we need a transaction and a postgres context for our triggers
 @login_not_required
+@readonly_view(except_methods=["GET"])
 def pro_connect_callback(request):
     code = request.GET.get("code")
     state = request.GET.get("state")

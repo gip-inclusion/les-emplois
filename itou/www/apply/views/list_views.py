@@ -3,7 +3,7 @@ import functools
 from collections import defaultdict
 
 from django.conf import settings
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Exists, F, OuterRef, Value
 from django.db.models.functions import Coalesce, Concat, Lower, NullIf
 from django.http import Http404, JsonResponse
@@ -24,6 +24,7 @@ from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_view_personal_information
+from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ArchivedChoices,
@@ -165,6 +166,7 @@ def _add_geiq_eligibility_diagnoses(job_applications):
             )
 
 
+@readonly_view
 @check_user(lambda u: u.is_job_seeker)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
     """
@@ -238,6 +240,7 @@ def annotate_title(base_title, archived_choice):
             raise ValueError(archived_choice)
 
 
+@readonly_view
 @check_request(lambda request: request.from_employer or request.from_prescriber)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
@@ -315,6 +318,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     )
 
 
+@readonly_view
 @check_request(lambda request: request.from_employer or request.from_prescriber)
 def list_prescriptions_exports(request, template_name="apply/list_of_available_exports.html"):
     """
@@ -335,6 +339,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
     return render(request, template_name, context)
 
 
+@readonly_view
 @check_request(lambda request: request.from_employer or request.from_prescriber)
 def list_prescriptions_exports_download(request, month_identifier=None):
     """
@@ -353,6 +358,7 @@ def list_prescriptions_exports_download(request, month_identifier=None):
     return stream_xlsx_export(job_applications, filename, request=request)
 
 
+@readonly_view
 def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
@@ -440,6 +446,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     )
 
 
+@readonly_view
 def list_for_siae_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a SIAE, sorted by month, displaying the count of applications per month
@@ -461,6 +468,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
     return render(request, template_name, context)
 
 
+@readonly_view
 def list_for_siae_exports_download(request, month_identifier=None):
     """
     List of applications for a SIAE for a given month identifier (YYYY-mm),
@@ -479,6 +487,7 @@ def list_for_siae_exports_download(request, month_identifier=None):
     return stream_xlsx_export(job_applications, filename, request=request)
 
 
+@readonly_view
 @check_request(lambda request: request.from_employer)
 def list_for_siae_actions(request):
     company = get_current_company_or_404(request)
@@ -557,7 +566,7 @@ def list_for_siae_actions(request):
     return response
 
 
-@transaction.non_atomic_requests
+@readonly_view
 @check_request(lambda request: request.from_employer or request.from_prescriber)
 def autocomplete(request, list_kind, field_name):
     if list_kind == JobApplicationsListKind.RECEIVED:
