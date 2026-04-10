@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -51,6 +51,7 @@ from itou.www.geiq_assessments_views.forms import (
     CreateForm,
     GeiqCommentForm,
     ReviewForm,
+    get_field_label_from_instance_funcs,
 )
 
 
@@ -571,13 +572,15 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     elif request.from_institution:
         stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
 
-    # Initializing the filter form with the raw parameters
-    filters_form = ContractFilterForm(request.GET or None)
-
     contracts_qs = (
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
         .select_related("employee__assessment")
         .order_by("employee__last_name", "employee__first_name")
+    )
+
+    # Initializing the filter form with the raw parameters
+    filters_form = ContractFilterForm(
+        data=request.GET, employee_contracts_qs=contracts_qs, request=request, assessment_pk=assessment.pk
     )
 
     contracts_qs = filters_form.filter(contracts_qs)
@@ -1017,3 +1020,44 @@ def assessment_print(request, pk, template_name="geiq_assessments_views/assessme
     }
 
     return render(request, template_name, context)
+
+
+def employee_autocomplete(request, assessment_pk, field_name):
+    if field_name != "employee":
+        raise Http404
+    term = request.GET.get("term", "")
+
+    field_display, qs_infos = get_field_label_from_instance_funcs(field_name, request)
+
+    contracts = EmployeeContract.objects.filter(employee__assessment_id=assessment_pk)
+    if request.from_employer:
+        contracts = contracts.filter(employee__assessment__companies=request.current_organization)
+    elif request.from_institution:
+        contracts = contracts.filter(employee__assessment__institutions=request.current_organization)
+
+    fields = qs_infos["fields"]
+    if term:
+        term_queries = []
+        for bit in term.split():
+            or_queries = models.Q.create(
+                [(f"{field}__{qs_infos['lookup']}", bit) for field in fields],
+                connector=models.Q.OR,
+            )
+            term_queries.append(or_queries)
+        contracts = contracts.filter(models.Q.create(term_queries))
+    results = []
+    if term:
+        objects = [
+            getattr(contract, field_name)
+            for contract in contracts.order_by(*fields, f"{field_name}_id")
+            .distinct(*fields, f"{field_name}_id")
+            .select_related(field_name)[:20]
+        ]
+        for obj in objects:
+            results.append(
+                {
+                    "id": str(obj.pk),
+                    "text": field_display(obj),
+                }
+            )
+    return JsonResponse({"results": results}, safe=False)

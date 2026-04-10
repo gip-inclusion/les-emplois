@@ -1,15 +1,16 @@
 from django import forms
 from django.forms import widgets
+from django.urls import reverse
 from django.utils import timezone
 
 from itou.files.forms import ItouFileField
-from itou.geiq_assessments.models import Assessment
+from itou.geiq_assessments.models import Assessment, Employee
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
 from itou.utils.templatetags.format_filters import format_int_euros
 from itou.utils.types import InclusiveDateRange
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 
 
 class CreateForm(forms.Form):
@@ -227,6 +228,22 @@ class ReviewForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+def get_field_label_from_instance_funcs(field_name, request):
+    fields_display = {
+        "employee": lambda employee: employee.get_full_name(),
+    }
+    qs_infos = {
+        "employee": {
+            "fields": (
+                "employee__first_name",
+                "employee__last_name",
+            ),
+            "lookup": "unaccent__istartswith",
+        },
+    }
+    return fields_display[field_name], qs_infos[field_name]
+
+
 class ContractFilterForm(forms.Form):
     """
     Allow users to filter the list of contracts.
@@ -255,6 +272,47 @@ class ContractFilterForm(forms.Form):
     allowance_requested_off = forms.BooleanField(label="Non", required=False)
     allowance_eligibility_on = forms.BooleanField(label="Oui", required=False)
     allowance_eligibility_off = forms.BooleanField(label="Non", required=False)
+    employee = forms.ModelChoiceField(
+        queryset=Employee.objects.all(),
+        label="Nom du salarié",
+        required=False,
+        widget=RemoteAutocompleteSelect2Widget(
+            attrs={
+                "class": "django-select2",
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 1,
+                "data-placeholder": "Nom du salarié",
+            }
+        ),
+    )
+
+    def _configure_autocomplete_field(
+        self, form_field_name, model_field_name, request, autocomplete_view_name=None, assessment_pk=None
+    ):
+        self.fields[form_field_name].widget.label_from_instance = get_field_label_from_instance_funcs(
+            model_field_name, request
+        )[0]
+        self.fields[form_field_name].queryset = self.fields[form_field_name].queryset.filter(
+            pk__in=self.employee_contracts_qs.values_list(f"{model_field_name}_id", flat=True).distinct()
+        )
+        kwargs = {"field_name": model_field_name}
+        if assessment_pk is not None:
+            kwargs["assessment_pk"] = assessment_pk
+        self.fields[form_field_name].widget.attrs["data-ajax--url"] = reverse(autocomplete_view_name, kwargs=kwargs)
+
+    def __init__(self, employee_contracts_qs, *args, request, assessment_pk, **kwargs):
+        self.employee_contracts_qs = employee_contracts_qs
+        super().__init__(*args, **kwargs)
+
+        self._configure_autocomplete_field(
+            "employee",
+            "employee",
+            request,
+            autocomplete_view_name="geiq_assessments_views:employee_autocomplete",
+            assessment_pk=assessment_pk,
+        )
 
     def clean(self):
         """
@@ -327,6 +385,10 @@ class ContractFilterForm(forms.Form):
                 queryset = queryset.filter(allowance_granted=False)
             case _:
                 pass
+
+        employee = self.cleaned_data.get("employee")
+        if employee:
+            queryset = queryset.filter(employee=employee)
 
         return queryset
 
