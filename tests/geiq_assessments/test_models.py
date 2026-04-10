@@ -8,6 +8,7 @@ from itou.geiq_assessments.models import AssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import (
+    AssessmentCampaignFactory,
     AssessmentFactory,
     EmployeeContractFactory,
     EmployeeFactory,
@@ -17,20 +18,60 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory
 
 
-def test_campaign_review_after_submission_constraint():
+def test_campaign_is_open_property():
+    today = timezone.localdate()
+    # Campaign not open yet
+    campaign = AssessmentCampaignFactory(
+        year=today.year,
+        opening_date=today + datetime.timedelta(days=1),
+        submission_deadline=today + datetime.timedelta(days=30),
+    )
+    assert not campaign.is_open
+
+    # Campaign currently open
+    campaign = AssessmentCampaignFactory(
+        year=today.year + 1,
+        opening_date=today - datetime.timedelta(days=1),
+        submission_deadline=today + datetime.timedelta(days=1),
+    )
+    assert campaign.is_open
+
+    # Campaign closed (submission deadline passed)
+    campaign = AssessmentCampaignFactory(
+        year=today.year + 2,
+        opening_date=today - datetime.timedelta(days=30),
+        submission_deadline=today - datetime.timedelta(days=1),
+    )
+    assert not campaign.is_open
+
+
+def test_campaign_date_constraints():
     june_1st = datetime.date(2024, 6, 1)
+    june_2nd = datetime.date(2024, 6, 2)
     july_1st = datetime.date(2024, 7, 1)
     with pytest.raises(IntegrityError):
         with transaction.atomic():
             AssessmentCampaign.objects.create(
                 year=2023,
+                # Submission deadline must be earlier than the review deadline.
+                opening_date=june_1st,
                 submission_deadline=july_1st,
-                review_deadline=june_1st,
+                review_deadline=june_2nd,
+            )
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            AssessmentCampaign.objects.create(
+                year=2023,
+                # Opening date must be earlier than the submission deadline.
+                opening_date=june_2nd,
+                submission_deadline=june_1st,
+                review_deadline=july_1st,
             )
     # Use consistent dates
     AssessmentCampaign.objects.create(
         year=2023,
-        submission_deadline=june_1st,
+        opening_date=june_1st,
+        submission_deadline=june_2nd,
         review_deadline=july_1st,
     )
 

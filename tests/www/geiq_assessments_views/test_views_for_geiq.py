@@ -75,19 +75,40 @@ class TestListAssessmentsView:
         assert response.status_code == 200
 
     def test_empty_list(self, client, settings, snapshot):
+        url_list = reverse("geiq_assessments_views:list_for_geiq")
+        url_create = reverse("geiq_assessments_views:create")
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+
+        # We first make sure the assessment creation link is removed from the page if there is no campaign at all.
         client.force_login(membership.user)
-        response = client.get(reverse("geiq_assessments_views:list_for_geiq"))
-        assertContains(response, reverse("geiq_assessments_views:create"))
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="assessments empty list")
+        response = client.get(url_list)
+        assertNotContains(response, url_create)
+
+        # We expect the same behavior after creating an outdated campaign.
+        campaign = AssessmentCampaignFactory(is_closed=True)
+        assert not campaign.is_open
+        response = client.get(url_list)
+        # Snapshot for when there is no currently open campaign.
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="assessments empty list no open campaign"
+        )
+
+        # Now we create a currently open campaign, so the page should display a link to create a new assessment.
+        campaign = AssessmentCampaignFactory()
+        assert campaign.is_open
+        response = client.get(url_list)
+        # Snapshot for when there is a currently open campaign.
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="assessments empty list open campaign"
+        )
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_complex_list(self, client, settings, snapshot):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        campaign = AssessmentCampaignFactory()
         new_assessment = AssessmentFactory(
             id=uuid.UUID("00000000-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
@@ -177,9 +198,14 @@ class TestCreateAssessmentView:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = []
 
         response = client.get(reverse("geiq_assessments_views:create"))
-        assert response.status_code == 403
+        assert response.status_code == 403  # Cannot create an assessment if there is no campaign at all.
 
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        response = client.get(reverse("geiq_assessments_views:create"))
+        assert response.status_code == 403  # Cannot create an assessment if there is no currently open campaign.
+
+        campaign = AssessmentCampaignFactory()
+        assert campaign.is_open
         response = client.get(reverse("geiq_assessments_views:create"))
         assert response.status_code == 200
 
@@ -188,10 +214,13 @@ class TestCreateAssessmentView:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
         response = client.get(reverse("geiq_assessments_views:create"))
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no campaign or data")
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        assert (
+            response.status_code == 403
+        )  # Must not be able to create an assessment if there is no currently open campaign.
+        campaign = AssessmentCampaignFactory()
         response = client.get(reverse("geiq_assessments_views:create"))
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no campaign or data")
+        campaign = AssessmentCampaignFactory()
         LabelInfos.objects.create(campaign=campaign, data=[])
         response = client.get(reverse("geiq_assessments_views:create"))
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="unknown SIRET")
@@ -214,7 +243,7 @@ class TestCreateAssessmentView:
             department=35,  # The DREETS matching deets
         )
         client.force_login(membership.user)
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        campaign = AssessmentCampaignFactory()
         LabelInfos.objects.create(
             campaign=campaign,
             data=[
@@ -265,7 +294,7 @@ class TestCreateAssessmentView:
             department=35,  # The DREETS matching deets
         )
         client.force_login(membership.user)
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        campaign = AssessmentCampaignFactory()
         other_antenna = CompanyFactory(siret="12345678903456", kind=CompanyKind.GEIQ)
         non_geiq_antenna = CompanyFactory(siret="12345678902345", kind=CompanyKind.ACI)
         LabelInfos.objects.create(

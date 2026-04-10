@@ -113,7 +113,7 @@ class TestListAssessmentsView:
             institution__name="Un DREETS GEIQ",
         )
         client.force_login(membership.user)
-        campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
+        campaign = AssessmentCampaignFactory()
         new_assessment = AssessmentFactory(
             id=uuid.UUID("00000000-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
