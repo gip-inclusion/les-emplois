@@ -59,6 +59,35 @@
                     {% elif warning == LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION %}
                         <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
                         <p>Veuillez vous faire inviter par un collaborateur de votre institution afin de pouvoir accéder au service.</p>
+                    {% elif warning == LogoutWarning.NO_ORGANIZATION %}
+                        <p>L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.</p>
+
+                        <ul>
+                            <li>
+                                Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a class="btn-link" href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                            </li>
+                            <li>
+                                Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
+                            </li>
+                            <li>
+                                Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
+                            </li>
+                            <li>
+                                Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'account_logout' %}?next={% url 'signup:choose_user_kind' %}" class="js-prevent-multiple-submit">
+                                    {% csrf_token %}
+                                    Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
+                                    <button type="submit" class="btn-link" aria-label="Se déconnecter">cliquez-ici</button>
+                                    .
+                                </form>
+                            </li>
+                        </ul>
+                        <p>
+                            En cas de besoin, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}" class="btn-link has-external-link" target="_blank">contacter notre support technique</a>.
+                        </p>
+                        <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
                     {% endif %}
                     <div class="row">
                         <div class="col-2">

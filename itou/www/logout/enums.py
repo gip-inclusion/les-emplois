@@ -6,6 +6,7 @@ class LogoutWarning(enum.StrEnum):
     EMPLOYER_INACTIVE_COMPANY = "employer_inactive_company"
     FT_NO_FT_ORGANIZATION = "ft_no_ft_organization"
     LABOR_INSPECTOR_NO_INSTITUTION = "labor_inspector_no_institution"
+    NO_ORGANIZATION = "no_organization"
 
     # Make the Enum work in Django's templates
     # See :

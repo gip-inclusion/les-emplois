@@ -48,7 +48,7 @@
 # ---
 # name: TestSavedSearches.test_display_saved_searches_and_delete_modal[/dashboard/][SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -377,6 +377,31 @@
           FROM "cities_city"
           WHERE "cities_city"."slug" IN (%s)
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "users_user"
+          WHERE EXISTS
+              (SELECT %s AS "a"
+               FROM "users_jobseekerassignment" U0
+               INNER JOIN "users_user" U4 ON (U0."job_seeker_id" = U4."id")
+               INNER JOIN "users_jobseekerprofile" U5 ON (U4."id" = U5."user_id")
+               WHERE (((U0."company_id" IS NULL
+                        AND U0."prescriber_organization_id" IS NULL
+                        AND U0."professional_id" = %s)
+                       OR (U0."company_id" IS NULL
+                           AND U0."prescriber_organization_id" = %s
+                           AND U0."professional_id" = %s))
+                      AND U5."is_stalled"
+                      AND NOT (U5."is_not_stalled_anymore"
+                               AND U5."is_not_stalled_anymore" IS NOT NULL)
+                      AND U0."job_seeker_id" = ("users_user"."id"))
+               LIMIT 1)
         ''',
       }),
       dict({

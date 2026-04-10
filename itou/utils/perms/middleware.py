@@ -133,8 +133,7 @@ class ItouCurrentOrganizationMiddleware:
                 m.organization.kind == PrescriberOrganizationKind.FT for m in prescriber_memberships
             ):
                 logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
-
-            if not request.current_organization:
+            elif not request.current_organization:
                 # SIAE user has no active SIAE and thus must not be able to access any page,
                 # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
                 if has_inactive_company_membership:
@@ -148,7 +147,7 @@ class ItouCurrentOrganizationMiddleware:
                         request.is_labor_inspector = True
                         logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
                     else:
-                        request.from_prescriber = True
+                        logout_warning = LogoutWarning.NO_ORGANIZATION
             # ------------------------------------------
             else:
                 if isinstance(request.current_organization, PrescriberOrganization):

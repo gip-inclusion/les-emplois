@@ -471,7 +471,7 @@ class TestExistingUserLogin:
 
 
 def test_prescriber_account_activation_view_with_next(client, pro_connect):
-    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, membership=True)
     client.force_login(user)
 
     url = reverse("dashboard:activate_pro_connect_account")

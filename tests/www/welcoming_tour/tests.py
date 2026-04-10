@@ -7,6 +7,7 @@ from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
+from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.testing import accept_legal_terms
 
@@ -58,6 +59,7 @@ class TestWelcomingTour:
         assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
 
     def test_new_prescriber_sees_welcoming_tour_test(self, client, pro_connect):
+        PrescriberWithOrgInvitationFactory(email=pro_connect.oidc_userinfo["email"])
         session = client.session
         session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()

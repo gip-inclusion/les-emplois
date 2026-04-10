@@ -285,7 +285,7 @@ class TestArchiveView:
         archived_at = archived_at_func()
         other_company = CompanyFactory(with_membership=True)
         job_app = JobApplicationFactory(
-            sent_by_prescriber_alone=True, archived_at=archived_at, state=JobApplicationState.REFUSED
+            sent_by_prescriber=True, archived_at=archived_at, state=JobApplicationState.REFUSED
         )
         url = reverse(viewname, args=(job_app.pk,))
 

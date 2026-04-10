@@ -56,7 +56,6 @@ def administrative_criteria_annex_1():
 
 
 class TestDashboardView:
-    NO_PRESCRIBER_ORG_MSG = "Votre compte n’est actuellement rattaché à aucune organisation."
     SUSPEND_TEXT = "Suspendre un PASS IAE"
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
@@ -627,20 +626,6 @@ class TestDashboardView:
             "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-candidat",
         )
 
-    def test_dashboard_prescriber_without_organization_message(self, client):
-        # An orienter is a prescriber without prescriber organization
-        orienter = PrescriberFactory()
-        client.force_login(orienter)
-        response = client.get(reverse("dashboard:index"))
-        assertContains(response, self.NO_PRESCRIBER_ORG_MSG)
-        assertContains(response, reverse("signup:prescriber_check_already_exists"))
-
-    def test_dashboard_prescriber_with_organization_no_message(self, client):
-        prescriber = PrescriberFactory(membership=True)
-        client.force_login(prescriber)
-        response = client.get(reverse("dashboard:index"))
-        assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
-
     def test_dashboard_prescriber_suspend_link(self, client):
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
@@ -1047,7 +1032,6 @@ class TestDashboardView:
         pytest.param(partial(JobSeekerFactory, with_address=True), assertNotContains, id="JobSeeker"),
         pytest.param(partial(EmployerFactory, membership=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
-        pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
         pytest.param(
             partial(PrescriberFactory, membership__organization__authorized=False),
             assertNotContains,

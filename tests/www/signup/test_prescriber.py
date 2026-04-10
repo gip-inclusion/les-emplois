@@ -593,10 +593,9 @@ class TestPrescriberSignup:
             KIND_PRESCRIBER,
             previous_url=previous_url,
         )
-        # Follow the redirections
+        # Follow the redirection : he is redirected to the logout warning page since an organization is now mandatory
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
         # Check `User` state.
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
@@ -794,9 +793,9 @@ class TestPrescriberSignup:
             KIND_PRESCRIBER,
             previous_url=previous_url,
         )
-        # Follow the redirection.
+        # Follow the redirection : he is redirected to the logout warning page since an organization is now mandatory
         response = client.get(response.url, follow=True)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.has_sso_provider
