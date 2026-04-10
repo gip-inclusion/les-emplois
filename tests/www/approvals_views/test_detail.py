@@ -102,9 +102,11 @@ class TestApprovalDetailView:
 
         # No accepted job application, but still a job application
         job_application.state = JobApplicationState.REFUSED
-        job_application.save(update_fields=("state", "updated_at"))
+        job_application.approval = None
+        job_application.eligibility_diagnosis = None
+        job_application.save(update_fields=("state", "approval", "eligibility_diagnosis", "updated_at"))
         response = client.get(url)
-        assertContains(response, format_approval_number(job_application.approval.number))
+        assertContains(response, format_approval_number(approval.number))
         assertNotContains(response, PROLONG_BUTTON_LABEL, html=True)
         assertNotContains(response, SUSPEND_BUTTON_LABEL, html=True)
 

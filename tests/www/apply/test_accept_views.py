@@ -345,10 +345,9 @@ class TestProcessAcceptViewsInWizard:
         assertNotContains(response, UNARCHIVE_BUTTON_MARKUP)
 
     def test_accept_with_iae_eligibility(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         today = timezone.localdate()
-        job_application = self.create_job_application(
-            state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=True
-        )
+        job_application = self.create_job_application()
         details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
         employer = self.company.members.first()
@@ -374,10 +373,9 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.state.is_accepted
 
     def test_accept_with_next_url(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         today = timezone.localdate()
-        job_application = self.create_job_application(
-            state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=True
-        )
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -473,14 +471,13 @@ class TestProcessAcceptViewsInWizard:
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
         )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
-        diagnosis = IAEEligibilityDiagnosisFactory(
+        IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=self.company,
             certifiable=True,
             criteria_kinds=[criteria_kind],
         )
         job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=datetime.date(
                 2002, 2, 20
             ),  # Required to certify the criteria later.
@@ -531,7 +528,7 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
 
     def test_select_job_description_for_job_application(self, client, snapshot):
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
         employer = self.company.members.first()
         client.force_login(employer)
 
@@ -561,7 +558,7 @@ class TestProcessAcceptViewsInWizard:
 
     def test_no_job_description_for_job_application(self, client):
         self.company.jobs.clear()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
         employer = self.company.members.first()
         client.force_login(employer)
         session_uuid = self.start_accept_job_application(client, job_application)
@@ -578,7 +575,7 @@ class TestProcessAcceptViewsInWizard:
 
     def test_wrong_dates(self, client):
         today = timezone.localdate()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
         hiring_start_at = today
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         # Force `hiring_start_at` in past.
@@ -616,6 +613,7 @@ class TestProcessAcceptViewsInWizard:
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
     def test_accept_hiring_date_after_approval(self, client, mocker):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # Jobseeker has an approval, but it ends after the start date of the job.
         approval = ApprovalFactory(end_at=timezone.localdate() + datetime.timedelta(days=1))
         self.job_seeker.approvals.add(approval)
@@ -624,7 +622,6 @@ class TestProcessAcceptViewsInWizard:
             to_company=self.company,
             sent_by_job_seeker=False,
             sent_by_authorized_prescriber=True,
-            approval=approval,
             hiring_start_at=approval.end_at + datetime.timedelta(days=1),
         )
 
@@ -661,7 +658,8 @@ class TestProcessAcceptViewsInWizard:
         self.confirm_step(client, session_uuid, reset_url=next_url)
 
     def test_no_address(self, client):
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        job_application = self.create_job_application()
         employer = self.company.members.first()
         client.force_login(employer)
 
@@ -749,7 +747,9 @@ class TestProcessAcceptViewsInWizard:
         today = timezone.localdate()
         # Old job application of job seeker
         old_job_application = self.create_job_application(
-            with_iae_eligibility_diagnosis=True, with_approval=True, hiring_start_at=today - relativedelta(days=100)
+            with_approval=True,
+            state=job_applications_enums.JobApplicationState.ACCEPTED,
+            hiring_start_at=today - relativedelta(days=100),
         )
         job_seeker = old_job_application.job_seeker
         # Create suspension for the job seeker
@@ -769,7 +769,6 @@ class TestProcessAcceptViewsInWizard:
         other_company = CompanyFactory(with_membership=True, with_jobs=True, subject_to_iae_rules=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
-            approval=approval,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
             to_company=other_company,
@@ -808,7 +807,7 @@ class TestProcessAcceptViewsInWizard:
         """
         Test the "manual approval delivery mode" path of the view.
         """
-
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         jobseeker_profile = self.job_seeker.jobseeker_profile
         # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
         jobseeker_profile.nir = ""
@@ -816,7 +815,7 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile.lack_of_pole_emploi_id_reason = LackOfPoleEmploiId.REASON_FORGOTTEN
         jobseeker_profile.birth_country = Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
         jobseeker_profile.save()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -842,13 +841,12 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
     def test_update_hiring_start_date_of_two_job_applications(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         hiring_start_at = timezone.localdate() + relativedelta(months=2)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
         # Send 3 job applications to 3 different structures
-        job_application = self.create_job_application(
-            hiring_start_at=hiring_start_at, hiring_end_at=hiring_end_at, with_iae_eligibility_diagnosis=True
-        )
+        job_application = self.create_job_application(hiring_start_at=hiring_start_at, hiring_end_at=hiring_end_at)
         job_seeker = job_application.job_seeker
 
         wall_e = CompanyFactory(with_membership=True, with_jobs=True, name="WALL-E", subject_to_iae_rules=True)
@@ -967,7 +965,7 @@ class TestProcessAcceptViewsInWizard:
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_nir_readonly(self, client):
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -987,10 +985,11 @@ class TestProcessAcceptViewsInWizard:
         assertNotContains(response, NIR_FIELD_ID)
 
     def test_no_nir_update(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -1034,7 +1033,7 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
         other_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
@@ -1060,10 +1059,11 @@ class TestProcessAcceptViewsInWizard:
         )
 
     def test_no_nir_update_with_reason(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -1102,11 +1102,12 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_lack_of_nir_reason_update(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         jobseeker_profile.save()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -1151,7 +1152,7 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         jobseeker_profile.save()
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application()
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -1181,10 +1182,11 @@ class TestProcessAcceptViewsInWizard:
         )
 
     def test_accept_after_cancel(self, client):
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
         job_application = self.create_job_application(
-            state=job_applications_enums.JobApplicationState.CANCELLED, with_iae_eligibility_diagnosis=True
+            state=job_applications_enums.JobApplicationState.CANCELLED,
         )
 
         employer = self.company.members.first()
@@ -1236,7 +1238,6 @@ class TestProcessAcceptViewsInWizard:
             criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
         )
         job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
@@ -1328,9 +1329,7 @@ class TestProcessAcceptViewsInWizard:
             **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
         )
-        job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
-        )
+        job_application = self.create_job_application()
         birthdate = datetime.date(1995, 12, 27)
         job_application.job_seeker.jobseeker_profile.birthdate = birthdate
         job_application.job_seeker.jobseeker_profile.birth_country = Country.objects.get(pk=Country.FRANCE_ID)
@@ -1382,9 +1381,7 @@ class TestProcessAcceptViewsInWizard:
             **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind],
         )
-        job_application = self.create_job_application(
-            geiq_eligibility_diagnosis=diagnosis,
-        )
+        job_application = self.create_job_application()
         birthdate = datetime.date(1995, 12, 27)
         job_application.job_seeker.jobseeker_profile.birthdate = birthdate
         job_application.job_seeker.jobseeker_profile.birth_country = Country.objects.get(pk=Country.FRANCE_ID)
@@ -1394,7 +1391,7 @@ class TestProcessAcceptViewsInWizard:
         job_application.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
             administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
-            eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
+            eligibility_diagnosis=diagnosis,
         ).all()
 
         employer = job_application.to_company.members.first()
@@ -1439,12 +1436,11 @@ class TestProcessAcceptViewsInWizard:
             criteria_kinds=[criteria_kind],
         )
         job_application = self.create_job_application(
-            geiq_eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
             administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
-            eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
+            eligibility_diagnosis=diagnosis,
         ).all()
 
         employer = job_application.to_company.members.first()
@@ -1518,7 +1514,6 @@ class TestProcessAcceptViewsInWizard:
             criteria_kinds=[AdministrativeCriteriaKind.RSA],
         )
         job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
             selected_jobs=company.jobs.all(),
             to_company=company,
         )
@@ -1563,9 +1558,8 @@ class TestProcessAcceptViewsInWizard:
         assert jobseeker_profile.birth_place_id == birth_place.id
 
     def test_accept_with_job_seeker_update(self, client):
-        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
         job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=datetime.date(1995, 12, 27),
         )
         job_seeker = job_application.job_seeker
@@ -1619,7 +1613,7 @@ class TestProcessAcceptViewsInWizard:
             criteria_kinds=[AdministrativeCriteriaKind.RSA],
         )
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
-        job_application = self.create_job_application(eligibility_diagnosis=diagnosis)
+        job_application = self.create_job_application()
         # Remove birth related infos to have the forms available
         birthdate = self.job_seeker.jobseeker_profile.birthdate
         self.job_seeker.jobseeker_profile.birthdate = None
@@ -1699,7 +1693,6 @@ class TestProcessAcceptViewsInWizard:
             criteria_kinds=[AdministrativeCriteriaKind.RSA],
         )
         job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())
@@ -1739,7 +1732,6 @@ class TestProcessAcceptViewsInWizard:
             criteria_kinds=[AdministrativeCriteriaKind.RSA],
         )
         job_application = self.create_job_application(
-            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())
@@ -1789,7 +1781,6 @@ class TestProcessAcceptViewsInWizard:
             job_seeker=job_seeker,
             to_company=self.company,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=selected_criteria.eligibility_diagnosis,
             selected_jobs=[self.company.jobs.first()],
         )
         client.force_login(self.company.members.get())

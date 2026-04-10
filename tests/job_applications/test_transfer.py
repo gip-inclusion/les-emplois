@@ -17,6 +17,24 @@ from tests.job_applications.factories import (
 from tests.users.factories import JobSeekerFactory
 
 
+def _create_processing_job_application_with_diagnosis(*, to_company, **kwargs):
+    """Create an ACCEPTED job app with an employer diagnosis, then set state to PROCESSING in memory.
+
+    The factory creates the row as ACCEPTED (to satisfy the DB constraint requiring
+    state=ACCEPTED for non-null eligibility_diagnosis), then the in-memory state is
+    set to PROCESSING so that the xworkflows transfer transition can fire.
+    """
+    job_application = JobApplicationFactory(
+        sent_by_employer=True,
+        state=JobApplicationState.ACCEPTED,
+        to_company=to_company,
+        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
+        **kwargs,
+    )
+    job_application.state = JobApplicationState.PROCESSING
+    return job_application
+
+
 def test_transferable_states(subtests):
     # If job application is in ACCEPTED state
     # it can't be transferred
@@ -107,15 +125,10 @@ def test_transfer():
     # "Normal" transfer
     assert job_application.to_company == target_company
     assert job_application.state == JobApplicationState.NEW
-    assert job_application.eligibility_diagnosis is not None
+    assert job_application.eligibility_diagnosis is None
 
     # Eligibilty diagnosis not sent by authorized prescriber must be deleted
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        state=JobApplicationState.PROCESSING,
-        to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
-    )
+    job_application = _create_processing_job_application_with_diagnosis(to_company=origin_company)
     eligibility_diagnosis_pk = job_application.eligibility_diagnosis.pk
     job_application.transfer(user=origin_user, target_company=target_company)
     job_application.refresh_from_db()
@@ -158,11 +171,8 @@ def test_model_fields(snapshot):
     target_user = target_company.members.first()
     target_company.members.add(origin_user)
 
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        state=JobApplicationState.PROCESSING,
+    job_application = _create_processing_job_application_with_diagnosis(
         to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
         answer="Answer to job seeker",
         answer_to_prescriber="Answer to prescriber",
     )
@@ -210,12 +220,7 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
     origin_user = origin_company.members.first()
     target_company.members.add(origin_user)
 
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        state=JobApplicationState.PROCESSING,
-        to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
-    )
+    job_application = _create_processing_job_application_with_diagnosis(to_company=origin_company)
     job_seeker = job_application.job_seeker
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -313,12 +318,7 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     origin_user_1, origin_user_2 = origin_company.members.all()
     target_company.members.add(origin_user_1)
 
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        state=JobApplicationState.PROCESSING,
-        to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
-    )
+    job_application = _create_processing_job_application_with_diagnosis(to_company=origin_company)
     job_seeker = job_application.job_seeker
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -346,12 +346,7 @@ def test_transfer_must_delete_comments(comments_count, caplog):
     origin_user = origin_company.members.first()
     target_company.members.add(origin_user)
 
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        state=JobApplicationState.PROCESSING,
-        to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
-    )
+    job_application = _create_processing_job_application_with_diagnosis(to_company=origin_company)
     if comments_count:
         JobApplicationCommentFactory.create_batch(comments_count, job_application=job_application)
 

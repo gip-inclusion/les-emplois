@@ -755,21 +755,18 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=company_diag,
             job_seeker=job_seeker,
             to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.REFUSED,
-            eligibility_diagnosis=no_criteria_prescriber_diag,
             job_seeker=job_seeker,
             to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            eligibility_diagnosis=prescriber_diag,
             job_seeker=job_seeker,
             to_company=company,
             **common_kwargs,
@@ -790,7 +787,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.POOL,
-            eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
             to_company=geiq,
             **common_kwargs,
@@ -798,14 +794,12 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         # GEIQ
         JobApplicationFactory(
             state=JobApplicationState.REFUSED,
-            geiq_eligibility_diagnosis=no_criteria_prescriber_geiq_diag,
             job_seeker=job_seeker,  # job_seeker has IAE and GEIQ diags, we should show the corresponding criteria
             to_company=geiq,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            geiq_eligibility_diagnosis=prescriber_geiq_diag,
             job_seeker=prescriber_geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,
@@ -995,21 +989,18 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=company_diag,
             job_seeker=job_seeker,
             to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=sender_company_diag,
             job_seeker=job_seeker,
             to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            eligibility_diagnosis=prescriber_diag,
             job_seeker=job_seeker,
             to_company=company,
             **common_kwargs,
@@ -1030,7 +1021,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.POOL,
-            eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
             to_company=company,
             **common_kwargs,
@@ -1038,7 +1028,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         # GEIQ
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            geiq_eligibility_diagnosis=prescriber_geiq_diag,
             job_seeker=prescriber_geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,
@@ -1056,10 +1045,9 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
             to_company=geiq,
             **common_kwargs,
         ),
-        # Expired diagnosis on the job application
+        # Expired diagnosis on the job seeker
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            geiq_eligibility_diagnosis=expired_geiq_diag,
             job_seeker=expired_geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,

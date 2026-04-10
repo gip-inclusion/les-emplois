@@ -86,7 +86,7 @@ def test_candidatures_geiq_is_empty(snapshot, job_application_status):
 
     ja = JobApplicationFactory(
         sent_by_prescriber_alone=True,
-        with_geiq_eligibility_diagnosis_from_employer=True,
+        to_company=CompanyFactory(with_membership=True, kind=CompanyKind.GEIQ),
         state=job_application_status,
     )
     _api_token_for([ja.to_company])

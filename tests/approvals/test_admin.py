@@ -49,10 +49,8 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 class TestApprovalAdmin:
     def test_change_approval_with_jobapp_no_hiring_dates(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
-        approval.jobapplication_set.add(
-            JobApplicationFactory(
-                sent_by_prescriber_alone=True, hiring_start_at=None, hiring_end_at=None, job_seeker=approval.user
-            )
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True, hiring_start_at=None, hiring_end_at=None, job_seeker=approval.user
         )
         client.force_login(ItouStaffFactory(is_superuser=True))
         response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
@@ -835,8 +833,9 @@ class TestCustomApprovalAdminViews:
             state=JobApplicationState.PROCESSING,
             approval=None,
             approval_number_sent_by_email=False,
-            with_iae_eligibility_diagnosis=True,
+            to_company__subject_to_iae_rules=True,
         )
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
         job_application.accept(user=job_application.to_company.members.first())
 
         url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
@@ -955,8 +954,9 @@ class TestCustomApprovalAdminViews:
             state=JobApplicationState.PROCESSING,
             approval=None,
             approval_number_sent_by_email=False,
-            with_iae_eligibility_diagnosis=True,
+            to_company__subject_to_iae_rules=True,
         )
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
         employer = job_application.to_company.members.first()
         job_application.accept(user=employer)
 
@@ -1045,6 +1045,7 @@ class TestCustomApprovalAdminViews:
         employee_record = EmployeeRecordFactory(status=Status.READY)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )

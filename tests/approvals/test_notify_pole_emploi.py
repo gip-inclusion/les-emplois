@@ -317,7 +317,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(
-            sent_by_prescriber_alone=True, to_company=company, approval=approval, state=JobApplicationState.POSTPONED
+            sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POSTPONED
         )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()

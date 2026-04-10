@@ -1015,15 +1015,14 @@ class TestAnonymizeJobseekersManagementCommand:
                 end_at=end_at,
             )
         for state in [JobApplicationState.ACCEPTED, JobApplicationState.NEW]:
+            is_accepted = state == JobApplicationState.ACCEPTED
             JobApplicationFactory(
                 sent_by_prescriber_alone=True,
                 job_seeker=approval_with_lot_of_datas.user,
-                approval=approval_with_lot_of_datas,
-                eligibility_diagnosis=approval_with_lot_of_datas.eligibility_diagnosis,
+                approval=approval_with_lot_of_datas if is_accepted else None,
+                eligibility_diagnosis=approval_with_lot_of_datas.eligibility_diagnosis if is_accepted else None,
                 created_at=timezone.make_aware(datetime.datetime(2023, 1, 16)),
-                processed_at=timezone.make_aware(datetime.datetime(2023, 1, 16))
-                if state == JobApplicationState.ACCEPTED
-                else None,
+                processed_at=timezone.make_aware(datetime.datetime(2023, 1, 16)) if is_accepted else None,
                 to_company__department=76,
                 to_company__naf="4567A",
                 to_company__kind=CompanyKind.EI,
@@ -1105,11 +1104,14 @@ class TestAnonymizeJobseekersManagementCommand:
             **kwargs,
         )
         for state in [JobApplicationState.ACCEPTED, JobApplicationState.POSTPONED]:
+            is_accepted = state == JobApplicationState.ACCEPTED
             JobApplicationFactory(
                 sent_by_prescriber_alone=True,
                 job_seeker=iae_diagnosis_from_prescriber_with_several_job_applications.job_seeker,
                 to_company__subject_to_iae_rules=True,
-                eligibility_diagnosis=iae_diagnosis_from_prescriber_with_several_job_applications,
+                eligibility_diagnosis=iae_diagnosis_from_prescriber_with_several_job_applications
+                if is_accepted
+                else None,
                 created_at=timezone.make_aware(datetime.datetime(2021, 6, 17)),
                 state=state,
             )

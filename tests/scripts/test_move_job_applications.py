@@ -1,6 +1,7 @@
 import pytest
 from django.core import management
 
+from itou.job_applications.enums import JobApplicationState
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -19,6 +20,7 @@ def test_command(wet_run, caplog):
     current_org = iae_diag.author_prescriber_organization
     iae_application = JobApplicationFactory(
         sent_by_prescriber_alone=True,
+        state=JobApplicationState.ACCEPTED,
         sender=prescriber,
         eligibility_diagnosis=iae_diag,
         sender_prescriber_organization=current_org,
@@ -28,6 +30,7 @@ def test_command(wet_run, caplog):
     )
     geiq_application = JobApplicationFactory(
         sent_by_prescriber_alone=True,
+        state=JobApplicationState.ACCEPTED,
         sender=prescriber,
         geiq_eligibility_diagnosis=geiq_diag,
         sender_prescriber_organization=current_org,

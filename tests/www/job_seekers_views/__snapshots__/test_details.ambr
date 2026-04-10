@@ -1822,8 +1822,8 @@
                                               </span>
                                           </div>
                                           <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">
-                                                  Nouvelle candidature
+                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_11111111-1111-1111-1111-111111111111">
+                                                  Candidature acceptée
                                               </span>
                                           </div>
                                       </div>
@@ -3040,8 +3040,8 @@
                                               </span>
                                           </div>
                                           <div>
-                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">
-                                                  Nouvelle candidature
+                                              <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_11111111-1111-1111-1111-111111111111">
+                                                  Candidature acceptée
                                               </span>
                                           </div>
                                       </div>

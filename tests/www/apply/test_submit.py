@@ -4427,10 +4427,10 @@ class TestCheckPreviousApplicationsView:
         ) == snapshot(name="allowed update diagnosis")
 
         # Remove previous eligibility diagnosis to change the button label
-        eligibility_diagnosis = job_application.eligibility_diagnosis
-        job_application.eligibility_diagnosis = None
-        job_application.save()
-        eligibility_diagnosis.delete()
+        JobApplication.objects.filter(eligibility_diagnosis__job_seeker=job_application.job_seeker).update(
+            eligibility_diagnosis=None
+        )
+        EligibilityDiagnosis.objects.filter(job_seeker=job_application.job_seeker).delete()
         response = client.get(self.check_prev_applications_url)
         assert pretty_indented(
             parse_response_to_soup(

@@ -53,6 +53,8 @@
         'sql': '''
           UPDATE "job_applications_jobapplication"
           SET "eligibility_diagnosis_id" = NULL,
+              "geiq_eligibility_diagnosis_id" = NULL,
+              "approval_id" = NULL,
               "updated_at" = %s
           WHERE "job_applications_jobapplication"."id" = %s
         ''',

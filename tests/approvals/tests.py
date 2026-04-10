@@ -28,6 +28,7 @@ from tests.approvals.factories import (
     SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
@@ -88,10 +89,10 @@ class TestCommonApprovalQuerySet:
 
     def test_can_be_deleted_even_if_other_applications(self):
         job_app = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        # A cancelled application does not reference the approval (invariant enforced by DB constraint).
         JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker=job_app.job_seeker,
-            approval=job_app.approval,
             state=JobApplicationState.CANCELLED,
         )
         approval = job_app.approval
@@ -634,8 +635,9 @@ class TestApprovalModel:
             sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
-            with_iae_eligibility_diagnosis=True,
+            to_company__subject_to_iae_rules=True,
         )
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
         job_application.accept(user=job_application.to_company.members.first())
 
         approval = job_application.approval
@@ -646,7 +648,7 @@ class TestApprovalModel:
             sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.ETTI,
-            with_iae_eligibility_diagnosis=True,
+            to_company__subject_to_iae_rules=True,
             job_seeker_id=job_application.job_seeker_id,  # Use pk to avoid cached_property invalidations
         )
         other_application.accept(user=other_application.to_company.members.first())
@@ -667,8 +669,9 @@ class TestApprovalModel:
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             state=JobApplicationState.PROCESSING,
-            with_iae_eligibility_diagnosis=True,
+            to_company__subject_to_iae_rules=True,
         )
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
         job_application.accept(user=job_application.to_company.members.first())
 
         approval = job_application.approval

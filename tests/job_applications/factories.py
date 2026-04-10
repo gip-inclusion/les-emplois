@@ -85,6 +85,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
         # IAE ---------------------------------------------------------------------------------------------------------
         with_iae_eligibility_diagnosis = factory.Trait(
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=factory.SubFactory(
                 IAEEligibilityDiagnosisFactory,
                 from_prescriber=True,
@@ -110,6 +111,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
         # GEIQ --------------------------------------------------------------------------------------------------------
         with_geiq_eligibility_diagnosis_from_employer = factory.Trait(
+            state=JobApplicationState.ACCEPTED,
             sent_by_employer=True,
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             geiq_eligibility_diagnosis=factory.SubFactory(
@@ -121,6 +123,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             ),
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
+            state=JobApplicationState.ACCEPTED,
             sent_by_authorized_prescriber=True,
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             geiq_eligibility_diagnosis=factory.SubFactory(

@@ -2,7 +2,7 @@ import json
 import re
 import uuid
 
-import factory.fuzzy
+
 import freezegun
 import pytest
 from django.test.utils import override_settings
@@ -101,12 +101,13 @@ def test_preflight_with_error(snapshot, command, caplog):
 
 
 def test_preflight_without_an_accepted_job_application(caplog, snapshot, command):
-    EmployeeRecordFactory(
-        ready_for_transfer=True,
-        job_application__state=factory.fuzzy.FuzzyChoice(
-            set(JobApplicationState.values) - {JobApplicationState.ACCEPTED}
-        ),
-    )
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+    job_application = employee_record.job_application
+    job_application.state = JobApplicationState.NEW
+    job_application.approval = None
+    job_application.eligibility_diagnosis = None
+    job_application.processed_at = None
+    job_application.save(update_fields=("state", "approval", "eligibility_diagnosis", "processed_at", "updated_at"))
 
     command.handle(preflight=True, upload=False, download=False, wet_run=False)
     assert caplog.messages == snapshot
@@ -149,12 +150,13 @@ def test_upload_only_send_a_limited_number_of_rows(mocker, snapshot, sftp_direct
 
 
 def test_upload_without_an_accepted_job_application(caplog, snapshot, command):
-    EmployeeRecordFactory(
-        ready_for_transfer=True,
-        job_application__state=factory.fuzzy.FuzzyChoice(
-            set(JobApplicationState.values) - {JobApplicationState.ACCEPTED}
-        ),
-    )
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True)
+    job_application = employee_record.job_application
+    job_application.state = JobApplicationState.NEW
+    job_application.approval = None
+    job_application.eligibility_diagnosis = None
+    job_application.processed_at = None
+    job_application.save(update_fields=("state", "approval", "eligibility_diagnosis", "processed_at", "updated_at"))
 
     command.handle(preflight=False, upload=True, download=False, wet_run=False)
     assert caplog.messages == snapshot

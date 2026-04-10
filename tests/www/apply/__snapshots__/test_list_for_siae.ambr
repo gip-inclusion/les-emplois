@@ -7509,7 +7509,7 @@
       '',
       'Pierre DUPONT',
       datetime.datetime(2024, 8, 18, 0, 0),
-      'Nouvelle candidature',
+      'Candidature acceptée',
       datetime.datetime(2024, 8, 18, 0, 0),
       datetime.datetime(2026, 8, 18, 0, 0),
       '',
@@ -10050,7 +10050,14 @@
                               Vous
                           </td>
                           <td>
-                              Le prescripteur habilité n'a pas renseigné de critères.
+                              <ul class="mb-0">
+                                  <li>
+                                      Allocataire AAH
+                                  </li>
+                                  <li>
+                                      Résident QPV
+                                  </li>
+                              </ul>
                           </td>
                           <td>
                               <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
@@ -10100,10 +10107,10 @@
                           <td>
                               <ul class="mb-0">
                                   <li>
-                                      Allocataire ASS
+                                      Allocataire AAH
                                   </li>
                                   <li>
-                                      Bénéficiaire du RSA
+                                      Résident QPV
                                   </li>
                               </ul>
                           </td>
@@ -10114,7 +10121,7 @@
                                   Éligible à l’IAE
                               </span>
                               <span class="d-block">
-                                  Éligibilité validée par votre entreprise
+                                  Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
                           <td class="text-end w-50px align-middle">

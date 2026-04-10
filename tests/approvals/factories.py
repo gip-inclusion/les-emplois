@@ -83,16 +83,18 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
             state = kwargs.pop("state", JobApplicationState.ACCEPTED)
             eligibility_diagnosis = kwargs.pop("eligibility_diagnosis", self.eligibility_diagnosis)
             sent_by_authorized_prescriber = kwargs.pop("sent_by_authorized_prescriber", True)
-            self.jobapplication_set.add(
-                JobApplicationFactory(
-                    sent_by_authorized_prescriber=sent_by_authorized_prescriber,
-                    state=state,
-                    job_seeker=self.user,
-                    with_iae_eligibility_diagnosis=True,
-                    eligibility_diagnosis=eligibility_diagnosis,
-                    **kwargs,
-                )
+            is_accepted = str(state) == str(JobApplicationState.ACCEPTED)
+            job_application = JobApplicationFactory(
+                sent_by_authorized_prescriber=sent_by_authorized_prescriber,
+                state=state,
+                job_seeker=self.user,
+                with_iae_eligibility_diagnosis=True,
+                eligibility_diagnosis=eligibility_diagnosis if is_accepted else None,
+                approval=self if is_accepted else None,
+                **kwargs,
             )
+            if is_accepted:
+                self.jobapplication_set.add(job_application)
 
     @factory.post_generation
     def with_ongoing_contract(self, create, extracted, **kwargs):
