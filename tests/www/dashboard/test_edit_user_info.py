@@ -782,6 +782,7 @@ class TestEditUserInfoView:
             first_name="Not Bob",
             last_name="Not Saint Clair",
             phone="0600000000",
+            membership=True,
         )
         client.force_login(original_user)
         url = reverse("dashboard:edit_user_info")

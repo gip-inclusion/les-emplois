@@ -48,7 +48,7 @@ from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED, OIDC_USERINFO
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     PrescriberFactory,
@@ -602,16 +602,14 @@ class TestProConnectCallbackView:
             email=pro_connect.oidc_userinfo["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        user = PrescriberFactory(
+        PrescriberFactory(
             first_name=pro_connect.oidc_userinfo["given_name"],
             last_name=pro_connect.oidc_userinfo["usual_name"],
             username=pro_connect.oidc_userinfo["sub"],
             email="random@email.com",
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
         )
-        client.force_login(user)
-        edit_user_info_url = reverse("dashboard:edit_user_info")
-        response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, next_url=edit_user_info_url)
+        response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
         response = client.get(response.url, follow=True)
         assertMessages(
             response,
@@ -641,26 +639,13 @@ class TestProConnectCallbackView:
         )
         assertQuerySetEqual(org.members.all(), [user])
 
+    # FIXME: Remove test once kinds are merged in db
     def test_callback_update_FT_organization_as_employer_does_not_crash(self, client, pro_connect):
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         pro_connect.mock_oauth_dance(
             client,
             UserKind.EMPLOYER,
             oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
-        )
-        user = get_user(client)
-        assert user.is_authenticated
-        assert not user.prescribermembership_set.exists()
-
-        # If he's a prescriber and uses the employer login button
-        user.kind = UserKind.PRESCRIBER
-        user.save()
-        client.logout()
-        pro_connect.mock_oauth_dance(
-            client,
-            UserKind.EMPLOYER,
-            oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
-            register=False,
         )
         user = get_user(client)
         assert user.is_authenticated
@@ -824,7 +809,11 @@ class TestProConnectLogin:
         """
         # Create an account with ProConnect.
         response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
-        response = client.get(response.url, follow=True)  # completes welcoming tour
+        # artificialy add a membership
+        user = User.objects.get()
+        PrescriberMembershipFactory(user=user)
+        # completes welcoming tour
+        response = client.get(response.url, follow=True)
         accept_legal_terms(client, response)
 
         # Then log out.
@@ -857,6 +846,7 @@ class TestProConnectLogin:
             **ProConnectPrescriberData.user_info_mapping_dict(user_info),
             identity_provider=IdentityProvider.DJANGO,
             with_verified_email=True,
+            membership=True,
         )
 
         # Existing user connects with Proconnect which results in:
@@ -941,11 +931,19 @@ class TestProConnectLogout:
         When ac ProConnect user wants to log out from his local account,
         he should be logged out too from ProConnect.
         """
-        response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        PrescriberFactory(
+            email=pro_connect.oidc_userinfo["email"],
+            membership=True,
+            has_completed_welcoming_tour=True,
+        )
+        response = pro_connect.mock_oauth_dance(
+            client,
+            UserKind.PRESCRIBER,
+            expected_redirect_url=reverse("dashboard:index"),
+        )
         assert auth.get_user(client).is_authenticated
         # Follow the redirection.
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
         assert client.session.get(constants.PRO_CONNECT_SESSION_KEY)

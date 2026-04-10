@@ -527,7 +527,7 @@ class TestJobDescriptionCardView:
         assertNotContains(response, BANNER_TXT)
 
         # If prescriber but not authorized, show the alert with masked name
-        unauthorized_prescriber = PrescriberFactory()
+        unauthorized_prescriber = PrescriberFactory(membership=True)
         client.force_login(unauthorized_prescriber)
         response = client.get(url)
         assertContains(response, BANNER_TXT_MASK)

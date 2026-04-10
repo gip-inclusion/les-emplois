@@ -470,7 +470,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     assert prescriber_3.email == "alphonse.armani@mailinator.com"
     assert prescriber_3.first_name == "Alphonse"
     assert prescriber_3.last_name == "Armani"
-    assert prescriber_3.is_prescriber
+    assert prescriber_3.is_professional
     assert prescriber_3.prescribermembership_set.get().organization == organization
     user_content_type = ContentType.objects.get_for_model(User)
     user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=prescriber_3.pk).get()
@@ -484,7 +484,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     assert prescriber_4.email == "beatrice.balladur@mailinator.com"
     assert prescriber_4.first_name == "Beatrice"
     assert prescriber_4.last_name == "Balladur"
-    assert prescriber_4.is_prescriber
+    assert prescriber_4.is_professional
     assert not prescriber_4.prescribermembership_set.exists()
     user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=prescriber_4.pk).get()
     assert user_remark.remark == "Créé par l'import des référents FT pour GPS"

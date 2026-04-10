@@ -10,14 +10,13 @@ KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_EMPLOYER = "employer"
 KIND_LABOR_INSPECTOR = "labor_inspector"
+KIND_PROFESSIONAL = "professional"
 KIND_ITOU_STAFF = "itou_staff"
 
 
 class UserKind(models.TextChoices):
     JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
-    PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
-    EMPLOYER = KIND_EMPLOYER, "employeur"
-    LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
+    PROFESSIONAL = KIND_PROFESSIONAL, "professionnel"
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 
     @classmethod
@@ -30,21 +29,6 @@ class UserKind(models.TextChoices):
             UserKind.ITOU_STAFF: "login:job_seeker",
         }
         return reverse(url_lookup[user_kind]) if user_kind in url_lookup else reverse(default)
-
-    @classmethod
-    def caseworkers(cls):
-        return [
-            cls.PRESCRIBER,
-            cls.EMPLOYER,
-        ]
-
-    @classmethod
-    def professionals(cls):
-        return [
-            cls.PRESCRIBER,
-            cls.EMPLOYER,
-            cls.LABOR_INSPECTOR,
-        ]
 
 
 MATOMO_ACCOUNT_TYPE = {

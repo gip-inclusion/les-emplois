@@ -26,33 +26,6 @@
         {% endcomponent_alert %}
     {% endif %}
 
-    {% if request.from_prescriber and not request.current_organization %}
-        {% component_alert title=title content=content variant="warning" icon=False %}
-            {% fragment as title %}
-                Votre compte n’est actuellement rattaché à aucune organisation.
-            {% endfragment %}
-            {% fragment as content %}
-                <p>Les candidatures de prescripteur sans organisation ont 2 fois moins de chances d’être acceptées !</p>
-                <ul class="mb-0">
-                    <li>
-                        Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq"
-    target="_blank"
-    class="has-external-link"
-    rel="noopener"
-    aria-label="Formulaire d'aide pour retrouver l’accès à votre compte existant (ouverture dans un nouvel onglet)">ce formulaire d’aide</a>.
-                    </li>
-                    <li>
-                        Si vous souhaitez rejoindre le tableau de bord d’une organisation présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
-                    </li>
-                    <li>
-                        Si votre organisation ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, utilisez
-                        <a href="{% url 'signup:prescriber_check_already_exists' %}">le formulaire d'inscription</a>.
-                    </li>
-                </ul>
-            {% endfragment %}
-        {% endcomponent_alert %}
-    {% endif %}
-
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if request.from_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
         {% component_alert title=title content=content variant="warning" dismissible=True %}

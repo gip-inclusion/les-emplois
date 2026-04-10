@@ -42,7 +42,7 @@ class TestUserHijack:
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assertRedirects(response, "/accounts/login/?next=/hijack/acquire/", fetch_redirect_response=False)
 
-        hijacker = PrescriberFactory()  # active but not staff or superuser
+        hijacker = PrescriberFactory(membership=True)  # active but not staff or superuser
         client.force_login(hijacker)
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 403

@@ -51,7 +51,7 @@ def test_not_a_job_seeker(client):
     not_a_job_seeker = random.choice(
         [PrescriberFactory(), EmployerFactory(), ItouStaffFactory(), LaborInspectorFactory()]
     )
-    client.force_login(PrescriberFactory())
+    client.force_login(PrescriberFactory(membership=True))
     url = reverse("job_seekers_views:details", kwargs={"public_id": not_a_job_seeker.public_id})
     response = client.get(url)
     assert response.status_code == 404
@@ -791,7 +791,7 @@ class TestContracts:
         job_seeker = JobSeekerFactory()
         for user, expected_status in [
             (LaborInspectorFactory(membership=True), 403),
-            (PrescriberFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
             (PrescriberFactory(membership__organization__authorized=True), 200),
             (EmployerFactory(membership=True), 403),
         ]:

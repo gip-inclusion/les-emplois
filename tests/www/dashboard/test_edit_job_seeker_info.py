@@ -328,10 +328,9 @@ class TestEditJobSeekerInfo:
         assert response.status_code == 200
 
     def test_edit_autonomous_not_allowed(self, client):
-        job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+        job_application = JobApplicationFactory(sent_by_prescriber=True)
         # The job seeker manages his own personal information (autonomous)
-        user = job_application.sender
-        client.force_login(user)
+        client.force_login(job_application.sender)
 
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
@@ -347,8 +346,7 @@ class TestEditJobSeekerInfo:
         )
 
         # Lambda prescriber not member of the sender organization
-        prescriber = PrescriberFactory()
-        client.force_login(prescriber)
+        client.force_login(PrescriberFactory(membership=True))
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
