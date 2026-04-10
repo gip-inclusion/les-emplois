@@ -1471,9 +1471,9 @@ class TestAssessmentContractsListView:
         response = client.get(self.url)
 
         assertContains(response, 'data-bs-toggle="offcanvas"')
-        assertContains(response, 'data-bs-target="#offcanvasFilters"')
+        assertContains(response, 'data-bs-target="#offcanvasApplyFiltersContent"')
 
-        assertContains(response, 'id="offcanvasFilters"')
+        assertContains(response, 'id="offcanvasApplyFiltersContent"')
         assertContains(response, "Filtrer", count=2)
 
     def test_offcanvas_form_structure_validity(self, client):
@@ -1484,7 +1484,7 @@ class TestAssessmentContractsListView:
         for form in forms:
             assert not form.find("form")
 
-        trigger_btn = soup.find("button", {"data-bs-target": "#offcanvasFilters"})
+        trigger_btn = soup.find("button", {"data-bs-target": "#offcanvasApplyFiltersContent"})
         assert trigger_btn is not None
         assert trigger_btn.get("type") == "button"
 
@@ -1532,6 +1532,7 @@ class TestAssessmentContractsListView:
 
     def test_contract_list_reset_button_visibility(self, client):
         response = client.get(self.url)
+        assertContains(response, 'id="all-filters-btn"')
         assertNotContains(response, self.RESET_BTN_LABEL)
 
         response = client.get(self.url, {"start_date_lower": "2024-01-01"})

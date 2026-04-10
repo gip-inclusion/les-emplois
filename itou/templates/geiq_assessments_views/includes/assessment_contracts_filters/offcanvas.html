@@ -1,7 +1,7 @@
 {% load django_bootstrap5 %}
 
 <form hx-get="{{ request.path }}" hx-trigger="change delay:.5s, duetChange delay:.5s" hx-target="#contracts-results-table" hx-swap="outerHTML" hx-indicator="#contracts-results-table" hx-push-url="true">
-    <div class="c-offcanvas-filters offcanvas offcanvas-end" tabindex="-1" id="offcanvasFilters" aria-labelledby="offcanvasFiltersLabel">
+    <div class="c-offcanvas-filters offcanvas offcanvas-end" tabindex="-1" id="offcanvasApplyFiltersContent" aria-labelledby="offcanvasApplyFiltersLabel">
         <div class="offcanvas-header">
             <h4 class="mb-0 btn-ico">
                 <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
