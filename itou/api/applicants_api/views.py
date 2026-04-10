@@ -79,6 +79,9 @@ la ou les structure(s) sélectionnée(s).
 Les candidats sont triés par date de création dans la base des emplois de l'inclusion,
 du plus récent au plus ancien.
 
+**Note** : la clé `lien_cv` est dépréciée et associée à une valeur vide. Elle est conservée pour
+des raisons de compatibilité.
+
 # Permissions
 
 L'utilisation de cette API nécessite un jeton d'autorisation (`token`) :
