@@ -194,7 +194,7 @@ class TestEmployeeRecordModel:
         employee_record = EmployeeRecordFactory(with_batch_information=True)
 
         assert EmployeeRecord.objects.find_by_batch("X", employee_record.asp_batch_line_number).count() == 0
-        assert EmployeeRecord.objects.find_by_batch(employee_record.asp_batch_file, 0).count() == 0
+        assert EmployeeRecord.objects.find_by_batch(employee_record.asp_batch_file, -1).count() == 0
 
         result = EmployeeRecord.objects.find_by_batch(
             employee_record.asp_batch_file, employee_record.asp_batch_line_number
