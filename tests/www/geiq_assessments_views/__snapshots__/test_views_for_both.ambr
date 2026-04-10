@@ -1327,7 +1327,7 @@
           <div class="s-section__row row">
               <div class="col-12">
                   <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                      <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <button aria-controls="offcanvasApplyFiltersContent" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFiltersContent" data-bs-toggle="offcanvas" type="button">
                           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
                           </i>
                           <span>
@@ -1536,7 +1536,7 @@
           <div class="s-section__row row">
               <div class="col-12">
                   <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                      <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <button aria-controls="offcanvasApplyFiltersContent" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFiltersContent" data-bs-toggle="offcanvas" type="button">
                           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
                           </i>
                           <span>
@@ -1771,7 +1771,7 @@
           <div class="s-section__row row">
               <div class="col-12">
                   <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                      <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <button aria-controls="offcanvasApplyFiltersContent" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFiltersContent" data-bs-toggle="offcanvas" type="button">
                           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
                           </i>
                           <span>
@@ -2251,7 +2251,7 @@
           <div class="s-section__row row">
               <div class="col-12">
                   <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                      <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <button aria-controls="offcanvasApplyFiltersContent" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFiltersContent" data-bs-toggle="offcanvas" type="button">
                           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
                           </i>
                           <span>
@@ -2428,7 +2428,7 @@
           <div class="s-section__row row">
               <div class="col-12">
                   <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                      <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <button aria-controls="offcanvasApplyFiltersContent" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFiltersContent" data-bs-toggle="offcanvas" type="button">
                           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
                           </i>
                           <span>
@@ -2631,7 +2631,7 @@
           <div class="s-section__row row">
               <div class="col-12">
                   <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                      <button aria-controls="offcanvasFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasFilters" data-bs-toggle="offcanvas" type="button">
+                      <button aria-controls="offcanvasApplyFiltersContent" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFiltersContent" data-bs-toggle="offcanvas" type="button">
                           <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
                           </i>
                           <span>
