@@ -486,22 +486,6 @@ class User(AbstractUser, AddressMixin):
         return self.kind == UserKind.JOB_SEEKER
 
     @property
-    def is_caseworker(self):
-        return self.kind in UserKind.caseworkers()
-
-    @property
-    def is_prescriber(self):
-        return self.kind == UserKind.PRESCRIBER
-
-    @property
-    def is_employer(self):
-        return self.kind == UserKind.EMPLOYER
-
-    @property
-    def is_labor_inspector(self):
-        return self.kind == UserKind.LABOR_INSPECTOR
-
-    @property
     def is_professional(self):
         return self.kind in UserKind.professionals()
 

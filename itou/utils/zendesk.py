@@ -90,6 +90,9 @@ def serialize_zendesk_params(request):
                 case _:
                     zendesk_institution_kind = "autre-admin-centarle"
 
+    elif request.user.is_professional:
+        zendesk_user_kind = "professionel_sans_orga"
+
     params = {
         "tf_anonymous_requester_email": request.user.email,
         "tf_30473760509585": request.user.phone,

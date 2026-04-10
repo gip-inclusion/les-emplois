@@ -16,6 +16,7 @@ from itou.approvals.enums import (
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -25,7 +26,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -61,7 +62,7 @@ class TestApprovalDetailView:
 
     def test_non_authorized_prescriber_access(self, client):
         job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True, with_approval=True, with_job_seeker_assignment=True
+            sent_by_prescriber=True, with_approval=True, with_job_seeker_assignment=True
         )
         url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
 
@@ -132,7 +133,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_seeker = approval.user
 
         # In progress
@@ -193,7 +194,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
 
         # Valid
         current_suspension = SuspensionFactory(
@@ -289,7 +290,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
 
         # Valid
         first = ProlongationFactory(
@@ -399,7 +400,7 @@ class TestApprovalDetailView:
         siae = job_application.to_company
         employer = siae.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_seeker = approval.user
 
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -461,7 +462,7 @@ class TestApprovalDetailView:
         siae = job_application.to_company
         employer = siae.members.first()
         prescriber = job_application.sender
-        assert prescriber.is_prescriber
+        assert prescriber.is_professional
         job_seeker = approval.user
 
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
@@ -538,7 +539,7 @@ class TestContractView:
 
     def test_no_access(self, client):
         job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True, with_approval=True, with_job_seeker_assignment=True
+            sent_by_prescriber=True, with_approval=True, with_job_seeker_assignment=True
         )
         approval = job_application.approval
         url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
@@ -558,7 +559,9 @@ class TestContractView:
             assert response.status_code == 403
 
         # Make the linked prescriber authorized
-        PrescriberMembershipFactory(user=job_application.sender, organization__authorized=True)
+        job_application.sender_prescriber_organization.kind = PrescriberOrganizationKind.FT
+        job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.VALIDATED
+        job_application.sender_prescriber_organization.save()
         for user in [
             job_application.sender,  # authorized prescriber linked to the approval's job seeker
             job_application.to_company.members.first(),  # linked employer

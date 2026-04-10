@@ -95,19 +95,9 @@ def test_refused_access(client, url):
         assert response.status_code == 403
 
 
-def test_raise_404_on_organization_tab_for_prescriber_without_org(client):
-    url = reverse("job_seekers_views:list_organization")
-    user = PrescriberFactory()
-    client.force_login(user)
-    response = client.get(url)
-
-    assert response.status_code == 404
-
-
 @pytest.mark.parametrize(
     "user_factory,assertion",
     [
-        pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
         pytest.param(
             partial(PrescriberFactory, membership__organization__authorized=False),
             assertNotContains,
@@ -232,7 +222,7 @@ def test_multiple(client, snapshot):
         with_job_seeker_assignment=True,
     )
     # Other app for which the current user cannot see the personal information
-    unauthorized_prescriber = PrescriberFactory(membership=False)
+    unauthorized_prescriber = PrescriberFactory(membership=True)
     job_app5 = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=unauthorized_prescriber,
@@ -568,6 +558,8 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         with_job_seeker_assignment=True,
     )
 
+    # The prescriber is now in another org (without it they can't use the website)
+    PrescriberMembershipFactory(user=prescriber)
     client.force_login(prescriber)
     response = client.get(reverse("job_seekers_views:list"))
     assertNotContains(response, alain.get_full_name())

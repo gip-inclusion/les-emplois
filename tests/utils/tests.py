@@ -143,7 +143,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(
             response,
-            reverse("logout:warning", kwargs={"kind": "employer_no_company"}),
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
             fetch_redirect_response=False,
         )
         # Session untouched
@@ -212,7 +212,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(
             response,
-            reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}),
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
             fetch_redirect_response=False,
         )
         # Session untouched
@@ -265,15 +265,15 @@ class TestItouCurrentOrganizationMiddleware:
     def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
         request = get_request(PrescriberFactory(), with_perms_middleware=False)
         with assertNumQueries(3):  # retrieve user memberships
-            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
-        assert mocked_get_response_for_middlewaremixin.call_count == 1
+            response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 0
+        assertRedirects(
+            response,
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
+            fetch_redirect_response=False,
+        )
         # Session untouched
         assert request.session.is_empty()
-        # Check new request attributes
-        assert request.current_organization is None
-        assert request.organizations == []
-        assert not request.is_current_organization_admin
-        assert not request.from_authorized_prescriber
 
     def test_prescriber_with_organization(self, mocked_get_response_for_middlewaremixin):
         organization = PrescriberOrganizationFactory(with_membership=True)
@@ -357,15 +357,14 @@ class TestItouCurrentOrganizationMiddleware:
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization.organization_switch_key
         request.session.save()
         with assertNumQueries(3):  # retrieve user memberships
-            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
-        assert mocked_get_response_for_middlewaremixin.call_count == 1
-        # Session cleaned up
-        assert request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) is None
-        # Check new request attributes
-        assert request.current_organization is None
-        assert request.organizations == []
-        assert not request.is_current_organization_admin
-        assert not request.from_authorized_prescriber
+            response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 0
+        assertRedirects(
+            response,
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
+            fetch_redirect_response=False,
+        )
+        assert global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY not in request.session
 
     def test_prescriber_wrong_org_in_session_with_other_org(self, mocked_get_response_for_middlewaremixin):
         prescriber = PrescriberFactory()
@@ -451,7 +450,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(
             response,
-            reverse("logout:warning", kwargs={"kind": "labor_inspector_no_institution"}),
+            reverse("logout:warning", kwargs={"kind": "no_organization"}),
             fetch_redirect_response=False,
         )
         # Session untouched

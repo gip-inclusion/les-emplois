@@ -2779,7 +2779,7 @@ class TestNewHireProcessInfo:
         assert response.status_code == 403
 
     def test_as_prescriber(self, client):
-        client.force_login(PrescriberFactory())
+        client.force_login(PrescriberFactory(membership=True))
         response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}), follow=True)
         assert response.status_code == 403
         response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.geiq.pk}), follow=True)

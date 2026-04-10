@@ -59,18 +59,15 @@ def get_active_company_memberships(user):
         .select_related("convention")
     }
     active_memberships = []
-    has_inactive = False
     for membership in memberships:
         if membership.company_id in companies:
             # The company is active (or in grace period)
             membership.company = companies[membership.company_id]
             active_memberships.append(membership)
-        else:
-            has_inactive = True
     # If there is no current company, we want to default to the first active one
     # (and preferably not one in grace period)
     active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.joined_at))
-    return active_memberships, has_inactive
+    return active_memberships
 
 
 def get_active_prescriber_memberships(user):
@@ -111,7 +108,7 @@ class ItouCurrentOrganizationMiddleware:
         request.from_authorized_prescriber = False
         request.from_institution = False
         if user.is_authenticated and user.is_professional:
-            company_memberships, has_inactive_company_membership = get_active_company_memberships(user)
+            company_memberships = get_active_company_memberships(user)
             prescriber_memberships = get_active_prescriber_memberships(user)
             institution_memberships = get_active_institution_memberships(user)
 
@@ -126,30 +123,14 @@ class ItouCurrentOrganizationMiddleware:
                 request.session,
             )
 
-            # ------------------------------------------
-            # TODO: Refactor this block
             # FT users must have at least one FT organization
             if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
                 m.organization.kind == PrescriberOrganizationKind.FT for m in prescriber_memberships
             ):
                 logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
+            elif not request.current_organization:
+                logout_warning = LogoutWarning.NO_ORGANIZATION
 
-            if not request.current_organization:
-                # SIAE user has no active SIAE and thus must not be able to access any page,
-                # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
-                if has_inactive_company_membership:
-                    request.from_employer = True
-                    logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
-                else:
-                    if request.user.is_employer:
-                        request.from_employer = True
-                        logout_warning = LogoutWarning.EMPLOYER_NO_COMPANY
-                    elif request.user.is_labor_inspector:
-                        request.is_labor_inspector = True
-                        logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
-                    else:
-                        request.from_prescriber = True
-            # ------------------------------------------
             else:
                 if isinstance(request.current_organization, PrescriberOrganization):
                     request.from_prescriber = True

@@ -25,14 +25,12 @@ class TestMembers:
         [
             [JobSeekerFactory, False],
             [partial(EmployerFactory, membership=True), False],
-            [PrescriberFactory, False],
             [partial(PrescriberFactory, membership=True), True],
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
             "job_seeker",
             "employer",
-            "prescriber_no_org",
             "prescriber",
             "labor_inspector",
         ],
@@ -279,27 +277,6 @@ class TestUserMembershipDeactivation:
         response = request(reverse("prescribers_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
         assert response.status_code == 404
         assert mailoutbox == []
-
-    def test_deactivated_prescriber_is_orienter(self, client):
-        """
-        A prescriber deactivated from a prescriber organization
-        and without any membership becomes an "orienteur".
-        As such he must be able to login.
-        """
-        organization = PrescriberOrganizationWith2MembershipFactory()
-        admin = organization.members.filter(prescribermembership__is_admin=True).first()
-        guest = organization.members.filter(prescribermembership__is_admin=False).first()
-
-        client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
-        response = client.post(url)
-        assert response.status_code == 302
-
-        # guest is now an orienter
-        client.force_login(guest)
-        url = reverse("dashboard:index")
-        response = client.post(url)
-        assert response.status_code == 200
 
     def test_deactivate_admin(self, caplog, client, mailoutbox):
         organization = PrescriberOrganizationFactory()

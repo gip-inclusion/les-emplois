@@ -52,7 +52,7 @@ class TestNewsRender:
         # professionals receive all items
         user = random.choice(
             [
-                PrescriberFactory(),
+                PrescriberFactory(membership=True),
                 EmployerFactory(membership=True),
                 LaborInspectorFactory(membership=True),
             ]
@@ -118,7 +118,7 @@ class TestNewsRender:
             content = parse_response_to_soup(response, ".s-section__container")
             assert pretty_indented(content) == snapshot(name="none_exists")
 
-        client.force_login(PrescriberFactory())
+        client.force_login(PrescriberFactory(membership=True))
         url = reverse("announcements:news")
 
         assert_content_matches_snapshot(client.get(url))

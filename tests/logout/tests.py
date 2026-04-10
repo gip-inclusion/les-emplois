@@ -8,13 +8,13 @@ from tests.users.factories import EmployerFactory, LaborInspectorFactory, Prescr
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
-def tests_employers_without_company(client, snapshot):
-    user = EmployerFactory()
-    client.force_login(user)
-    response = client.get("dashboard:index", follow=True)
+def tests_pro_without_organization(client, snapshot):
+    for user in [EmployerFactory(), PrescriberFactory(), LaborInspectorFactory()]:
+        client.force_login(user)
+        response = client.get("dashboard:index", follow=True)
 
-    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_no_company"}))
-    assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
+        assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 
 def tests_employers_with_inactive_company(client, snapshot):
@@ -22,16 +22,7 @@ def tests_employers_with_inactive_company(client, snapshot):
     client.force_login(user)
     response = client.get("dashboard:index", follow=True)
 
-    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
-    assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
-
-
-def test_labor_inspector_with_no_institution(client, snapshot):
-    user = LaborInspectorFactory()
-    client.force_login(user)
-    response = client.get("dashboard:index", follow=True)
-
-    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "labor_inspector_no_institution"}))
+    assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
     assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 

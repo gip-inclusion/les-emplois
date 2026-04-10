@@ -253,6 +253,8 @@ class BaseTestSendInvitation:
             LaborInspectorFactory,
             ItouStaffFactory,
         } - {self.user_factory}
+        if self.user_kind in UserKind.professionals():
+            user_factory_choices -= {EmployerFactory, PrescriberFactory, LaborInspectorFactory}
         guest = random.choice(list(user_factory_choices))()
         post_data = {
             "form-TOTAL_FORMS": "1",
@@ -266,12 +268,7 @@ class BaseTestSendInvitation:
 
         response = client.post(self.invitation_url, data=post_data)
         assert response.status_code == 200
-        if self.user_kind == UserKind.PRESCRIBER:
-            self.assert_no_invitation(response, "Cet utilisateur n'est pas un prescripteur.")
-        elif self.user_kind == UserKind.EMPLOYER:
-            self.assert_no_invitation(response, "Cet utilisateur n'est pas un employeur.")
-        else:
-            self.assert_no_invitation(response, "Cet utilisateur n'est pas un inspecteur du travail.")
+        self.assert_no_invitation(response, "Cet utilisateur n'est pas un professionel.")
 
     def test_already_a_member(self, client):
         self.setup_test(client)
@@ -307,11 +304,6 @@ class TestSendPrescriberInvitation(PrescriberMixin, BaseTestSendInvitation):
         )
         # The form is prefilled with GET params (if valid)
         assertContains(response, "Emma")
-
-    def test_prescriber_without_organization(self, client):
-        client.force_login(PrescriberFactory())
-        response = client.get(self.invitation_url)
-        assert response.status_code == 403
 
 
 class TestSendCompanyInvitation(CompanyMixin, BaseTestSendInvitation):
@@ -445,6 +437,8 @@ class BaseTestAcceptInvitation:
             LaborInspectorFactory,
             ItouStaffFactory,
         } - {self.user_factory}
+        if self.user_kind in UserKind.professionals():
+            user_factory_choices -= {EmployerFactory, PrescriberFactory, LaborInspectorFactory}
         user = random.choice(list(user_factory_choices))()
         invitation = self.invitation_factory(email=user.email)
 

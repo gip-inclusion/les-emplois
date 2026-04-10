@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -13,7 +15,7 @@ def one_request_per_minute(mocker):
 
 
 @freeze_time()
-@pytest.mark.parametrize("user_factory", [None, PrescriberFactory])
+@pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
 def test_throttling(client, user_factory, one_request_per_minute):
     if user_factory is not None:
         client.force_login(user_factory())
