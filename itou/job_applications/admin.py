@@ -312,9 +312,24 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
     actions = [create_employee_record]
 
+    # FK fields that may only be set on ACCEPTED applications (enforced by DB constraints).
+    # When an accept transition is requested via the admin, the form sets these fields
+    # before save_model() runs, but the state is not yet ACCEPTED. We defer them so the
+    # intermediate save doesn't violate the constraint; response_change() restores them
+    # before firing the transition.
+    ACCEPTED_ONLY_FK_FIELDS = ("eligibility_diagnosis", "geiq_eligibility_diagnosis", "approval")
+
     def save_model(self, request, obj, form, change):
         if not change:
             obj.origin = Origin.ADMIN
+
+        if "transition_accept" in request.POST:
+            request._deferred_fk_values = {}
+            for field in self.ACCEPTED_ONLY_FK_FIELDS:
+                value = getattr(obj, field)
+                if value is not None:
+                    request._deferred_fk_values[field] = value
+                    setattr(obj, field, None)
 
         super().save_model(request, obj, form, change)
 
@@ -354,6 +369,10 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         """
         for transition in ["accept", "cancel", "reset", "process"]:
             if f"transition_{transition}" in request.POST:
+                if transition == "accept" and hasattr(request, "_deferred_fk_values"):
+                    for field, value in request._deferred_fk_values.items():
+                        setattr(obj, field, value)
+                    del request._deferred_fk_values
                 try:
                     getattr(obj, transition)(user=request.user)
                     # Stay on same page

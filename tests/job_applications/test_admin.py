@@ -268,10 +268,13 @@ def test_create_then_accept_job_application(admin_client, caplog):
 def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     job_application = factories.JobApplicationFactory(
         sent_by_another_employer=True,
-        with_iae_eligibility_diagnosis=True,
-        eligibility_diagnosis__expires_at=timezone.localdate() - timezone.timedelta(days=1),
+        to_company__subject_to_iae_rules=True,
     )
-    old_diag = job_application.eligibility_diagnosis
+    old_diag = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker=job_application.job_seeker,
+        expires_at=timezone.localdate() - timezone.timedelta(days=1),
+    )
     other_job_seeker_diag = IAEEligibilityDiagnosisFactory(from_employer=True)
     other_company_diag = IAEEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, from_employer=True)
     post_data = {
@@ -302,9 +305,8 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     )
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.PROCESSING
-    assert response.context["errors"] == [
-        ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."]
-    ]
+    errors = response.context["errors"]
+    assert any("Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature." in e for e in errors)
     assertContains(response, 'value="Accepter"')
 
     # use a bad diag (wrong company)
@@ -454,32 +456,10 @@ def test_create_inconsistent_job_application(admin_client):
         **JOB_APPLICATION_FORMSETS_PAYLOAD,
     }
     response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assertRedirects(response, reverse("admin:job_applications_jobapplication_changelist"))
-    job_app = models.JobApplication.objects.get()
-    assertMessages(
-        response,
-        [
-            messages.Message(
-                messages.WARNING,
-                (
-                    "1 objet incohérent: <ul>"
-                    '<li class="warning">'
-                    f'<a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">'
-                    f"candidature - {job_app.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
-                    "</ul>"
-                ),
-            ),
-            messages.Message(
-                messages.SUCCESS,
-                (
-                    "L'objet candidature "
-                    f'« <a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">{job_app.pk}</a> » '
-                    "a été ajouté avec succès."
-                ),
-            ),
-        ],
-    )
+    # The DB constraint prevents creating a non-accepted job application with an approval.
+    assert response.status_code == 200
+    assert response.context["errors"]
+    assert not models.JobApplication.objects.exists()
 
 
 def test_delete_is_possible_when_transition_logs_exists(snapshot, admin_client):

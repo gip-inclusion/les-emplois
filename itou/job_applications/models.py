@@ -895,6 +895,25 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     ~models.Q(sender_kind="prescriber") | models.Q(sender_kind="prescriber", sender_company=None)
                 ),
             ),
+            models.CheckConstraint(
+                name="accepted_eligibility_diagnosis_coherence",
+                violation_error_message=(
+                    "Un diagnostic d'éligibilité IAE ne peut être lié qu'à une candidature acceptée."
+                ),
+                condition=models.Q(state="accepted") | models.Q(eligibility_diagnosis=None),
+            ),
+            models.CheckConstraint(
+                name="accepted_geiq_diagnosis_coherence",
+                violation_error_message=(
+                    "Un diagnostic d'éligibilité GEIQ ne peut être lié qu'à une candidature acceptée."
+                ),
+                condition=models.Q(state="accepted") | models.Q(geiq_eligibility_diagnosis=None),
+            ),
+            models.CheckConstraint(
+                name="accepted_approval_coherence",
+                violation_error_message="Un PASS IAE ne peut être lié qu'à une candidature acceptée.",
+                condition=models.Q(state="accepted") | models.Q(approval=None),
+            ),
         ]
         permissions = [
             ("export_job_applications_unknown_to_ft", "Can export job applications of job seekers unknown to FT")

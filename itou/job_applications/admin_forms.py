@@ -14,13 +14,13 @@ class JobApplicationAdminForm(forms.ModelForm):
             "sender_prescriber_organization": "Organisation émettrice (si type est Prescripteur)",
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, data=None, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
         if self.instance is None:
             self._initial_job_application_state = None
         else:
             self._initial_job_application_state = self.instance.state
-        self._job_application_to_accept = False
+        self._job_application_to_accept = data is not None and "transition_accept" in data
 
     def clean(self):
         super().clean()
@@ -74,3 +74,22 @@ class JobApplicationAdminForm(forms.ModelForm):
                 raise ValidationError("Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature.")
 
         return
+
+    def validate_constraints(self):
+        # The default implementation excludes fields not present in POST data (like `state`,
+        # managed by xworkflows). This would skip accepted-only constraints. Always include
+        # `state` so these constraints are checked at the form level.
+        exclude = self._get_validation_exclusions()
+        exclude.discard("state")
+        if self._job_application_to_accept:
+            # The accept transition will change the state to ACCEPTED, so validate
+            # constraints as if the state were already ACCEPTED.
+            original_state = self.instance.state
+            self.instance.state = "accepted"
+        try:
+            self.instance.validate_constraints(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e)
+        finally:
+            if self._job_application_to_accept:
+                self.instance.state = original_state
