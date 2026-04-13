@@ -12,6 +12,7 @@ from django.views.generic import TemplateView, View
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
@@ -49,11 +50,6 @@ class HirePermissionMixin:
             raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
         if not self.company.has_member(request.user):
             raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-        if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-            raise PermissionDenied(
-                "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                "a posteriori. " + suspension_explanation
-            )
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -119,6 +115,19 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, self.company
             )
+
+    def dispatch(self, request, *args, **kwargs):
+        if (
+            self.is_iae_eligibility_diagnosis_needed()
+            # For employer diagnosis, the sanction presence must be checked
+            or (self.eligibility_diagnosis and self.eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER)
+        ) and (suspension_explanation := self.company.get_active_suspension_text_with_dates()):
+            raise PermissionDenied(
+                "Ce candidat ne dispose ni d’un PASS IAE ni du diagnostic d’un prescripteur habilité et vous ne "
+                "pouvez pas effectuer d’auto-prescription suite aux mesures prises dans le cadre du contrôle "
+                "a posteriori. " + suspension_explanation
+            )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_session(self):
         # Used by BaseFillJobSeekerInfosView, BaseContractInfosView & BaseConfirmationView

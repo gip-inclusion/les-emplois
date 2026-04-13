@@ -24,9 +24,10 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
+from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind, ContractType
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,
@@ -245,18 +246,97 @@ class TestDirectHireFullProcess:
         )
         user = company.members.first()
         client.force_login(user)
-        hire_session = fake_session_initialization(
-            client,
-            company,
-            job_seeker,
-            {"selected_jobs": [], "contract_form_data": {"hiring_start_at": timezone.localdate()}},
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}), follow=True)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+        hire_session_name = get_session_name(client.session, HIRE_SESSION_KIND)
+        check_nir_url = reverse(
+            "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name}
+        )
+        assertRedirects(response, check_nir_url)  # Hire process is not directly blocked
+
+        def check_views(view_names, blocked):
+            for view_name in view_names:
+                url = reverse(
+                    view_name,
+                    kwargs={"session_uuid": hire_session_name},
+                    query={"job_seeker_public_id": job_seeker.public_id},
+                )
+                response = client.get(url, follow=True)
+                if blocked:
+                    assertContains(
+                        response,
+                        "suite aux mesures prises dans le cadre du contrôle a posteriori",
+                        status_code=403,
+                    )
+                else:
+                    assert response.status_code == 200
+
+        check_views(
+            [
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                "apply:hire_fill_job_seeker_infos",
+                "apply:hire_contract_infos",
+            ],
+            blocked=True,
+        )
+        # Add hiring_start_at in session for testing sake
+        # (even if normally impossible since hire_contract_infos view is blocked)
+        session = client.session
+        session[hire_session_name] = {
+            **session[hire_session_name],
+            "contract_form_data": {"hiring_start_at": timezone.localdate()},
+        }
+        session.save()
+
+        check_views(
+            [
+                "apply:iae_eligibility_for_hire",
+                "apply:hire_confirmation",
+            ],
+            blocked=True,
         )
 
-        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
-        assertContains(
-            response,
-            "suite aux mesures prises dans le cadre du contrôle a posteriori",
-            status_code=403,
+        # Now try with an approval
+        approval = ApprovalFactory(user=job_seeker, origin_ai_stock=True)  # AI origin to avoid diagnosis creation
+        check_views(
+            [
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                "apply:hire_fill_job_seeker_infos",
+                "apply:hire_contract_infos",
+                "apply:iae_eligibility_for_hire",
+                "apply:hire_confirmation",
+            ],
+            blocked=False,
+        )
+
+        # Or with an authorized prescriber diagnosis
+        Approval.objects.filter(pk=approval.pk).update(user=JobSeekerFactory())  # Deleting an approval is tricky
+        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True)
+        check_views(
+            [
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                "apply:hire_fill_job_seeker_infos",
+                "apply:hire_contract_infos",
+                "apply:iae_eligibility_for_hire",
+                "apply:hire_confirmation",
+            ],
+            blocked=False,
+        )
+
+        # But blocked with a pre-existing employer diagnosis
+        diagnosis.delete()
+        IAEEligibilityDiagnosisFactory(
+            job_seeker=job_seeker, author_kind=AuthorKind.EMPLOYER, author_siae=company, author=user
+        )
+        check_views(
+            [
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                "apply:hire_fill_job_seeker_infos",
+                "apply:hire_contract_infos",
+                "apply:iae_eligibility_for_hire",
+                "apply:hire_confirmation",
+            ],
+            blocked=True,
         )
 
     @freeze_time("2025-08-22")
