@@ -100,6 +100,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "approval_manually_delivered",  # JobApplication.approval_manually_delivered_by
         "approval_manually_refused",  # JobApplication.approval_manually_refused_by
         "approvals_suspended_set",  # Suspension.created_by
+        "assessmenttransitionlog",  # AssessmentTransitionLog.user
         "auth_token",  # rest_framework.authtoken.models.Token.user
         "authorization_status_set",  # PrescriberOrganization.authorization_updated_by
         "contracts",  # Contract.job_seeker

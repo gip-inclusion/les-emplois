@@ -3,11 +3,13 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django_xworkflows import models as xwf_models
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import File
+from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.users.enums import Title
@@ -54,7 +56,24 @@ class LabelInfos(models.Model):
         return f"Liste récupérée le {timezone.localdate(self.synced_at).isoformat()}"
 
 
-class Assessment(models.Model):
+class AssessmentWorkflow(xwf_models.Workflow):
+    states = AssessmentState.choices
+    initial_state = AssessmentState.NEW
+
+    transitions = (
+        (AssessmentTransition.SUBMIT, AssessmentState.NEW, AssessmentState.SUBMITTED),
+        (AssessmentTransition.REVIEW, AssessmentState.SUBMITTED, AssessmentState.REVIEWED),
+        (
+            AssessmentTransition.FINAL_REVIEW,
+            [AssessmentState.SUBMITTED, AssessmentState.REVIEWED],
+            AssessmentState.FINAL_REVIEWED,
+        ),
+    )
+
+    log_model = "geiq_assessments.AssessmentTransitionLog"
+
+
+class Assessment(xwf_models.WorkflowEnabled, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField("créé le", auto_now_add=True)
     created_by = models.ForeignKey(
@@ -63,6 +82,7 @@ class Assessment(models.Model):
         related_name="created_assessments",
         on_delete=models.RESTRICT,  # For traceability and accountability
     )
+    state = xwf_models.StateField(AssessmentWorkflow, verbose_name="état")
     campaign = models.ForeignKey(AssessmentCampaign, related_name="assessments", on_delete=models.PROTECT)
     companies = models.ManyToManyField(
         Company,
@@ -255,6 +275,13 @@ class Assessment(models.Model):
                 ),
             ),
             models.CheckConstraint(
+                name="geiq_assessment_state_submitted_at",
+                violation_error_message="Impossible d'avoir de date de soumission si le statut est "
+                f"{AssessmentState.NEW.label}.",
+                condition=models.Q(submitted_at=None, state=AssessmentState.NEW)
+                | (models.Q(submitted_at__isnull=False) & ~models.Q(state=AssessmentState.NEW)),
+            ),
+            models.CheckConstraint(
                 name="geiq_assessment_full_or_no_review",
                 violation_error_message="Impossible d'avoir un contrôle partiel",
                 condition=(
@@ -270,6 +297,17 @@ class Assessment(models.Model):
                 ),
             ),
             models.CheckConstraint(
+                name="geiq_assessment_state_reviewed_at",
+                violation_error_message="Impossible d'avoir de date de contrôle si le statut est "
+                f"{AssessmentState.NEW.label} ou {AssessmentState.SUBMITTED.label}.",
+                condition=models.Q(reviewed_at=None, state__in=[AssessmentState.NEW, AssessmentState.SUBMITTED])
+                | (
+                    models.Q(
+                        reviewed_at__isnull=False, state__in=[AssessmentState.REVIEWED, AssessmentState.FINAL_REVIEWED]
+                    )
+                ),
+            ),
+            models.CheckConstraint(
                 name="geiq_assessment_full_or_no_final_review",
                 violation_error_message="Impossible d'avoir un contrôle DREETS partiel",
                 condition=(
@@ -280,6 +318,13 @@ class Assessment(models.Model):
                         final_reviewed_by_institution__isnull=False,
                     )
                 ),
+            ),
+            models.CheckConstraint(
+                name="geiq_assessment_state_final_reviewed_at",
+                violation_error_message="Impossible d'avoir de date de contrôle DREETS si le statut n'est "
+                f"pas {AssessmentState.FINAL_REVIEWED.label}.",
+                condition=(models.Q(final_reviewed_at=None) & ~models.Q(state=AssessmentState.FINAL_REVIEWED))
+                | (models.Q(final_reviewed_at__isnull=False, state=AssessmentState.FINAL_REVIEWED)),
             ),
             models.UniqueConstraint(
                 fields=["campaign", "label_geiq_id"],
@@ -350,6 +395,23 @@ class Assessment(models.Model):
                 ]
             )
         return antenna_names
+
+
+class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
+    MODIFIED_OBJECT_FIELD = "assessment"
+    EXTRA_LOG_ATTRIBUTES = (("user", "user", None), ("institution", "institution", None))
+
+    assessment = models.ForeignKey(Assessment, related_name="logs", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT)
+    institution = models.ForeignKey(Institution, null=True, on_delete=models.RESTRICT)
+
+    class Meta:
+        verbose_name = "log des transitions du bilan d'exécution"
+        verbose_name_plural = "logs des transitions du bilan d'exécution"
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return str(self.id)
 
 
 class AssessmentInstitutionLink(models.Model):

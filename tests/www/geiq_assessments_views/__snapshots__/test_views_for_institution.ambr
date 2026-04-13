@@ -2784,6 +2784,7 @@
           SELECT "geiq_assessments_assessment"."id",
                  "geiq_assessments_assessment"."created_at",
                  "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."state",
                  "geiq_assessments_assessment"."campaign_id",
                  "geiq_assessments_assessment"."label_geiq_id",
                  "geiq_assessments_assessment"."label_geiq_name",

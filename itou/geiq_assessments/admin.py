@@ -106,6 +106,13 @@ class CompaniesInline(ReadonlyMixin, ItouTabularInline):
     verbose_name_plural = "entreprises concernées"
 
 
+class TransitionLogInline(ReadonlyMixin, ItouTabularInline):
+    model = models.AssessmentTransitionLog
+    extra = 0
+    raw_id_fields = ("user", "institution")
+    readonly_fields = ("transition", "from_state", "to_state", "user", "institution", "timestamp")
+
+
 @admin.register(models.Assessment)
 class AssessmentAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = [
@@ -119,6 +126,7 @@ class AssessmentAdmin(ReadonlyMixin, ItouModelAdmin):
     inlines = [
         AssessmentInstitutionLinkInline,
         CompaniesInline,
+        TransitionLogInline,
         EmployeeInline,
     ]
     fieldsets = (
