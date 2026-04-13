@@ -107,10 +107,10 @@ class TestSiaeJobApplicationListView:
         assert evaluated_job_application == response.context["evaluated_job_applications"][0]
         assert reverse("dashboard:index") == response.context["back_url"]
 
+        asked_at_local = timezone.localtime(evaluated_siae.evaluation_campaign.evaluations_asked_at)
         assertContains(
             response,
-            f"Contrôle initié le "
-            f"{dateformat.format(evaluated_siae.evaluation_campaign.evaluations_asked_at, 'd E Y').lower()}",
+            f"Contrôle initié le {dateformat.format(asked_at_local, 'd E Y').lower()}",
         )
 
     def test_redirection(self, client):

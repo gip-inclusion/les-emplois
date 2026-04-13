@@ -140,7 +140,11 @@ class SuspensionFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory)
         model = Suspension
 
     approval = factory.SubFactory(ApprovalFactory)
-    start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
+    start_at = factory.Faker(
+        "date_between",
+        start_date=factory.SelfAttribute("..approval.start_at"),
+        end_date=factory.LazyFunction(timezone.localdate),
+    )
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
     siae = factory.SubFactory(CompanyFactory)
 
@@ -164,7 +168,11 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
         )
 
     approval = factory.SubFactory(ApprovalFactory)
-    start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
+    start_at = factory.Faker(
+        "date_between",
+        start_date=factory.SelfAttribute("..approval.start_at"),
+        end_date=factory.LazyFunction(timezone.localdate),
+    )
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + datetime.timedelta(days=30))
     reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."

@@ -528,7 +528,8 @@ class TestInstitutionEvaluatedSiaeListView:
             )
         )
         assert response.context["back_url"] == reverse("dashboard:index")
-        assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
+        asked_at_local = timezone.localtime(evaluation_campaign.evaluations_asked_at)
+        assertContains(response, dateformat.format(asked_at_local, "d F Y"))
 
     def test_siae_infos(self, client, snapshot):
         client.force_login(self.user)

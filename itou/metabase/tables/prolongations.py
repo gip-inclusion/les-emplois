@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from itou.approvals.models import Prolongation
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -16,7 +18,7 @@ TABLE.add_columns(
             "name": "date_de_création",
             "type": "date",
             "comment": "Date de création",
-            "fn": lambda o: o.created_at.date(),
+            "fn": lambda o: timezone.localdate(o.created_at),
         },
         get_column_from_field(get_model_field(Prolongation, "request"), name="id_demande_de_prolongation"),
     ]
