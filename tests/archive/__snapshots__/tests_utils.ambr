@@ -6,6 +6,7 @@
     'approval_manually_refused__isnull': True,
     'approvals__isnull': True,
     'approvals_suspended_set__isnull': True,
+    'assessmenttransitionlog__isnull': True,
     'authorization_status_set__isnull': True,
     'contracts__isnull': True,
     'created_assessments__isnull': True,

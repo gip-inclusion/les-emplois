@@ -22,6 +22,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.geiq_assessments import sync
+from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -305,7 +306,8 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
         else:
             assessment.submitted_at = timezone.now()
             assessment.submitted_by = request.user
-            assessment.save(update_fields=("submitted_at", "submitted_by"))
+            assessment.state = AssessmentState.SUBMITTED
+            assessment.save(update_fields=("submitted_at", "submitted_by", "state"))
             # Preselect all contracts for institution validation
             EmployeeContract.objects.filter(employee__assessment=assessment).update(
                 allowance_granted=F("allowance_requested")
@@ -854,7 +856,8 @@ def assessment_details_for_institution(
                 assessment.reviewed_at = now
                 assessment.reviewed_by = request.user
                 assessment.reviewed_by_institution = request.current_organization
-                assessment.save(update_fields=("reviewed_at", "reviewed_by", "reviewed_by_institution"))
+                assessment.state = AssessmentState.REVIEWED
+                assessment.save(update_fields=("reviewed_at", "reviewed_by", "reviewed_by_institution", "state"))
                 logger.info(
                     "user=%s reviewed the assessment=%s",
                     request.user.pk,
@@ -869,8 +872,14 @@ def assessment_details_for_institution(
                     assessment.final_reviewed_at = now
                     assessment.final_reviewed_by = request.user
                     assessment.final_reviewed_by_institution = request.current_organization
+                    assessment.state = AssessmentState.FINAL_REVIEWED
                     assessment.save(
-                        update_fields=("final_reviewed_at", "final_reviewed_by", "final_reviewed_by_institution")
+                        update_fields=(
+                            "final_reviewed_at",
+                            "final_reviewed_by",
+                            "final_reviewed_by_institution",
+                            "state",
+                        )
                     )
                     logger.info(
                         "user=%s dreets-reviewed the assessment=%s",
@@ -905,7 +914,8 @@ def assessment_details_for_institution(
                 assessment.reviewed_at = None
                 assessment.reviewed_by = None
                 assessment.reviewed_by_institution = None
-                assessment.save(update_fields=("reviewed_at", "reviewed_by", "reviewed_by_institution"))
+                assessment.state = AssessmentState.SUBMITTED
+                assessment.save(update_fields=("reviewed_at", "reviewed_by", "reviewed_by_institution", "state"))
                 logger.info(
                     "user=%s asked for a fix of assessment=%s",
                     request.user.pk,

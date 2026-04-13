@@ -6,6 +6,7 @@ import factory.fuzzy
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -56,6 +57,16 @@ class AssessmentFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory)
     created_by = factory.SubFactory(EmployerFactory, membership__company__kind=CompanyKind.GEIQ)
     label_geiq_id = factory.Sequence(int)
     label_antennas = []
+
+    @factory.lazy_attribute
+    def state(obj):
+        if getattr(obj, "final_reviewed_at", None):
+            return AssessmentState.FINAL_REVIEWED
+        if getattr(obj, "reviewed_at", None):
+            return AssessmentState.REVIEWED
+        if getattr(obj, "submitted_at", None):
+            return AssessmentState.SUBMITTED
+        return AssessmentState.NEW
 
     @factory.post_generation
     def companies(self, create, extracted, **kwargs):

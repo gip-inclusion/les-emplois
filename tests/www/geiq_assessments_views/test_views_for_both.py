@@ -11,6 +11,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
@@ -185,6 +186,7 @@ class TestAssessmentContractsListAndToggle:
         )
         assessment.submitted_at = timezone.now()
         assessment.submitted_by = geiq_membership.user
+        assessment.state = AssessmentState.SUBMITTED
         assessment.save()
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -526,6 +528,7 @@ class TestAssessmentContractsDetails:
         # Submit the assessment
         assessment.submitted_at = timezone.now()
         assessment.submitted_by = geiq_membership.user
+        assessment.state = AssessmentState.SUBMITTED
         assessment.save()
         check_user_access_to_all_tabs(ddets_membership.user, access=True)
 

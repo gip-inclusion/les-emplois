@@ -18,6 +18,7 @@ from pytest_django.asserts import (
 )
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
 from itou.institutions.enums import InstitutionKind
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -810,6 +811,7 @@ class TestAssessmentGetFile:
         filled_assessment.contracts_selection_validated_at = timezone.now()
         filled_assessment.submitted_by = geiq_membership.user
         filled_assessment.submitted_at = timezone.now()
+        filled_assessment.state = AssessmentState.SUBMITTED
         filled_assessment.save()
 
         # GEIQ & institution can now access the files
@@ -1048,6 +1050,7 @@ class TestAssessmentUploadActionFinancialAssessment:
         assessment.contracts_selection_validated_at = timezone.now()
         assessment.submitted_by = geiq_membership.user
         assessment.submitted_at = timezone.now()
+        assessment.state = AssessmentState.SUBMITTED
         assessment.save()
         response = client.get(url)
         assert response.status_code == 404

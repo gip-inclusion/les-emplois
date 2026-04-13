@@ -1,9 +1,11 @@
 import datetime
+import random
 
 import pytest
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
+from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import AssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
@@ -20,7 +22,7 @@ from tests.users.factories import EmployerFactory
 def test_campaign_review_after_submission_constraint():
     june_1st = datetime.date(2024, 6, 1)
     july_1st = datetime.date(2024, 7, 1)
-    with pytest.raises(IntegrityError):
+    with pytest.raises(IntegrityError, match=r".*geiq_review_after_submission.*"):
         with transaction.atomic():
             AssessmentCampaign.objects.create(
                 year=2023,
@@ -54,16 +56,19 @@ def test_assessment_date_order_constraints():
             assessment.action_financial_assessment_file = FileFactory()
             assessment.structure_financial_assessment_file = FileFactory()
             assessment.geiq_comment = "Bonjour, merci, au revoir !"
+            assessment.state = AssessmentState.SUBMITTED
         elif date_field == "reviewed_at":
             ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
             assessment.reviewed_by = ddets_membership.user
             assessment.reviewed_by_institution = ddets_membership.institution
             assessment.review_comment = "Bravo !"
+            assessment.state = AssessmentState.REVIEWED
         elif date_field == "final_reviewed_at":
             dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
             assessment.final_reviewed_by = dreets_membership.user
             assessment.final_reviewed_by_institution = dreets_membership.institution
-        with pytest.raises(IntegrityError):
+            assessment.state = AssessmentState.FINAL_REVIEWED
+        with pytest.raises(IntegrityError, match=r".*geiq_assessment_.*_before_.*"):
             with transaction.atomic():
                 setattr(assessment, date_field, previous_field_value - datetime.timedelta(hours=1))
                 assessment.save()
@@ -78,9 +83,10 @@ def test_assessment_full_submission_or_no_submission_constraint():
         contracts_synced_at=timezone.now() + datetime.timedelta(hours=1),
         contracts_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
     )
-    with pytest.raises(IntegrityError):
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_full_or_no_submission.*"):
         with transaction.atomic():
             assessment.submitted_at = timezone.now() + datetime.timedelta(hours=1)
+            assessment.state = AssessmentState.SUBMITTED
             assessment.save()
     # Add required submission fields
     assessment.submitted_by = EmployerFactory()
@@ -88,6 +94,32 @@ def test_assessment_full_submission_or_no_submission_constraint():
     assessment.structure_financial_assessment_file = FileFactory()
     assessment.action_financial_assessment_file = FileFactory()
     assessment.geiq_comment = "Bonjour, merci, au revoir !"
+    assessment.save()
+
+
+def test_assessment_state_submitted_at_constraint():
+    assessment = AssessmentFactory(
+        campaign__year=2023,
+        contracts_synced_at=timezone.now() + datetime.timedelta(hours=1),
+        contracts_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+    )
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_submitted_at.*"):
+        with transaction.atomic():
+            assessment.state = AssessmentState.SUBMITTED
+            assessment.save()
+
+    assessment.submitted_at = timezone.now() + datetime.timedelta(hours=1)
+    assessment.submitted_by = EmployerFactory()
+    assessment.summary_document_file = FileFactory()
+    assessment.structure_financial_assessment_file = FileFactory()
+    assessment.action_financial_assessment_file = FileFactory()
+    assessment.geiq_comment = "Bonjour, merci, au revoir !"
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_submitted_at.*"):
+        with transaction.atomic():
+            assessment.state = AssessmentState.NEW
+            assessment.save()
+
+    assessment.state = AssessmentState.SUBMITTED
     assessment.save()
 
 
@@ -100,9 +132,10 @@ def test_assessment_full_or_no_review_constraint():
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
     )
-    with pytest.raises(IntegrityError):
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_full_or_no_review.*"):
         with transaction.atomic():
             assessment.reviewed_at = assessment.decision_validated_at + datetime.timedelta(hours=1)
+            assessment.state = AssessmentState.REVIEWED
             assessment.save()
 
     # Add missing review fields
@@ -110,6 +143,34 @@ def test_assessment_full_or_no_review_constraint():
     assessment.reviewed_by = ddets_membership.user
     assessment.reviewed_by_institution = ddets_membership.institution
     assessment.review_comment = "Bravo !"
+    assessment.save()
+
+
+def test_assessment_state_reviewed_at_constraint():
+    assessment = AssessmentFactory(
+        campaign__year=2023,
+        with_submission_requirements=True,
+        submitted_at=timezone.now() + datetime.timedelta(hours=1),
+        submitted_by=EmployerFactory(),
+        grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+        decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+    )
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_reviewed_at.*"):
+        with transaction.atomic():
+            assessment.state = AssessmentState.REVIEWED
+            assessment.save()
+
+    assessment.reviewed_at = assessment.decision_validated_at + datetime.timedelta(hours=1)
+    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    assessment.reviewed_by = ddets_membership.user
+    assessment.reviewed_by_institution = ddets_membership.institution
+    assessment.review_comment = "Bravo !"
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_reviewed_at.*"):
+        with transaction.atomic():
+            assessment.state = random.choice([AssessmentState.NEW, AssessmentState.SUBMITTED])
+            assessment.save()
+
+    assessment.state = AssessmentState.REVIEWED
     assessment.save()
 
 
@@ -127,15 +188,50 @@ def test_assessment_full_or_no_final_review_constraint():
         reviewed_by_institution=ddets_membership.institution,
         review_comment="Bravo !",
     )
-    with pytest.raises(IntegrityError):
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_full_or_no_final_review.*"):
         with transaction.atomic():
             assessment.final_reviewed_at = assessment.decision_validated_at + datetime.timedelta(hours=1)
+            assessment.state = AssessmentState.FINAL_REVIEWED
             assessment.save()
 
     # Add missing review fields
     dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
     assessment.final_reviewed_by = dreets_membership.user
     assessment.final_reviewed_by_institution = dreets_membership.institution
+    assessment.save()
+
+
+def test_assessment_state_final_reviewed_at_constraint():
+    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    assessment = AssessmentFactory(
+        campaign__year=2023,
+        with_submission_requirements=True,
+        submitted_at=timezone.now() + datetime.timedelta(hours=1),
+        submitted_by=EmployerFactory(),
+        grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+        decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+        reviewed_at=timezone.now() + datetime.timedelta(hours=1),
+        reviewed_by=ddets_membership.user,
+        reviewed_by_institution=ddets_membership.institution,
+        review_comment="Bravo !",
+    )
+    with pytest.raises(IntegrityError, match=r"geiq_assessment_state_final_reviewed_at.*"):
+        with transaction.atomic():
+            assessment.state = AssessmentState.FINAL_REVIEWED
+            assessment.save()
+
+    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    assessment.final_reviewed_at = assessment.decision_validated_at + datetime.timedelta(hours=1)
+    assessment.final_reviewed_by = dreets_membership.user
+    assessment.final_reviewed_by_institution = dreets_membership.institution
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_state_final_reviewed_at.*"):
+        with transaction.atomic():
+            assessment.state = random.choice(
+                [AssessmentState.NEW, AssessmentState.SUBMITTED, AssessmentState.REVIEWED]
+            )
+            assessment.save()
+
+    assessment.state = AssessmentState.FINAL_REVIEWED
     assessment.save()
 
 

@@ -9,6 +9,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.www.geiq_assessments_views.views import (
@@ -316,6 +317,7 @@ class TestAssessmentDetailsForInstitutionView:
         )
         assessment.submitted_at = timezone.now() + datetime.timedelta(hours=3)
         assessment.submitted_by = geiq_membership.user
+        assessment.state = AssessmentState.SUBMITTED
         assessment.save()
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
@@ -352,6 +354,7 @@ class TestAssessmentDetailsForInstitutionView:
         assessment.reviewed_by = ddets_membership.user
         assessment.reviewed_by_institution = ddets_membership.institution
         assessment.review_comment = "Bravo !"
+        assessment.state = AssessmentState.REVIEWED
         assessment.save()
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
@@ -368,6 +371,7 @@ class TestAssessmentDetailsForInstitutionView:
         assessment.final_reviewed_at = timezone.now() + datetime.timedelta(hours=7)
         assessment.final_reviewed_by = dreets_membership.user
         assessment.final_reviewed_by_institution = dreets_membership.institution
+        assessment.state = AssessmentState.FINAL_REVIEWED
         assessment.save()
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
@@ -587,6 +591,7 @@ class TestAssessmentContractsListForInstitutionView:
         )
         assessment.submitted_at = timezone.now()
         assessment.submitted_by = geiq_membership.user
+        assessment.state = AssessmentState.SUBMITTED
         assessment.save()
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -851,6 +856,7 @@ class TestAssessmentReviewView:
         assessment.final_reviewed_at = timezone.now() + datetime.timedelta(hours=7)
         assessment.final_reviewed_by = dreets_membership.user
         assessment.final_reviewed_by_institution = dreets_membership.institution
+        assessment.state = AssessmentState.FINAL_REVIEWED
         assessment.save()
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
