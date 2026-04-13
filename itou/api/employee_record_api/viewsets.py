@@ -1,7 +1,6 @@
 import logging
 
-from django.db.models import DateField
-from django.db.models.functions import Cast
+from django.db.models.functions import TruncDate
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.throttling import UserRateThrottle
@@ -58,8 +57,9 @@ class AbstractEmployeeRecordViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyMode
 
 
 def _annotate_convert_created_at(queryset):
-    # Add a new `creation_date` field (cast of `created_at` to a date)
-    return queryset.annotate(creation_date=Cast("created_at", output_field=DateField()))
+    # Add a new `creation_date` field: convert `created_at` to a local date with
+    # `TruncDate` which computes the date after timezone conversion
+    return queryset.annotate(creation_date=TruncDate("created_at"))
 
 
 class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):

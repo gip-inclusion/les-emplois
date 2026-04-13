@@ -203,7 +203,7 @@ class TestEvaluatedSiaeSanctionView:
             response,
             f"""
             <b>Mode de notification :</b>
-            Transmis par e-mail le {self.evaluated_siae.notified_at.strftime("%d/%m/%Y")}
+            Transmis par e-mail le {timezone.localtime(self.evaluated_siae.notified_at).strftime("%d/%m/%Y")}
             """,
             html=True,
             count=int(not has_significant_sanction),

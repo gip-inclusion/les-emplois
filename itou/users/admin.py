@@ -709,7 +709,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         messages.success(request, format_html("Réactivation de l'utilisateur {user} effectuée.", user=user))
         add_support_remark_to_obj(
             user,
-            f"{timezone.now():%Y-%m-%d} ({request.user.get_full_name()}): Réactivation de l’utilisateur",
+            f"{timezone.localdate():%Y-%m-%d} ({request.user.get_full_name()}): Réactivation de l’utilisateur",
         )
         return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
 

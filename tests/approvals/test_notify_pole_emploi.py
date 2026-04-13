@@ -218,12 +218,12 @@ class TestApprovalNotifyPoleEmploiIntegration:
 
     @respx.mock
     def test_notification_stays_pending_if_approval_starts_after_today(self, caplog):
-        now = timezone.now()
+        today = timezone.localdate()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
-        tomorrow = (now + datetime.timedelta(days=1)).date()
+        tomorrow = today + datetime.timedelta(days=1)
         approval = ApprovalFactory(start_at=tomorrow)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -231,7 +231,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         assert (
             f"! notify_pole_emploi approval={approval} "
             f"start_at={approval.start_at} "
-            f"starts after today={now.date()}" == caplog.messages[0]
+            f"starts after today={today}" == caplog.messages[0]
         )
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"

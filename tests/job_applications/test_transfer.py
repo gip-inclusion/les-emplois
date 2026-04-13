@@ -181,7 +181,7 @@ def test_model_fields(snapshot):
 
     assert job_application.transferred_by == origin_user
     assert job_application.transferred_from == origin_company
-    assert timezone.localdate() == job_application.transferred_at.date()
+    assert timezone.localdate() == timezone.localdate(job_application.transferred_at)
     assert job_application.to_company == target_company
     assert job_application.state == JobApplicationState.NEW
     assert job_application.eligibility_diagnosis is None

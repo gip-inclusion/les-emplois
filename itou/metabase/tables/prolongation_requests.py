@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.metabase.tables.utils import (
@@ -40,7 +42,7 @@ TABLE.add_columns(
             "name": "date_de_demande",
             "type": "date",
             "comment": "Date de la demande",
-            "fn": lambda o: o.created_at.date(),
+            "fn": lambda o: timezone.localdate(o.created_at),
         },
         get_column_from_field(get_model_field(ProlongationRequest, "processed_at"), name="date_traitement"),
         get_column_from_field(get_model_field(ProlongationRequest, "processed_by"), name="id_utilisateur_traitant"),
