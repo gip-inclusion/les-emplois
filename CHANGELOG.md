@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## 2026-04-13
+
+### Ajouté
+
+- [Candidature : Inciter à accepter la candidature déjà présente pour ne pas créer de doublons](https://github.com/gip-inclusion/les-emplois/pull/7765)
+- [DDETS : Ajout du filtre "Eligible à l'aide" pour les contrats de bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7813)
+- [GEIQ : Ajout du filtre "Aide demandée" pour les contrats de bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7802)
+- [GEIQ : Ajout du filtre "Aide potentielle" pour la sélection des contrats du bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7782)
+- [GEIQ : Impression des bilans pour les DDETS/DREETS](https://github.com/gip-inclusion/les-emplois/pull/7771)
+
+### Modifié
+
+- [Admin : Le champ 'Entreprise gérant le PASS' ne peut correspondre à une structure qui n'est pas une SIAE](https://github.com/gip-inclusion/les-emplois/pull/7848)
+- [Candidats : Utiliser le nouvel objet intermédiaire pour lister les candidats](https://github.com/gip-inclusion/les-emplois/pull/7787)
+- [Candidature : La page d'une candidature acceptée en GEIQ affichait systématiquement le diagnostic comme valide](https://github.com/gip-inclusion/les-emplois/pull/7779)
+- [Candidature : Suppression du champ "nombre de jours d'accompagnement"](https://github.com/gip-inclusion/les-emplois/pull/7844)
+- [Connexion : Demander une authentification multi-facteurs (MFA) sur ProConnect, si possible](https://github.com/gip-inclusion/les-emplois/pull/7786)
+- [Fiches salarié : Modification des codes commune et pays envoyés à l'ASP pour les lieux de naissance dans certains territoires (dont la Nouvelle-Calédonie)](https://github.com/gip-inclusion/les-emplois/pull/7843)
+- [Interface : Supprimer le badge statut de candidature si on complète un formulaire d’acceptation de candidature](https://github.com/gip-inclusion/les-emplois/pull/7860)
+
+### Tech
+
+- [Tech : Modifications nécessaire pour lancer le projet sur une machine Apple Silicon](https://github.com/gip-inclusion/les-emplois/pull/7845)
+
 ## 2026-04-06
 
 ### Ajouté
