@@ -46,30 +46,30 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
@@ -77,8 +77,8 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item">
-                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
                                   Archiver
@@ -130,30 +130,30 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
@@ -161,8 +161,8 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item">
-                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
                                   Archiver
@@ -213,38 +213,38 @@
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
                       <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
-                              <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                              <i aria-hidden="true" class="ri-eye-line fw-medium">
                               </i>
                               <span>
                                   Étudier
                               </span>
                           </button>
                       </form>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </a>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -295,30 +295,30 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
@@ -326,8 +326,8 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item">
-                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
                                   Archiver
@@ -379,30 +379,30 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
@@ -410,8 +410,8 @@
                       </button>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item">
-                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
                                   Archiver
@@ -462,38 +462,38 @@
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
                       <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
-                              <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                              <i aria-hidden="true" class="ri-eye-line fw-medium">
                               </i>
                               <span>
                                   Étudier
                               </span>
                           </button>
                       </form>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </a>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </button>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -541,37 +541,37 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -619,37 +619,37 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -697,37 +697,37 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </a>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </button>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -775,37 +775,37 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </a>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -853,37 +853,37 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </a>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
@@ -934,30 +934,30 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </button>
                       <hr class="dropdown-divider m-0"/>
-                      <a class="btn justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
@@ -965,8 +965,8 @@
                       </a>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item">
-                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
                                   Archiver
@@ -1018,30 +1018,30 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </button>
                       <hr class="dropdown-divider m-0"/>
-                      <a class="btn justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
@@ -1049,8 +1049,8 @@
                       </a>
                       <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn justify-content-start dropdown-item">
-                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          <button class="btn btn-ico justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium">
                               </i>
                               <span>
                                   Archiver
@@ -1099,37 +1099,37 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium">
                           </i>
                           <span>
                               Mettre en attente
                           </span>
                       </a>
-                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
-                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                      <a class="btn btn-ico justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium">
                           </i>
                           <span>
                               Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
-                          <i class="ri-arrow-left-right-line me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i aria-hidden="true" class="ri-arrow-left-right-line fw-medium">
                           </i>
                           <span>
                               Transférer vers
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium">
                           </i>
                           <span>
                               Archiver
