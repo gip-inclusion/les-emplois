@@ -7,7 +7,7 @@
     <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl input-group-search{% endif %} flex-nowrap align-items-center">
         <label class="input-group-text mb-0{% if is_home %} ps-0{% endif %}" for="{{ form.city.id_for_label }}">
             <span class="visually-hidden">{{ form.city.label }}</span>
-            <i class="ri-map-pin-line fw-medium ri-xl{% if is_home %}text-tertiary{% else %}text-disabled{% endif %}" aria-hidden="true"></i>
+            <i class="ri-map-pin-line fw-medium ri-xl {% if is_home %}text-tertiary{% else %}text-disabled{% endif %}" aria-hidden="true"></i>
         </label>
         {{ form.city }}
     </div>

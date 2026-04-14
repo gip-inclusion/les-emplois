@@ -8,7 +8,7 @@
                   <span class="visually-hidden">
                       Ville
                   </span>
-                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xltext-disabled">
+                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-disabled">
                   </i>
               </label>
               <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
@@ -1497,7 +1497,7 @@
                                                   <span class="visually-hidden">
                                                       Ville
                                                   </span>
-                                                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xltext-disabled">
+                                                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-disabled">
                                                   </i>
                                               </label>
                                               <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
@@ -1689,7 +1689,7 @@
                                                   <span class="visually-hidden">
                                                       Ville
                                                   </span>
-                                                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xltext-disabled">
+                                                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-disabled">
                                                   </i>
                                               </label>
                                               <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
