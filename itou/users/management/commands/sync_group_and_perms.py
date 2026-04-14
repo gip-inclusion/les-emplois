@@ -127,6 +127,7 @@ def get_permissions_dict():
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         prescribers_models.PrescriberOrganization: PERMS_READ,
         users_models.User: PERMS_ADD | PERMS_HIJACK | PERMS_EXPORT_CTA,
+        users_models.JobSeekerAssignment: PERMS_READ,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
     group_pilotage_admin_permissions = {
