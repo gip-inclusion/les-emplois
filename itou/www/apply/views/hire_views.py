@@ -152,7 +152,7 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
 
 
 class CheckPreviousApplicationsForHireView(HireBaseView):
-    template_name = "apply/submit_step_check_prev_applications.html"
+    template_name = "apply/hire_step_check_prev_applications.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

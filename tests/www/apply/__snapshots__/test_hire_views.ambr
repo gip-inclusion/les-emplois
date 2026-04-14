@@ -2000,7 +2000,7 @@
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit_step_check_prev_applications.html]',
+          'ExtendsNode[apply/hire_step_check_prev_applications.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2020,7 +2020,7 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit_step_check_prev_applications.html]',
+          'ExtendsNode[apply/hire_step_check_prev_applications.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
