@@ -197,8 +197,10 @@ class FollowUpGroupMembership(models.Model):
 
     @property
     def organization_name(self):
-        return next((org.name for org in self.member.prescriberorganization_set.all()), None) or next(
-            (company.display_name for company in self.member.company_set.all()), None
+        return next(
+            (org.name for org in self.member.prescriberorganization_set.filter(memberships__is_active=True)), None
+        ) or next(
+            (company.display_name for company in self.member.company_set.filter(memberships__is_active=True)), None
         )
 
     @property
