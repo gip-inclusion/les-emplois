@@ -7,7 +7,9 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.www.gps.enums import EndReason
+from tests.companies.factories import CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -147,6 +149,30 @@ class TestFollowBeneficiary:
 
         assert not FollowUpGroup.objects.exists()
         assert f"Cannot follow beneficiary with inactive user={user}" in caplog.messages
+
+
+class TestFollowUpGroupMembership:
+    def test_organization_name_with_company_membership(self):
+        # Inactive membership => None
+        company_mship = CompanyMembershipFactory(is_active=False)
+        group = FollowUpGroupMembershipFactory(member=company_mship.user)
+        assert group.organization_name is None
+
+        # Active membership => company name
+        company_mship.is_active = True
+        company_mship.save()
+        assert group.organization_name == company_mship.company.display_name
+
+    def test_organization_name_with_organization_membership(self):
+        # Inactive membership => None
+        prescriber_mship = PrescriberMembershipFactory(is_active=False)
+        group = FollowUpGroupMembershipFactory(member=prescriber_mship.user)
+        assert group.organization_name is None
+
+        # Active membership => prescriber organization name
+        prescriber_mship.is_active = True
+        prescriber_mship.save()
+        assert group.organization_name == prescriber_mship.organization.display_name
 
 
 @freeze_time("2025-02-13T16:44:42")
