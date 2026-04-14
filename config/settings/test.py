@@ -16,6 +16,8 @@ from config.settings.base import *  # noqa: E402,F403
 SECRET_KEY = "foobar"
 ALLOWED_HOSTS = []
 
+SECURE_SSL_REDIRECT = False
+
 # We *want* to do the same `collectstatic` on the CI than on PROD to catch errors early,
 # but we don't want to do it when running the test suite locally for performance reasons.
 if not os.getenv("CI", False):
