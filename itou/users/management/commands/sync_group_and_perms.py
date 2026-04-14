@@ -46,6 +46,7 @@ def get_permissions_dict():
     import itou.invitations.models as invitation_models
     import itou.job_applications.models as job_applications_models
     import itou.jobs.models as jobs_models
+    import itou.nexus.models as nexus_models
     import itou.prescribers.models as prescribers_models
     import itou.siae_evaluations.models as siae_evaluations_models
     import itou.users.models as users_models
@@ -104,6 +105,7 @@ def get_permissions_dict():
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         jobs_models.Appellation: PERMS_READ,
         jobs_models.Rome: PERMS_READ,
+        nexus_models.ActivatedService: PERMS_DELETE,
         prescribers_models.PrescriberMembership: PERMS_ADD,
         prescribers_models.PrescriberOrganization: PERMS_ALL,
         siae_evaluations_models.Calendar: PERMS_READ,
