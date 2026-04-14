@@ -1161,7 +1161,7 @@ class NirModificationRequestAdmin(ItouModelAdmin):
 
 
 @admin.register(models.JobSeekerAssignment)
-class JobSeekerAssignmentAdmin(ReadonlyMixin, ItouModelAdmin):
+class JobSeekerAssignmentAdmin(ItouModelAdmin):
     list_display = [
         "job_seeker_display",
         "professional_display",
