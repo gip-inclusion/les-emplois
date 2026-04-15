@@ -34,6 +34,6 @@ def readonly_view(function=None, *, except_methods=None):
 
 class ReadonlyViewMixin:
     @classmethod
-    def as_view(cls, **initkwargs):
-        view = super().as_view(**initkwargs)
+    def as_view(cls, *args, **kwargs):
+        view = super().as_view(*args, **kwargs)
         return readonly_view(except_methods=getattr(cls, "non_readonly_methods", None))(view)
