@@ -605,7 +605,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 24,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -895,14 +895,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id" AS "pk"
@@ -927,6 +922,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1067,6 +1063,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1102,6 +1099,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1241,6 +1239,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1276,6 +1275,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1327,6 +1327,7 @@
           'pager[utils/pagination.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1377,6 +1378,7 @@
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1516,6 +1518,7 @@
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1552,6 +1555,7 @@
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1578,6 +1582,7 @@
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1587,12 +1592,6 @@
                  AND "approvals_suspension"."start_at" <= %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1839,7 +1838,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 23,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -2129,14 +2128,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id" AS "pk"
@@ -2160,6 +2154,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2298,6 +2293,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2332,6 +2328,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2469,6 +2466,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2503,6 +2501,7 @@
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2556,6 +2555,7 @@
           'pager[utils/pagination.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -2604,6 +2604,7 @@
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2741,6 +2742,7 @@
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2776,6 +2778,7 @@
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -2785,12 +2788,6 @@
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
