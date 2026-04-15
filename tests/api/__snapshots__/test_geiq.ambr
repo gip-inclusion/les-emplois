@@ -64,19 +64,14 @@
 # ---
 # name: test_candidatures_geiq_nominal[SQL queries with result]
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
       dict({
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -91,6 +86,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -353,6 +349,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_geiqselectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -382,6 +379,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_prioraction"."id",
@@ -402,6 +400,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_prioraction"."id",
@@ -417,31 +416,20 @@
                                                                              %s))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: test_candidatures_geiq_nominal[SQL queries without filter]
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
       dict({
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -455,6 +443,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -716,6 +705,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_geiqselectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -745,6 +735,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_prioraction"."id",
@@ -765,6 +756,7 @@
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
           'GeiqJobApplicationListView.get[api/geiq/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_prioraction"."id",
@@ -781,37 +773,13 @@
           ORDER BY RANDOM() ASC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: test_candidatures_geiq_nominal[SQL queries without result]
   dict({
-    'num_queries': 3,
+    'num_queries': 0,
     'queries': list([
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'ROLLBACK TO SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
