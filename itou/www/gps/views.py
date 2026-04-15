@@ -14,6 +14,7 @@ from itou.users.models import User
 from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url, get_safe_url
@@ -44,6 +45,7 @@ def is_allowed_to_use_gps_advanced_features(request):
     return request.from_employer or request.from_authorized_prescriber or is_gps_authorized(request)
 
 
+@readonly_view
 @check_request(is_allowed_to_use_gps)
 def group_list(request, current, template_name="gps/group_list.html"):
     logger.info(f"GPS visit_list_groups{'_old' if current is False else ''}")
@@ -121,7 +123,7 @@ class GroupDetailsMixin:
         }
 
 
-class GroupMembershipsView(GroupDetailsMixin, TemplateView):
+class GroupMembershipsView(ReadonlyViewMixin, GroupDetailsMixin, TemplateView):
     template_name = "gps/group_memberships.html"
 
     def get(self, request, *args, **kwargs):
@@ -151,7 +153,7 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
         return context
 
 
-class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
+class GroupBeneficiaryView(ReadonlyViewMixin, GroupDetailsMixin, TemplateView):
     template_name = "gps/group_beneficiary.html"
 
     def get(self, request, *args, **kwargs):
@@ -183,7 +185,7 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
         return context
 
 
-class GroupContributionView(GroupDetailsMixin, TemplateView):
+class GroupContributionView(ReadonlyViewMixin, GroupDetailsMixin, TemplateView):
     template_name = "gps/group_contribution.html"
 
     def get(self, request, *args, **kwargs):
@@ -333,6 +335,7 @@ def ask_access(request, group_id):
     )
 
 
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
 @check_request(is_allowed_to_use_gps)
 def join_group(request, template_name="gps/join_group.html"):
     urls = {
@@ -357,6 +360,7 @@ def join_group(request, template_name="gps/join_group.html"):
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(is_allowed_to_use_gps)
 def join_group_from_coworker(request, template_name="gps/join_group_from_coworker.html"):
     if request.current_organization is None:
@@ -378,6 +382,7 @@ def join_group_from_coworker(request, template_name="gps/join_group_from_coworke
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(is_allowed_to_use_gps_advanced_features)
 def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
     form = CheckJobSeekerNirForm(data=request.POST or None, is_gps=True)
@@ -424,6 +429,7 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(is_allowed_to_use_gps)
 def join_group_from_name_and_email(request, template_name="gps/join_group_from_name_and_email.html"):
     form = JobSeekerSearchByNameEmailForm(data=request.POST or None)
@@ -516,6 +522,7 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
     return render(request, template_name, context)
 
 
+@readonly_view
 @check_request(is_allowed_to_use_gps)
 def beneficiaries_autocomplete(request):
     """
