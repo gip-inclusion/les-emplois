@@ -4,12 +4,10 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
 
-from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationComment, JobApplicationWorkflow
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationCommentFactory,
     JobApplicationFactory,
@@ -107,23 +105,7 @@ def test_transfer():
     # "Normal" transfer
     assert job_application.to_company == target_company
     assert job_application.state == JobApplicationState.NEW
-    assert job_application.eligibility_diagnosis is not None
-
-    # Eligibilty diagnosis not sent by authorized prescriber must be deleted
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        state=JobApplicationState.PROCESSING,
-        to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
-    )
-    eligibility_diagnosis_pk = job_application.eligibility_diagnosis.pk
-    job_application.transfer(user=origin_user, target_company=target_company)
-    job_application.refresh_from_db()
-
-    assert job_application.to_company == target_company
-    assert job_application.state == JobApplicationState.NEW
     assert job_application.eligibility_diagnosis is None
-    assert not EligibilityDiagnosis.objects.filter(pk=eligibility_diagnosis_pk)
 
 
 def test_transfer_to_without_sender():
@@ -162,7 +144,6 @@ def test_model_fields(snapshot):
         sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
         answer="Answer to job seeker",
         answer_to_prescriber="Answer to prescriber",
     )
@@ -214,7 +195,6 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
         sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
     )
     job_seeker = job_application.job_seeker
 
@@ -317,7 +297,6 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
         sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
     )
     job_seeker = job_application.job_seeker
 
@@ -350,7 +329,6 @@ def test_transfer_must_delete_comments(comments_count, caplog):
         sent_by_employer=True,
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
     )
     if comments_count:
         JobApplicationCommentFactory.create_batch(comments_count, job_application=job_application)

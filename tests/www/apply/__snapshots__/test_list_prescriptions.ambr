@@ -5461,7 +5461,7 @@
       'Pres. Org.',
       'Pierre DUPONT',
       datetime.datetime(2024, 8, 18, 0, 0),
-      'Nouvelle candidature',
+      'Candidature acceptée',
       datetime.datetime(2024, 8, 18, 0, 0),
       datetime.datetime(2026, 8, 18, 0, 0),
       '',
@@ -5488,7 +5488,7 @@
       '',
       'Pierre DUPONT',
       datetime.datetime(2024, 8, 17, 0, 0),
-      'Nouvelle candidature',
+      'Candidature acceptée',
       datetime.datetime(2024, 8, 18, 0, 0),
       datetime.datetime(2026, 8, 18, 0, 0),
       '',
@@ -8286,10 +8286,10 @@
                   <div class="mb-3 mb-md-4">
                       <ul>
                           <li>
-                              Allocataire ASS
+                              Allocataire AAH
                           </li>
                           <li>
-                              Bénéficiaire du RSA
+                              Résident QPV
                           </li>
                       </ul>
                   </div>
@@ -8367,10 +8367,10 @@
                   <div class="mb-3 mb-md-4">
                       <ul>
                           <li>
-                              Parent isolé
+                              Allocataire AAH
                           </li>
                           <li>
-                              Travailleur handicapé
+                              Résident QPV
                           </li>
                       </ul>
                   </div>
@@ -8902,21 +8902,6 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <p class="h5">
-                      Critères administratifs
-                      
-                          GEIQ
-                  </p>
-                  <div class="mb-3 mb-md-4">
-                      <ul>
-                          <li>
-                              Bénéficiaire du Revenu de Solidarité Active (RSA)
-                          </li>
-                          <li>
-                              Problème de mobilité
-                          </li>
-                      </ul>
-                  </div>
                   <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
@@ -9109,10 +9094,10 @@
                       <td>
                           <ul class="mb-0">
                               <li>
-                                  Allocataire ASS
+                                  Allocataire AAH
                               </li>
                               <li>
-                                  Bénéficiaire du RSA
+                                  Résident QPV
                               </li>
                           </ul>
                       </td>
@@ -9123,7 +9108,7 @@
                               Éligible à l’IAE
                           </span>
                           <span class="d-block">
-                              Éligibilité validée par l’employeur
+                              Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
                       <td class="text-end w-50px align-middle">
@@ -9161,10 +9146,10 @@
                       <td>
                           <ul class="mb-0">
                               <li>
-                                  Parent isolé
+                                  Allocataire AAH
                               </li>
                               <li>
-                                  Travailleur handicapé
+                                  Résident QPV
                               </li>
                           </ul>
                       </td>
@@ -9175,7 +9160,7 @@
                               Éligible à l’IAE
                           </span>
                           <span class="d-block">
-                              Éligibilité validée par l’employeur
+                              Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
                       <td class="text-end w-50px align-middle">
@@ -9536,14 +9521,9 @@
                           Vous
                       </td>
                       <td>
-                          <ul class="mb-0">
-                              <li>
-                                  Bénéficiaire du Revenu de Solidarité Active (RSA)
-                              </li>
-                              <li>
-                                  Problème de mobilité
-                              </li>
-                          </ul>
+                          <i class="text-disabled">
+                              Aucun critère sélectionné
+                          </i>
                       </td>
                       <td>
                           <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
@@ -9552,7 +9532,7 @@
                               Éligibilité GEIQ non confirmée
                           </span>
                           <span class="d-block">
-                              Diagnostic public prioritaire GEIQ validé par un prescripteur habilité
+                              Un diagnostic doit être réalisé
                           </span>
                       </td>
                       <td class="text-end w-50px align-middle">
@@ -9736,10 +9716,10 @@
                   <div class="mb-3 mb-md-4">
                       <ul>
                           <li>
-                              Allocataire ASS
+                              Allocataire AAH
                           </li>
                           <li>
-                              Bénéficiaire du RSA
+                              Résident QPV
                           </li>
                       </ul>
                   </div>
@@ -9809,6 +9789,21 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
+                  <p class="h5">
+                      Critères administratifs
+                      
+                          IAE
+                  </p>
+                  <div class="mb-3 mb-md-4">
+                      <ul>
+                          <li>
+                              Allocataire AAH
+                          </li>
+                          <li>
+                              Résident QPV
+                          </li>
+                      </ul>
+                  </div>
                   <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
@@ -10724,10 +10719,10 @@
                       <td>
                           <ul class="mb-0">
                               <li>
-                                  Allocataire ASS
+                                  Allocataire AAH
                               </li>
                               <li>
-                                  Bénéficiaire du RSA
+                                  Résident QPV
                               </li>
                           </ul>
                       </td>
@@ -10738,7 +10733,7 @@
                               Éligible à l’IAE
                           </span>
                           <span class="d-block">
-                              Éligibilité validée par l’employeur
+                              Éligibilité validée par un prescripteur habilité
                           </span>
                       </td>
                       <td class="text-end w-50px align-middle">
@@ -10774,7 +10769,14 @@
                           Vous
                       </td>
                       <td>
-                          Le prescripteur habilité n'a pas renseigné de critères.
+                          <ul class="mb-0">
+                              <li>
+                                  Allocataire AAH
+                              </li>
+                              <li>
+                                  Résident QPV
+                              </li>
+                          </ul>
                       </td>
                       <td>
                           <span class="badge badge-sm rounded-pill bg-success-lighter text-success">

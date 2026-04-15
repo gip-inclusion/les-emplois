@@ -80,18 +80,16 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
         if extracted:
             from tests.job_applications.factories import JobApplicationFactory
 
-            state = kwargs.pop("state", JobApplicationState.ACCEPTED)
             eligibility_diagnosis = kwargs.pop("eligibility_diagnosis", self.eligibility_diagnosis)
             sent_by_authorized_prescriber = kwargs.pop("sent_by_authorized_prescriber", True)
-            self.jobapplication_set.add(
-                JobApplicationFactory(
-                    sent_by_authorized_prescriber=sent_by_authorized_prescriber,
-                    state=state,
-                    job_seeker=self.user,
-                    with_iae_eligibility_diagnosis=True,
-                    eligibility_diagnosis=eligibility_diagnosis,
-                    **kwargs,
-                )
+            JobApplicationFactory(
+                sent_by_authorized_prescriber=sent_by_authorized_prescriber,
+                state=JobApplicationState.ACCEPTED,
+                job_seeker=self.user,
+                with_iae_eligibility_diagnosis=True,
+                eligibility_diagnosis=eligibility_diagnosis,
+                approval=self,
+                **kwargs,
             )
 
     @factory.post_generation

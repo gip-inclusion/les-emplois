@@ -63,7 +63,7 @@ class TestEmployeeRecordModel:
             with subtests.test(state):
                 with pytest.raises(ValidationError) as exc:
                     job_application = JobApplicationFactory(
-                        sent_by_prescriber_alone=True, with_approval=True, state=state
+                        sent_by_prescriber_alone=True, to_company__subject_to_iae_rules=True, state=state
                     )
                     EmployeeRecord.from_job_application(job_application)
                 assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED

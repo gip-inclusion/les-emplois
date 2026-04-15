@@ -957,13 +957,14 @@ def test_list_snapshot(client, snapshot):
         assert pretty_indented(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
-    common_kwargs = {"job_seeker": job_seeker, "with_iae_eligibility_diagnosis": True, "to_company": company}
+    common_kwargs = {"job_seeker": job_seeker, "to_company": company}
     prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
 
     job_applications = [
         JobApplicationFactory(
             sent_by_job_seeker=True,
             state=JobApplicationState.ACCEPTED,
+            with_iae_eligibility_diagnosis=True,
             sender=job_seeker,
             **common_kwargs,
         ),
@@ -2082,19 +2083,13 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
 
 
 @pytest.mark.parametrize(
-    "company_kwargs,acceptable_application_kwargs",
+    "company_kwargs",
     [
-        pytest.param(
-            {"subject_to_iae_rules": True},
-            {"with_iae_eligibility_diagnosis": True},
-            id="iae",
-        ),
-        pytest.param({"kind": CompanyKind.GEIQ}, {}, id="geiq"),
+        pytest.param({"subject_to_iae_rules": True}, id="iae"),
+        pytest.param({"kind": CompanyKind.GEIQ}, id="geiq"),
     ],
 )
-def test_list_for_siae_select_applications_batch_accept(
-    client, snapshot, company_kwargs, acceptable_application_kwargs
-):
+def test_list_for_siae_select_applications_batch_accept(client, snapshot, company_kwargs):
     company = CompanyFactory(with_membership=True, **company_kwargs)
     employer = company.members.first()
 
@@ -2103,7 +2098,6 @@ def test_list_for_siae_select_applications_batch_accept(
         pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         to_company=company,
         state=JobApplicationState.PROCESSING,
-        **acceptable_application_kwargs,
     )
     assert acceptable_app_1.accept.is_available()
     acceptable_app_2 = JobApplicationFactory(
@@ -2111,7 +2105,6 @@ def test_list_for_siae_select_applications_batch_accept(
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
-        **acceptable_application_kwargs,
     )
     assert acceptable_app_2.accept.is_available()
     acceptable_app_3 = JobApplicationFactory(
@@ -2119,7 +2112,6 @@ def test_list_for_siae_select_applications_batch_accept(
         pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=company,
         state=JobApplicationState.NEW,
-        **acceptable_application_kwargs,
     )
     assert acceptable_app_3.accept.is_available()
 
@@ -2289,20 +2281,20 @@ def test_table_iae_state_and_criteria(client, snapshot):
         "sender": employer,
         "sender_company": company,
     }
-    company_diag = IAEEligibilityDiagnosisFactory(
+    _company_diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.EMPLOYER,
         author_siae=company,
         author=company.members.first(),
         criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
     )
-    no_criteria_prescriber_diag = IAEEligibilityDiagnosisFactory(
+    _no_criteria_prescriber_diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.PRESCRIBER,
         author_prescriber_organization=prescriber_org,
         author=prescriber,
     )
-    prescriber_diag = IAEEligibilityDiagnosisFactory(
+    _prescriber_diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.PRESCRIBER,
         author_prescriber_organization=prescriber_org,
@@ -2341,19 +2333,16 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=company_diag,
             job_seeker=job_seeker,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.REFUSED,
-            eligibility_diagnosis=no_criteria_prescriber_diag,
             job_seeker=job_seeker,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            eligibility_diagnosis=prescriber_diag,
             job_seeker=job_seeker,
             **common_kwargs,
         ),
