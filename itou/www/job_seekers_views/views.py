@@ -14,7 +14,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django.views.decorators.http import require_POST, require_safe
 from django.views.generic import DetailView, TemplateView, View
 
 from itou.approvals.enums import ProlongationRequestStatus
@@ -37,6 +36,7 @@ from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.utils.views import with_triggers_context
@@ -97,7 +97,7 @@ def build_services_search_url(request, job_seeker):
     return reverse("search:services_results", query=query)
 
 
-class JobSeekerDetailView(UserPassesTestMixin, DetailView):
+class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
     slug_field = "public_id"
@@ -228,7 +228,7 @@ def can_see_external_job_applications(job_seeker, request):
     )
 
 
-@require_POST
+@http_methods(db_write=["POST"])
 @check_request(lambda request: request.from_authorized_prescriber)
 @with_triggers_context
 def switch_stalled_status(request, public_id):
@@ -248,7 +248,7 @@ def switch_stalled_status(request, public_id):
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
-@require_safe
+@readonly_view
 @check_request(lambda request: request.from_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if list_organization:
@@ -1436,6 +1436,7 @@ class CheckJobSeekerInformationsForHire(HireBaseView):
         }
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.user.is_job_seeker or request.from_employer or request.from_prescriber)
 def nir_modification_request(request, public_id, *, template_name="job_seekers_views/nir_modification_request.html"):
     job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
