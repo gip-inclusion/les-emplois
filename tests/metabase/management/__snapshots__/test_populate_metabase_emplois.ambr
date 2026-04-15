@@ -1,20 +1,8 @@
 # serializer version: 1
 # name: test_populate_analytics
   dict({
-    'num_queries': 36,
+    'num_queries': 35,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -471,20 +459,8 @@
 # ---
 # name: test_populate_approvals
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -871,20 +847,8 @@
 # ---
 # name: test_populate_companies
   dict({
-    'num_queries': 62,
+    'num_queries': 61,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -1824,20 +1788,8 @@
 # ---
 # name: test_populate_criteria
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -2028,21 +1980,8 @@
 # ---
 # name: test_populate_enums
   dict({
-    'num_queries': 36,
+    'num_queries': 35,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'create_table[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'create_table[metabase/db.py]',
@@ -2483,20 +2422,8 @@
 # ---
 # name: test_populate_evaluated_criteria
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -2715,20 +2642,8 @@
 # ---
 # name: test_populate_evaluated_job_applications
   dict({
-    'num_queries': 16,
+    'num_queries': 15,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -2941,20 +2856,8 @@
 # ---
 # name: test_populate_evaluated_siaes
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -3223,20 +3126,8 @@
 # ---
 # name: test_populate_evaluation_campaigns
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -3454,20 +3345,8 @@
 # ---
 # name: test_populate_gps_groups
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -3685,20 +3564,8 @@
 # ---
 # name: test_populate_gps_memberships
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -3979,20 +3846,8 @@
 # ---
 # name: test_populate_institutions
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -4214,20 +4069,8 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 43,
+    'num_queries': 42,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -4837,20 +4680,8 @@
 # ---
 # name: test_populate_job_applications.1
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -5050,20 +4881,8 @@
 # ---
 # name: test_populate_job_descriptions
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -5506,20 +5325,8 @@
 # ---
 # name: test_populate_job_seekers
   dict({
-    'num_queries': 74,
+    'num_queries': 73,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'get_table[metabase/tables/job_seekers.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'get_table[metabase/tables/job_seekers.py]',
@@ -6556,20 +6363,8 @@
 # ---
 # name: test_populate_memberships
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -6902,20 +6697,8 @@
 # ---
 # name: test_populate_organizations
   dict({
-    'num_queries': 41,
+    'num_queries': 40,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -7626,20 +7409,8 @@
 # ---
 # name: test_populate_prolongation_requests
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -8018,20 +7789,8 @@
 # ---
 # name: test_populate_prolongations
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -8314,20 +8073,8 @@
 # ---
 # name: test_populate_suspensions
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',
@@ -8557,20 +8304,8 @@
 # ---
 # name: test_populate_users
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[metabase/db.py]',

@@ -133,6 +133,9 @@ class MatomoFetchOptions:
 class Command(BaseCommand):
     help = "Fetches dashboards from matomo and inserts them monday by monday in Metabase in its raw version"
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
         parser.add_argument("--pool-size", dest="pool_size", type=int, default=2)
