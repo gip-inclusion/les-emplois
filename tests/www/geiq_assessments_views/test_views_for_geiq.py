@@ -1474,7 +1474,7 @@ class TestAssessmentContractsListView:
         assertContains(response, 'data-bs-target="#offcanvasApplyFiltersContent"')
 
         assertContains(response, 'id="offcanvasApplyFiltersContent"')
-        assertContains(response, "Filtrer", count=2)
+        assertContains(response, "Tous les filtres", count=1)
 
     def test_offcanvas_form_structure_validity(self, client):
         response = client.get(self.url)
