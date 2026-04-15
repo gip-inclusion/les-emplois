@@ -9,6 +9,7 @@ from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company, CompanyMembership
 from itou.nexus.enums import Service
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.readonly import ReadonlyViewMixin
 
 
 class MarchePermission(IsAuthenticated):
@@ -23,7 +24,7 @@ class MarchePermission(IsAuthenticated):
         )
 
 
-class MarcheCompanyView(LoginNotRequiredMixin, generics.ListAPIView):
+class MarcheCompanyView(LoginNotRequiredMixin, ReadonlyViewMixin, generics.ListAPIView):
     """API pour le Marché de l'inclusion"""
 
     authentication_classes = [ServiceTokenAuthentication]
