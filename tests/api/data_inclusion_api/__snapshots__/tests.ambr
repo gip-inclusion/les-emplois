@@ -1,17 +1,12 @@
 # serializer version: 1
 # name: TestDataInclusionPrescriberStructure.test_list_structures
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -29,6 +24,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -39,6 +35,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -76,29 +73,18 @@
                    "prescribers_prescriberorganization"."id" ASC
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestDataInclusionPrescriberStructure.test_list_structures_date_maj_value
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -116,6 +102,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -126,6 +113,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -164,28 +152,17 @@
           LIMIT 1
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestDataInclusionSiaeStructure.test_list_structures
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -203,6 +180,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -227,6 +205,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -285,28 +264,17 @@
           LIMIT 1
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestDataInclusionSiaeStructure.test_list_structures_antenne_with_user_created_and_999
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -324,6 +292,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -348,6 +317,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -412,6 +382,7 @@
           'CompanySerializer.get_siret[api/data_inclusion_api/serializers.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -460,28 +431,17 @@
           LIMIT 1
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestDataInclusionSiaeStructure.test_list_structures_antenne_with_user_created_with_proper_siret
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -499,6 +459,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -523,6 +484,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -581,28 +543,17 @@
           LIMIT 3
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestDataInclusionSiaeStructure.test_list_structures_duplicated_siret
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -620,6 +571,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -644,6 +596,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -702,28 +655,17 @@
           LIMIT 2
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestDataInclusionSiaeStructure.test_list_structures_inactive_excluded
   dict({
-    'num_queries': 4,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -741,6 +683,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -760,29 +703,18 @@
                                 AND U0."is_active")
                          LIMIT 1)))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestDataInclusionSiaeStructure.test_list_structures_siret_with_999_and_no_other_siret_available
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -800,6 +732,7 @@
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -824,6 +757,7 @@
         'origin': list([
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -888,6 +822,7 @@
           'CompanySerializer.get_siret[api/data_inclusion_api/serializers.py]',
           'DataInclusionStructureView.list[<site-packages>/rest_framework/mixins.py]',
           'DataInclusionStructureView.list[api/data_inclusion_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -935,12 +870,6 @@
                    "companies_company"."id" ASC
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

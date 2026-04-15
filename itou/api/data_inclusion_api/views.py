@@ -9,6 +9,7 @@ from itou.companies.models import Company
 from itou.nexus.enums import Service
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.readonly import ReadonlyViewMixin
 
 
 class DataInclusionPermission(BasePermission):
@@ -31,7 +32,7 @@ class DataInclusionPermission(BasePermission):
         many=True,
     )
 )
-class DataInclusionStructureView(LoginNotRequiredMixin, generics.ListAPIView):
+class DataInclusionStructureView(LoginNotRequiredMixin, ReadonlyViewMixin, generics.ListAPIView):
     """
     # API au format data.inclusion
 
