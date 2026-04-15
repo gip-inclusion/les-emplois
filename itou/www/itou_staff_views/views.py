@@ -31,6 +31,7 @@ from itou.utils.admin import get_admin_view_link
 from itou.utils.auth import check_user
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
+from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
 from itou.www.itou_staff_views import merge_utils
 from itou.www.itou_staff_views.export_utils import (
@@ -56,6 +57,7 @@ class Echo:
         return value
 
 
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
 @check_user(lambda user: user.is_staff)
 @permission_required("job_applications.export_job_applications_unknown_to_ft")
 def export_job_applications_unknown_to_ft(
@@ -129,6 +131,7 @@ def export_job_applications_unknown_to_ft(
     return render(request, template_name, {"form": form})
 
 
+@readonly_view
 @check_user(lambda user: user.is_staff)
 @permission_required("approvals.export_ft_api_rejections")
 def export_ft_api_rejections(request):
@@ -192,6 +195,7 @@ def export_ft_api_rejections(request):
     )
 
 
+@readonly_view
 @check_user(lambda user: user.is_staff)
 @permission_required("users.export_cta")
 def export_cta(request):
@@ -218,6 +222,7 @@ def export_cta(request):
     )
 
 
+@readonly_view
 @check_user(lambda user: user.is_staff)
 @permission_required("employee_record.view_employeerecord")
 def export_fs_3437(request):
@@ -258,6 +263,7 @@ class ImportFS3437Result:
     er_to_resend: list[EmployeeRecord]
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user(lambda user: user.is_staff)
 @permission_required("users.import_fs_3437_from_asp")
 @with_triggers_context
@@ -379,6 +385,7 @@ def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3
     )
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user(lambda user: user.is_staff)
 @permission_required("companies.import_aci_convergence_phc")
 def import_aci_convergence_phc(request, template_name="itou_staff_views/import_aci_convergence_phc.html"):
@@ -409,6 +416,7 @@ def import_aci_convergence_phc(request, template_name="itou_staff_views/import_a
     )
 
 
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
 @check_user(lambda user: user.is_staff)
 @permission_required("users.merge_users")
 def merge_users(request, template_name="itou_staff_views/merge_users.html"):
@@ -425,6 +433,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     return render(request, template_name, {"form": form})
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user(lambda user: user.is_staff)
 @permission_required("users.merge_users")
 def merge_users_confirm(
@@ -504,6 +513,7 @@ def merge_users_confirm(
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user(lambda user: user.is_staff)
 def otp_devices(request, template_name="itou_staff_views/otp_devices.html"):
     if request.method == "POST":
@@ -524,6 +534,7 @@ def otp_devices(request, template_name="itou_staff_views/otp_devices.html"):
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user(lambda user: user.is_staff)
 def otp_confirm_device(request, device_id, template_name="itou_staff_views/otp_confirm_device.html"):
     device = get_object_or_404(TOTPDevice.objects.filter(user=request.user, confirmed=False), pk=device_id)
