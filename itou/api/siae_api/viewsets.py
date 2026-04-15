@@ -15,6 +15,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.models import Company, JobDescription
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.readonly import ReadonlyViewMixin
 
 
 logger = logging.getLogger("api_drf")
@@ -106,7 +107,7 @@ class CompanyFilterSet(FilterSet):
         return filtered_queryset
 
 
-class SiaeViewSet(LoginNotRequiredMixin, viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
+class SiaeViewSet(LoginNotRequiredMixin, ReadonlyViewMixin, viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     # Liste des structures
 
