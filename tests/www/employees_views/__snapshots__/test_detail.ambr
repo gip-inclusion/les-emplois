@@ -16,7 +16,7 @@
 # ---
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 35,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -392,13 +392,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'EmployeeDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -504,6 +499,7 @@
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -821,6 +817,7 @@
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -844,6 +841,7 @@
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -866,6 +864,7 @@
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1041,6 +1040,7 @@
         'origin': list([
           'JobApplication.get_eligibility_diagnosis[job_applications/models.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1088,6 +1088,7 @@
       dict({
         'origin': list([
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1135,6 +1136,7 @@
         'origin': list([
           'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "gps_followupgroup"."id",
@@ -1149,12 +1151,6 @@
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
