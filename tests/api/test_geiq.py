@@ -4,6 +4,7 @@ import uuid
 from unittest.mock import patch
 
 import pytest
+from django.db import transaction
 from django.urls import reverse
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
@@ -48,12 +49,14 @@ def test_candidatures_geiq_token_authentication():
     JobApplicationFactory(sent_by_prescriber_alone=True, state="accepted", to_company=antenna)
 
     api_client = APIClient(headers={"Authorization": "Token invalid"})
-    response = api_client.get(reverse("v1:geiq_jobapplication_list"))
+    with transaction.atomic():  # Prevent this failing request from messing with the test's transaction
+        response = api_client.get(reverse("v1:geiq_jobapplication_list"))
     assert response.status_code == 401
 
     # try with an unknown UUID token
     api_client = APIClient(headers={"Authorization": "Token 72da817e-f000-4fa3-a2b2-119883410698"})
-    response = api_client.get(reverse("v1:geiq_jobapplication_list"))
+    with transaction.atomic():  # Prevent this failing request from messing with the test's transaction
+        response = api_client.get(reverse("v1:geiq_jobapplication_list"))
     assert response.status_code == 401
 
     # returns any associated antennas even if the token is not linked to it explicitly
@@ -68,7 +71,8 @@ def test_candidatures_geiq_token_authentication():
 def test_candidatures_geiq_api_authentication(client):
     user = ItouStaffFactory(is_superuser=False)
     client.force_login(user)
-    response = client.get(reverse("v1:geiq_jobapplication_list"))
+    with transaction.atomic():  # Prevent this failing request from messing with the test's transaction
+        response = client.get(reverse("v1:geiq_jobapplication_list"))
     assert response.status_code == 403
 
     user.is_superuser = True
@@ -155,9 +159,10 @@ def test_candidatures_geiq_nominal(snapshot):
     assert response.status_code == 200
     assert response.json() == snapshot(name="with_results")
 
-    with assertSnapshotQueries(snapshot(name="SQL queries without result")):
-        response = client.get(f"{reverse('v1:geiq_jobapplication_list')}?siren=foobar")
-    assert response.status_code == 400
+    with transaction.atomic():  # Prevent this failing request from messing with the test's transaction
+        with assertSnapshotQueries(snapshot(name="SQL queries without result")):
+            response = client.get(f"{reverse('v1:geiq_jobapplication_list')}?siren=foobar")
+        assert response.status_code == 400
     assert response.json() == {"detail": "Invalid SIREN."}
 
     with assertSnapshotQueries(snapshot(name="SQL queries with result")):
