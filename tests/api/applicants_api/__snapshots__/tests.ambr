@@ -1,17 +1,12 @@
 # serializer version: 1
 # name: TestApplicantsAPI.test_applicant_data
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -52,6 +47,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -94,6 +90,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -115,6 +112,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -238,29 +236,18 @@
           ORDER BY "users_user"."id" DESC
           LIMIT 2
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_applicant_data_mode_multiple_structures
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -301,6 +288,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -343,6 +331,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -364,6 +353,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -487,29 +477,18 @@
           ORDER BY "users_user"."id" DESC
           LIMIT 2
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -550,6 +529,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -592,6 +572,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -609,29 +590,18 @@
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[multi]
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -672,6 +642,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -714,6 +685,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -735,6 +707,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -858,29 +831,18 @@
           ORDER BY "users_user"."id" DESC
           LIMIT 4
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[multi_structure_id]
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -921,6 +883,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -963,6 +926,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -984,6 +948,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1107,29 +1072,18 @@
           ORDER BY "users_user"."id" DESC
           LIMIT 2
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[single]
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -1170,6 +1124,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -1212,6 +1167,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1233,6 +1189,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1357,28 +1314,17 @@
           LIMIT 2
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[single_multiple_structure_id]
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -1419,6 +1365,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -1461,6 +1408,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1482,6 +1430,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1606,28 +1555,17 @@
           LIMIT 4
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[single_nonexistent_uid]
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -1668,6 +1606,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -1710,6 +1649,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1722,29 +1662,18 @@
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[single_not_uid]
   dict({
-    'num_queries': 5,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -1785,6 +1714,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -1827,6 +1757,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1840,28 +1771,17 @@
              GROUP BY 1) subquery
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestApplicantsAPI.test_login_as_siae_multiple_membership[single_structure_id]
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApplicantsAPIPermission.has_permission[api/applicants_api/perms.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."is_admin" AS "is_admin"
@@ -1902,6 +1822,7 @@
         'origin': list([
           'ApplicantsView.get_queryset[api/applicants_api/views.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."company_id" AS "company_id",
@@ -1944,6 +1865,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1965,6 +1887,7 @@
       dict({
         'origin': list([
           'ApplicantsView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2088,12 +2011,6 @@
           ORDER BY "users_user"."id" DESC
           LIMIT 2
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
