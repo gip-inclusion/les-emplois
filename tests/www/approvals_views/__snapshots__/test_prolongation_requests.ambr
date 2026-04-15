@@ -734,7 +734,7 @@
 # ---
 # name: test_empty_list_view[SQL queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1024,27 +1024,16 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'prolongation_requests_list[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "approvals_prolongationrequest"
           WHERE "approvals_prolongationrequest"."prescriber_organization_id" = %s
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1234,7 +1223,7 @@
 # ---
 # name: test_list_view[SQL queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1524,15 +1513,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'prolongation_requests_list[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1546,6 +1530,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[approvals/prolongation_requests/list.html]',
           'prolongation_requests_list[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1707,12 +1692,6 @@
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

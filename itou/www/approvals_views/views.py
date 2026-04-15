@@ -15,7 +15,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
-from django.views.decorators.http import require_safe
 from django.views.generic import DetailView, ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
@@ -49,6 +48,7 @@ from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.utils import can_view_personal_information
+from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import get_safe_url
 from itou.www.approvals_views.forms import (
@@ -134,7 +134,7 @@ class ApprovalBaseViewMixin:
         return context
 
 
-class ApprovalListView(ApprovalBaseViewMixin, ListView):
+class ApprovalListView(ReadonlyViewMixin, ApprovalBaseViewMixin, ListView):
     paginate_by = settings.PAGE_SIZE_DEFAULT
     paginator_class = ItouPaginator
 
@@ -183,7 +183,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         return context
 
 
-class BaseApprovalDetailView(UserPassesTestMixin, DetailView):
+class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView):
     model = Approval
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
@@ -332,7 +332,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
         return context
 
 
-class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
+class ApprovalPrintableDisplay(ReadonlyViewMixin, ApprovalBaseViewMixin, TemplateView):
     template_name = "approvals/printable_approval.html"
 
     def get_context_data(self, **kwargs):
@@ -382,6 +382,7 @@ def prolongation_back_url(request):
     return get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
     """
     Declare a prolongation for the given approval.
@@ -466,7 +467,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     return render(request, template_name, context)
 
 
-class DeclareProlongationHTMXFragmentView(TemplateView):
+class DeclareProlongationHTMXFragmentView(ReadonlyViewMixin, TemplateView):
     """
     HTMX interactions on dynamic parts of the prolongation declaration form
     """
@@ -556,6 +557,7 @@ class CheckContactDetailsView(DeclareProlongationHTMXFragmentView):
     clear_errors = ("contact_email", "contact_phone")
 
 
+@readonly_view
 def prolongation_requests_list(request, template_name="approvals/prolongation_requests/list.html"):
     current_organization = get_current_org_or_404(request)
     if not current_organization.is_authorized:
@@ -577,7 +579,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
     return render(request, template_name, context)
 
 
-@require_safe
+@readonly_view
 @check_request(lambda request: request.from_prescriber)
 def prolongation_request_report_file(request, prolongation_request_id):
     prolongation_request = get_object_or_404(
@@ -610,7 +612,7 @@ class ProlongationRequestViewMixin:
         }
 
 
-class ProlongationRequestShowView(ProlongationRequestViewMixin, TemplateView):
+class ProlongationRequestShowView(ReadonlyViewMixin, ProlongationRequestViewMixin, TemplateView):
     template_name = "approvals/prolongation_requests/show.html"
 
 
@@ -689,6 +691,7 @@ class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionW
         return reverse(self.url_name, kwargs={"prolongation_request_id": self.prolongation_request.pk, "step": step})
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
     siae = get_current_company_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
@@ -731,6 +734,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
 def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
@@ -775,6 +779,7 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspension_update(request, suspension_id, template_name="approvals/suspension_update.html"):
     """
     Edit the given suspension.
@@ -821,6 +826,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(

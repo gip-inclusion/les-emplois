@@ -243,7 +243,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
   dict({
-    'num_queries': 22,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -619,13 +619,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -741,6 +736,7 @@
       dict({
         'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -802,6 +798,7 @@
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."state" AS "state"
@@ -815,6 +812,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -988,6 +986,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1101,6 +1100,7 @@
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Approval.can_be_suspended_by_siae[approvals/models.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1181,12 +1181,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -1261,7 +1255,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as job_seeker]
   dict({
-    'num_queries': 11,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -1325,13 +1319,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1447,6 +1436,7 @@
       dict({
         'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -1507,6 +1497,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -1680,6 +1671,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1788,12 +1780,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -1823,7 +1809,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as prescriber]
   dict({
-    'num_queries': 18,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -2113,13 +2099,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2235,6 +2216,7 @@
       dict({
         'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -2296,6 +2278,7 @@
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2318,6 +2301,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2491,6 +2475,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -2596,12 +2581,6 @@
                  AND "approvals_prolongation"."id" IS NULL)
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -2925,7 +2904,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
   dict({
-    'num_queries': 22,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -3301,13 +3280,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -3423,6 +3397,7 @@
       dict({
         'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -3484,6 +3459,7 @@
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."state" AS "state"
@@ -3501,6 +3477,7 @@
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
           'ApprovalDetailView.get_suspensions[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -3583,6 +3560,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -3756,6 +3734,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -3864,12 +3843,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -3944,7 +3917,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as job_seeker]
   dict({
-    'num_queries': 11,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -4008,13 +3981,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -4130,6 +4098,7 @@
       dict({
         'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -4190,6 +4159,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -4363,6 +4333,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -4471,12 +4442,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -4506,7 +4471,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as prescriber]
   dict({
-    'num_queries': 18,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -4796,13 +4761,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -4918,6 +4878,7 @@
       dict({
         'origin': list([
           'ApprovalDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -4979,6 +4940,7 @@
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -5001,6 +4963,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -5174,6 +5137,7 @@
         'origin': list([
           'ApprovalDetailView.get_prolongation_and_requests[www/approvals_views/views.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -5279,12 +5243,6 @@
                  AND "approvals_prolongation"."id" IS NULL)
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
