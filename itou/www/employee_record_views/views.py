@@ -11,7 +11,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.decorators.http import require_safe
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
@@ -26,6 +25,7 @@ from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
+from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.employee_record_views.enums import EmployeeRecordOrder, MissingEmployeeCase
 from itou.www.employee_record_views.forms import (
@@ -140,6 +140,7 @@ class AddView(UserPassesTestMixin, WizardView):
         return reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
 
 
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
 @check_request(lambda request: request.from_employer)
 def missing_employee(request, template_name="employee_record/missing_employee.html"):
     siae = get_current_company_or_404(request)
@@ -209,7 +210,7 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
     return render(request, template_name, context)
 
 
-@require_safe
+@readonly_view
 def list_employee_records(request, template_name="employee_record/list.html"):
     siae = get_current_company_or_404(request)
 
@@ -318,6 +319,7 @@ def set_session_ntt(request, job_application, ntt_value):
     request.session[key] = ntt_value
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def create(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -379,6 +381,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     return render(request, template_name, context)
 
 
+@http_methods(db_write=["GET", "HEAD", "POST"])  # TODO(xfernandez): stop modifying objects in GET/HEAD
 def create_step_2(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -428,6 +431,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def create_step_3(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -499,6 +503,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def create_step_4(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -535,6 +540,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def create_step_5(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -585,6 +591,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
+@readonly_view
 def summary(request, employee_record_id, template_name="employee_record/summary.html"):
     siae = get_current_company_or_404(request)
 
@@ -629,6 +636,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def disable(request, employee_record_id, template_name="employee_record/disable.html"):
     siae = get_current_company_or_404(request)
 
@@ -659,6 +667,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def reactivate(request, employee_record_id, template_name="employee_record/reactivate.html"):
     siae = get_current_company_or_404(request)
 
@@ -696,6 +705,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     return render(request, template_name, context)
 
 
+@readonly_view
 def nir_already_used(request, job_seeker_public_id, template_name="employee_record/nir_already_used.html"):
     siae = get_current_company_or_404(request)
 
