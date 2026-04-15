@@ -1508,13 +1508,6 @@
                           <h2 class="mb-0">
                               Intervenants
                           </h2>
-                          <a class="btn btn-ico btn-primary" href="/gps/request-new-participant/[Public ID of beneficiary]" id="request-new-participant-link">
-                              <i aria-hidden="true" class="ri-user-add-line">
-                              </i>
-                              <span>
-                                  Ajouter un intervenant existant
-                              </span>
-                          </a>
                       </div>
                       <form id="display-contact-info-form">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>

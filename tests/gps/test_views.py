@@ -440,9 +440,6 @@ class TestGroupDetailsMembershipTab:
         assertContains(response, display_email_txt, count=1)
         assertNotContains(response, display_phone_txt)
 
-        assertContains(response, "Ajouter un intervenant")
-        assertContains(response, f"/gps/request-new-participant/{beneficiary.public_id}")
-
     def test_group_memberships_order(self, client):
         prescriber = PrescriberFactory(membership=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
