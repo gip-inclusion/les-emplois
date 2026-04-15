@@ -249,6 +249,7 @@ class TestCriterionCertificationBadge:
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -264,7 +265,6 @@ class TestCriterionCertificationBadge:
         )
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
-            eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
         assertHTMLEqual(
@@ -284,7 +284,6 @@ class TestCriterionCertificationBadge:
         )
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
-            eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
         assertHTMLEqual(
@@ -301,6 +300,7 @@ class TestCriterionCertificationBadge:
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_not_certified=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -313,6 +313,7 @@ class TestCriterionCertificationBadge:
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certification_error=True)
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )
@@ -325,6 +326,7 @@ class TestCriterionCertificationBadge:
         criterion = IAESelectedAdministrativeCriteriaFactory()
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=criterion.eligibility_diagnosis,
             job_seeker=criterion.eligibility_diagnosis.job_seeker,
         )

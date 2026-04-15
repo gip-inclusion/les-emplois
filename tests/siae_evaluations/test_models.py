@@ -86,6 +86,7 @@ class TestEvaluationCampaignMiscMethods:
                 job_seeker=job_seeker,
                 eligibility_diagnosis=eligibility_diagnosis,
                 sender=sender,
+                state=JobApplicationState.ACCEPTED,
             )
 
         # zero job application
@@ -228,6 +229,8 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         evaluation_campaign = EvaluationCampaignFactory()
         job_app = campaign_eligible_job_app_objects["job_app"]
         job_app.state = JobApplicationState.REFUSED
+        job_app.approval = None
+        job_app.eligibility_diagnosis = None
         job_app.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
         assert _eligible_to_siae_evaluations(job_app) == "non"

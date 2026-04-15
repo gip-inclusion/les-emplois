@@ -346,13 +346,15 @@ class TestProcessViews:
                     if state is job_applications_enums.JobApplicationState.ACCEPTED
                     else assertNotContains
                 )
-                job_application = JobApplicationFactory(
-                    job_seeker=approval.user,
-                    approval=approval,
-                    to_company=company,
-                    sent_by_authorized_prescriber=True,
-                    state=state,
-                )
+                factory_kwargs = {
+                    "job_seeker": approval.user,
+                    "to_company": company,
+                    "sent_by_authorized_prescriber": True,
+                    "state": state,
+                }
+                if state is job_applications_enums.JobApplicationState.ACCEPTED:
+                    factory_kwargs["approval"] = approval
+                job_application = JobApplicationFactory(**factory_kwargs)
                 url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
                 response = client.get(url)
                 # Check if approval is displayed
@@ -382,6 +384,7 @@ class TestProcessViews:
         eligibility_diagnosis = selected_criteria.eligibility_diagnosis
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             to_company=company,
             job_seeker=job_seeker,
             hiring_start_at=today,
@@ -580,6 +583,7 @@ class TestProcessViews:
             certifiable_by_api_particulier=True,
         )
         job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=certified_crit.eligibility_diagnosis,
             sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
@@ -603,6 +607,7 @@ class TestProcessViews:
             eligibility_diagnosis__from_prescriber=True,
         )
         job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
             sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
@@ -625,6 +630,7 @@ class TestProcessViews:
             criteria_certification_error=True,
         )
         job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
             sent_by_authorized_prescriber=True,
             to_company__subject_to_iae_rules=True,
@@ -705,8 +711,9 @@ class TestProcessViews:
         job_seeker = JobSeekerFactory()
 
         job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True, job_seeker=job_seeker, with_iae_eligibility_diagnosis=True
+            sent_by_prescriber_alone=True, job_seeker=job_seeker, to_company__subject_to_iae_rules=True
         )
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
         job_application.process()
 
         client.force_login(job_seeker)
@@ -775,8 +782,9 @@ class TestProcessViews:
             job_application = JobApplicationFactory(
                 for_snapshot=True,
                 sent_by_authorized_prescriber=True,
-                with_iae_eligibility_diagnosis=True,
+                to_company__subject_to_iae_rules=True,
             )
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
 
         user = job_application.to_company.members.first()
         # transition logs setup
@@ -800,8 +808,9 @@ class TestProcessViews:
             job_application = JobApplicationFactory(
                 for_snapshot=True,
                 sent_by_authorized_prescriber=True,
-                with_iae_eligibility_diagnosis=True,
+                to_company__subject_to_iae_rules=True,
             )
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
 
         user = job_application.to_company.active_members.first()
         # transition logs setup
@@ -823,8 +832,9 @@ class TestProcessViews:
             job_application = JobApplicationFactory(
                 for_snapshot=True,
                 sent_by_authorized_prescriber=True,
-                with_iae_eligibility_diagnosis=True,
+                to_company__subject_to_iae_rules=True,
             )
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
 
         user = job_application.to_company.active_members.first()
         # transition logs setup
@@ -878,13 +888,14 @@ class TestProcessViews:
                 for_snapshot=True,
                 job_seeker=job_seeker,
                 sent_by_authorized_prescriber=True,
-                with_iae_eligibility_diagnosis=True,
+                to_company__subject_to_iae_rules=True,
             )
             job_app2 = JobApplicationFactory(
                 job_seeker=job_seeker,
                 sent_by_authorized_prescriber=True,
-                with_iae_eligibility_diagnosis=True,
+                to_company__subject_to_iae_rules=True,
             )
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
         user1 = job_app1.to_company.active_members.first()
         user2 = job_app2.to_company.active_members.first()
@@ -2423,7 +2434,11 @@ def test_details_for_prescriber_geiq_without_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
-        with_geiq_eligibility_diagnosis_from_prescriber=True,
+        to_company__kind=CompanyKind.GEIQ,
+    )
+    GEIQEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker=job_application.job_seeker,
     )
     prescriber = job_application.sender_prescriber_organization.members.first()
     client.force_login(prescriber)
@@ -2432,7 +2447,9 @@ def test_details_for_prescriber_geiq_without_prior_actions(client):
     response = client.get(url)
     assert response.status_code == 200
 
-    assert response.context["geiq_eligibility_diagnosis"] == job_application.geiq_eligibility_diagnosis
+    assert response.context["geiq_eligibility_diagnosis"] == job_application.get_geiq_eligibility_diagnosis(
+        for_prescriber=True
+    )
     assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
 
@@ -2447,7 +2464,11 @@ def test_details_geiq_with_prior_actions_for_non_employer_viewers(client, viewer
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber=True,
         state=job_applications_enums.JobApplicationState.PROCESSING,
-        with_geiq_eligibility_diagnosis_from_prescriber=True,
+        to_company__kind=CompanyKind.GEIQ,
+    )
+    GEIQEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker=job_application.job_seeker,
     )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR

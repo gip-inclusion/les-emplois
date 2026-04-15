@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_model_fields
   dict({
-    'num_queries': 16,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -43,60 +43,6 @@
                            AND U0."company_id" = %s))
                  AND "users_user"."id" = %s)
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.save[<site-packages>/django/db/models/base.py]',
-          'JobApplication.transfer[job_applications/models.py]',
-        ]),
-        'sql': '''
-          UPDATE "job_applications_jobapplication"
-          SET "eligibility_diagnosis_id" = NULL,
-              "updated_at" = %s
-          WHERE "job_applications_jobapplication"."id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.transfer[job_applications/models.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id"
-          FROM "job_applications_jobapplication"
-          WHERE "job_applications_jobapplication"."eligibility_diagnosis_id" IN (%s)
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.transfer[job_applications/models.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."eligibility_diagnosis_id" IN (%s)
-          ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.transfer[job_applications/models.py]',
-        ]),
-        'sql': '''
-          DELETE
-          FROM "eligibility_selectedadministrativecriteria"
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.transfer[job_applications/models.py]',
-        ]),
-        'sql': '''
-          DELETE
-          FROM "eligibility_eligibilitydiagnosis"
-          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s)
         ''',
       }),
       dict({

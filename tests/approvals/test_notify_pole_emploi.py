@@ -60,9 +60,12 @@ class TestApprovalNotifyPoleEmploiIntegration:
         assert approval.pe_notification_exit_code == "MISSING_USER_DATA"
 
     def test_invalid_job_application(self):
-        approval = ApprovalFactory(
-            with_jobapplication=True,
-            with_jobapplication__state=JobApplicationState.CANCELLED,
+        approval = ApprovalFactory()
+        JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            job_seeker=approval.user,
+            state=JobApplicationState.CANCELLED,
+            approval=None,
         )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -318,9 +321,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(
-            sent_by_prescriber_alone=True, to_company=company, approval=approval, state=JobApplicationState.POSTPONED
-        )
+        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POSTPONED)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.PENDING

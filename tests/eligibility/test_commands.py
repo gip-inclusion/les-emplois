@@ -53,8 +53,11 @@ class TestRetryCertifyCriteria:
             # Criteria to retry:
             to_retry.append(factory(criteria_certification_error=True))
             crit_with_job_app = factory(criteria_certification_error=True)
+            # Non-accepted job application: diagnosis FK is null (DB constraint), so it won't
+            # exclude this criterion from retry.
             JobApplicationFactory(
-                sent_by_prescriber_alone=True, eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis
+                sent_by_prescriber_alone=True,
+                job_seeker=crit_with_job_app.eligibility_diagnosis.job_seeker,
             )
             to_retry.append(crit_with_job_app)
             crit_with_accepted_job_app_in_the_future = factory(criteria_certification_error=True)
@@ -128,7 +131,8 @@ class TestRetryCertifyCriteria:
             )
             crit_with_job_app = factory(criteria_certification_error=True)
             JobApplicationFactory(
-                sent_by_prescriber_alone=True, eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis
+                sent_by_prescriber_alone=True,
+                job_seeker=crit_with_job_app.eligibility_diagnosis.job_seeker,
             )
             to_retry.append(crit_with_job_app)
             crit_with_accepted_job_app_in_the_future = factory(criteria_certification_error=True)

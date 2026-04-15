@@ -739,10 +739,14 @@ class TestMergeUsers:
         job_app = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             sender=user_2,
+            state=JobApplicationState.ACCEPTED,
             approval_manually_refused_by=user_2,
+            transferred_by=user_2,
+        )
+        archived_job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
             archived_by=user_2,
             archived_at=timezone.now(),
-            transferred_by=user_2,
         )
         job_app_log = JobApplicationTransitionLog(job_application=job_app, user=user_2)
         job_app_log.save()
@@ -781,8 +785,9 @@ class TestMergeUsers:
         job_app.refresh_from_db()
         assert job_app.sender == user_1
         assert job_app.approval_manually_refused_by == user_1
-        assert job_app.archived_by == user_1
         assert job_app.transferred_by == user_1
+        archived_job_app.refresh_from_db()
+        assert archived_job_app.archived_by == user_1
         job_app_log.refresh_from_db()
         assert job_app_log.user == user_1
         prolongation.refresh_from_db()
@@ -830,7 +835,7 @@ class TestMergeUsers:
             f"{prefix}itou.gps.models.FollowUpGroupMembership.user moved : [{gps_group.pk}]",
             f"{prefix}itou.invitations.models.EmployerInvitation.sender : [{invitation.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.approval_manually_refused_by : [{job_app.pk}]",
-            f"{prefix}itou.job_applications.models.JobApplication.archived_by : [{job_app.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplication.archived_by : [{archived_job_app.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.sender : [{job_app.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.transferred_by : [{job_app.pk}]",
             f"{prefix}itou.job_applications.models.JobApplicationTransitionLog.user : [{job_app_log.pk}]",

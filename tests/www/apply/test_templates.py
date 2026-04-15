@@ -15,7 +15,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
 )
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
-from itou.job_applications.enums import Origin
+from itou.job_applications.enums import JobApplicationState, Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.types import InclusiveDateRange
@@ -203,6 +203,7 @@ class TestIAEEligibilityDetail:
     def default_params(self, diagnosis):
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
+            state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=diagnosis,
             hiring_start_at=datetime.date(2024, 8, 3),
         )

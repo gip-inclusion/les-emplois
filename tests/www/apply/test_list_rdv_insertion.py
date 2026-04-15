@@ -17,6 +17,7 @@ from itou.utils.mocks.rdv_insertion import (
     RDV_INSERTION_CREATE_AND_INVITE_SUCCESS_BODY,
 )
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -59,12 +60,13 @@ class TestRdvInsertionDisplay:
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,
+            to_company__subject_to_iae_rules=True,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
             sent_by_authorized_prescriber=True,
             for_snapshot=True,
-            with_iae_eligibility_diagnosis=True,
         )
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.participation = ParticipationFactory(
             job_seeker=self.job_application.job_seeker,
             appointment__company=self.job_application.to_company,
