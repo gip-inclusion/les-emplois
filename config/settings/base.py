@@ -328,13 +328,6 @@ LOGGING = {
         "django": {
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
-        # Silence `Invalid HTTP_HOST header` errors.
-        # This should be done at the HTTP server level when possible.
-        # https://docs.djangoproject.com/en/3.0/topics/logging/#django-security
-        "django.security.DisallowedHost": {
-            "handlers": ["null"],
-            "propagate": False,
-        },
         "itou": {
             "level": os.getenv("ITOU_LOG_LEVEL", "INFO"),
         },
