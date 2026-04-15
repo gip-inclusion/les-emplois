@@ -132,6 +132,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # Generate request Id
     "django_datadog_logger.middleware.request_id.RequestIdMiddleware",
+    "itou.www.clever_debug.LogDisallowedHostMiddleware",
     # Itou health check for Clever Cloud, don’t require requests to match ALLOWED_HOSTS
     "itou.www.middleware.public_health_check",
     # Django stack
@@ -318,10 +319,15 @@ LOGGING = {
     },
     "formatters": {
         "json": {"()": "itou.utils.logging.ItouDataDogJSONFormatter"},
+        "verbose": {"format": "%(levelname)s %(asctime)s %(name)s %(message)s"},
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "json"},
         "null": {"class": "logging.NullHandler"},
+        "probe_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "": {"handlers": ["console"], "level": "INFO"},
@@ -346,6 +352,11 @@ LOGGING = {
         },
         "httpx": {
             "filters": ["httpx_filter"],
+        },
+        "probe": {
+            "handlers": ["probe_console"],
+            "level": "WARNING",
+            "propagate": False,
         },
     },
 }
