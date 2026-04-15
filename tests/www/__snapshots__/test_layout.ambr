@@ -152,8 +152,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -172,8 +174,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -483,8 +487,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -503,8 +509,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -786,8 +794,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -806,8 +816,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -1126,8 +1138,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -1146,8 +1160,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -1460,8 +1476,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -1480,8 +1498,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -1725,8 +1745,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -1745,8 +1767,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -2145,8 +2169,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -2165,8 +2191,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -2409,8 +2437,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -2429,8 +2459,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -2717,8 +2749,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -2737,8 +2771,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
@@ -3040,8 +3076,10 @@
                           </i>
                           <span>
                               Rechercher
-                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                  Nouveau
+                              <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                  <i aria-hidden="true" class="ri-flask-line">
+                                  </i>
+                                  Beta
                               </span>
                           </span>
                       </button>
@@ -3060,8 +3098,10 @@
                               <li>
                                   <a href="/search/services/results">
                                       Un service d'insertion
-                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
-                                          Nouveau
+                                      <span class="badge rounded-pill bg-important-lighter text-important badge-sm ms-2">
+                                          <i aria-hidden="true" class="ri-flask-line">
+                                          </i>
+                                          Beta
                                       </span>
                                   </a>
                               </li>
