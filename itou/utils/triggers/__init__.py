@@ -1,20 +1,34 @@
 import contextlib
 import functools
 import json
+import logging
 import operator
 import threading
 from typing import Any
 
+from django.conf import settings
 from django.db import connection, models
 from pgtrigger import Condition, core
+
+from itou.utils.enums import ItouEnvironment
+
+
+logger = logging.getLogger(__name__)
 
 
 _context = threading.local()
 
 
-def _set_context_connection_wrapper(execute, *args, **kwargs):
+def _set_context_connection_wrapper(execute, sql, params, many, context):
     context_is_outdated = getattr(_context, "last_data_set", None) != _context.data
     if context_is_outdated:
+        if not context["connection"].in_atomic_block:
+            # This should not happen since set_config is called with is_local=true
+            error_msg = "Trying to define a context outside a transaction"
+            if settings.ITOU_ENVIRONMENT in [ItouEnvironment.DEV, ItouEnvironment.TEST]:
+                raise RuntimeError(error_msg)
+            else:
+                logger.error(error_msg)  # Notify issue to sentry
         # Ideally we should set the last data *after* the completion of the query, but
         # doing it here prevent the connection wrapper to be called recursively without exit
         # condition or any other kind of synchronization because of the `set_config()` query.
@@ -25,7 +39,7 @@ def _set_context_connection_wrapper(execute, *args, **kwargs):
                 [json.dumps(_context.data)],
             )
 
-    return execute(*args, **kwargs)
+    return execute(sql, params, many, context)
 
 
 @contextlib.contextmanager

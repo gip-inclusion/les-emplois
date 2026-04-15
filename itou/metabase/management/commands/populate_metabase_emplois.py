@@ -91,6 +91,9 @@ def log_retry_attempt(retry_state):
 class Command(BaseCommand):
     help = "Populate metabase database."
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Order in the dict is the order in which the function are going to be called, hence referential data on top

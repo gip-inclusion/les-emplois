@@ -75,20 +75,8 @@
 # ---
 # name: test_matomo_populate_public[SQL queries]
   dict({
-    'num_queries': 4,
+    'num_queries': 3,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'create_table[metabase/db.py]',
-          'update_table_at_date[metabase/management/commands/populate_metabase_matomo.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_matomo.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'create_table[metabase/db.py]',
