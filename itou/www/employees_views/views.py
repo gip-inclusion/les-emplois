@@ -18,13 +18,14 @@ from itou.users.models import User
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_edit_personal_information
+from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
 
 
 logger = logging.getLogger(__name__)
 
 
-class EmployeeDetailView(DetailView):
+class EmployeeDetailView(ReadonlyViewMixin, DetailView):
     model = User
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile")
     template_name = "employees/detail.html"
