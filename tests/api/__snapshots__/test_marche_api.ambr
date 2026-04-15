@@ -1,17 +1,12 @@
 # serializer version: 1
 # name: TestMarcheCompanyAPI.test_list_companies
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -28,6 +23,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -39,6 +35,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -98,6 +95,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -208,29 +206,18 @@
                     AND "qual0" <= %s)) "qualify_mask"
           ORDER BY "col3" DESC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_companies_antenne_with_user_created_and_999
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -247,6 +234,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -258,6 +246,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -317,6 +306,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -435,6 +425,7 @@
           'CompanyQuerySet.first[<site-packages>/django/db/models/query.py]',
           'MarcheCompanySerializer.get_siret[api/marche_api/serializers.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -482,29 +473,18 @@
                    "companies_company"."id" ASC
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_companies_antenne_with_user_created_with_proper_siret
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -521,6 +501,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -532,6 +513,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -591,6 +573,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -704,28 +687,17 @@
           ORDER BY "col3" DESC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_companies_siret_with_999_and_no_other_siret_available
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -742,6 +714,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -753,6 +726,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -812,6 +786,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -928,6 +903,7 @@
           'CompanyQuerySet.first[<site-packages>/django/db/models/query.py]',
           'MarcheCompanySerializer.get_siret[api/marche_api/serializers.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -976,28 +952,17 @@
           LIMIT 1
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_companies_with_multiple_admins
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -1014,6 +979,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1025,6 +991,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1084,6 +1051,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -1194,29 +1162,18 @@
                     AND "qual0" <= %s)) "qualify_mask"
           ORDER BY "col3" DESC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_companies_without_admins
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -1233,6 +1190,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1244,6 +1202,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1303,6 +1262,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -1413,29 +1373,18 @@
                     AND "qual0" <= %s)) "qualify_mask"
           ORDER BY "col3" DESC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_companies_without_convention
   dict({
-    'num_queries': 6,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -1452,6 +1401,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1463,6 +1413,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1522,6 +1473,7 @@
       dict({
         'origin': list([
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "_prefetch_related_val_company_id",
@@ -1633,28 +1585,17 @@
           ORDER BY "col3" DESC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestMarcheCompanyAPI.test_list_no_reserved_companies
   dict({
-    'num_queries': 4,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "api_servicetoken"."id",
@@ -1671,6 +1612,7 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1678,12 +1620,6 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND NOT ("companies_company"."kind" = %s))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
