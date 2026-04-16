@@ -113,7 +113,7 @@ def webhook(request):
                         participation_data = next(
                             (
                                 d
-                                for d in event.body["data"].get("participations")
+                                for d in event.body["data"].get("participations") or []
                                 if d and d["user"]["id"] == invitation_request.rdv_insertion_user_id
                             ),
                             None,
