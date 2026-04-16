@@ -681,7 +681,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                         nir,
                     )
                     messages.warning(request, msg)
-                    logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
+                    logger.exception("step_job_seeker: error when saving job_seeker=%s", job_seeker)
                 else:
                     if self.is_gps:
                         gps_utils.add_beneficiary(request, job_seeker, created=True)

@@ -967,7 +967,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 self.user.jobseeker_profile.birthdate,
             ]
         ):
-            self.pe_log_err("had an invalid user={} nir={}", self.user, self.user.jobseeker_profile.nir)
+            self.pe_log_err("had an invalid user={}", self.user)
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
             return self.pe_save_pending(
