@@ -5,7 +5,7 @@ from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation
 from itou.users.enums import UserKind
 
 
-def handle_prescriber_intivation(invitation, request):
+def handle_prescriber_invitation(invitation, request):
     if not invitation.guest_can_join_organization(request):
         raise PermissionDenied()
 
@@ -53,7 +53,7 @@ def accept_all_pending_invitations(request):
         return False
 
     MAPPING = {
-        UserKind.PRESCRIBER: (PrescriberWithOrgInvitation, handle_prescriber_intivation),
+        UserKind.PRESCRIBER: (PrescriberWithOrgInvitation, handle_prescriber_invitation),
         UserKind.EMPLOYER: (EmployerInvitation, handle_employer_invitation),
         UserKind.LABOR_INSPECTOR: (LaborInspectorInvitation, handle_labor_inspector_invitation),
     }

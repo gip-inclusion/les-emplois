@@ -35,7 +35,7 @@ from itou.www.invitations_views.forms import (
 from itou.www.invitations_views.helpers import (
     handle_employer_invitation,
     handle_labor_inspector_invitation,
-    handle_prescriber_intivation,
+    handle_prescriber_invitation,
 )
 from itou.www.signup import forms as signup_forms
 
@@ -231,7 +231,7 @@ class InvitePrescriberView(BaseInviteUserView):
 @bypass_terms_acceptance
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
-    handle_prescriber_intivation(invitation, request)
+    handle_prescriber_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
         invitation.organization.organization_switch_key
     )
