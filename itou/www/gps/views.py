@@ -7,12 +7,10 @@ from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView
-from itoutils.urls import add_url_params
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.admin import get_admin_url
 from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -589,29 +587,3 @@ def beneficiaries_autocomplete(request):
         users = [format_data(user) for user in users_qs[:10]]
 
     return JsonResponse({"results": users})
-
-
-@check_request(is_allowed_to_use_gps)
-def request_new_participant(request, job_seeker_public_id):
-    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
-    group, _created = FollowUpGroup.objects.get_or_create(beneficiary=job_seeker)
-
-    request_new_participant_form_url = add_url_params(
-        "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
-        {
-            "user_name": request.user.get_full_name(),
-            "user_id": request.user.pk,
-            "user_email": request.user.email,
-            "user_organization_name": getattr(request.current_organization, "display_name", ""),
-            "user_organization_id": getattr(request.current_organization, "pk", ""),
-            "user_type": request.user.kind,
-            "beneficiary_link": get_admin_url(group.beneficiary),
-            "beneficiary_id": group.beneficiary.pk,
-            "success_url": request.build_absolute_uri(),
-            "followupgroup_id": group.pk,
-        },
-    )
-
-    logger.info("GPS visit_request_new_participant")
-
-    return HttpResponseRedirect(request_new_participant_form_url)
