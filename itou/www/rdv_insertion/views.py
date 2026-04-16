@@ -68,14 +68,17 @@ def webhook(request):
             )
             if invitation_requests.exists():
                 with transaction.atomic():
-                    location, _ = Location.objects.update_or_create(
-                        rdv_solidarites_id=event.body["data"]["lieu"]["rdv_solidarites_lieu_id"],
-                        defaults=dict(
-                            name=event.body["data"]["lieu"]["name"],
-                            address=event.body["data"]["lieu"]["address"],
-                            phone_number=event.body["data"]["lieu"]["phone_number"],
-                        ),
-                    )
+                    if event.body["data"]["lieu"]:
+                        location, _ = Location.objects.update_or_create(
+                            rdv_solidarites_id=event.body["data"]["lieu"]["rdv_solidarites_lieu_id"],
+                            defaults=dict(
+                                name=event.body["data"]["lieu"]["name"],
+                                address=event.body["data"]["lieu"]["address"],
+                                phone_number=event.body["data"]["lieu"]["phone_number"],
+                            ),
+                        )
+                    else:
+                        location = None
                     appointment, _ = Appointment.objects.update_or_create(
                         company=Company.objects.get(rdv_solidarites_id=rdvs_company_id),
                         rdv_insertion_id=event.body["data"]["id"],
