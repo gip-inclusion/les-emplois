@@ -4,6 +4,7 @@ import hmac
 import json
 import logging
 
+import pytest
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -190,8 +191,16 @@ class TestRdvInsertion:
         assert not Participation.objects.exists()
 
     @override_settings(RDV_INSERTION_WEBHOOK_SECRET="much-much-secret")
-    def test_webhook_handler_creates_appointment(self, client):
-        body_data = rdv_insertion_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY["data"]
+    @pytest.mark.parametrize(
+        "body",
+        [
+            rdv_insertion_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY,
+            rdv_insertion_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY_WITHOUT_LIEU,
+        ],
+        ids=["with_location", "without_location"],
+    )
+    def test_webhook_handler_creates_appointment(self, client, body):
+        body_data = body["data"]
 
         invitation_request = InvitationRequestFactory(
             company__rdv_solidarites_id=body_data["organisation"]["rdv_solidarites_organisation_id"],
@@ -199,7 +208,7 @@ class TestRdvInsertion:
         )
 
         url = reverse("rdv_insertion:webhook")
-        raw_data = json.dumps(rdv_insertion_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY, ensure_ascii=False).encode()
+        raw_data = json.dumps(body, ensure_ascii=False).encode()
         response = client.post(
             url,
             data=raw_data,
@@ -210,7 +219,7 @@ class TestRdvInsertion:
 
         # Event must be persisted as-is, flagged processed
         webhook_event = WebhookEvent.objects.get()
-        assert webhook_event.body == rdv_insertion_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY
+        assert webhook_event.body == body
         assert webhook_event.is_processed
 
         # Check for created objects
@@ -223,7 +232,7 @@ class TestRdvInsertion:
         assert appointment.start_at == datetime.datetime.fromisoformat(body_data["starts_at"])
         assert appointment.duration == datetime.timedelta(minutes=body_data["duration_in_min"])
         assert appointment.canceled_at == datetime.datetime.fromisoformat(body_data["cancelled_at"])
-        assert appointment.address == body_data["lieu"]["address"]
+        assert appointment.address == body_data["address"]
         assert appointment.total_participants == body_data["users_count"]
         assert appointment.max_participants == body_data["max_participants_count"]
         assert appointment.rdv_insertion_id == body_data["id"]
@@ -234,7 +243,10 @@ class TestRdvInsertion:
         assert participation.rdv_insertion_user_id == body_data["participations"][0]["user"]["id"]
         assert participation.rdv_insertion_id == body_data["participations"][0]["id"]
 
-        assert appointment.location.name == body_data["lieu"]["name"]
-        assert appointment.location.address == body_data["lieu"]["address"]
-        assert appointment.location.phone_number == body_data["lieu"]["phone_number"]
-        assert appointment.location.rdv_solidarites_id == body_data["lieu"]["rdv_solidarites_lieu_id"]
+        if body_data["lieu"]:
+            assert appointment.location.name == body_data["lieu"]["name"]
+            assert appointment.location.address == body_data["lieu"]["address"]
+            assert appointment.location.phone_number == body_data["lieu"]["phone_number"]
+            assert appointment.location.rdv_solidarites_id == body_data["lieu"]["rdv_solidarites_lieu_id"]
+        else:
+            assert appointment.location is None

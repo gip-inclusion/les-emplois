@@ -231,3 +231,8 @@ RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY = {
     },
     "meta": {"event": "created", "model": "Rdv", "timestamp": "2024-08-15 19:30:08 +0200"},
 }
+
+RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY_WITHOUT_LIEU = {
+    **RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY,
+    "data": {**RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY["data"], "lieu": None, "address": ""},
+}
