@@ -128,7 +128,6 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                 self.HARD_DUPLICATES_COUNT,
                 len(duplicates),
                 duplicate.email,
-                duplicate.jobseeker_profile.nir,
                 duplicate.jobseeker_profile.birthdate,
                 approval.number if approval else "",
                 approval.start_at.strftime("%d/%m/%Y") if approval else "",
@@ -158,7 +157,6 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                 self.NIR_DUPLICATES_COUNT,
                 len(duplicates),
                 duplicate.email,
-                duplicate.nir,
             ]
 
             # Debug info (when verbosity >= 1).
