@@ -25,6 +25,9 @@ class Command(BaseCommand):
     # interrupted, prefer frequent and quick iterations.
     BATCH_SIZE = 200
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def handle(self, *args, **options):
         now = timezone.now()
         files = File.objects.exclude(scan__clamav_completed_at__gt=now - relativedelta(months=1)).order_by(
