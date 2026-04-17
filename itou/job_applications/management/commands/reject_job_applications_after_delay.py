@@ -4,10 +4,14 @@ from django.template import loader
 
 from itou.job_applications.enums import RefusalReason
 from itou.job_applications.models import JobApplication
+from itou.utils import triggers
 from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument("--limit", type=int, default=40)
 
@@ -24,7 +28,7 @@ class Command(BaseCommand):
         )[:limit]
 
         for job_seeker in job_seekers_with_their_rejectable_applications:
-            with transaction.atomic():
+            with transaction.atomic(), triggers.context(**self.get_trigger_context()):
                 job_seeker_applications = (
                     JobApplication.objects.filter(job_seeker_id=job_seeker["job_seeker"])
                     .automatically_rejectable_applications()
