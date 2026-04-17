@@ -31,8 +31,8 @@ def test_middleware_allows_htmx_requests(client):
 def test_middleware_allows_post_requests(client):
     user = EmployerFactory(membership=True, terms_accepted_at=None)
     client.force_login(user)
-    response = client.post(reverse("dashboard:index"))
-    assertTemplateUsed(response, "dashboard/dashboard.html")
+    response = client.post(reverse("dashboard:edit_user_info"))
+    assertTemplateUsed(response, "dashboard/edit_user_info.html")
 
 
 @pytest.mark.parametrize(
