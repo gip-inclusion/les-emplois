@@ -1134,7 +1134,7 @@ class TestAutocomplete:
         for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
             client.force_login(user)
             for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
-                response = client.post(
+                response = client.get(
                     reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": field_name})
                 )
                 assert response.status_code == 403
