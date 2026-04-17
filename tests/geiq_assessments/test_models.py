@@ -337,6 +337,7 @@ def test_transition_submit():
     assert transition.transition == AssessmentTransition.SUBMIT
     assert transition.user == transition.assessment.submitted_by
     assert transition.institution is None
+    assert transition.timestamp == transition.assessment.submitted_at
 
 
 def test_transition_review():
@@ -360,6 +361,7 @@ def test_transition_review():
     assert transition.transition == AssessmentTransition.REVIEW
     assert transition.user == ddets_membership.user
     assert transition.institution == ddets_membership.institution
+    assert transition.timestamp == transition.assessment.reviewed_at
 
 
 @pytest.mark.parametrize("is_reviewed", [True, False])
@@ -388,3 +390,4 @@ def test_transition_final_review(is_reviewed):
     assert transition.transition == AssessmentTransition.FINAL_REVIEW
     assert transition.user == dreets_membership.user
     assert transition.institution == dreets_membership.institution
+    assert transition.timestamp == transition.assessment.final_reviewed_at
