@@ -13,6 +13,8 @@ from itou.utils.command import BaseCommand
 
 class Command(BaseCommand):
     ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     help = """\
     Queue Huey tasks that could not be scheduled.
 
