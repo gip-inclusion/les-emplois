@@ -444,6 +444,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.transition == AssessmentTransition.REVIEW
             assert transition.user == ddets_membership.user
             assert transition.institution == ddets_membership.institution
+            assert transition.timestamp == transition.assessment.reviewed_at
 
             assert len(mailoutbox) == 1
             email = mailoutbox[0]
@@ -470,6 +471,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.transition == AssessmentTransition.FINAL_REVIEW
             assert transition.user == dreets_membership.user
             assert transition.institution == dreets_membership.institution
+            assert transition.timestamp == transition.assessment.final_reviewed_at
             assert len(mailoutbox) == 1
             email = mailoutbox[0]
             assert (
@@ -535,6 +537,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.transition == AssessmentTransition.REVIEW
             assert transition.user == ddets_membership.user
             assert transition.institution == ddets_membership.institution
+            assert transition.timestamp == transition.assessment.reviewed_at
 
         # DREETS fix
         client.force_login(dreets_membership.user)

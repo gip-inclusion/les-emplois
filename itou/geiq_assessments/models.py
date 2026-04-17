@@ -432,6 +432,26 @@ class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
         verbose_name_plural = "logs des transitions du bilan d'exécution"
         ordering = ["-timestamp"]
 
+    @classmethod
+    def log_transition(cls, transition, from_state, to_state, modified_object, **kwargs):
+        """Override to make timestamps between the assessment and the transition match."""
+        timestamp_attribute = {
+            AssessmentState.SUBMITTED: "submitted_at",
+            AssessmentState.REVIEWED: "reviewed_at",
+            AssessmentState.FINAL_REVIEWED: "final_reviewed_at",
+        }[to_state]
+
+        kwargs.update(
+            {
+                "transition": transition,
+                "from_state": from_state,
+                "to_state": to_state,
+                "timestamp": getattr(modified_object, timestamp_attribute),
+                cls.MODIFIED_OBJECT_FIELD: modified_object,
+            }
+        )
+        return cls.objects.create(**kwargs)
+
     def __str__(self):
         return str(self.id)
 

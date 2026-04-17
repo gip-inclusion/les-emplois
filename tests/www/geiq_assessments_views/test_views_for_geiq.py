@@ -649,6 +649,7 @@ class TestAssessmentDetailsForGEIQView:
         assert transition.assessment.state == AssessmentState.SUBMITTED
         assert transition.transition == AssessmentTransition.SUBMIT
         assert transition.user == membership.user
+        assert transition.timestamp == transition.assessment.submitted_at
         requested_contract.refresh_from_db()
         # Requested allowance are automatically granted by default
         assert requested_contract.allowance_granted is True
