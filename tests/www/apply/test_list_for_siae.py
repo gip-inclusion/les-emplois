@@ -2434,7 +2434,7 @@ class TestAutocomplete:
         for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
             client.force_login(user)
             for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
-                response = client.post(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))
+                response = client.get(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))
                 assert response.status_code == 403
 
     def test_as_prescriber(self, client):
