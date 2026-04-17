@@ -207,7 +207,7 @@ class JobSeekerExistsForm(forms.Form):
 
     email = forms.EmailField(
         label="Adresse e-mail personnelle du candidat",
-        help_text=("Par exemple: julie@example.com"),
+        help_text="Par exemple : julie@example.com",
         widget=forms.EmailInput(attrs={"autocomplete": "off"}),
     )
 
@@ -419,7 +419,7 @@ class NirModificationRequestForm(forms.ModelForm):
         required=True,
         strip=True,
         validators=[validate_nir],
-        help_text="Par exemple: 2 69 05 49 588 157 80",
+        help_text="Par exemple : 2 69 05 49 588 157 80",
     )
 
     rationale = forms.CharField(
