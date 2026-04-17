@@ -24,7 +24,7 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.readonly import ReadonlyViewMixin, readonly_view
+from itou.utils.readonly import ReadonlyViewMixin, http_methods
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
@@ -109,7 +109,7 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJ
         }
 
 
-@readonly_view(except_methods=["POST"])
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def job_description_list(request, template_name="companies/job_description_list.html"):
     company = get_current_company_or_404(request)
     job_descriptions = (
