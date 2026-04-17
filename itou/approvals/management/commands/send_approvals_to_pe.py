@@ -20,6 +20,9 @@ MAX_APPROVALS_PER_RUN = 140
 class Command(BaseCommand):
     help = "Regularly sends all 'pending' and 'should retry' approvals to PE"
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
         parser.add_argument("--delay", action="store", dest="delay", default=0, type=int, choices=range(0, 5))
