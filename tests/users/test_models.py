@@ -1317,6 +1317,20 @@ class TestJobSeekerAssignment:
                 last_action_kind=random.choice(ActionKind.values),
             ).save()
 
+    def test_constraint_unknown_advisor_without_organization_or_company(self):
+        job_seeker = JobSeekerFactory()
+        professional = random.choice([PrescriberFactory(), EmployerFactory()])
+
+        with pytest.raises(IntegrityError):
+            JobSeekerAssignment(
+                job_seeker=job_seeker,
+                professional=professional,
+                prescriber_organization=None,
+                company=None,
+                last_action_kind=random.choice(ActionKind.values),
+                assigned_to_unknown_advisor=True,
+            ).save()
+
     @pytest.mark.parametrize(
         "with_prescriber_organization, with_company", [(True, False), (False, True), (False, False)]
     )

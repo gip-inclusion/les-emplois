@@ -1173,6 +1173,7 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         "organization",
         "updated_at",
         "last_action_kind",
+        "assigned_to_unknown_advisor",
     ]
     list_display_links = ("job_seeker_display",)
     list_filter = ("last_action_kind",)
