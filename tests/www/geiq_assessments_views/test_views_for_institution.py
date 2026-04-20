@@ -540,18 +540,22 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.timestamp == transition.assessment.reviewed_at
 
         # DREETS fix
-        client.force_login(dreets_membership.user)
-        response = client.post(
-            reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
-            data={"action": "fix"},
-        )
-        assertRedirects(
-            response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
-        )
-        assessment.refresh_from_db()
-        assert assessment.reviewed_at is None
-        assert assessment.reviewed_by is None
-        assert assessment.reviewed_by_institution is None
+        with freeze_time(timezone.now() + datetime.timedelta(hours=6)):
+            client.force_login(dreets_membership.user)
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "fix"},
+            )
+            assertRedirects(
+                response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+            )
+            transition = AssessmentTransitionLog.objects.filter(assessment=assessment).first()
+            assert transition.assessment.reviewed_at is None
+            assert transition.assessment.reviewed_by is None
+            assert transition.assessment.reviewed_by_institution is None
+            assert transition.transition == AssessmentTransition.INSTITUTION_FIX
+            assert transition.user == dreets_membership.user
+            assert transition.institution == dreets_membership.institution
 
         # DREETS review
         with freeze_time(timezone.now() + datetime.timedelta(hours=6)):

@@ -68,6 +68,7 @@ class AssessmentWorkflow(xwf_models.Workflow):
             [AssessmentState.SUBMITTED, AssessmentState.REVIEWED],
             AssessmentState.FINAL_REVIEWED,
         ),
+        (AssessmentTransition.INSTITUTION_FIX, AssessmentState.REVIEWED, AssessmentState.SUBMITTED),
     )
 
     log_model = "geiq_assessments.AssessmentTransitionLog"
@@ -418,6 +419,12 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
         self.final_reviewed_by = user
         self.final_reviewed_by_institution = institution
 
+    @xwf_models.transition()
+    def institution_fix(self, *, user, institution):
+        self.reviewed_at = None
+        self.reviewed_by = None
+        self.reviewed_by_institution = None
+
 
 class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "assessment"
@@ -435,21 +442,23 @@ class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
     @classmethod
     def log_transition(cls, transition, from_state, to_state, modified_object, **kwargs):
         """Override to make timestamps between the assessment and the transition match."""
-        timestamp_attribute = {
-            AssessmentState.SUBMITTED: "submitted_at",
-            AssessmentState.REVIEWED: "reviewed_at",
-            AssessmentState.FINAL_REVIEWED: "final_reviewed_at",
-        }[to_state]
-
         kwargs.update(
             {
                 "transition": transition,
                 "from_state": from_state,
                 "to_state": to_state,
-                "timestamp": getattr(modified_object, timestamp_attribute),
                 cls.MODIFIED_OBJECT_FIELD: modified_object,
             }
         )
+
+        if transition in AssessmentTransition.with_timestamp_match():
+            timestamp_attribute = {
+                AssessmentState.SUBMITTED: "submitted_at",
+                AssessmentState.REVIEWED: "reviewed_at",
+                AssessmentState.FINAL_REVIEWED: "final_reviewed_at",
+            }[to_state]
+
+            kwargs.update({"timestamp": getattr(modified_object, timestamp_attribute)})
         return cls.objects.create(**kwargs)
 
     def __str__(self):
