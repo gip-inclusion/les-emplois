@@ -16,13 +16,13 @@ from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
-from itou.companies.models import Company, JobDescription
+from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
 from itou.jobs.models import Appellation
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, PoleEmploiFieldsMixin
 from itou.users.models import JobSeekerProfile, User
@@ -81,6 +81,20 @@ class ApplicationJobsForm(forms.ModelForm):
         return self.fields.get("spontaneous_application") or self.fields["selected_jobs"].choices
 
 
+def get_advisor_choice_field(user, job_seeker_name, queryset):
+    field = forms.ModelChoiceField(
+        label=f"Accompagnateur de {job_seeker_name} au sein de votre structure",
+        help_text="Sélectionnez le professionnel qui accompagne le candidat",
+        queryset=queryset,
+        empty_label="Non référencé sur le service",
+        initial=user,
+        required=False,
+    )
+    choices = [(u.pk, u.get_inverted_full_name()) for u in queryset] + [("", field.empty_label)]
+    field.choices = choices
+    return field
+
+
 class SubmitJobApplicationForm(forms.Form):
     """
     Submit a job application to a company.
@@ -93,7 +107,9 @@ class SubmitJobApplicationForm(forms.Form):
         max_upload_size=5 * global_constants.MB,
     )
 
-    def __init__(self, company, user, auto_prescription_process, *args, **kwargs):
+    def __init__(
+        self, company, user, auto_prescription_process, job_seeker_name, current_organization, *args, **kwargs
+    ):
         self.company = company
         super().__init__(*args, **kwargs)
         self.fields.update(forms.fields_for_model(JobApplication, fields=["message"]))
@@ -110,6 +126,19 @@ class SubmitJobApplicationForm(forms.Form):
             message.label = "Message à l’employeur (avec copie transmise au candidat)"
             help_text = "Message obligatoire et non modifiable après l’envoi."
         message.help_text = help_text
+
+        if user.is_professional:
+            qs = User.objects.order_by("last_name")
+            if isinstance(current_organization, PrescriberOrganization):
+                qs = qs.filter(
+                    Exists(PrescriberMembership.objects.filter(user=OuterRef("pk"), organization=current_organization))
+                )
+            else:
+                qs = qs.filter(
+                    Exists(CompanyMembership.objects.filter(user=OuterRef("pk"), company=current_organization))
+                )
+
+            self.fields["advisor"] = get_advisor_choice_field(user, job_seeker_name, qs)
 
 
 class TransferJobApplicationForm(SubmitJobApplicationForm):
