@@ -710,7 +710,7 @@ def test_prolongation_report_file_filter(admin_client):
     assertNotContains(response, prolongation.declared_by.display_with_pii)
 
 
-def test_create_suspensionç_with_no_approval_does_raise_500(admin_client):
+def test_create_suspension_with_no_approval_does_raise_500(admin_client):
     response = admin_client.post(
         reverse("admin:approvals_suspension_add"),
         data={},
