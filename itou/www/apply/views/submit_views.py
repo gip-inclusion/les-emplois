@@ -28,6 +28,7 @@ from itou.users.models import JobSeekerAssignment, User
 from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import constants as apply_view_constants
@@ -591,10 +592,20 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         self.form = None
 
     def get_form_kwargs(self):
+        job_seeker_name = mask_unless(
+            self.job_seeker.get_inverted_full_name(),
+            predicate=can_view_personal_information(self.request, self.job_seeker),
+        )
+        current_organization = None
+        if self.request.from_prescriber or self.request.from_employer:
+            current_organization = self.request.current_organization
+
         return {
             "company": self.company,
             "user": self.request.user,
             "auto_prescription_process": self.tunnel == ApplyTunnel.AUTO_PRESCRIPTION,
+            "job_seeker_name": job_seeker_name,
+            "current_organization": current_organization,
             "data": self.request.POST or None,
             "files": self.request.FILES or None,
         }
@@ -648,9 +659,17 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
+            advisor = self.form.cleaned_data.get("advisor")
+
             # Sync job seeker assignment
+            professional = advisor or self.request.user
+            assigned_to_unknown_advisor = advisor is None
             JobSeekerAssignment.objects.upsert_assignment(
-                self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
+                self.job_seeker,
+                professional,
+                self.request.current_organization,
+                ActionKind.APPLY,
+                assigned_to_unknown_advisor,
             )
 
         # Send notifications

@@ -2,6 +2,7 @@ import datetime
 import io
 import random
 import uuid
+from functools import partial
 from unittest import mock
 
 import pytest
@@ -23,6 +24,7 @@ from pytest_django.asserts import (
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind
+from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -45,7 +47,10 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+)
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -376,6 +381,115 @@ class TestApply:
 
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
         assert client.session[apply_session_name] == expected_session
+
+    @pytest.mark.parametrize(
+        "memberships,with_known_advisor",
+        [
+            pytest.param(
+                lambda: PrescriberMembershipFactory.create_batch(2, organization=PrescriberOrganizationFactory()),
+                False,
+                id="unknown_advisor_as_prescriber",
+            ),
+            pytest.param(
+                lambda: CompanyMembershipFactory.create_batch(2, company=CompanyFactory()),
+                False,
+                id="unknown_advisor_as_employer",
+            ),
+            pytest.param(
+                lambda: PrescriberMembershipFactory.create_batch(
+                    2, organization=PrescriberOrganizationFactory(authorized=False)
+                ),
+                True,
+                id="unauthorized_prescriber_advisor",
+            ),
+            pytest.param(
+                lambda: PrescriberMembershipFactory.create_batch(
+                    2, organization=PrescriberOrganizationFactory(authorized=True)
+                ),
+                True,
+                id="authorized_prescriber_advisor",
+            ),
+            pytest.param(
+                lambda: CompanyMembershipFactory.create_batch(2, company=CompanyFactory()),
+                True,
+                id="employer_advisor",
+            ),
+        ],
+    )
+    @pytest.mark.usefixtures("temporary_bucket")
+    def test_apply_with_advisor(self, client, pdf_file, memberships, with_known_advisor):
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
+        assert company.job_description_through.first() is not None
+
+        membership1, membership2 = memberships()
+        user, other_user = membership1.user, membership2.user
+        job_seeker = JobSeekerFactory()
+        selected_job = company.job_description_through.first()
+        FollowUpGroup.objects.follow_beneficiary(job_seeker, user)
+
+        client.force_login(user)
+
+        apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": [selected_job]})
+        next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name})
+        response = client.get(next_url)
+
+        assertContains(response, "Postuler")
+        can_display_name = isinstance(membership1, CompanyMembership) or (membership1.organization.is_authorized)
+        job_seeker_displayed_name = mask_unless(job_seeker.get_inverted_full_name(), can_display_name)
+        assertContains(response, f"Accompagnateur de {job_seeker_displayed_name} au sein de votre structure")
+
+        # check if available advisors are displayed in the correct order and if logged in user is selected by default
+        option_fields = "".join(
+            [
+                (
+                    f'  <option value="{u.pk}"{" selected" if u.pk == user.pk else ""}>'
+                    f"{u.get_inverted_full_name()}"
+                    "</option>"
+                )
+                for u in sorted([user, other_user], key=lambda u: u.last_name)
+            ]
+        )
+        assertContains(
+            response,
+            f"""
+            <select name="advisor" class="form-select" aria-describedby="id_advisor_helptext" id="id_advisor">
+                {option_fields}
+                <option value="">Non référencé sur le service</option>
+            </select>
+            """,
+            html=True,
+        )
+
+        data = {
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume": pdf_file,
+        }
+
+        # add prescriber advisor to the payload if present
+        if with_known_advisor:
+            data |= {"advisor": other_user.id}
+
+        with mock.patch(
+            "itou.files.models.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = client.post(next_url, data=data)
+
+        assignment = JobSeekerAssignment.objects.get()
+
+        if with_known_advisor:
+            assert assignment.professional == other_user
+        else:
+            assert assignment.professional == user
+
+        if isinstance(membership1, CompanyMembership):
+            assert assignment.company == membership1.company
+        else:
+            assert assignment.prescriber_organization == membership1.organization
+
+        assert assignment.assigned_to_unknown_advisor is not with_known_advisor
+        assert assignment.job_seeker == job_seeker
+        assert assignment.last_action_kind == ActionKind.APPLY
 
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
@@ -3026,6 +3140,46 @@ class TestApplicationView:
         assertContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
         assertContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
         assertContains(response, f"{self.DIAGORIENTE_URL}?utm_source=emploi-inclusion-prescripteur")
+
+    @pytest.mark.parametrize(
+        "membership_factory,organization_factory",
+        [
+            pytest.param(
+                lambda org: partial(PrescriberMembershipFactory, organization=org),
+                partial(PrescriberOrganizationFactory, authorized=True),
+                id="prescriber_advisor",
+            ),
+            pytest.param(
+                lambda company: partial(CompanyMembershipFactory, company=company),
+                CompanyFactory,
+                id="employer_advisor",
+            ),
+        ],
+    )
+    def test_application_resume_with_advisor(self, client, membership_factory, organization_factory):
+        company = CompanyFactory(with_membership=True, with_jobs=True)
+        organization = organization_factory()
+        active_user = membership_factory(organization)().user
+        active_user_2 = membership_factory(organization)().user
+        active_user_inactive_membership = membership_factory(organization)(is_active=False).user
+        inactive_user = membership_factory(organization)(user__is_active=False).user
+        job_seeker = JobSeekerFactory()
+
+        client.force_login(active_user)
+        apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
+
+        response = client.get(reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name}))
+
+        assertContains(
+            response,
+            f"Accompagnateur de {job_seeker.get_inverted_full_name()} au sein de votre structure",
+        )
+
+        assertNotContains(response, inactive_user.get_inverted_full_name())
+        assertNotContains(response, active_user_inactive_membership.get_inverted_full_name())
+        assertContains(response, active_user.get_inverted_full_name())
+        assertContains(response, active_user_2.get_inverted_full_name())
+        assertContains(response, "Non référencé sur le service")
 
     def test_application_eligibility_is_bypassed_for_company_not_subject_to_eligibility_rules(self, client):
         company = CompanyFactory(not_subject_to_iae_rules=True, with_membership=True)
