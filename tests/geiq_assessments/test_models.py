@@ -4,9 +4,10 @@ import random
 import pytest
 from django.db import IntegrityError, transaction
 from django.utils import timezone
+from freezegun import freeze_time
 
-from itou.geiq_assessments.enums import AssessmentState
-from itou.geiq_assessments.models import AssessmentCampaign
+from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
+from itou.geiq_assessments.models import AssessmentCampaign, AssessmentTransitionLog
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import (
@@ -323,3 +324,67 @@ def test_assessment_label_antenna_names():
         "Antenne de fourmi (12)",
         "Antenne de télévision (département non disponible)",
     ]
+
+
+def test_transition_submit():
+    assessment = AssessmentFactory(campaign__year=2023, with_submission_requirements=True)
+    assert assessment.state == AssessmentState.NEW
+
+    assessment.submit(user=EmployerFactory())
+
+    transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+    assert transition.assessment.state == AssessmentState.SUBMITTED
+    assert transition.transition == AssessmentTransition.SUBMIT
+    assert transition.user == transition.assessment.submitted_by
+    assert transition.institution is None
+
+
+def test_transition_review():
+    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    with freeze_time(timezone.now() - datetime.timedelta(hours=1)):
+        assessment = AssessmentFactory(
+            campaign__year=2023,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=1),
+            submitted_by=EmployerFactory(),
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+            review_comment="Bravo !",
+        )
+    assert assessment.state == AssessmentState.SUBMITTED
+
+    assessment.review(user=ddets_membership.user, institution=ddets_membership.institution)
+
+    transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+    assert transition.assessment.state == AssessmentState.REVIEWED
+    assert transition.transition == AssessmentTransition.REVIEW
+    assert transition.user == ddets_membership.user
+    assert transition.institution == ddets_membership.institution
+
+
+@pytest.mark.parametrize("is_reviewed", [True, False])
+def test_transition_final_review(is_reviewed):
+    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    with freeze_time(timezone.now() - datetime.timedelta(hours=1)):
+        assessment = AssessmentFactory(
+            campaign__year=2023,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=1),
+            submitted_by=EmployerFactory(),
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+            review_comment="Bravo !",
+            reviewed_at=(timezone.now() + datetime.timedelta(hours=1)) if is_reviewed else None,
+            reviewed_by=ddets_membership.user if is_reviewed else None,
+            reviewed_by_institution=ddets_membership.institution if is_reviewed else None,
+        )
+    assert assessment.state == AssessmentState.REVIEWED if is_reviewed else AssessmentState.SUBMITTED
+
+    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    assessment.final_review(user=dreets_membership.user, institution=dreets_membership.institution)
+
+    transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+    assert transition.assessment.state == AssessmentState.FINAL_REVIEWED
+    assert transition.transition == AssessmentTransition.FINAL_REVIEW
+    assert transition.user == dreets_membership.user
+    assert transition.institution == dreets_membership.institution

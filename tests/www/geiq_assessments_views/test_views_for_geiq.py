@@ -18,8 +18,8 @@ from pytest_django.asserts import (
 )
 
 from itou.companies.enums import CompanyKind
-from itou.geiq_assessments.enums import AssessmentState
-from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
+from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
+from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, AssessmentTransitionLog, LabelInfos
 from itou.institutions.enums import InstitutionKind
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.files.factories import FileFactory
@@ -643,9 +643,12 @@ class TestAssessmentDetailsForGEIQView:
         response = client.post(details_url)
         assertRedirects(response, details_url)
 
-        assessment.refresh_from_db()
-        assert assessment.submitted_at is not None
-        assert assessment.submitted_by == membership.user
+        transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+        assert transition.assessment.submitted_at is not None
+        assert transition.assessment.submitted_by == membership.user
+        assert transition.assessment.state == AssessmentState.SUBMITTED
+        assert transition.transition == AssessmentTransition.SUBMIT
+        assert transition.user == membership.user
         requested_contract.refresh_from_db()
         # Requested allowance are automatically granted by default
         assert requested_contract.allowance_granted is True
@@ -667,7 +670,7 @@ class TestAssessmentDetailsForGEIQView:
             name="submitted assessment details section"
         )
 
-        origin_submitted_at = assessment.submitted_at
+        origin_submitted_at = transition.assessment.submitted_at
         response = client.post(details_url)
         assertMessages(
             response,
@@ -809,10 +812,7 @@ class TestAssessmentGetFile:
         filled_assessment.geiq_comment = "Un commentaire"
         filled_assessment.contracts_synced_at = timezone.now()
         filled_assessment.contracts_selection_validated_at = timezone.now()
-        filled_assessment.submitted_by = geiq_membership.user
-        filled_assessment.submitted_at = timezone.now()
-        filled_assessment.state = AssessmentState.SUBMITTED
-        filled_assessment.save()
+        filled_assessment.submit(user=geiq_membership.user)
 
         # GEIQ & institution can now access the files
         client.force_login(geiq_membership.user)
@@ -1048,10 +1048,7 @@ class TestAssessmentUploadActionFinancialAssessment:
         assessment.geiq_comment = "Un commentaire"
         assessment.contracts_synced_at = timezone.now()
         assessment.contracts_selection_validated_at = timezone.now()
-        assessment.submitted_by = geiq_membership.user
-        assessment.submitted_at = timezone.now()
-        assessment.state = AssessmentState.SUBMITTED
-        assessment.save()
+        assessment.submit(user=geiq_membership.user)
         response = client.get(url)
         assert response.status_code == 404
 

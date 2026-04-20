@@ -11,7 +11,6 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
@@ -184,10 +183,7 @@ class TestAssessmentContractsListAndToggle:
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
             with_submission_requirements=True,
         )
-        assessment.submitted_at = timezone.now()
-        assessment.submitted_by = geiq_membership.user
-        assessment.state = AssessmentState.SUBMITTED
-        assessment.save()
+        assessment.submit(user=geiq_membership.user)
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
             institution=ddets_membership.institution,
@@ -526,10 +522,7 @@ class TestAssessmentContractsDetails:
         check_user_access_to_all_tabs(ddets_membership.user, access=False)
 
         # Submit the assessment
-        assessment.submitted_at = timezone.now()
-        assessment.submitted_by = geiq_membership.user
-        assessment.state = AssessmentState.SUBMITTED
-        assessment.save()
+        assessment.submit(user=geiq_membership.user)
         check_user_access_to_all_tabs(ddets_membership.user, access=True)
 
         # Now for contract without allowance requested

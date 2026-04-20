@@ -9,8 +9,8 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.geiq_assessments.enums import AssessmentState
-from itou.geiq_assessments.models import AssessmentInstitutionLink
+from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
+from itou.geiq_assessments.models import AssessmentInstitutionLink, AssessmentTransitionLog
 from itou.institutions.enums import InstitutionKind
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
@@ -315,10 +315,8 @@ class TestAssessmentDetailsForInstitutionView:
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessment details section for submission"
         )
-        assessment.submitted_at = timezone.now() + datetime.timedelta(hours=3)
-        assessment.submitted_by = geiq_membership.user
-        assessment.state = AssessmentState.SUBMITTED
-        assessment.save()
+        with freeze_time(timezone.now() + datetime.timedelta(hours=3)):
+            assessment.submit(user=geiq_membership.user)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
             name="assessment details title after submission"
@@ -350,12 +348,9 @@ class TestAssessmentDetailsForInstitutionView:
             name="assessment details section ready for review"
         )
 
-        assessment.reviewed_at = timezone.now() + datetime.timedelta(hours=6)
-        assessment.reviewed_by = ddets_membership.user
-        assessment.reviewed_by_institution = ddets_membership.institution
         assessment.review_comment = "Bravo !"
-        assessment.state = AssessmentState.REVIEWED
-        assessment.save()
+        with freeze_time(timezone.now() + datetime.timedelta(hours=6)):
+            assessment.review(user=ddets_membership.user, institution=ddets_membership.institution)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
             name="reviewed assessment details title"
@@ -368,11 +363,8 @@ class TestAssessmentDetailsForInstitutionView:
             institution__name="DREETS BRET",
             institution__kind=InstitutionKind.DREETS_GEIQ,
         )
-        assessment.final_reviewed_at = timezone.now() + datetime.timedelta(hours=7)
-        assessment.final_reviewed_by = dreets_membership.user
-        assessment.final_reviewed_by_institution = dreets_membership.institution
-        assessment.state = AssessmentState.FINAL_REVIEWED
-        assessment.save()
+        with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
+            assessment.final_review(user=dreets_membership.user, institution=dreets_membership.institution)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
             name="final reviewed assessment details title"
@@ -445,10 +437,13 @@ class TestAssessmentDetailsForInstitutionView:
             assertRedirects(
                 response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
             )
-            assessment.refresh_from_db()
-            assert assessment.reviewed_at == timezone.now()
-            assert assessment.reviewed_by == ddets_membership.user
-            assert assessment.reviewed_by_institution == ddets_membership.institution
+            transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+            assert transition.assessment.reviewed_at == timezone.now()
+            assert transition.assessment.reviewed_by == ddets_membership.user
+            assert transition.assessment.reviewed_by_institution == ddets_membership.institution
+            assert transition.transition == AssessmentTransition.REVIEW
+            assert transition.user == ddets_membership.user
+            assert transition.institution == ddets_membership.institution
 
             assert len(mailoutbox) == 1
             email = mailoutbox[0]
@@ -468,10 +463,13 @@ class TestAssessmentDetailsForInstitutionView:
             assertRedirects(
                 response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
             )
-            assessment.refresh_from_db()
-            assert assessment.final_reviewed_at == timezone.now()
-            assert assessment.final_reviewed_by == dreets_membership.user
-            assert assessment.final_reviewed_by_institution == dreets_membership.institution
+            transition = AssessmentTransitionLog.objects.filter(assessment=assessment).first()
+            assert transition.assessment.final_reviewed_at == timezone.now()
+            assert transition.assessment.final_reviewed_by == dreets_membership.user
+            assert transition.assessment.final_reviewed_by_institution == dreets_membership.institution
+            assert transition.transition == AssessmentTransition.FINAL_REVIEW
+            assert transition.user == dreets_membership.user
+            assert transition.institution == dreets_membership.institution
             assert len(mailoutbox) == 1
             email = mailoutbox[0]
             assert (
@@ -530,10 +528,13 @@ class TestAssessmentDetailsForInstitutionView:
             assertRedirects(
                 response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
             )
-            assessment.refresh_from_db()
-            assert assessment.reviewed_at == timezone.now()
-            assert assessment.reviewed_by == ddets_membership.user
-            assert assessment.reviewed_by_institution == ddets_membership.institution
+            transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+            assert transition.assessment.reviewed_at == timezone.now()
+            assert transition.assessment.reviewed_by == ddets_membership.user
+            assert transition.assessment.reviewed_by_institution == ddets_membership.institution
+            assert transition.transition == AssessmentTransition.REVIEW
+            assert transition.user == ddets_membership.user
+            assert transition.institution == ddets_membership.institution
 
         # DREETS fix
         client.force_login(dreets_membership.user)
@@ -559,13 +560,24 @@ class TestAssessmentDetailsForInstitutionView:
             assertRedirects(
                 response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
             )
-            assessment.refresh_from_db()
-            assert assessment.reviewed_at == timezone.now()
-            assert assessment.reviewed_by == dreets_membership.user
-            assert assessment.reviewed_by_institution == dreets_membership.institution
-            assert assessment.final_reviewed_at == timezone.now()
-            assert assessment.final_reviewed_by == dreets_membership.user
-            assert assessment.final_reviewed_by_institution == dreets_membership.institution
+            transition_review = AssessmentTransitionLog.objects.filter(
+                assessment=assessment, transition=AssessmentTransition.REVIEW
+            ).get()
+            assert transition_review.assessment.reviewed_at == timezone.now()
+            assert transition_review.assessment.reviewed_by == dreets_membership.user
+            assert transition_review.assessment.reviewed_by_institution == dreets_membership.institution
+            assert (
+                transition_review.assessment.final_reviewed_at == transition_review.assessment.reviewed_at
+            )  # useless assert because of freeze_time
+            assert transition_review.assessment.final_reviewed_by == dreets_membership.user
+            assert transition_review.assessment.final_reviewed_by_institution == dreets_membership.institution
+            assert transition_review.user == ddets_membership.user  # The DRRETS directly final_reviewed
+            assert transition_review.institution == ddets_membership.institution
+            transition_final_review = AssessmentTransitionLog.objects.filter(
+                assessment=assessment, transition=AssessmentTransition.FINAL_REVIEW
+            ).get()
+            assert transition_final_review.user == dreets_membership.user
+            assert transition_final_review.institution == dreets_membership.institution
 
 
 class TestAssessmentContractsListForInstitutionView:
@@ -853,11 +865,8 @@ class TestAssessmentReviewView:
             user__first_name="Julia",
             user__last_name="Thomas",
         )
-        assessment.final_reviewed_at = timezone.now() + datetime.timedelta(hours=7)
-        assessment.final_reviewed_by = dreets_membership.user
-        assessment.final_reviewed_by_institution = dreets_membership.institution
-        assessment.state = AssessmentState.FINAL_REVIEWED
-        assessment.save()
+        with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
+            assessment.final_review(user=dreets_membership.user, institution=dreets_membership.institution)
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="disabled assessments review form with final review"
