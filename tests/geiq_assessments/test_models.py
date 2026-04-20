@@ -364,6 +364,33 @@ def test_transition_review():
     assert transition.timestamp == transition.assessment.reviewed_at
 
 
+def test_transition_institution_fix():
+    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
+    with freeze_time(timezone.now() - datetime.timedelta(hours=1)):
+        assessment = AssessmentFactory(
+            campaign__year=2023,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=1),
+            submitted_by=EmployerFactory(),
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+            review_comment="Bravo !",
+            reviewed_at=timezone.now() + datetime.timedelta(hours=1),
+            reviewed_by=ddets_membership.user,
+            reviewed_by_institution=ddets_membership.institution,
+        )
+    assert assessment.state == AssessmentState.REVIEWED
+
+    assessment.institution_fix(user=dreets_membership.user, institution=dreets_membership.institution)
+
+    transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
+    assert transition.assessment.state == AssessmentState.SUBMITTED
+    assert transition.transition == AssessmentTransition.INSTITUTION_FIX
+    assert transition.user == dreets_membership.user
+    assert transition.institution == dreets_membership.institution
+
+
 @pytest.mark.parametrize("is_reviewed", [True, False])
 def test_transition_final_review(is_reviewed):
     ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
@@ -382,7 +409,7 @@ def test_transition_final_review(is_reviewed):
         )
     assert assessment.state == AssessmentState.REVIEWED if is_reviewed else AssessmentState.SUBMITTED
 
-    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
     assessment.final_review(user=dreets_membership.user, institution=dreets_membership.institution)
 
     transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()

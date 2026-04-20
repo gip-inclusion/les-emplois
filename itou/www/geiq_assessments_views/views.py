@@ -22,7 +22,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.geiq_assessments import sync
-from itou.geiq_assessments.enums import AssessmentState
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -894,11 +893,7 @@ def assessment_details_for_institution(
             elif not assessment.reviewed_at:
                 messages.warning(request, "Ce bilan n’a pas encore été contrôlé : il n’y a rien à corriger.")
             else:
-                assessment.reviewed_at = None
-                assessment.reviewed_by = None
-                assessment.reviewed_by_institution = None
-                assessment.state = AssessmentState.SUBMITTED
-                assessment.save(update_fields=("reviewed_at", "reviewed_by", "reviewed_by_institution", "state"))
+                assessment.institution_fix(user=request.user, institution=request.current_organization)
                 logger.info(
                     "user=%s asked for a fix of assessment=%s",
                     request.user.pk,
