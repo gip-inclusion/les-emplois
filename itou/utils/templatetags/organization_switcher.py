@@ -35,28 +35,28 @@ def organization_switcher(context, mode):
         elif request.from_employer:
             userkind_context = {
                 "icon": "ri-community-line",
-                "kind_display": "Employeur",
-                "no_org_display": "Compte inactif",
+                # kind_display and no_org_display are never used since there's always an organization
             }
         elif request.from_prescriber:
             userkind_context = {
                 "icon": (
-                    "ri-user-line"
-                    if current_organization is None
-                    else (
-                        "ri-home-smile-line"
-                        if current_organization.kind != PrescriberOrganizationKind.OTHER
-                        else "ri-group-line"
-                    )
-                ),
-                "kind_display": "Orienteur seul" if current_organization is None else current_organization.kind,
-                "no_org_display": request.user.get_full_name(),
+                    "ri-home-smile-line"
+                    if current_organization.kind != PrescriberOrganizationKind.OTHER
+                    else "ri-group-line"
+                )
+                # kind_display and no_org_display are never used since there's always an organization
             }
         elif request.from_institution:
             userkind_context = {
                 "icon": "ri-government-line",
-                "kind_display": "Inspecteur du travail",
-                "no_org_display": "Compte inactif",
+                # kind_display and no_org_display are never used since there's always an organization
+            }
+        elif request.user.is_professional:
+            # This means current organization is None
+            userkind_context = {
+                "icon": "ri-user-line",
+                "kind_display": "Professionel",
+                "no_org_display": request.user.get_full_name(),
             }
         elif request.user.is_itou_staff:
             userkind_context = {
