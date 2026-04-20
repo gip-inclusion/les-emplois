@@ -1041,7 +1041,6 @@ class TestProConnectPrescribersViewsExceptions:
             KIND_PRESCRIBER,
             previous_url=previous_url,
             next_url=next_url,
-            register=False,
         )
         # Follow the redirection.
         response = client.get(response.url, follow=True)
@@ -1060,90 +1059,6 @@ class TestProConnectPrescribersViewsExceptions:
                 )
             ],
         )
-
-    def test_employer_already_exists(self, client, pro_connect):
-        """
-        User is already a member of an SIAE.
-        Raise an exception.
-        """
-        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = EmployerFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
-        client.get(reverse("signup:prescriber_check_already_exists"))
-
-        session_signup_data = client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        # Jump over the last step to avoid double-testing each one
-        # as they are already tested on prescriber's signup views.
-        # Prescriber's signup process heavily relies on session data.
-        # Override only what's needed for our test.
-        # PrescriberOrganizationFactoy does not contain any address field
-        # so we can't use it.
-        prescriber_org_data = {
-            "siret": org.siret,
-            "is_head_office": True,
-            "name": org.name,
-            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
-            "address_line_2": "",
-            "post_code": "13150",
-            "city": "TARASCON",
-            "department": "13",
-            "longitude": 4.660572,
-            "latitude": 43.805661,
-            "geocoding_score": 0.8178357293868921,
-        }
-        session_signup_data = session_signup_data | {
-            "authorization_status": "NOT_SET",
-            "kind": org.kind,
-            "prescriber_org_data": prescriber_org_data,
-        }
-
-        client_session = client.session
-        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
-        client_session.save()
-        signup_url = reverse("signup:prescriber_user")
-
-        response = client.get(signup_url)
-        pro_connect.assertContainsButton(response)
-
-        # Connect with ProConnect
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-            expected_redirect_url=add_url_params(
-                pro_connect.logout_url,
-                {
-                    "redirect_url": previous_url,
-                    "token": ID_TOKEN_ENCODED,
-                },
-            ),
-        )
-
-        # IC logout redirects to previous_url
-        response = client.get(previous_url)
-        # Show an error and don't create an organization.
-
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    messages.ERROR,
-                    "Un compte employeur existe déjà avec cette adresse e-mail. Vous devez créer un compte "
-                    f"{pro_connect.identity_provider.label} avec une autre adresse e-mail pour devenir prescripteur "
-                    "sur la plateforme. "
-                    f"Besoin d'aide ? <a href='{global_constants.ITOU_HELP_CENTER_URL}/requests/new' "
-                    "target='_blank'>Contactez-nous</a>.",
-                )
-            ],
-        )
-
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.first_name != pro_connect.oidc_userinfo["given_name"]
-        organization_exists = PrescriberOrganization.objects.filter(siret=org.siret).exists()
-        assert not organization_exists
-        assert not user.prescriberorganization_set.exists()
 
     def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
         """

@@ -58,7 +58,6 @@ class ProConnectStateData:
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
     channel: str = None
-    enforce_kind: bool = False
     prescriber_session_data: dict = None
 
 
@@ -161,11 +160,7 @@ def pro_connect_authorize(request):
     if user_kind not in USER_DATA_CLASSES:
         return _redirect_to_login_page_on_error(error_msg="Wrong user kind.")
 
-    enforce_kind = bool(request.GET.get("register")) or request.GET.get("channel") == ProConnectChannel.INVITATION
-
-    pc_data = ProConnectStateData(
-        user_kind=user_kind, previous_url=previous_url, next_url=next_url, enforce_kind=enforce_kind
-    )
+    pc_data = ProConnectStateData(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
 
     if channel := request.GET.get("channel"):
         pc_data.channel = channel
@@ -304,7 +299,6 @@ def pro_connect_callback(request):
 
     try:
         user, _ = pc_user_data.create_or_update_user(
-            enforce_kind=pro_connect_state.data.get("enforce_kind"),
             login_only=pro_connect_state.data["channel"] == ProConnectChannel.NEXUS,
         )
     except InactiveUserException as e:

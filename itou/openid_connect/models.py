@@ -157,11 +157,11 @@ class OIDConnectUserData:
     def login_allowed_user_kinds(self) -> tuple[UserKind]:
         return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
 
-    def _check_valid_kind(self, user, user_data_dict, enforce_kind):
-        if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and enforce_kind):
+    def _check_valid_kind(self, user):
+        if user.kind not in self.login_allowed_user_kinds:
             raise InvalidKindException(user)
 
-    def create_or_update_user(self, *, enforce_kind=True, login_only=False):
+    def create_or_update_user(self, *, login_only=False):
         """
         A user is being created or updated from information provided by an identity provider.
         A user is globally unique with the combination of SSO provider + sub (e.g. InclusionConnect:username).
@@ -196,7 +196,7 @@ class OIDConnectUserData:
                     if not self.is_sub_update_allowed(user):
                         raise MultipleSubSameEmailException(user)
                 elif user.identity_provider not in self.allowed_identity_provider_migration:
-                    self._check_valid_kind(user, user_data_dict, enforce_kind)
+                    self._check_valid_kind(user)
                     raise EmailInUseException(user)
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
@@ -220,7 +220,7 @@ class OIDConnectUserData:
         if not user.is_active:
             raise InactiveUserException(user)
 
-        self._check_valid_kind(user, user_data_dict, enforce_kind)
+        self._check_valid_kind(user)
 
         readonly_pii_fields = user.jobseeker_profile.readonly_pii_fields() if is_jobseeker else set()
         readonly_pii_fields_changed = []
