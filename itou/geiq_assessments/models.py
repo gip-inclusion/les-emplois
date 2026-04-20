@@ -396,6 +396,28 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
             )
         return antenna_names
 
+    @xwf_models.transition()
+    def submit(self, *, user):
+        self.submitted_at = timezone.now()
+        self.submitted_by = user
+
+    @xwf_models.transition()
+    def review(self, *, user, institution):
+        self.reviewed_at = timezone.now()
+        self.reviewed_by = user
+        self.reviewed_by_institution = institution
+
+    @xwf_models.transition()
+    def final_review(self, *, user, institution):
+        now = timezone.now()
+        if self.reviewed_at is None:
+            self.reviewed_at = now
+            self.reviewed_by = user
+            self.reviewed_by_institution = institution
+        self.final_reviewed_at = now
+        self.final_reviewed_by = user
+        self.final_reviewed_by_institution = institution
+
 
 class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "assessment"

@@ -304,10 +304,7 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
                 f"Ce bilan ne peut pas encore être soumis. Ces actions sont manquantes : {','.join(missing_actions)}",
             )
         else:
-            assessment.submitted_at = timezone.now()
-            assessment.submitted_by = request.user
-            assessment.state = AssessmentState.SUBMITTED
-            assessment.save(update_fields=("submitted_at", "submitted_by", "state"))
+            assessment.submit(user=request.user)
             # Preselect all contracts for institution validation
             EmployeeContract.objects.filter(employee__assessment=assessment).update(
                 allowance_granted=F("allowance_requested")
@@ -851,36 +848,30 @@ def assessment_details_for_institution(
         except ValueError:
             raise Http404
         if action is InstitutionAction.REVIEW:
-            now = timezone.now()
-            if not assessment.reviewed_at:
-                assessment.reviewed_at = now
-                assessment.reviewed_by = request.user
-                assessment.reviewed_by_institution = request.current_organization
-                assessment.state = AssessmentState.REVIEWED
-                assessment.save(update_fields=("reviewed_at", "reviewed_by", "reviewed_by_institution", "state"))
-                logger.info(
-                    "user=%s reviewed the assessment=%s",
-                    request.user.pk,
-                    assessment.pk,
-                    extra={"geiq_assessment": assessment.pk},
-                )
-            elif request.current_organization.kind == InstitutionKind.DDETS_GEIQ:
-                # DDETS trying to review an already reviewed assessment
-                raise PermissionDenied
-            if request.current_organization.kind == InstitutionKind.DREETS_GEIQ:
-                if not assessment.final_reviewed_at:
-                    assessment.final_reviewed_at = now
-                    assessment.final_reviewed_by = request.user
-                    assessment.final_reviewed_by_institution = request.current_organization
-                    assessment.state = AssessmentState.FINAL_REVIEWED
-                    assessment.save(
-                        update_fields=(
-                            "final_reviewed_at",
-                            "final_reviewed_by",
-                            "final_reviewed_by_institution",
-                            "state",
-                        )
+            if request.current_organization.kind == InstitutionKind.DDETS_GEIQ:
+                if not assessment.reviewed_at:
+                    assessment.review(user=request.user, institution=request.current_organization)
+                    logger.info(
+                        "user=%s reviewed the assessment=%s",
+                        request.user.pk,
+                        assessment.pk,
+                        extra={"geiq_assessment": assessment.pk},
                     )
+                    dreets_members = {
+                        membership.user
+                        for membership in InstitutionMembership.objects.filter(
+                            institution__kind=InstitutionKind.DREETS_GEIQ,
+                            institution__assessment_links__assessment=assessment,
+                        ).select_related("user")
+                    }
+                    for member in dreets_members:
+                        AssessmentReviewedForDREETSLaborInspectorNotification(member, assessment=assessment).send()
+                else:
+                    # DDETS trying to review an already reviewed assessment
+                    raise PermissionDenied
+            elif request.current_organization.kind == InstitutionKind.DREETS_GEIQ:
+                if not assessment.final_reviewed_at:
+                    assessment.final_review(user=request.user, institution=request.current_organization)
                     logger.info(
                         "user=%s dreets-reviewed the assessment=%s",
                         request.user.pk,
@@ -892,16 +883,8 @@ def assessment_details_for_institution(
                     # DREETS trying to review an already final_reviewed assessment
                     raise PermissionDenied
             else:
-                # Reviewed by a DDETS
-                dreets_members = {
-                    membership.user
-                    for membership in InstitutionMembership.objects.filter(
-                        institution__kind=InstitutionKind.DREETS_GEIQ,
-                        institution__assessment_links__assessment=assessment,
-                    ).select_related("user")
-                }
-                for member in dreets_members:
-                    AssessmentReviewedForDREETSLaborInspectorNotification(member, assessment=assessment).send()
+                # Unexpected institution kind
+                raise PermissionDenied
 
         elif action is InstitutionAction.FIX:
             if assessment.final_reviewed_at:
