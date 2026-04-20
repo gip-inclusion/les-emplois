@@ -56,6 +56,12 @@ def test_navigation_not_authenticated(snapshot, client):
             ),
             id="PrescriberWithAuthorizedOrganization",
         ),
+        pytest.param(
+            partial(
+                PrescriberFactory,
+            ),
+            id="ProfessionalWithoutOrganization",
+        ),
     ],
 )
 def test_navigation_authenticated(snapshot, client, user_factory):

@@ -1684,7 +1684,7 @@
   
   '''
 # ---
-# name: test_navigation_authenticated[PrescriberWithoutOrganization][navigation]
+# name: test_navigation_authenticated[ProfessionalWithoutOrganization][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
       <div class="offcanvas-header offcanvas-header--organization">
@@ -1693,7 +1693,7 @@
                   <i aria-hidden="true" class="ri-user-line">
                   </i>
                   <span>
-                      Orienteur seul
+                      Professionel
                   </span>
                   <strong>
                       John DOE
@@ -1711,47 +1711,11 @@
           <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
               <ul class="nav nav-tabs flex-column mb-3">
                   <li class="nav-item">
-                      <a class="nav-link active" href="/dashboard/">
+                      <a class="nav-link" href="/dashboard/">
                           <i aria-hidden="true" class="ri-home-line fw-medium">
                           </i>
                           <span>
                               Accueil
-                          </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
-                          <i aria-hidden="true" class="ri-draft-line fw-medium">
-                          </i>
-                          <span>
-                              Candidatures
-                          </span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-user-line fw-medium">
-                          </i>
-                          <span>
-                              Candidats
-                          </span>
-                      </button>
-                      <div class="collapse" id="collapse-nav-candidats">
-                          <ul>
-                              <li>
-                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
-                                  </a>
-                              </li>
-                          </ul>
-                      </div>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-pin-distance-line fw-medium">
-                          </i>
-                          <span>
-                              Réseau d'intervenants
                           </span>
                       </a>
                   </li>
@@ -1864,7 +1828,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=professionnel_sans_orga" rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -1920,7 +1884,7 @@
   
   '''
 # ---
-# name: test_navigation_authenticated[PrescriberWithoutOrganization][user menu]
+# name: test_navigation_authenticated[ProfessionalWithoutOrganization][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
       <ul>
