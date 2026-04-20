@@ -1554,7 +1554,9 @@ class IdentityCertification(models.Model):
 
 
 class JobSeekerAssignmentManager(models.Manager):
-    def upsert_assignment(self, job_seeker, professional, organization, last_action_kind):
+    def upsert_assignment(
+        self, job_seeker, professional, organization, last_action_kind, assigned_to_unknown_advisor=False
+    ):
         assert job_seeker.is_job_seeker
         if not professional.is_professional:
             # This should not happen but we don't want to block everything
@@ -1571,11 +1573,12 @@ class JobSeekerAssignmentManager(models.Manager):
             prescriber_organization=prescriber_organization,
             company=company,
             last_action_kind=last_action_kind,
+            assigned_to_unknown_advisor=assigned_to_unknown_advisor,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
-            update_fields=["updated_at", "last_action_kind"],
+            update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor"],
             unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
         )
 
@@ -1635,6 +1638,10 @@ class JobSeekerAssignment(models.Model):
         choices=ActionKind.choices,
         default=ActionKind.CREATE,
     )
+    assigned_to_unknown_advisor = models.BooleanField(
+        verbose_name="assigné à un accompagnateur non référencé sur le service",
+        default=False,
+    )
 
     objects = JobSeekerAssignmentManager()
 
@@ -1657,6 +1664,16 @@ class JobSeekerAssignment(models.Model):
                 condition=~models.Q(company__isnull=False, prescriber_organization__isnull=False),
                 violation_error_message=(
                     "Une affectation ne peut pas comporter une organisation prescriptrice et une entreprise."
+                ),
+            ),
+            models.CheckConstraint(
+                name="prescriber_organization_or_company_not_null_if_unknown_advisor",
+                condition=~models.Q(
+                    assigned_to_unknown_advisor=True, company__isnull=True, prescriber_organization__isnull=True
+                ),
+                violation_error_message=(
+                    "Une affectation doit comporter une organisation prescriptrice ou une entreprise "
+                    "si elle est liée à un accompagnateur non référencé sur le service."
                 ),
             ),
         ]
