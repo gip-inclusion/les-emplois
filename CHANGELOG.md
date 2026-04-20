@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2026-04-20
+
+### Ajouté
+
+- [GEIQ : Ajout du compteur de filtres actifs pour les contrats du bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7879)
+
+### Modifié
+
+- [Admin : Modifications des permissions des affectations candidat](https://github.com/gip-inclusion/les-emplois/pull/7890)
+- [Candidature : Autoriser les SIAE suspendue dans le cadre du contrôle a posteriori à utiliser le parcours de déclaration d'embauche](https://github.com/gip-inclusion/les-emplois/pull/7643)
+- [Prescripteur : Utiliser la date de dernière action sur le candidat pour trier le tableau "Mes candidats"](https://github.com/gip-inclusion/les-emplois/pull/7862)
+- [Tech : Correction de bugs & tests bagottant du fait du décalage entre heure locale et heure GMT](https://github.com/gip-inclusion/les-emplois/pull/7885)
+
+### Supprimé
+
+- [GPS : Suppression de la vue et de l'url du formulaire d'ajout d'intervenant](https://github.com/gip-inclusion/les-emplois/pull/7896)
+
 ## 2026-04-13
 
 ### Ajouté
