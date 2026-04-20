@@ -63,7 +63,6 @@ def mock_oauth_dance(
     user_email=None,
     user_info_email=None,
     channel=None,
-    register=True,
     other_client=None,
     oidc_userinfo=None,
 ):
@@ -75,7 +74,6 @@ def mock_oauth_dance(
         "next_url": next_url,
         "user_email": user_email,
         "channel": channel,
-        "register": register,
     }
     authorize_params = {k: v for k, v in authorize_params.items() if v}
 
