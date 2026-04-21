@@ -106,10 +106,13 @@ class FollowUpGroup(models.Model):
     def __str__(self):
         return "Groupe de " + self.beneficiary.get_full_name()
 
-    # returns certified referent or latest user to follow beneficiary
+    # TODO(viblanc): referent acts as a placeholder for the last known advisor
+    # until follow up groups are replaced in favor of job seeker assignments
     @property
     def referent(self):
-        return self.memberships.order_by("-is_referent_certified", "-created_at").filter(is_active=True).first()
+        if last_advisor := self.beneficiary.last_advisor:
+            return self.memberships.filter(member=last_advisor.id).first()
+        return None
 
 
 class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):

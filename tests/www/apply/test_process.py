@@ -53,7 +53,13 @@ from tests.job_applications.factories import JobApplicationFactory, PriorActionF
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerAssignmentFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     accept_legal_terms,
@@ -2065,6 +2071,13 @@ class TestProcessViews:
             sent_by_employer=True,
         )
         employer = job_application.to_company.members.first()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=job_application.sender,
+            company=job_application.sender_company,
+            assigned_to_unknown_advisor=True,
+        )
+
         client.force_login(employer)
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -2080,6 +2093,7 @@ class TestProcessViews:
             member=employer,
             started_at=datetime.date(2024, 1, 1),
         )
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=employer)
 
         group = membership.follow_up_group
 
@@ -2100,6 +2114,7 @@ class TestProcessViews:
             member=prescriber,
             started_at=datetime.date(2025, 1, 1),
         )
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
 
         # Referent is present but and displayed
         response = client.get(url)
@@ -2145,6 +2160,7 @@ class TestProcessViews:
             started_at=datetime.date(2024, 1, 1),
         )
         group = membership.follow_up_group
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
 
         client.force_login(prescriber)
 
@@ -2202,6 +2218,8 @@ class TestProcessViews:
             started_at=datetime.date(2024, 1, 1),
         )
         group = membership.follow_up_group
+
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
 
         client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})

@@ -23,6 +23,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -552,6 +553,7 @@ def test_display_job_seeker_referent(client, snapshot):
         started_at=datetime.date(2024, 1, 1),
     )
     group = membership.follow_up_group
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
 
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
