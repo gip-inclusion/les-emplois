@@ -19,3 +19,7 @@ def dotteditemgetter(*items):
         return tuple(reduce(operator.getitem, item.split("."), obj) for item in items)[slicer]
 
     return g
+
+
+def identity(x):
+    return x
