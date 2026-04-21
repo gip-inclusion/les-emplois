@@ -726,6 +726,12 @@ class User(AbstractUser, AddressMixin):
             return True
         return self.terms_accepted_at < get_latest_terms_datetime()
 
+    @cached_property
+    def last_advisor(self):
+        if last_assignment := self.job_seeker_assignments.order_by("-updated_at").first():
+            return None if last_assignment.assigned_to_unknown_advisor else last_assignment.professional
+        return None
+
 
 def get_allauth_account_user_display(user):
     return user.email
