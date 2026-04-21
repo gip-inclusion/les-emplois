@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_collection_differ_simple_operations[both collections empty]
+  'SUMMARY File current_collection_keys_count=0 comparative_collection_keys_count=0 common_keys_count=0 added_keys_count=0 updated_keys_count=0 removed_keys_count=0'
+# ---
+# name: test_collection_differ_simple_operations[one object added]
+  'SUMMARY File current_collection_keys_count=0 comparative_collection_keys_count=1 common_keys_count=0 added_keys_count=1 updated_keys_count=0 removed_keys_count=0'
+# ---
+# name: test_collection_differ_simple_operations[one object removed]
+  'SUMMARY File current_collection_keys_count=1 comparative_collection_keys_count=0 common_keys_count=0 added_keys_count=0 updated_keys_count=0 removed_keys_count=1'
+# ---
+# name: test_collection_differ_simple_operations[one object updated]
+  'SUMMARY File current_collection_keys_count=1 comparative_collection_keys_count=1 common_keys_count=1 added_keys_count=0 updated_keys_count=1 removed_keys_count=0'
+# ---
