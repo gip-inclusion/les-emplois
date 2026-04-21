@@ -247,7 +247,8 @@ def sync_employee_and_contracts(assessment):
             year=assessment.campaign.year,
         )
         contract.allowance_requested = (
-            contract.nb_days_in_campaign_year > geiq_assessments_models.MIN_DAYS_IN_YEAR_FOR_ALLOWANCE
+            contract.employee.allowance_amount
+            and contract.nb_days_in_campaign_year > geiq_assessments_models.MIN_DAYS_IN_YEAR_FOR_ALLOWANCE
         )
 
         return contract

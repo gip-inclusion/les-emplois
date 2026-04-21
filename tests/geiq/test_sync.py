@@ -44,7 +44,7 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
         salarie__montant_aide=814,
         antenne={"id": 0, "name": "Un Joli GEIQ"},
         date_debut="2023-01-15:00:00+01:00",
-        date_fin="2023-01-31:00:00+01:00",
+        date_fin="2023-01-31:00:00+01:00",  # Contract duration is less than 3 months
         date_fin_contrat="2023-01-31:00:00+01:00",
     )
     prequal_of_contract = SalariePreQualificationLabelDataFactory(
@@ -58,10 +58,17 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
         date_fin="2023-01-31:00:00+01:00",
         date_fin_contrat="2022-01-31:00:00+01:00",
     )
+    contract_without_allowance = SalarieContratLabelDataFactory(
+        salarie__geiq_id=assessment.label_geiq_id,
+        salarie__montant_aide=0,
+        antenne={"id": 0, "name": "Un Joli GEIQ"},
+        date_debut="2023-01-01T00:00:00+01:00",
+        date_fin="2024-01-31:00:00+01:00",
+    )
 
     def _fake_get_all_contracts(self, geiq_id, date_fin=None):
         assert geiq_id == assessment.label_geiq_id
-        return [dict(contract), dict(contract_with_prequal), dict(contract_of_antenna)]
+        return [dict(c) for c in (contract, contract_with_prequal, contract_of_antenna, contract_without_allowance)]
 
     def _fake_get_all_prequalifications(self, geiq_id):
         assert geiq_id == assessment.label_geiq_id
@@ -85,7 +92,7 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
     mocker.patch.object(geiq_label.LabelApiClient, "get_taux_geiq", _fake_get_taux_geiq)
     sync.sync_employee_and_contracts(assessment)
     employees = models.Employee.objects.order_by("label_id")
-    assert len(employees) == 2
+    assert len(employees) == 3
     assert prequal_only["salarie"]["id"] not in {employee.label_id for employee in employees}
     assert contract_ending_before_2023["salarie"]["id"] not in {employee.label_id for employee in employees}
     assert contract["salarie"]["id"] == employees[0].label_id
@@ -101,17 +108,21 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
     assert contract1.nb_days_in_campaign_year == 17
     assert contract1.allowance_requested is False  # Since less than 90 days
     assert contract1.allowance_granted is False
+    assert employees[2].allowance_amount == 0
+    contract2 = employees[2].contracts.first()
+    assert contract2.allowance_requested is False  # Since no potential allowance
+    assert contract2.allowance_granted is False
 
     assessment.refresh_from_db()
     assert assessment.contracts_synced_at is not None
     assert assessment.label_rates == FAKE_LABEL_RATES
-    assert assessment.employee_nb == 2
+    assert assessment.employee_nb == 3
 
     assert caplog.messages == [
-        "Label sync will create nb=2 type=employé",
+        "Label sync will create nb=3 type=employé",
         "Label sync will update nb=0 type=employé",
         "Label sync will delete nb=0 type=employé",
-        "Label sync will create nb=2 type=contrat",
+        "Label sync will create nb=3 type=contrat",
         "Label sync will update nb=0 type=contrat",
         "Label sync will delete nb=0 type=contrat",
         "Label sync will create nb=1 type=préqualification",
