@@ -19,3 +19,14 @@ class AssessmentTransition(enum.StrEnum):
     @classmethod
     def with_timestamp_match(cls):
         return {cls.SUBMIT, cls.REVIEW, cls.FINAL_REVIEW}
+
+
+class InstitutionAction(enum.StrEnum):
+    REVIEW = "review"
+    FIX = "fix"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)

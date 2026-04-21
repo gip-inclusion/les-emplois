@@ -22,6 +22,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.geiq_assessments import sync
+from itou.geiq_assessments.enums import InstitutionAction
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -827,17 +828,6 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
         "can_access_details": organization_kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
     }
     return render(request, template_name, context)
-
-
-class InstitutionAction(enum.StrEnum):
-    REVIEW = "review"
-    FIX = "fix"
-
-    # Make the Enum work in Django's templates
-    # See :
-    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
-    # - https://github.com/django/django/pull/12304
-    do_not_call_in_templates = enum.nonmember(True)
 
 
 @check_request(lambda request: request.from_institution)
