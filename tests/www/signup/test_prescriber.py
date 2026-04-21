@@ -96,7 +96,6 @@ class TestPrescriberSignup:
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
             "next_url": next_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -180,7 +179,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -260,7 +258,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -358,7 +355,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -445,7 +441,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -583,7 +578,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -658,7 +652,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -782,7 +775,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -850,7 +842,6 @@ class TestPrescriberSignup:
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
-            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")

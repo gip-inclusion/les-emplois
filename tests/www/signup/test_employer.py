@@ -85,7 +85,6 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -201,7 +200,6 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -247,7 +245,6 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -295,7 +292,6 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -400,7 +396,6 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
-            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
