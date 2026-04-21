@@ -9,10 +9,11 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.www.gps.enums import EndReason
 from tests.companies.factories import CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -73,35 +74,38 @@ class TestFollowBeneficiary:
         job_seeker = JobSeekerFactory()
         prescriber_1 = PrescriberFactory()
         follow_up_group = FollowUpGroupFactory(beneficiary=job_seeker)
-        FollowUpGroupMembershipFactory(
-            member=prescriber_1,
-            follow_up_group=follow_up_group,
-            is_active=False,
-            is_referent_certified=False,
-        )
+        FollowUpGroupMembershipFactory(member=prescriber_1, follow_up_group=follow_up_group)
 
-        # No active nor certified referent
+        # No advisor
         assert follow_up_group.referent is None
 
-        # No certified referent but one active membership
+        # Last known advisor
         prescriber_2 = PrescriberFactory()
         membership_2 = FollowUpGroupMembershipFactory(
             member=prescriber_2,
             follow_up_group=follow_up_group,
-            is_active=True,
-            is_referent_certified=False,
         )
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber_2)
+
+        follow_up_group.refresh_from_db()
         assert follow_up_group.referent == membership_2
 
-        # # Certified referent
-        prescriber_3 = PrescriberFactory()
-        membership_3 = FollowUpGroupMembershipFactory(
+        # Last known advisor is not referenced
+        organization = PrescriberOrganizationFactory(with_membership=True)
+        prescriber_3 = organization.members.first()
+        FollowUpGroupMembershipFactory(
             member=prescriber_3,
             follow_up_group=follow_up_group,
-            is_active=True,
-            is_referent_certified=True,
         )
-        assert follow_up_group.referent == membership_3
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=prescriber_2,
+            prescriber_organization=organization,
+            assigned_to_unknown_advisor=True,
+        )
+
+        follow_up_group.refresh_from_db()
+        assert follow_up_group.referent is None
 
     def test_is_active(self):
         beneficiary = JobSeekerFactory()

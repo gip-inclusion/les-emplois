@@ -29,7 +29,13 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerAssignmentFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, get_session_name, parse_response_to_soup, pretty_indented
 
@@ -627,6 +633,7 @@ class TestGroupDetailsMembershipTab:
             follow_up_group=group,
             is_active=True,
         ).member
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=target_participant)
 
         client.force_login(job_seeker)
 
