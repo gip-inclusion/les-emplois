@@ -69,6 +69,14 @@
                 <i class="text-disabled">Non renseigné</i>
             {% endif %}
         </li>
+        <li>
+            <small>Accompagnateur au sein de la structure</small>
+            {% if form_accept.cleaned_data.advisor %}
+                <strong>{{ form_accept.cleaned_data.advisor.get_full_name }}</strong>
+            {% else %}
+                <i class="text-disabled">Non référencé sur le service</i>
+            {% endif %}
+        </li>
         {% if form_accept.is_geiq %}
             <li>
                 <small>Type de qualification visé</small>

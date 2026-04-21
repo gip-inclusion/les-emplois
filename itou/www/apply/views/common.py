@@ -18,7 +18,6 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import ActionKind
-from itou.users.models import JobSeekerAssignment
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
@@ -183,6 +182,7 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
             instance=self.job_application,
             company=self.company,
             job_seeker=self.job_seeker,
+            current_user=self.request.user,
             data=self.request.POST or None,
             initial=contract_form_data,
         )
@@ -337,17 +337,16 @@ class BaseConfirmationView(UserPassesTestMixin, JobSeekerAndContractInfosNeededM
                     job_application.sender_company = self.company
                     job_application.process(user=request.user)
                     self.job_application = job_application  # store in class to have access later
-                job_application.accept(user=request.user)
+                professional = job_application.advisor or request.user
+                assigned_to_unknown_advisor = job_application.advisor is None
+                action_kind = ActionKind.HIRE if creating else ActionKind.ACCEPT
+                job_application.accept(
+                    user=professional, action_kind=action_kind, assigned_to_unknown_advisor=assigned_to_unknown_advisor
+                )
 
                 # Mark job seeker's infos as up-to-date
                 job_application.job_seeker.last_checked_at = timezone.now()
                 job_application.job_seeker.save(update_fields=["last_checked_at"])
-
-                # Sync job seeker assignment
-                last_action_kind = ActionKind.HIRE if creating else ActionKind.ACCEPT
-                JobSeekerAssignment.objects.upsert_assignment(
-                    self.job_seeker, request.user, self.company, last_action_kind
-                )
 
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.", extra_tags="toast")
