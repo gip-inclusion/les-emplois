@@ -303,7 +303,7 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.PROCESSING
     assert response.context["errors"] == [
-        ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."]
+        ["Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature."]
     ]
     assertContains(response, 'value="Accepter"')
 
@@ -321,7 +321,7 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
         [
             messages.Message(
                 messages.ERROR,
-                "Le diagnostic d'eligibilité n'est pas valide pour ce candidat et cette entreprise",
+                "Le diagnostic d'éligibilité n'est pas valide pour ce candidat et cette entreprise",
             )
         ],
     )
