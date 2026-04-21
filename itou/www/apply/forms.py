@@ -336,7 +336,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, company, job_seeker, initial=None, **kwargs):
+    def __init__(self, *args, company, job_seeker, current_user=None, initial=None, **kwargs):
         super().__init__(*args, initial=initial, **kwargs)
         self.company = company
         self.is_geiq = company.kind == CompanyKind.GEIQ
@@ -484,6 +484,9 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.fields["appellation"].label = "Préciser le nom du poste (code ROME)"
         self.fields["location"].label = "Localisation du poste"
 
+        qs = User.objects.filter(pk__in=company.memberships.values_list("user", flat=True)).order_by("last_name")
+        self.fields["advisor"] = get_advisor_choice_field(current_user, job_seeker.get_inverted_full_name(), qs)
+
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
@@ -568,6 +571,9 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         else:
             # A job description has been selected is the list: link it to current hiring
             instance.hired_job_id = self.cleaned_data.get("hired_job")
+
+        instance.advisor = self.cleaned_data.get("advisor")
+
         return instance
 
     def get_display_for_choices(self):

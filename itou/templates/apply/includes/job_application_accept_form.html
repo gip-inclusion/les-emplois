@@ -38,6 +38,8 @@
             {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
         {% endif %}
 
+        {% bootstrap_field form_accept.advisor %}
+
         {% bootstrap_field form_accept.answer %}
 
         {% itou_buttons_form secondary_url=back_url reset_url=reset_url %}

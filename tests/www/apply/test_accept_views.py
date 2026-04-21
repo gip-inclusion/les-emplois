@@ -51,7 +51,12 @@ from itou.www.apply.forms import AcceptForm
 from itou.www.apply.views.accept_views import ACCEPT_SESSION_KIND, initialize_accept_session
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_geispolsheim
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory, SiaeConventionFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    JobDescriptionFactory,
+    SiaeConventionFactory,
+)
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
@@ -216,6 +221,8 @@ class TestProcessAcceptViewsInWizard:
         else:
             assertContains(response, LINK_RESET_MARKUP % reset_url)
             assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
+        JOB_SEEKER_NAME = job_application.job_seeker.get_inverted_full_name()
+        assertContains(response, f"Accompagnateur de {JOB_SEEKER_NAME} au sein de votre structure")
 
         post_data = self._accept_contract_post_data(job_application=job_application, post_data=post_data)
         response = client.post(contract_info_url, data=post_data)
@@ -229,6 +236,7 @@ class TestProcessAcceptViewsInWizard:
         assertContains(response, "Confirmer l’embauche", count=3)  # alert + button label + button aria-label
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
         assertContains(response, BACK_BUTTON_ARIA_LABEL)
+        assertContains(response, "Accompagnateur au sein de la structure")
         response = client.post(url_confirm)
         if assert_successful:
             assertRedirects(
@@ -1856,6 +1864,78 @@ class TestProcessAcceptViewsInWizard:
         response = client.get(details_url)
         assertTemplateUsed(response, "apply/process_details_company.html", count=1)
         assertContains(response, badge, html=True)
+
+    @pytest.mark.parametrize("with_known_advisor", [True, False])
+    def test_accept_with_advisor(self, client, with_known_advisor):
+        today = timezone.localdate()
+        job_application = self.create_job_application(
+            state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=True
+        )
+        details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+        employer = self.company.members.first()
+        colleague = CompanyMembershipFactory(company=self.company).user
+        inactive_employer = CompanyMembershipFactory(company=self.company, user__is_active=False).user
+        employer_with_inactive_membership = CompanyMembershipFactory(company=self.company, is_active=False).user
+        client.force_login(employer)
+        # Good duration.
+        hiring_start_at = today
+        post_data = {"hiring_end_at": ""}
+        if with_known_advisor:
+            post_data |= {"advisor": colleague.id}
+
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
+        assertContains(response, LINK_RESET_MARKUP % details_url)
+        assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
+        response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
+        assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
+
+        contract_info_url = self.get_contract_info_step_url(session_uuid)
+        response = client.get(contract_info_url)
+        JOB_SEEKER_NAME = job_application.job_seeker.get_inverted_full_name()
+        assertContains(response, f"Accompagnateur de {JOB_SEEKER_NAME} au sein de votre structure")
+
+        # check if available advisors are displayed in the correct order and if logged in user is selected by default
+        option_fields = "".join(
+            [
+                (
+                    f'  <option value="{u.pk}"{" selected" if u.pk == employer.pk else ""}>'
+                    f"{u.get_inverted_full_name()}"
+                    "</option>"
+                )
+                for u in sorted([employer, colleague], key=lambda u: u.last_name)
+            ]
+        )
+        assertContains(
+            response,
+            f"""
+            <select name="advisor" class="form-select" aria-describedby="id_advisor_helptext" id="id_advisor">
+                {option_fields}
+                <option value="">Non référencé sur le service</option>
+            </select>
+            """,
+            html=True,
+        )
+
+        assertNotContains(response, inactive_employer.get_inverted_full_name())
+        assertNotContains(response, employer_with_inactive_membership.get_inverted_full_name())
+
+        self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data, reset_url=details_url)
+
+        self.confirm_step(client, session_uuid, reset_url=details_url)
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.hiring_end_at is None
+        assert job_application.state.is_accepted
+
+        job_seeker_assignment = JobSeekerAssignment.objects.get()
+        assert job_seeker_assignment.job_seeker == job_application.job_seeker
+        assert job_seeker_assignment.last_action_kind == ActionKind.ACCEPT
+        assert job_seeker_assignment.professional == (colleague if with_known_advisor else employer)
+        assert job_seeker_assignment.assigned_to_unknown_advisor is not with_known_advisor
 
 
 class TestFillJobSeekerInfosForAccept:

@@ -1174,7 +1174,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.notifications_transfer_for_proxy(notification_context).send()
 
     @xwf_models.transition()
-    def accept(self, *, user):
+    def accept(self, *, user, action_kind=ActionKind.ACCEPT, assigned_to_unknown_advisor=False):
         if not self.hiring_start_at:
             raise xwf_models.AbortTransition(JobApplicationWorkflow.error_missing_hiring_start_at)
 
@@ -1241,6 +1241,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
             job_application.render_obsolete(user=user)
 
+        if user.is_professional:
+            # Sync job seeker assignment, but not for ITOU_STAFF users in the admin
+            JobSeekerAssignment.objects.upsert_assignment(
+                self.job_seeker, user, self.to_company, action_kind, assigned_to_unknown_advisor
+            )
+
         # Notifications & emails.
         self.notifications_accept_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
@@ -1254,10 +1260,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
-
-        if user.is_professional:
-            # Sync job seeker assignment, but not for ITOU_STAFF users in the admin
-            JobSeekerAssignment.objects.upsert_assignment(self.job_seeker, user, self.to_company, ActionKind.ACCEPT)
 
     @xwf_models.transition()
     def add_to_pool(self, *, user):

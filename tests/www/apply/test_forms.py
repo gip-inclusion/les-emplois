@@ -23,6 +23,7 @@ class TestAcceptForm:
         form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
 
         assert sorted(form.fields.keys()) == [
+            "advisor",
             "answer",
             "appellation",
             "hired_job",
@@ -34,6 +35,7 @@ class TestAcceptForm:
 
     def test_accept_form_with_geiq(self):
         EXPECTED_FIELDS = [
+            "advisor",
             "answer",
             "appellation",
             "contract_type",
