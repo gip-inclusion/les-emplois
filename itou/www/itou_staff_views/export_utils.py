@@ -206,6 +206,7 @@ cta_export_spec = {
     "Structure - région": lambda membership: get_org(membership).region,
     "Utilisateur - prénom": lambda membership: membership.user.first_name,
     "Utilisateur - nom": lambda membership: membership.user.last_name,
+    "Utilisateur - téléphone": lambda membership: membership.user.phone,
     "Utilisateur - e-mail": lambda membership: membership.user.email,
     "Administrateur ?": lambda membership: "Oui" if membership.is_admin else "Non",
     "Utilisateur - date d'inscription": lambda membership: membership.user.date_joined.strftime("%d-%m-%Y"),

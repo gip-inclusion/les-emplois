@@ -265,9 +265,9 @@
 # ---
 # name: TestExportCTA.test_export[streaming content]
   '''
-  Utilisateur - type,Structure - type,Structure - nom,Structure - SIRET,Structure - adresse ligne 1,Structure - adresse ligne 2,Structure - code postal,Structure - ville,Structure - département,Structure - région,Utilisateur - prénom,Utilisateur - nom,Utilisateur - e-mail,Administrateur ?,Utilisateur - date d'inscription
-  Employeur,EI,ACME Inc.,012345678910,112 rue de la Croix-Nivert,,75015,Paris,75,Île-de-France,John,Doe,john.doe@test.local,Oui,17-05-2024
-  Orienteur,FT,Pres. Org.,012345678910,39 rue d'Artois,,75008,Paris,75,Île-de-France,Pierre,Dupont,pierre.dupont@test.local,Oui,17-05-2024
+  Utilisateur - type,Structure - type,Structure - nom,Structure - SIRET,Structure - adresse ligne 1,Structure - adresse ligne 2,Structure - code postal,Structure - ville,Structure - département,Structure - région,Utilisateur - prénom,Utilisateur - nom,Utilisateur - téléphone,Utilisateur - e-mail,Administrateur ?,Utilisateur - date d'inscription
+  Employeur,EI,ACME Inc.,012345678910,112 rue de la Croix-Nivert,,75015,Paris,75,Île-de-France,John,Doe,0606060606,john.doe@test.local,Oui,17-05-2024
+  Orienteur,FT,Pres. Org.,012345678910,39 rue d'Artois,,75008,Paris,75,Île-de-France,Pierre,Dupont,0612345678,pierre.dupont@test.local,Oui,17-05-2024
   
   '''
 # ---
