@@ -1003,6 +1003,32 @@ class TestLatestApproval:
         )
 
 
+class TestLastAdvisor:
+    def test_no_last_advisor(self):
+        job_seeker = JobSeekerFactory()
+        assert job_seeker.last_advisor is None
+
+    def test_unknown_advisor(self):
+        job_seeker_assignment = JobSeekerAssignmentFactory(
+            assigned_to_unknown_advisor=True, prescriber_organization=PrescriberOrganizationFactory()
+        )
+        job_seeker = job_seeker_assignment.job_seeker
+        assert job_seeker.last_advisor is None
+
+    def test_last_advisor(self):
+        updated_at = datetime.datetime(2026, 1, 1, 1, 1, 11, tzinfo=datetime.UTC)
+        job_seeker_assignment = JobSeekerAssignmentFactory(
+            prescriber_organization=PrescriberOrganizationFactory(),
+            updated_at=updated_at,
+            assigned_to_unknown_advisor=True,
+        )
+        job_seeker = job_seeker_assignment.job_seeker
+        updated_at = datetime.datetime(2026, 4, 21, 12, 12, 11, tzinfo=datetime.UTC)
+        job_seeker_assignment_2 = JobSeekerAssignmentFactory(updated_at=updated_at, job_seeker=job_seeker)
+
+        assert job_seeker.last_advisor == job_seeker_assignment_2.professional
+
+
 @pytest.mark.parametrize("initial_asp_uid", ("000000000000000000000000000000", ""))
 @override_settings(SECRET_KEY="test")
 def test_job_seeker_profile_asp_uid(initial_asp_uid):
