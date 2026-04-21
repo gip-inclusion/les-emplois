@@ -69,11 +69,6 @@ def prescribers_accounts_tag():
             "email": "demo.emplois+orienteur@inclusion.gouv.fr",
             "action_url": action_url,
         },
-        {
-            "title": "Orienteur seul sans organisation",
-            "email": "demo.emplois+orienteur-solo@inclusion.gouv.fr",
-            "action_url": action_url,
-        },
     ]
 
 
