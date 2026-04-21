@@ -1359,6 +1359,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.sender,
             self.sender_prescriber_organization or self.sender_company,
             job_application=self,
+            advisor=self.job_seeker.last_advisor,
         )
 
     @property
