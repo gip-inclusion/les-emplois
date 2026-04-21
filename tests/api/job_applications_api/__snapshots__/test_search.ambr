@@ -1,26 +1,24 @@
 # serializer version: 1
 # name: TestJobApplicationSearchApi.test_performances
   dict({
-    'num_queries': 9,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
+          'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
           'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -42,6 +40,7 @@
         'origin': list([
           'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
           'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -345,6 +344,7 @@
         'origin': list([
           'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
           'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -375,6 +375,7 @@
         'origin': list([
           'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
           'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -397,6 +398,7 @@
         'origin': list([
           'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
           'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -497,6 +499,7 @@
         'origin': list([
           'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
           'JobApplicationSearchView.post[api/job_application_api/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -586,12 +589,6 @@
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
           WHERE ("companies_jobdescription"."id") IN ((%s))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

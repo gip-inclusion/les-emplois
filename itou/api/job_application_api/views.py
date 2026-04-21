@@ -17,6 +17,7 @@ from itou.api.job_application_api.throttling import JobApplicationSearchThrottle
 from itou.companies.models import JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.readonly import ReadonlyViewMixin
 
 
 job_application_search_view_description = """
@@ -88,7 +89,9 @@ Elle ne retourne que les candidatures dont le dernier changement date de moins d
         ],
     )
 )
-class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, generics.GenericAPIView):
+class JobApplicationSearchView(
+    LoginNotRequiredMixin, ReadonlyViewMixin, mixins.ListModelMixin, generics.GenericAPIView
+):
     authentication_classes = (DepartmentTokenAuthentication,)
     permission_classes = (JobApplicationSearchAPIPermission,)
     serializer_class = JobApplicationSearchResponseSerializer
