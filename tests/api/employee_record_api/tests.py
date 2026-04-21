@@ -430,7 +430,12 @@ class TestEmployeeRecordUpdateNotificationViewSet:
         company = notification.employee_record.job_application.to_company
         membership = CompanyMembershipFactory(company=company, is_admin=False)
 
-        api_client.force_login(membership.user)
+        # force_authenticate to avoid SessionMiddleware middleware
+        # that doesn't play nicely with a PermissionDenied causing
+        # the tests connection to be marked as needs_rollback
+        # preventing SessionMiddleware to update the session and
+        # ending with a 400 status code
+        api_client.force_authenticate(user=membership.user)
         response = api_client.get(self.endpoint_url, format="json")
         assert response.status_code == 403
 

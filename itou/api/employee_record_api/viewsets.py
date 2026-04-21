@@ -13,6 +13,7 @@ from itou.api.employee_record_api.serializers import (
 )
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.readonly import ReadonlyViewMixin
 
 
 logger = logging.getLogger("api_drf")
@@ -24,7 +25,7 @@ class EmployeeRecordRateThrottle(UserRateThrottle):
     rate = "60/min"
 
 
-class AbstractEmployeeRecordViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyModelViewSet):
+class AbstractEmployeeRecordViewSet(LoginNotRequiredMixin, ReadonlyViewMixin, viewsets.ReadOnlyModelViewSet):
     throttle_classes = [EmployeeRecordRateThrottle]
 
     # Possible authentication frameworks:
