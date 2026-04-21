@@ -26,10 +26,12 @@ def clear_bucket(bucket_name):
             )
 
 
-def main(bucket_name, admin_password):
+def main(bucket_name, admin_password, dora_token):
     from django.core.cache import caches
     from django.db import connection
 
+    from itou.api.models import ServiceToken
+    from itou.nexus.enums import Service
     from itou.users.models import User
     from itou.utils.cache import UnclearableCache
     from itou.utils.enums import ItouEnvironment
@@ -69,6 +71,8 @@ def main(bucket_name, admin_password):
     u.set_password(admin_password)
     u.save(update_fields=["password"])
 
+    ServiceToken.objects.create(key=dora_token, service=Service.DORA, purpose="Pour l'API nexus")
+
     for cache_name in caches:
         cache = caches[cache_name]
         if isinstance(cache, UnclearableCache):
@@ -87,5 +91,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--bucket-name", required=True)
     parser.add_argument("--admin-password", required=True)
+    parser.add_argument("--dora-token", required=True)
     args = parser.parse_args()
-    main(args.bucket_name, args.admin_password)
+    main(args.bucket_name, args.admin_password, args.dora_token)
