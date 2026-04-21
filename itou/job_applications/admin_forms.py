@@ -71,6 +71,6 @@ class JobApplicationAdminForm(forms.ModelForm):
         if eligibility_diagnosis:
             job_seeker = self.cleaned_data.get("job_seeker")
             if job_seeker.pk != eligibility_diagnosis.job_seeker_id:
-                raise ValidationError("Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature.")
+                raise ValidationError("Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature.")
 
         return

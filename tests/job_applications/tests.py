@@ -2842,7 +2842,7 @@ class TestJobApplicationAdminForm:
         job_application.job_seeker = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."] == form.errors[
+        assert ["Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature."] == form.errors[
             "__all__"
         ]
 
