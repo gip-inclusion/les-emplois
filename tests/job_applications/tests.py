@@ -51,7 +51,13 @@ from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerAssignmentFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+)
 from tests.utils.testing import excel_date_format, get_request, get_rows_from_streaming_response
 
 
@@ -1268,7 +1274,8 @@ class TestJobApplicationNotifications:
         assert job_application.answer in email.body
 
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
-    def test_accept_for_prescriber(self, is_authorized_prescriber):
+    @pytest.mark.parametrize("with_unknown_advisor", [False, True])
+    def test_accept_for_prescriber(self, is_authorized_prescriber, with_unknown_advisor):
         # Unauthorized prescriber is the default sender
         extra_kwargs = (
             {"sent_by_authorized_prescriber": True} if is_authorized_prescriber else {"sent_by_prescriber_alone": True}
@@ -1279,6 +1286,13 @@ class TestJobApplicationNotifications:
             job_seeker__first_name="Un autre joli prénom",
             job_seeker__last_name="Un autre nom de famille original",
             **extra_kwargs,
+        )
+        # assign advisor to job seeker
+        JobSeekerAssignmentFactory(
+            job_seeker=job_application.job_seeker,
+            professional=job_application.sender,
+            prescriber_organization=PrescriberOrganizationFactory(),
+            assigned_to_unknown_advisor=with_unknown_advisor,
         )
         email = job_application.notifications_accept_for_proxy.build()
         # To.
@@ -1298,6 +1312,11 @@ class TestJobApplicationNotifications:
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
         assert "Date de fin du contrat" in email.body
         assert job_application.hiring_end_at.strftime("%d/%m/%Y") in email.body
+        assert "Accompagnateur au sein de la structure" in email.body
+        if with_unknown_advisor:
+            assert "Non référencé" in email.body
+        else:
+            assert job_application.job_seeker.last_advisor.get_full_name() in email.body
         if is_authorized_prescriber:
             assert job_application.sender_prescriber_organization.accept_survey_url in email.body
 
