@@ -54,6 +54,20 @@ from itou.www.apply.views.constants import APPLICATIONS_VISIBILITY_FOR_EMPLOYERS
 
 logger = logging.getLogger(__name__)
 
+# Maps each field that is only meaningful on an accepted application to its "empty" default,
+# Outside the model so JobApplication.Meta can use it during class creation
+ACCEPTED_ONLY_FIELDS = {
+    "eligibility_diagnosis": None,
+    "geiq_eligibility_diagnosis": None,
+    "approval": None,
+    "approval_delivery_mode": "",
+    "approval_number_sent_by_email": False,
+    "approval_number_sent_at": None,
+    "approval_manually_delivered_by": None,
+    "approval_manually_refused_by": None,
+    "approval_manually_refused_at": None,
+}
+
 
 class JobApplicationWorkflow(xwf_models.Workflow):
     """
@@ -1122,6 +1136,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.archived_at = None
         self.archived_by = None
 
+    def _reset_accepted_state(self):
+        """Clear all fields that are only meaningful on an ACCEPTED application."""
+        for field, default in ACCEPTED_ONLY_FIELDS.items():
+            setattr(self, field, default)
+
     @xwf_models.transition()
     def transfer(self, *, user, target_company):
         if not self.can_be_transferred(user, target_company):
@@ -1134,18 +1153,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.transferred_at = timezone.now()
         self.to_company = target_company
         self.state = JobApplicationState.NEW
-        # Consider job application as new : don't keep answers
+        # Consider job application as new: don't keep answers
         self.answer = self.answer_to_prescriber = ""
 
-        # Delete eligibility diagnosis if not provided by an authorized prescriber
-        eligibility_diagnosis = self.eligibility_diagnosis
-        is_eligibility_diagnosis_made_by_siae = (
-            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
-        )
-        if is_eligibility_diagnosis_made_by_siae:
-            self.eligibility_diagnosis = None
-            self.save(update_fields={"eligibility_diagnosis", "updated_at"})
-            eligibility_diagnosis.delete()
+        self._reset_accepted_state()
 
         # Delete comments
         del_count, _ = JobApplicationComment.objects.filter(job_application=self.pk).delete()
@@ -1301,13 +1312,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         if self.approval and self.approval.can_be_deleted():
             self.approval.delete()
-            self.approval = None
 
-            # Remove flags on the job application about approval
-            self.approval_number_sent_by_email = False
-            self.approval_number_sent_at = None
-            self.approval_delivery_mode = ""
-            self.approval_manually_delivered_by = None
+        self._reset_accepted_state()
 
         for employee_record in self.employee_record.all():
             if not employee_record.was_sent():
