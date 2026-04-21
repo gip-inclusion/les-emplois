@@ -623,12 +623,8 @@
                       </div>
                       <div class="c-box--summary__footer">
                           <div class="d-flex justify-content-end">
-                              <a class="btn btn-primary btn-block btn-ico w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/print" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Consulter la décision
-                                  </span>
+                              <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                                  Saisir la décision
                               </a>
                           </div>
                       </div>
@@ -1566,7 +1562,7 @@
                       </div>
                       <div class="c-box--summary__footer">
                           <div class="d-flex justify-content-end">
-                              <a class="btn btn-primary btn-block btn-ico w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/print" rel="noopener" target="_blank">
+                              <a class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>
                                   <span>
