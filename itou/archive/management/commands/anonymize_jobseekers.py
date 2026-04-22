@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db import transaction
 from django.db.models import Count, F, Max, Min, OuterRef, Q, Subquery, Sum
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
@@ -155,6 +154,8 @@ def anonymized_eligibility_diagnosis(obj):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
@@ -185,7 +186,6 @@ class Command(BaseCommand):
 
         self.logger.info("Reset notified job seekers with recent activity: %s", reset_users_count)
 
-    @transaction.atomic
     def archive_jobseekers_after_grace_period(self):
         now = timezone.now()
         grace_period_since = now - GRACE_PERIOD

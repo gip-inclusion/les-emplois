@@ -27,6 +27,8 @@ RETRY_DELAY = datetime.timedelta(days=7)
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
         # default chunk size is chosen to be 200 so that the cron lasts about 3 minutes.

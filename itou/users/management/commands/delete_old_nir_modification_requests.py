@@ -9,6 +9,8 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
