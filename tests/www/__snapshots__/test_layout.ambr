@@ -15,7 +15,7 @@
               <ul class="list-unstyled">
                   <li>
                       <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-government-line">
                           </i>
                           <span>
                               DDETS IAE
@@ -39,7 +39,7 @@
                   </li>
                   <li>
                       <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-home-smile-line">
                           </i>
                           <span>
                               FT
@@ -85,7 +85,7 @@
               <ul class="list-unstyled">
                   <li>
                       <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-government-line">
                           </i>
                           <span>
                               DDETS IAE
@@ -109,7 +109,7 @@
                   </li>
                   <li>
                       <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-home-smile-line">
                           </i>
                           <span>
                               FT
