@@ -242,6 +242,16 @@ class OrganizationAbstract(models.Model):
     def organization_switch_key(self):
         return f"{self.ORGANIZATION_KIND.name}-{self.pk}"
 
+    @property
+    def icon(self):
+        match self.ORGANIZATION_KIND:
+            case OrganizationKind.PRESCRIBER_ORGANIZATION:
+                return "ri-home-smile-line"
+            case OrganizationKind.COMPANY:
+                return "ri-community-line"
+            case OrganizationKind.INSTITUTION:
+                return "ri-government-line"
+
 
 class MembershipQuerySet(models.QuerySet):
     @property
