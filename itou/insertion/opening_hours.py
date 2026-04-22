@@ -103,5 +103,4 @@ def format_osm_hours(value: str) -> FormattedOpeningHours | None:
         ]
         return {"entries": entries, "has_ph_off": has_ph_off}
     except Exception:
-        # todo: log the error?
         return None

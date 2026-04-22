@@ -1,5 +1,8 @@
 {% extends "layout/base.html" %}
-{% load matomo str_filters %}
+{% load dora %}
+{% load matomo %}
+{% load str_filters %}
+
 
 {% block title %}{{ service.name }} {{ block.super }}{% endblock %}
 
@@ -28,7 +31,7 @@
                         <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                            rel="noopener"
                            target="_blank"
-                           href="{% if service.is_orientable_with_form %}https://dora.inclusion.gouv.fr{% else %}{{ service.mobilization_modes_professionals_external_form_link }}{% endif %}"
+                           href="{% if service.is_orientable_with_form %}{% dora_orientation_url service orientation_jwt=orientation_jwt source=request.user.kind|default:"accueil" %}{% else %}{{ service.mobilization_modes_professionals_external_form_link }}{% endif %}"
                            {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
                             <span>
                                 {% if service.is_orientable_with_form %}
