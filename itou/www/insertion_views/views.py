@@ -1,9 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 
-from itou.insertion.models import Service, Structure
+from itou.insertion.models import GenericReferenceItem, Service, Structure
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
@@ -30,3 +32,25 @@ class StructureCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateV
             "matomo_custom_title": "Fiche structure d’insertion",
             "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("home:hp")),
         }
+
+
+class ServiceDetailView(LoginRequiredMixin, DetailView):
+    model = Service
+    queryset = Service.objects.select_related(
+        "source",
+        "fee",
+        "kind",
+        "structure",
+        "structure__source",
+        "insee_city",
+    ).prefetch_related(
+        "thematics",
+        "publics",
+        Prefetch("receptions", queryset=GenericReferenceItem.objects.order_by("label")),
+        "mobilizations",
+        "mobilization_publics",
+    )
+    slug_field = "uid"
+    slug_url_kwarg = "service_uid"
+    template_name = "insertion/service_detail.html"
+    context_object_name = "service"
