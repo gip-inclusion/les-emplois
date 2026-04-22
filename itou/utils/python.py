@@ -1,4 +1,6 @@
 import logging
+import operator
+from functools import reduce
 
 
 logger = logging.getLogger(__name__)
@@ -9,3 +11,11 @@ class Sentinel:
 
     def __bool__(self):
         return False
+
+
+def dotteditemgetter(*items):
+    def g(obj):
+        slicer = 0 if len(items) == 1 else slice(None)
+        return tuple(reduce(operator.getitem, item.split("."), obj) for item in items)[slicer]
+
+    return g
