@@ -12,7 +12,7 @@ from itou.jobs.models import Appellation, Rome
         "SECRET": "pe-secret",
     }
 )
-def test_sync_rome_appellation(caplog, respx_mock):
+def test_sync_rome_appellation(caplog, respx_mock, snapshot):
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
@@ -43,29 +43,7 @@ def test_sync_rome_appellation(caplog, respx_mock):
     appellation0.save()
     appellation1.save()
     management.call_command("sync_romes_and_appellations", wet_run=True)
-    assert caplog.messages[:-1] == [
-        'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
-        'HTTP Request: GET https://pe.fake/offresdemploi/v2/referentiel/metiers "HTTP/1.1 200 OK"',
-        (
-            "HTTP Request: GET https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code) "
-            '"HTTP/1.1 200 OK"'
-        ),
-        "count=1 label=Rome had the same key in collection and queryset",
-        "\tCHANGED name=Patisserie changed to value=Pâtisserie avec accent",
-        "count=1 label=Rome added by collection",
-        '\tADDED {"code": "MET01", "libelle": "Edition"}',
-        "count=2 label=Rome removed by collection",
-        "\tREMOVED Métiers du corps (B001)",
-        "\tREMOVED Arts de la table (F002)",  # not really removed though by our command, see docstring
-        "len=2 ROME entries have been created or updated.",
-        "count=2 label=Appellation had the same key in collection and queryset",
-        "\tCHANGED name=Entraîneur sportif changed to value=Entraîneur sportif avéré",
-        "\tCHANGED name=Chef cuistot d'élite changed to value=Chef cuistor d'élite",
-        "count=1 label=Appellation added by collection",
-        '\tADDED {"code": "JOB32", "libelle": "Ecriveur de bouquins", "metier": {"code": "MET01"}}',
-        "count=0 label=Appellation removed by collection",
-        "len=3 Appellation entries have been created or updated.",
-    ]
+    assert caplog.messages[:-1] == snapshot(name="logs")
     caplog.messages[-1].startswith(
         "Management command itou.jobs.management.commands.sync_romes_and_appellations succeeded in"
     )
