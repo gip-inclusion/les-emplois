@@ -5,20 +5,11 @@ from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
 from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
-from itou.utils.sync import yield_sync_diff
+from itou.utils.diff import CollectionDiffer, DiffItemKind
 
 
 # more than the number of Romes (~500) but less than the number of Appellations (~11000)
 BULK_CREATE_BATCH_SIZE = 1000
-
-
-def pe_data_to_appellation(data, at):
-    rome = Rome.objects.get(code=data["metier"]["code"])
-    return Appellation(code=data["code"], name=data["libelle"], updated_at=at, rome_id=rome.pk)
-
-
-def pe_data_to_rome(data, at):
-    return Rome(code=data["code"], name=data["libelle"], updated_at=at)
 
 
 class Command(BaseCommand):
@@ -44,30 +35,66 @@ class Command(BaseCommand):
             romes_data = client.referentiel(pe_api_enums.REFERENTIEL_ROME)
             appellations_data = client.appellations()
 
-        for item in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):
-            self.logger.info(item.label)
+        # ROMEs
+        to_create, to_update = [], []
+        differ = CollectionDiffer(Rome.objects.all(), romes_data, "code", watched_data={"name": "libelle"})
+        for diff_item in differ:
+            self.logger.info(diff_item.label())
 
-        romes = [pe_data_to_rome(item, now) for item in romes_data]
-        Rome.objects.bulk_create(
-            romes,
-            batch_size=BULK_CREATE_BATCH_SIZE,
-            update_conflicts=True,
-            update_fields=("name", "updated_at"),
-            unique_fields=("code",),
+            if diff_item.kind is DiffItemKind.ADDED:
+                to_create.append(
+                    Rome(
+                        code=diff_item.key[0],
+                        name=diff_item.data["name"].after,
+                        updated_at=now,
+                    )
+                )
+            if diff_item.kind is DiffItemKind.UPDATED:
+                for current_item_attr, data_diff in diff_item.data.items():
+                    setattr(diff_item.current_item, current_item_attr, data_diff.after)
+                diff_item.current_item.updated_at = now
+                to_update.append(diff_item.current_item)
+
+        self.logger.info(differ.summary_label())
+
+        created = Rome.objects.bulk_create(to_create, batch_size=BULK_CREATE_BATCH_SIZE)
+        self.logger.info("count=%d ROME entries have been created.", len(created))
+        updated = Rome.objects.bulk_update(to_update, {"name", "updated_at"}, batch_size=BULK_CREATE_BATCH_SIZE)
+        self.logger.info("count=%d ROME entries have been updated.", updated)
+
+        # Appellations
+        rome_by_code = Rome.objects.in_bulk(field_name="code")
+        to_create, to_update = [], []
+        differ = CollectionDiffer(
+            Appellation.objects.all(),
+            appellations_data,
+            "code",
+            watched_data={"name": "libelle", "rome": "metier"},
+            comparative_data_converters={"metier": lambda value: rome_by_code[value["code"]]},
         )
-        self.logger.info("len=%d ROME entries have been created or updated.", len(romes))
+        for diff_item in differ:
+            self.logger.info(diff_item.label())
 
-        for item in yield_sync_diff(
-            appellations_data, "code", Appellation.objects.all(), "code", [("libelle", "name")]
-        ):
-            self.logger.info(item.label)
+            if diff_item.kind is DiffItemKind.ADDED:
+                to_create.append(
+                    Appellation(
+                        code=diff_item.key[0],
+                        name=diff_item.data["name"].after,
+                        rome=diff_item.data["rome"].after,
+                        updated_at=now,
+                    )
+                )
+            if diff_item.kind is DiffItemKind.UPDATED:
+                for current_item_attr, data_diff in diff_item.data.items():
+                    setattr(diff_item.current_item, current_item_attr, data_diff.after)
+                diff_item.current_item.updated_at = now
+                to_update.append(diff_item.current_item)
 
-        appellations = [pe_data_to_appellation(item, now) for item in appellations_data]
-        Appellation.objects.bulk_create(
-            appellations,
-            batch_size=BULK_CREATE_BATCH_SIZE,
-            update_conflicts=True,
-            update_fields=("name", "updated_at", "rome_id"),
-            unique_fields=("code",),
+        self.logger.info(differ.summary_label())
+
+        created = Appellation.objects.bulk_create(to_create, batch_size=BULK_CREATE_BATCH_SIZE)
+        self.logger.info("count=%d Appellation entries have been created.", len(created))
+        updated = Appellation.objects.bulk_update(
+            to_update, {"name", "rome", "updated_at"}, batch_size=BULK_CREATE_BATCH_SIZE
         )
-        self.logger.info("len=%d Appellation entries have been created or updated.", len(appellations))
+        self.logger.info("count=%d Appellation entries have been updated.", updated)
