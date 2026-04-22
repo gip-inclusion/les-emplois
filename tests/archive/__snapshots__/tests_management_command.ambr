@@ -946,6 +946,14 @@
     'queries': list([
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -983,17 +991,6 @@
                  AND "users_user"."last_login" >= ("users_user"."upcoming_deletion_notified_at")
                  AND "users_user"."upcoming_deletion_notified_at" IS NOT NULL)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -3408,7 +3405,6 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
@@ -3419,8 +3415,6 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),

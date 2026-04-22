@@ -1,7 +1,6 @@
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.db import transaction
 from django.db.models import Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
@@ -25,6 +24,8 @@ BATCH_SIZE = 200
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
@@ -52,7 +53,6 @@ class Command(BaseCommand):
 
         self.logger.info("Reset notified professionals with recent activity: %s", reset_users_count)
 
-    @transaction.atomic
     def anonymize_professionals_after_grace_period(self):
         now = timezone.now()
         grace_period_since = now - GRACE_PERIOD

@@ -33,6 +33,7 @@ HELP_TEXT = """
 
 class Command(BaseCommand):
     help = HELP_TEXT
+    ATOMIC_HANDLE = True
 
     def add_arguments(self, parser):
         parser.add_argument(

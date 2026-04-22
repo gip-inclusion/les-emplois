@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db import transaction
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
@@ -24,6 +23,8 @@ def anonymized_cancelled_approval(obj):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
@@ -44,7 +45,6 @@ class Command(BaseCommand):
         },
     )
     @dry_runnable
-    @transaction.atomic
     def handle(self, *args, wet_run, **options):
         if settings.SUSPEND_ANONYMIZE_CANCELLED_APPROVALS:
             self.logger.info("Anonymizing cancelled approvals is suspended, exiting command")

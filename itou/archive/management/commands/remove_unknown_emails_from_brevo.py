@@ -23,6 +23,8 @@ def modified_before(contact, cutoff_date):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
