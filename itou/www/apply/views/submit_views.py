@@ -21,6 +21,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import save_file
 from itou.gps.models import FollowUpGroup
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
@@ -607,11 +608,21 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
 
     def form_valid(self):
         # Fill the job application with the required information
+        sender_kind = None
+        if self.request.from_employer:
+            sender_kind = SenderKind.EMPLOYER
+        elif self.request.from_prescriber:
+            sender_kind = SenderKind.PRESCRIBER
+        elif self.request.user.is_job_seeker:
+            sender_kind = SenderKind.JOB_SEEKER
+        else:
+            logger.error("Unable to set sender_kind")
+
         job_application = JobApplication(
             job_seeker=self.job_seeker,
             to_company=self.company,
             sender=self.request.user,
-            sender_kind=self.request.user.kind,
+            sender_kind=sender_kind,
             message=self.form.cleaned_data["message"],
         )
         if self.request.from_prescriber:
