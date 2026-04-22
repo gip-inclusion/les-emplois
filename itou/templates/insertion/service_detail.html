@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load matomo %}
+{% load matomo str_filters %}
 
 {% block title %}{{ service.name }} {{ block.super }}{% endblock %}
 
@@ -21,27 +21,45 @@
 {% block title_extra %}
     <div class="c-box c-box--action d-flex align-items-center justify-content-between">
         <div class="form-row align-items-center gx-3">
-            {% if service.is_orientable_with_form %}
+            {% if service.is_orientable_with_form or service.mobilization_link %}
                 <div class="form-group col-12 col-lg-auto">
                     {#                    todo: put the correct link to Dora with the token #}
-                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
-                       rel="noopener"
-                       target="_blank"
-                       href="https://dora.inclusion.gouv.fr"
-                       {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
-                        <span>Orienter le bénéficiaire</span>
-                    </a>
+                    {% if user.is_authenticated %}
+                        <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                           rel="noopener"
+                           target="_blank"
+                           href="{% if service.is_orientable_with_form %}https://dora.inclusion.gouv.fr{% else %}{{ service.mobilization_modes_professionals_external_form_link }}{% endif %}"
+                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
+                            <span>
+                                {% if service.is_orientable_with_form %}
+                                    Orienter le bénéficiaire
+                                {% else %}
+                                    {{ service.mobilization_modes_professionals_external_form_link_text }}
+                                {% endif %}
+                            </span>
+                        </a>
+                    {% else %}
+                        <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                           href="{% url 'login:prescriber' %}?next={{ request.get_full_path|urlencode }}"
+                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
+                            <span>Orienter le bénéficiaire</span>
+                        </a>
+                    {% endif %}
                 </div>
             {% endif %}
-            <div class="form-group col-12 col-lg-auto">
-                <button class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
-                        type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#js-contact-modal"
-                        {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
-                    <span>Voir les coordonnées de contact du service</span>
-                </button>
-            </div>
+            {% if user.is_authenticated or service.is_contact_info_public %}
+                <div class="form-group col-12 col-lg-auto">
+                    <button class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#js-contact-modal"
+                            data-contact-email="{{ service.contact_email }}"
+                            data-contact-phone="{{ service.contact_phone }}"
+                            {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
+                        <span>Voir les coordonnées de contact du service</span>
+                    </button>
+                </div>
+            {% endif %}
         </div>
         <div>
             <button id="dropdown_action_menu" class="btn btn-sm btn-link btn-ico-only text-white" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
@@ -60,186 +78,235 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
+                {# Main column #} <div class="col-12 col-lg-8">  {# Service information card #}
+                <div class="c-box mb-3 mb-md-4">
+                    <h2 class="h4">Informations du service</h2>
+                    {% if service.average_orientation_response_delay_days is not None %}
+                        <div class="mb-3">
+                            {% include "insertion/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
+                        </div>
+                    {% endif %}
 
-                {# Main column #}
-                <div class="col-12 col-lg-8">
-
-                    {# Service information card #}
-                    <div class="c-box mb-3 mb-md-4">
-                        <h2 class="h4">Informations du service</h2>
-
-                        {% if service.average_orientation_response_delay_days is not None %}
-                            <div class="mb-3">
-                                {% include "insertion/service_response_time.html" with days=service.average_orientation_response_delay_days only %}
-                            </div>
+                    {% if service.description_short %}<p>{{ service.description_short }}</p>{% endif %}
+                    <dl class="row mb-0">
+                        {% if service.publics.exists %}
+                            <dt class="fw-normal col-sm-4">
+                                Public concerné
+                                {% if service.publics_details %}
+                                    <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
+                                {% endif %}
+                            </dt>
+                            <dd class="col-sm-8">
+                                {% for public in service.publics.all %}
+                                    <strong>{{ public.label }}</strong>{# djlint: off #}{% if not forloop.last %},{% endif %}{# djlint: on #}
+                                {% endfor %}
+                            </dd>
                         {% endif %}
 
-                        {% if service.description_short %}<p>{{ service.description_short }}</p>{% endif %}
+                        {% if service.receptions.exists or service.address_line_1 %}
+                            <dt class="fw-normal col-sm-4">Lieu d'accueil</dt>
+                            <dd class="col-sm-8">
+                                {% for reception in service.receptions.all %}
+                                    <strong>{# djlint: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# djlint: on #}</strong>
+                                {% endfor %}
+                                {% if service.address_line_1 and service.has_in_person_reception %}
+                                    <strong>
+                                        {% if service.receptions.exists %}—{% endif %}
+                                        {{ service.address_line_1 }}
+                                        {% if service.address_line_2 %}, {{ service.address_line_2 }}{% endif %}
+                                    — {{ service.post_code }} {{ service.city }}</strong>
+                                {% endif %}
+                            </dd>
+                        {% endif %}
 
-                        <dl class="row mb-0">
-                            {% if service.publics.exists %}
-                                <dt class="fw-normal col-sm-4">
-                                    Public concerné
-                                    {% if service.publics_details %}
-                                        <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
-                                    {% endif %}
-                                </dt>
-                                <dd class="col-sm-8">
-                                    {% for public in service.publics.all %}
-                                        <strong>{{ public.label }}</strong>
-                                        {% if not forloop.last %},{% endif %}
-                                    {% endfor %}
-                                </dd>
-                            {% endif %}
+                        {% if service.fee %}
+                            <dt class="fw-normal col-sm-4">
+                                Frais à charge
+                                {% if service.fee_details %}
+                                    <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
+                                {% endif %}
+                            </dt>
+                            <dd class="col-sm-8">
+                                <strong>{{ service.fee.label }}</strong>
+                            </dd>
+                        {% endif %}
 
-                            {% if service.receptions.exists or service.address_line_1 %}
-                                <dt class="fw-normal col-sm-4">Lieu d'accueil</dt>
-                                <dd class="col-sm-8">
-                                    {% for reception in service.receptions.all %}
-                                        <strong>{# djlint: off #}{{ reception.label }}{% if not forloop.last %},{% endif %}{# djlint: on #}</strong>
-                                    {% endfor %}
-                                    {% if service.address_line_1 and service.has_in_person_reception %}
-                                        <strong>
-                                            {% if service.receptions.exists %}—{% endif %}
-                                            {{ service.address_line_1 }}
-                                            {% if service.address_line_2 %}, {{ service.address_line_2 }}{% endif %}
-                                        — {{ service.post_code }} {{ service.city }}</strong>
-                                    {% endif %}
-                                </dd>
-                            {% endif %}
+                        {% if service.opening_hours %}
+                            <dt class="fw-normal col-sm-4">
+                                Fréquence et horaires
+                                {% if formatted_opening_hours.has_ph_off %}
+                                    <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
+                                {% endif %}
+                            </dt>
+                            <dd class="col-sm-8">
+                                {% include "insertion/opening_hours.html" %}
+                            </dd>
+                        {% endif %}
 
-                            {% if service.fee %}
-                                <dt class="fw-normal col-sm-4">
-                                    Frais à charge
-                                    {% if service.fee_details %}
-                                        <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
-                                    {% endif %}
-                                </dt>
-                                <dd class="col-sm-8">
-                                    <strong>{{ service.fee.label }}</strong>
-                                </dd>
-                            {% endif %}
+                        {% if service.insee_city %}
+                            <dt class="fw-normal col-sm-4">Périmètre géographique</dt>
+                            <dd class="col-sm-8">
+                                <strong>{{ service.insee_city.get_department_display }}</strong>
+                            </dd>
+                        {% endif %}
 
-                            {% if service.opening_hours %}
-                                <dt class="fw-normal col-sm-4">
-                                    Fréquence et horaires
-                                    {% if formatted_opening_hours.has_ph_off %}
-                                        <i class="ri-information-line ri-xl text-info" aria-label="Hors jours fériés" data-bs-toggle="tooltip" data-bs-title="Hors jours fériés" role="button" tabindex="0"></i>
-                                    {% endif %}
-                                </dt>
-                                <dd class="col-sm-8">
-                                    {% include "insertion/opening_hours.html" %}
-                                </dd>
-                            {% endif %}
+                        {% if service.access_conditions %}
+                            <dt class="fw-normal col-sm-4">Les critères d'admission</dt>
+                            <dd class="col-sm-8">
+                                <strong>{{ service.access_conditions }}</strong>
+                            </dd>
+                        {% endif %}
+                    </dl>
 
-                            {% if service.insee_city %}
-                                <dt class="fw-normal col-sm-4">Périmètre géographique</dt>
-                                <dd class="col-sm-8">
-                                    <strong>{{ service.insee_city.get_department_display }}</strong>
-                                </dd>
-                            {% endif %}
+                    <p class="badge rounded-pill bg-disabled-color-light mb-0 mt-3">
+                        <small class="text-muted">Source : {{ service.source.label }}</small>
+                    </p>
+                </div>
 
-                            {% if service.access_conditions %}
-                                <dt class="fw-normal col-sm-4">Les critères d'admission</dt>
-                                <dd class="col-sm-8">
-                                    <strong>{{ service.access_conditions }}</strong>
-                                </dd>
-                            {% endif %}
-                        </dl>
+                {# Description #}
+                {% if service.description %}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Description du service</h2>
+                        {% load markdownify %}
+                        <div id="js-description-wrapper" class="service-description-wrapper">
+                            <div class="mb-0">{{ service.description|markdownify }}</div>
+                            <div id="js-description-fade" class="service-description-fade"></div>
+                        </div>
+                        <a href="#" id="js-description-toggle" class="fw-bold d-none">Lire la suite</a>
+                    </div>
+                {% endif %}
 
-                        <p class="badge rounded-pill bg-disabled-color-light mb-0 mt-3">
-                            <small class="text-muted">Source : {{ service.source.label }}</small>
+                {# Thematics #}
+                {% if service.thematics.exists %}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Thématique et besoins associés</h2>
+                        <ul class="mb-0">
+                            {% for thematic in service.thematics.all %}<li>{{ thematic.label }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {# Pré-requis et justificatifs #}
+                {% if service.access_conditions_di or service.access_conditions_dora %}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h4">Pré-requis et justificatifs</h2>
+                        {% if service.access_conditions_dora %}
+                            <ul class="mb-0">
+                                {% for condition in service.access_conditions_dora %}<li>{{ condition }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if service.access_conditions_di %}<p class="mb-0">{{ service.access_conditions_di }}</p>{% endif %}
+                        {#                    todo: decide how this should be displayed#}
+                        {% if service.credentials %}
+                            <ul class="mb-0">
+                                {% for credential in service.credentials %}<li>{{ credential }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {# Mobilizations #}
+                <div class="c-box mb-3 mb-md-4">
+                    <h2 class="h4">Les démarches à réaliser</h2>
+                    {% if service.mobilizations.exists %}
+
+                        <ul class="mb-0">
+                            {% for mobilization in service.mobilizations.all %}<li>{{ mobilization.label }}</li>{% endfor %}
+                        </ul>
+                        {% if service.mobilizations_details %}<p class="mt-2 mb-0">{{ service.mobilizations_details }}</p>{% endif %}
+                        {% if service.mobilization_modes_professionals.exists or service.mobilization_modes_professionals_external_form_link or service.mobilization_modes_professionals_other %}
+                            <p class="fw-bold mt-2 mb-1">Pour les professionnels de l'accompagnement</p>
+                            <ul class="mb-3">
+                                {% for mode in service.mobilization_modes_professionals.all %}<li>{{ mode.label }}</li>{% endfor %}
+                                {% if service.mobilization_modes_professionals_external_form_link %}
+                                    <li>
+                                        <a href="{{ service.mobilization_modes_professionals_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_professionals_external_form_link_text }}</a>
+                                    </li>
+                                {% endif %}
+                                {% if service.mobilization_modes_professionals_other %}
+                                    <li>{{ service.mobilization_modes_professionals_other|urlize_new_tab }}</li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                        {% if service.mobilization_modes_beneficiaries.exists or service.mobilization_modes_beneficiaries_external_form_link or service.mobilization_modes_beneficiaries_other %}
+                            <p class="fw-bold mb-1">Pour les particuliers</p>
+                            <ul class="mb-3">
+                                {% for mode in service.mobilization_modes_beneficiaries.all %}<li>{{ mode.label }}</li>{% endfor %}
+                                {% if service.mobilization_modes_beneficiaries_external_form_link %}
+                                    <li>
+                                        <a href="{{ service.mobilization_modes_beneficiaries_external_form_link }}" target="_blank" rel="noopener noreferrer">{{ service.mobilization_modes_beneficiaries_external_form_link_text }}</a>
+                                    </li>
+                                {% endif %}
+                                {% if service.mobilization_modes_beneficiaries_other %}
+                                    <li>{{ service.mobilization_modes_beneficiaries_other|urlize_new_tab }}</li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                        <p class="mt-3 mb-0">
+                            Vous êtes un particulier ? <a href="#" class="fw-bold" data-bs-toggle="modal" data-bs-target="#js-contact-modal" data-contact-email="{{ service.structure.email }}" data-contact-phone="{{ service.structure.phone }}">Voir les coordonnées de la structure</a>
                         </p>
                     </div>
+                {% endif %}
 
-                    {# Description #}
-                    {% if service.description %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h4">Description du service</h2>
-                            {% load markdownify %}
-                            <div id="js-description-wrapper" style="max-height: 150px; overflow: hidden; position: relative;">
-                                <div class="mb-0">{{ service.description|markdownify }}</div>
-                                <div id="js-description-fade" style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, white);">
-                                </div>
-                            </div>
-                            <a href="#" id="js-description-toggle" class="fw-bold d-none">Lire la suite</a>
-                        </div>
-                    {% endif %}
-
-                    {# Thematics #}
-                    {% if service.thematics.exists %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h4">Thématique et besoins associés</h2>
-                            <ul class="mb-0">
-                                {% for thematic in service.thematics.all %}<li>{{ thematic.label }}</li>{% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-
-                    {# Mobilizations #}
-                    {% if service.mobilizations.exists %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h4">Les démarches à réaliser</h2>
-                            <ul class="mb-0">
-                                {% for mobilization in service.mobilizations.all %}<li>{{ mobilization.label }}</li>{% endfor %}
-                            </ul>
-                            {% if service.mobilizations_details %}<p class="mt-2 mb-0">{{ service.mobilizations_details }}</p>{% endif %}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-                {# Sidebar #}
-                <div class="col-12 col-lg-4">
+                {# Documents à compléter #}
+                {% if service.credentials_documents or service.credentials_online_form %}
                     <div class="c-box mb-3 mb-md-4">
-                        <h2 class="h4">Informations de la structure</h2>
-                        <p>{{ service.structure.name }}</p>
-                        {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
-                        <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "fiche-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
+                        <h2 class="h4">Documents à compléter</h2>
+                        <ul class="mb-0">
+                            {% for document in service.credentials_documents %}<li>{{ document|urlize_new_tab }}</li>{% endfor %}
+                            {% if service.credentials_online_form %}
+                                <li>
+                                    <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener noreferrer">{{ service.credentials_online_form }}</a>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
-                </div>
+                {% endif %}
 
             </div>
-        </div>
-    </section>
 
-    <div class="modal fade" id="js-contact-modal" tabindex="-1" aria-labelledby="js-contact-modal-label" aria-modal="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title h5" id="js-contact-modal-label">Coordonnées de contact</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            {# Sidebar #}
+            <div class="col-12 col-lg-4">
+                <div class="c-box mb-3 mb-md-4">
+                    <h2 class="h4">Informations de la structure</h2>
+                    <p>{{ service.structure.name }}</p>
+                    {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
+                    <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "fiche-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
                 </div>
-                <div class="modal-body">
-                    {% if service.contact_email %}
-                        <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
-                            <div>
-                                <i class="ri-mail-line me-2" aria-hidden="true"></i>
-                                {{ service.contact_email }}
-                            </div>
-                            <button id="js-copy-email"
-                                    class="btn btn-link btn-ico-only"
-                                    type="button"
-                                    aria-label="Copier l'adresse e-mail"
-                                    data-email="{{ service.contact_email }}"
-                                    {% matomo_event "fiche-service" "clic" "copier-email-contact" %}>
-                                <i class="ri-file-copy-line" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    {% endif %}
-                    {% if service.contact_phone %}
-                        <div class="border rounded p-3">
-                            <i class="ri-phone-line me-2" aria-hidden="true"></i>
-                            {{ service.contact_phone }}
-                        </div>
-                    {% endif %}
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="js-contact-modal" tabindex="-1" aria-labelledby="js-contact-modal-label" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="js-contact-modal-label">Coordonnées de contact</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div id="js-contact-email-row" class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                    <div>
+                        <i class="ri-mail-line me-2" aria-hidden="true"></i>
+                        <span id="js-contact-email-value"></span>
+                    </div>
+                    <button id="js-copy-email" class="btn btn-link btn-ico-only" type="button" aria-label="Copier l'adresse e-mail" {% matomo_event "fiche-service" "clic" "copier-email-contact" %}>
+                        <i class="ri-file-copy-line" aria-hidden="true"></i>
+                    </button>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+                <div id="js-contact-phone-row" class="border rounded p-3">
+                    <i class="ri-phone-line me-2" aria-hidden="true"></i>
+                    <span id="js-contact-phone-value"></span>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block script %}
