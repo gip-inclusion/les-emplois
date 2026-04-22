@@ -17,12 +17,12 @@ def dora_service_url(service, *, orientation_jwt, source):
         service_url = service["lien_source"]
         # Rewrite URLs to not redirect to production when using review app,
         # this will also prevent some data mischief.
-        if not url_has_allowed_host_and_scheme(service_url, settings.DORA_BASE_URL):
+        if not url_has_allowed_host_and_scheme(service_url, settings.DORA_WWW_BASE_URL):
             service_url_parts = urlsplit(service_url)
-            dora_url_parts = urlsplit(settings.DORA_BASE_URL)
+            dora_url_parts = urlsplit(settings.DORA_WWW_BASE_URL)
             service_url = urlunsplit(dora_url_parts[:2] + service_url_parts[2:])
     else:
-        service_url = urljoin(settings.DORA_BASE_URL, f"/services/di--{service['id']}")
+        service_url = urljoin(settings.DORA_WWW_BASE_URL, f"/services/di--{service['id']}")
     params = {"mtm_campaign": "lesemplois", "mtm_kwd": "rechservice-" + source}
     if orientation_jwt:
         params["op"] = orientation_jwt

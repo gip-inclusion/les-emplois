@@ -323,17 +323,21 @@ class TestCriterionCertificationBadge:
 
 class TestDORAServiceURL:
     def test_source_dora_with_matching_base_url(self, settings):
-        expected = f"{settings.DORA_BASE_URL}/services/dora-service?mtm_campaign=lesemplois&mtm_kwd=rechservice-foo"
+        expected = (
+            f"{settings.DORA_WWW_BASE_URL}/services/dora-service?mtm_campaign=lesemplois&mtm_kwd=rechservice-foo"
+        )
 
         service_url = dora_service_url(
-            {"source": "dora", "lien_source": settings.DORA_BASE_URL + "/services/dora-service"},
+            {"source": "dora", "lien_source": settings.DORA_WWW_BASE_URL + "/services/dora-service"},
             orientation_jwt=False,
             source="foo",
         )
         assert service_url == expected
 
     def test_source_dora_without_matching_base_url(self, settings):
-        expected = f"{settings.DORA_BASE_URL}/services/dora-service?mtm_campaign=lesemplois&mtm_kwd=rechservice-foo"
+        expected = (
+            f"{settings.DORA_WWW_BASE_URL}/services/dora-service?mtm_campaign=lesemplois&mtm_kwd=rechservice-foo"
+        )
 
         service_url = dora_service_url(
             {"source": "dora", "lien_source": "https://sub.dom.tld/services/dora-service"},
