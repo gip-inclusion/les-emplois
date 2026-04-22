@@ -6,6 +6,7 @@ from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 
 from itou.insertion.models import GenericReferenceItem, Service, Structure
+from itou.insertion.opening_hours import format_osm_hours
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
@@ -54,3 +55,8 @@ class ServiceDetailView(LoginRequiredMixin, DetailView):
     slug_url_kwarg = "service_uid"
     template_name = "insertion/service_detail.html"
     context_object_name = "service"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
+        return context
