@@ -1,4 +1,5 @@
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
@@ -28,11 +29,14 @@ class Command(BaseCommand):
     enough to not setup the whole process of keeping track of outdated objects in the sync, etc.
     """
 
+    ATOMIC_HANDLE = True
+
     help = "Synchronizes ROMEs and Appellations from the PE API"
 
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
+    @dry_runnable
     def handle(self, *, wet_run, **options):
         now = timezone.now()
 
@@ -43,29 +47,27 @@ class Command(BaseCommand):
         for item in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):
             self.logger.info(item.label)
 
-        if wet_run:
-            romes = [pe_data_to_rome(item, now) for item in romes_data]
-            Rome.objects.bulk_create(
-                romes,
-                batch_size=BULK_CREATE_BATCH_SIZE,
-                update_conflicts=True,
-                update_fields=("name", "updated_at"),
-                unique_fields=("code",),
-            )
-            self.logger.info("len=%d ROME entries have been created or updated.", len(romes))
+        romes = [pe_data_to_rome(item, now) for item in romes_data]
+        Rome.objects.bulk_create(
+            romes,
+            batch_size=BULK_CREATE_BATCH_SIZE,
+            update_conflicts=True,
+            update_fields=("name", "updated_at"),
+            unique_fields=("code",),
+        )
+        self.logger.info("len=%d ROME entries have been created or updated.", len(romes))
 
         for item in yield_sync_diff(
             appellations_data, "code", Appellation.objects.all(), "code", [("libelle", "name")]
         ):
             self.logger.info(item.label)
 
-        if wet_run:
-            appellations = [pe_data_to_appellation(item, now) for item in appellations_data]
-            Appellation.objects.bulk_create(
-                appellations,
-                batch_size=BULK_CREATE_BATCH_SIZE,
-                update_conflicts=True,
-                update_fields=("name", "updated_at", "rome_id"),
-                unique_fields=("code",),
-            )
-            self.logger.info("len=%d Appellation entries have been created or updated.", len(appellations))
+        appellations = [pe_data_to_appellation(item, now) for item in appellations_data]
+        Appellation.objects.bulk_create(
+            appellations,
+            batch_size=BULK_CREATE_BATCH_SIZE,
+            update_conflicts=True,
+            update_fields=("name", "updated_at", "rome_id"),
+            unique_fields=("code",),
+        )
+        self.logger.info("len=%d Appellation entries have been created or updated.", len(appellations))
