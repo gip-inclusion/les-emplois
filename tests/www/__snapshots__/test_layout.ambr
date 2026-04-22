@@ -1,4 +1,141 @@
 # serializer version: 1
+# name: test_nav_dropdown_with_multiple_org_types[multi organization structure switcher in nav]
+  '''
+  <li class="d-none d-lg-inline-block dropdown dropdown-organization">
+      <button aria-controls="switchOrganizationDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
+          <span>
+              EI - ACME Inc.
+          </span>
+      </button>
+      <div class="dropdown-menu w-100" id="switchOrganizationDropdown">
+          <form action="/dashboard/switch-organization?next_url=/dashboard/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <ul class="list-unstyled">
+                  <li>
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <span>
+                              DDETS IAE
+                          </span>
+                          <strong>
+                              1 Titus Ion
+                          </strong>
+                      </button>
+                  </li>
+                  <li>
+                      <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <span>
+                              EI
+                          </span>
+                          <strong>
+                              ACME Inc.
+                          </strong>
+                      </button>
+                  </li>
+                  <li>
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <span>
+                              FT
+                          </span>
+                          <strong>
+                              Pres. Org.
+                          </strong>
+                      </button>
+                  </li>
+              </ul>
+          </form>
+          <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+              <i aria-hidden="true" class="ri-add-line">
+              </i>
+              <span>
+                  Créer ou rejoindre
+              </span>
+              <strong>
+                  une nouvelle structure
+              </strong>
+          </a>
+      </div>
+  </li>
+  
+  '''
+# ---
+# name: test_nav_dropdown_with_multiple_org_types[multi organization structure switcher in offcanvas]
+  '''
+  <div class="dropdown dropdown-organization flex-grow-1 py-4">
+      <button aria-controls="switchOrganizationDropdownMobile" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" type="button">
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
+          <span>
+              EI
+          </span>
+          <strong>
+              ACME Inc.
+          </strong>
+      </button>
+      <div class="dropdown-menu" id="switchOrganizationDropdownMobile">
+          <form action="/dashboard/switch-organization?next_url=/dashboard/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <ul class="list-unstyled">
+                  <li>
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <span>
+                              DDETS IAE
+                          </span>
+                          <strong>
+                              1 Titus Ion
+                          </strong>
+                      </button>
+                  </li>
+                  <li>
+                      <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <span>
+                              EI
+                          </span>
+                          <strong>
+                              ACME Inc.
+                          </strong>
+                      </button>
+                  </li>
+                  <li>
+                      <button class="dropdown-item dropdown-item__summary" name="organization_key" value="ORGANIZATION_KEY">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <span>
+                              FT
+                          </span>
+                          <strong>
+                              Pres. Org.
+                          </strong>
+                      </button>
+                  </li>
+              </ul>
+          </form>
+          <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+              <i aria-hidden="true" class="ri-add-line">
+              </i>
+              <span>
+                  Créer ou rejoindre
+              </span>
+              <strong>
+                  une nouvelle structure
+              </strong>
+          </a>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_navigation_authenticated[Employer][navigation]
   '''
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
