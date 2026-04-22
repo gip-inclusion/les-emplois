@@ -1,0 +1,17 @@
+{% if formatted_opening_hours %}
+    {% for entry in formatted_opening_hours.entries %}
+        <ul class="list-data d-flex">
+            <li>
+                <span><strong>{{ entry.label }} :</strong></span>
+            </li>
+            <li class="ms-2">
+                <span><strong>{{ entry.hours }}</strong>
+                    {% if entry.comment %}<span>(<strong>{{ entry.comment|lower }}</strong>)</span>{% endif %}
+                </span>
+            </li>
+        </ul>
+    {% endfor %}
+
+{% else %}
+    {{ service.opening_hours }}
+{% endif %}

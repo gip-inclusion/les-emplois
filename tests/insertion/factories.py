@@ -1,7 +1,15 @@
+import datetime
+
 import factory
 from django.utils import timezone
 
-from itou.insertion.models import GenericReferenceItem, GenericReferenceItemKind, GenericReferenceItemSource, Structure
+from itou.insertion.models import (
+    GenericReferenceItem,
+    GenericReferenceItemKind,
+    GenericReferenceItemSource,
+    Service,
+    Structure,
+)
 
 
 class GenericReferenceItemFactory(factory.django.DjangoModelFactory):
@@ -23,3 +31,16 @@ class StructureFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("company", locale="fr_FR")
     description = factory.Faker("paragraph", locale="fr_FR")
     updated_on = factory.LazyFunction(timezone.localdate)
+
+
+class ServiceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Service
+        skip_postgeneration_save = True
+
+    uid = factory.Sequence(lambda n: f"service-uid-{n}")
+    source = factory.SubFactory(GenericReferenceItemFactory, kind=GenericReferenceItemKind.SOURCE)
+    structure = factory.SubFactory(StructureFactory)
+    name = factory.Sequence(lambda n: f"Service {n}")
+    description = "Description du service."
+    updated_on = datetime.date(2025, 1, 1)

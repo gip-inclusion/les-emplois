@@ -8,6 +8,7 @@ import textwrap
 
 from django import template
 from django.template import defaultfilters
+from django.utils.safestring import mark_safe
 
 
 register = template.Library()
@@ -51,3 +52,12 @@ def mask_unless(value, predicate, mask_function=(lambda x: x[0] + "…")):
 @defaultfilters.stringfilter
 def shorten(value, width):
     return textwrap.shorten(value, width=width, placeholder=" …")
+
+
+@register.filter(is_safe=True)
+@defaultfilters.stringfilter
+def urlize_new_tab(value: str) -> str:
+    """Like |urlize but opens links in a new tab with rel="noopener noreferrer"."""
+    urlized = defaultfilters.urlize(value)
+    result = re.sub(r"<a ", '<a target="_blank" rel="noopener noreferrer" ', urlized)
+    return mark_safe(result)
