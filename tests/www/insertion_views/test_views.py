@@ -4,6 +4,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.insertion.models import GenericReferenceItemKind
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -14,7 +15,7 @@ def detail_url(service):
 
 @pytest.fixture
 def user(db):
-    return PrescriberFactory()
+    return PrescriberFactory(membership=True)
 
 
 @pytest.fixture
@@ -29,10 +30,9 @@ def service(db):
     )
 
 
-def test_detail_requires_login(client, service):
+def test_detail_accessible_without_login(client, service):
     response = client.get(detail_url(service))
-    assert response.status_code == 302
-    assert "/accounts/login" in response["Location"]
+    assert response.status_code == 200
 
 
 def test_detail_basic(client, user, service, snapshot):
@@ -67,7 +67,7 @@ def test_detail_with_all_optional_fields(client, user, snapshot):
         fee=fee,
         fee_details="Sous conditions de ressources.",
         publics_details="Toute personne majeure.",
-        access_conditions="Être orienté par un prescripteur.",
+        access_conditions_di="Être orienté par un prescripteur.",
         mobilizations_details="Contacter le service par téléphone.",
         contact_email="contact@service.fr",
         contact_phone="01 23 45 67 89",
@@ -147,3 +147,39 @@ def test_detail_without_source_link(client, user):
     client.force_login(user)
     response = client.get(detail_url(service_no_link))
     assertNotContains(response, 'rel="canonical"')
+
+
+def test_detail_orientation_url_with_jwt_for_authorized_prescriber(client):
+    organization = PrescriberOrganizationFactory(authorized=True)
+    prescriber = PrescriberFactory(membership=True, membership__organization=organization)
+    service = ServiceFactory(
+        uid="test-jwt-uid",
+        updated_on="2025-01-15",
+        is_orientable_with_form=True,
+        structure__uid="test-structure-jwt-uid",
+        structure__updated_on="2025-01-15",
+    )
+    client.force_login(prescriber)
+
+    response = client.get(detail_url(service))
+
+    assert response.status_code == 200
+    # Authorized ProConnect prescribers get orientation URL wrapped in nexus auto_login with JWT
+    assertContains(response, reverse("nexus:auto_login"))
+
+
+def test_detail_orientation_url_without_jwt_for_regular_prescriber(client, user):
+    service = ServiceFactory(
+        uid="test-no-jwt-uid",
+        updated_on="2025-01-15",
+        is_orientable_with_form=True,
+        structure__uid="test-structure-no-jwt-uid",
+        structure__updated_on="2025-01-15",
+    )
+    client.force_login(user)
+
+    response = client.get(detail_url(service))
+
+    assert response.status_code == 200
+    # Regular prescribers get direct DORA URL without nexus auto_login
+    assertNotContains(response, reverse("nexus:auto_login"))

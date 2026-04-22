@@ -369,7 +369,7 @@
 # ---
 # name: test_results_html_link[anonymous]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2Fservices%2Fdora-presentiel-vannes%3Fmtm_campaign%3Dlesemplois%26mtm_kwd%3Drechservice-accueil%26op%3Dop_jwt_token" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -381,7 +381,7 @@
 # ---
 # name: test_results_html_link[employer]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-employer" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2Fservices%2Fdora-presentiel-vannes%3Fmtm_campaign%3Dlesemplois%26mtm_kwd%3Drechservice-employer%26op%3Dop_jwt_token" rel="noopener" target="_blank">
       <span>
           Orienter
       </span>
@@ -393,7 +393,7 @@
 # ---
 # name: test_results_html_link[itou_staff]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-itou_staff" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2Fservices%2Fdora-presentiel-vannes%3Fmtm_campaign%3Dlesemplois%26mtm_kwd%3Drechservice-itou_staff%26op%3Dop_jwt_token" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -405,7 +405,7 @@
 # ---
 # name: test_results_html_link[jobseeker]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-job_seeker" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2Fservices%2Fdora-presentiel-vannes%3Fmtm_campaign%3Dlesemplois%26mtm_kwd%3Drechservice-job_seeker%26op%3Dop_jwt_token" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -417,7 +417,7 @@
 # ---
 # name: test_results_html_link[labor_inspector]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-labor_inspector" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2Fservices%2Fdora-presentiel-vannes%3Fmtm_campaign%3Dlesemplois%26mtm_kwd%3Drechservice-labor_inspector%26op%3Dop_jwt_token" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -441,7 +441,7 @@
 # ---
 # name: test_results_html_link[prescriber_not_authorized]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-prescriber" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="/portal/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2Fservices%2Fdora-presentiel-vannes%3Fmtm_campaign%3Dlesemplois%26mtm_kwd%3Drechservice-prescriber%26op%3Dop_jwt_token" rel="noopener" target="_blank">
       <span>
           Orienter
       </span>

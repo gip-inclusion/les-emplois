@@ -6,6 +6,7 @@ from django.views.generic.base import TemplateView
 
 from itou.insertion.models import GenericReferenceItem, Service, Structure
 from itou.insertion.opening_hours import format_osm_hours
+from itou.insertion.utils import get_orientation_jwt
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
@@ -60,4 +61,5 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
         context["back_url"] = "#"  # TODO: link to the service list once it exists
         context["matomo_custom_title"] = "Fiche de la service d'insértion"
+        context["orientation_jwt"] = get_orientation_jwt(self.request)
         return context
