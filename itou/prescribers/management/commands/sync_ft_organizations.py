@@ -1,5 +1,6 @@
 from django.db import IntegrityError, transaction
 from django.db.models import Q
+from itoutils.django.commands import dry_runnable
 
 from itou.cities.models import City
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, lat_lon_to_coords
@@ -76,7 +77,7 @@ class Command(BaseCommand):
         parser.add_argument("action", choices=["update-information", "fix-empty-safir"])
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def fix_empty_safir(self, data, *, wet_run=False):
+    def fix_empty_safir(self, data):
         data_by_siret = {datum["siret"]: datum for datum in data if datum.get("siret")}
         for organization in PrescriberOrganization.objects.filter(
             Q(code_safir_pole_emploi="") | Q(code_safir_pole_emploi=None),
@@ -86,14 +87,13 @@ class Command(BaseCommand):
             self.stdout.write(f"Organization={organization.pk} doesn't have a safir code")
             organization.code_safir_pole_emploi = data_by_siret[organization.siret]["codeSafir"]
             self.stdout.write(f"Set safir={organization.code_safir_pole_emploi} for organization={organization} ")
-            if wet_run:
-                try:
-                    with transaction.atomic():
-                        organization.save(update_fields={"code_safir_pole_emploi"})
-                except IntegrityError:
-                    self.stdout.write(f"ERR: safir={organization.code_safir_pole_emploi} already used")
+            try:
+                with transaction.atomic():
+                    organization.save(update_fields={"code_safir_pole_emploi"})
+            except IntegrityError:
+                self.stdout.write(f"ERR: safir={organization.code_safir_pole_emploi} already used")
 
-    def update_information(self, data, *, wet_run=False):
+    def update_information(self, data):
         qs = PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.FT).exclude(
             Q(code_safir_pole_emploi="") | Q(code_safir_pole_emploi=None)
         )
@@ -134,17 +134,16 @@ class Command(BaseCommand):
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                 )
                 fill_organization_from_api_data(obj, siret, item.raw)
-                if wet_run:
-                    obj.save()
+                obj.save()
             elif item.kind == DiffItemKind.EDITION:
                 fill_organization_from_api_data(item.db_obj, siret, item.raw)
-                if wet_run:
-                    item.db_obj.save()
+                item.db_obj.save()
 
+    @dry_runnable
     def handle(self, *, action, wet_run=False, **options):
         data = pole_emploi_partenaire_api_client().agences()
         match action:
             case "fix-empty-safir":
-                self.fix_empty_safir(data, wet_run=wet_run)
+                self.fix_empty_safir(data)
             case "update-information":
-                self.update_information(data, wet_run=wet_run)
+                self.update_information(data)
