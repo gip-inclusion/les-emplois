@@ -6,10 +6,17 @@ from django.urls import reverse
 from itou.nexus.enums import Service
 from itou.nexus.models import ActivatedService
 from itou.users.enums import IdentityProvider
+from tests.companies.factories import CompanyMembershipFactory
+from tests.institutions.factories import InstitutionMembershipFactory
 from tests.nexus.factories import NexusUserFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented, remove_static_hash
+
+
+def set_org_id_for_snapshot(soup):
+    for button in soup.find_all("button", {"name": "organization_key"}):
+        button["value"] = "ORGANIZATION_KEY"
 
 
 def test_navigation_not_authenticated(snapshot, client):
@@ -76,12 +83,6 @@ def test_navigation_authenticated(snapshot, client, user_factory):
     response = client.get(reverse("home:hp"), follow=True)
     soup = parse_response_to_soup(response)
 
-    def set_org_id_for_snapshot(soup):
-        organization_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_key"})
-        if organization_switcher_buttons:
-            [organization_switcher_button] = organization_switcher_buttons
-            organization_switcher_button["value"] = "ORGANIZATION_KEY"
-
     [nav_primary] = soup.select("#nav-primary")
     set_org_id_for_snapshot(nav_primary)
     assert pretty_indented(nav_primary) == snapshot(name="user menu")
@@ -92,6 +93,24 @@ def test_navigation_authenticated(snapshot, client, user_factory):
             a_tags["href"] = remove_static_hash(a_tags["href"])  # Normalize href for CI
     set_org_id_for_snapshot(offcanvasNav)
     assert pretty_indented(offcanvasNav) == snapshot(name="navigation")
+
+
+def test_nav_dropdown_with_multiple_org_types(snapshot, client):
+    user = PrescriberMembershipFactory(organization__for_snapshot=True, user__for_snapshot=True).user
+    CompanyMembershipFactory(company__for_snapshot=True, user=user)
+    InstitutionMembershipFactory(institution__name="1 Titus Ion", user=user)
+    client.force_login(user)
+
+    response = client.get(reverse("home:hp"), follow=True)
+    soup = parse_response_to_soup(response)
+
+    [switcher_nav] = soup.select("li.dropdown-organization")
+    set_org_id_for_snapshot(switcher_nav)
+    assert pretty_indented(switcher_nav) == snapshot(name="multi organization structure switcher in nav")
+
+    [switcher_offcanvas] = soup.select("div.dropdown-organization")
+    set_org_id_for_snapshot(switcher_offcanvas)
+    assert pretty_indented(switcher_offcanvas) == snapshot(name="multi organization structure switcher in offcanvas")
 
 
 @pytest.mark.parametrize("case", ["disabled", "enabled_no_proconnect", "enabled", "enabled_all_activated"])
@@ -116,12 +135,6 @@ def test_nexus_dropdown(snapshot, client, case, pro_connect):
     client.force_login(user)
     response = client.get(reverse("home:hp"), follow=True)
     soup = parse_response_to_soup(response)
-
-    def set_org_id_for_snapshot(soup):
-        organization_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_key"})
-        if organization_switcher_buttons:
-            [organization_switcher_button] = organization_switcher_buttons
-            organization_switcher_button["value"] = "ORGANIZATION_KEY"
 
     [offcanvasNav] = soup.select("#offcanvasNav")
     for a_tags in soup.find_all("a", attrs={"href": True}):
