@@ -1,4 +1,3 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -35,7 +34,7 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
         }
 
 
-class ServiceDetailView(LoginRequiredMixin, DetailView):
+class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     model = Service
     queryset = Service.objects.select_related(
         "source",

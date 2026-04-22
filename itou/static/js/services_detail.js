@@ -45,3 +45,25 @@ function initCopyEmail() {
 }
 
 initCopyEmail();
+
+function initContactModal() {
+    const modal = document.getElementById("js-contact-modal");
+    if (!modal) return;
+    const emailRow = modal.querySelector("#js-contact-email-row");
+    const emailValue = modal.querySelector("#js-contact-email-value");
+    const copyBtn = modal.querySelector("#js-copy-email");
+    const phoneRow = modal.querySelector("#js-contact-phone-row");
+    const phoneValue = modal.querySelector("#js-contact-phone-value");
+    modal.addEventListener("show.bs.modal", function (event) {
+        const trigger = event.relatedTarget;
+        const email = trigger.dataset.contactEmail || "";
+        const phone = trigger.dataset.contactPhone || "";
+        emailRow.classList.toggle("d-none", !email);
+        emailValue.textContent = email;
+        copyBtn.dataset.email = email;
+        phoneRow.classList.toggle("d-none", !phone);
+        phoneValue.textContent = phone;
+    });
+}
+
+initContactModal();
