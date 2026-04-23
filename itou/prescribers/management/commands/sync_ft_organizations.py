@@ -29,10 +29,6 @@ def address_from_api_data(data):
     return data["adressePrincipale"].get("ligne4")
 
 
-def address_extra_from_api_data(data):
-    return data["adressePrincipale"].get("ligne3", "")
-
-
 def post_code_from_api_data(data):
     return data["adressePrincipale"].get("bureauDistributeur")
 
@@ -57,7 +53,6 @@ def fill_organization_from_api_data(obj, siret, data):
     obj.email = email_from_api_data(data)
     # Address
     obj.address_line_1 = address_from_api_data(data)
-    obj.address_line_2 = address_extra_from_api_data(data)
     obj.post_code = post_code_from_api_data(data)
     # Geolocation
     obj.coords = coordinates_from_api_data(data)
@@ -103,7 +98,6 @@ class Command(BaseCommand):
             (phone_from_api_data, "phone"),
             (email_from_api_data, "email"),
             (address_from_api_data, "address_line_1"),
-            (address_extra_from_api_data, "address_line_2"),
             (post_code_from_api_data, "post_code"),
             (coordinates_from_api_data, "coords"),
             (insee_city_from_api_data, "insee_city"),
