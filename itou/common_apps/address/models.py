@@ -135,8 +135,6 @@ class AddressMixin(models.Model):
     # instead implement a way for the user to confirm it directly (semi-auto selection in the form for instance)
     BAN_API_LEGACY_RELIANCE_SCORE = 0.4
 
-    DEPARTMENT_CHOICES = DEPARTMENTS.items()
-
     address_line_1 = models.CharField(verbose_name="adresse", max_length=255, blank=True)
     address_line_2 = models.CharField(
         verbose_name="complément d'adresse",
@@ -153,7 +151,7 @@ class AddressMixin(models.Model):
     city = models.CharField(verbose_name="ville", max_length=255, blank=True)
     department = models.CharField(
         verbose_name="département",
-        choices=DEPARTMENT_CHOICES,
+        choices=DEPARTMENTS.items(),
         max_length=3,
         blank=True,
         db_index=True,
