@@ -5,7 +5,7 @@
   "*/20 7-18 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_jobseekers --wet-run",
 
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_ft_offers --wet-run",
-  "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score",
+  "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score --wet-run",
   "10 * * * * $ROOT/clevercloud/run_management_command.sh pe_certify_users --wet-run",
   "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records",
   "30 * * * * $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
