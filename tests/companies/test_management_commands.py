@@ -211,8 +211,22 @@ def test_update_companies_job_app_score(caplog):
     assert company_1.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
     assert company_2.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
 
+    # Dry run first
+    management.call_command("update_companies_job_app_score", wet_run=False)
+    assert caplog.messages[0] == "Command launched with wet_run=False"
+    assert caplog.messages[1] == "Updated 2 companies"
+
+    company_1.refresh_from_db()
+    company_2.refresh_from_db()
+
+    assert company_1.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
+    assert company_2.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
+
+    caplog.clear()
+
+    # Wet run now
     stdout = io.StringIO()
-    management.call_command("update_companies_job_app_score")
+    management.call_command("update_companies_job_app_score", wet_run=True)
     assert caplog.messages[0] == "Updated 2 companies"
 
     company_1.refresh_from_db()
@@ -230,7 +244,7 @@ def test_update_companies_job_app_score(caplog):
     for jd in company_2.job_description_through.all():
         jd.delete()
     caplog.clear()
-    management.call_command("update_companies_job_app_score", stdout=stdout)
+    management.call_command("update_companies_job_app_score", wet_run=True, stdout=stdout)
     # company_2 changed
     assert caplog.messages[0] == "Updated 1 companies"
 
