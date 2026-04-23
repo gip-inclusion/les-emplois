@@ -15,15 +15,16 @@ def command_fixture():
     return sanitize_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
 
 
-def test_handle_dry_run_option(mocker, command, caplog):
+def test_handle_dry_run(mocker, command, caplog):
     mocker.patch.object(command, "_check_approvals")
     mocker.patch.object(command, "_check_missed_notifications")
 
-    command.handle(dry_run=True)
+    command.handle(wet_run=False)
     assert caplog.messages == [
+        "Command launched with wet_run=False",
         "Checking employee records coherence before transferring to ASP",
-        "DRY-RUN mode: not fixing, just reporting",
         "Employee records sanitizing done. Have a great day!",
+        "Setting transaction to be rollback as wet_run=False",
     ]
 
 
@@ -34,13 +35,18 @@ def test_missing_approvals(command, caplog):
     employee_record.job_application.approval = None
     employee_record.job_application.save()
 
-    command._check_approvals(dry_run=False)
+    command.handle(wet_run=True)
 
     assert models.EmployeeRecord.objects.count() == 0
     assert caplog.messages == [
+        "Checking employee records coherence before transferring to ASP",
         "found 1 employee records with missing approval",
         "deleted 1/1 employee records with missing approval",
+        "found 0 missed employee records notifications",
+        "0/0 employee records were unarchived",
+        "Employee records sanitizing done. Have a great day!",
     ]
+    assert not models.EmployeeRecord.objects.filter(pk=employee_record.pk).exists()
 
 
 def test_missed_notifications(command, faker, caplog, snapshot):
@@ -77,7 +83,7 @@ def test_missed_notifications(command, faker, caplog, snapshot):
     )
 
     # Various cases are now set up, finally check the behavior
-    command._check_missed_notifications(dry_run=False)
+    command.handle(wet_run=True)
     assert employee_record_before_approval.update_notifications.count() == 1
     employee_record_before_approval.refresh_from_db()
     assert employee_record_before_approval.status != Status.ARCHIVED
@@ -95,7 +101,7 @@ def test_missed_notifications_limit(faker, mocker, snapshot, command, caplog):
         ),
     )
 
-    command._check_missed_notifications(dry_run=False)
+    command.handle(wet_run=True)
 
     assert models.EmployeeRecordUpdateNotification.objects.count() == 2
     assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()

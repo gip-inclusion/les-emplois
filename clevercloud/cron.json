@@ -7,7 +7,7 @@
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_ft_offers --wet-run",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score --wet-run",
   "10 * * * * $ROOT/clevercloud/run_management_command.sh pe_certify_users --wet-run",
-  "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records",
+  "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records --wet-run",
   "30 * * * * $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "45 * * * * $ROOT/clevercloud/run_management_command.sh requeue_tasks",
   "0 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=companies",

@@ -1,16 +1,22 @@
 # serializer version: 1
 # name: test_missed_notifications
   list([
+    'Checking employee records coherence before transferring to ASP',
+    'found 0 employee records with missing approval',
     'found 1 missed employee records notifications',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
     '1/1 employee records were unarchived',
+    'Employee records sanitizing done. Have a great day!',
   ])
 # ---
 # name: test_missed_notifications_limit
   list([
+    'Checking employee records coherence before transferring to ASP',
+    'found 0 employee records with missing approval',
     'found 3 missed employee records notifications',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
     '2/3 employee records were unarchived',
+    'Employee records sanitizing done. Have a great day!',
   ])
 # ---
