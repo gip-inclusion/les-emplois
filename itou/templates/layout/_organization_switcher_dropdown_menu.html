@@ -3,7 +3,9 @@
     <ul class="list-unstyled">
         {% for org in organizations %}
             <li>
-                <button class="dropdown-item dropdown-item__summary{% if org.pk == current_organization.pk %} active{% endif %}" name="organization_key" value="{{ org.organization_switch_key }}">
+                <button class="dropdown-item dropdown-item__summary{% if org.organization_switch_key == current_organization.organization_switch_key %} active{% endif %}"
+                        name="organization_key"
+                        value="{{ org.organization_switch_key }}">
                     <i class="{{ org.icon }}" aria-hidden="true"></i>
                     <span>{{ org.kind }}</span>
                     {% if org.display_name|length > 18 %}

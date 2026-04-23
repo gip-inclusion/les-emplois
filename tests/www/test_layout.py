@@ -96,9 +96,12 @@ def test_navigation_authenticated(snapshot, client, user_factory):
 
 
 def test_nav_dropdown_with_multiple_org_types(snapshot, client):
-    user = PrescriberMembershipFactory(organization__for_snapshot=True, user__for_snapshot=True).user
-    CompanyMembershipFactory(company__for_snapshot=True, user=user)
-    InstitutionMembershipFactory(institution__name="1 Titus Ion", user=user)
+    # Force pks to be identical: only one menu entry should be `active`
+    user = PrescriberMembershipFactory(
+        organization__for_snapshot=True, user__for_snapshot=True, organization__pk=5001
+    ).user
+    CompanyMembershipFactory(company__for_snapshot=True, user=user, company__pk=5001)
+    InstitutionMembershipFactory(institution__name="1 Titus Ion", user=user, institution__pk=5001)
     client.force_login(user)
 
     response = client.get(reverse("home:hp"), follow=True)
