@@ -24,3 +24,10 @@ class ItouProvider(BaseProvider):
         return Point(
             [float(coord) for coord in self.generator.format("local_latlng", country_code="FR", coords_only=True)]
         )
+
+    def postalcode(self) -> str:
+        while True:
+            postcode = self.generator.format("postcode")
+            if postcode.startswith("20") and postcode[:3] not in {"200", "201", "202", "204", "206", "207"}:
+                continue
+            return postcode
