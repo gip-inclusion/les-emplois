@@ -194,7 +194,34 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
     )
 
     def save_model(self, request, obj, form, change):
-        if not change:
+        if change:
+            if form.cleaned_data.get("automatic_geocoding_update") and obj.geocoding_address:
+                try:
+                    # Refresh geocoding.
+                    obj.geocode_address()
+                except GeocodingDataError:
+                    messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
+
+            if "kind" in form.changed_data:
+                # Make authorization not required when switching organization kind to "Other".
+                if form.cleaned_data.get("kind") == PrescriberOrganizationKind.OTHER:
+                    obj.authorization_status = PrescriberAuthorizationStatus.NOT_REQUIRED
+                    messages.warning(
+                        request,
+                        "L'habilitation n'est plus nécessaire pour ce type d'organisation.",
+                    )
+                # Unset authorization when switching organization kind from "Other".
+                else:
+                    obj.authorization_status = PrescriberAuthorizationStatus.NOT_SET
+                    messages.warning(
+                        request,
+                        (
+                            "L'habilitation a été invalidée suite au changement de type de l'organisation ; veuillez "
+                            "à présent valider ou refuser l'habilitation."
+                        ),
+                    )
+
+        else:
             if not obj.geocoding_score and obj.geocoding_address:
                 try:
                     # Set geocoding.
@@ -202,13 +229,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                 except GeocodingDataError:
                     # do nothing, the user has not made any changes to the address
                     pass
-
-        if change and form.cleaned_data.get("automatic_geocoding_update") and obj.geocoding_address:
-            try:
-                # Refresh geocoding.
-                obj.geocode_address()
-            except GeocodingDataError:
-                messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
 
         super().save_model(request, obj, form, change)
 
@@ -228,8 +248,8 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                     .exists()
                 ):
                     msg = (
-                        "Impossible de refuser cette habilitation: cela changerait son type vers “Autre” "
-                        "et une autre organisation de type “Autre” a le même SIRET."
+                        "Impossible de refuser cette habilitation: cela changerait son type vers « Autre » "
+                        "et une autre organisation de type « Autre » a le même SIRET."
                     )
                     self.message_user(request, msg, messages.ERROR)
                     return HttpResponseRedirect(request.get_full_path())
@@ -247,7 +267,9 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
             if request.user.is_itou_admin or obj.has_pending_authorization() or obj.has_refused_authorization():
                 # Organizations typed as "Other" cannot be marked valid
                 if obj.kind == PrescriberOrganizationKind.OTHER:
-                    msg = "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”."
+                    msg = (
+                        "Avant d’habiliter cette organisation, vous devez sélectionner un type différent de « Autre »."
+                    )
                     self.message_user(request, msg, messages.ERROR)
                     return HttpResponseRedirect(request.get_full_path())
                 obj.authorization_status = PrescriberAuthorizationStatus.VALIDATED

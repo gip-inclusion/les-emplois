@@ -227,7 +227,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                     kind=PrescriberOrganizationKind.OTHER,
                 ),
-                violation_error_message=('Une organisation habilitée ne peut pas être de type "Autre".'),
+                violation_error_message='Une organisation habilitée ne peut pas être de type "Autre".',
             ),
             models.CheckConstraint(
                 name="prevent_not_required_authorization_unless_other",

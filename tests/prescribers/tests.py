@@ -100,6 +100,99 @@ class TestPrescriberOrganizationManager:
         assert len(mailoutbox) == 1
         assert str(org.pk) in mailoutbox[0].body
 
+    def test_switch_kind_from_other_with_not_required_authorization(self, admin_client):
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.OTHER, authorization_status=PrescriberAuthorizationStatus.NOT_REQUIRED
+        )
+        change_url = reverse("admin:prescribers_prescriberorganization_change", args=[org.pk])
+        response = admin_client.get(change_url)
+        assert response.status_code == 200
+        response = admin_client.post(
+            change_url,
+            data={
+                "siret": org.siret,
+                "kind": random.choice(tuple(set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.OTHER})),
+                "name": org.name,
+                "phone": org.phone,
+                "email": org.email,
+                "website": org.website,
+                "code_safir_pole_emploi": org.code_safir_pole_emploi or "",
+                "description": org.description,
+                "memberships-TOTAL_FORMS": "0",
+                "memberships-INITIAL_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
+        assertRedirects(response, change_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    (
+                        "L'habilitation a été invalidée suite au changement de type de l'organisation ; "
+                        "veuillez à présent valider ou refuser l'habilitation."
+                    ),
+                ),
+                messages.Message(
+                    messages.SUCCESS,
+                    (
+                        f'L’objet organisation « <a href="{change_url}">{org.name}</a> » a été modifié avec succès. '
+                        "Vous pouvez l’éditer à nouveau ci-dessous."
+                    ),
+                ),
+            ],
+        )
+        org.refresh_from_db()
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
+
+    def test_switch_kind_to_other(self, admin_client):
+        org = PrescriberOrganizationFactory(
+            kind=random.choice(tuple(set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.OTHER}))
+        )
+        change_url = reverse("admin:prescribers_prescriberorganization_change", args=[org.pk])
+        response = admin_client.get(change_url)
+        assert response.status_code == 200
+        response = admin_client.post(
+            change_url,
+            data={
+                "siret": org.siret,
+                "kind": PrescriberOrganizationKind.OTHER,
+                "name": org.name,
+                "phone": org.phone,
+                "email": org.email,
+                "website": org.website,
+                "code_safir_pole_emploi": org.code_safir_pole_emploi or "",
+                "description": org.description,
+                "memberships-TOTAL_FORMS": "0",
+                "memberships-INITIAL_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
+        assertRedirects(response, change_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    "L'habilitation n'est plus nécessaire pour ce type d'organisation.",
+                ),
+                messages.Message(
+                    messages.SUCCESS,
+                    (
+                        f'L’objet organisation « <a href="{change_url}">{org.name}</a> » a été modifié avec succès. '
+                        "Vous pouvez l’éditer à nouveau ci-dessous."
+                    ),
+                ),
+            ],
+        )
+        org.refresh_from_db()
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_REQUIRED
+
 
 class TestPrescriberOrganizationModel:
     def test_accept_survey_url(self):
@@ -443,8 +536,8 @@ class TestPrescriberOrganizationAdmin:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Impossible de refuser cette habilitation: cela changerait son type vers “Autre” "
-                    "et une autre organisation de type “Autre” a le même SIRET.",
+                    "Impossible de refuser cette habilitation: cela changerait son type vers « Autre » "
+                    "et une autre organisation de type « Autre » a le même SIRET.",
                 )
             ],
         )
@@ -707,7 +800,7 @@ class TestPrescriberOrganizationAdmin:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”.",
+                    "Avant d’habiliter cette organisation, vous devez sélectionner un type différent de « Autre ».",
                 )
             ],
         )
@@ -750,7 +843,7 @@ class TestPrescriberOrganizationAdmin:
 
         response = client.post(url, data=post_data)
         assert response.status_code == 200
-        expected_msg = "Cette organisation a été habilitée. Vous devez sélectionner un type différent de “Autre”."
+        expected_msg = "Cette organisation a été habilitée. Vous devez sélectionner un type différent de « Autre »."
         assert len(response.context["errors"]) == 1
         assert response.context["errors"][0] == [expected_msg]
 
@@ -821,7 +914,7 @@ def test_prevent_not_required_authorization_unless_other_constraint():
     organization = PrescriberOrganizationFactory(
         kind=PrescriberOrganizationKind.OTHER, authorization_status=PrescriberAuthorizationStatus.NOT_REQUIRED
     )
-    with pytest.raises(IntegrityError):
+    with pytest.raises(IntegrityError, match=r".*prevent_not_required_authorization_unless_other.*"):
         PrescriberOrganization.objects.filter(pk=organization.pk).update(
             kind=random.choice(tuple(set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.OTHER}))
         )
