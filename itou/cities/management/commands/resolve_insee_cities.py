@@ -15,6 +15,7 @@ that we can ask the users to fix it.
 """
 
 from django.core.management.base import CommandError
+from itoutils.django.commands import dry_runnable
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, resolve_insee_city
 from itou.companies.models import Company
@@ -25,6 +26,8 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     # Keep the running duration low (<10s), no matter the size of the table.
     # After the initial "migration" this command will only take care of the eventual
     # address changes, so probably very few objects at a time.
@@ -46,7 +49,8 @@ class Command(BaseCommand):
             required=True,
         )
 
-    def handle(self, wet_run, mode, **options):
+    @dry_runnable
+    def handle(self, mode, **options):
         if mode == "companies":
             queryset = Company.objects.active()
             model = Company
@@ -82,18 +86,17 @@ class Command(BaseCommand):
                 self.logger.warning(f"Failed to find matching city for {item.city=} {item.post_code=}")
                 item.geocoding_score = 0  # reset the score to not see them again next run of the cron
                 failed_items.append(item)
-        if wet_run:
-            model.objects.bulk_update(
-                updated_items,
-                ["insee_city"],
-                batch_size=self.BATCH_UPDATE_SIZE,
-            )
-            model.objects.bulk_update(
-                failed_items,
-                ["geocoding_score"],
-                batch_size=self.BATCH_UPDATE_SIZE,
-            )
-            self.logger.info(
-                f"count={len(updated_items)} {model_name} updated and "
-                f"err_count={len(failed_items)} {model_name} without a resolution."
-            )
+        model.objects.bulk_update(
+            updated_items,
+            ["insee_city"],
+            batch_size=self.BATCH_UPDATE_SIZE,
+        )
+        model.objects.bulk_update(
+            failed_items,
+            ["geocoding_score"],
+            batch_size=self.BATCH_UPDATE_SIZE,
+        )
+        self.logger.info(
+            f"count={len(updated_items)} {model_name} updated and "
+            f"err_count={len(failed_items)} {model_name} without a resolution."
+        )
