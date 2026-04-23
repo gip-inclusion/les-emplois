@@ -1,5 +1,4 @@
 import datetime
-import io
 import operator
 
 import pytest
@@ -225,7 +224,6 @@ def test_update_companies_job_app_score(caplog):
     caplog.clear()
 
     # Wet run now
-    stdout = io.StringIO()
     management.call_command("update_companies_job_app_score", wet_run=True)
     assert caplog.messages[0] == "Updated 2 companies"
 
@@ -244,7 +242,7 @@ def test_update_companies_job_app_score(caplog):
     for jd in company_2.job_description_through.all():
         jd.delete()
     caplog.clear()
-    management.call_command("update_companies_job_app_score", wet_run=True, stdout=stdout)
+    management.call_command("update_companies_job_app_score", wet_run=True)
     # company_2 changed
     assert caplog.messages[0] == "Updated 1 companies"
 
