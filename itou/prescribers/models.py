@@ -229,6 +229,19 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
                 ),
                 violation_error_message=('Une organisation habilitée ne peut pas être de type "Autre".'),
             ),
+            models.CheckConstraint(
+                name="prevent_not_required_authorization_unless_other",
+                condition=~models.Q(
+                    authorization_status=PrescriberAuthorizationStatus.NOT_REQUIRED,
+                )
+                | models.Q(
+                    kind=PrescriberOrganizationKind.OTHER,
+                ),
+                violation_error_message=(
+                    'Seules les organisations de type "Autre" peuvent avoir le statut '
+                    '"Pas d\'habilitation nécessaire".'
+                ),
+            ),
         ]
 
     def save(self, *args, **kwargs):

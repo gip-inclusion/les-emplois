@@ -73,9 +73,15 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email", locale="fr_FR")
     post_code = factory.LazyFunction(create_fake_postcode)
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
-    # Default organization is not authorized, and does not require a authorization validation
+    # Default organization is not authorized, and does not require an authorization validation
     kind = PrescriberOrganizationKind.OTHER
-    authorization_status = PrescriberAuthorizationStatus.NOT_REQUIRED
+    authorization_status = factory.LazyAttribute(
+        lambda obj: (
+            PrescriberAuthorizationStatus.NOT_REQUIRED
+            if obj.kind == PrescriberOrganizationKind.OTHER
+            else PrescriberAuthorizationStatus.NOT_SET
+        )
+    )
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
