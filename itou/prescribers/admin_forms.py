@@ -16,6 +16,6 @@ class PrescriberOrganizationAdminForm(forms.ModelForm):
             and self.instance.authorization_status == PrescriberAuthorizationStatus.VALIDATED
         ):
             raise forms.ValidationError(
-                "Cette organisation a été habilitée. Vous devez sélectionner un type différent de “Autre”."
+                "Cette organisation a été habilitée. Vous devez sélectionner un type différent de « Autre »."
             )
         return cleaned_data
