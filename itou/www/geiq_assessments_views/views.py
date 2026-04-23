@@ -376,7 +376,11 @@ def assessment_get_file(request, pk, *, file_field):
     if file is None:
         raise Http404
     return HttpResponseRedirect(
-        file.url(parameters={"ResponseContentDisposition": content_disposition_header("inline", filename)})
+        file.url(
+            parameters={
+                "ResponseContentDisposition": content_disposition_header(as_attachment=False, filename=filename)
+            }
+        )
     )
 
 
