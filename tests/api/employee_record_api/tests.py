@@ -363,9 +363,9 @@ class TestEmployeeRecordAPIParameters:
             "itou.common_apps.address.format.get_geocoding_data",
             side_effect=mock_get_geocoding_data,
         )
-        sooner_ts = timezone.now() - relativedelta(days=3)
+        sooner_ts = timezone.localtime() - relativedelta(days=3)
         sooner = f"{sooner_ts:%Y-%m-%d}"
-        ancient_ts = timezone.now() - relativedelta(months=2)
+        ancient_ts = timezone.localtime() - relativedelta(months=2)
         ancient = f"{ancient_ts:%Y-%m-%d}"
 
         job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
