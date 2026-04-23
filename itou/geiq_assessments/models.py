@@ -83,6 +83,11 @@ class AssessmentWorkflow(xwf_models.Workflow):
             AssessmentState.FINAL_REVIEWED,
         ),
         (AssessmentTransition.ASK_FOR_INSTITUTION_FIX, AssessmentState.REVIEWED, AssessmentState.SUBMITTED),
+        (
+            AssessmentTransition.ASK_FOR_GEIQ_FIX,
+            [AssessmentState.SUBMITTED, AssessmentState.REVIEWED],
+            AssessmentState.NEW,
+        ),
     )
 
     log_model = "geiq_assessments.AssessmentTransitionLog"
@@ -439,19 +444,46 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
         self.reviewed_by = None
         self.reviewed_by_institution = None
 
+    @xwf_models.transition()
+    def ask_for_geiq_fix(self, *, user, institution, comment):
+        self.submitted_at = None
+        self.submitted_by = None
+
+        self.reviewed_at = None
+        self.reviewed_by = None
+        self.reviewed_by_institution = None
+        self.decision_validated_at = None
+        self.grants_selection_validated_at = None
+
+        self.final_reviewed_at = None
+        self.final_reviewed_by = None
+        self.final_reviewed_by_institution = None
+
+        # Unselect all contracts for institution validation
+        EmployeeContract.objects.filter(employee__assessment=self).update(allowance_granted=False)
+
 
 class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "assessment"
-    EXTRA_LOG_ATTRIBUTES = (("user", "user", None), ("institution", "institution", None))
+    EXTRA_LOG_ATTRIBUTES = (("user", "user", None), ("institution", "institution", None), ("comment", "comment", ""))
 
     assessment = models.ForeignKey(Assessment, related_name="logs", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT)
     institution = models.ForeignKey(Institution, null=True, on_delete=models.RESTRICT)
+    comment = models.TextField("commentaire pour expliquer la correction attendue", blank=True)
 
     class Meta:
         verbose_name = "log des transitions du bilan d'exécution"
         verbose_name_plural = "logs des transitions du bilan d'exécution"
         ordering = ["-timestamp"]
+        constraints = [
+            models.CheckConstraint(
+                name="ask_for_geiq_fix_transition_with_comment",
+                violation_error_message=("Une demande de correction GEIQ doit être accompagnée d'un commentaire"),
+                condition=(models.Q(transition=AssessmentTransition.ASK_FOR_GEIQ_FIX) & ~models.Q(comment=""))
+                | (~models.Q(transition=AssessmentTransition.ASK_FOR_GEIQ_FIX) & models.Q(comment="")),
+            ),
+        ]
 
     @classmethod
     def log_transition(cls, transition, from_state, to_state, modified_object, **kwargs):

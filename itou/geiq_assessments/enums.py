@@ -15,6 +15,7 @@ class AssessmentTransition(enum.StrEnum):
     REVIEW = "review"
     FINAL_REVIEW = "final_review"
     ASK_FOR_INSTITUTION_FIX = "ask_for_institution_fix"
+    ASK_FOR_GEIQ_FIX = "ask_for_geiq_fix"
 
     @classmethod
     def with_timestamp_match(cls):
