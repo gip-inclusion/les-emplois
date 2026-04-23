@@ -321,4 +321,44 @@
             </div>
         </div>
     {% endif %}
+    {% if assessment.submitted_at and not assessment.final_reviewed_at %}
+        <div id="send_back_for_correction_modal" class="modal" tabindex="-1" aria-labelledby="send_back_for_correction_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="send_back_for_correction_modal_title">Renvoyer le bilan d’exécution au GEIQ</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% bootstrap_field geiq_fix_comment_form.comment %}
+                            <br>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-sm btn-primary" name="action" value="{{ InstitutionAction.ASK_FOR_GEIQ_FIX }}">
+                                Confirmer
+                            </button>
+                            <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% if geiq_fix_comment_form.errors %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ csp_nonce }}">
+            document.addEventListener("DOMContentLoaded", function() {
+                // Adding the "show" CSS class is not enough and not documented.
+                // A JS initialization is recommended.
+                const sendBackForCorrectionModal = new bootstrap.Modal("#send_back_for_correction_modal");
+                sendBackForCorrectionModal.show();
+            });
+        </script>
+    {% endif %}
+{% endblock script %}

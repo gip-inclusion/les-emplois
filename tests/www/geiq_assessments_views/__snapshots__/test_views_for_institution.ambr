@@ -1,4 +1,26 @@
 # serializer version: 1
+# name: TestAssessmentDetailsForInstitutionView.test_ddets_ask_for_geiq_fix[body of mail sent to GEIQ members]
+  '''
+  Bonjour,
+  
+  La DDETS 29 vous a renvoyé votre bilan d’exécution afin que vous puissiez y apporter les corrections nécessaires.
+  
+  Structure concernée :
+  Une antenne (29)
+  
+  Commentaire de la DDETS 29 :
+  Revoyez votre copie.
+  
+  Une fois les corrections effectuées, vous pourrez transmettre à nouveau votre dossier.
+  
+  Cordialement,
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
 # name: TestAssessmentDetailsForInstitutionView.test_ddets_review_and_dreets_final_review[body of mail sent to DREETS members]
   '''
   Bonjour,
@@ -283,6 +305,9 @@
                               </strong>
                           </li>
                       </ul>
+                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#send_back_for_correction_modal" data-bs-toggle="modal" type="button">
+                          Renvoyer au GEIQ pour correction
+                      </button>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
                           Valider le contrôle
                       </button>
@@ -643,6 +668,9 @@
                       <p>
                           Vous avez jusqu’au 26/07/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
+                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#send_back_for_correction_modal" data-bs-toggle="modal" type="button">
+                          Renvoyer au GEIQ pour correction
+                      </button>
                       <form method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-primary btn-block" name="action" type="submit" value="review">
@@ -1278,6 +1306,9 @@
                               </strong>
                           </li>
                       </ul>
+                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#send_back_for_correction_modal" data-bs-toggle="modal" type="button">
+                          Renvoyer au GEIQ pour correction
+                      </button>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
                           Valider le contrôle
                       </button>
@@ -1873,6 +1904,28 @@
       </div>
   </section>
   
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_dreets_ask_for_geiq_fix[body of mail sent to GEIQ members]
+  '''
+  Bonjour,
+  
+  La DREETS 29 vous a renvoyé votre bilan d’exécution afin que vous puissiez y apporter les corrections nécessaires.
+  
+  Structure concernée :
+  Une antenne (29)
+  
+  Commentaire de la DREETS 29 :
+  Revoyez votre copie.
+  
+  Une fois les corrections effectuées, vous pourrez transmettre à nouveau votre dossier.
+  
+  Cordialement,
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
   '''
 # ---
 # name: TestAssessmentReviewView.test_review_already_reviewed_assessment[disabled assessments review form with final review]

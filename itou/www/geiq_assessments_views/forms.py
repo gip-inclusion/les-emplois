@@ -368,3 +368,9 @@ class ContractFilterForm(forms.Form):
         count += sum(any(self.cleaned_data.get(f) for f in group) for group in self.FILTER_GROUPS)
 
         return count
+
+
+class GeiqFixCommentForm(forms.Form):
+    comment = forms.CharField(
+        label="Précisez les corrections à apporter au dossier", widget=forms.Textarea(), strip=True
+    )

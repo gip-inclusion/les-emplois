@@ -441,6 +441,86 @@ class TestAssessmentContractsListAndToggle:
         contract_2.refresh_from_db()
         assert contract_2.allowance_granted is True
 
+    def test_contract_selection_after_ask_for_geiq_fix(self, settings, client):
+        """Simulate back and forth exchanges between institution and GEIQ."""
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
+        assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            created_by__first_name="Jean",
+            created_by__last_name="Dupont",
+            created_by__email="jean.dupont@example.com",
+            label_geiq_name="Un Joli GEIQ",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(seconds=1),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(seconds=2),
+            review_comment="Bon bilan.",
+            convention_amount=10_000,
+            granted_amount=9_000,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+        contract_1 = EmployeeContractFactory(
+            id=uuid.UUID("11111111-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+            allowance_granted=True,
+        )
+        assessment.ask_for_geiq_fix(
+            user=ddets_membership.user, institution=ddets_membership.institution, comment="À revoir"
+        )
+
+        # Sending the assessment back to the GEIQ for correction unsets allowance_granted
+        contract_1.refresh_from_db()
+        assert contract_1.allowance_requested is True
+        assert contract_1.allowance_granted is False
+
+        client.force_login(geiq_membership.user)
+
+        # The GEIQ can unselect a contract
+        assessment.contracts_selection_validated_at = None
+        assessment.save()
+        client.post(
+            reverse(
+                "geiq_assessments_views:assessment_contracts_exclude",
+                kwargs={"contract_pk": str(contract_1.pk)},
+            )
+            + "?from_list=1",
+            headers={"HX-Request": "true"},
+        )
+        contract_1.refresh_from_db()
+        assert contract_1.allowance_requested is False
+        assert contract_1.allowance_granted is False
+
+        # The work done by the institution was not lost
+        assessment.refresh_from_db()
+        assert assessment.review_comment == "Bon bilan."
+        assert assessment.convention_amount == 10_000
+        assert assessment.granted_amount == 9_000
+        assert assessment.advance_amount == 0
+
+        # FIXME(ewen): when refusal and refusal_reason are ready, update this test as we'll use these fields
+        # to automatically unselect the contracts in the institution's view.
+
 
 class TestAssessmentContractsDetails:
     @pytest.mark.parametrize("tab", AssessmentContractDetailsTab)

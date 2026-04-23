@@ -22,16 +22,25 @@
                     </li>
                 {% endfor %}
             </ul>
+            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#send_back_for_correction_modal">
+                Renvoyer au GEIQ pour correction
+            </button>
             {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
                 <button type="button" class="btn btn-primary btn-block" disabled>Valider et transmettre la décision au GEIQ</button>
             {% else %}
                 <button type="button" class="btn btn-primary btn-block" disabled>Valider le contrôle</button>
             {% endif %}
         {% elif request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#send_back_for_correction_modal">
+                Renvoyer au GEIQ pour correction
+            </button>
             <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#final_review_modal">
                 Valider et transmettre la décision au GEIQ
             </button>
         {% else %}
+            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#send_back_for_correction_modal">
+                Renvoyer au GEIQ pour correction
+            </button>
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary btn-block" name="action" value="{{ InstitutionAction.REVIEW }}">
@@ -47,6 +56,9 @@
             Ce bilan a été contrôlé le {{ assessment.reviewed_at|date:"d/m/Y" }} par {{ assessment.reviewed_by.get_full_name }}. Il doit désormais être validé par la DREETS.
         </p>
         {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#send_back_for_correction_modal">
+                Renvoyer au GEIQ pour correction
+            </button>
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.ASK_FOR_INSTITUTION_FIX }}">

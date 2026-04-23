@@ -25,6 +25,7 @@ class AssessmentTransition(enum.StrEnum):
 class InstitutionAction(enum.StrEnum):
     REVIEW = "review"
     ASK_FOR_INSTITUTION_FIX = "ask_for_institution_fix"
+    ASK_FOR_GEIQ_FIX = "ask_for_geiq_fix"
 
     # Make the Enum work in Django's templates
     # See :
