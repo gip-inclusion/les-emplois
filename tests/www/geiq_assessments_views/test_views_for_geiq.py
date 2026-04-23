@@ -825,7 +825,7 @@ class TestAssessmentGetFile:
                                 getattr(assessment, attr_name).key,
                                 parameters={
                                     "ResponseContentDisposition": content_disposition_header(
-                                        "inline", expected_filename
+                                        as_attachment=False, filename=expected_filename
                                     ),
                                 },
                             ),
