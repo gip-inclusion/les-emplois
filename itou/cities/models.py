@@ -17,8 +17,6 @@ class EditionModeChoices(models.TextChoices):
 class City(models.Model):
     """French cities with their geocoding data, synchronized via the sync_cities script regularly."""
 
-    DEPARTMENT_CHOICES = DEPARTMENTS.items()
-
     name = models.CharField(verbose_name="ville", max_length=255, db_index=True)
     normalized_name = models.GeneratedField(
         expression=Replace(Lower(SlylyImmutableUnaccent("name")), Value("-"), Value(" ")),
@@ -27,7 +25,7 @@ class City(models.Model):
         db_persist=True,
     )
     slug = models.SlugField(verbose_name="slug", max_length=255, unique=True)
-    department = models.CharField(verbose_name="département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True)
+    department = models.CharField(verbose_name="département", choices=DEPARTMENTS.items(), max_length=3, db_index=True)
 
     # Note that post codes and insee codes have a n-to-n relationship.
     # One insee code can have several post codes but the inverse is also true e.g. zip code 33360 has six insee codes.
