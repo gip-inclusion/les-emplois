@@ -254,6 +254,7 @@ class TestEmployeeRecordUpdateNotificationSerializer:
         ("hexa_post_code", "", "adresse"),
         ("hexa_commune", None, "adresse"),
         ("education_level", "", "situationSalarie"),
+        ("nir", "", "personnePhysique"),
     ],
 )
 def test_update_notification_use_static_serializers_on_missing_fields(snapshot, field, value, key):
@@ -266,6 +267,18 @@ def test_update_notification_use_static_serializers_on_missing_fields(snapshot, 
 
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
     assert data[key] == snapshot()
+
+
+def test_update_notification_use_static_serializers_on_missing_ntt_field(snapshot):
+    notification = EmployeeRecordUpdateNotificationFactory(
+        employee_record__job_application__for_snapshot=True,
+        # such NIR starting with an 8 requires a NTT
+        employee_record__job_application__job_seeker__jobseeker_profile__nir="890012345678901",
+        employee_record__ntt=None,
+    )
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["personnePhysique"] == snapshot()
 
 
 def test_update_notification_use_static_serializers_on_missing_pole_emploi_since_fields(snapshot):

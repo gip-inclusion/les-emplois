@@ -89,6 +89,17 @@ class _StaticPersonSerializer(_PersonSerializer):
     def get_civilite(self, obj: EmployeeRecord) -> str:
         return super().get_civilite(obj) or Title.M.value
 
+    def get_salarieNIR(self, obj: EmployeeRecord) -> str:
+        if salarieNir := super().get_salarieNIR(obj):
+            return salarieNir
+        # Provide a valid NTT for update notification
+        ntt_parts = ["1" if self.get_civilite(obj) == Title.M.value else "2"]
+        ntt_parts.append("130030133")  # PDI SIREN
+        # With asp_uid being 30 characters long, it matches perfectly the 40-char max length
+        # constraint of NTT
+        ntt_parts.append(obj.job_application.job_seeker.jobseeker_profile.asp_uid)
+        return "".join(ntt_parts)
+
 
 class _AddressSerializer(serializers.Serializer):
     # Source object is a job seeker
@@ -355,7 +366,11 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
                 for field in {"birth_country"}
             ]
         )
-        if is_missing_required_fields:
+        # Also check if a NIR/NTT is missing
+        if is_missing_required_fields or (
+            is_ntt_required(obj.employee_record.job_application.job_seeker.jobseeker_profile.nir)
+            and not obj.employee_record.ntt
+        ):
             return _StaticPersonSerializer(obj.employee_record).data
         return _PersonSerializer(obj.employee_record).data
 

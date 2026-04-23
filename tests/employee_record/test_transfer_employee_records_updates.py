@@ -81,6 +81,8 @@ def test_preflight_with_error(snapshot, command, caplog):
         ready_for_transfer=True,
         employee_record__approval_number="",
         employee_record__job_application__approval=None,
+        # Make sure a missing NTT does not change the error message
+        employee_record__job_application__job_seeker__jobseeker_profile__with_classic_nir=True,
         # Data used by the snapshot
         pk=42,
     )
