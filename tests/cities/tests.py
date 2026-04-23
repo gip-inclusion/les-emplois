@@ -393,12 +393,23 @@ def test_resolve_insee_cities(caplog, snapshot):
     user = JobSeekerFactory(city="GUERAND", post_code="44350", geocoding_score=0.9)
     non_resolved_user_1 = JobSeekerFactory(city="Guérande", post_code="54350", geocoding_score=0.9)
     non_resolved_user_2 = JobSeekerFactory(city="ERAND", post_code="44350", geocoding_score=0.9)
+
+    # Dry run
+    call_command("resolve_insee_cities", wet_run=False, mode="job_seekers")
+    assert caplog.messages[:-1] == snapshot(name="dry_run")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
+    )
+    user.refresh_from_db()
+    assert user.insee_city is None
+    caplog.clear()
+
+    # Wet run
     call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
     assert caplog.messages[:-1] == snapshot(name="first_pass")
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
     )
-
     user.refresh_from_db()
     assert user.insee_city == guerande
     non_resolved_user_1.refresh_from_db()
