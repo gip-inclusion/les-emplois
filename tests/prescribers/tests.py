@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timedelta
 
 import pytest
@@ -813,6 +814,16 @@ def test_prevent_validated_authorization_if_other_constraint():
     with pytest.raises(IntegrityError):
         PrescriberOrganization.objects.filter(pk=organization.pk).update(
             authorization_status=PrescriberAuthorizationStatus.VALIDATED
+        )
+
+
+def test_prevent_not_required_authorization_unless_other_constraint():
+    organization = PrescriberOrganizationFactory(
+        kind=PrescriberOrganizationKind.OTHER, authorization_status=PrescriberAuthorizationStatus.NOT_REQUIRED
+    )
+    with pytest.raises(IntegrityError):
+        PrescriberOrganization.objects.filter(pk=organization.pk).update(
+            kind=random.choice(tuple(set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.OTHER}))
         )
 
 
