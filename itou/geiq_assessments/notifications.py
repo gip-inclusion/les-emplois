@@ -58,3 +58,29 @@ class AssessmentReviewedForGeiqNotification(EmailNotification):
         # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
         email_message.cc = sorted(cc_user.email for cc_user in cc_users)
         return email_message
+
+
+@notifications_registry.register
+class AssessmentFixRequestedForGeiqNotification(EmailNotification):
+    """Notification sent to the members of the GEIQ linked to the assessment for which a fix is requested"""
+
+    name = "Demande de correction de votre bilan d’exécution GEIQ"
+    category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
+    can_be_disabled = False
+    subject_template = "geiq_assessments/email/assessment_fix_requested_for_geiq_subject.txt"
+    body_template = "geiq_assessments/email/assessment_fix_requested_for_geiq_body.txt"
+
+    def build(self):
+        email_message = super().build()
+        assessment = self.context["assessment"]
+        cc_users = {
+            membership.user
+            for membership in InstitutionMembership.objects.filter(
+                institution__in=AssessmentInstitutionLink.objects.filter(
+                    assessment=assessment, with_convention=True
+                ).values_list("institution", flat=True),
+            ).select_related("user")
+        }
+        # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
+        email_message.cc = sorted(cc_user.email for cc_user in cc_users)
+        return email_message

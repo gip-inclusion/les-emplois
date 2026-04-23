@@ -1,4 +1,5 @@
 import datetime
+import random
 import uuid
 
 import pytest
@@ -585,6 +586,182 @@ class TestAssessmentDetailsForInstitutionView:
             ).get()
             assert transition_final_review.user == dreets_membership.user
             assert transition_final_review.institution == dreets_membership.institution
+
+    def test_ddets_ask_for_geiq_fix(self, client, snapshot, mailoutbox):
+        ddets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DDETS_GEIQ, institution__name="DDETS 29"
+        )
+        other_ddets_membership = InstitutionMembershipFactory(institution=ddets_membership.institution)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            company__for_snapshot=True,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        is_reviewed = random.choice([True, False])  # a DDETS can request for fix even if an assessment is reviewed
+        assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            created_by__first_name="Jean",
+            created_by__last_name="Dupont",
+            created_by__email="jean.dupont@example.com",
+            label_geiq_name="Un Joli GEIQ",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=80_000,
+            review_comment="Bravo !",
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=(timezone.now() + datetime.timedelta(hours=5)) if is_reviewed else None,
+            reviewed_by=ddets_membership.user if is_reviewed else None,
+            reviewed_by_institution=ddets_membership.institution if is_reviewed else None,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+
+        with freeze_time(timezone.now() + datetime.timedelta(hours=6)):
+            client.force_login(ddets_membership.user)
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_geiq_fix"},  # no comment
+            )
+            assertContains(response, "Ce champ est obligatoire.")
+            assessment.refresh_from_db()
+            assert assessment.submitted_at is not None
+            assert AssessmentTransitionLog.objects.count() == 0
+
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_geiq_fix", "comment": " "},  # empty comment (space will be trimmed)
+            )
+            assertContains(response, "Ce champ est obligatoire.")
+            assessment.refresh_from_db()
+            assert assessment.submitted_at is not None
+            assert AssessmentTransitionLog.objects.count() == 0
+
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_geiq_fix", "comment": "Revoyez votre copie."},
+            )
+            assertRedirects(
+                response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+            )
+            assessment.refresh_from_db()
+            assert assessment.submitted_at is None
+            assert assessment.submitted_by is None
+            assert assessment.state == AssessmentState.NEW
+            transition = AssessmentTransitionLog.objects.get()
+            assert transition.user == ddets_membership.user
+            assert transition.institution == ddets_membership.institution
+            assert transition.transition == AssessmentTransition.ASK_FOR_GEIQ_FIX
+            assert transition.comment == "Revoyez votre copie."
+            assert len(mailoutbox) == 1
+            email = mailoutbox[0]
+            assert "[TEST] Demande de correction de votre bilan d’exécution GEIQ" == email.subject
+            assert email.to[0] == geiq_membership.user.email
+            assert email.body == snapshot(name="body of mail sent to GEIQ members")
+            assert email.cc == sorted([ddets_membership.user.email, other_ddets_membership.user.email])
+
+    def test_dreets_ask_for_geiq_fix(self, client, snapshot, mailoutbox):
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        dreets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ, institution__name="DREETS 29"
+        )
+        other_dreets_membership = InstitutionMembershipFactory(institution=dreets_membership.institution)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            company__for_snapshot=True,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        is_reviewed = random.choice([True, False])  # a DREETS can request for fix even if an assessment is reviewed
+        assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            created_by__first_name="Jean",
+            created_by__last_name="Dupont",
+            created_by__email="jean.dupont@example.com",
+            label_geiq_name="Un Joli GEIQ",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=80_000,
+            review_comment="Bravo !",
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=(timezone.now() + datetime.timedelta(hours=5)) if is_reviewed else None,
+            reviewed_by=ddets_membership.user if is_reviewed else None,
+            reviewed_by_institution=ddets_membership.institution if is_reviewed else None,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=dreets_membership.institution,
+            with_convention=True,
+        )
+
+        with freeze_time(timezone.now() + datetime.timedelta(hours=6)):
+            client.force_login(dreets_membership.user)
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_geiq_fix"},  # no comment
+            )
+            assertContains(response, "Ce champ est obligatoire.")
+            assessment.refresh_from_db()
+            assert assessment.submitted_at is not None
+            assert AssessmentTransitionLog.objects.count() == 0
+
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_geiq_fix", "comment": " "},  # empty comment (space will be trimmed)
+            )
+            assertContains(response, "Ce champ est obligatoire.")
+            assessment.refresh_from_db()
+            assert assessment.submitted_at is not None
+            assert AssessmentTransitionLog.objects.count() == 0
+
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_geiq_fix", "comment": "Revoyez votre copie."},
+            )
+            assertRedirects(
+                response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+            )
+            assessment.refresh_from_db()
+            assert assessment.submitted_at is None
+            assert assessment.submitted_by is None
+            assert assessment.state == AssessmentState.NEW
+            transition = AssessmentTransitionLog.objects.get()
+            assert transition.user == dreets_membership.user
+            assert transition.institution == dreets_membership.institution
+            assert transition.transition == AssessmentTransition.ASK_FOR_GEIQ_FIX
+            assert transition.comment == "Revoyez votre copie."
+            assert len(mailoutbox) == 1
+            email = mailoutbox[0]
+            assert "[TEST] Demande de correction de votre bilan d’exécution GEIQ" == email.subject
+            assert email.to[0] == geiq_membership.user.email
+            assert email.body == snapshot(name="body of mail sent to GEIQ members")
+            assert email.cc == sorted(
+                [dreets_membership.user.email, other_dreets_membership.user.email, ddets_membership.user.email]
+            )
 
 
 class TestAssessmentContractsListForInstitutionView:

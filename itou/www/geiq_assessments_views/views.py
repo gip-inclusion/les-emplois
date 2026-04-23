@@ -32,6 +32,7 @@ from itou.geiq_assessments.models import (
     LabelInfos,
 )
 from itou.geiq_assessments.notifications import (
+    AssessmentFixRequestedForGeiqNotification,
     AssessmentReviewedForDREETSLaborInspectorNotification,
     AssessmentReviewedForGeiqNotification,
     AssessmentSubmittedForLaborInspectorNotification,
@@ -51,6 +52,7 @@ from itou.www.geiq_assessments_views.forms import (
     ContractFilterForm,
     CreateForm,
     GeiqCommentForm,
+    GeiqFixCommentForm,
     ReviewForm,
 )
 
@@ -834,6 +836,7 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
 def assessment_details_for_institution(
     request, pk, template_name="geiq_assessments_views/assessment_details_for_institution.html"
 ):
+    # FIXME(ewen): split this view as it has significantly grown
     if request.current_organization.kind not in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS:
         raise Http404
     assessment = get_object_or_404(
@@ -842,7 +845,13 @@ def assessment_details_for_institution(
         ),
         pk=pk,
     )
+    geiq_fix_comment_form = GeiqFixCommentForm(
+        data=request.POST
+        if request.POST and request.POST.get("action") == InstitutionAction.ASK_FOR_GEIQ_FIX
+        else None
+    )
     if request.method == "POST":
+        redirect_to_details = True
         try:
             action = InstitutionAction(request.POST.get("action"))
         except ValueError:
@@ -896,14 +905,49 @@ def assessment_details_for_institution(
             else:
                 assessment.ask_for_institution_fix(user=request.user, institution=request.current_organization)
                 logger.info(
-                    "user=%s asked for a fix of assessment=%s",
+                    "user=%s asked for an institution fix of assessment=%s",
                     request.user.pk,
                     assessment.pk,
                     extra={"geiq_assessment": assessment.pk},
                 )
-        return HttpResponseRedirect(
-            reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
-        )
+
+        elif action is InstitutionAction.ASK_FOR_GEIQ_FIX:
+            if not geiq_fix_comment_form.is_valid():
+                # Auto-show the modal and the form with errors
+                redirect_to_details = False
+            else:
+                if assessment.final_reviewed_at:
+                    messages.error(
+                        request, "Ce dossier a déjà été validé : vous ne pouvez plus demander au GEIQ de le corriger."
+                    )
+                elif not assessment.submitted_at:
+                    messages.error(
+                        request,
+                        "Ce bilan n’a pas encore été transmis par le GEIQ : vous ne pouvez pas le renvoyer au GEIQ.",
+                    )
+                else:
+                    comment = geiq_fix_comment_form.cleaned_data["comment"]
+                    AssessmentFixRequestedForGeiqNotification(
+                        assessment.submitted_by,
+                        assessment=assessment,
+                        institution=request.current_organization,
+                        comment=comment,
+                    ).send()
+                    assessment.ask_for_geiq_fix(
+                        user=request.user,
+                        institution=request.current_organization,
+                        comment=comment,
+                    )
+                    logger.info(
+                        "user=%s asked for a geiq fix of assessment=%s",
+                        request.user.pk,
+                        assessment.pk,
+                        extra={"geiq_assessment": assessment.pk},
+                    )
+        if redirect_to_details:
+            return HttpResponseRedirect(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+            )
 
     context = {
         "assessment": assessment,
@@ -915,6 +959,7 @@ def assessment_details_for_institution(
         ),
         "matomo_custom_title": "Bilan d’exécution - page de detail Institution",
         "InstitutionAction": InstitutionAction,
+        "geiq_fix_comment_form": geiq_fix_comment_form,
         "abs_balance_amount": abs(assessment.granted_amount - assessment.advance_amount),
     }
     return render(request, template_name, context)
