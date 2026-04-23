@@ -112,7 +112,7 @@ class TransitionLogInline(ReadonlyMixin, ItouTabularInline):
     model = models.AssessmentTransitionLog
     extra = 0
     raw_id_fields = ("user", "institution")
-    readonly_fields = ("transition", "from_state", "to_state", "user", "institution", "timestamp")
+    readonly_fields = ("transition", "from_state", "to_state", "user", "institution", "timestamp", "comment")
 
 
 @admin.register(models.Assessment)

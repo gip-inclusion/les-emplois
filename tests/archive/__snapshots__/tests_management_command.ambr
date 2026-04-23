@@ -2856,7 +2856,8 @@
                  "geiq_assessments_assessmenttransitionlog"."timestamp",
                  "geiq_assessments_assessmenttransitionlog"."assessment_id",
                  "geiq_assessments_assessmenttransitionlog"."user_id",
-                 "geiq_assessments_assessmenttransitionlog"."institution_id"
+                 "geiq_assessments_assessmenttransitionlog"."institution_id",
+                 "geiq_assessments_assessmenttransitionlog"."comment"
           FROM "geiq_assessments_assessmenttransitionlog"
           WHERE "geiq_assessments_assessmenttransitionlog"."user_id" IN (%s,
                                                                          %s,
