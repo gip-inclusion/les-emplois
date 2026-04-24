@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views import generic
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_POST
 from django.views.generic.detail import SingleObjectMixin
 
 from itou.files.models import save_file
@@ -26,6 +26,7 @@ from itou.utils.auth import check_request
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
+from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.siae_evaluations_views.forms import (
     SUBSIDY_CUT,
@@ -41,6 +42,7 @@ from itou.www.siae_evaluations_views.forms import (
 )
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.from_institution)
 def samples_selection(request, template_name="siae_evaluations/samples_selection.html"):
     institution = get_current_institution_or_404(request)
@@ -75,6 +77,7 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
     return render(request, template_name, context)
 
 
+@readonly_view
 def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evaluations/campaign_calendar.html"):
     evaluation_campaign = get_object_or_404(
         EvaluationCampaign,
@@ -88,6 +91,7 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
     return render(request, template_name, context)
 
 
+@readonly_view
 @check_request(lambda request: request.from_institution)
 def institution_evaluated_siae_list(
     request, evaluation_campaign_pk, template_name="siae_evaluations/institution_evaluated_siae_list.html"
@@ -119,6 +123,7 @@ def institution_evaluated_siae_list(
     return render(request, template_name, context)
 
 
+@readonly_view
 @check_request(lambda request: request.from_institution or request.from_employer)
 def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evaluations/evaluated_siae_detail.html"):
     owner_data = {}
@@ -405,6 +410,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         )
 
 
+@readonly_view
 @check_request(lambda request: request.from_institution or request.from_employer)
 def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     allowed_viewers = {
@@ -462,6 +468,7 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     return render(request, "siae_evaluations/evaluated_siae_sanction.html", context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def evaluated_job_application(
     request, evaluated_job_application_pk, template_name="siae_evaluations/evaluated_job_application.html"
 ):
@@ -605,6 +612,7 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     )
 
 
+@readonly_view
 def siae_job_applications_list(
     request,
     evaluated_siae_pk,
@@ -641,6 +649,7 @@ def siae_job_applications_list(
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def siae_select_criteria(
     request, evaluated_job_application_pk, template_name="siae_evaluations/siae_select_criteria.html"
 ):
@@ -717,6 +726,7 @@ def siae_select_criteria(
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def siae_upload_doc(
     request, evaluated_administrative_criteria_pk, template_name="siae_evaluations/siae_upload_doc.html"
 ):
@@ -809,7 +819,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     return HttpResponseRedirect(back_url)
 
 
-@require_safe
+@readonly_view
 def view_proof(request, evaluated_administrative_criteria_id):
     if request.from_employer:
         org_lookup = "evaluated_job_application__evaluated_siae__siae__in"
