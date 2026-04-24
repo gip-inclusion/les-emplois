@@ -78,7 +78,7 @@ class ItouPasswordResetFromKeyView(PasswordResetFromKeyView):
             # clear any pre-existing session and login the user
             self.request.session.clear()
             self.reset_user.emailaddress_set.filter(email=self.reset_user.email).update(verified=True)
-            login(self.request, self.reset_user, backend="django.contrib.auth.backends.ModelBackend")
+            login(self.request, self.reset_user)
             return reverse("welcoming_tour:index")
         return super().get_success_url()
 

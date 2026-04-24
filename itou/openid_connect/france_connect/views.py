@@ -216,9 +216,7 @@ def france_connect_callback(request):
 
     init_user_nir_from_session(request, user)
 
-    # Because we have more than one Authentication backend in our settings, we need to specify
-    # the one we want to use in login
-    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    login(request, user)
     # Keep token_data["id_token"] to logout from FC
     request.session[constants.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session[constants.FRANCE_CONNECT_SESSION_STATE] = state

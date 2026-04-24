@@ -364,10 +364,7 @@ DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = re.compile(
 
 AUTH_USER_MODEL = "users.User"
 
-AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
-)
+AUTHENTICATION_BACKENDS = ("allauth.account.auth_backends.AuthenticationBackend",)
 
 SILENCED_SYSTEM_CHECKS = ["slippers.E001"]  # We register the components differently
 
