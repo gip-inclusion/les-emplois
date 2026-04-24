@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from functools import wraps
 
 from django.db import connection, transaction
@@ -11,7 +12,13 @@ def only_select_allowed(execute, sql, params, many, context):
     return execute(sql, params, many, context)
 
 
-def http_methods(function=None, *, db_readonly=frozenset(), db_write=frozenset(), auto_options=True):
+def http_methods(
+    function=None,
+    *,
+    db_readonly: Iterable[str] = frozenset(),
+    db_write: Iterable[str] = frozenset(),
+    auto_options=True,
+):
     def decorator(view_func):
         allowed_methods = {"OPTIONS"} if auto_options else set()
         allowed_methods.update(db_readonly)
