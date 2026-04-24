@@ -189,7 +189,7 @@ def professional_user(request, template_name="signup/professional_user.html"):
     params = {
         "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),
-        # FIXME: Add next url
+        "next_url": reverse("signup:choose_pro_membership_kind"),
     }
 
     pro_connect_url = (
@@ -198,9 +198,21 @@ def professional_user(request, template_name="signup/professional_user.html"):
 
     context = {
         "pro_connect_url": pro_connect_url,
-        "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
+        "matomo_account_type": MATOMO_ACCOUNT_TYPE[KIND_PRESCRIBER],
     }
     return render(request, template_name, context)
+
+
+class ChooseMembershipKindView(FormView):
+    template_name = "signup/choose_membership_kind.html"
+    form_class = forms.ChooseMembershipKindForm
+
+    def form_valid(self, form):
+        urls = {
+            KIND_PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
+            KIND_EMPLOYER: reverse("signup:company_select"),
+        }
+        return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
 
 # SIAEs signup.

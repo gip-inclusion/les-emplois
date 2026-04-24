@@ -11,7 +11,7 @@ from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import Title, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, Title, UserKind
 from itou.users.forms import validate_francetravail_email
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
@@ -74,6 +74,10 @@ class ChooseUserKindSignupForm(forms.Form):
         widget=forms.RadioSelect,
         choices=[(e.value, e.label) for e in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.EMPLOYER]],
     )
+
+
+class ChooseMembershipKindForm(forms.Form):
+    kind = forms.ChoiceField(choices=[(kind, kind) for kind in [KIND_PRESCRIBER, KIND_EMPLOYER]])
 
 
 class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, BaseSignupForm):

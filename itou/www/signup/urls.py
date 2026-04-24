@@ -51,6 +51,11 @@ urlpatterns = [
         views.professional_user,
         name="professional_user",
     ),
+    path(
+        "professional/kind",
+        views.ChooseMembershipKindView.as_view(),
+        name="choose_pro_membership_kind",
+    ),
     # Prescriber.
     path(
         "prescriber/check_already_exists",

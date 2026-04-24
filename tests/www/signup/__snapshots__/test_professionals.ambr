@@ -1,0 +1,108 @@
+# serializer version: 1
+# name: TestProfessionalSignup.test_choose_membership_kind
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Inscription
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                      <div class="c-form">
+                          <h2>
+                              Précisez votre profil *
+                          </h2>
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <div class="c-card card my-3">
+                                  <div class="card-body">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="kind_prescriber" name="kind" required="" type="radio" value="prescriber"/>
+                                          <label class="form-check-label" for="kind_prescriber">
+                                              <strong>
+                                                  Prescripteur / Orienteur
+                                              </strong>
+                                              <br/>
+                                              Vous accompagnez des candidats dans leur recherche d’emploi inclusif
+                                          </label>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="c-card card my-3">
+                                  <div class="card-body">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="kind_employer" name="kind" required="" type="radio" value="employer"/>
+                                          <label class="form-check-label" for="kind_employer">
+                                              <strong>
+                                                  Employeur inclusif
+                                              </strong>
+                                              <br/>
+                                              Vous travaillez dans une structure inclusive qui recrute et accompagne des candidats (SIAE, GEIQ, OPCS)
+                                          </label>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <hr class="mb-3"/>
+                                      <small class="d-inline-block mb-3">
+                                          * champs obligatoires
+                                      </small>
+                                      <div class="form-row align-items-center justify-content-end gx-3">
+                                          <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                              <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/employers">
+                                                  <i aria-hidden="true" class="ri-close-line ri-lg">
+                                                  </i>
+                                                  <span>
+                                                      Annuler
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                              <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                                  <span>
+                                                      Suivant
+                                                  </span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                      <div class="c-form mt-3 mt-md-4">
+                          <h2 class="m-0">
+                              Vous êtes membre d’une institution partenaire ?
+                          </h2>
+                          <p>
+                              <strong>
+                                  (DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE ...)
+                              </strong>
+                          </p>
+                          <p>
+                              Pour vous inscrire, un membre de votre institution doit vous ajouter. Merci de le contacter directement.
+                          </p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
