@@ -3,8 +3,9 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from tests.users.factories import PrescriberFactory
+from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
 
 
 class TestProfessionalSignup:
@@ -15,9 +16,11 @@ class TestProfessionalSignup:
         response = client.get(start_url)
 
         # Check ProConnect will redirect to the correct url
+        next_url = reverse("signup:choose_pro_membership_kind")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": start_url,
+            "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -26,10 +29,11 @@ class TestProfessionalSignup:
             client,
             KIND_PRESCRIBER,
             previous_url=start_url,
+            next_url=next_url,
         )
 
-        response = client.get(response.url)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
+        response = accept_legal_terms(client, response)
+        assertRedirects(response, next_url)
 
     def test_user_already_exists(self, client, pro_connect):
         # FIXME(alaurent) Allow LaborInspector to use ProConnect
@@ -38,18 +42,37 @@ class TestProfessionalSignup:
         response = client.get(start_url)
 
         # Check ProConnect will redirect to the correct url
+        next_url = reverse("signup:choose_pro_membership_kind")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": start_url,
+            "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = pro_connect.mock_oauth_dance(
+        # mock_oauth_dance check the response redirects to mock_oauth_dance
+        pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=start_url,
+            next_url=next_url,
         )
 
-        response = client.get(response.url)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
+    def test_choose_membership_kind(self, client, snapshot):
+        url = reverse("signup:choose_pro_membership_kind")
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+        user = PrescriberFactory()
+        client.force_login(user)
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+        response = client.post(url, data={"kind": KIND_PRESCRIBER})
+        assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
+        # The next steps are in tests/www/signup/test_prescriber.py
+
+        response = client.post(url, data={"kind": KIND_EMPLOYER})
+        assertRedirects(response, reverse("signup:company_select"))
+        # The next steps are in tests/www/signup/test_employer.py
