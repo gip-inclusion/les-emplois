@@ -142,7 +142,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_queries[queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -319,14 +319,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -371,6 +366,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -386,6 +382,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -518,6 +515,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -544,6 +542,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -575,6 +574,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -627,6 +627,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -680,6 +681,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -701,6 +703,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -729,6 +732,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -741,12 +745,6 @@
                                                                                       %s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -976,7 +974,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_view_as_institution[non_significant_sanction][queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1153,14 +1151,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1205,6 +1198,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1220,6 +1214,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1352,6 +1347,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -1374,6 +1370,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -1401,6 +1398,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1453,6 +1451,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1506,6 +1505,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1527,6 +1527,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -1555,6 +1556,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1567,12 +1569,6 @@
                                                                                       %s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1625,7 +1621,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_view_as_institution[significant_sanction][queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1802,14 +1798,9 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1854,6 +1845,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1869,6 +1861,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -2001,6 +1994,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -2023,6 +2017,7 @@
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -2050,6 +2045,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2102,6 +2098,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -2155,6 +2152,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -2176,6 +2174,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -2204,6 +2203,7 @@
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -2216,12 +2216,6 @@
                                                                                       %s)
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

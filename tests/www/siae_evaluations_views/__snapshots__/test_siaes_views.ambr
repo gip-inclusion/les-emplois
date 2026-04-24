@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestSiaeJobApplicationListView.test_access[view queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -377,13 +377,8 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -422,6 +417,7 @@
       dict({
         'origin': list([
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -436,6 +432,7 @@
       dict({
         'origin': list([
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -461,6 +458,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/siae_job_applications_list.html]',
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -481,6 +479,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/siae_job_applications_list.html]',
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -505,6 +504,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/siae_job_applications_list.html]',
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -693,6 +693,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/siae_job_applications_list.html]',
           'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -710,12 +711,6 @@
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
