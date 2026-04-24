@@ -27,7 +27,6 @@ from tests.eligibility.factories import (
 )
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import (
-    PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
@@ -58,12 +57,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
         sent_by_prescriber = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(PrescriberOrganizationFactory, with_membership=True),
-            sender=factory.LazyAttribute(
-                lambda obj: (
-                    obj.sender_prescriber_organization.members.first()
-                    or PrescriberMembershipFactory(organization=obj.sender_presciber_organization).user
-                )
-            ),
+            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
         )
         sent_by_authorized_prescriber = factory.Trait(
