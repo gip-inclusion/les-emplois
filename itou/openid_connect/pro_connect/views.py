@@ -390,9 +390,7 @@ def pro_connect_callback(request):
                 },
             )
 
-    # Because we have more than one Authentication backend in our settings, we need to specify
-    # the one we want to use in login
-    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    login(request, user)
 
     # reattach prescriber session
     if prescriber_session_data := pro_connect_state.data.get("prescriber_session_data"):
