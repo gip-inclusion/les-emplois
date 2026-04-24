@@ -10,6 +10,7 @@ KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_EMPLOYER = "employer"
 KIND_LABOR_INSPECTOR = "labor_inspector"
+KIND_PROFESSIONAL = "professional"
 KIND_ITOU_STAFF = "itou_staff"
 
 
