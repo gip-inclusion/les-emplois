@@ -5,9 +5,9 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 
 
-def only_select_allowed(execute, sql, params, many, context):
-    if not sql.upper().startswith("SELECT"):
-        raise RuntimeError("Only SELECT statements allowed in readonly views")
+def only_readonly_allowed(execute, sql, params, many, context):
+    if not sql.upper().startswith(("SELECT", "SAVEPOINT ", "RELEASE SAVEPOINT ")):
+        raise RuntimeError("Only SAVEPOINT/SELECT/RELEASE SAVEPOINT statements allowed in readonly views")
     return execute(sql, params, many, context)
 
 
@@ -34,7 +34,7 @@ def http_methods(function=None, *, db_readonly=frozenset(), db_write=frozenset()
             # Here request.method is in db_readonly, thanks to require_http_methods decorator
             # No need for DB transaction since we're only reading
             # and the transaction isolation level is READ COMMITED
-            with connection.execute_wrapper(only_select_allowed):
+            with connection.execute_wrapper(only_readonly_allowed):
                 return view_func(request, *args, **kwargs)
 
         # Add some attributes for view introspection
