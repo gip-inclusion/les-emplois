@@ -37,7 +37,7 @@ urlpatterns = [
     ),
     path(
         "facilitator/join",
-        views.FacilitatorJoinView.as_view(),
+        views.facilitator_join,
         name="facilitator_join",
     ),
     # Professional generic views
