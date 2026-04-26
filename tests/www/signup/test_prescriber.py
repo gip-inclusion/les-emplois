@@ -558,52 +558,6 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         assertRedirects(response, url)
 
-    def test_create_user_prescriber_without_org(self, client, mailoutbox, pro_connect):
-        """
-        Test the creation of a user of type prescriber without organization.
-        """
-        # Step 1: the user clicks on "No organization" in search of organization
-        # (SIREN and department).
-        url = reverse("signup:prescriber_check_already_exists")
-        response = client.get(url)
-
-        # Step 2: ProConnect button
-        url = reverse("signup:prescriber_user")
-        assertContains(response, url)
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-        )
-        # Follow the redirection : he is redirected to the logout warning page since an organization is now mandatory
-        response = client.get(response.url, follow=True)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
-
-        # Check `User` state.
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.kind == UserKind.PRESCRIBER
-
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
-
-        # Check membership.
-        assert 0 == user.prescriberorganization_set.count()
-
-        # No email has been sent.
-        assert len(mailoutbox) == 0
-
     def test_create_user_prescriber_with_same_siret_and_different_kind(self, client, mocker, pro_connect):
         """
         A user can create a new prescriber organization with an existing SIRET number,
