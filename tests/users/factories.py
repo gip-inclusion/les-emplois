@@ -445,6 +445,11 @@ def random_user_kind_factory(**kwargs):
     )(**kwargs)
 
 
+# Temporary method before merging all 3 user kinds
+def random_pro_user_factory(**kwargs):
+    return random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])(**kwargs)
+
+
 class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerAssignment
