@@ -730,35 +730,6 @@ def prescriber_join_org(request):
 # ------------------------------------------------------------------------------------------
 
 
-class FacilitatorBaseMixin:
-    def dispatch(self, request, *args, **kwargs):
-        if ITOU_SESSION_FACILITATOR_SIGNUP_KEY not in request.session:
-            return HttpResponseRedirect(reverse("signup:facilitator_search"))
-        self._get_session_siae()
-        return super().dispatch(request, *args, **kwargs)
-
-    def _get_session_siae(self):
-        org_data = self.request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
-        self.company_to_create = Company(
-            kind=CompanyKind.OPCS,
-            source=CompanySource.USER_CREATED,
-            siret=org_data["siret"],
-            name=org_data["name"],
-            address_line_1=org_data["address_line_1"] or "",
-            address_line_2=org_data["address_line_2"] or "",
-            post_code=org_data["post_code"],
-            city=org_data["city"],
-            department=org_data["department"],
-            email="",  # not public
-            auth_email="",  # filled in the form
-            phone="",
-            geocoding_score=org_data["geocoding_score"],
-            coords=lat_lon_to_coords(org_data.get("latitude"), org_data.get("longitude")),
-            created_by=None,
-            is_searchable=False,  # Wait for admin to check the company
-        )
-
-
 def facilitator_search(request, template_name="signup/facilitator_search.html"):
     form = forms.FacilitatorSearchForm(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -772,22 +743,39 @@ def facilitator_search(request, template_name="signup/facilitator_search.html"):
     return render(request, template_name, context)
 
 
-# FIXME(alaurent) refactor: no need for a CBV since the BaseMixin is only used here
-class FacilitatorJoinView(FacilitatorBaseMixin, View):
-    def get(self, request, *args, **kwargs):
-        self.company_to_create.auth_email = request.user.email
-        self.company_to_create.created_by = request.user
-        self.company_to_create.save()
+def facilitator_join(request):
+    if ITOU_SESSION_FACILITATOR_SIGNUP_KEY not in request.session:
+        return HttpResponseRedirect(reverse("signup:facilitator_search"))
 
-        CompanyMembership.objects.create(
-            user=request.user,
-            company=self.company_to_create,
-            is_admin=True,  # by construction, this user is the first of the SIAE.
-        )
+    org_data = request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
+    company_to_create = Company.objects.create(
+        kind=CompanyKind.OPCS,
+        source=CompanySource.USER_CREATED,
+        siret=org_data["siret"],
+        name=org_data["name"],
+        address_line_1=org_data["address_line_1"] or "",
+        address_line_2=org_data["address_line_2"] or "",
+        post_code=org_data["post_code"],
+        city=org_data["city"],
+        department=org_data["department"],
+        email="",  # not public
+        auth_email=request.user.email,
+        phone="",
+        geocoding_score=org_data["geocoding_score"],
+        coords=lat_lon_to_coords(org_data.get("latitude"), org_data.get("longitude")),
+        created_by=request.user,
+        is_searchable=False,  # Wait for admin to check the company
+    )
 
-        # redirect to post login page.
-        next_url = get_adapter(request).get_login_redirect_url(request)
-        # delete session data
-        request.session.pop(ITOU_SESSION_FACILITATOR_SIGNUP_KEY)
-        request.session.modified = True
-        return HttpResponseRedirect(next_url)
+    CompanyMembership.objects.create(
+        user=request.user,
+        company=company_to_create,
+        is_admin=True,  # by construction, this user is the first of the SIAE.
+    )
+
+    # redirect to post login page.
+    next_url = get_adapter(request).get_login_redirect_url(request)
+    # delete session data
+    request.session.pop(ITOU_SESSION_FACILITATOR_SIGNUP_KEY)
+    request.session.modified = True
+    return HttpResponseRedirect(next_url)
