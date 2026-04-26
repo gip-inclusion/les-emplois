@@ -611,8 +611,11 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
     """
-    Find a pre-existing Pôle emploi organization from a given SAFIR code.
+    Find a pre-existing France Travail organization from a given SAFIR code.
     """
+
+    if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+        raise PermissionDenied()
 
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
