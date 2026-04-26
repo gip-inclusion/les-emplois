@@ -609,7 +609,6 @@ class TestPrescribersViewsExceptions:
         assert not auth.get_user(client).is_authenticated
         assert not user.prescriberorganization_set.exists()
 
-    @pytest.mark.xfail
     def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
         """
         A user creates a prescriber account on Itou with ProConnect
@@ -619,34 +618,17 @@ class TestPrescribersViewsExceptions:
         user = random_pro_user_factory()
         client.force_login(user)
 
-        pe_org = PrescriberOrganizationFactory(france_travail=True)
-        pe_email = f"athos{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}"
-
         # Go through each step to ensure session data is recorded properly.
         # Step 1: choose organization kind or go to the "no organization" page.
         response = client.get(reverse("signup:prescriber_check_already_exists"))
 
-        # Step 2: find PE organization by SAFIR code.
         safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
         assertNotContains(response, safir_step_url)
 
-        # FIXME: The url should be restricted
         response = client.get(safir_step_url)
-        post_data = {"safir_code": pe_org.code_safir_pole_emploi}
-        response = client.post(safir_step_url, data=post_data)
+        assert response.status_code == 403
 
-        # Step 3: check email
-        check_email_url = reverse("signup:prescriber_check_pe_email")
-        post_data = {"email": pe_email}
-        response = client.post(check_email_url, data=post_data)
-        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
-
-        # FIXME(alaurent) we should no allow the user to join
-        response = client.get(response.url)
-        assert user.prescribermembership_set.count() == 0
-
-        # Organization
-        assert not client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+        # FIXME also check joining is blocked
 
     def test_permission_denied_when_skiping_first_step(self, client, subtests):
         client.force_login(random_pro_user_factory())
