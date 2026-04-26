@@ -624,10 +624,13 @@ class TestPrescribersViewsExceptions:
 
         # Go through each step to ensure session data is recorded properly.
         # Step 1: choose organization kind or go to the "no organization" page.
-        client.get(reverse("signup:prescriber_check_already_exists"))
+        response = client.get(reverse("signup:prescriber_check_already_exists"))
 
         # Step 2: find PE organization by SAFIR code.
         safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        assertNotContains(response, safir_step_url)
+
+        # FIXME: The url should be restricted
         response = client.get(safir_step_url)
         post_data = {"safir_code": pe_org.code_safir_pole_emploi}
         response = client.post(safir_step_url, data=post_data)

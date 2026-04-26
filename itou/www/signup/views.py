@@ -444,6 +444,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         "prescriber_orgs_with_members_same_siret": prescriber_orgs_with_members_same_siret,
         "prescriber_orgs_with_members_same_siren": prescriber_orgs_with_members_same_siren,
         "form": form,
+        "user_is_from_ft": request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX),
     }
     return render(request, template_name, context)
 
