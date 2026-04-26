@@ -18,14 +18,15 @@
 
 {% block title_messages %}
     {{ block.super }}
-    {% component_alert content=content variant="info" icon=False %}
-        {% fragment as content %}
-            <p class="m-0">
-                {# FIXME rely on authenticated user email #}
-                <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
-            </p>
-        {% endfragment %}
-    {% endcomponent_alert %}
+    {% if user_is_from_ft %}
+        {% component_alert content=content variant="info" icon=False %}
+            {% fragment as content %}
+                <p class="m-0">
+                    <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Cliquez-ici pour rejoindre une organisation France Travail</a>
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
