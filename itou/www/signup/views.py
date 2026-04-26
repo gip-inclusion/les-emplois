@@ -595,29 +595,6 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     return render(request, template_name, context)
 
 
-@valid_prescriber_signup_session_required
-@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft_org.html"):
-    """
-    Find a pre-existing France Travail organization from a given SAFIR code.
-    """
-
-    if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
-        raise PermissionDenied()
-
-    form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        next_url = reverse("signup:prescriber_join_ft_org", kwargs={"uuid": form.pole_emploi_org.uid})
-        return HttpResponseRedirect(next_url)
-
-    context = {
-        "form": form,
-        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-    }
-    return render(request, template_name, context)
-
-
 def get_prescriber_post_join_redirect_url(request):
     # redirect to post login page.
     next_url = get_adapter(request).get_login_redirect_url(request)
@@ -625,25 +602,6 @@ def get_prescriber_post_join_redirect_url(request):
     request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
     request.session.modified = True
     return next_url
-
-
-@valid_prescriber_signup_session_required
-@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_ft_org.html"):
-    """
-    Join the given organization
-    """
-    if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
-        raise PermissionDenied()
-
-    ft_org = get_object_or_404(PrescriberOrganization, uid=uuid, kind=PrescriberOrganizationKind.FT.value)
-
-    if request.method == "POST":
-        ft_org.add_or_activate_membership(user=request.user)
-        next_url = get_prescriber_post_join_redirect_url(request)
-        return HttpResponseRedirect(next_url)
-
-    return render(request, template_name, {"ft_org": ft_org})
 
 
 @bypass_terms_acceptance
@@ -706,6 +664,52 @@ def prescriber_join_org(request):
 
     next_url = get_prescriber_post_join_redirect_url(request)
     return HttpResponseRedirect(next_url)
+
+
+# FT prescriber signup.
+# ------------------------------------------------------------------------------------------
+
+
+@valid_prescriber_signup_session_required
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft_org.html"):
+    """
+    Find a pre-existing France Travail organization from a given SAFIR code.
+    """
+
+    if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+        raise PermissionDenied()
+
+    form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        next_url = reverse("signup:prescriber_join_ft_org", kwargs={"uuid": form.pole_emploi_org.uid})
+        return HttpResponseRedirect(next_url)
+
+    context = {
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
+    return render(request, template_name, context)
+
+
+@valid_prescriber_signup_session_required
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_ft_org.html"):
+    """
+    Join the given organization
+    """
+    if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+        raise PermissionDenied()
+
+    ft_org = get_object_or_404(PrescriberOrganization, uid=uuid, kind=PrescriberOrganizationKind.FT.value)
+
+    if request.method == "POST":
+        ft_org.add_or_activate_membership(user=request.user)
+        next_url = get_prescriber_post_join_redirect_url(request)
+        return HttpResponseRedirect(next_url)
+
+    return render(request, template_name, {"ft_org": ft_org})
 
 
 # Facilitator signup.
