@@ -407,8 +407,6 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         "email": None,
         "kind": None,
         "prescriber_org_data": None,
-        "pole_emploi_org_pk": None,
-        "safir_code": None,
         "url_history": [request.path],
         "next": get_safe_url(request, "next"),
     }
@@ -512,8 +510,6 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
             {
                 "authorization_status": authorization_status,
                 "kind": prescriber_kind,
-                "pole_emploi_org_pk": None,
-                "safir_code": None,
             }
         )
         request.session.modified = True
@@ -556,8 +552,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
             {
                 "authorization_status": authorization_status,
                 "kind": kind,
-                "pole_emploi_org_pk": None,
-                "safir_code": None,
             }
         )
         request.session.modified = True
@@ -589,8 +583,6 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
             {
                 "authorization_status": PrescriberAuthorizationStatus[authorization_status].value,
                 "kind": PrescriberOrganizationKind.OTHER.value,
-                "pole_emploi_org_pk": None,
-                "safir_code": None,
             }
         )
         request.session.modified = True
@@ -670,9 +662,6 @@ def prescriber_join_org(request):
 
     # Get useful information from session.
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-
-    if not session_data.get("prescriber_org_data") and not session_data.get("pole_emploi_org_pk"):
-        raise PermissionDenied("Missing prescriber_org_data or pole_emploi_org_pk")
 
     authorization_status = session_data.get("authorization_status")
     kind = session_data.get("kind")
