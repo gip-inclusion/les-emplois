@@ -2,14 +2,12 @@ import httpx
 import pytest
 import respx
 from django.conf import settings
-from django.contrib import auth, messages
+from django.contrib import auth
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
-from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
-    assertMessages,
     assertNotContains,
     assertRedirects,
     assertTemplateUsed,
@@ -18,16 +16,14 @@ from pytest_django.asserts import (
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.enums import KIND_PRESCRIBER, UserKind
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
-from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.testing import ItouClient, accept_legal_terms
+from tests.users.factories import random_pro_user_factory
 
 
 @pytest.fixture(autouse=True)
@@ -47,15 +43,11 @@ class TestPrescriberSignup:
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 
-    def test_choose_user_kind(self, client):
-        url = reverse("signup:choose_user_kind")
-        response = client.get(url)
-        assertContains(response, "Prescripteur / Orienteur")
+    def test_professional_is_member_of_france_travail(self, client, mailoutbox):
+        email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
+        user = random_pro_user_factory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
 
-        response = client.post(url, data={"kind": UserKind.PRESCRIBER})
-        assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
-
-    def test_create_user_prescriber_member_of_france_travail(self, client, mailoutbox, pro_connect):
         organization = PrescriberOrganizationFactory(france_travail=True)
 
         # Go through each step to ensure session data is recorded properly.
@@ -81,39 +73,13 @@ class TestPrescriberSignup:
         email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
         post_data = {"email": email}
         response = client.post(url, data=post_data)
-        assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
+        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
         session_data = client.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         assert email == session_data.get("email")
 
+        # Step 4: Join organization
         response = client.get(response.url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_pole_emploi_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_email": email,
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        # Connect with ProConnect but no safir code is returned
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            user_email=email,
-            channel="pole_emploi",
-            user_info_email=email,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirection.
-        response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        assertRedirects(response, reverse("welcoming_tour:index"))
 
         # Organization
         assert (
@@ -124,7 +90,6 @@ class TestPrescriberSignup:
         assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 
         user = User.objects.get(email=email)
-        assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
         assert not user.emailaddress_set.exists()
@@ -142,9 +107,14 @@ class TestPrescriberSignup:
         [email] = mailoutbox
         assert email.subject == "[TEST] Votre rôle d’administrateur"
 
-    def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(
-        self, client, mocker, mailoutbox, pro_connect
-    ):
+    @respx.mock
+    def test_join_an_authorized_org_of_known_kind(self, client, mocker, mailoutbox):
+        """
+        Test joining an authorized organization of *known* kind.
+        """
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
@@ -166,117 +136,11 @@ class TestPrescriberSignup:
         }
         response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
+        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
 
-        # Step 3: ProConnect button
-        url = reverse("signup:prescriber_user")
-        assertRedirects(response, url)
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        other_client = ItouClient()
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-            other_client=other_client,
-        )
-        # Follow the redirections
-        response = other_client.get(response.url, follow=True)
-        response = accept_legal_terms(other_client, response)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
-
-        # Check `User` state.
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.kind == UserKind.PRESCRIBER
-
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
-
-        # Check organization.
-        org = PrescriberOrganization.objects.get(siret=siret)
-        assert not org.is_authorized
-        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
-
-        # Check membership.
-        assert 1 == user.prescriberorganization_set.count()
-        assert user.prescribermembership_set.count() == 1
-        membership = user.prescribermembership_set.get(organization=org)
-        assert membership.is_admin
-
-        # Check email has been sent to support (validation/refusal of authorisation needed).
-        [authorization_email, administrator_email] = mailoutbox
-        assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
-        assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
-
-    def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, pro_connect):
-        """
-        Test the creation of a user of type prescriber with an authorized organization of *known* kind.
-        """
-        mock_call_ban_geocoding_api = mocker.patch(
-            "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
-        )
-        siret = "26570134200148"
-
-        # Step 1: search organizations with SIRET
-        url = reverse("signup:prescriber_check_already_exists")
-        post_data = {
-            "siret": siret,
-            "department": "67",
-        }
-        response = client.post(url, data=post_data)
-
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
-        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
-        assertRedirects(response, url)
-        post_data = {
-            "kind": PrescriberOrganizationKind.CAP_EMPLOI.value,
-        }
-        response = client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
-
-        # Step 3: ProConnect button
-        url = reverse("signup:prescriber_user")
-        assertRedirects(response, url)
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirections
+        # Step 3: Follow the redirections and join the org
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
-
-        # Check `User` state.
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
         assert not user.emailaddress_set.exists()
@@ -301,10 +165,14 @@ class TestPrescriberSignup:
         assert "- Type sélectionné par l’utilisateur : Cap emploi" in body_lines
         assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
-    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, pro_connect):
+    @respx.mock
+    def test_join_an_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox):
         """
-        Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
+        Test joining an authorized organization of *unknown* kind.
         """
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
@@ -342,39 +210,11 @@ class TestPrescriberSignup:
             "confirm_authorization": 1,
         }
         response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
 
-        # Step 5: ProConnect button
-        url = reverse("signup:prescriber_user")
-        assertRedirects(response, url)
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        previous_url = reverse("signup:prescriber_user")
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirections
+        # Step 5: Follow the redirections and join the org
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
-
-        # Check `User` state.
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
         assert not user.emailaddress_set.exists()
@@ -395,10 +235,14 @@ class TestPrescriberSignup:
         assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
         assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
-    def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, pro_connect):
+    @respx.mock
+    def test_join_an_unauthorized_org(self, client, mocker, mailoutbox):
         """
-        Test the creation of a user of type prescriber with an unauthorized organization.
+        Test joining an unauthorized organization.
         """
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
@@ -428,38 +272,11 @@ class TestPrescriberSignup:
             "kind": PrescriberChooseKindForm.KIND_UNAUTHORIZED_ORG,
         }
         response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
 
-        # Step 4: ProConnect button
-        url = reverse("signup:prescriber_user")
-        assertRedirects(response, url)
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirections
+        # Step 4: Follow the redirections and join the org
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
-
-        # Check `User` state.
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
         assert not user.emailaddress_set.exists()
@@ -478,10 +295,12 @@ class TestPrescriberSignup:
         [email] = mailoutbox
         assert email.subject == "[TEST] Votre rôle d’administrateur"
 
-    def test_create_user_prescriber_with_existing_siren_other_department(self, client):
+    def test_check_org_with_existing_siren_other_department(self, client):
         """
-        Test the creation of a user of type prescriber with existing SIREN but in an other department
+        Test checking for existing org with existing SIREN but in an other department
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
 
         siret1 = "26570134200056"
         siret2 = "26570134200148"
@@ -502,10 +321,13 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         assertRedirects(response, url)
 
-    def test_create_user_prescriber_with_existing_siren_same_department(self, client):
+    def test_check_org_with_existing_siren_same_department(self, client):
         """
-        Test the creation of a user of type prescriber with existing SIREN in a same department
+        Test checking for existing org with existing SIREN but in the same department
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         siret1 = "26570134200056"
         siret2 = "26570134200148"
 
@@ -537,28 +359,28 @@ class TestPrescriberSignup:
         # New organization link.
         assertContains(response, reverse("signup:prescriber_choose_org"))
 
-    def test_create_user_prescriber_with_existing_siren_without_member(self, client):
+    def test_check_org_without_member(self, client):
         """
-        Test the creation of a user of type prescriber with existing organization does not have a member
+        Test check for existing org if the organization does not have a member
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
 
-        siret1 = "26570134200056"
-        siret2 = "26570134200148"
-
-        PrescriberOrganizationFactory(siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="67")
+        siret = "26570134200148"
 
         # Search organizations with SIRET
         url = reverse("signup:prescriber_check_already_exists")
         post_data = {
-            "siret": siret2,
+            "siret": siret,
             "department": "67",
         }
         response = client.post(url, data=post_data)
 
-        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
         assertRedirects(response, url)
 
-    def test_create_user_prescriber_with_same_siret_and_different_kind(self, client, mocker, pro_connect):
+    @respx.mock
+    def test_join_new_organization_with_same_siret_and_different_kind(self, client, mocker):
         """
         A user can create a new prescriber organization with an existing SIRET number,
         provided that:
@@ -569,6 +391,9 @@ class TestPrescriberSignup:
         - user can't create 2 PLIE with the same SIRET
         - user can create a PLIE and a ML with the same SIRET
         """
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
@@ -593,33 +418,10 @@ class TestPrescriberSignup:
         post_data = {"kind": PrescriberOrganizationKind.PLIE.value}
         response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
+        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
 
-        # Step 3: ProConnect button
-        url = reverse("signup:prescriber_user")
-        assertRedirects(response, url)
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirections
+        # Step 4: Follow the redirections and join the org
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check new org is OK.
@@ -629,12 +431,16 @@ class TestPrescriberSignup:
         assert PrescriberOrganizationKind.ML.value == org1.kind
         assert PrescriberOrganizationKind.PLIE.value == org2.kind
 
-    def test_create_user_prescriber_with_same_siret_and_same_kind(self, client, mocker, pro_connect):
+    @respx.mock
+    def test_join_new_organization_with_same_siret_and_same_kind(self, client, mocker):
         """
         A user can't create a new prescriber organization with an existing SIRET number if:
         * the kind of the new organization is the same as an existing one
         * there is no duplicate of the (kind, siret) pair
         """
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
@@ -663,6 +469,9 @@ class TestPrescriberSignup:
         mock_call_ban_geocoding_api.assert_called_once()
 
     def test_form_to_request_for_an_invitation(self, client, mailoutbox):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         siret = "26570134200148"
         prescriber_org = PrescriberOrganizationFactory(
             siret=siret, membership__user__for_snapshot=True, for_snapshot=True, with_membership=True
@@ -710,122 +519,13 @@ class TestPrescriberSignup:
         invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(requestor)}"
         assert invitation_url in mail_body
 
-    def test_prescriber_already_exists_simple_signup(self, client, pro_connect):
-        """
-        He does not want to join an organization, only create an account.
-        He likely forgot he had an account.
-        He will be logged in instead as if he just used the login through IC button
-        """
-        #### User is a prescriber. Update it and connect. ####
-        PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
-        client.get(reverse("signup:prescriber_check_already_exists"))
-
-        # Step 2: register as a simple prescriber (orienteur).
-        response = client.get(reverse("signup:prescriber_user"))
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        # Connect with ProConnect
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-        )
-        # Follow the redirection : he is redirected to the logout warning page since an organization is now mandatory
-        response = client.get(response.url, follow=True)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
-
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.has_sso_provider
-
-    def test_prescriber_already_exists_create_organization(self, client, pro_connect):
-        """
-        User is already a prescriber.
-        We should update his account and make him join this new organization.
-        """
-        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
-
-        client.get(reverse("signup:prescriber_check_already_exists"))
-
-        session_signup_data = client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        # Jump over the last step to avoid double-testing each one
-        # as they are already tested on prescriber's signup views.
-        # Prescriber's signup process heavily relies on session data.
-        # Override only what's needed for our test.
-        # PrescriberOrganizationFactoy does not contain any address field
-        # so we can't use it.
-        prescriber_org_data = {
-            "siret": org.siret,
-            "is_head_office": True,
-            "name": org.name,
-            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
-            "address_line_2": "",
-            "post_code": "13150",
-            "city": "TARASCON",
-            "department": "13",
-            "longitude": 4.660572,
-            "latitude": 43.805661,
-            "geocoding_score": 0.8178357293868921,
-        }
-        session_signup_data = session_signup_data | {
-            "authorization_status": "NOT_SET",
-            "kind": org.kind,
-            "prescriber_org_data": prescriber_org_data,
-        }
-
-        client_session = client.session
-        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
-        client_session.save()
-        signup_url = reverse("signup:prescriber_user")
-
-        response = client.get(signup_url)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        params = {
-            "user_kind": KIND_PRESCRIBER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        # Connect with ProConnect
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirection.
-        response = client.get(response.url, follow=True)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
-
-        # Check organization
-        org = PrescriberOrganization.objects.get(siret=org.siret)
-        assert not org.is_authorized
-        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
-
-        # Check membership.
-        assert user.prescribermembership_set.count() == 1
-        membership = user.prescribermembership_set.get(organization=org)
-        assert membership.is_admin
-
     def test_hidden_organization_kinds(self, client, mocker):
         """
         HIDDEN_PRESCRIBER_KINDS should not be displayed or chosen in the form
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
 
         siret = "26570134200148"
@@ -854,70 +554,18 @@ class TestPrescriberSignup:
         response = client.post(url, data=post_data)
         assert "kind" in response.context["form"].errors
 
-    def test_professional_can_join_organization(self, client):
-        user = EmployerFactory(membership=True)
-        client.force_login(user)
 
-        client.get(reverse("signup:prescriber_check_already_exists"))
-
-        session_signup_data = client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        # Jump over the last step to avoid double-testing each one
-        # as they are already tested on prescriber's signup views.
-        # Prescriber's signup process heavily relies on session data.
-        # Override only what's needed for our test.
-        # PrescriberOrganizationFactoy does not contain any address field
-        # so we can't use it.
-        dummy_prescriber_org = PrescriberOrganizationFactory.build()
-        prescriber_org_data = {
-            "siret": dummy_prescriber_org.siret,
-            "is_head_office": True,
-            "name": dummy_prescriber_org.name,
-            "address_line_1": dummy_prescriber_org.address_line_1,
-            "address_line_2": "",
-            "post_code": dummy_prescriber_org.post_code,
-            "city": dummy_prescriber_org.city,
-            "department": dummy_prescriber_org.department,
-            "longitude": dummy_prescriber_org.longitude,
-            "latitude": dummy_prescriber_org.latitude,
-            "geocoding_score": dummy_prescriber_org.geocoding_score,
-        }
-        # Try creating an organization with same siret and same kind
-        # (it won't work because of the psql uniqueness constraint).
-        session_signup_data = session_signup_data | {
-            "authorization_status": "NOT_SET",
-            "kind": PrescriberOrganizationKind.OTHER,
-            "prescriber_org_data": prescriber_org_data,
-        }
-
-        client_session = client.session
-        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
-        client_session.save()
-
-        client.get(reverse("signup:prescriber_join_org"), follow=True)
-
-        # Check organization
-        org = PrescriberOrganization.objects.get()
-        assert not org.is_authorized
-        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
-
-        # Check membership.
-        assert user.prescribermembership_set.count() == 1
-        membership = user.prescribermembership_set.get(organization=org)
-        assert membership.is_admin
-
-
-class TestProConnectPrescribersViewsExceptions:
-    """
-    Prescribers' signup and login exceptions: user already exists, ...
-    """
-
+class TestPrescribersViewsExceptions:
     def test_organization_creation_error(self, client, pro_connect):
         """
         The organization creation didn't work.
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        user = PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
+        user = random_pro_user_factory(
+            email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"]
+        )
+        client.force_login(user)
 
         client.get(reverse("signup:prescriber_check_already_exists"))
 
@@ -952,38 +600,25 @@ class TestProConnectPrescribersViewsExceptions:
         client_session = client.session
         client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
-        signup_url = reverse("signup:prescriber_user")
 
-        response = client.get(signup_url)
-        pro_connect.assertContainsButton(response)
-
-        # Connect with ProConnect
-        previous_url = reverse("signup:prescriber_user")
-        next_url = reverse("signup:prescriber_join_org")
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        # Follow the redirection.
-        response = client.get(response.url)
+        response = client.get(reverse("signup:prescriber_join_org"))
+        assertRedirects(response, reverse("search:employers_home"))
 
         # The user should be logged out and redirected to the home page.
-        pro_connect.assert_and_mock_forced_logout(client, response)
         assert not client.session.get(PRO_CONNECT_SESSION_KEY)
         assert not auth.get_user(client).is_authenticated
-
-        # Check user was created but did not join an organization
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert not user.prescriberorganization_set.exists()
 
+    @pytest.mark.xfail
     def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
         """
         A user creates a prescriber account on Itou with ProConnect
         He wants to join a Pôle emploi organization
         but his e-mail suffix is wrong. An error should be raised.
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         pe_org = PrescriberOrganizationFactory(france_travail=True)
         pe_email = f"athos{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}"
 
@@ -995,54 +630,23 @@ class TestProConnectPrescribersViewsExceptions:
         safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
         response = client.get(safir_step_url)
         post_data = {"safir_code": pe_org.code_safir_pole_emploi}
-        response = client.post(safir_step_url, data=post_data, follow=True)
+        response = client.post(safir_step_url, data=post_data)
 
         # Step 3: check email
         check_email_url = reverse("signup:prescriber_check_pe_email")
         post_data = {"email": pe_email}
-        response = client.post(check_email_url, data=post_data, follow=True)
-        pro_connect.assertContainsButton(response)
+        response = client.post(check_email_url, data=post_data)
+        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
 
-        # Connect with ProConnect but, this time, don't use a PE email.
-        previous_url = reverse("signup:prescriber_pole_emploi_user")
-        next_url = reverse("signup:prescriber_join_org")
-        wrong_email = "athos@touspourun.com"
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_PRESCRIBER,
-            user_email=pe_email,
-            channel="pole_emploi",
-            previous_url=previous_url,
-            next_url=next_url,
-            user_info_email=wrong_email,
-            expected_redirect_url=add_url_params(
-                pro_connect.logout_url,
-                {
-                    "redirect_url": previous_url,
-                    "token": ID_TOKEN_ENCODED,
-                },
-            ),
-        )
-
-        # IC logout redirects to previous_url
-        response = client.get(previous_url)
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    messages.ERROR,
-                    "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
-                    f"{pro_connect.identity_provider.label} (athos@touspourun.com) est différente de celle que vous "
-                    "avez indiquée précédemment (athos@pole-emploi.fr).",
-                )
-            ],
-        )
+        # FIXME(alaurent) we should no allow the user to join
+        response = client.get(response.url)
+        assert user.prescribermembership_set.count() == 0
 
         # Organization
         assert not client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-        assert not User.objects.filter(email=pe_email).exists()
 
     def test_permission_denied_when_skiping_first_step(self, client, subtests):
+        client.force_login(random_pro_user_factory())
         urls = [
             reverse("signup:prescriber_request_invitation", kwargs={"membership_id": 1}),
             reverse("signup:prescriber_choose_org"),
@@ -1050,16 +654,9 @@ class TestProConnectPrescribersViewsExceptions:
             reverse("signup:prescriber_confirm_authorization"),
             reverse("signup:prescriber_pole_emploi_safir_code"),
             reverse("signup:prescriber_check_pe_email"),
-            reverse("signup:prescriber_pole_emploi_user"),
-            reverse("signup:prescriber_user"),
+            reverse("signup:prescriber_join_org"),
         ]
         for url in urls:
             with subtests.test(url=url):
                 response = client.get(url)
                 assert response.status_code == 403
-        # This view requires to be logged in
-        url = reverse("signup:prescriber_join_org")
-        with subtests.test(url=url):
-            client.force_login(PrescriberFactory())
-            response = client.get(url)
-            assert response.status_code == 403

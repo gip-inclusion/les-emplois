@@ -21,6 +21,7 @@
     {% component_alert content=content variant="info" icon=False %}
         {% fragment as content %}
             <p class="m-0">
+                {# FIXME rely on authenticated user email #}
                 <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
             </p>
         {% endfragment %}

@@ -151,6 +151,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path.startswith("/logout/"),
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/"),  # professional about to join an organization/company
+            request.path.startswith("/pro_connect/"),  # logging in again in signup flows
             request.path in [reverse("account_login"), reverse("account_logout")],
             request.path.startswith("/hijack/release"),  # Allow to release hijack
             request.path.startswith("/api"),  # APIs should handle those errors
