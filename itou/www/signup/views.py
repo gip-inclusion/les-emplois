@@ -501,7 +501,7 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
         authorization_status = None
 
         if prescriber_kind == PrescriberOrganizationKind.FT.value:
-            next_url = reverse("signup:prescriber_pole_emploi_safir_code")
+            next_url = reverse("signup:prescriber_search_ft_org")
 
         elif prescriber_kind == PrescriberOrganizationKind.OTHER.value:
             next_url = reverse("signup:prescriber_choose_kind")
@@ -609,7 +609,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
 
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
+def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft_org.html"):
     """
     Find a pre-existing France Travail organization from a given SAFIR code.
     """

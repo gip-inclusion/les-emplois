@@ -54,7 +54,7 @@ class TestPrescriberSignup:
         # Step 1: the user works for PE follows PE link
         url = reverse("signup:prescriber_check_already_exists")
         response = client.get(url)
-        safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        safir_step_url = reverse("signup:prescriber_search_ft_org")
         assertContains(response, safir_step_url)
 
         # Step 2: find PE organization by SAFIR code.
@@ -622,7 +622,7 @@ class TestPrescribersViewsExceptions:
         # Step 1: choose organization kind or go to the "no organization" page.
         response = client.get(reverse("signup:prescriber_check_already_exists"))
 
-        safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        safir_step_url = reverse("signup:prescriber_search_ft_org")
         assertNotContains(response, safir_step_url)
 
         response = client.get(safir_step_url)
@@ -637,7 +637,7 @@ class TestPrescribersViewsExceptions:
             reverse("signup:prescriber_choose_org"),
             reverse("signup:prescriber_choose_kind"),
             reverse("signup:prescriber_confirm_authorization"),
-            reverse("signup:prescriber_pole_emploi_safir_code"),
+            reverse("signup:prescriber_search_ft_org"),
             reverse("signup:prescriber_check_pe_email"),
             reverse("signup:prescriber_join_org"),
         ]
