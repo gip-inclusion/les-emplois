@@ -78,9 +78,9 @@ urlpatterns = [
         name="prescriber_confirm_authorization",
     ),
     path(
-        "prescriber/pole_emploi/safir",
-        views.prescriber_pole_emploi_safir_code,
-        name="prescriber_pole_emploi_safir_code",
+        "prescriber/france-travail/search",
+        views.prescriber_search_ft_org,
+        name="prescriber_search_ft_org",
     ),
     path(
         "prescriber/pole_emploi/check_email",
