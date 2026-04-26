@@ -25,7 +25,7 @@ from itou.companies.models import Company, CompanyMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.adapter import UserAdapter
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.legal_terms import bypass_terms_acceptance
@@ -90,8 +90,7 @@ class ChooseUserKindSignupView(LoginNotRequiredMixin, FormView):
     def form_valid(self, form):
         urls = {
             UserKind.JOB_SEEKER: reverse("signup:job_seeker_start"),
-            UserKind.PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
-            UserKind.EMPLOYER: reverse("signup:company_select"),
+            KIND_PROFESSIONAL: reverse("signup:professional_user"),
         }
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
@@ -219,7 +218,6 @@ class ChooseMembershipKindView(FormView):
 # ------------------------------------------------------------------------------------------
 
 
-@login_not_required
 def company_select(request, template_name="signup/company_select.html"):
     """
     Entry point of the signup process for SIAEs which consists of 2 steps.
@@ -281,7 +279,7 @@ def company_select(request, template_name="signup/company_select.html"):
                 f"de réception."
             )
             messages.success(request, message)
-            return HttpResponseRedirect(next_url or reverse("search:employers_home"))
+            return HttpResponseRedirect(next_url or reverse("dashboard:index"))
 
     context = {
         "next_url": next_url,
@@ -381,7 +379,6 @@ def valid_prescriber_signup_session_required(function=None):
     return decorated
 
 
-@login_not_required
 def prescriber_check_already_exists(request, template_name="signup/prescriber_check_already_exists.html"):
     """
 
@@ -392,7 +389,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
 
     Answers are kept in session.
 
-    At the end of the process a user will be created and he will be:
+    At the end of the process the user will be:
     - added to the members of a pre-existing Pôle emploi agency ("prescripteur habilité")
     - added to the members of a new authorized organization ("prescripteur habilité")
     - added to the members of a new unauthorized organization ("orienteur")
@@ -451,7 +448,6 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     return render(request, template_name, context)
 
 
-@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
@@ -487,7 +483,6 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
     return render(request, template_name, context)
 
 
-@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_org(request, siret, template_name="signup/prescriber_choose_org.html"):
@@ -513,7 +508,7 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
         else:
             # A pre-existing kind of authorized organization was chosen.
             authorization_status = PrescriberAuthorizationStatus.NOT_SET.value
-            next_url = reverse("signup:prescriber_user")
+            next_url = reverse("signup:prescriber_join_org")
 
         session_data.update(
             {
@@ -533,7 +528,6 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
     return render(request, template_name, context)
 
 
-@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind.html"):
@@ -553,7 +547,7 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
         next_url = reverse(
             "signup:prescriber_confirm_authorization"
             if prescriber_kind == form.KIND_AUTHORIZED_ORG
-            else "signup:prescriber_user"
+            else "signup:prescriber_join_org"
         )
 
         if prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
@@ -578,7 +572,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
     return render(request, template_name, context)
 
 
-@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_confirm_authorization(request, template_name="signup/prescriber_confirm_authorization.html"):
@@ -603,7 +596,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
             }
         )
         request.session.modified = True
-        next_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -613,7 +606,6 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     return render(request, template_name, context)
 
 
-@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
@@ -646,16 +638,16 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
     return render(request, template_name, context)
 
 
-@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe_email.html"):
+    # FIXME(alaurent): Refactor FT org flow ?
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     form = forms.PrescriberCheckPEemail(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
         session_data["email"] = form.cleaned_data["email"]
         request.session.modified = True
-        next_url = reverse("signup:prescriber_pole_emploi_user")
+        next_url = reverse("signup:prescriber_join_org")
         return HttpResponseRedirect(next_url)
 
     kind = session_data.get("kind")
@@ -676,114 +668,11 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     return render(request, template_name, context)
 
 
-@login_not_required
-@valid_prescriber_signup_session_required
-@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_emploi_user.html"):
-    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    kind = session_data.get("kind")
-    pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-
-    # Check session data.
-    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.FT.value:
-        raise PermissionDenied
-
-    pole_emploi_org = get_object_or_404(
-        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
-    )
-    params = {
-        "user_email": session_data["email"],
-        "user_kind": KIND_PRESCRIBER,
-        "previous_url": request.get_full_path(),
-        "next_url": reverse("signup:prescriber_join_org"),
-    }
-    pro_connect_url = (
-        f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
-    )
-
-    context = {
-        "pro_connect_url": pro_connect_url,
-        "pole_emploi_org": pole_emploi_org,
-        "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
-        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-    }
-    return render(request, template_name, context)
-
-
-@login_not_required
-@valid_prescriber_signup_session_required
-@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_user(request, template_name="signup/prescriber_user.html"):
-    """
-    Display ProConnect button.
-    This page is also shown if an error is detected during
-    OAuth callback.
-    """
-    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    authorization_status = session_data.get("authorization_status")
-    prescriber_org_data = session_data.get("prescriber_org_data")
-    kind = session_data.get("kind")
-
-    join_as_orienteur_without_org = kind is None and authorization_status is None and prescriber_org_data is None
-
-    join_as_orienteur_with_org = (
-        authorization_status == PrescriberAuthorizationStatus.NOT_REQUIRED.value
-        and kind == PrescriberOrganizationKind.OTHER.value
-        and prescriber_org_data is not None
-    )
-
-    join_authorized_org = (
-        authorization_status == PrescriberAuthorizationStatus.NOT_SET.value
-        and kind not in [None, PrescriberOrganizationKind.FT.value]
-        and prescriber_org_data is not None
-    )
-
-    # Check session data. There can be only one kind.
-    if sum([join_as_orienteur_without_org, join_as_orienteur_with_org, join_authorized_org]) != 1:
-        raise PermissionDenied
-
-    if kind not in PrescriberOrganizationKind.values:
-        kind = None
-
-    try:
-        authorization_status = PrescriberAuthorizationStatus[authorization_status]
-    except KeyError:
-        authorization_status = None
-
-    # Get kind label
-    kind_label = dict(PrescriberOrganizationKind.choices).get(kind)
-
-    params = {
-        "user_kind": KIND_PRESCRIBER,
-        "previous_url": request.get_full_path(),
-    }
-    if join_as_orienteur_with_org or join_authorized_org:
-        # Redirect to the join organization view after login or signup.
-        params["next_url"] = reverse("signup:prescriber_join_org")
-
-    pro_connect_url = (
-        f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
-    )
-
-    context = {
-        "pro_connect_url": pro_connect_url,
-        "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
-        "join_as_orienteur_without_org": join_as_orienteur_without_org,
-        "join_authorized_org": join_authorized_org,
-        "kind_label": kind_label,
-        "kind_is_other": kind == PrescriberOrganizationKind.OTHER.value,
-        "prescriber_org_data": prescriber_org_data,
-        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-    }
-    return render(request, template_name, context)
-
-
 @bypass_terms_acceptance
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_join_org(request):
     """
-    User is redirected here after a successful oauth signup.
     This is the last step of the signup path.
     """
     if not request.user.is_professional:
@@ -794,6 +683,25 @@ def prescriber_join_org(request):
 
     # Get useful information from session.
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+
+    if not session_data.get("prescriber_org_data") and not session_data.get("pole_emploi_org_pk"):
+        raise PermissionDenied("Missing prescriber_org_data or pole_emploi_org_pk")
+
+    authorization_status = session_data.get("authorization_status")
+    kind = session_data.get("kind")
+
+    join_non_authorized_org = (
+        authorization_status == PrescriberAuthorizationStatus.NOT_REQUIRED.value
+        and kind == PrescriberOrganizationKind.OTHER.value
+    )
+
+    join_authorized_org = kind in PrescriberOrganizationKind.FT.value or (
+        authorization_status == PrescriberAuthorizationStatus.NOT_SET.value and kind is not None
+    )
+
+    # Check session data. There can be only one kind.
+    if sum([join_non_authorized_org, join_authorized_org]) != 1:
+        raise PermissionDenied
 
     try:
         with transaction.atomic():
@@ -827,6 +735,7 @@ def prescriber_join_org(request):
             prescriber_org.add_or_activate_membership(user=request.user)
 
     except Error:
+        # FIXME(alaurent) Rethink the failure flow we don't need to logout the user here
         messages.error(request, "L'organisation n'a pas pu être créée")
         # Logout user from any SSO and redirect to homepage.
         # As we cannot logout with GET nor redirect as POST to the logout page,
@@ -876,12 +785,11 @@ class FacilitatorBaseMixin:
         )
 
 
-@login_not_required
 def facilitator_search(request, template_name="signup/facilitator_search.html"):
     form = forms.FacilitatorSearchForm(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
         request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY] = form.org_data
-        return HttpResponseRedirect(reverse("signup:facilitator_user"))
+        return HttpResponseRedirect(reverse("signup:facilitator_join"))
 
     context = {
         "form": form,
@@ -890,32 +798,8 @@ def facilitator_search(request, template_name="signup/facilitator_search.html"):
     return render(request, template_name, context)
 
 
-class FacilitatorUserView(LoginNotRequiredMixin, FacilitatorBaseMixin, TemplateView):
-    """
-    Display ProConnect button.
-    This page is also shown if an error is detected during
-    OAuth callback.
-    """
-
-    template_name = "signup/employer.html"
-
-    def get_context_data(self, **kwargs):
-        params = {
-            "user_kind": KIND_EMPLOYER,
-            "previous_url": self.request.get_full_path(),
-            "next_url": reverse("signup:facilitator_join"),
-        }
-        pro_connect_url = (
-            f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
-        )
-        return super().get_context_data(**kwargs) | {
-            "pro_connect_url": pro_connect_url,
-            "company": self.company_to_create,
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
-        }
-
-
-class FacilitatorJoinView(LoginNotRequiredMixin, FacilitatorBaseMixin, View):
+# FIXME(alaurent) refactor: no need for a CBV since the BaseMixin is only used here
+class FacilitatorJoinView(FacilitatorBaseMixin, View):
     def get(self, request, *args, **kwargs):
         self.company_to_create.auth_email = request.user.email
         self.company_to_create.created_by = request.user

@@ -19,10 +19,9 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory, random_pro_user_factory
 from tests.utils.testing import ItouClient, accept_legal_terms
 
 
@@ -34,19 +33,14 @@ class TestCompanySignup:
             f"{admin_user.first_name.title()} {admin_user.last_name[0].upper()}.</b>"
         )
 
-    def test_choose_user_kind(self, client):
-        url = reverse("signup:choose_user_kind")
-        response = client.get(url)
-        assertContains(response, "Employeur inclusif")
-
-        response = client.post(url, data={"kind": UserKind.EMPLOYER})
-        assertRedirects(response, reverse("signup:company_select"))
-
     @freeze_time("2024-09-15 15:53:54")
     def test_join_an_company_without_members(self, client, mailoutbox, pro_connect):
         """
         A user joins a company without members.
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
@@ -61,9 +55,8 @@ class TestCompanySignup:
         # Choose a company between results.
         post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
-        response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
-        assert response.status_code == 302
-        assertRedirects(response, reverse("search:employers_home"))
+        response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data, follow=True)
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
@@ -89,6 +82,7 @@ class TestCompanySignup:
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
+        # FIXME(alaurent) Allow to skip ProConnect when already logged in with the correct account
         response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
@@ -123,6 +117,9 @@ class TestCompanySignup:
 
     @freeze_time("2024-09-15 15:53:54")
     def test_join_a_company_without_members_but_invalid_auth_email(self, client, mailoutbox):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(kind=CompanyKind.OPCS, auth_email="Non renseigné")
         assert 0 == company.members.count()
 
@@ -154,6 +151,9 @@ class TestCompanySignup:
         assert len(mailoutbox) == 0
 
     def test_join_company_with_member(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True, for_snapshot=True)
         assert company.members.count() > 0
 
@@ -171,6 +171,9 @@ class TestCompanySignup:
         post_data = {"siaes": company.pk}
         response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
         assert response.status_code == 200
+        assert response.context["company_select_form"].errors == {
+            "siaes": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."]
+        }
 
     @freeze_time("2024-09-15 15:53:54")
     def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
@@ -187,6 +190,8 @@ class TestCompanySignup:
         )
         CompanyMembershipFactory(user=user)
         assert 1 == user.company_set.count()
+
+        client.force_login(user)
 
         magic_link = company.signup_magic_link
         response = client.get(magic_link)
@@ -224,6 +229,9 @@ class TestCompanySignup:
         """
         A user joins a company without members.
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
@@ -271,6 +279,9 @@ class TestCompanySignup:
         """
         A user joins a company without members.
         """
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(kind=CompanyKind.ETTI)
 
         user = EmployerFactory(
@@ -314,6 +325,9 @@ class TestCompanySignup:
         assert 2 == user.company_set.count()
 
     def test_user_invalid_company_id(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = client.get(reverse("signup:employer", kwargs={"company_id": "0", "token": company.get_token()}))
         assertRedirects(response, reverse("signup:company_select"))
@@ -328,6 +342,9 @@ class TestCompanySignup:
         )
 
     def test_join_invalid_company_id(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         user = EmployerFactory(membership=True)
         client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
@@ -345,7 +362,11 @@ class TestCompanySignup:
             ],
         )
 
-    def test_create_facilitator(self, client, mocker, mailoutbox, settings, pro_connect):
+    @respx.mock
+    def test_create_facilitator(self, client, mocker, mailoutbox, settings):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         settings.API_INSEE_AUTH_URL = "https://insee.fake"
         settings.API_INSEE_SIRENE_URL = "https://entreprise.fake"
         settings.API_INSEE_CLIENT_ID = "foo"
@@ -378,34 +399,8 @@ class TestCompanySignup:
         )
         response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
-        assertRedirects(response, reverse("signup:facilitator_user"))
+        assertRedirects(response, reverse("signup:facilitator_join"), fetch_redirect_response=False)
 
-        # Checks that the SIRET and  the enterprise name are present in the second step
-        response = client.post(url, data=post_data, follow=True)
-        assertContains(response, "CENTRE COMMUNAL")
-        assertContains(response, format_siret(FAKE_SIRET))
-
-        # Now, we're on the second page.
-        url = reverse("signup:facilitator_user")
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        previous_url = reverse("signup:facilitator_user")
-        next_url = reverse("signup:facilitator_join")
-        params = {
-            "user_kind": KIND_EMPLOYER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_EMPLOYER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
         response = client.get(response.url)
         # Check user is redirected to the welcoming tour
         assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
@@ -413,11 +408,6 @@ class TestCompanySignup:
         response = client.get(response.url)
         assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-
-        # Check `User` state.
-        assert user.kind == UserKind.EMPLOYER
-        assert user.is_active
         company = Company.objects.get(siret=FAKE_SIRET)
         assert company.has_admin(user)
         assert 1 == company.members.count()
@@ -427,6 +417,9 @@ class TestCompanySignup:
         assert len(mailoutbox) == 0
 
     def test_facilitator_base_signup_process(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         url = reverse("signup:company_select")
         response = client.get(url, {"siren": "111111111"})  # not existing SIREN
         assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
@@ -434,6 +427,9 @@ class TestCompanySignup:
         assertContains(response, reverse("signup:facilitator_search"))
 
     def test_company_select_does_not_die_under_requests(self, client, snapshot):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         companies = (
             CompanyFactory(siret="40219166200001", with_membership=True, not_ea_eatt_kind=True),
             CompanyFactory(siret="40219166200002", with_membership=True, not_ea_eatt_kind=True),
@@ -460,13 +456,19 @@ class TestCompanySignup:
         assertContains(response, "00004", count=1)
         assertContains(response, "00005", count=2)
 
-    def test_ignores_inactive_members(self, client, snapshot):
+    def test_ignores_inactive_members(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         company = CompanyFactory(siret="40219166200001", with_jobs=True, not_ea_eatt_kind=True)
         membership = CompanyMembershipFactory.create(company=company, is_active=False)
         response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
         assertNotContains(response, self.to_join_msg(membership.user))
 
     def test_with_next_param(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         next_url = reverse("dashboard:index")
         url = add_url_params(reverse("signup:company_select"), {"next": next_url})
         response = client.get(url)
@@ -480,6 +482,9 @@ class TestCompanySignup:
 
     @pytest.mark.parametrize("with_membership", [True, False])
     def test_cannot_join_ea_eatt(self, client, with_membership):
+        user = random_pro_user_factory()
+        client.force_login(user)
+
         CompanyFactory(
             siret="40219166200001",
             with_membership=with_membership,

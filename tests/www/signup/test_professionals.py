@@ -3,13 +3,19 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL
 from tests.users.factories import PrescriberFactory
 from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
 
 
 class TestProfessionalSignup:
-    # FIXME: Add a test_choose_user_kind when it's connected to the new signup flow
+    def test_choose_user_kind(self, client):
+        url = reverse("signup:choose_user_kind")
+        response = client.get(url)
+        assertContains(response, "Professionnel de l’inclusion")
+
+        response = client.post(url, data={"kind": KIND_PROFESSIONAL})
+        assertRedirects(response, reverse("signup:professional_user"))
 
     def test_user_creation_with_proconnect(self, client, pro_connect):
         start_url = reverse("signup:professional_user")

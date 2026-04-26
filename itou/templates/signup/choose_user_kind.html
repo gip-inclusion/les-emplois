@@ -25,8 +25,7 @@
                             {% csrf_token %}
 
                             {% include "signup/includes/user_kind_radio.html" with kind="job_seeker" label="Candidat" description="Vous êtes à la recherche d’un emploi" only %}
-                            {% include "signup/includes/user_kind_radio.html" with kind="prescriber" label="Prescripteur / Orienteur" description="Vous accompagnez des candidats dans leur recherche d’emploi inclusif" only %}
-                            {% include "signup/includes/user_kind_radio.html" with kind="employer" label="Employeur inclusif" description="Vous travaillez dans une structure inclusive qui recrute et accompagne des candidats (SIAE, GEIQ, OPCS)" only %}
+                            {% include "signup/includes/user_kind_radio.html" with kind="professional" label="Professionnel de l’inclusion" description="Vous accompagnez des candidats vers l'emploi, ou vous recrutez dans une structure inclusive (SIAE, GEIQ, EA…)." only %}
 
                             {% url 'search:employers_home' as reset_url %}
                             {% itou_buttons_form primary_label="Suivant" reset_url=reset_url %}

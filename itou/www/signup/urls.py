@@ -36,11 +36,6 @@ urlpatterns = [
         name="facilitator_search",
     ),
     path(
-        "facilitator/user",
-        views.FacilitatorUserView.as_view(),
-        name="facilitator_user",
-    ),
-    path(
         "facilitator/join",
         views.FacilitatorJoinView.as_view(),
         name="facilitator_join",
@@ -91,16 +86,6 @@ urlpatterns = [
         "prescriber/pole_emploi/check_email",
         views.prescriber_check_pe_email,
         name="prescriber_check_pe_email",
-    ),
-    path(
-        "prescriber/pole_emploi/user",
-        views.prescriber_pole_emploi_user,
-        name="prescriber_pole_emploi_user",
-    ),
-    path(
-        "prescriber/user",
-        views.prescriber_user,
-        name="prescriber_user",
     ),
     path(
         "prescriber/join_org",
