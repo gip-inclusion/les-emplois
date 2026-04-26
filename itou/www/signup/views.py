@@ -7,7 +7,7 @@ import logging
 from allauth.account.adapter import get_adapter
 from allauth.account.views import PasswordResetFromKeyView, PasswordResetView, SignupView
 from django.conf import settings
-from django.contrib import auth, messages
+from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, login
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
@@ -24,7 +24,6 @@ from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company, CompanyMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.auth import LoginNotRequiredMixin
@@ -702,14 +701,8 @@ def prescriber_join_org(request):
             prescriber_org.add_or_activate_membership(user=request.user)
 
     except Error:
-        # FIXME(alaurent) Rethink the failure flow we don't need to logout the user here
         messages.error(request, "L'organisation n'a pas pu être créée")
-        # Logout user from any SSO and redirect to homepage.
-        # As we cannot logout with GET nor redirect as POST to the logout page,
-        # we need to do it manually.
-        redirect_url = UserAdapter().get_logout_redirect_url(request)
-        auth.logout(request)
-        return HttpResponseRedirect(redirect_url)
+        return HttpResponseRedirect(reverse("signup:prescriber_check_already_exists"))
 
     next_url = get_prescriber_post_join_redirect_url(request)
     return HttpResponseRedirect(next_url)

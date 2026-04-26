@@ -4,7 +4,6 @@ import httpx
 import pytest
 import respx
 from django.conf import settings
-from django.contrib import auth
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -15,7 +14,6 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import IdentityProvider
@@ -592,11 +590,7 @@ class TestPrescribersViewsExceptions:
         client_session.save()
 
         response = client.get(reverse("signup:prescriber_join_org"))
-        assertRedirects(response, reverse("search:employers_home"))
-
-        # The user should be logged out and redirected to the home page.
-        assert not client.session.get(PRO_CONNECT_SESSION_KEY)
-        assert not auth.get_user(client).is_authenticated
+        assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
         assert not user.prescriberorganization_set.exists()
 
     def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
