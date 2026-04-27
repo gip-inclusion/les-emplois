@@ -1654,3 +1654,55 @@ def test_delete_old_nir_modification_requests(is_after_cutoff, caplog):
     call_command("delete_old_nir_modification_requests", wet_run=True)
     assert caplog.messages[4] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1 - del_count
+
+
+def test_update_companies_job_seeker_assignments():
+    job_seeker_1 = JobSeekerFactory()
+    job_seeker_2 = JobSeekerFactory()
+
+    company_1 = CompanyFactory(with_membership=True)
+    employer_1 = company_1.members.first()
+    assignment_accept = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_1, professional=employer_1, company=company_1, last_action_kind=ActionKind.ACCEPT
+    )
+
+    company_2 = CompanyFactory(with_membership=True)
+    employer_2 = company_2.members.first()
+    assignment_hire = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_2, professional=employer_2, company=company_2, last_action_kind=ActionKind.HIRE
+    )
+
+    # Ignore assignments with employers and actions other than ACCEPT or HIRE
+    company_3 = CompanyFactory(with_membership=True)
+    employer_3 = company_3.members.first()
+    assignment_apply = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_1, professional=employer_3, company=company_1, last_action_kind=ActionKind.APPLY
+    )
+
+    # Ignore assignments with prescribers
+    prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
+    prescriber = prescriber_organization.members.first()
+    assignment_prescriber = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_1,
+        professional=prescriber,
+        prescriber_organization=prescriber_organization,
+        company=None,
+    )
+
+    call_command("update_companies_job_seeker_assignments", wet_run=True)
+
+    assignment_accept_updated_at = assignment_accept.updated_at
+    assignment_accept.refresh_from_db()
+    assert assignment_accept.updated_at == assignment_accept_updated_at
+    assert assignment_accept.assigned_to_unknown_advisor is True
+
+    assignment_hire_updated_at = assignment_hire.updated_at
+    assignment_hire.refresh_from_db()
+    assert assignment_hire.updated_at == assignment_hire_updated_at
+    assert assignment_hire.assigned_to_unknown_advisor is True
+
+    assignment_apply.refresh_from_db()
+    assert assignment_apply.assigned_to_unknown_advisor is False
+
+    assignment_prescriber.refresh_from_db()
+    assert assignment_prescriber.assigned_to_unknown_advisor is False
