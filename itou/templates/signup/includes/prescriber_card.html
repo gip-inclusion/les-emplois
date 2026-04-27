@@ -1,4 +1,5 @@
 {% load format_filters %}
+{% load support %}
 <div class="card my-4">
     <div class="card-body">
         <h3 class="h2 card-title">
@@ -32,7 +33,7 @@
                 </form>
             {% endwith %}
         {% else %}
-            <i>Cette organisation n'a pas de membre.</i>
+            <i>Cette organisation n'a pas de membre. Si vous souhaitez la rejoindre, veuillez <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="has-external-link">contacter notre support technique</a>.</i>
         {% endif %}
     </div>
 </div>
