@@ -9,10 +9,10 @@ from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pret
 
 
 class TestProfessionalSignup:
-    def test_choose_user_kind(self, client):
+    def test_choose_user_kind(self, client, snapshot):
         url = reverse("signup:choose_user_kind")
         response = client.get(url)
-        assertContains(response, "Professionnel de l’inclusion")
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
         response = client.post(url, data={"kind": KIND_PROFESSIONAL})
         assertRedirects(response, reverse("signup:professional_user"))

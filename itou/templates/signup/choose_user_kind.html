@@ -2,45 +2,96 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load theme_inclusion %}
 
-{% block title %}Inscription {{ block.super }}{% endblock %}
+{% block title %}S'inscrire {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Inscription</h1>
+            <h1>S'inscrire</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
-    <section class="s-section">
+    <section class="s-section mb-5">
         <div class="s-section__container container">
-            <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="c-form">
-                        <h2>Sélectionnez votre profil *</h2>
-
-                        <form method="post">
-                            {% csrf_token %}
-
-                            {% include "signup/includes/user_kind_radio.html" with kind="job_seeker" label="Candidat" description="Vous êtes à la recherche d’un emploi" only %}
-                            {% include "signup/includes/user_kind_radio.html" with kind="professional" label="Professionnel de l’inclusion" description="Vous accompagnez des candidats vers l'emploi, ou vous recrutez dans une structure inclusive (SIAE, GEIQ, EA…)." only %}
-
-                            {% url 'search:employers_home' as reset_url %}
-                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url %}
-                        </form>
+            <form method="post">
+                {% csrf_token %}
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <h2>Sélectionnez votre profil</h2>
                     </div>
 
-                    <div class="c-form mt-3 mt-md-4">
-                        <h2 class="m-0">Vous êtes membre d’une institution partenaire ?</h2>
-                        <p>
-                            <strong>(DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE ...)</strong>
-                        </p>
-                        <p>Pour vous inscrire, un membre de votre institution doit vous ajouter. Merci de le contacter directement.</p>
+                    <div class="s-section__col col-12 col-lg-6 mb-3 mb-md-4">
+                        <div class="c-card card has-one-link-inside has-rich-radio h-100">
+                            <div class="card-header pb-3 pb-me-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="kind" value="professional" id="kind_professional" required>
+                                    <label class="form-check-label stretched-link" for="kind_professional">
+                                        <strong>Professionnel de l’inclusion</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div>
+                                        <p>Vous accompagnez des candidats vers l’emploi, ou vous recrutez dans une structure inclusive (SIAE, GEIQ, …).</p>
+                                        <div class="tag-group">
+                                            <span class="tag bg-info-lighter text-info">Prescripteur</span>
+                                            <span class="tag bg-info-lighter text-info">Orienteur</span>
+                                            <span class="tag bg-info-lighter text-info">Employeur</span>
+                                        </div>
+                                    </div>
+                                    <figure class="d-none d-md-inline-flex">
+                                        <img src="{% static_theme_images 'illustration-signup-01.png' %}" loading="lazy" alt="" width="150">
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="s-section__col col-12 col-lg-6 mb-3 mb-md-4">
+                        <div class="c-card card has-one-link-inside has-rich-radio h-100">
+                            <div class="card-header pb-3 pb-me-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="kind" value="job_seeker" id="kind_job_seeker" required>
+                                    <label class="form-check-label stretched-link" for="kind_job_seeker">
+                                        <strong>Candidat</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div>
+                                        <p>Vous êtes à la recherche d’un emploi inclusif et souhaitez être accompagné dans votre parcours.</p>
+                                    </div>
+                                    <figure class="d-none d-md-inline-flex">
+                                        <img src="{% static_theme_images 'illustration-signup-02.png' %}" loading="lazy" alt="" width="150">
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="s-section__col col-12">
+                        {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInstitution" extra_classes="mb-3" %}
+                            {% fragment as c_info__summary %}
+                                Vous êtes membre d’une institution partenaire ?
+                            {% endfragment %}
+                            {% fragment as c_info__detail %}
+                                <p class="mb-0">
+                                    DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE… Pour rejoindre une institution, un membre existant doit vous ajouter directement. Il n'est pas possible de s'inscrire en autonomie via ce formulaire.
+                                </p>
+                                <a href="" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">En savoir plus sur les institutions partenaires</a>
+                            {% endfragment %}
+                        {% endcomponent_info %}
+
+                        {% url 'search:employers_home' as reset_url %}
+                        {% itou_buttons_form primary_label="Suivant" reset_url=reset_url show_mandatory_fields_mention=False %}
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </section>
 {% endblock %}
