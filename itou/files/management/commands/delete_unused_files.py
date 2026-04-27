@@ -18,6 +18,9 @@ CLEANING_DELAY = datetime.timedelta(days=1)
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def get_relations(self):
         relations = {
             (remote_field.field.model, remote_field.field.name)
