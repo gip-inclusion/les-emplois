@@ -10,6 +10,7 @@ class Command(BaseCommand):
     help = "Cleanup OIDC states."
 
     ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
 
     def handle(self, *args, **kwargs):
         for model in (FranceConnectState, PoleEmploiConnectState, ProConnectState):
