@@ -42,6 +42,9 @@ def check_limit_choices_to_inconsistencies(queryset):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def handle(self, verbosity, **options):
         inconsistencies = {}
         for app in apps.get_app_configs():
