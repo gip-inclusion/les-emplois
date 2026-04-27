@@ -113,7 +113,7 @@ class TestPrescriberLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_using_django_with_sso_provider(self, client, pro_connect, settings):
+    def test_login_using_django_with_sso_provider(self, client, settings):
         user = PrescriberFactory(with_password=True)
         url = reverse("login:prescriber")
         response = client.get(url)
@@ -129,10 +129,13 @@ class TestPrescriberLogin:
             "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
         )
 
-        # It's possible if we allow it
+        # Still forbidden when ProConnect is not enforced for all pro users
         settings.FORCE_PROCONNECT_LOGIN = False
         response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
+        assertContains(
+            response,
+            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
+        )
 
     def test_rate_limits(self, client):
         user = PrescriberFactory()
@@ -187,7 +190,7 @@ class TestEmployerLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_using_django_with_sso_provider(self, client, pro_connect, settings):
+    def test_login_using_django_with_sso_provider(self, client, settings):
         user = EmployerFactory(with_password=True)
         url = reverse("login:employer")
         response = client.get(url)
@@ -203,10 +206,13 @@ class TestEmployerLogin:
             "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
         )
 
-        # It's possible if we allow it
+        # Still forbidden when ProConnect is not enforced for all pro users
         settings.FORCE_PROCONNECT_LOGIN = False
         response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
+        assertContains(
+            response,
+            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
+        )
 
     def test_rate_limits(self, client):
         user = EmployerFactory()

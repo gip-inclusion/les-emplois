@@ -780,11 +780,10 @@ class TestProConnectLogin:
         assertContains(response, error_message)
         assert not auth.get_user(client).is_authenticated
 
-        # But it's possible if we allow it
+        # Still forbidden when ProConnect is not enforced for all pro users
         settings.FORCE_PROCONNECT_LOGIN = False
         response = client.post(reverse("login:prescriber"), data=post_data)
-        assertRedirects(response, reverse("dashboard:index"))
-        assert auth.get_user(client).is_authenticated
+        assertContains(response, error_message)
 
 
 class TestProConnectLogout:
