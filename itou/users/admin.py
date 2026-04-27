@@ -392,9 +392,11 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def disabled_notifications(self, obj):
         if obj.is_professional:
             return "Voir pour chaque structure ci-dessous"
-        notification_settings, _ = NotificationSettings.get_or_create(obj)
-        disabled_notifications = notification_settings.disabled_notifications_names
-        if disabled_notifications:
+        notification_settings = NotificationSettings.objects.filter(
+            **NotificationSettings.get_filter_kwargs(obj.user, structure=None)
+        ).first()
+
+        if notification_settings and (disabled_notifications := notification_settings.disabled_notifications_names):
             return mark_safe(
                 "<ul class='inline'>"
                 + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
