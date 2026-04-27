@@ -69,3 +69,17 @@ class ReadonlyViewMixin:
         db_readonly = [method.upper() for method in cls.http_method_names if method.upper() not in db_write]
         # Let Django's View.options method handle response
         return http_methods(db_readonly=db_readonly, db_write=db_write, auto_options=False)(view)
+
+
+class ReadonlyTemplateRenderingMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_template_response(self, request, response):
+        # Wrap render() method in a context manager to ensure we only perform readonly SQL queries
+        # since the template late rendering happens outside any transaction
+        response.render = connection.execute_wrapper(only_readonly_allowed)(response.render)
+        return response
