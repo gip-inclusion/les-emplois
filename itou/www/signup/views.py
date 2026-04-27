@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView, TemplateView, View
 
@@ -32,7 +33,7 @@ from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_safe_url, get_zendesk_form_url
 from itou.www.signup import forms
 from itou.www.signup.errors import JobSeekerSignupConflictModalResolver
 
@@ -291,16 +292,18 @@ def company_select(request, template_name="signup/company_select.html"):
         if not obfuscated_auth_email:
             messages.error(
                 request,
-                (
-                    "L'adresse e-mail de contact du correspondant de cette structure n'est pas renseignée ou "
-                    "incorrecte. Merci de contacter l’assistance pour continuer l'inscription."
+                mark_safe(
+                    "L’adresse e-mail de contact du gestionnaire de cette structure n’est pas renseignée. Merci de "
+                    f'<a href="{get_zendesk_form_url(request)}" target="_blank" rel="noopener" '
+                    'class="has-external-link">contacter notre support technique</a> afin de poursuivre votre'
+                    "inscription."
                 ),
             )
         else:
             company_selected.new_signup_activation_email_to_official_contact().send()
             message = (
                 f"Nous venons d'envoyer un e-mail à l'adresse {company_selected.obfuscated_auth_email} "
-                f"pour continuer votre inscription. Veuillez consulter votre boite "
+                f"pour poursuivre votre inscription. Veuillez consulter votre boite "
                 f"de réception."
             )
             messages.success(request, message)

@@ -124,6 +124,10 @@
                                                 {{ company.address_line_1 }},
                                                 {% if company.address_line_2 %}{{ company.address_line_2 }},{% endif %}
                                                 {{ company.post_code }} {{ company.city }}
+                                                <br>
+                                                {% if not company.auth_email %}
+                                                    <i>Cette organisation n'a pas de membre. Si vous souhaitez la rejoindre, veuillez <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="has-external-link">contacter notre support technique</a>.</i>
+                                                {% endif %}
                                             </label>
                                         </li>
                                     {% endfor %}

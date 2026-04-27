@@ -19,7 +19,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.urls import get_tally_form_url
+from itou.utils.urls import get_tally_form_url, get_zendesk_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import JobSeekerFactory, random_pro_user_factory
 from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
@@ -138,8 +138,10 @@ class TestCompanySignup:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "L'adresse e-mail de contact du correspondant de cette structure n'est pas renseignée ou "
-                        "incorrecte. Merci de contacter l’assistance pour continuer l'inscription."
+                        "L’adresse e-mail de contact du gestionnaire de cette structure n’est pas renseignée. Merci "
+                        f'de <a href="{get_zendesk_form_url(response.wsgi_request)}" target="_blank" rel="noopener" '
+                        'class="has-external-link">contacter notre support technique</a> afin de poursuivre votre'
+                        "inscription."
                     ),
                 )
             ],
