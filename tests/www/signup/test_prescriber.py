@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import (
     assertContains,
     assertNotContains,
+    assertQuerySetEqual,
     assertRedirects,
     assertTemplateUsed,
 )
@@ -22,7 +23,7 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import random_pro_user_factory
 
 
@@ -43,11 +44,15 @@ class TestPrescriberSignup:
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 
-    def test_professional_is_member_of_france_travail(self, client, mailoutbox):
+    @pytest.mark.parametrize("already_has_membership", [True, False])
+    def test_professional_is_member_of_france_travail(self, client, mailoutbox, already_has_membership):
         email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
         user = random_pro_user_factory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
 
+        if already_has_membership:
+            # create a previous org to ensure the user is switched to the new org
+            old_org = PrescriberMembershipFactory(user=user, organization__france_travail=True).organization
         organization = PrescriberOrganizationFactory(france_travail=True)
 
         # Go through each step to ensure session data is recorded properly.
@@ -56,6 +61,11 @@ class TestPrescriberSignup:
         response = client.get(url)
         safir_step_url = reverse("signup:prescriber_search_ft_org")
         assertContains(response, safir_step_url)
+        if already_has_membership:
+            assert (
+                client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+                == old_org.organization_switch_key
+            )
 
         # Step 2: find PE organization by SAFIR code.
         response = client.get(url)
@@ -87,9 +97,12 @@ class TestPrescriberSignup:
         assert organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
         # Check membership.
-        assert 1 == user.prescriberorganization_set.count()
-        assert user.prescribermembership_set.count() == 1
-        assert user.prescribermembership_set.get().organization_id == organization.pk
+        assertQuerySetEqual(
+            user.prescribermembership_set.all(),
+            [old_org, organization] if already_has_membership else [organization],
+            transform=lambda m: m.organization,
+            ordered=False,
+        )
         assert user.company_set.count() == 0
 
         [email] = mailoutbox
