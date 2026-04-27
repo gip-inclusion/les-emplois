@@ -1182,6 +1182,12 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         "company__name",
         "company__brand",
     )
+    raw_id_fields = (
+        "job_seeker",
+        "professional",
+        "prescriber_organization",
+        "company",
+    )
     ordering = ("-updated_at",)
 
     @admin.display(description="candidat")
