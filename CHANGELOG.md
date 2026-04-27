@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2026-04-27
+
+### Ajouté
+
+- [GEIQ : Ajout du filtre "Nom du salarié" pour les contrats du bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7840)
+- [Services : Permettre aux prescripteurs habilités d’orienter leurs candidats sur DORA](https://github.com/gip-inclusion/les-emplois/pull/7523)
+
+### Modifié
+
+- [Admin : Permettre aux membres de `itou_admin` de supprimer des affectations candidat](https://github.com/gip-inclusion/les-emplois/pull/7922)
+- [Candidature : Résolution d'un bug empêchant un prescripteur nouvellement inscrit de postuler pour un candidat](https://github.com/gip-inclusion/les-emplois/pull/7925)
+- [GEIQ : La DDETS peut corriger sa décision quand la DREETS lui renvoie pour correction](https://github.com/gip-inclusion/les-emplois/pull/7917)
+- [Interface : Afficher l'icône du bon type devant l'organisation dans le menu de changement d'organisation (s'il y a plusieurs types)](https://github.com/gip-inclusion/les-emplois/pull/7927)
+- [Interface : Correction d'un bug permettant d'avoir plusieurs organisations sélectionnées dans le menu de sélection d'organisation](https://github.com/gip-inclusion/les-emplois/pull/7939)
+- [Interface : Correction du menu de changement d'organisation pour les pro sans organisation](https://github.com/gip-inclusion/les-emplois/pull/7911)
+- [Professionel : Fusion des pros et impossibilité de se connecter sans organisation](https://github.com/gip-inclusion/les-emplois/pull/7759)
+- [Services : Utiliser un badge beta au lieu d'un badge nouveau pour la recherche d'un service](https://github.com/gip-inclusion/les-emplois/pull/7820)
+
 ## 2026-04-20
 
 ### Ajouté
