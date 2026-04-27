@@ -12,7 +12,6 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, Title, UserKind
-from itou.users.forms import validate_francetravail_email
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
@@ -371,19 +370,3 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
             error = "Ce code SAFIR est inconnu."
             raise forms.ValidationError(error)
         return safir_code
-
-
-class PrescriberCheckPEemail(forms.Form):
-    email = forms.EmailField(
-        label="Adresse e-mail",
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "type": "email",
-                "autocomplete": "off",
-            }
-        ),
-    )
-
-    def clean_email(self):
-        return validate_francetravail_email(self.cleaned_data["email"])

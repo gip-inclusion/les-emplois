@@ -1,3 +1,5 @@
+import uuid
+
 import httpx
 import pytest
 import respx
@@ -62,23 +64,11 @@ class TestPrescriberSignup:
         post_data = {"safir_code": organization.code_safir_pole_emploi}
         response = client.post(safir_step_url, data=post_data)
 
-        # Step 3: check email
-        url = reverse("signup:prescriber_check_pe_email")
-        assertRedirects(response, url)
-        post_data = {"email": "athos@lestroismousquetaires.com"}
-        response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assert response.context["form"].errors.get("email")
+        join_step_url = reverse("signup:prescriber_join_ft_org", kwargs={"uuid": organization.uid})
+        assertRedirects(response, join_step_url)
 
-        email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
-        post_data = {"email": email}
-        response = client.post(url, data=post_data)
-        assertRedirects(response, reverse("signup:prescriber_join_org"), fetch_redirect_response=False)
-        session_data = client.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        assert email == session_data.get("email")
-
-        # Step 4: Join organization
-        response = client.get(response.url)
+        # Step3 3: join the organization
+        response = client.post(join_step_url, data=post_data)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         # Organization
@@ -628,7 +618,11 @@ class TestPrescribersViewsExceptions:
         response = client.get(safir_step_url)
         assert response.status_code == 403
 
-        # FIXME also check joining is blocked
+        ft_org = PrescriberOrganizationFactory(france_travail=True)
+        join_step_url = reverse("signup:prescriber_join_ft_org", kwargs={"uuid": ft_org.uid})
+        response = client.post(join_step_url)
+        assert response.status_code == 403
+        assert not user.prescriberorganization_set.exists()
 
     def test_permission_denied_when_skiping_first_step(self, client, subtests):
         client.force_login(random_pro_user_factory())
@@ -638,7 +632,7 @@ class TestPrescribersViewsExceptions:
             reverse("signup:prescriber_choose_kind"),
             reverse("signup:prescriber_confirm_authorization"),
             reverse("signup:prescriber_search_ft_org"),
-            reverse("signup:prescriber_check_pe_email"),
+            reverse("signup:prescriber_join_ft_org", kwargs={"uuid": uuid.uuid4()}),
             reverse("signup:prescriber_join_org"),
         ]
         for url in urls:

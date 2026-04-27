@@ -83,9 +83,9 @@ urlpatterns = [
         name="prescriber_search_ft_org",
     ),
     path(
-        "prescriber/pole_emploi/check_email",
-        views.prescriber_check_pe_email,
-        name="prescriber_check_pe_email",
+        "prescriber/france-travail/join/<uuid:uuid>",
+        views.prescriber_join_ft_org,
+        name="prescriber_join_ft_org",
     ),
     path(
         "prescriber/join_org",

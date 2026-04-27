@@ -617,22 +617,10 @@ def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft
     if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
         raise PermissionDenied()
 
-    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-
     form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        session_data.update(
-            {
-                "authorization_status": None,
-                "kind": PrescriberOrganizationKind.FT.value,
-                "prescriber_org_data": None,
-                "pole_emploi_org_pk": form.pole_emploi_org.pk,
-                "safir_code": form.cleaned_data["safir_code"],
-            }
-        )
-        request.session.modified = True
-        next_url = reverse("signup:prescriber_check_pe_email")
+        next_url = reverse("signup:prescriber_join_ft_org", kwargs={"uuid": form.pole_emploi_org.uid})
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -640,36 +628,34 @@ def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft
         "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
+
+
+def get_prescriber_post_join_redirect_url(request):
+    # redirect to post login page.
+    next_url = get_adapter(request).get_login_redirect_url(request)
+    # delete session data
+    request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    request.session.modified = True
+    return next_url
 
 
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe_email.html"):
-    # FIXME(alaurent): Refactor FT org flow ?
-    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    form = forms.PrescriberCheckPEemail(data=request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        session_data["email"] = form.cleaned_data["email"]
-        request.session.modified = True
-        next_url = reverse("signup:prescriber_join_org")
+def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_ft_org.html"):
+    """
+    Join the given organization
+    """
+    if not request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+        raise PermissionDenied()
+
+    ft_org = get_object_or_404(PrescriberOrganization, uid=uuid, kind=PrescriberOrganizationKind.FT.value)
+
+    if request.method == "POST":
+        ft_org.add_or_activate_membership(user=request.user)
+        next_url = get_prescriber_post_join_redirect_url(request)
         return HttpResponseRedirect(next_url)
 
-    kind = session_data.get("kind")
-    pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-
-    # Check session data.
-    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.FT.value:
-        raise PermissionDenied
-
-    pole_emploi_org = get_object_or_404(
-        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
-    )
-    context = {
-        "pole_emploi_org": pole_emploi_org,
-        "form": form,
-        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-    }
-    return render(request, template_name, context)
+    return render(request, template_name, {"ft_org": ft_org})
 
 
 @bypass_terms_acceptance
@@ -709,33 +695,24 @@ def prescriber_join_org(request):
 
     try:
         with transaction.atomic():
-            if session_data["kind"] == "FT":
-                # Organization creation is not allowed for FT.
-                pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-                # We should not have errors here since we have a FT organization pk from the database.
-                prescriber_org = PrescriberOrganization.objects.get(
-                    pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
-                )
-            else:
-                org_attributes = {
-                    "siret": session_data["prescriber_org_data"]["siret"],
-                    "name": session_data["prescriber_org_data"]["name"],
-                    "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
-                    "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
-                    "post_code": session_data["prescriber_org_data"]["post_code"],
-                    "city": session_data["prescriber_org_data"]["city"],
-                    "department": session_data["prescriber_org_data"]["department"],
-                    "coords": lat_lon_to_coords(
-                        session_data["prescriber_org_data"]["latitude"],
-                        session_data["prescriber_org_data"]["longitude"],
-                    ),
-                    "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
-                    "kind": session_data["kind"],
-                    "authorization_status": session_data["authorization_status"],
-                    "created_by": request.user,
-                }
-                prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
-
+            org_attributes = {
+                "siret": session_data["prescriber_org_data"]["siret"],
+                "name": session_data["prescriber_org_data"]["name"],
+                "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
+                "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
+                "post_code": session_data["prescriber_org_data"]["post_code"],
+                "city": session_data["prescriber_org_data"]["city"],
+                "department": session_data["prescriber_org_data"]["department"],
+                "coords": lat_lon_to_coords(
+                    session_data["prescriber_org_data"]["latitude"],
+                    session_data["prescriber_org_data"]["longitude"],
+                ),
+                "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
+                "kind": session_data["kind"],
+                "authorization_status": session_data["authorization_status"],
+                "created_by": request.user,
+            }
+            prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
             prescriber_org.add_or_activate_membership(user=request.user)
 
     except Error:
@@ -748,11 +725,7 @@ def prescriber_join_org(request):
         auth.logout(request)
         return HttpResponseRedirect(redirect_url)
 
-    # redirect to post login page.
-    next_url = get_adapter(request).get_login_redirect_url(request)
-    # delete session data
-    request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-    request.session.modified = True
+    next_url = get_prescriber_post_join_redirect_url(request)
     return HttpResponseRedirect(next_url)
 
 
