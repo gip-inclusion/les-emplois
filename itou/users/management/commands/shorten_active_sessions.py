@@ -14,6 +14,9 @@ class Command(BaseCommand):
     but all offline users will have to login again.
     """
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def handle(self, **options):
         engine = import_module(settings.SESSION_ENGINE)
         new_expire = timezone.now() + relativedelta(hours=1)
