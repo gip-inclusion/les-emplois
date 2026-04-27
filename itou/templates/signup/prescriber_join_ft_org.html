@@ -15,31 +15,22 @@
     {% endcomponent_title %}
 {% endblock %}
 
-{% block title_messages %}
-    {{ block.super }}
-    {% component_alert content=content variant="info" icon=False %}
-        {% fragment as content %}
-            <p class="mb-0">
-                Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
-            </p>
-        {% endfragment %}
-    {% endcomponent_alert %}
-{% endblock %}
-
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <form method="post" class="js-prevent-multiple-submit">
 
+                    <p class="mb-0">
+                        Vous allez rejoindre <b>{{ ft_org.display_name }}</b>
+                    </p>
+
+                    <form method="post" class="js-prevent-multiple-submit">
                         {% csrf_token %}
 
-                        {% bootstrap_form form alert_error_type="all" %}
-
-                        {% url 'search:employers_home' as reset_url %}
-                        {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url reset_url=reset_url %}
-
+                        {% url 'signup:choose_pro_membership_kind' as reset_url %}
+                        {% url 'signup:prescriber_search_ft_org' as prev_url %}
+                        {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url reset_url=reset_url show_mandatory_fields_mention=False %}
                     </form>
                 </div>
             </div>
