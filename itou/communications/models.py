@@ -104,20 +104,23 @@ class NotificationSettings(models.Model):
             return f"Paramètres de notification de {self.user.get_full_name()} ({self.structure})"
         return f"Paramètres de notification de {self.user.get_full_name()}"
 
-    @staticmethod
-    def get_or_create(user, structure=None):
+    @classmethod
+    def get_filter_kwargs(cls, user, structure=None):
         if structure is None:
             structure_type = None
             structure_pk = None
         else:
             structure_type = ContentType.objects.get_for_model(structure)
             structure_pk = structure.pk
+        return {
+            "user": user,
+            "structure_type": structure_type,
+            "structure_pk": structure_pk,
+        }
 
-        notification_settings, created = NotificationSettings.objects.get_or_create(
-            user=user,
-            structure_type=structure_type,
-            structure_pk=structure_pk,
-        )
+    @classmethod
+    def get_or_create(cls, user, structure=None):
+        notification_settings, created = cls.objects.get_or_create(**cls.get_filter_kwargs(user, structure=structure))
         return notification_settings, created
 
     @property

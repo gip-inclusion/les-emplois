@@ -76,14 +76,17 @@ class DisabledNotificationsMixin:
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
         if isinstance(obj, CompanyMembership):
-            notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.company)
+            structure = obj.company
         elif isinstance(obj, PrescriberMembership):
-            notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.organization)
+            structure = obj.organization
         else:
-            notification_settings, _ = NotificationSettings.get_or_create(obj.user)
+            structure = None
 
-        disabled_notifications = notification_settings.disabled_notifications_names
-        if disabled_notifications:
+        notification_settings = NotificationSettings.objects.filter(
+            **NotificationSettings.get_filter_kwargs(obj.user, structure=structure)
+        ).first()
+
+        if notification_settings and (disabled_notifications := notification_settings.disabled_notifications_names):
             return mark_safe(
                 "<ul class='inline'>"
                 + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
