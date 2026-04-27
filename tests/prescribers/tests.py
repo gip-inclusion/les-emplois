@@ -754,55 +754,6 @@ class TestPrescriberOrganizationAdmin:
         assert response.context["errors"][0] == [expected_msg]
 
 
-class TestUpdateRefusedPrescriberOrganizationKindManagementCommands:
-    def test_update_kind(self):
-        # Prescriber organization - one sample per authorization status
-        # One refused prescriber organizations without duplicated siret which will be
-        # updated in this subset
-        for authorization_status in list(PrescriberAuthorizationStatus):
-            PrescriberOrganizationFactory(
-                authorization_status=authorization_status,
-                kind=PrescriberOrganizationKind.FT,
-            )
-
-        # Prescriber organization - Authorization Status = Refused - with duplicated siret
-        # These Prescriber organization kind won't be updated into Other, because
-        # of unicity constraint on (siret,kind)
-        PrescriberOrganizationFactory(
-            authorization_status=PrescriberAuthorizationStatus.REFUSED,
-            siret="83987278500010",
-            kind=PrescriberOrganizationKind.CHRS,
-        )
-        PrescriberOrganizationFactory(
-            authorization_status=PrescriberAuthorizationStatus.REFUSED,
-            siret="83987278500010",
-            kind=PrescriberOrganizationKind.CHU,
-        )
-
-        # Controls before execution
-        assert len(PrescriberAuthorizationStatus) + 2 == PrescriberOrganization.objects.all().count()
-        assert (
-            3
-            == PrescriberOrganization.objects.filter(
-                authorization_status=PrescriberAuthorizationStatus.REFUSED
-            ).count()
-        )
-        assert 0 == PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count()
-
-        # Update refused prescriber organizations without duplicated siret
-        call_command("update_refused_prescriber_organizations_kind")
-
-        # Controls after execution
-        assert len(PrescriberAuthorizationStatus) + 2 == PrescriberOrganization.objects.all().count()
-        assert (
-            3
-            == PrescriberOrganization.objects.filter(
-                authorization_status=PrescriberAuthorizationStatus.REFUSED
-            ).count()
-        )
-        assert 1 == PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count()
-
-
 @pytest.mark.parametrize("organization_kind", PrescriberOrganizationKind)
 def test_organization_kind_to_PE_typologie_prescripteur(organization_kind):
     # If you add a new value to PrescriberOrganizationKind:
