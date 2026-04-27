@@ -106,3 +106,144 @@
   
   '''
 # ---
+# name: TestProfessionalSignup.test_choose_user_kind
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  S'inscrire
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section mb-5">
+          <div class="s-section__container container">
+              <form method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <div class="s-section__row row">
+                      <div class="s-section__col col-12">
+                          <h2>
+                              Sélectionnez votre profil
+                          </h2>
+                      </div>
+                      <div class="s-section__col col-12 col-lg-6 mb-3 mb-md-4">
+                          <div class="c-card card has-one-link-inside has-rich-radio h-100">
+                              <div class="card-header pb-3 pb-me-4">
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="kind_professional" name="kind" required="" type="radio" value="professional"/>
+                                      <label class="form-check-label stretched-link" for="kind_professional">
+                                          <strong>
+                                              Professionnel de l’inclusion
+                                          </strong>
+                                      </label>
+                                  </div>
+                              </div>
+                              <div class="card-body">
+                                  <div class="d-flex">
+                                      <div>
+                                          <p>
+                                              Vous accompagnez des candidats vers l’emploi, ou vous recrutez dans une structure inclusive (SIAE, GEIQ, …).
+                                          </p>
+                                          <div class="tag-group">
+                                              <span class="tag bg-info-lighter text-info">
+                                                  Prescripteur
+                                              </span>
+                                              <span class="tag bg-info-lighter text-info">
+                                                  Orienteur
+                                              </span>
+                                              <span class="tag bg-info-lighter text-info">
+                                                  Employeur
+                                              </span>
+                                          </div>
+                                      </div>
+                                      <figure class="d-none d-md-inline-flex">
+                                          <img alt="" loading="lazy" src="/static/vendor/theme-inclusion/images/illustration-signup-01.png" width="150"/>
+                                      </figure>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="s-section__col col-12 col-lg-6 mb-3 mb-md-4">
+                          <div class="c-card card has-one-link-inside has-rich-radio h-100">
+                              <div class="card-header pb-3 pb-me-4">
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="kind_job_seeker" name="kind" required="" type="radio" value="job_seeker"/>
+                                      <label class="form-check-label stretched-link" for="kind_job_seeker">
+                                          <strong>
+                                              Candidat
+                                          </strong>
+                                      </label>
+                                  </div>
+                              </div>
+                              <div class="card-body">
+                                  <div class="d-flex">
+                                      <div>
+                                          <p>
+                                              Vous êtes à la recherche d’un emploi inclusif et souhaitez être accompagné dans votre parcours.
+                                          </p>
+                                      </div>
+                                      <figure class="d-none d-md-inline-flex">
+                                          <img alt="" loading="lazy" src="/static/vendor/theme-inclusion/images/illustration-signup-02.png" width="150"/>
+                                      </figure>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="s-section__col col-12">
+                          <div class="c-info mb-3">
+                              <button aria-controls="collapseInstitution" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseInstitution" data-bs-toggle="collapse" type="button">
+                                  <span>
+                                      Vous êtes membre d’une institution partenaire ?
+                                  </span>
+                              </button>
+                              <div class="c-info__detail collapse" id="collapseInstitution">
+                                  <p class="mb-0">
+                                      DDETS, DREETS, DGEFP, DIHAL, DRIHL, Réseaux IAE… Pour rejoindre une institution, un membre existant doit vous ajouter directement. Il n'est pas possible de s'inscrire en autonomie via ce formulaire.
+                                  </p>
+                                  <a aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)" class="has-external-link" href="" rel="noopener" target="_blank">
+                                      En savoir plus sur les institutions partenaires
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/employers">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
