@@ -1,13 +1,24 @@
+import logging
 from functools import wraps
 
+from django.conf import settings
 from django.db import connection, transaction
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 
+from itou.utils.enums import ItouEnvironment
+
+
+logger = logging.getLogger(__name__)
+
 
 def only_readonly_allowed(execute, sql, params, many, context):
     if not sql.upper().startswith(("SELECT", "SAVEPOINT ", "RELEASE SAVEPOINT ")):
-        raise RuntimeError("Only SAVEPOINT/SELECT/RELEASE SAVEPOINT statements allowed in readonly views")
+        error_msg = "Only SAVEPOINT/SELECT/RELEASE SAVEPOINT statements allowed in readonly views"
+        if settings.ITOU_ENVIRONMENT in [ItouEnvironment.DEV, ItouEnvironment.TEST]:
+            raise RuntimeError(error_msg)
+        else:
+            logger.error(error_msg)  # Notify issue to sentry
     return execute(sql, params, many, context)
 
 
