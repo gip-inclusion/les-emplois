@@ -34,12 +34,17 @@ class TestCompanySignup:
         )
 
     @freeze_time("2024-09-15 15:53:54")
-    def test_join_an_company_without_members(self, client, mailoutbox, pro_connect):
+    @pytest.mark.parametrize("already_has_membership", [True, False])
+    def test_join_an_company_without_members(self, client, mailoutbox, pro_connect, already_has_membership):
         """
         A user joins a company without members.
         """
         user = random_pro_user_factory()
         client.force_login(user)
+
+        if already_has_membership:
+            # create a previous org to ensure the user is switched to the new company
+            old_company = CompanyMembershipFactory(user=user).company
 
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -47,6 +52,12 @@ class TestCompanySignup:
         url = reverse("signup:company_select")
         response = client.get(url)
         assert response.status_code == 200
+
+        if already_has_membership:
+            assert (
+                client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+                == old_company.organization_switch_key
+            )
 
         # Find a company by SIREN.
         response = client.get(url, {"siren": company.siret[:9]})
@@ -56,7 +67,10 @@ class TestCompanySignup:
         post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
         response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data, follow=True)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
+        if already_has_membership:
+            assertRedirects(response, reverse("dashboard:index"))
+        else:
+            assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
@@ -99,6 +113,10 @@ class TestCompanySignup:
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
 
         # Check `User` state.
+        assert (
+            client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+            == company.organization_switch_key
+        )
         assert user.kind == UserKind.EMPLOYER
         assert user.is_active
         assert company.has_admin(user)

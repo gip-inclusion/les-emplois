@@ -40,6 +40,15 @@ logger = logging.getLogger(__name__)
 ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
 
 
+def get_pro_post_join_redirect_url(request, org):
+    # redirect to post login page.
+    next_url = get_adapter(request).get_login_redirect_url(request)
+    # Switch to new membership
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = org.organization_switch_key
+    request.session.modified = True
+    return next_url
+
+
 class ItouPasswordResetView(PasswordResetView):
     def form_valid(self, form):
         form.save(self.request)
@@ -351,15 +360,15 @@ class CompanyJoinView(CompanyBaseView):
             )
             return HttpResponseRedirect(reverse("search:employers_results"))
 
-        CompanyMembership.objects.create(
+        membership = CompanyMembership.objects.create(
             user=request.user,
             company=self.company,
             # Only the first member becomes an admin.
             is_admin=self.company.active_members.count() == 0,
         )
 
-        url = get_adapter(request).get_login_redirect_url(request)
-        return HttpResponseRedirect(url)
+        next_url = get_pro_post_join_redirect_url(request, membership.company)
+        return HttpResponseRedirect(next_url)
 
 
 # Prescribers signup.
@@ -595,15 +604,6 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     return render(request, template_name, context)
 
 
-def get_prescriber_post_join_redirect_url(request):
-    # redirect to post login page.
-    next_url = get_adapter(request).get_login_redirect_url(request)
-    # delete session data
-    request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-    request.session.modified = True
-    return next_url
-
-
 @bypass_terms_acceptance
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
@@ -662,7 +662,9 @@ def prescriber_join_org(request):
         messages.error(request, "L'organisation n'a pas pu être créée")
         return HttpResponseRedirect(reverse("signup:prescriber_check_already_exists"))
 
-    next_url = get_prescriber_post_join_redirect_url(request)
+    request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    request.session.modified = True
+    next_url = get_pro_post_join_redirect_url(request, prescriber_org)
     return HttpResponseRedirect(next_url)
 
 
@@ -706,7 +708,9 @@ def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_
 
     if request.method == "POST":
         ft_org.add_or_activate_membership(user=request.user)
-        next_url = get_prescriber_post_join_redirect_url(request)
+        request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        request.session.modified = True
+        next_url = get_pro_post_join_redirect_url(request, ft_org)
         return HttpResponseRedirect(next_url)
 
     return render(request, template_name, {"ft_org": ft_org})
@@ -753,15 +757,14 @@ def facilitator_join(request):
         is_searchable=False,  # Wait for admin to check the company
     )
 
-    CompanyMembership.objects.create(
+    membership = CompanyMembership.objects.create(
         user=request.user,
         company=company_to_create,
         is_admin=True,  # by construction, this user is the first of the SIAE.
     )
 
-    # redirect to post login page.
-    next_url = get_adapter(request).get_login_redirect_url(request)
     # delete session data
     request.session.pop(ITOU_SESSION_FACILITATOR_SIGNUP_KEY)
     request.session.modified = True
+    next_url = get_pro_post_join_redirect_url(request, membership.company)
     return HttpResponseRedirect(next_url)
