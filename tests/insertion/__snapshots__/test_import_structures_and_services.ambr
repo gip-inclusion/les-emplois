@@ -328,7 +328,7 @@
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 85,
+    'num_queries': 59,
     'queries': list([
       dict({
         'origin': list([
@@ -960,101 +960,6 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_thematics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_thematics"."genericreferenceitem_id")
-          WHERE "insertion_service_thematics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_receptions" ON ("insertion_genericreferenceitem"."id" = "insertion_service_receptions"."genericreferenceitem_id")
-          WHERE "insertion_service_receptions"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilizations" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilizations"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilizations"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
           DELETE
           FROM "insertion_service_funding_labels"
           WHERE "insertion_service_funding_labels"."service_id" = %s
@@ -1147,101 +1052,6 @@
                                            "created_at",
                                            "updated_at")
           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_thematics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_thematics"."genericreferenceitem_id")
-          WHERE "insertion_service_thematics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_receptions" ON ("insertion_genericreferenceitem"."id" = "insertion_service_receptions"."genericreferenceitem_id")
-          WHERE "insertion_service_receptions"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilizations" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilizations"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilizations"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1379,25 +1189,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_thematics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_thematics"."genericreferenceitem_id")
-          WHERE "insertion_service_thematics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1443,25 +1235,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1507,25 +1281,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_receptions" ON ("insertion_genericreferenceitem"."id" = "insertion_service_receptions"."genericreferenceitem_id")
-          WHERE "insertion_service_receptions"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1570,25 +1326,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilizations" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilizations"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilizations"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1633,25 +1371,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1666,25 +1386,6 @@
                                                                 "genericreferenceitem_id")
           SELECT *
           FROM UNNEST((%s)::integer[], (%s)::integer[]) ON CONFLICT DO NOTHING
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_funding_labels" ON ("insertion_genericreferenceitem"."id" = "insertion_service_funding_labels"."genericreferenceitem_id")
-          WHERE "insertion_service_funding_labels"."service_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1716,25 +1417,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_modes_beneficiaries" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_modes_beneficiaries"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_modes_beneficiaries"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1779,25 +1462,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_modes_professionals" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_modes_professionals"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_modes_professionals"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1871,25 +1536,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_thematics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_thematics"."genericreferenceitem_id")
-          WHERE "insertion_service_thematics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1908,44 +1555,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_receptions" ON ("insertion_genericreferenceitem"."id" = "insertion_service_receptions"."genericreferenceitem_id")
-          WHERE "insertion_service_receptions"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1963,25 +1573,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilizations" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilizations"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilizations"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -1999,25 +1591,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_publics" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_publics"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_publics"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -2036,44 +1610,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_funding_labels" ON ("insertion_genericreferenceitem"."id" = "insertion_service_funding_labels"."genericreferenceitem_id")
-          WHERE "insertion_service_funding_labels"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_modes_beneficiaries" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_modes_beneficiaries"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_modes_beneficiaries"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
@@ -2091,25 +1628,7 @@
       }),
       dict({
         'origin': list([
-          'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
-          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
-          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "insertion_genericreferenceitem"."id" AS "id"
-          FROM "insertion_genericreferenceitem"
-          INNER JOIN "insertion_service_mobilization_modes_professionals" ON ("insertion_genericreferenceitem"."id" = "insertion_service_mobilization_modes_professionals"."genericreferenceitem_id")
-          WHERE "insertion_service_mobilization_modes_professionals"."service_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
+          'do_m2m_operation[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_service_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
           'Command._fill_and_save_service_from_api_data[insertion/management/commands/import_structures_and_services.py]',
           'Command.import_services[insertion/management/commands/import_structures_and_services.py]',

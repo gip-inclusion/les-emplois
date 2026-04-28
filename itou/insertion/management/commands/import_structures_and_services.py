@@ -307,37 +307,53 @@ class Command(BaseCommand):
             service.is_orientable_with_form = service.structure.uid not in disabled_dora_form_di_structures
             service.average_orientation_response_delay_days = None
 
-    def _fill_service_related_fields_from_data(self, service, data, dora_services):
-        service.thematics.set(
+    def _fill_service_related_fields_from_data(self, service, data, dora_services, is_creation):
+        def do_m2m_operation(attr, objs):
+            """Heavily reduce queries numbers when creating new object.
+
+            I would have used .set() but most ManyRelatedManager operations clear
+            the prefetch cache so we can't rely on it and have to make that kind of things"""
+            m2m_manager = getattr(service, attr)
+            if is_creation:
+                m2m_manager.add(*objs)
+            else:
+                m2m_manager.set(objs)
+
+        do_m2m_operation(
+            "thematics",
             self.get_reference_set_from_data(
                 data, "thematiques", GenericReferenceItemSource.DATA_INCLUSION, GenericReferenceItemKind.THEMATIC
-            )
+            ),
         )
-        service.publics.set(
+        do_m2m_operation(
+            "publics",
             self.get_reference_set_from_data(
                 data, "publics", GenericReferenceItemSource.DATA_INCLUSION, GenericReferenceItemKind.PUBLIC
-            )
+            ),
         )
-        service.receptions.set(
+        do_m2m_operation(
+            "receptions",
             self.get_reference_set_from_data(
                 data, "modes_accueil", GenericReferenceItemSource.DATA_INCLUSION, GenericReferenceItemKind.RECEPTION
-            )
+            ),
         )
-        service.mobilizations.set(
+        do_m2m_operation(
+            "mobilizations",
             self.get_reference_set_from_data(
                 data,
                 "modes_mobilisation",
                 GenericReferenceItemSource.DATA_INCLUSION,
                 GenericReferenceItemKind.MOBILIZATION,
-            )
+            ),
         )
-        service.mobilization_publics.set(
+        do_m2m_operation(
+            "mobilization_publics",
             self.get_reference_set_from_data(
                 data,
                 "mobilisable_par",
                 GenericReferenceItemSource.DATA_INCLUSION,
                 GenericReferenceItemKind.MOBILIZATION_PUBLIC,
-            )
+            ),
         )
         if service.source.value == SOURCE_DORA_VALUE:
             dora_data = dora_services.get(service.uid)
@@ -345,29 +361,32 @@ class Command(BaseCommand):
                 self.logger.warning("Service uid=%s was not returned by the DORA API", service.uid)
                 return
 
-            service.funding_labels.set(
+            do_m2m_operation(
+                "funding_labels",
                 self.get_reference_set_from_data(
                     dora_data,
                     "funding_labels",
                     GenericReferenceItemSource.DORA,
                     GenericReferenceItemKind.FUNDING_LABEL,
-                )
+                ),
             )
-            service.mobilization_modes_beneficiaries.set(
+            do_m2m_operation(
+                "mobilization_modes_beneficiaries",
                 self.get_reference_set_from_data(
                     dora_data,
                     "beneficiaries_access_modes",
                     GenericReferenceItemSource.DORA,
                     GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
-                )
+                ),
             )
-            service.mobilization_modes_professionals.set(
+            do_m2m_operation(
+                "mobilization_modes_professionals",
                 self.get_reference_set_from_data(
                     dora_data,
                     "coach_orientation_modes",
                     GenericReferenceItemSource.DORA,
                     GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
-                )
+                ),
             )
         else:
             service.funding_labels.clear()
@@ -375,8 +394,9 @@ class Command(BaseCommand):
             service.mobilization_modes_professionals.clear()
 
     def _fill_and_save_service_from_api_data(
-        self, service, data, dora_services, disabled_dora_form_di_structures, structures
+        self, obj, data, dora_services, disabled_dora_form_di_structures, structures
     ):
+        service, is_creation = (obj, False) if obj is not None else (Service(), True)
         # Fill non ManyToManyField
         service.uid = data["id"]
 
@@ -431,7 +451,7 @@ class Command(BaseCommand):
 
         service.save()  # Save to have a PK for ManyToManyField fields
 
-        self._fill_service_related_fields_from_data(service, data, dora_services)  # Fill ManyToManyField
+        self._fill_service_related_fields_from_data(service, data, dora_services, is_creation)  # Fill ManyToManyField
 
     def import_services(self, di_client, dora_client):
         self.logger.info("Importing services")
@@ -451,7 +471,7 @@ class Command(BaseCommand):
 
             if diff_item.kind is diff.DiffItemKind.ADDED:
                 self._fill_and_save_service_from_api_data(
-                    Service(),
+                    None,
                     diff_item.comparative_item,
                     dora_services,
                     disabled_dora_form_di_structures,
