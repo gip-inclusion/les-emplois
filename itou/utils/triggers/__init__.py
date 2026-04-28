@@ -4,6 +4,7 @@ import json
 import logging
 import operator
 import threading
+from functools import wraps
 from typing import Any
 
 from django.conf import settings
@@ -124,3 +125,20 @@ class FieldsHistory(core.Trigger):
             NEW.{sql_history_field} = array_append(NEW.{sql_history_field}, _rows_diff);
             RETURN NEW;
         """
+
+
+def request_context(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if request.method in ["GET", "HEAD"]:
+            return view_func(request, *args, **kwargs)
+
+        base_context = {
+            "user": request.user.pk if request.user.is_authenticated else None,
+            "request_id": request.request_id if hasattr(request, "request_id") else None,
+        }
+
+        with context(**base_context):
+            return view_func(request, *args, **kwargs)
+
+    return wrapper

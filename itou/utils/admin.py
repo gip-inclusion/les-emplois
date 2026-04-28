@@ -16,6 +16,7 @@ from django.utils.html import format_html, format_html_join
 
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from itou.utils.templatetags.str_filters import pluralizefr
+from itou.utils.triggers import request_context
 from itou.utils.widgets import OSMWidget
 
 
@@ -235,6 +236,10 @@ class ItouModelMixin:
             if field_name in fields_with_pii:
                 new_list[i] = f"{field_name}_display_with_pii"
         return tuple(new_list)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Make sure this view has the trigger context available
+        return request_context(super().change_view)(request, object_id, form_url=form_url, extra_context=extra_context)
 
 
 class ItouModelAdmin(ItouModelMixin, ModelAdmin):
