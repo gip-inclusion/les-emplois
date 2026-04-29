@@ -692,12 +692,35 @@
                  "approvals_approval"."user_id",
                  "approvals_approval"."origin",
           
-            (SELECT U0."to_company_id" AS "to_company"
-             FROM "job_applications_jobapplication" U0
-             WHERE (U0."state" = %s
-                    AND U0."job_seeker_id" = ("approvals_approval"."user_id"))
-             ORDER BY U0."created_at" DESC
-             LIMIT 1) AS "last_hiring_company_pk",
+            (SELECT V0."to_company_id" AS "to_company"
+             FROM "job_applications_jobapplication" V0
+             INNER JOIN "companies_company" V2 ON (V0."to_company_id" = V2."id")
+             WHERE (V0."state" = %s
+                    AND V0."job_seeker_id" = ("approvals_approval"."user_id")
+                    AND V2."kind" IN (%s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s))
+             ORDER BY CASE
+                          WHEN (V0."origin" = %s) THEN V0."hiring_start_at"
+                          WHEN (V0."origin" = %s) THEN V0."created_at"
+                          WHEN (V0."state" = %s) THEN COALESCE(
+                                                                 (SELECT U0."timestamp" AS "timestamp"
+                                                                  FROM "job_applications_jobapplicationtransitionlog" U0
+                                                                  WHERE (U0."job_application_id" = (V0."id")
+                                                                         AND U0."transition" = %s)
+                                                                  ORDER BY 1 DESC
+                                                                  LIMIT 1), V0."created_at")
+                          ELSE
+                                 (SELECT U0."timestamp" AS "timestamp"
+                                  FROM "job_applications_jobapplicationtransitionlog" U0
+                                  WHERE (U0."job_application_id" = (V0."id")
+                                         AND U0."transition" = %s)
+                                  ORDER BY 1 DESC
+                                  LIMIT 1)
+                      END DESC, V0."hiring_start_at" DESC
+             LIMIT 1) AS "assigned_company",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",

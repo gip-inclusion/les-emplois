@@ -20,7 +20,7 @@ def get_companies_map():
 
 
 def get_company_from_approval(approval):
-    return get_companies_map().get(approval.last_hiring_company_pk)
+    return get_companies_map().get(approval.assigned_company)
 
 
 def get_approval_type(approval):
