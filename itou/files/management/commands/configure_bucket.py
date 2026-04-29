@@ -10,6 +10,9 @@ from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument("--auto-expire", action="store_true", dest="autoexpire")
 
