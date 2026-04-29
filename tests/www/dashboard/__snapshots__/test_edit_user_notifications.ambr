@@ -482,7 +482,7 @@
 # ---
 # name: test_employer_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -855,13 +855,6 @@
                     AND "nexus_nexususer"."email" = %s))
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1025,7 +1018,7 @@
 # ---
 # name: test_employer_create_update_notification_settings[view queries - enable all notifications]
   dict({
-    'num_queries': 21,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -1398,13 +1391,6 @@
                     AND "nexus_nexususer"."email" = %s))
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1657,7 +1643,7 @@
 # ---
 # name: test_job_seeker_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 12,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -1718,13 +1704,6 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1878,7 +1857,7 @@
 # ---
 # name: test_job_seeker_create_update_notification_settings[view queries - enable all notifications]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1939,13 +1918,6 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -2398,7 +2370,7 @@
 # ---
 # name: test_prescriber_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -2685,13 +2657,6 @@
                     AND "nexus_nexususer"."email" = %s))
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -2849,7 +2814,7 @@
 # ---
 # name: test_prescriber_create_update_notification_settings[view queries - enable all notifications]
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -3136,13 +3101,6 @@
                     AND "nexus_nexususer"."email" = %s))
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

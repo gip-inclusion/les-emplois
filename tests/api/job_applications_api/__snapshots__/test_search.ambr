@@ -1,18 +1,8 @@
 # serializer version: 1
 # name: TestJobApplicationSearchApi.test_performances
   dict({
-    'num_queries': 7,
+    'num_queries': 6,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Paginator.count[<site-packages>/django/core/paginator.py]',
-          'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
-          'JobApplicationSearchView.post[api/job_application_api/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',

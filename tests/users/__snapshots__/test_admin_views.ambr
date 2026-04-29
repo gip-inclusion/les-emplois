@@ -72,6 +72,8 @@
       dict({
         'origin': list([
           'ItouUserAdmin.get_object[utils/admin.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -215,6 +217,8 @@
       dict({
         'origin': list([
           'ItouUserAdmin.get_inlines[users/admin.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -234,6 +238,8 @@
       dict({
         'origin': list([
           'ItouUserAdmin.get_inlines[users/admin.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id",
@@ -253,6 +259,8 @@
       dict({
         'origin': list([
           'ItouUserAdmin.get_inlines[users/admin.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -283,6 +291,8 @@
         'origin': list([
           'EmailAddressFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
           'EmailAddressFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "account_emailaddress"."id",
@@ -336,6 +346,8 @@
         'origin': list([
           'PrescriberMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
           'PrescriberMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -356,6 +368,8 @@
         'origin': list([
           'CompanyMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
           'CompanyMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -376,6 +390,8 @@
         'origin': list([
           'InstitutionMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
           'InstitutionMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "institutions_institutionmembership"."id",
@@ -396,6 +412,8 @@
         'origin': list([
           'JobApplicationFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
           'JobApplicationFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -525,6 +543,8 @@
       dict({
         'origin': list([
           'PkSupportRemarkFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'wrapper[utils/views.py]',
+          'ItouUserAdmin.change_view[utils/admin.py]',
         ]),
         'sql': '''
           SELECT "utils_pksupportremark"."id",

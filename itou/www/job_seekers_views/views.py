@@ -39,6 +39,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
+from itou.utils.views import with_triggers_context
 from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireBaseView
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
@@ -229,6 +230,7 @@ def can_see_external_job_applications(job_seeker, request):
 
 @require_POST
 @check_request(lambda request: request.from_authorized_prescriber)
+@with_triggers_context
 def switch_stalled_status(request, public_id):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER, jobseeker_profile__is_stalled=True).select_related(

@@ -793,7 +793,7 @@
 # ---
 # name: test_cannot_delete_somebody_else_comment[delete comment queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1166,13 +1166,6 @@
                     AND "nexus_nexususer"."email" = %s))
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

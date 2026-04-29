@@ -31,6 +31,7 @@ from itou.utils.admin import get_admin_view_link
 from itou.utils.auth import check_user
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
+from itou.utils.views import with_triggers_context
 from itou.www.itou_staff_views import merge_utils
 from itou.www.itou_staff_views.export_utils import (
     cta_export_spec,
@@ -259,6 +260,7 @@ class ImportFS3437Result:
 
 @check_user(lambda user: user.is_staff)
 @permission_required("users.import_fs_3437_from_asp")
+@with_triggers_context
 def import_fs_3437_from_asp(request, template_name="itou_staff_views/import_fs_3437_from_asp.html"):
     form = (
         ImportFS3437FromAspForm(data=request.POST, files=request.FILES)
