@@ -3303,11 +3303,18 @@ class TestApplicationView:
         assert response.context["form"].initial["level_1_2"] is True  # ASS criterion
         assert response.context["form"].initial["level_2_17"] is True  # FLE / low_level_in_french criterion
 
-    @pytest.mark.parametrize("is_prescriber", [True, False])
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            pytest.param(partial(PrescriberFactory, membership__organization__authorized=True), id="prescriber"),
+            pytest.param(partial(EmployerFactory, membership=True), id="employer"),
+            pytest.param(None, id="auto_prescripting_employer"),
+        ],
+    )
     @pytest.mark.parametrize("search_from_job_seeker_profile", [True, False])
     @pytest.mark.parametrize("apply_from_card", [True, False])
     def test_application_end_displayed_buttons(
-        self, client, is_prescriber, search_from_job_seeker_profile, apply_from_card
+        self, client, user_factory, search_from_job_seeker_profile, apply_from_card
     ):
         geispolsheim = create_city_geispolsheim()
         geispolsheim_company = CompanyFactory(
@@ -3320,16 +3327,14 @@ class TestApplicationView:
             with_jobs=True,
         )
         JobDescriptionFactory(company=geispolsheim_company, location=geispolsheim)
-        user = (
-            PrescriberFactory(membership__organization__authorized=True)
-            if is_prescriber
-            else EmployerFactory(membership=True)
-        )
+        user = user_factory and user_factory() or geispolsheim_company.members.first()
         job_seeker = JobSeekerFactory(
             jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
             jobseeker_profile__pole_emploi_id="1234567A",
             created_by=PrescriberFactory(),
         )
+        is_prescriber = user_factory and user_factory.func is PrescriberFactory
+        is_auto_prescription = user_factory is None
 
         client.force_login(user)
 
@@ -3451,14 +3456,26 @@ class TestApplicationView:
             )
         else:
             dashboard_url = reverse("dashboard:index")
-            assertContains(
-                response,
-                f"""
-                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
-                    Tableau de bord</a>
-                """,
-                html=True,
-            )
+            if is_auto_prescription:
+                assertContains(
+                    response,
+                    f"""
+                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
+                        Tableau de bord</a>
+                    """,
+                    html=True,
+                )
+            else:
+                assertContains(
+                    response,
+                    f"""
+                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
+                        Tableau de bord</a>
+                        <a class="btn btn-primary btn-block w-100 w-md-auto" href={search_url}>
+                        Revenir à la recherche pour ce candidat</a>
+                    """,
+                    html=True,
+                )
 
 
 class TestApplicationEndView:
