@@ -548,14 +548,7 @@ class Command(BaseCommand):
         }
         queryset = (
             Approval.objects.select_related("user")
-            .annotate(
-                last_hiring_company_pk=(
-                    JobApplication.objects.accepted()
-                    .filter(job_seeker=OuterRef("user"))
-                    .values("to_company")
-                    .order_by("-created_at")[:1]
-                )
-            )
+            .with_assigned_company()
             .only(
                 *only_fields,
                 "user_id",

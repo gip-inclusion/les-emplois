@@ -213,7 +213,7 @@ def test_populate_job_seekers(snapshot):
     user_3_selected_criteria.certification_period = InclusiveDateRange(datetime.date(2025, 3, 13))
     user_3_selected_criteria.save()
     # Older accepted job_application with no eligibility diagnosis
-    # Allow to check last_hiring_company_pk
+    # Allow to check assigned_company
     JobApplicationFactory(
         sent_by_prescriber_alone=True,
         job_seeker=user_3,
@@ -522,6 +522,28 @@ def test_populate_job_applications(snapshot):
 def test_populate_approvals(snapshot):
     approval = ApprovalFactory()
 
+    # create an older accepted job application at a SIAE
+    siae = CompanyFactory(kind=CompanyKind.EI, department="01")
+    JobApplicationFactory(
+        sent_by_job_seeker=True,
+        job_seeker=approval.user,
+        to_company=siae,
+        created_at=datetime.datetime(2023, 2, 5, tzinfo=datetime.UTC),
+        state=JobApplicationState.ACCEPTED,
+        approval=approval,
+    )
+
+    # create a more recent accepted job application at a GEIQ, which should be ignored
+    non_siae = CompanyFactory(kind=CompanyKind.GEIQ, department="02")
+    JobApplicationFactory(
+        sent_by_job_seeker=True,
+        job_seeker=approval.user,
+        to_company=non_siae,
+        created_at=datetime.datetime(2023, 2, 8, tzinfo=datetime.UTC),
+        state=JobApplicationState.ACCEPTED,
+        approval=approval,
+    )
+
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="approvals")
 
@@ -536,13 +558,13 @@ def test_populate_approvals(snapshot):
                 datetime.date(2025, 1, 31),
                 datetime.timedelta(days=729),
                 approval.user.id,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                siae.id,
+                siae.kind,
+                siae.siret,
+                siae.display_name,
+                "01",
+                "01 - Ain",
+                "Auvergne-Rhône-Alpes",
                 0,
                 hash_content(approval.number),
                 datetime.date(2023, 2, 2),
