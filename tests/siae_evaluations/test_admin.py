@@ -104,7 +104,6 @@ class TestEvaluationCampaignAdmin:
         client.force_login(admin_user)
         with assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # SELECT set_config()
             + 1  # Load Django session
             + 1  # Load user
             + 1  # Count the filtered results (paginator)
@@ -222,7 +221,6 @@ class TestEvaluationCampaignAdmin:
         client.force_login(admin_user)
         with assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # SELECT set_config()
             + 1  # Load Django session
             + 1  # Load user
             + 1  # Count the filtered results (paginator)

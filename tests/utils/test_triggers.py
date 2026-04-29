@@ -9,6 +9,7 @@ from itou.utils import triggers
 
 
 @pytest.mark.parametrize("context", [{}, {"key": "value"}], ids=["empty", "non-empty"])
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context(context):
     with assertNumQueries(2):
         with triggers.context(**context), connection.cursor() as cursor:
@@ -16,6 +17,7 @@ def test_context(context):
             assert cursor.fetchone() == (json.dumps(context),)
 
 
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_stacking():
     with assertNumQueries(6), connection.cursor() as cursor:
         context_1 = {"level": 1}
@@ -32,6 +34,7 @@ def test_context_stacking():
             assert cursor.fetchone() == (json.dumps(context_1),)
 
 
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_stacking_with_different_data():
     expected = {"uuid": str(uuid.uuid4()), "foo": "bar"}
     # 5 different contexts defined and queried: 10 queries
@@ -58,6 +61,7 @@ def test_context_stacking_with_different_data():
             assert cursor.fetchone() == ("{}",)
 
 
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_stacking_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
     with assertNumQueries(3), connection.cursor() as cursor:
@@ -70,6 +74,7 @@ def test_context_stacking_with_same_data():
             assert cursor.fetchone() == (json.dumps(expected),)
 
 
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_consecutively_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
     with assertNumQueries(4), connection.cursor() as cursor:
@@ -83,6 +88,7 @@ def test_context_consecutively_with_same_data():
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_savepoint_rollback():
     expected = {"uuid": str(uuid.uuid4())}
     with transaction.atomic(), assertNumQueries(7), connection.cursor() as cursor:
@@ -100,6 +106,7 @@ def test_context_savepoint_rollback():
             assert cursor.fetchone() == (json.dumps(expected),)
 
 
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_laziness():
     expected = {"uuid": str(uuid.uuid4())}
     with assertNumQueries(2), connection.cursor() as cursor:
@@ -109,6 +116,7 @@ def test_context_laziness():
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_context_on_error():
     with transaction.atomic(), connection.cursor() as cursor, pytest.raises(RuntimeError), triggers.context():
         cursor.execute("SELECT current_setting('itou.context')")
@@ -119,3 +127,9 @@ def test_context_on_error():
     with transaction.atomic(), connection.cursor() as cursor, triggers.context():
         cursor.execute("SELECT current_setting('itou.context')")
         assert cursor.fetchone() == ("{}",)
+
+
+def test_without_connection_wrapper_set():
+    with pytest.raises(RuntimeError, match=r".*without _set_context_connection_wrapper.*"):
+        with transaction.atomic(), triggers.context():
+            pass

@@ -20,8 +20,8 @@ _context = threading.local()
 
 
 def _set_context_connection_wrapper(execute, sql, params, many, context):
-    context_is_outdated = getattr(_context, "last_data_set", None) != _context.data
-    if context_is_outdated and not context["connection"].in_atomic_block and _context.data is None:
+    context_is_outdated = getattr(_context, "last_data_set", None) != getattr(_context, "data", None)
+    if context_is_outdated and not context["connection"].in_atomic_block and getattr(_context, "data", None) is None:
         # If we aren't in a transaction then the context has already been flushed so we don't need
         # to call `set_config()` to empty it as `None` is the default sentinel value for `_context.data`.
         _context.last_data_set = None
@@ -37,11 +37,11 @@ def _set_context_connection_wrapper(execute, sql, params, many, context):
         # Ideally we should set the last data *after* the completion of the query, but
         # doing it here prevent the connection wrapper to be called recursively without exit
         # condition or any other kind of synchronization because of the `set_config()` query.
-        _context.last_data_set = _context.data
+        _context.last_data_set = getattr(_context, "data", None)
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT set_config('itou.context', %s, true)",
-                [json.dumps(_context.data)],
+                [json.dumps(_context.last_data_set)],
             )
 
     return execute(sql, params, many, context)
@@ -49,18 +49,22 @@ def _set_context_connection_wrapper(execute, sql, params, many, context):
 
 @contextlib.contextmanager
 def context(*, replace_existing: bool = False, **kwargs):
+    if not connection.in_atomic_block:
+        # This should never happen but is hard to detect in tests since
+        # most our tests run in transaction
+        error_msg = "Entering trigger context outside a transaction"
+        if settings.ITOU_ENVIRONMENT in [ItouEnvironment.DEV, ItouEnvironment.TEST]:
+            raise RuntimeError(error_msg)
+        else:
+            logger.error(error_msg)  # Notify issue to sentry
+    if _set_context_connection_wrapper not in connection.execute_wrappers:
+        raise RuntimeError("triggers.context called without _set_context_connection_wrapper in place")
+
     previous_data, _context.data = getattr(_context, "data", None), kwargs
     if not replace_existing and previous_data:
         _context.data = {**previous_data, **_context.data}
-
-    if _set_context_connection_wrapper not in connection.execute_wrappers:
-        cm = connection.execute_wrapper(_set_context_connection_wrapper)
-    else:
-        cm = contextlib.nullcontext()
-
     try:
-        with cm:
-            yield
+        yield
     finally:
         _context.data, _context.last_data_set = previous_data, None
 
