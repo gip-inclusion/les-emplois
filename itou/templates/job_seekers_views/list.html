@@ -55,6 +55,17 @@
     {% include "job_seekers_views/includes/job_seekers_filters/offcanvas.html" with filters_counter=filters_counter filters_form=filters_form list_organization=list_organization order=order request=request only %}
     <section class="s-section">
         <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <h2>
+                        {% if list_organization %}
+                            Tous les candidats de la structure
+                        {% else %}
+                            Mes candidats
+                        {% endif %}
+                    </h2>
+                </div>
+            </div>
             {% if list_organization %}
                 {% url 'job_seekers_views:list_organization' as url_list %}
             {% else %}

@@ -38,6 +38,13 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="col-12">
+                    <h2>
+                        {% if active_memberships %}
+                            En cours d’accompagnement
+                        {% else %}
+                            Historique
+                        {% endif %}
+                    </h2>
                     {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
                         {% fragment as c_info__summary %}
                             Retrouvez la liste de vos bénéficiaires et les coordonnées des professionnels qui interviennent dans leur parcours
