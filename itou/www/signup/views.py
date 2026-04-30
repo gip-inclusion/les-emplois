@@ -96,6 +96,10 @@ class ChooseUserKindSignupView(LoginNotRequiredMixin, FormView):
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
 
+# Job Seeker signup.
+# ------------------------------------------------------------------------------------------
+
+
 class JobSeekerStartSignupView(LoginNotRequiredMixin, TemplateView):
     template_name = "signup/job_seeker_start.html"
 
@@ -167,6 +171,36 @@ class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
         # Signup successful. Clear session
         self.request.session.pop(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
         return response
+
+
+# Professional generic signup.
+# ------------------------------------------------------------------------------------------
+
+
+@login_not_required
+def professional_user(request, template_name="signup/professional_user.html"):
+    """
+    Display ProConnect button.
+    This page is also shown if an error is detected during
+    OAuth callback.
+    """
+
+    # FIXME: We use KIND_PRESCRIBER for all new professionals until we merge all 3 pro kind
+    params = {
+        "user_kind": KIND_PRESCRIBER,
+        "previous_url": request.get_full_path(),
+        # FIXME: Add next url
+    }
+
+    pro_connect_url = (
+        f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
+    )
+
+    context = {
+        "pro_connect_url": pro_connect_url,
+        "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
+    }
+    return render(request, template_name, context)
 
 
 # SIAEs signup.

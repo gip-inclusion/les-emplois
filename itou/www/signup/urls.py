@@ -45,6 +45,12 @@ urlpatterns = [
         views.FacilitatorJoinView.as_view(),
         name="facilitator_join",
     ),
+    # Professional generic views
+    path(
+        "professional/user",
+        views.professional_user,
+        name="professional_user",
+    ),
     # Prescriber.
     path(
         "prescriber/check_already_exists",

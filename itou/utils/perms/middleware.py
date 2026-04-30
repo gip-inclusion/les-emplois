@@ -154,6 +154,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path in [reverse("account_login"), reverse("account_logout")],
             request.path.startswith("/hijack/release"),  # Allow to release hijack
             request.path.startswith("/api"),  # APIs should handle those errors
+            request.path.startswith("/legal/terms/"),
         ]
         if any(skip_middleware_conditions):
             return self.get_response(request)
