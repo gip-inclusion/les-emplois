@@ -159,6 +159,13 @@
       </div>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <h2>
+                          Tous les candidats de la structure
+                      </h2>
+                  </div>
+              </div>
               <form hx-get="/job-seekers/list-organization" hx-include="#id_job_seeker,#id_organization_members" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s, change from:#id_organization_members delay:.5s">
                   <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
                       <div class="col-12">
@@ -457,6 +464,13 @@
       </div>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <h2>
+                          Mes candidats
+                      </h2>
+                  </div>
+              </div>
               <form hx-get="/job-seekers/list" hx-include="#id_job_seeker" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s">
                   <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
                       <div class="col-12">
