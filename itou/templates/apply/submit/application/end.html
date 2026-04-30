@@ -102,6 +102,9 @@
                                                     <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
                                                 {% endif %}
                                                 <a class="btn btn-primary btn-block w-100 w-md-auto" href={{ search_url }}>Revenir à la recherche pour ce candidat</a>
+                                            {% elif auto_prescription_process %}
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href={% url "apply:details_for_company" job_application_id=job_application.id %}>Voir la candidature</a>
                                             {% else %}
                                                 <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
                                             {% endif %}
