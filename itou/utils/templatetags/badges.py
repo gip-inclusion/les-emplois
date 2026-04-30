@@ -132,7 +132,8 @@ def criterion_certification_badge(selected_criterion, job_application):
             if job_application and job_application.state == JobApplicationState.ACCEPTED:
                 template = (
                     "eligibility/includes/badge_certified.html"
-                    if job_application.hiring_start_at in selected_criterion.certification_period
+                    if job_application.hiring_start_at
+                    and job_application.hiring_start_at in selected_criterion.certification_period
                     else "eligibility/includes/badge_not_certified.html"
                 )
             else:
