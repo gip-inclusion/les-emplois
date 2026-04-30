@@ -232,6 +232,19 @@ class TestCriterionCertificationBadge:
             NOT_CERTIFIED_BADGE_HTML,
         )
 
+    def test_accepted_job_app_without_hiring_start_at(self):
+        """This happens for job applications imported together with PE approvals (origin="pe_approval")"""
+        criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            hiring_start_at=None,
+            state=JobApplicationState.ACCEPTED,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            NOT_CERTIFIED_BADGE_HTML,
+        )
+
     def test_certified_complete_eligibility_diagnosis_duration(self):
         criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
         job_application = JobApplicationFactory(
