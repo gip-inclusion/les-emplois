@@ -1,0 +1,33 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+
+{% block title %}Professionnel - Inscription {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>S'inscrire</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    <div class="c-stepper">
+        <div class="progress">
+            <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+            </div>
+        </div>
+        <p>
+            <strong>Étape 1</strong>/3 : Authentification
+        </p>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <section class="s-section mb-5">
+        <div class="s-section__container container">{% include "pro_connect/includes/description.html" %}</div>
+    </section>
+{% endblock %}
