@@ -1894,7 +1894,7 @@
                   Rechercher une immersion
               </a>
           </p>
-          <p>
+          <p class="mb-0">
               <a aria-label="Initier une convention (ouverture dans un nouvel onglet)" class="btn-link has-external-link" href="https://staging.immersion-facile.beta.gouv.fr/initier-convention?mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">
                   Initier une convention
               </a>
@@ -1924,7 +1924,7 @@
                   Rechercher une immersion
               </a>
           </p>
-          <p>
+          <p class="mb-0">
               <a aria-label="Initier une convention (ouverture dans un nouvel onglet)" class="btn-link has-external-link" href="https://staging.immersion-facile.beta.gouv.fr/initier-convention?mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">
                   Initier une convention
               </a>
@@ -1956,7 +1956,7 @@
                   Rechercher une immersion
               </a>
           </p>
-          <p>
+          <p class="mb-0">
               <a aria-label="Initier une convention (ouverture dans un nouvel onglet)" class="btn-link has-external-link" href="https://staging.immersion-facile.beta.gouv.fr/initier-convention?mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">
                   Initier une convention
               </a>
@@ -1986,7 +1986,7 @@
                   Rechercher une immersion
               </a>
           </p>
-          <p>
+          <p class="mb-0">
               <a aria-label="Initier une convention (ouverture dans un nouvel onglet)" class="btn-link has-external-link" href="https://staging.immersion-facile.beta.gouv.fr/initier-convention?mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">
                   Initier une convention
               </a>

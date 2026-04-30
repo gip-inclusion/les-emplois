@@ -63,7 +63,7 @@
 
         <hr class="my-4">
         <h2 class="h3">Situation du {{ request.current_organization|worker_denomination }}</h2>
-        <ul class="mb-0">
+        <ul class="mb-0 fs-sm">
             <li>{{ profile.get_education_level_display }}</li>
             {% if profile.low_level_in_french %}<li>Maîtrise de la langue française inférieure au niveau A1</li>{% endif %}
             {% if profile.pole_emploi_since %}
@@ -113,14 +113,14 @@
 
         <hr class="my-4">
         <h2 class="h3">Annexe financière</h2>
-        <p class="mb-0">
+        <p class="mb-0 fs-sm">
             {% if employee_record.financial_annex %}
                 {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})
             {% else %}
                 Aucune annexe financière n’a été sélectionnée.
             {% endif %}
         </p>
-        <p>
+        <p class="mb-0 fs-sm">
             L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.
             Elle est destinée uniquement aux logiciels de gestion des salariés.
             {% if in_form_step %}Si vous n’en utilisez pas, vous pouvez laisser cette étape vide.{% endif %}

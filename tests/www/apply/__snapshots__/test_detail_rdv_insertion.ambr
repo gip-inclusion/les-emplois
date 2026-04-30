@@ -2435,29 +2435,31 @@
 # name: TestRdvInsertionInvitationRequestsList.test_invitations_requests_listing[employer-apply:details_for_company-True]
   '''
   <div class="mb-6" id="rdvi-invitation-requests">
-      <div class="d-flex justify-content-between mb-3">
-          <h3 class="mb-0">
+      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+          <h2 class="mb-0">
               Invitations envoyées
-          </h3>
-          <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
-              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-              <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
-                  <div class="stable-text">
-                      <i aria-hidden="true" class="ri-mail-send-line fw-medium">
-                      </i>
-                      <span>
-                          Proposer un rendez-vous
-                      </span>
-                  </div>
-                  <div class="loading-text">
-                      <span aria-hidden="true" class="spinner-border spinner-border-sm">
-                      </span>
-                      <span role="status">
-                          Envoi en cours
-                      </span>
-                  </div>
-              </button>
-          </form>
+          </h2>
+          <div class="d-flex flex-column flex-md-row gap-2">
+              <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
+                          </i>
+                          <span>
+                              Proposer un rendez-vous
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm">
+                          </span>
+                          <span role="status">
+                              Envoi en cours
+                          </span>
+                      </div>
+                  </button>
+              </form>
+          </div>
       </div>
       <p>
           Aucune invitation en attente de réponse actuellement
@@ -2469,29 +2471,31 @@
 # name: TestRdvInsertionInvitationRequestsList.test_invite_response_includes_updated_invitation_requests_listing_for_employer[existing_invitation_requests]
   '''
   <div class="mb-6" id="rdvi-invitation-requests">
-      <div class="d-flex justify-content-between mb-3">
-          <h3 class="mb-0">
+      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+          <h2 class="mb-0">
               Invitations envoyées
-          </h3>
-          <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
-              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-              <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
-                  <div class="stable-text">
-                      <i aria-hidden="true" class="ri-mail-send-line fw-medium">
-                      </i>
-                      <span>
-                          Proposer un rendez-vous
-                      </span>
-                  </div>
-                  <div class="loading-text">
-                      <span aria-hidden="true" class="spinner-border spinner-border-sm">
-                      </span>
-                      <span role="status">
-                          Envoi en cours
-                      </span>
-                  </div>
-              </button>
-          </form>
+          </h2>
+          <div class="d-flex flex-column flex-md-row gap-2">
+              <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button aria-label="Proposer un rendez-vous à HENRY Jacques" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                      <div class="stable-text">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium">
+                          </i>
+                          <span>
+                              Proposer un rendez-vous
+                          </span>
+                      </div>
+                      <div class="loading-text">
+                          <span aria-hidden="true" class="spinner-border spinner-border-sm">
+                          </span>
+                          <span role="status">
+                              Envoi en cours
+                          </span>
+                      </div>
+                  </button>
+              </form>
+          </div>
       </div>
       <p>
           Aucune invitation en attente de réponse actuellement
@@ -2503,17 +2507,19 @@
 # name: TestRdvInsertionInvitationRequestsList.test_invite_response_includes_updated_invitation_requests_listing_for_employer[updated_invitation_requests]
   '''
   <div class="mb-6" id="rdvi-invitation-requests">
-      <div class="d-flex justify-content-between mb-3">
-          <h3 class="mb-0">
+      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+          <h2 class="mb-0">
               Invitations envoyées
-          </h3>
-          <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
-              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium">
-              </i>
-              Invitation envoyée
-              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0">
-              </i>
-          </span>
+          </h2>
+          <div class="d-flex flex-column flex-md-row gap-2">
+              <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
+                  <i aria-hidden="true" class="ri-check-line ri-xl fw-medium">
+                  </i>
+                  Invitation envoyée
+                  <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0">
+                  </i>
+              </span>
+          </div>
       </div>
       <div class="table-responsive mt-3 mt-md-4">
           <table class="table table-hover">

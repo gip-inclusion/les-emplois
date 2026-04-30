@@ -65,7 +65,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Informations
                           </h2>
@@ -160,7 +160,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Informations
                           </h2>
@@ -305,7 +305,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Informations
                           </h2>
@@ -457,7 +457,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Informations
                           </h2>
@@ -629,7 +629,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Informations
                           </h2>
@@ -817,7 +817,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Mon intervention
                           </h2>
@@ -862,12 +862,19 @@
                           </ul>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
-                          <h3 class="mb-0">
+                          <h3>
                               Motif de l’intervention
                           </h3>
-                          <strong>
-                              parce que
-                          </strong>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Motif
+                                  </small>
+                                  <strong>
+                                      parce que
+                                  </strong>
+                              </li>
+                          </ul>
                       </div>
                   </div>
               </div>
@@ -943,7 +950,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Mon intervention
                           </h2>
@@ -981,19 +988,26 @@
                                   <small>
                                       Date de fin
                                   </small>
-                                  <span class="text-disabled">
+                                  <i class="text-disabled">
                                       (accompagnement en cours)
-                                  </span>
+                                  </i>
                               </li>
                           </ul>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
-                          <h3 class="mb-0">
+                          <h3>
                               Motif de l’intervention
                           </h3>
-                          <i class="text-disabled">
-                              Non renseigné
-                          </i>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Motif
+                                  </small>
+                                  <i class="text-disabled">
+                                      Non renseigné
+                                  </i>
+                              </li>
+                          </ul>
                       </div>
                   </div>
               </div>
@@ -1504,7 +1518,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12" id="gps_intervenants">
-                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                           <h2 class="mb-0">
                               Intervenants
                           </h2>

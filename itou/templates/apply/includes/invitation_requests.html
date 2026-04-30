@@ -1,8 +1,11 @@
 <div id="rdvi-invitation-requests" class="mb-6">
-    <div class="d-flex justify-content-between mb-3">
-        <h3 class="mb-0">Invitations envoyées</h3>
-        {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=True only %}
+    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+        <h2 class="mb-0">Invitations envoyées</h2>
+        <div class="d-flex flex-column flex-md-row gap-2">
+            {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=True only %}
+        </div>
     </div>
+
     {% if invitation_requests %}
         <div class="table-responsive mt-3 mt-md-4">
             <table class="table table-hover">

@@ -460,7 +460,7 @@
           <h2 class="h3">
               Situation du salarié
           </h2>
-          <ul class="mb-0">
+          <ul class="mb-0 fs-sm">
               <li>
                   Troisième cycle ou école d'ingénieur
               </li>
@@ -514,10 +514,10 @@
           <h2 class="h3">
               Annexe financière
           </h2>
-          <p class="mb-0">
+          <p class="mb-0 fs-sm">
               Aucune annexe financière n’a été sélectionnée.
           </p>
-          <p>
+          <p class="mb-0 fs-sm">
               L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.
               Elle est destinée uniquement aux logiciels de gestion des salariés.
           </p>

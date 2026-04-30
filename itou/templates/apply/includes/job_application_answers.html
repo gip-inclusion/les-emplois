@@ -2,7 +2,7 @@
 {% load matomo %}
 
 {% if job_application.answer or job_application.state.is_refused %}
-    <div class="c-box mb-4">
+    <div class="c-box mb-3 mb-md-4">
         <h3>Réponse de l'employeur</h3>
         <ul class="list-data mb-3">
             {% if job_application.refusal_reason %}
