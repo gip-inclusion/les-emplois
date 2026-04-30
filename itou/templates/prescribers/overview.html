@@ -34,7 +34,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
                     <div class="tab-content">
-                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3 mb-lg-4">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                             <h2 class="mb-0">Présentation</h2>
                             <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur l'organisation">
                                 <a class="btn {% if can_edit %}btn-outline-primary{% else %}btn-primary{% endif %} btn-ico"
@@ -57,7 +57,7 @@
                             <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                 <div class="c-box h-100 {% if not organization.description %}d-flex align-items-center justify-content-center{% endif %}">
                                     {% if organization.description %}
-                                        <article class="mb-3 mb-lg-5">
+                                        <article>
                                             <h3>Son activité</h3>
                                             {{ organization.description|markdownify }}
                                         </article>

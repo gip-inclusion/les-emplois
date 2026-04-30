@@ -59,8 +59,8 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="informations" role="tabpanel" aria-labelledby="informations-tab">
                     <div class="s-section__row row">
-                        <div class="s-section__col col-12 col-xxl-12 order-2 order-xxl-1">
-                            <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        <div class="s-section__col col-12 col-xxl-12 order-1 order-xxl-1">
+                            <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
                                 <h2 class="mb-0">Informations générales</h2>
                                 <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">
                                     {% include "includes/job_seekers/copy_public_id.html" with public_id=job_application.job_seeker.public_id only %}
@@ -91,7 +91,7 @@
 
                                 {# Prior actions info #}
                                 {% if job_application.can_have_prior_action and job_application.prior_actions.all %}
-                                    <hr>
+                                    <hr class="my-4">
                                     <h3>Action préalable à l'embauche</h3>
                                     {% for prior_action in job_application.prior_actions.all %}
                                         {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last with_oob_state_update=False %}
@@ -105,7 +105,7 @@
                             {# Job seeker referent ------------------------------------------------------------------------- #}
                             {% include "gps/includes/membership_referent.html" with job_seeker=job_application.job_seeker %}
                         </div>
-                        <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-3">
+                        <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
                             {% block sidebar %}
                                 {% if request.from_prescriber %}
                                     <div class="c-box mb-4">
@@ -124,7 +124,7 @@
                 {% if participations %}
                     <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
                         <div class="s-section__row row">
-                            <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                            <div class="s-section__col col-12">
                                 {# Appointments ------------------------------------------------- #}
                                 {% include "apply/includes/appointments.html" with job_application=job_application %}
                             </div>
@@ -133,7 +133,7 @@
                 {% endif %}
                 <div class="tab-pane fade" id="historique" role="tabpanel" aria-labelledby="historique-tab">
                     <div class="s-section__row row">
-                        <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                        <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                             <h2>Historique des modifications</h2>
                             {# History ------------------------------------------------------ #}
                             {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}

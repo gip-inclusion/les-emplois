@@ -46,7 +46,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
                     <div class="tab-content">
-                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3 mb-lg-4">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                             <h2 class="mb-0">Présentation</h2>
                             <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur la structure">
                                 <a class="btn btn-outline-primary btn-ico"
@@ -67,15 +67,16 @@
                             <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                 <div class="c-box h-100 {% if not company.description and not company.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
                                     {% if company.description %}
-                                        <article class="mb-3 mb-md-5">
-                                            <h3 class="mb-2">Son activité</h3>
+                                        <article>
+                                            <h3>Son activité</h3>
                                             {{ company.description|markdownify }}
                                         </article>
                                     {% endif %}
 
                                     {% if company.provided_support %}
+                                        <hr class="my-4">
                                         <article>
-                                            <h3 class="mb-2">L'accompagnement proposé</h3>
+                                            <h3>L'accompagnement proposé</h3>
                                             {{ company.provided_support|markdownify }}
                                         </article>
                                     {% endif %}
