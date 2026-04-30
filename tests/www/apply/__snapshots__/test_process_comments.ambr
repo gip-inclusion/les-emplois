@@ -168,17 +168,13 @@
                                           </h3>
                                       </div>
                                       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                          <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                          <span class="btn btn-ico btn-outline-primary disabled" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" tabindex="0">
                                               <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                               </i>
                                               <span>
                                                   Modifier
                                               </span>
-                                          </a>
-                                          <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
-                                              <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1">
-                                              </i>
-                                          </button>
+                                          </span>
                                       </div>
                                   </div>
                                   <ul class="list-data mb-3">
