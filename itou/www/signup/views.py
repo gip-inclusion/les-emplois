@@ -500,10 +500,7 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
         prescriber_kind = form.cleaned_data["kind"]
         authorization_status = None
 
-        if prescriber_kind == PrescriberOrganizationKind.FT.value:
-            next_url = reverse("signup:prescriber_search_ft_org")
-
-        elif prescriber_kind == PrescriberOrganizationKind.OTHER.value:
+        if prescriber_kind == PrescriberOrganizationKind.OTHER.value:
             next_url = reverse("signup:prescriber_choose_kind")
 
         else:

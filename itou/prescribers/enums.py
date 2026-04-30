@@ -58,6 +58,7 @@ class PrescriberOrganizationKind(models.TextChoices):
 
 
 HIDDEN_PRESCRIBER_KINDS = [
+    PrescriberOrganizationKind.FT,
     PrescriberOrganizationKind.OHPD,
     PrescriberOrganizationKind.OCASF,
     PrescriberOrganizationKind.ORIENTEUR,
