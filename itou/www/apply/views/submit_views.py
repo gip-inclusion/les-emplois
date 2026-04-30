@@ -771,7 +771,8 @@ class ApplicationEndView(TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        if self.request.from_employer and self.company == self.request.current_organization:
+        auto_prescription_process = self.request.from_employer and self.company == self.request.current_organization
+        if auto_prescription_process:
             page_title = "Auto-prescription enregistrée"
             matomo_custom_title = "Auto-prescription enregistrée"
             search_url = None
@@ -796,6 +797,7 @@ class ApplicationEndView(TemplateView):
             "search_url": search_url,
             "page_title": page_title,
             "matomo_custom_title": matomo_custom_title,
+            "auto_prescription_process": auto_prescription_process,
         }
 
 

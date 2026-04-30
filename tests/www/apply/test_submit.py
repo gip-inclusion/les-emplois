@@ -3457,11 +3457,16 @@ class TestApplicationView:
         else:
             dashboard_url = reverse("dashboard:index")
             if is_auto_prescription:
+                job_application_url = reverse(
+                    "apply:details_for_company", kwargs={"job_application_id": job_application.id}
+                )
                 assertContains(
                     response,
                     f"""
                         <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
                         Tableau de bord</a>
+                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_application_url}">
+                        Voir la candidature</a>
                     """,
                     html=True,
                 )
