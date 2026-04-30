@@ -9,17 +9,23 @@
         <h3 class="mb-0">Informations personnelles</h3>
     </div>
     <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-        <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
-           class="btn btn-ico btn-outline-primary{% if not can_edit_personal_information %} disabled{% endif %}"
-           {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
-           aria-label="Modifier les informations personnelles de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}">
-            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
-            <span>Modifier</span>
-        </a>
-        {% if not can_edit_personal_information %}
-            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.">
-                <i class="ri-information-line ri-xl text-info ms-1" aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
-            </button>
+        {% if can_edit_personal_information %}
+            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}"
+               class="btn btn-ico btn-outline-primary"
+               {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
+               aria-label="Modifier les informations personnelles de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}">
+                <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                <span>Modifier</span>
+            </a>
+        {% else %}
+            <span tabindex="0"
+                  class="btn btn-ico btn-outline-primary disabled"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.">
+                <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                <span>Modifier</span>
+            </span>
         {% endif %}
     </div>
 </div>
