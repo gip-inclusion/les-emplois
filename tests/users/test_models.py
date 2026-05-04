@@ -1043,7 +1043,6 @@ def test_job_seeker_profile_asp_uid_field_history():
     profile.asp_uid = "000000000000000000000000000001"
     with triggers.connection_wrapper(), triggers.context():
         profile.save()
-    profile.refresh_from_db()
     assert normalize_fields_history(profile.fields_history) == [
         {
             "before": {"asp_uid": "000000000000000000000000000000"},
@@ -1059,7 +1058,6 @@ def test_job_seeker_profile_asp_uid_field_history():
     profile.asp_uid = "000000000000000000000000000002"
     with triggers.connection_wrapper(), triggers.context(profile=profile.pk):
         profile.save()
-    profile.refresh_from_db()
     assert normalize_fields_history(profile.fields_history) == [
         {
             "before": {"asp_uid": "000000000000000000000000000000"},
