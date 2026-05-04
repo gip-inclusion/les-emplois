@@ -1,0 +1,111 @@
+{% extends "layout/base.html" %}
+
+{% load components %}
+{% load format_filters %}
+{% load markdownify %}
+{% load matomo %}
+{% load static %}
+
+
+{% block title %}{{ structure.name }} {{ block.super }}{% endblock %}
+
+{% block canonical %}
+    {% if structure.source.value == "dora" and structure.source_link %}
+        <link rel="canonical" href="{{ structure.source_link }}">
+    {% endif %}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ structure.name }}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <div class="c-box">
+                        <article>
+                            <h3>Présentation de la structure</h3>
+                            {{ structure.description|markdownify }}
+                        </article>
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h3>Informations pratiques</h3>
+                        <button class="btn btn-secondary btn-block" type="button" data-bs-toggle="modal" data-bs-target="#structure-contact-modal" {% matomo_event "fiche-structure" "clic" "voir-coordonnees-structure" %}>
+                            Voir les coordonnées de la structure
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block modals %}
+    <div class="modal fade" id="structure-contact-modal" tabindex="-1" aria-labelledby="structure-contact-modal-label" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="structure-contact-modal-label">Coordonnées de contact</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    {% if structure.address_on_one_line %}
+                        <div class="d-flex">
+                            <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
+                            <address class="m-0">{{ structure.address_on_one_line }}</address>
+                        </div>
+                        {% if structure.email or structure.phone or structure.website %}<hr class="my-3">{% endif %}
+                    {% endif %}
+                    {% if structure.email or structure.phone or structure.website %}
+                        <ul class="list-unstyled mb-0">
+                            {% if structure.email %}
+                                <li>
+                                    <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                    <a href="mailto:{{ structure.email }}" aria-label="Contact par mail" class="text-break">{{ structure.email }}</a>
+                                    {% matomo_event "fiche-structure" "clic" "copier-email-contact" as matomo_event_attrs %}
+                                    {% include "includes/copy_to_clipboard.html" with content=structure.email css_classes="btn-link fw-medium ms-1" only_icon=True text="Copier l’adresse e-mail" matomo_event_attrs=matomo_event_attrs %}
+                                </li>
+                            {% endif %}
+                            {% if structure.phone %}
+                                <li>
+                                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                    {{ structure.phone|format_phone }}
+                                    {% include 'includes/copy_to_clipboard.html' with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                                </li>
+                            {% endif %}
+                            {% if structure.website %}
+                                <li>
+                                    <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
+                                    <a href="{{ structure.website }}"
+                                       rel="noopener noreferrer"
+                                       target="_blank"
+                                       class="btn-link fw-medium has-external-link"
+                                       aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)"
+                                       {% matomo_event "fiche-structure" "clic" "lien-site-web" %}>
+                                        {{ structure.website }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
