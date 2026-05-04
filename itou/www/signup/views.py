@@ -346,6 +346,14 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
 
     template_name = "signup/employer.html"
 
+    def dispatch(self, request, *args, company_id, token, **kwargs):
+        parent_dispatch = super().dispatch(request, *args, company_id=company_id, **kwargs)
+        if isinstance(parent_dispatch, HttpResponseRedirect):
+            return parent_dispatch
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("signup:company_join", args=(company_id, token)))
+        return parent_dispatch
+
     def get_context_data(self, **kwargs):
         params = {
             "user_kind": KIND_EMPLOYER,

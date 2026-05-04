@@ -14,15 +14,15 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
-from itou.users.enums import KIND_EMPLOYER, UserKind
+from itou.users.enums import KIND_EMPLOYER, IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory, random_pro_user_factory
-from tests.utils.testing import ItouClient, accept_legal_terms
+from tests.users.factories import JobSeekerFactory, random_pro_user_factory
+from tests.utils.testing import accept_legal_terms
 
 
 class TestCompanySignup:
@@ -34,17 +34,12 @@ class TestCompanySignup:
         )
 
     @freeze_time("2024-09-15 15:53:54")
-    @pytest.mark.parametrize("already_has_membership", [True, False])
-    def test_join_an_company_without_members(self, client, mailoutbox, pro_connect, already_has_membership):
+    def test_join_a_company_without_members(self, client, mailoutbox):
         """
         A user joins a company without members.
         """
-        user = random_pro_user_factory()
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
         client.force_login(user)
-
-        if already_has_membership:
-            # create a previous org to ensure the user is switched to the new company
-            old_company = CompanyMembershipFactory(user=user).company
 
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -52,12 +47,6 @@ class TestCompanySignup:
         url = reverse("signup:company_select")
         response = client.get(url)
         assert response.status_code == 200
-
-        if already_has_membership:
-            assert (
-                client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-                == old_company.organization_switch_key
-            )
 
         # Find a company by SIREN.
         response = client.get(url, {"siren": company.siret[:9]})
@@ -67,10 +56,7 @@ class TestCompanySignup:
         post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
         response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data, follow=True)
-        if already_has_membership:
-            assertRedirects(response, reverse("dashboard:index"))
-        else:
-            assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
 
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
@@ -78,46 +64,18 @@ class TestCompanySignup:
 
         magic_link = company.signup_magic_link
         response = client.get(magic_link)
-        assert response.status_code == 200
-
-        # No error when opening magic link a second time.
-        response = client.get(magic_link)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
         token = company.get_token()
-        previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:company_join", args=(company.pk, token))
-        params = {
-            "user_kind": KIND_EMPLOYER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
+        assertRedirects(response, next_url, fetch_redirect_response=False)
 
-        # FIXME(alaurent) Allow to skip ProConnect when already logged in with the correct account
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_EMPLOYER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
         response = client.get(response.url, follow=True)
-        response = accept_legal_terms(client, response)
         # Check user is redirected to the welcoming tour
         assertRedirects(response, reverse("welcoming_tour:index"))
         # Check user sees the employer tour
         assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-
         # Check `User` state.
-        assert (
-            client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-            == company.organization_switch_key
-        )
-        assert user.kind == UserKind.EMPLOYER
+        user.refresh_from_db()
         assert user.is_active
         assert company.has_admin(user)
         assert 1 == company.members.count()
@@ -168,7 +126,7 @@ class TestCompanySignup:
         )
         assert len(mailoutbox) == 0
 
-    def test_join_company_with_member(self, client):
+    def test_join_a_company_with_member(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
 
@@ -194,70 +152,45 @@ class TestCompanySignup:
         }
 
     @freeze_time("2024-09-15 15:53:54")
-    def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
-        """
-        A user joins a company without members.
-        """
+    def test_join_a_company_without_members_as_an_existing_employer(self, client, pro_connect):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
-        user = EmployerFactory(
+        user = random_pro_user_factory(
             username=pro_connect.oidc_userinfo["sub"],
             email=pro_connect.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
-        CompanyMembershipFactory(user=user)
+        old_company = CompanyMembershipFactory(user=user).company
         assert 1 == user.company_set.count()
 
         client.force_login(user)
+        client.get(reverse("dashboard:index"))
+        assert (
+            client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+            == old_company.organization_switch_key
+        )
 
         magic_link = company.signup_magic_link
-        response = client.get(magic_link)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        token = company.get_token()
-        previous_url = reverse("signup:employer", args=(company.pk, token))
-        next_url = reverse("signup:company_join", args=(company.pk, token))
-        params = {
-            "user_kind": KIND_EMPLOYER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_EMPLOYER,
-            previous_url=previous_url,
-            next_url=next_url,
-        )
-        response = client.get(response.url)
-        # Check user is redirected to the dashboard
+        response = client.get(magic_link, follow=True)
         assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
         assert company.has_admin(user)
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
+        assert (
+            client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+            == company.organization_switch_key
+        )
 
     @freeze_time("2024-09-15 15:53:54")
-    def test_join_a_company_without_members_as_an_existing_professional(self, client, pro_connect):
+    def test_join_a_company_without_members_logged_out(self, client, pro_connect):
         """
         A user joins a company without members.
         """
-        user = random_pro_user_factory()
-        client.force_login(user)
-
         company = CompanyFactory(kind=CompanyKind.ETTI)
-        assert 0 == company.members.count()
-
-        user = PrescriberFactory(
-            username=pro_connect.oidc_userinfo["sub"],
-            email=pro_connect.oidc_userinfo["email"],
-            has_completed_welcoming_tour=True,
-        )
 
         magic_link = company.signup_magic_link
         response = client.get(magic_link)
@@ -281,66 +214,15 @@ class TestCompanySignup:
             previous_url=previous_url,
             next_url=next_url,
         )
-        response = client.get(response.url)
-        # Check user is redirected to the dashboard
-        assertRedirects(response, reverse("dashboard:index"))
+        response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
+        assertRedirects(response, reverse("welcoming_tour:index"))
 
         # Check `User` state.
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert company.has_admin(user)
         assert 1 == company.members.count()
         assert 1 == user.company_set.count()
-
-    @freeze_time("2024-09-15 15:53:54")
-    def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
-        self, client, pro_connect
-    ):
-        """
-        A user joins a company without members.
-        """
-        user = random_pro_user_factory()
-        client.force_login(user)
-
-        company = CompanyFactory(kind=CompanyKind.ETTI)
-
-        user = EmployerFactory(
-            username=pro_connect.oidc_userinfo["sub"],
-            email=pro_connect.oidc_userinfo["email"],
-            has_completed_welcoming_tour=True,
-        )
-        CompanyMembershipFactory(user=user)
-
-        magic_link = company.signup_magic_link
-        response = client.get(magic_link)
-        pro_connect.assertContainsButton(response)
-
-        # Check ProConnect will redirect to the correct url
-        token = company.get_token()
-        previous_url = reverse("signup:employer", args=(company.pk, token))
-        next_url = reverse("signup:company_join", args=(company.pk, token))
-        params = {
-            "user_kind": KIND_EMPLOYER,
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        other_client = ItouClient()
-        response = pro_connect.mock_oauth_dance(
-            client,
-            KIND_EMPLOYER,
-            previous_url=previous_url,
-            next_url=next_url,
-            other_client=other_client,
-        )
-        response = other_client.get(response.url)
-        # Check user is redirected to the dashboard
-        assertRedirects(response, reverse("dashboard:index"))
-
-        # Check `User` state.
-        assert company.has_admin(user)
-        assert 1 == company.members.count()
-        assert 2 == user.company_set.count()
 
     def test_user_invalid_company_id(self, client):
         user = random_pro_user_factory()
@@ -363,8 +245,6 @@ class TestCompanySignup:
         user = random_pro_user_factory()
         client.force_login(user)
 
-        user = EmployerFactory(membership=True)
-        client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = client.get(
             reverse("signup:company_join", kwargs={"company_id": "0", "token": company.get_token()}), follow=True
