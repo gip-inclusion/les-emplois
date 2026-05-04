@@ -33,8 +33,6 @@ from factory import Faker
 from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 
-from itou.utils import triggers
-
 
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
@@ -799,9 +797,3 @@ def detect_missing_csrf_token():
 @pytest.fixture(autouse=True)
 def do_not_bypass_terms_acceptance(settings):
     settings.BYPASS_TERMS_ACCEPTANCE = False
-
-
-@pytest.fixture
-def with_connection_wrapper_set():
-    with connection.execute_wrapper(triggers._set_context_connection_wrapper):
-        yield

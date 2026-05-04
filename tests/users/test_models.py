@@ -1010,13 +1010,12 @@ def test_job_seeker_profile_asp_uid(initial_asp_uid):
     assert profile.asp_uid == initial_asp_uid or "08b4e9f755a688b554a6487d96d2a0"
 
 
-@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_job_seeker_profile_asp_uid_field_history():
     profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
     assert profile.fields_history == []
 
     profile.asp_uid = "000000000000000000000000000001"
-    with triggers.context():
+    with triggers.connection_wrapper(), triggers.context():
         profile.save()
     profile.refresh_from_db()
     assert normalize_fields_history(profile.fields_history) == [
@@ -1032,7 +1031,7 @@ def test_job_seeker_profile_asp_uid_field_history():
     )
 
     profile.asp_uid = "000000000000000000000000000002"
-    with triggers.context(profile=profile.pk):
+    with triggers.connection_wrapper(), triggers.context(profile=profile.pk):
         profile.save()
     profile.refresh_from_db()
     assert normalize_fields_history(profile.fields_history) == [
