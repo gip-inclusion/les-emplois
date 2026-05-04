@@ -37,6 +37,17 @@ class GeolocatedAddressMixin(models.Model):
 
     coordinates = gis_models.PointField(geography=True, null=True, blank=True)
 
+    @property
+    def address_on_one_line(self):
+        if not all([self.address_line_1, self.post_code, self.city]):
+            return None
+        fields = [
+            self.address_line_1,
+            self.address_line_2,
+            f"{self.post_code} {self.city}",
+        ]
+        return ", ".join(field for field in fields if field)
+
     class Meta:
         abstract = True
 
