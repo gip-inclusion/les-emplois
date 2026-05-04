@@ -1,0 +1,78 @@
+# serializer version: 1
+# name: TestPrescriberSignup.test_professional_is_already_member_of_ft_organization
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                  <p class="mb-0">
+                      Vous êtes déjà membre de
+                      <b>
+                          Pres. Org.
+                      </b>
+                      .
+                  </p>
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <div class="row">
+                          <div class="col-12">
+                              <hr class="mb-3"/>
+                              <div class="form-row align-items-center justify-content-end gx-3">
+                                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                      <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                                          </i>
+                                          <span>
+                                              Annuler
+                                          </span>
+                                      </button>
+                                  </div>
+                                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                      <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/signup/prescriber/france-travail/search">
+                                          <span>
+                                              Retour
+                                          </span>
+                                      </a>
+                                  </div>
+                                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                      <button class="btn btn-block btn-primary disabled" type="button">
+                                          <span>
+                                              Suivant
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h3 class="modal-title">
+                                          Êtes-vous sûr de vouloir annuler ?
+                                      </h3>
+                                  </div>
+                                  <div class="modal-body">
+                                      Les informations renseignées ne seront pas enregistrées.
+                                      <br/>
+                                      Cette action est irréversible.
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                          Retour
+                                      </button>
+                                      <a class="btn btn-sm btn-danger" href="/signup/professional/kind">
+                                          Confirmer l'annulation
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---

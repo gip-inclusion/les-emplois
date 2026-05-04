@@ -21,16 +21,23 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
 
-                    <p class="mb-0">
-                        Vous allez rejoindre <b>{{ ft_org.display_name }}</b>
-                    </p>
+                    {% if not already_member %}
 
+                        <p class="mb-0">
+                            Vous allez rejoindre <b>{{ ft_org.display_name }}</b>
+                        </p>
+
+                    {% else %}
+                        <p class="mb-0">
+                            Vous êtes déjà membre de <b>{{ ft_org.display_name }}</b>.
+                        </p>
+                    {% endif %}
                     <form method="post" class="js-prevent-multiple-submit">
                         {% csrf_token %}
 
                         {% url 'signup:choose_pro_membership_kind' as reset_url %}
                         {% url 'signup:prescriber_search_ft_org' as prev_url %}
-                        {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                        {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url reset_url=reset_url show_mandatory_fields_mention=False primary_disabled=already_member %}
                     </form>
                 </div>
             </div>
