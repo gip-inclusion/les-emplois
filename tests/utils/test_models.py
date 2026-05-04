@@ -3,13 +3,21 @@ from django.apps import apps
 from django.db import ProgrammingError, connection, transaction
 from psycopg.types.json import Jsonb
 
+from itou.companies.models import Company
 from itou.users.models import JobSeekerProfile
 from itou.utils import triggers
 from itou.utils.models import AbstractFieldsHistoryModel
+from tests.companies.factories import CompanyFactory
 from tests.users.factories import JobSeekerProfileFactory
 
 
 FIELDS_HISTORY_MODELS_TO_TEST_PARAMS = {
+    Company: {
+        "factory": CompanyFactory,
+        "test_field": "siret",
+        "initial": "00000000000000",
+        "update": "00000000000001",
+    },
     JobSeekerProfile: {
         "factory": JobSeekerProfileFactory,
         "test_field": "asp_uid",

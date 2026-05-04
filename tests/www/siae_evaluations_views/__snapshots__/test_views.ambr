@@ -578,6 +578,7 @@
         ]),
         'sql': '''
           SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -612,8 +613,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -1402,6 +1402,7 @@
         ]),
         'sql': '''
           SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1436,8 +1437,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -2049,6 +2049,7 @@
         ]),
         'sql': '''
           SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -2083,8 +2084,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21

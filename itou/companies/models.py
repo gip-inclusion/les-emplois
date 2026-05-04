@@ -33,8 +33,8 @@ from itou.companies.enums import (
     JobSourceTag,
 )
 from itou.utils.emails import get_email_message
+from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import company_signup_token_generator
-from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
@@ -232,7 +232,7 @@ class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
         return super().get_queryset().defer("fields_history")
 
 
-class Company(AddressMixin, OrganizationAbstract):
+class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
     """
     Structures d'insertion par l'activité économique.
 
@@ -240,6 +240,12 @@ class Company(AddressMixin, OrganizationAbstract):
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
         self.job_description_through.all()     <QuerySet [<JobDescription>, ...]>
     """
+
+    # Configuration for AbstractFieldsHistoryModel
+    FIELDS_HISTORY_TRIGGER_NAME = "company_fields_history"
+    FIELDS_HISTORY_TRIGGER_FIELDS = [
+        "siret",
+    ]
 
     # These kinds of Companies can use employee record app to send data to ASP
     ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.EITI, CompanyKind.ETTI]
@@ -341,19 +347,10 @@ class Company(AddressMixin, OrganizationAbstract):
         related_query_name="company",
     )
 
-    fields_history = ArrayField(
-        models.JSONField(
-            encoder=DjangoJSONEncoder,
-        ),
-        verbose_name="historique des champs modifiés sur le modèle",
-        default=list,
-        db_default=[],
-    )
-
     objects = CompanyManager()
     unfiltered_objects = CompanyUnfilteredManager()
 
-    class Meta:
+    class Meta(AddressMixin.Meta):
         verbose_name = "entreprise"
         unique_together = ("siret", "kind")
         constraints = [
@@ -363,7 +360,6 @@ class Company(AddressMixin, OrganizationAbstract):
                 condition=Q(source=CompanySource.ASP),
             ),
         ]
-        triggers = [FieldsHistory(name="company_fields_history", fields=["siret"])]
         permissions = [
             ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
         ]

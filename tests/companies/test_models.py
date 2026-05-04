@@ -5,7 +5,6 @@ from unittest import mock
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import ProgrammingError, transaction
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -695,18 +694,3 @@ def test_company_siret_field_history():
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
         datetime.now().timestamp()
     )
-
-
-def test_company_field_history_raise(faker):
-    company = CompanyFactory(siret="00000000000000")
-    assert company.fields_history == []
-
-    company.fields_history = [faker.pydict()]
-    with pytest.raises(ProgrammingError, match='Modification du champ "fields_history" interdit'):
-        with transaction.atomic():
-            company.save()
-
-    company.siret = "00000000000001"
-    with pytest.raises(ProgrammingError, match='Modification du champ "fields_history" interdit'):
-        with transaction.atomic():
-            company.save()

@@ -206,6 +206,7 @@
                  T5."upcoming_deletion_notified_at",
                  T5."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -241,7 +242,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -273,6 +273,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  T8."id",
+                 T8."fields_history",
                  T8."address_line_1",
                  T8."address_line_2",
                  T8."post_code",
@@ -307,8 +308,7 @@
                  T8."convention_id",
                  T8."job_app_score",
                  T8."is_searchable",
-                 T8."rdv_solidarites_id",
-                 T8."fields_history"
+                 T8."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           INNER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -426,6 +426,7 @@
                  "jobs_rome"."code",
                  "jobs_rome"."name",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -461,7 +462,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -526,6 +526,7 @@
                  "jobs_rome"."code",
                  "jobs_rome"."name",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -561,7 +562,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",

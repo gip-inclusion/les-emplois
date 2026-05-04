@@ -1603,6 +1603,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1637,8 +1638,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -1740,6 +1740,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1774,8 +1775,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -1875,6 +1875,7 @@
                  T4."upcoming_deletion_notified_at",
                  T4."allow_next_sso_sub_update",
                  T5."id",
+                 T5."fields_history",
                  T5."address_line_1",
                  T5."address_line_2",
                  T5."post_code",
@@ -1910,7 +1911,6 @@
                  T5."job_app_score",
                  T5."is_searchable",
                  T5."rdv_solidarites_id",
-                 T5."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2869,6 +2869,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -2903,8 +2904,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -3006,6 +3006,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3040,8 +3041,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -3807,6 +3807,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3841,8 +3842,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -3939,6 +3939,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3973,8 +3974,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_geiqeligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -5015,6 +5015,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -5049,8 +5050,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -5152,6 +5152,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -5186,8 +5187,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -6122,6 +6122,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -6156,8 +6157,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -6259,6 +6259,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -6293,8 +6294,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
