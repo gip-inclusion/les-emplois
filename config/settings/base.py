@@ -163,6 +163,8 @@ MIDDLEWARE = [
     "itou.utils.triggers.middleware.fields_history",
     # Final logger
     "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
+    # Template rendering middleware
+    "itou.utils.readonly.ReadonlyTemplateRenderingMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
