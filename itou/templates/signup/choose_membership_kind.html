@@ -3,12 +3,12 @@
 {% load components %}
 {% load django_bootstrap5 %}
 
-{% block title %}Inscription {{ block.super }}{% endblock %}
+{% block title %}S’inscrire {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Inscription</h1>
+            <h1>S’inscrire</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
