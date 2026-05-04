@@ -17,22 +17,31 @@
         {% fragment as c_title__main %}
             <h1>Détail du contrat : {{ contract.employee.get_full_name }}</h1>
         {% endfragment %}
-        {% fragment as c_title__cta %}
-            {% if request.from_employer %}
-                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=False editable=editable request=request only %}
-            {% elif request.from_institution %}
-                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=False editable=editable request=request only %}
-            {% endif %}
-        {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
 
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         {% for tab in AssessmentContractDetailsTab %}
-            <li class="nav-item">
-                <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}</a>
-            </li>
+            {% if tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
+                {# Tab only displayed when appropriate #}
+                {% if request.from_employer and contract.requires_justification %}
+                    <li class="nav-item">
+                        <a class="nav-link{% if active_tab == 'justification' %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                            {{ tab.label }}
+                            {% if not contract.allowance_request_justification_reason %}
+                                <i class="ri-error-warning-line ri-xl text-warning ms-2"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                        {{ tab.label }}
+                    </a>
+                </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endblock %}
@@ -41,8 +50,8 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <h2>{{ active_tab.label }}</h2>
+                <h2>{{ active_tab.label }}</h2>
+                <div class="s-section__col col">
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
@@ -102,6 +111,11 @@
                             </ul>
                         </div>
                     {% elif active_tab == AssessmentContractDetailsTab.CONTRACT %}
+                        {% if request.from_institution and contract.requires_justification and contract.allowance_request_justification_reason %}
+                            <div class="mb-3 mb-md-4">
+                                {% include "geiq_assessments_views/includes/allowance_request_justified_box.html" with MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE contract=contract assessment=assessment request=request only %}
+                            </div>
+                        {% endif %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
                                 <li>
@@ -354,8 +368,82 @@
                                 </li>
                             </ul>
                         </div>
+                    {% elif active_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
+                        {% if contract.requires_justification %}
+                            {% if assessment.contracts_selection_validated_at or assessment.submitted_at %}
+                                <div class="mb-3 mb-md-4">
+                                    {% include "geiq_assessments_views/includes/allowance_request_justified_box.html" with MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE contract=contract assessment=assessment request=request only %}
+                                </div>
+                            {% else %}
+                                {% include "geiq_assessments_views/includes/allowance_request_justification_form.html" with back_url=back_url contract=contract assessment=assessment form=allowance_request_justification_form csrf_token=csrf_token only %}
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                 </div>
+                {% if request.from_employer and editable %}
+                    <div class="col-5">
+                        {% if contract.allowance_requested %}
+                            {% if contract.requires_justification %}
+                                <div class="c-box {% if contract.allowance_request_justification_reason %}border-info{% else %}bg-warning-lightest border-warning{% endif %} mb-3 mb-md-4">
+                                    <h3>Aide sollicitée pour ce contrat</h3>
+                                    <p>
+                                        La durée du contrat est inférieure à {{ MIN_DAYS_IN_YEAR_FOR_ALLOWANCE }} jours sur l’année {{ contract.employee.assessment.campaign.year }}.
+                                        {% if contract.allowance_request_justification_reason %}
+                                            <b>Vous avez motivé cette demande d’aide</b>. Vous pouvez encore y apporter des corrections si besoin.
+                                        {% else %}
+                                            Vous devez donc <b>obligatoirement justifier</b> votre demande.
+                                        {% endif %}
+                                    </p>
+                                    <p>Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».</p>
+                                    {% if active_tab is not AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
+                                        {% if contract.allowance_request_justification_reason %}
+                                            <a type="button"
+                                               class="btn btn-primary w-100 mb-3"
+                                               href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.value %}">
+                                                <span>Consulter votre justification</span>
+                                            </a>
+                                        {% else %}
+                                            <a type="submit"
+                                               class="btn btn-ico btn-primary w-100 mb-3"
+                                               href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.value %}">
+                                                <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+                                                <span>Justifier la demande d’aide</span>
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                    <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_exclude' contract_pk=contract.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100">
+                                            <i class="ri-close-large-line font-weight-medium" aria-hidden="true"></i>
+                                            <span>Ne plus solliciter l’aide</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <div class="c-box bg-info-lightest border-info mb-3 mb-md-4">
+                                    <h3>Aide sollicitée pour ce contrat</h3>
+                                    <p>Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.</p>
+                                    <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_exclude' contract_pk=contract.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100">
+                                            <i class="ri-close-large-line font-weight-medium" aria-hidden="true"></i>
+                                            <span>Ne plus solliciter l’aide</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="c-box bg-info-lightest border-info mb-3 mb-md-4">
+                                <h3>Aide non sollicitée pour ce contrat</h3>
+                                <p>Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.</p>
+                                <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_include' contract_pk=contract.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary w-100">Solliciter l’aide</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </section>

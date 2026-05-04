@@ -6,7 +6,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
+from itou.geiq_assessments.enums import AllowanceJustificationReason, AssessmentState, AssessmentTransition
 from itou.geiq_assessments.models import AssessmentCampaign, AssessmentTransitionLog
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
@@ -388,6 +388,33 @@ def test_employee_contract_nb_of_days():
         contract.nb_days_in_previous_year() + contract.nb_days_in_campaign_year + contract.nb_days_in_following_year()
         == contract.real_duration().days
     )
+
+
+def test_employee_contract_allowance_request_justification_constraint():
+    # Filling both fields together is valid.
+    EmployeeContractFactory(
+        allowance_request_justification_reason=AllowanceJustificationReason.OTHER,
+        allowance_request_justification_details="Précision obligatoire",
+    )
+    # Both fields set to empty string is valid.
+    EmployeeContractFactory(
+        allowance_request_justification_reason="",
+        allowance_request_justification_details="",
+    )
+    # Reason without details: forbidden.
+    with pytest.raises(IntegrityError, match=r".*geiq_allowance_request_justification_set.*"):
+        with transaction.atomic():
+            EmployeeContractFactory(
+                allowance_request_justification_reason=AllowanceJustificationReason.OTHER,
+                allowance_request_justification_details="",
+            )
+    # Details without reason: forbidden.
+    with pytest.raises(IntegrityError, match=r".*geiq_allowance_request_justification_set.*"):
+        with transaction.atomic():
+            EmployeeContractFactory(
+                allowance_request_justification_reason=None,
+                allowance_request_justification_details="Précision sans motif",
+            )
 
 
 def test_employee_contract_antenna_department():

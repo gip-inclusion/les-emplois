@@ -80,6 +80,11 @@ urlpatterns = [
         kwargs={"new_value": False},
     ),
     path(
+        "contracts/<uuid:contract_pk>/justify",
+        views.assessment_contracts_save_justification,
+        name="assessment_contracts_save_justification",
+    ),
+    path(
         "contracts/<uuid:contract_pk>/<str:tab>",
         views.assessment_contracts_details,
         name="assessment_contracts_details",

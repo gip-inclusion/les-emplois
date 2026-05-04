@@ -12,7 +12,26 @@
       class="js-prevent-multiple-submit">
     {% csrf_token %}
     <div class="form-check form-switch{% if not from_list %} form-switch-lg{% endif %}">
-        <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if not editable %}disabled{% endif %} />
+        <div class="d-flex align-items-center gap-2">
+            <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if not editable %}disabled{% endif %} />
+            {% if request.from_employer and contract.requires_justification %}
+                {% if contract.allowance_request_justification_reason %}
+                    <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
+                       class="text-success text-decoration-none lh-1"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Vous avez motivé la demande d’aide de ce contrat">
+                        <i class="ri-check-line ri-xl" aria-label="Afficher une information complémentaire" role="button" tabindex="0"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
+                       class="text-warning text-decoration-none lh-1"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat">
+                        <i class="ri-error-warning-line ri-xl" aria-label="Afficher une information complémentaire" role="button" tabindex="0"></i>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
         <label class="form-check-label{% if from_list %} visually-hidden{% endif %}" for="allowance_for_contract_{{ contract.pk }}">
             {% if request.from_employer %}
                 Obtenir l’aide
@@ -25,5 +44,7 @@
 {% with disable_oob=disable_stats_oob|default:False %}
     {% if from_list and request.htmx and not disable_oob %}
         {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True request=request only %}
+        {% include "geiq_assessments_views/includes/contracts_list_justification_alert.html" with contracts_awaiting_justification_nb=stats.contracts_awaiting_allowance_request_justification_nb assessment=assessment request=request hx_swap_oob=True only %}
+        {% include "geiq_assessments_views/includes/contracts_list_validate_button_form.html" with ContractsAction=ContractsAction back_url=back_url primary_disabled=stats.contracts_awaiting_allowance_request_justification_nb csrf_token=csrf_token hx_swap_oob=True only %}
     {% endif %}
 {% endwith %}

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django_select2.forms import Select2Widget
 
 from itou.files.forms import ItouFileField
+from itou.geiq_assessments.enums import AllowanceJustificationReason
 from itou.geiq_assessments.models import Assessment, Employee
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -374,3 +375,19 @@ class GeiqFixCommentForm(forms.Form):
     comment = forms.CharField(
         label="Précisez les corrections à apporter au dossier", widget=forms.Textarea(), strip=True
     )
+
+
+class AllowanceRequestJustificationForm(forms.Form):
+    allowance_request_reason = forms.ChoiceField(
+        label="Sélectionnez le motif applicable",
+        required=True,
+        choices=AllowanceJustificationReason.choices,
+        widget=forms.RadioSelect,
+    )
+    allowance_request_details = forms.CharField(label="Précisions", required=True, widget=forms.Textarea(), strip=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for choice in self["allowance_request_reason"]:
+            choice.description = AllowanceJustificationReason.get_description(choice.data["value"])

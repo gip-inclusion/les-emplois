@@ -1,0 +1,21 @@
+<div class="c-box bg-info-lightest border-info">
+    <h3>Demande d’aide motivée</h3>
+    <p>
+        Ce salarié a un contrat de moins de {{ MIN_DAYS_IN_YEAR_FOR_ALLOWANCE }} jours sur l’année {{ assessment.campaign.year }}.
+        {% if request.from_institution %}
+            Le GEIQ a motivé cette demande d’aide :
+        {% elif request.from_employer %}
+            Vous avez motivé cette demande d’aide :
+        {% endif %}
+    </p>
+    <ul class="list-data">
+        <li>
+            <small>Motif</small>
+            <strong>{{ contract.get_allowance_request_justification_reason_display }}</strong>
+        </li>
+        <li>
+            <small>Précision</small>
+            <span>{{ contract.allowance_request_justification_details }}</span>
+        </li>
+    </ul>
+</div>

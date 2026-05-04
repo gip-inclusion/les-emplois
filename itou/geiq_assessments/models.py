@@ -9,6 +9,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import File
+from itou.geiq_assessments import enums as geiq_enums
 from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -610,6 +611,16 @@ class EmployeeContract(models.Model):
 
     allowance_requested = models.BooleanField(verbose_name="aide demandée par le GEIQ")
     allowance_granted = models.BooleanField(verbose_name="aide acceptée par l'institution")
+    allowance_request_justification_reason = models.CharField(
+        verbose_name="motif de la demande d'aide (GEIQ)",
+        max_length=30,
+        choices=geiq_enums.AllowanceJustificationReason,
+        blank=True,
+    )
+    allowance_request_justification_details = models.TextField(
+        verbose_name="commentaire associé à la demande d'aide (GEIQ)",
+        blank=True,
+    )
 
     other_data = models.JSONField(verbose_name="autres données")
 
@@ -620,6 +631,22 @@ class EmployeeContract(models.Model):
                 name="geiq_allowance_requested_or_not_granted",
                 violation_error_message="Impossible d'accorder une aide non-sollicitée",
                 condition=~models.Q(allowance_requested=False, allowance_granted=True),
+            ),
+            models.CheckConstraint(
+                name="geiq_allowance_request_justification_set",
+                violation_error_message="Le motif et le commentaire de justification doivent être renseignés ensemble",
+                condition=(
+                    models.Q(
+                        allowance_request_justification_reason="",
+                        allowance_request_justification_details="",
+                    )
+                    | (
+                        models.Q(
+                            allowance_request_justification_reason__isnull=False,
+                        )
+                        & ~models.Q(allowance_request_justification_details="")
+                    )
+                ),
             ),
         ]
 
@@ -665,6 +692,10 @@ class EmployeeContract(models.Model):
             return "Hors période d’essai"
         else:
             return "En période d’essai"
+
+    @property
+    def requires_justification(self):
+        return self.allowance_requested and self.nb_days_in_campaign_year < MIN_DAYS_IN_YEAR_FOR_ALLOWANCE
 
 
 class EmployeePrequalification(models.Model):

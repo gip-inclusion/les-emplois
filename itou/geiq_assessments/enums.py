@@ -32,3 +32,24 @@ class InstitutionAction(enum.StrEnum):
     # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
     # - https://github.com/django/django/pull/12304
     do_not_call_in_templates = enum.nonmember(True)
+
+
+# class GEIQAction(enum.StrEnum):
+#     ALLOWANCE_REQUEST_JUSTIFICATION = "allowance_request_justification"
+
+
+class AllowanceJustificationReason(models.TextChoices):
+    OTHER_REFERENCE_PERIOD = "other_reference_period", "Autre période de référence"
+    SUPPORT_CONSIDERATION = "support_consideration", "Prise en compte de l'accompagnement"
+    OTHER = "other", "Autre motif"
+
+    @classmethod
+    def get_description(cls, reason):
+        details = {
+            cls.OTHER_REFERENCE_PERIOD: "La période de contrat / l’accompagnement s’étend sur un autre exercice.",
+            cls.SUPPORT_CONSIDERATION: (
+                "L'accompagnement a débuté avant et/ou s'est poursuivi après la fin du contrat."
+            ),
+            cls.OTHER: "Précisez le motif dans le champ de saisie ci-dessous.",
+        }
+        return details.get(reason)

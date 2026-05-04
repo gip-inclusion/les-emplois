@@ -1,0 +1,29 @@
+{% load components %}
+{% load str_filters %}
+<div id="alert-contracts-awaiting-justification"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+    {% if contracts_awaiting_justification_nb %}
+        {% if request.from_employer %}
+            {% component_alert title=title content=content variant="warning" extra_classes="mt-2" %}
+                {% fragment as title %}
+                    {{ contracts_awaiting_justification_nb|pluralizefr:"Demande d’aide,Demandes d’aides" }} à justifier
+                {% endfragment %}
+                {% fragment as content %}
+                    <div class="row">
+                        <div class="col">
+                            <p class="mb-0">
+                                Vous devez encore motiver {{ contracts_awaiting_justification_nb|pluralizefr:"la demande,les demandes" }} d’aide de {{ contracts_awaiting_justification_nb }} {{ contracts_awaiting_justification_nb|pluralizefr:"contrat,contrats" }}.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-auto">
+                            <a type="button"
+                               class="btn btn-sm btn-outline-warning"
+                               href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
+                                Afficher les contrats concernés
+                            </a>
+                        </div>
+                    </div>
+                {% endfragment %}
+            {% endcomponent_alert %}
+        {% endif %}
+    {% endif %}
+</div>
