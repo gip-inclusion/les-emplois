@@ -7,31 +7,24 @@
 {% block title %}Facilitateur de clauses sociales - S’inscrire {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+    {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>S’inscrire</h1>
             <p>Facilitateur de clauses sociales</p>
         {% endfragment %}
-        {% fragment as c_title__secondary %}
-            <h2>Inscrire mon organisation porteuse de la clause sociale d’insertion</h2>
-            <p>
-                Cette inscription est soumise à des conditions qui ont été définies en lien avec nos partenaires publics et privés nationaux.
-            </p>
-            <p>
-                <span class="d-block">Les conditions suivantes sont nécessaires :</span>
-                <b>
-                    La structure qui s’inscrit, pour un territoire donné, doit être porteuse d’un poste occupé par une personne ayant des compétences de facilitateur (reconnues et validées par le réseau national des facilitateurs) et s’engager à respecter les fondamentaux de la clause sociale.
-                </b>
-            </p>
-            <p>
-                Lors de l’inscription en tant qu’organisme porteur de la clause sociale, le compte restera inactif tant qu’il n’aura pas été vérifié par le réseau national des facilitateurs de la clause sociale, Alliance Villes Emploi (AVE).
-
-            </p>
-            <p>
-                Pour obtenir des informations complémentaires, vous pouvez contacter AVE à l’adresse suivante : <a href="mailto:ave@ville-emploi.asso.fr" aria-label="Rédiger un e-mail à Alliance Villes Emploi">ave@ville-emploi.asso.fr</a>.
-            </p>
-        {% endfragment %}
     {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    <div class="c-stepper">
+        <div class="progress">
+            <div class="progress-bar progress-bar-66" role="progressbar" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">
+            </div>
+        </div>
+        <p>
+            <strong>Étape 2</strong>/3 : Rattachement à votre structure
+        </p>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -39,6 +32,23 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <h2>Inscrire mon organisation porteuse de la clause sociale d’insertion</h2>
+                    <p>
+                        Cette inscription est soumise à des conditions qui ont été définies en lien avec nos partenaires publics et privés nationaux.
+                    </p>
+                    <p>
+                        <span class="d-block">Les conditions suivantes sont nécessaires :</span>
+                        <b>
+                            La structure qui s’inscrit, pour un territoire donné, doit être porteuse d’un poste occupé par une personne ayant des compétences de facilitateur (reconnues et validées par le réseau national des facilitateurs) et s’engager à respecter les fondamentaux de la clause sociale.
+                        </b>
+                    </p>
+                    <p>
+                        Lors de l’inscription en tant qu’organisme porteur de la clause sociale, le compte restera inactif tant qu’il n’aura pas été vérifié par le réseau national des facilitateurs de la clause sociale, Alliance Villes Emploi (AVE).
+
+                    </p>
+                    <p>
+                        Pour obtenir des informations complémentaires, vous pouvez contacter AVE à l’adresse suivante : <a href="mailto:ave@ville-emploi.asso.fr" aria-label="Rédiger un e-mail à Alliance Villes Emploi">ave@ville-emploi.asso.fr</a>.
+                    </p>
                     <!-- this prevents the user from clicking on the "back" button of the browser -->
                     <form method="post" class="js-prevent-multiple-submit">
 
