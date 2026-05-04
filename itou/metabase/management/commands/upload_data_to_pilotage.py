@@ -20,6 +20,9 @@ from itou.utils.storage.s3 import pilotage_s3_client
 class Command(BaseCommand):
     help = "Upload FluxIAE to S3 for sharing."
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     FILENAME_PREFIX = "fluxIAE_ITOU_"
     DATASTORE_DIRECTORY = "flux-iae/"
 
