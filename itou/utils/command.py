@@ -2,7 +2,6 @@ import contextlib
 import os
 
 from django.core.management import base
-from django.db import connection
 from itoutils.django.commands import AtomicHandleMixin, LoggedCommandMixin, get_current_command_info
 
 from itou.utils import triggers
@@ -16,7 +15,7 @@ class TriggerContextMixin:
 
     def execute(self, *args, **kwargs):
         with (
-            connection.execute_wrapper(triggers._set_context_connection_wrapper),
+            triggers.connection_wrapper(),
             triggers.context(**self.get_trigger_context()) if self.AUTO_TRIGGER_CONTEXT else contextlib.nullcontext(),
         ):
             return super().execute(*args, **kwargs)

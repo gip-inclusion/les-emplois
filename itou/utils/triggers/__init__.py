@@ -47,6 +47,11 @@ def _set_context_connection_wrapper(execute, sql, params, many, context):
     return execute(sql, params, many, context)
 
 
+# This is a context manager ready to be used
+def connection_wrapper():
+    return connection.execute_wrapper(_set_context_connection_wrapper)
+
+
 @contextlib.contextmanager
 def context(*, replace_existing: bool = False, **kwargs):
     if not connection.in_atomic_block:
