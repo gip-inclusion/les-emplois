@@ -1,8 +1,10 @@
+import copy
+
 from django import forms
 from django.core.exceptions import ValidationError
 
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.models import ACCEPTED_ONLY_FIELDS, JobApplication
 
 
 class JobApplicationAdminForm(forms.ModelForm):
@@ -14,13 +16,13 @@ class JobApplicationAdminForm(forms.ModelForm):
             "sender_prescriber_organization": "Organisation émettrice (si type est Prescripteur)",
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, data=None, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
         if self.instance is None:
             self._initial_job_application_state = None
         else:
             self._initial_job_application_state = self.instance.state
-        self._job_application_to_accept = False
+        self._job_application_to_accept = data is not None and "transition_accept" in data
 
     def clean(self):
         super().clean()
@@ -74,3 +76,25 @@ class JobApplicationAdminForm(forms.ModelForm):
                 raise ValidationError("Le diagnostic d'éligibilité n'appartient pas au candidat de la candidature.")
 
         return
+
+    def validate_constraints(self):
+        """Override the default implementation to include the DB constraints on `state`.
+
+        `state` is managed by xworkflows and the ACCEPTED_ONLY_FIELDS are admin readonly.
+        Both end up excluded by the default logic, which would silently skip the
+        `accepted_only_fields` check constraint. Force their inclusion here so the
+        constraint is actually evaluated against the instance's current values.
+        """
+        exclude = self._get_validation_exclusions()
+        exclude.discard("state")
+        exclude.difference_update(ACCEPTED_ONLY_FIELDS)
+        # Validate against a shallow copy so we never temporarily mutate the real
+        # instance's state: this copy avoids a transient "accepted" state on the
+        # instance being saved
+        instance = copy.copy(self.instance)
+        if self._job_application_to_accept:
+            instance.state = JobApplicationState.ACCEPTED
+        try:
+            instance.validate_constraints(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e)

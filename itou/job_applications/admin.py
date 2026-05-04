@@ -3,6 +3,7 @@ import uuid
 
 import xworkflows
 from django.contrib import admin, messages
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -12,6 +13,7 @@ from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
+from itou.job_applications.models import ACCEPTED_ONLY_FIELDS
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.models import User
 from itou.utils.admin import (
@@ -315,6 +317,17 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         if not change:
             obj.origin = Origin.ADMIN
 
+        # When accepting via the admin, the form may set accepted-only FKs while the
+        # state is still non-ACCEPTED. Null them for the intermediate save so the DB
+        # check constraints hold; response_change() rehydrates `eligibility_diagnosis`
+        # from request.POST before firing the transition (which saves again with
+        # state=ACCEPTED). The outer atomic block in `changeform_view()` rolls this
+        # intermediate save back if the `accept()` transition aborts, so the row
+        # keeps its original FK values on failure.
+        if "transition_accept" in request.POST:
+            for field, default in ACCEPTED_ONLY_FIELDS.items():
+                setattr(obj, field, default)
+
         super().save_model(request, obj, form, change)
 
     def get_form(self, request, obj=None, **kwargs):
@@ -349,10 +362,19 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         * processing the job application
         * accepting the job application
         * refusing the job application
-        * reseting the job applciation
+        * resetting the job application
         """
         for transition in ["accept", "cancel", "reset", "process"]:
             if f"transition_{transition}" in request.POST:
+                if transition == "accept":
+                    # Rehydrate `eligibility_diagnosis` from request.POST. This is
+                    # the only accepted-only FK that needs rehydration: accept()
+                    # overwrites `geiq_eligibility_diagnosis` for GEIQ & manages
+                    # `approval` internally, so the nulled values from save_model()
+                    # are fine for those. `eligibility_diagnosis` is only preserved
+                    # for ITOU_STAFF (the accept() branch that keeps the admin-supplied
+                    # value instead of recomputing it).
+                    obj.eligibility_diagnosis_id = request.POST.get("eligibility_diagnosis") or None
                 try:
                     getattr(obj, transition)(user=request.user)
                     # Stay on same page
@@ -360,6 +382,9 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     updated_request.update({"_continue": ["please"]})
                     request.POST = updated_request
                 except xworkflows.AbortTransition as e:
+                    # Roll back the intermediate save that save_model() made with
+                    # NULL accepted-only FKs, so the row keeps its original values.
+                    transaction.set_rollback(True)
                     return self.transition_error(request, e)
 
         return super().response_change(request, obj)
