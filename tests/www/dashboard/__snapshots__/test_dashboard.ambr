@@ -952,6 +952,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -986,8 +987,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" ON ("eligibility_eligibilitydiagnosis"."job_seeker_id" = "users_user"."id")
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
@@ -1143,6 +1143,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1177,8 +1178,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "eligibility_geiqeligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_geiqeligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")

@@ -1389,6 +1389,7 @@
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
                              COALESCE(NULLIF(T3."brand", %s), T3."name") AS "sender_company_display_name",
                              T3."id",
+                             T3."fields_history",
                              T3."address_line_1",
                              T3."address_line_2",
                              T3."post_code",
@@ -1423,8 +1424,7 @@
                              T3."convention_id",
                              T3."job_app_score",
                              T3."is_searchable",
-                             T3."rdv_solidarites_id",
-                             T3."fields_history"
+                             T3."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
@@ -3080,6 +3080,7 @@
                  T7."upcoming_deletion_notified_at",
                  T7."allow_next_sso_sub_update",
                  T8."id",
+                 T8."fields_history",
                  T8."address_line_1",
                  T8."address_line_2",
                  T8."post_code",
@@ -3115,7 +3116,6 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
-                 T8."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3147,6 +3147,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3182,7 +3183,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -3333,6 +3333,7 @@
         ]),
         'sql': '''
           SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3367,8 +3368,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE ("companies_company"."id") IN ((%s))
         ''',
@@ -4269,6 +4269,7 @@
                  T7."upcoming_deletion_notified_at",
                  T7."allow_next_sso_sub_update",
                  T8."id",
+                 T8."fields_history",
                  T8."address_line_1",
                  T8."address_line_2",
                  T8."post_code",
@@ -4304,7 +4305,6 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
-                 T8."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4336,6 +4336,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -4371,7 +4372,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -4520,6 +4520,7 @@
         ]),
         'sql': '''
           SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -4554,8 +4555,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE ("companies_company"."id") IN ((%s))
         ''',
@@ -5632,6 +5632,7 @@
                  T7."upcoming_deletion_notified_at",
                  T7."allow_next_sso_sub_update",
                  T10."id",
+                 T10."fields_history",
                  T10."address_line_1",
                  T10."address_line_2",
                  T10."post_code",
@@ -5667,7 +5668,6 @@
                  T10."job_app_score",
                  T10."is_searchable",
                  T10."rdv_solidarites_id",
-                 T10."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -5699,6 +5699,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -5734,7 +5735,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -6960,6 +6960,7 @@
                  T7."upcoming_deletion_notified_at",
                  T7."allow_next_sso_sub_update",
                  T8."id",
+                 T8."fields_history",
                  T8."address_line_1",
                  T8."address_line_2",
                  T8."post_code",
@@ -6995,7 +6996,6 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
-                 T8."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -7027,6 +7027,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -7062,7 +7063,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",

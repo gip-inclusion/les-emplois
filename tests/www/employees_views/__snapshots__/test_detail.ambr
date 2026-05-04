@@ -622,6 +622,7 @@
                  T7."upcoming_deletion_notified_at",
                  T7."allow_next_sso_sub_update",
                  T8."id",
+                 T8."fields_history",
                  T8."address_line_1",
                  T8."address_line_2",
                  T8."post_code",
@@ -657,7 +658,6 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
-                 T8."fields_history",
                  "files_file"."id",
                  "files_file"."key",
                  "files_file"."last_modified",
@@ -1044,6 +1044,7 @@
         ]),
         'sql': '''
           SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1078,8 +1079,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -1464,6 +1464,7 @@
                  T4."upcoming_deletion_notified_at",
                  T4."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1498,8 +1499,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")

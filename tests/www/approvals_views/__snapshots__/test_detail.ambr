@@ -751,6 +751,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -785,8 +786,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -871,6 +871,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -906,7 +907,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1048,6 +1048,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1082,8 +1083,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -1451,6 +1451,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1485,8 +1486,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -1556,6 +1556,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1591,7 +1592,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1733,6 +1733,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -1767,8 +1768,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -2231,6 +2231,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -2265,8 +2266,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -2360,6 +2360,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -2395,7 +2396,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2537,6 +2537,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -2571,8 +2572,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -3412,6 +3412,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3446,8 +3447,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -3619,6 +3619,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3654,7 +3655,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3796,6 +3796,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -3830,8 +3831,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -4113,6 +4113,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -4147,8 +4148,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -4218,6 +4218,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -4253,7 +4254,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4395,6 +4395,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -4429,8 +4430,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -4893,6 +4893,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -4927,8 +4928,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -5022,6 +5022,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -5057,7 +5058,6 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -5199,6 +5199,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
                  "companies_company"."id",
+                 "companies_company"."fields_history",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
                  "companies_company"."post_code",
@@ -5233,8 +5234,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
+                 "companies_company"."rdv_solidarites_id"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
