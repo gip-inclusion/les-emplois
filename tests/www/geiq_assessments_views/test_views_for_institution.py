@@ -325,8 +325,21 @@ class TestAssessmentDetailsForInstitutionView:
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessment details section after submission"
         )
+        with freeze_time(timezone.now() + datetime.timedelta(hours=4)):
+            assessment.ask_for_geiq_fix(
+                user=ddets_membership.user, institution=ddets_membership.institution, comment="À revoir"
+            )
+        response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
+        assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
+            name="assessment details title after geiq fix request"
+        )
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="assessment details section after geiq fix request"
+        )
+        with freeze_time(timezone.now() + datetime.timedelta(hours=4.5)):
+            assessment.submit(user=geiq_membership.user)
 
-        assessment.grants_selection_validated_at = timezone.now() + datetime.timedelta(hours=4)
+        assessment.grants_selection_validated_at = timezone.now() + datetime.timedelta(hours=5)
         assessment.save()
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
@@ -336,7 +349,7 @@ class TestAssessmentDetailsForInstitutionView:
             name="assessment details section with grants selection validated"
         )
 
-        assessment.decision_validated_at = timezone.now() + datetime.timedelta(hours=5)
+        assessment.decision_validated_at = timezone.now() + datetime.timedelta(hours=6)
         assessment.convention_amount = 100_000
         assessment.advance_amount = 50_000
         assessment.granted_amount = 80_000
@@ -350,7 +363,7 @@ class TestAssessmentDetailsForInstitutionView:
         )
 
         assessment.review_comment = "Bravo !"
-        with freeze_time(timezone.now() + datetime.timedelta(hours=6)):
+        with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
             assessment.review(user=ddets_membership.user, institution=ddets_membership.institution)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
@@ -364,7 +377,7 @@ class TestAssessmentDetailsForInstitutionView:
             institution__name="DREETS BRET",
             institution__kind=InstitutionKind.DREETS_GEIQ,
         )
-        with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
+        with freeze_time(timezone.now() + datetime.timedelta(hours=8)):
             assessment.final_review(user=dreets_membership.user, institution=dreets_membership.institution)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(

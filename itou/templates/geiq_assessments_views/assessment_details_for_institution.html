@@ -32,9 +32,15 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>Dossier transmis par le GEIQ</h2>
-                    {% if not assessment.submitted_at %}
+                    {% if not assessment.submitted_at and not last_geiq_fix_transition %}
                         <div class="c-box">
                             <p class="mb-0">Le dossier n’a pas encore été transmis par le GEIQ.</p>
+                        </div>
+                    {% elif not assessment.submitted_at %}
+                        <div class="c-box">
+                            <p class="mb-0">
+                                Le dossier a été renvoyé au GEIQ pour correction le {{ last_geiq_fix_transition.timestamp|date:"d/m/Y" }}.
+                            </p>
                         </div>
                     {% else %}
                         <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
