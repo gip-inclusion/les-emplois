@@ -9,7 +9,12 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrga
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
-from itou.utils.diff import CollectionDiffer, DiffItemKind, if_not_set_converter
+from itou.utils.diff import (
+    CollectionDiffer,
+    DiffItemKind,
+    apply_diff,
+    if_not_set_converter,
+)
 
 
 def name_from_api_data(name):
@@ -108,13 +113,11 @@ class Command(BaseCommand):
                     code_safir_pole_emploi=safir,
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                 )
-                for current_item_attr, comparative_item_value in diff_item.data.items():
-                    setattr(obj, current_item_attr, comparative_item_value.after)
+                apply_diff(diff_item, on=obj)
                 self.set_extra_informations(obj, diff_item.data)
                 obj.save()
             elif diff_item.kind is DiffItemKind.UPDATED:
-                for current_item_attr, data_diff in diff_item.data.items():
-                    setattr(diff_item.current_item, current_item_attr, data_diff.after)
+                apply_diff(diff_item)
                 updated_fields = self.set_extra_informations(diff_item.current_item, diff_item.data)
                 diff_item.current_item.updated_at = timezone.now()
                 diff_item.current_item.save(update_fields={*diff_item.data.keys(), *updated_fields, "updated_at"})

@@ -5,7 +5,7 @@ from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
 from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
-from itou.utils.diff import CollectionDiffer, DiffItemKind
+from itou.utils.diff import CollectionDiffer, DiffItemKind, apply_diff
 
 
 # more than the number of Romes (~500) but less than the number of Appellations (~11000)
@@ -50,8 +50,7 @@ class Command(BaseCommand):
                     )
                 )
             if diff_item.kind is DiffItemKind.UPDATED:
-                for current_item_attr, data_diff in diff_item.data.items():
-                    setattr(diff_item.current_item, current_item_attr, data_diff.after)
+                apply_diff(diff_item)
                 diff_item.current_item.updated_at = now
                 to_update.append(diff_item.current_item)
 
@@ -85,8 +84,7 @@ class Command(BaseCommand):
                     )
                 )
             if diff_item.kind is DiffItemKind.UPDATED:
-                for current_item_attr, data_diff in diff_item.data.items():
-                    setattr(diff_item.current_item, current_item_attr, data_diff.after)
+                apply_diff(diff_item)
                 diff_item.current_item.updated_at = now
                 to_update.append(diff_item.current_item)
 
