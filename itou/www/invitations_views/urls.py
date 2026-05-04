@@ -11,6 +11,8 @@ urlpatterns = [
     path("invite_prescriber_with_org", views.InvitePrescriberView.as_view(), name="invite_prescriber_with_org"),
     path("invite_employer", views.InviteEmployerView.as_view(), name="invite_employer"),
     path("<str:invitation_type>/<uuid:invitation_id>/new_user", views.new_user, name="new_user"),
+    path("<str:invitation_type>/<uuid:invitation_id>/join", views.join, name="join"),
+    # FIXME(alaurent) Remove after 2026/06/22
     path("<uuid:invitation_id>/join_institution", views.join_institution, name="join_institution"),
     path(
         "<uuid:invitation_id>/join_prescriber_organization",

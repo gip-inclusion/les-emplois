@@ -51,9 +51,6 @@ class PrescriberMixin:
     invitation_url = reverse_lazy("invitations_views:invite_prescriber_with_org")
     members_url = reverse_lazy("prescribers_views:members")
 
-    def join_url(self, invitation):
-        return reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
-
 
 class CompanyMixin:
     org_factory = CompanyFactory
@@ -66,9 +63,6 @@ class CompanyMixin:
     invitation_url = reverse_lazy("invitations_views:invite_employer")
     members_url = reverse_lazy("companies_views:members")
 
-    def join_url(self, invitation):
-        return reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
-
 
 class InstitutionMixin:
     org_factory = InstitutionFactory
@@ -80,9 +74,6 @@ class InstitutionMixin:
     invitation_model = LaborInspectorInvitation
     invitation_url = reverse_lazy("invitations_views:invite_labor_inspector")
     members_url = reverse_lazy("institutions_views:members")
-
-    def join_url(self, invitation):
-        return reverse("invitations_views:join_institution", kwargs={"invitation_id": invitation.id})
 
 
 class BaseTestSendInvitation:
@@ -475,7 +466,7 @@ class BaseTestAcceptInvitation:
 
         client.force_login(user)
         # Try to bypass the first check by directly reaching the join endpoint
-        response = client.get(self.join_url(invitation), follow=True)
+        response = client.get(invitation.acceptance_url_for_existing_user, follow=True)
         # The 2 views return the same error message
         assertContains(response, escape("Ce lien n'est plus valide."))
 
@@ -519,7 +510,7 @@ class ProConnectSignupTestAcceptInvitation:
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = self.join_url(invitation)
+        next_url = invitation.acceptance_url_for_existing_user
         params = {
             "user_kind": self.user_kind,
             "user_email": invitation.email,
@@ -582,7 +573,7 @@ class ProConnectSignupTestAcceptInvitation:
         assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
         assert not invitation.accepted_at
 
-        next_url = self.join_url(invitation)
+        next_url = invitation.acceptance_url_for_existing_user
         params = {
             "user_kind": self.user_kind,
             "previous_url": login_url,
@@ -613,7 +604,7 @@ class ProConnectSignupTestAcceptInvitation:
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = self.join_url(invitation)
+        next_url = invitation.acceptance_url_for_existing_user
         params = {
             "user_kind": self.user_kind,
             "user_email": invitation.email,
