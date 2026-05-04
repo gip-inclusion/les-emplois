@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 2026-05-04
+
+### Modifié
+
+- [Admin : Correction de la vue des affectations candidat](https://github.com/gip-inclusion/les-emplois/pull/7947)
+- [Candidature : Correction d'un bug sur les candidatures avec critères certifiés mais sans date de début de contrat](https://github.com/gip-inclusion/les-emplois/pull/7964)
+- [Connexion : Forcer la connexion avec ProConnect pour les comptes l'ayant déjà utilisé](https://github.com/gip-inclusion/les-emplois/pull/7945)
+- [GEIQ : Désélection par défaut des contrats sans aide potentielle](https://github.com/gip-inclusion/les-emplois/pull/7903)
+- [Inscription : Refonte du parcours d'inscription pour les Pros pour commencer par la création de compte utilisateur](https://github.com/gip-inclusion/les-emplois/pull/7941)
+- [Interface : Harmonisation du nom du bloc GPS](https://github.com/gip-inclusion/les-emplois/pull/7859)
+
 ## 2026-04-27
 
 ### Ajouté
