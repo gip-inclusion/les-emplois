@@ -689,7 +689,7 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
         client.force_login(user)
         join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
         response = client.get(join_url, follow=True)
-        assertContains(response, escape("Cette structure n'est plus active."))
+        assertContains(response, escape("Ce lien n'est plus valide."))
 
 
 def test_job_seeker_no_access(client, subtests):

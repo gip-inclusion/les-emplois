@@ -217,6 +217,10 @@ class EmployerInvitation(InvitationAbstract):
     def target(self):
         return self.company
 
+    @property
+    def can_be_accepted(self):
+        return super().can_be_accepted and self.company.is_active
+
 
 class LaborInspectorInvitation(InvitationAbstract):
     USER_KIND = UserKind.LABOR_INSPECTOR
