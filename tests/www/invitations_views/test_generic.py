@@ -37,7 +37,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import ItouClient, accept_legal_terms, assert_previous_step
+from tests.utils.testing import accept_legal_terms, assert_previous_step
 
 
 class PrescriberMixin:
@@ -541,43 +541,6 @@ class ProConnectSignupTestAcceptInvitation:
         )
         terms_page_response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, terms_page_response)
-        assertRedirects(response, reverse("welcoming_tour:index"))
-
-        user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(
-            response, user, invitation, mailoutbox, messages_response=terms_page_response
-        )
-
-    def test_new_user__ProConnect_signup__returns_on_other_browser(self, client, mailoutbox, pro_connect):
-        invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
-        response = client.get(invitation.acceptance_link)
-        pro_connect.assertContainsButton(response)
-
-        # We don't put the full path with the FQDN in the parameters
-        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = self.join_url(invitation)
-        params = {
-            "user_kind": self.user_kind,
-            "user_email": invitation.email,
-            "channel": "invitation",
-            "previous_url": previous_url,
-            "next_url": next_url,
-        }
-        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-        assertContains(response, url + '"')
-
-        other_client = ItouClient()
-        response = pro_connect.mock_oauth_dance(
-            client,
-            self.user_kind,
-            user_email=invitation.email,
-            channel="invitation",
-            previous_url=previous_url,
-            next_url=next_url,
-            other_client=other_client,
-        )
-        terms_page_response = other_client.get(response.url, follow=True)
-        response = accept_legal_terms(other_client, terms_page_response)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)

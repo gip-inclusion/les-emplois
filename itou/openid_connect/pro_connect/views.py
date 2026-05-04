@@ -58,7 +58,6 @@ class ProConnectStateData:
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
     channel: str = None
-    prescriber_session_data: dict = None
 
 
 @dataclasses.dataclass
@@ -167,9 +166,6 @@ def pro_connect_authorize(request):
 
     if user_email := request.GET.get("user_email"):
         pc_data.user_email = user_email
-
-    if session_data := request.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY):
-        pc_data.prescriber_session_data = {global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY: session_data}
 
     data = _generate_pro_params_from_session(dataclasses.asdict(pc_data))
     # Store the state in session to allow the user to use resume registration view
@@ -391,10 +387,6 @@ def pro_connect_callback(request):
             )
 
     login(request, user)
-
-    # reattach prescriber session
-    if prescriber_session_data := pro_connect_state.data.get("prescriber_session_data"):
-        request.session.update(prescriber_session_data)
 
     accept_all_pending_invitations(request)
 
