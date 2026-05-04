@@ -25,6 +25,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import random_pro_user_factory
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 @pytest.fixture(autouse=True)
@@ -123,6 +124,26 @@ class TestPrescriberSignup:
 
         response = client.post(url, data={"kind": "FT"})
         assert response.context["form"].errors == {"kind": ["Sélectionnez un choix valide. FT n’en fait pas partie."]}
+
+    def test_professional_is_already_member_of_ft_organization(self, client, snapshot):
+        email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
+        user = random_pro_user_factory(email=email, identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
+        organization = PrescriberOrganizationFactory(france_travail=True, for_snapshot=True)
+        PrescriberMembershipFactory(user=user, organization=organization)
+
+        safir_step_url = reverse("signup:prescriber_search_ft_org")
+        post_data = {"safir_code": organization.code_safir_pole_emploi}
+        response = client.post(safir_step_url, data=post_data)
+
+        join_step_url = reverse("signup:prescriber_join_ft_org", kwargs={"uuid": organization.uid})
+        assertRedirects(response, join_step_url)
+        response = client.get(response.url)
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot
+
+        response = client.post(join_step_url)
+        assert response.status_code == 200  # We stay on the same page
 
     @respx.mock
     def test_join_an_authorized_org_of_known_kind(self, client, mocker, mailoutbox):

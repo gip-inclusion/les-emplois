@@ -712,13 +712,18 @@ def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_
         raise PermissionDenied()
 
     ft_org = get_object_or_404(PrescriberOrganization, uid=uuid, kind=PrescriberOrganizationKind.FT.value)
+    already_member = ft_org.has_member(request.user)
 
-    if request.method == "POST":
+    if request.method == "POST" and not already_member:
         ft_org.add_or_activate_membership(user=request.user)
         next_url = get_pro_post_join_redirect_url(request, ft_org)
         return HttpResponseRedirect(next_url)
 
-    return render(request, template_name, {"ft_org": ft_org})
+    return render(
+        request,
+        template_name,
+        {"ft_org": ft_org, "already_member": already_member},
+    )
 
 
 # Facilitator signup.
