@@ -117,6 +117,19 @@ def new_user(request, invitation_type, invitation_id):
     return handle_registration(request, invitation, invitation_type)
 
 
+@bypass_terms_acceptance
+def join(request, invitation_type, invitation_id):
+    if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
+        messages.error(request, "Ce lien n'est plus valide.")
+        return redirect(reverse("search:employers_home"))
+    invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
+    invitation = get_object_or_404(invitation_class, pk=invitation_id)
+    handle_invitation(invitation, request)
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.target.organization_switch_key
+    url = get_adapter(request).get_login_redirect_url(request)
+    return HttpResponseRedirect(url)
+
+
 def _toast_invitation_sent(invitations):
     s = pluralizefr(len(invitations))
     expiration_date = formats.date_format(invitations[0].expiration_date)

@@ -96,7 +96,7 @@ class InvitationAbstract(models.Model):
         """
         URL usable by an existing user to accept the invitation.
         """
-        raise NotImplementedError
+        return reverse("invitations_views:join", kwargs={"invitation_type": self.USER_KIND, "invitation_id": self.pk})
 
     @property
     def expiration_date(self):
@@ -187,10 +187,6 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         verbose_name_plural = "invitations prescripteurs"
 
     @property
-    def acceptance_url_for_existing_user(self):
-        return reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": self.pk})
-
-    @property
     def target(self):
         return self.organization
 
@@ -208,10 +204,6 @@ class EmployerInvitation(InvitationAbstract):
     class Meta:
         verbose_name = "invitation employeur"
         verbose_name_plural = "invitations employeurs"
-
-    @property
-    def acceptance_url_for_existing_user(self):
-        return reverse("invitations_views:join_company", kwargs={"invitation_id": self.pk})
 
     @property
     def target(self):
@@ -235,10 +227,6 @@ class LaborInspectorInvitation(InvitationAbstract):
     class Meta:
         verbose_name = "invitation inspecteurs du travail"
         verbose_name_plural = "invitations inspecteurs du travail"
-
-    @property
-    def acceptance_url_for_existing_user(self):
-        return reverse("invitations_views:join_institution", kwargs={"invitation_id": self.pk})
 
     @property
     def target(self):
