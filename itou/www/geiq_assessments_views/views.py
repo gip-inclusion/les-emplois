@@ -22,7 +22,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.geiq_assessments import sync
-from itou.geiq_assessments.enums import InstitutionAction
+from itou.geiq_assessments.enums import AssessmentTransition, InstitutionAction
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -840,9 +840,9 @@ def assessment_details_for_institution(
     if request.current_organization.kind not in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS:
         raise Http404
     assessment = get_object_or_404(
-        Assessment.objects.filter(institutions=request.current_organization).select_related(
-            "campaign", "created_by", "submitted_by"
-        ),
+        Assessment.objects.filter(institutions=request.current_organization)
+        .select_related("campaign", "created_by", "submitted_by")
+        .prefetch_related("logs"),
         pk=pk,
     )
     geiq_fix_comment_form = GeiqFixCommentForm(
@@ -949,6 +949,10 @@ def assessment_details_for_institution(
                 reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
             )
 
+    last_geiq_fix_transition = (
+        [log for log in assessment.logs.all() if log.transition == AssessmentTransition.ASK_FOR_GEIQ_FIX] or [None]
+    )[0]
+
     context = {
         "assessment": assessment,
         "back_url": reverse("geiq_assessments_views:list_for_institution"),
@@ -961,6 +965,7 @@ def assessment_details_for_institution(
         "InstitutionAction": InstitutionAction,
         "geiq_fix_comment_form": geiq_fix_comment_form,
         "abs_balance_amount": abs(assessment.granted_amount - assessment.advance_amount),
+        "last_geiq_fix_transition": last_geiq_fix_transition,
     }
     return render(request, template_name, context)
 

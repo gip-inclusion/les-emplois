@@ -81,6 +81,59 @@
   http://localhost:8000/
   '''
 # ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section after geiq fix request]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box">
+                      <p class="mb-0">
+                          Le dossier a été renvoyé au GEIQ pour correction le 27/05/2025.
+                      </p>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+                      <h3>
+                          Bilan d’exécution à valider
+                      </h3>
+                      <p class="mb-0">
+                          Le GEIQ a jusqu’au 26/06/2025 pour importer son rapport d’activité et valider le bilan.
+                      </p>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <strong>
+                          Structures concernées par la convention
+                      </strong>
+                      <ul class="mb-0">
+                          <li>
+                              Une antenne (29)
+                          </li>
+                      </ul>
+                      <hr class="my-3"/>
+                      <strong>
+                          Contact(s) GEIQ
+                      </strong>
+                      <ul class="mb-0">
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
 # name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section after submission]
   '''
   <section class="s-section">
@@ -1703,6 +1756,45 @@
                               Paul MARTIN - paul.martin@example.com
                           </li>
                       </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details title after geiq fix request]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/institution/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - Un Joli GEIQ
+                              <span class="badge rounded-pill text-nowrap badge-base bg-warning">
+                                  En attente
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
                   </div>
               </div>
           </div>
