@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
+from itou.common_apps.address.format import format_address_on_one_line
 from itou.utils.validators import validate_post_code
 
 
@@ -26,6 +27,10 @@ class GeolocatedAddressMixin(models.Model):
     insee_city = models.ForeignKey("cities.City", on_delete=models.RESTRICT, null=True, related_name="+")
 
     coordinates = gis_models.PointField(geography=True, null=True, blank=True)
+
+    @property
+    def address_on_one_line(self):
+        return format_address_on_one_line(self)
 
     class Meta:
         abstract = True
