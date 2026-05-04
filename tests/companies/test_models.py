@@ -652,13 +652,12 @@ def test_jobdescription_is_active_field_history():
     ]
 
 
-@pytest.mark.usefixtures("with_connection_wrapper_set")
 def test_company_siret_field_history():
     company = CompanyFactory(siret="00000000000000")
     assert company.fields_history == []
 
     company.siret = "00000000000001"
-    with triggers.context():
+    with triggers.connection_wrapper(), triggers.context():
         company.save()
     company.refresh_from_db()
     assert normalize_fields_history(company.fields_history) == [
@@ -676,7 +675,7 @@ def test_company_siret_field_history():
     )
 
     company.siret = "00000000000002"
-    with triggers.context(company=company.pk):
+    with triggers.connection_wrapper(), triggers.context(company=company.pk):
         company.save()
     company.refresh_from_db()
     assert normalize_fields_history(company.fields_history) == [
