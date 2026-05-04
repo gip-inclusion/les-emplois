@@ -1,0 +1,56 @@
+{% load format_filters %}
+{% load matomo %}
+
+<div class="modal fade" id="structure-contact-modal" tabindex="-1" aria-labelledby="structure-contact-modal-label" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="structure-contact-modal-label">Coordonnées de contact</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                {% if structure.address_on_one_line %}
+                    <div class="d-flex">
+                        <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
+                        <address class="m-0">{{ structure.address_on_one_line }}</address>
+                    </div>
+                {% endif %}
+                {% if structure.email or structure.phone or structure.website %}
+                    <hr class="my-3">
+                    <ul class="list-unstyled mb-0">
+                        {% if structure.email %}
+                            <li>
+                                <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                <a href="mailto:{{ structure.email }}" aria-label="Contact par mail" class="text-break">{{ structure.email }}</a>
+                                {% include "includes/copy_to_clipboard.html" with content=structure.email css_classes="btn-link fw-medium ms-1" only_icon=True text="Copier l’adresse e-mail" matomo_event_attrs='data-matomo-event="true" data-matomo-category="fiche-structure" data-matomo-action="clic" data-matomo-option="copier-email-contact"' %}
+                            </li>
+                        {% endif %}
+                        {% if structure.phone %}
+                            <li>
+                                <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                {{ structure.phone|format_phone }}
+                                {% include 'includes/copy_to_clipboard.html' with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                            </li>
+                        {% endif %}
+                        {% if structure.website %}
+                            <li>
+                                <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
+                                <a href="{{ structure.website }}"
+                                   rel="noopener noreferrer"
+                                   target="_blank"
+                                   class="btn-link fw-medium has-external-link"
+                                   aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)"
+                                   {% matomo_event "fiche-structure" "clic" "lien-site-web" %}>
+                                    {{ structure.website }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+            </div>
+        </div>
+    </div>
+</div>
