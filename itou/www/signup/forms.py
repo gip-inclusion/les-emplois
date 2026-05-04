@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS
+from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
@@ -76,6 +76,11 @@ class ChooseUserKindSignupForm(forms.Form):
 
 class ChooseMembershipKindForm(forms.Form):
     kind = forms.ChoiceField(choices=[(kind, kind) for kind in [KIND_PRESCRIBER, KIND_EMPLOYER]])
+
+    def __init__(self, is_ft_user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if is_ft_user:
+            self.fields["kind"].choices.append((PrescriberOrganizationKind.FT, PrescriberOrganizationKind.FT))
 
 
 class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, BaseSignupForm):

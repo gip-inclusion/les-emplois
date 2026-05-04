@@ -36,6 +36,8 @@ def setup_api_insee(settings):
 
 
 class TestPrescriberSignup:
+    FT_KIND_TEXT = "Vous travaillez dans une organisation France Travail"
+
     def setup_method(self):
         respx.post(f"{settings.API_INSEE_AUTH_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
@@ -57,10 +59,13 @@ class TestPrescriberSignup:
 
         # Go through each step to ensure session data is recorded properly.
         # Step 1: the user works for PE follows PE link
-        url = reverse("signup:prescriber_check_already_exists")
+        url = reverse("signup:choose_pro_membership_kind")
         response = client.get(url)
+        assertContains(response, self.FT_KIND_TEXT)
+
+        response = client.post(url, data={"kind": "FT"})
         safir_step_url = reverse("signup:prescriber_search_ft_org")
-        assertContains(response, safir_step_url)
+        assertRedirects(response, safir_step_url)
         if already_has_membership:
             assert (
                 client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
@@ -107,6 +112,17 @@ class TestPrescriberSignup:
 
         [email] = mailoutbox
         assert email.subject == "[TEST] Votre rôle d’administrateur"
+
+    def test_professional_is_not_member_of_france_travail(self, client):
+        user = random_pro_user_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        client.force_login(user)
+
+        url = reverse("signup:choose_pro_membership_kind")
+        response = client.get(url)
+        assertNotContains(response, self.FT_KIND_TEXT)
+
+        response = client.post(url, data={"kind": "FT"})
+        assert response.context["form"].errors == {"kind": ["Sélectionnez un choix valide. FT n’en fait pas partie."]}
 
     @respx.mock
     def test_join_an_authorized_org_of_known_kind(self, client, mocker, mailoutbox):

@@ -214,12 +214,24 @@ class ChooseMembershipKindView(FormView):
     template_name = "signup/choose_membership_kind.html"
     form_class = forms.ChooseMembershipKindForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["is_ft_user"] = self.request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX)
+        return kwargs
+
     def form_valid(self, form):
         urls = {
+            # Only available for FT user in ChooseMembershipKindForm
+            PrescriberOrganizationKind.FT: reverse("signup:prescriber_search_ft_org"),
             KIND_PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
             KIND_EMPLOYER: reverse("signup:company_select"),
         }
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_ft_user"] = self.get_form_kwargs()["is_ft_user"]
+        return context
 
 
 # SIAEs signup.
@@ -450,7 +462,6 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         "prescriber_orgs_with_members_same_siret": prescriber_orgs_with_members_same_siret,
         "prescriber_orgs_with_members_same_siren": prescriber_orgs_with_members_same_siren,
         "form": form,
-        "user_is_from_ft": request.user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX),
     }
     return render(request, template_name, context)
 
@@ -672,8 +683,6 @@ def prescriber_join_org(request):
 # ------------------------------------------------------------------------------------------
 
 
-@valid_prescriber_signup_session_required
-@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft_org.html"):
     """
     Find a pre-existing France Travail organization from a given SAFIR code.
@@ -690,13 +699,11 @@ def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft
 
     context = {
         "form": form,
-        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": reverse("signup:choose_pro_membership_kind"),
     }
     return render(request, template_name, context)
 
 
-@valid_prescriber_signup_session_required
-@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_ft_org.html"):
     """
     Join the given organization
@@ -708,8 +715,6 @@ def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_
 
     if request.method == "POST":
         ft_org.add_or_activate_membership(user=request.user)
-        request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        request.session.modified = True
         next_url = get_pro_post_join_redirect_url(request, ft_org)
         return HttpResponseRedirect(next_url)
 
