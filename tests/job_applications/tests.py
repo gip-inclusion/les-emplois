@@ -2297,6 +2297,57 @@ class TestJobApplicationWorkflow:
         assert job_application.geiq_eligibility_diagnosis is None
 
 
+@pytest.mark.django_db(transaction=True)
+class TestJobApplicationFKConstraints:
+    """Some ForeignKeys must be NULL on non-accepted job applications."""
+
+    def test_constraint_blocks_eligibility_diagnosis_on_non_accepted(self):
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+        )
+        diagnosis = job_application.eligibility_diagnosis
+        # clear approval first so we only test the eligibility_diagnosis constraint
+        JobApplication.objects.filter(pk=job_application.pk).update(approval=None)
+        with pytest.raises(IntegrityError, match="accepted_only_fields"):
+            JobApplication.objects.filter(pk=job_application.pk).update(
+                state=JobApplicationState.CANCELLED, eligibility_diagnosis=diagnosis
+            )
+
+    def test_constraint_blocks_geiq_diagnosis_on_non_accepted(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True, with_geiq_eligibility_diagnosis_from_prescriber=True
+        )
+        diagnosis = job_application.geiq_eligibility_diagnosis
+        with pytest.raises(IntegrityError, match="accepted_only_fields"):
+            JobApplication.objects.filter(pk=job_application.pk).update(
+                state=JobApplicationState.CANCELLED, geiq_eligibility_diagnosis=diagnosis
+            )
+
+    def test_constraint_blocks_approval_on_non_accepted(self):
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        approval = job_application.approval
+        # clear eligibility_diagnosis first so we only test the approval constraint
+        JobApplication.objects.filter(pk=job_application.pk).update(eligibility_diagnosis=None)
+        with pytest.raises(IntegrityError, match="accepted_only_fields"):
+            JobApplication.objects.filter(pk=job_application.pk).update(
+                state=JobApplicationState.CANCELLED, approval=approval
+            )
+
+    def test_constraint_allows_null_fks_on_non_accepted(self):
+        job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        # clearing all FKs should be fine regardless of state
+        JobApplication.objects.filter(pk=job_application.pk).update(
+            state=JobApplicationState.CANCELLED,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=None,
+            approval=None,
+        )
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationState.CANCELLED
+        assert job_application.eligibility_diagnosis is None
+
+
 @pytest.mark.parametrize(
     "transition,from_state",
     [

@@ -268,10 +268,13 @@ def test_create_then_accept_job_application(admin_client, caplog):
 def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     job_application = factories.JobApplicationFactory(
         sent_by_another_employer=True,
-        with_iae_eligibility_diagnosis=True,
-        eligibility_diagnosis__expires_at=timezone.localdate() - timezone.timedelta(days=1),
+        to_company__subject_to_iae_rules=True,
     )
-    old_diag = job_application.eligibility_diagnosis
+    old_diag = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker=job_application.job_seeker,
+        expires_at=timezone.localdate() - timezone.timedelta(days=1),
+    )
     other_job_seeker_diag = IAEEligibilityDiagnosisFactory(from_employer=True)
     other_company_diag = IAEEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, from_employer=True)
     post_data = {
@@ -387,6 +390,40 @@ def test_accept_job_application_not_subject_to_eligibility(admin_client):
     assert job_application.approval is None
 
 
+def test_failed_admin_accept_rolls_back_intermediate_save(admin_client):
+    """Regression guard against silent loss of row state on a failed admin `accept`.
+
+    When `accept()` aborts, the NULL-FK intermediate save issued by `save_model()` must be rolled back
+    by the `changeform_view` atomic wrapper, along with any other form-driven changes.
+    """
+    original_hiring_end_at = timezone.localdate() + timezone.timedelta(days=60)
+    job_application = factories.JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        to_company__not_subject_to_iae_rules=True,
+        state=JobApplicationState.PROCESSING,
+        hiring_end_at=original_hiring_end_at,
+    )
+    url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
+    post_data = {
+        "job_seeker": job_application.job_seeker_id,
+        "to_company": job_application.to_company_id,
+        "sender_kind": job_application.sender_kind,
+        "sender": job_application.sender_id,
+        # we omit `hiring_start_at` so `accept()` aborts
+        "hiring_end_at": timezone.localdate(),
+        **JOB_APPLICATION_FORMSETS_PAYLOAD,
+    }
+
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url, fetch_redirect_response=False)
+
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+    # The atomic block rolled the intermediate save back: `hiring_end_at` kept its
+    # original value even though the form tried to overwrite it
+    assert job_application.hiring_end_at == original_hiring_end_at
+
+
 @pytest.mark.parametrize("state", JobApplicationState)
 def test_available_transitions(client, state, snapshot):
     superuser = ItouStaffFactory(is_superuser=True)
@@ -439,6 +476,7 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
 
 
 def test_create_inconsistent_job_application(admin_client):
+    """A database constraint prevents creating any non-accepted job application with an approval."""
     job_seeker = JobSeekerFactory()
     company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
     employer = company.members.first()
@@ -449,37 +487,16 @@ def test_create_inconsistent_job_application(admin_client):
         "sender_kind": "employer",
         "sender_company": company.pk,
         "sender": employer.pk,
-        "approval": approval.pk,
+        "approval": approval.pk,  # another job seeker's approval
         # Formsets to please django admin
         **JOB_APPLICATION_FORMSETS_PAYLOAD,
     }
     response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assertRedirects(response, reverse("admin:job_applications_jobapplication_changelist"))
-    job_app = models.JobApplication.objects.get()
-    assertMessages(
-        response,
-        [
-            messages.Message(
-                messages.WARNING,
-                (
-                    "1 objet incohérent: <ul>"
-                    '<li class="warning">'
-                    f'<a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">'
-                    f"candidature - {job_app.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
-                    "</ul>"
-                ),
-            ),
-            messages.Message(
-                messages.SUCCESS,
-                (
-                    "L'objet candidature "
-                    f'« <a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">{job_app.pk}</a> » '
-                    "a été ajouté avec succès."
-                ),
-            ),
-        ],
-    )
+    # The DB constraint prevents creating a non-accepted job application with an approval
+    assert response.status_code == 200
+    expected = "Les champs ACCEPTED_ONLY_FIELDS d'une candidature non acceptée doivent être à leur valeur par défaut"
+    assert [expected] in response.context["errors"]
+    assert not models.JobApplication.objects.exists()
 
 
 def test_delete_is_possible_when_transition_logs_exists(snapshot, admin_client):

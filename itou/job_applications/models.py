@@ -904,6 +904,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     ~models.Q(sender_kind="prescriber") | models.Q(sender_kind="prescriber", sender_company=None)
                 ),
             ),
+            models.CheckConstraint(
+                name="accepted_only_fields",
+                violation_error_message=(
+                    "Les champs ACCEPTED_ONLY_FIELDS d'une candidature non acceptée"
+                    " doivent être à leur valeur par défaut"
+                ),
+                condition=models.Q(state="accepted") | models.Q(**ACCEPTED_ONLY_FIELDS),
+            ),
         ]
         permissions = [
             ("export_job_applications_unknown_to_ft", "Can export job applications of job seekers unknown to FT")
