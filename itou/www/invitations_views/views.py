@@ -93,10 +93,6 @@ def new_user(request, invitation_type, invitation_id):
         messages.error(request, "Ce lien n'est plus valide.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
-    if invitation_type == KIND_EMPLOYER and not invitation.company.is_active:
-        messages.error(request, "La structure que vous souhaitez rejoindre n'est plus active.")
-        return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
-
     if user := User.objects.filter(email__iexact=invitation.email).first():
         if request.user.is_authenticated:
             # We know that request.user.email & invitation.email match

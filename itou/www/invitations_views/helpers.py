@@ -8,10 +8,6 @@ def handle_invitation(invitation, request):
     if not invitation.guest_can_join(request):
         raise PermissionDenied()
 
-    if isinstance(invitation, EmployerInvitation) and not invitation.company.is_active:
-        messages.error(request, "Cette structure n'est plus active.")
-        return False
-
     if invitation.can_be_accepted:
         invitation.add_invited_user()
         invitation.accept()
