@@ -22,10 +22,17 @@ def format_phone(phone_number):
     Usage:
         {% load format_filters %}
         {{ user.phone|format_phone }}
+
+    French E.164 numbers (+33 …) are shown in national form (leading 0).
     """
     if not phone_number:
         return ""
-    return " ".join(wrap(phone_number, 2))
+    normalized = phone_number.strip()
+    if normalized.startswith("+33"):
+        rest = re.sub(r"\D", "", normalized[3:])
+        if rest:
+            normalized = f"0{rest}"
+    return " ".join(wrap(normalized, 2))
 
 
 @register.filter
