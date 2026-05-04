@@ -228,3 +228,9 @@ def if_not_set_converter(default):
         return default if value is NOT_SET else value
 
     return f
+
+
+def apply_diff(diff_item: DiffItem, *, on=None, setter=setattr):
+    item = on or diff_item.current_item
+    for attribute_name, data_diff in diff_item.data.items():
+        setter(item, attribute_name, data_diff.after)
