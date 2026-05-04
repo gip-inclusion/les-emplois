@@ -24,6 +24,9 @@
                         <form method="post">
                             {% csrf_token %}
 
+                            {% if is_ft_user %}
+                                {% include "signup/includes/user_kind_radio.html" with kind="FT" label="France Travail" description="Vous travaillez dans une organisation France Travail" only %}
+                            {% endif %}
                             {% include "signup/includes/user_kind_radio.html" with kind="prescriber" label="Prescripteur / Orienteur" description="Vous accompagnez des candidats dans leur recherche d’emploi inclusif" only %}
                             {% include "signup/includes/user_kind_radio.html" with kind="employer" label="Employeur inclusif" description="Vous travaillez dans une structure inclusive qui recrute et accompagne des candidats (SIAE, GEIQ, OPCS)" only %}
 

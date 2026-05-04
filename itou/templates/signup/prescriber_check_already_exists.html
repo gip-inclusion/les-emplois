@@ -16,19 +16,6 @@
     {% endcomponent_title %}
 {% endblock %}
 
-{% block title_messages %}
-    {{ block.super }}
-    {% if user_is_from_ft %}
-        {% component_alert content=content variant="info" icon=False %}
-            {% fragment as content %}
-                <p class="m-0">
-                    <a href="{% url 'signup:prescriber_search_ft_org' %}">Cliquez-ici pour rejoindre une organisation France Travail</a>
-                </p>
-            {% endfragment %}
-        {% endcomponent_alert %}
-    {% endif %}
-{% endblock %}
-
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
