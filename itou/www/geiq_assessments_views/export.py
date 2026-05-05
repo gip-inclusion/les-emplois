@@ -66,8 +66,14 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     "Nombre de jours réalisés au total": with_format(
         Format.INTEGER, lambda contract: duration.days if (duration := contract.real_duration()) else None
     ),
-    # N-1 will be replaced by the actual year number in the export
+    # N-2, N-1 and N will be replaced by the actual year numbers in the export
+    "Nombre de jours réalisés en N-2": with_format(
+        Format.INTEGER, lambda contract: contract.nb_days_in_previous_year()
+    ),
     "Nombre de jours réalisés en N-1": with_format(Format.INTEGER, lambda contract: contract.nb_days_in_campaign_year),
+    "Nombre de jours réalisés en N": with_format(
+        Format.INTEGER, lambda contract: contract.nb_days_in_following_year()
+    ),
     "Poste occupé": with_format(Format.TEXT, lambda contract: contract.other_data.get("metier_prepare", "")),
     "Secteur d’activité": with_format(
         Format.TEXT, lambda contract: contract.other_data.get("secteur_activite", {}).get("nom", "")
