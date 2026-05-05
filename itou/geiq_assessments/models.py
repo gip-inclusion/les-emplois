@@ -13,6 +13,7 @@ from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.users.enums import Title
+from itou.utils.date import nb_days_in_year
 from itou.utils.models import check_nullable_date_order_constraint
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -597,6 +598,22 @@ class EmployeeContract(models.Model):
         if self.end_at is None:
             return None
         return self.end_at - self.start_at + timezone.timedelta(days=1)
+
+    def nb_days_in_previous_year(self):
+        # In the year before the campaign year
+        return nb_days_in_year(
+            self.start_at,
+            self.end_at or self.planned_end_at,
+            year=self.employee.assessment.campaign.year - 1,
+        )
+
+    def nb_days_in_following_year(self):
+        # In the year following the campaign year
+        return nb_days_in_year(
+            self.start_at,
+            self.end_at or self.planned_end_at,
+            year=self.employee.assessment.campaign.year + 1,
+        )
 
     def antenna_department(self):
         antenna = self.other_data.get("antenne")

@@ -328,6 +328,38 @@ def test_employee_contract_durations(start, planned_end, end, planned_expected, 
         assert contract.real_duration().days == real_expected
 
 
+def test_employee_contract_nb_of_days():
+    employee = EmployeeFactory()
+    campaign_year = employee.assessment.campaign.year
+
+    contract = EmployeeContractFactory(
+        start_at=datetime.date(campaign_year - 1, random.randint(1, 12), random.randint(1, 28)),
+        planned_end_at=datetime.date(campaign_year + 1, random.randint(1, 12), random.randint(1, 28)),
+        end_at=None,
+    )
+    assert contract.nb_days_in_previous_year()
+    assert contract.nb_days_in_campaign_year
+    assert contract.nb_days_in_following_year()
+    assert (
+        contract.nb_days_in_previous_year() + contract.nb_days_in_campaign_year + contract.nb_days_in_following_year()
+        == contract.planned_duration().days
+    )
+
+    # Check that planned_end_at is ignored if end_at is defined
+    contract = EmployeeContractFactory(
+        start_at=datetime.date(campaign_year - 1, random.randint(1, 12), random.randint(1, 28)),
+        planned_end_at=datetime.date(campaign_year, random.randint(1, 12), random.randint(1, 28)),
+        end_at=datetime.date(campaign_year + 1, random.randint(1, 12), random.randint(1, 28)),
+    )
+    assert contract.nb_days_in_previous_year()
+    assert contract.nb_days_in_campaign_year
+    assert contract.nb_days_in_following_year()
+    assert (
+        contract.nb_days_in_previous_year() + contract.nb_days_in_campaign_year + contract.nb_days_in_following_year()
+        == contract.real_duration().days
+    )
+
+
 def test_employee_contract_antenna_department():
     antenna_contract = EmployeeContractFactory(
         employee__assessment__label_geiq_post_code="54321",
