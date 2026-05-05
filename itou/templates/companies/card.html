@@ -98,15 +98,16 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 mt-3 mt-xxl-0 {% if not siae.description and not siae.provided_support %}d-none d-xxl-block{% endif %}">
                     <div class="c-box h-100 {% if not siae.description and not siae.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
                         {% if siae.description %}
-                            <article class="mb-3 mb-md-5">
-                                <h2 class="h3 mb-2">Son activité</h2>
+                            <article>
+                                <h2 class="h3">Son activité</h2>
                                 {{ siae.description|markdownify }}
                             </article>
                         {% endif %}
 
                         {% if siae.provided_support %}
+                            <hr class="my-4">
                             <article>
-                                <h2 class="h3 mb-2">L'accompagnement proposé</h2>
+                                <h2 class="h3">L'accompagnement proposé</h2>
                                 {{ siae.provided_support|markdownify }}
                             </article>
                         {% endif %}
@@ -133,23 +134,25 @@
                         </div>
                     {% endif %}
                     <div class="c-box">
-                        <h3 class="mb-2">Coordonnées</h3>
+                        <h3>Coordonnées</h3>
                         <div class="d-flex text-secondary fs-sm">
                             <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
                             <address class="m-0">{{ siae.address_on_one_line }}</address>
                         </div>
-                        <hr class="my-3">
-                        <ul class="fs-sm list-unstyled mb-0">
-                            {% if siae.email %}
-                                {% include "includes/organizations/email_li.html" with email=siae.email only %}
-                            {% endif %}
-                            {% if siae.phone %}
-                                {% include "includes/organizations/phone_li.html" with phonenumber=siae.phone only %}
-                            {% endif %}
-                            {% if siae.website %}
-                                {% include "includes/organizations/website_li.html" with website=siae.website only %}
-                            {% endif %}
-                        </ul>
+                        {% if siae.email or siae.phone or siae.website %}
+                            <hr class="my-3">
+                            <ul class="fs-sm list-unstyled mb-0">
+                                {% if siae.email %}
+                                    {% include "includes/organizations/email_li.html" with email=siae.email only %}
+                                {% endif %}
+                                {% if siae.phone %}
+                                    {% include "includes/organizations/phone_li.html" with phonenumber=siae.phone only %}
+                                {% endif %}
+                                {% if siae.website %}
+                                    {% include "includes/organizations/website_li.html" with website=siae.website only %}
+                                {% endif %}
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>
