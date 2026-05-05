@@ -47,8 +47,6 @@
                     <form method="post" class="js-prevent-multiple-submit">
                         {% csrf_token %}
 
-                        {% url 'signup:choose_pro_membership_kind' as reset_url %}
-                        {% url 'signup:prescriber_search_ft_org' as prev_url %}
                         {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url reset_url=reset_url show_mandatory_fields_mention=False primary_disabled=already_member %}
                     </form>
                 </div>

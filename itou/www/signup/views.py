@@ -307,6 +307,8 @@ def company_select(request, template_name="signup/company_select.html"):
         "companies_with_members": companies_with_members,
         "company_select_form": company_select_form,
         "siren_form": siren_form,
+        "prev_url": reverse("signup:choose_pro_membership_kind"),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -470,6 +472,8 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         "prescriber_orgs_with_members_same_siret": prescriber_orgs_with_members_same_siret,
         "prescriber_orgs_with_members_same_siren": prescriber_orgs_with_members_same_siren,
         "form": form,
+        "prev_url": reverse("signup:choose_pro_membership_kind"),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -505,6 +509,7 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
         "organization": prescriber_membership.organization,
         "form": form,
         "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -545,6 +550,7 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
     context = {
         "form": form,
         "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -587,6 +593,7 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
     context = {
         "form": form,
         "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -619,6 +626,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     context = {
         "form": form,
         "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -708,6 +716,7 @@ def prescriber_search_ft_org(request, template_name="signup/prescriber_search_ft
     context = {
         "form": form,
         "prev_url": reverse("signup:choose_pro_membership_kind"),
+        "reset_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -730,7 +739,12 @@ def prescriber_join_ft_org(request, uuid, template_name="signup/prescriber_join_
     return render(
         request,
         template_name,
-        {"ft_org": ft_org, "already_member": already_member},
+        {
+            "ft_org": ft_org,
+            "already_member": already_member,
+            "prev_url": reverse("signup:prescriber_search_ft_org"),
+            "reset_url": reverse("dashboard:index"),
+        },
     )
 
 
