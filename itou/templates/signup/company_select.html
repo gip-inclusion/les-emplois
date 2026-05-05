@@ -41,9 +41,7 @@
 
                             {% bootstrap_form siren_form alert_error_type="all" %}
 
-                            {% url 'search:employers_home' as reset_url %}
-                            {% itou_buttons_form primary_label="Rechercher" reset_url=reset_url %}
-
+                            {% itou_buttons_form primary_label="Rechercher" secondary_url=prev_url reset_url=reset_url %}
                         </form>
                     </div>
 

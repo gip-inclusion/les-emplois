@@ -40,9 +40,7 @@
 
                             {% bootstrap_form form alert_error_type="all" %}
 
-                            {% url 'search:employers_home' as reset_url %}
-                            {% url 'signup:choose_user_kind' as previous_url %}
-                            {% itou_buttons_form primary_label="Rechercher" secondary_url=previous_url reset_url=reset_url %}
+                            {% itou_buttons_form primary_label="Rechercher" secondary_url=prev_url reset_url=reset_url %}
 
                         </form>
                     </div>
