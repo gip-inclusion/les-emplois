@@ -470,7 +470,7 @@ class TestAssessmentContractsDetails:
             response = client.get(url)
             assert response.status_code == expected_status
 
-    def test_contract_details_access(self, client, settings):
+    def test_contract_details_access(self, client, settings, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -505,15 +505,18 @@ class TestAssessmentContractsDetails:
 
         def check_user_access_to_all_tabs(user, *, access):
             client.force_login(user)
+            user_label = "GEIQ" if user == geiq_membership.user else "DDETS"
             for tab in AssessmentContractDetailsTab:
                 tab_url = reverse(
                     "geiq_assessments_views:assessment_contracts_details",
                     kwargs={"contract_pk": str(contract.pk), "tab": tab.value},
                 )
-                response = client.get(tab_url)
                 if access:
+                    with assertSnapshotQueries(snapshot(name=f"SQL queries for {tab=} as {user_label}")):
+                        response = client.get(tab_url)
                     assertContains(response, "DUPONT Jean")
                 else:
+                    response = client.get(tab_url)
                     assert response.status_code == 404
 
         check_user_access_to_all_tabs(geiq_membership.user, access=True)
