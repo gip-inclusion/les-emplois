@@ -22,7 +22,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import JobSeekerFactory, random_pro_user_factory
-from tests.utils.testing import accept_legal_terms
+from tests.utils.testing import accept_legal_terms, parse_response_to_soup, pretty_indented
 
 
 class TestCompanySignup:
@@ -261,7 +261,7 @@ class TestCompanySignup:
         )
 
     @respx.mock
-    def test_create_facilitator(self, client, mocker, mailoutbox, settings):
+    def test_create_facilitator(self, client, mocker, mailoutbox, settings, snapshot):
         user = random_pro_user_factory()
         client.force_login(user)
 
@@ -300,11 +300,7 @@ class TestCompanySignup:
         assertRedirects(response, reverse("signup:facilitator_join"), fetch_redirect_response=False)
 
         response = client.get(response.url)
-        # Check user is redirected to the welcoming tour
-        assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
-        # Which redirects to logout page while waiting for the validation
-        response = client.get(response.url)
-        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "no_organization"}))
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot
 
         company = Company.objects.get(siret=FAKE_SIRET)
         assert company.has_admin(user)
