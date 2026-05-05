@@ -412,21 +412,19 @@ def valid_prescriber_signup_session_required(function=None):
 def prescriber_check_already_exists(request, template_name="signup/prescriber_check_already_exists.html"):
     """
 
-    Entry point of the signup process for prescribers/orienteurs.
+    Entry point of the signup process for prescribers/orienteurs not from France Travail.
 
     The signup process consists of several steps during which the user answers
     a series of questions to determine the `kind` of his organization if any.
 
     Answers are kept in session.
 
-    At the end of the process the user will be:
-    - added to the members of a pre-existing Pôle emploi agency ("prescripteur habilité")
-    - added to the members of a new authorized organization ("prescripteur habilité")
-    - added to the members of a new unauthorized organization ("orienteur")
-    - without any organization ("orienteur")
+    At the end of the process the user will:
+    - be added to the members of a new authorized organization ("prescripteur habilité")
+    - be added to the members of a new unauthorized organization ("orienteur")
+    - request an invitation to an existing organization (authorized or not)
 
-    Step 1: makes it possible to avoid duplicates of prescriber's organizations.
-    As 80% of prescribers on Itou are Pôle emploi members, a link is dedicated for users who work for PE.
+    This first Step makes it possible to avoid duplicates of prescriber's organizations.
     """
 
     # Start a fresh session that will be used during the signup process.
