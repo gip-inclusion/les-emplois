@@ -1,9 +1,13 @@
+import copy
+import logging
+
 import pytest
 from django.core import management
 from django.test import override_settings
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET
+from itou.companies.management.commands.sync_ft_offers import pe_offer_to_job_description
 from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
@@ -174,3 +178,34 @@ def test_sync_ft_offers(caplog, respx_mock):
         "successfully deleted count=1 PE job offers",
     ]
     assert JobDescription.objects.count() == 1
+
+
+class TestPeOfferToJobDescription:
+    def setup_method(self):
+        rome = Rome.objects.create(code="I1304")
+        Appellation.objects.create(
+            code=rome.code,
+            name="Technicien / Technicienne de maintenance industrielle",
+            rome=rome,
+        )
+
+    @property
+    def base_offer_data(self):
+        d = copy.deepcopy(API_OFFRES_RESPONSE_OK[0])
+        d["natureContrat"] = pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]
+        return d
+
+    def test_pe_offer_to_job_description_basic_insee_code_lookup(self):
+        city = City.objects.create(
+            slug="slug",
+            department="39",
+            name="SAINT-CLAUDE",
+            post_codes=["ignored"],
+            code_insee="39478",
+        )
+        offer = self.base_offer_data
+        offer["lieuTravail"]["commune"] = "39478"
+
+        job_description = pe_offer_to_job_description(offer, logging.getLogger())
+
+        assert job_description.location == city
