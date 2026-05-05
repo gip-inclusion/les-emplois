@@ -1,59 +1,78 @@
-[
-  {
-    "id": "46f7ea19-c97b-4f45-90a9-027b44cad927",
-    "short_desc": "Les emplois de l'inclusion est un service numérique de mise en relation d'employeurs solidaires avec des candidats éloignés de l'emploi par le biais de tiers (prescripteurs habilités, orienteurs) ou en auto-prescription.",
-    "recurrence": "",
-    "funding_labels": [],
-    "coach_orientation_modes": ["autre", "formulaire-dora"],
-    "coach_orientation_modes_other": "S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/",
-    "coach_orientation_modes_external_form_link": "",
-    "coach_orientation_modes_external_form_link_text": "Orienter votre bénéficiaire",
-    "beneficiaries_access_modes": ["autre"],
-    "beneficiaries_access_modes_other": "S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/",
-    "beneficiaries_access_modes_external_form_link": "",
-    "beneficiaries_access_modes_external_form_link_text": "Faire une demande",
-    "forms": [
-      {
-        "name": "cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h35_21.png",
-        "url": "http://dora.url/cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h35_21.png"
-      },
-      {
-        "name": "cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h34_58.png",
-        "url": "http://dora.url/cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h34_58.png"
-      }
-    ],
-    "online_form": "",
-    "access_conditions": ["Résident QPV / ZRR", "Personne non imposable"],
-    "credentials": ["Contrat d'apprentissage"],
-    "is_orientable_with_form": true,
-    "contact_name": "Z... H...",
-    "contact_phone": "9690430172",
-    "contact_email": "contact-emplois@yopmail.com",
-    "is_contact_info_public": false,
-    "average_orientation_response_delay_days": 16
-  },
-  {
-    "id": "b6f651e2-56d7-4ffa-a1c6-ae7295089a9e",
-    "short_desc": "Immersion Facilitée donne accès à des entreprises qui accueillent en immersion et simplifie les démarches de conventionnement de l'immersion.",
-    "recurrence": "",
-    "funding_labels": [],
-    "coach_orientation_modes": ["autre"],
-    "coach_orientation_modes_other": "https://immersion-facile.beta.gouv.fr/",
-    "coach_orientation_modes_external_form_link": "",
-    "coach_orientation_modes_external_form_link_text": "",
-    "beneficiaries_access_modes": ["autre"],
-    "beneficiaries_access_modes_other": "https://immersion-facile.beta.gouv.fr/",
-    "beneficiaries_access_modes_external_form_link": "",
-    "beneficiaries_access_modes_external_form_link_text": "",
-    "forms": [],
-    "online_form": "https://immersion-facile.beta.gouv.fr/",
-    "access_conditions": [],
-    "credentials": [],
-    "is_orientable_with_form": false,
-    "contact_name": "Ansel Hauck",
-    "contact_phone": "9247096169",
-    "contact_email": "gianni@example.com",
-    "is_contact_info_public": true,
-    "average_orientation_response_delay_days": null
-  }
-]
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "46f7ea19-c97b-4f45-90a9-027b44cad927",
+      "short_desc": "Les emplois de l'inclusion est un service numérique de mise en relation d'employeurs solidaires avec des candidats éloignés de l'emploi par le biais de tiers (prescripteurs habilités, orienteurs) ou en auto-prescription.",
+      "recurrence": "",
+      "funding_labels": [],
+      "coach_orientation_modes": [
+        "autre",
+        "formulaire-dora"
+      ],
+      "coach_orientation_modes_other": "S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/",
+      "coach_orientation_modes_external_form_link": "",
+      "coach_orientation_modes_external_form_link_text": "Orienter votre bénéficiaire",
+      "beneficiaries_access_modes": [
+        "autre"
+      ],
+      "beneficiaries_access_modes_other": "S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/",
+      "beneficiaries_access_modes_external_form_link": "",
+      "beneficiaries_access_modes_external_form_link_text": "Faire une demande",
+      "forms": [
+        {
+          "name": "cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h35_21.png",
+          "url": "http://dora.url/cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h35_21.png"
+        },
+        {
+          "name": "cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h34_58.png",
+          "url": "http://dora.url/cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd/2025-03-13_15h34_58.png"
+        }
+      ],
+      "online_form": "",
+      "access_conditions": [
+        "Résident QPV / ZRR",
+        "Personne non imposable"
+      ],
+      "credentials": [
+        "Contrat d'apprentissage"
+      ],
+      "is_orientable_with_form": true,
+      "contact_name": "Z... H...",
+      "contact_phone": "9690430172",
+      "contact_email": "contact-emplois@yopmail.com",
+      "is_contact_info_public": false,
+      "average_orientation_response_delay_days": 16
+    },
+    {
+      "id": "b6f651e2-56d7-4ffa-a1c6-ae7295089a9e",
+      "short_desc": "Immersion Facilitée donne accès à des entreprises qui accueillent en immersion et simplifie les démarches de conventionnement de l'immersion.",
+      "recurrence": "",
+      "funding_labels": [],
+      "coach_orientation_modes": [
+        "autre"
+      ],
+      "coach_orientation_modes_other": "https://immersion-facile.beta.gouv.fr/",
+      "coach_orientation_modes_external_form_link": "",
+      "coach_orientation_modes_external_form_link_text": "",
+      "beneficiaries_access_modes": [
+        "autre"
+      ],
+      "beneficiaries_access_modes_other": "https://immersion-facile.beta.gouv.fr/",
+      "beneficiaries_access_modes_external_form_link": "",
+      "beneficiaries_access_modes_external_form_link_text": "",
+      "forms": [],
+      "online_form": "https://immersion-facile.beta.gouv.fr/",
+      "access_conditions": [],
+      "credentials": [],
+      "is_orientable_with_form": false,
+      "contact_name": "Ansel Hauck",
+      "contact_phone": "9247096169",
+      "contact_email": "gianni@example.com",
+      "is_contact_info_public": true,
+      "average_orientation_response_delay_days": null
+    }
+  ]
+}

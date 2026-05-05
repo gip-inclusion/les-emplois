@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 
 import httpx
@@ -8,6 +9,33 @@ logger = logging.getLogger(__name__)
 
 class DoraAPIException(Exception):
     pass
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class DoraApiPaginatedResponse:
+    results: list[dict]
+    count: int
+    next: str | None
+    previous: str | None
+
+
+class DoraApiItemsIterator:
+    DEFAULT_PAGE = 1
+    DEFAULT_PAGE_SIZE = 1_000
+
+    def __init__(self, client_method, *, page_size=DEFAULT_PAGE_SIZE, params=None):
+        self._client_method = client_method
+        self._params = params or {}
+        self.page_size = page_size
+
+    def __iter__(self):
+        page = self.DEFAULT_PAGE
+        while True:
+            response = self._client_method(**{**self._params, "page": page, "page_size": self.page_size})
+            yield from response.results
+            if response.next is None:
+                break
+            page += 1
 
 
 class DoraAPIClient:
@@ -42,10 +70,7 @@ class DoraAPIClient:
         return self._request("/reference-data/", params).json()
 
     def emplois_services(self, **params):
-        return {
-            "dora--" + r["id"]: {**r, "uid": "dora--" + r["id"]}
-            for r in self._request("/services/", params).json()
-        }
+        return DoraApiPaginatedResponse(**self._request("/services/", params).json())
 
     def disabled_dora_form_di_structures(self, **params):
         return {

@@ -456,7 +456,7 @@ class Command(BaseCommand):
     def import_services(self, di_client, dora_client):
         self.logger.info("Importing services")
         disabled_dora_form_di_structures = dora_client.disabled_dora_form_di_structures()
-        dora_services = dora_client.emplois_services()
+        dora_services = {"dora--" + item["id"]: item for item in DoraApiItemsIterator(dora_client.emplois_services)}
         structures = Structure.objects.only("uid").in_bulk(field_name="uid")
 
         differ = diff.CollectionDiffer(
