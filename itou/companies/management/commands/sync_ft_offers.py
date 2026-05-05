@@ -62,7 +62,21 @@ def pe_offer_to_job_description(data, logger):
         logger.warning(f"no job URL in raw offer, skipping {source_id=}")
         return None
 
-    city = City.objects.get(code_insee=data["lieuTravail"]["commune"])
+    try:
+        city = City.objects.get(code_insee=data["lieuTravail"]["commune"])
+    except City.DoesNotExist:
+        try:
+            # It may be the INSEE code of a "commune déléguée", which
+            # we do not store in City. Try the postal code as a
+            # fallback.
+            city = City.objects.get(post_codes__contains=[data["lieuTravail"]["codePostal"]])
+        except City.DoesNotExist:
+            logger.error(
+                "Could not find city with insee_code=%s or postal_code=%s",
+                data["lieuTravail"]["commune"],
+                data["lieuTravail"]["codePostal"],
+            )
+            return None
 
     source_tags = []
     if data["natureContrat"] == pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]:

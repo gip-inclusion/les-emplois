@@ -209,3 +209,26 @@ class TestPeOfferToJobDescription:
         job_description = pe_offer_to_job_description(offer, logging.getLogger())
 
         assert job_description.location == city
+
+    def test_pe_offer_to_job_description_basic_postal_code_fallback(self):
+        city = City.objects.create(
+            slug="slug",
+            department="74",
+            name="ANNECY",
+            post_codes=["74000", "74370", "74600", "74940", "74960"],
+            code_insee="74010",
+        )
+        offer = self.base_offer_data
+        offer["lieuTravail"] = {
+            "codePostal": "74960",
+            # This is the INSEE code of Cran-Gevrier, a "commune
+            # déléguée", which we do not store.
+            "commune": "74093",
+            "latitude": 45.90795,
+            "libelle": "74 - ANNECY",
+            "longitude": 6.106588,
+        }
+
+        job_description = pe_offer_to_job_description(offer, logging.getLogger())
+
+        assert job_description.location == city
