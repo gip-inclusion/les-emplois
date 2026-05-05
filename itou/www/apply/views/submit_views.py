@@ -672,6 +672,10 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
                 assigned_to_unknown_advisor,
             )
 
+            # Add advisor to GPS as well
+            if advisor := (professional is not self.request.user and professional):
+                FollowUpGroup.objects.follow_beneficiary(self.job_seeker, advisor)
+
         # Send notifications
         company_recipients = job_application.to_company.active_members.all()
         for employer in company_recipients:
