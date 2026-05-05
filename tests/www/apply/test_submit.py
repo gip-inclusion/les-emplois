@@ -479,6 +479,7 @@ class TestApply:
 
         if with_known_advisor:
             assert assignment.professional == other_user
+            assert assignment.job_seeker.follow_up_group.referent.member == other_user
         else:
             assert assignment.professional == user
 
