@@ -533,19 +533,9 @@ class TestPrescriberSignup:
         )
 
         url = reverse("signup:prescriber_request_invitation", kwargs={"membership_id": prescriber_membership.id})
-        response = client.get(url)
-        assertContains(response, prescriber_org.display_name)
-        assertContains(
-            response,
-            "Renseignez vos coordonnées afin d'être ajouté à l'organisation « Pres. Org. » par Pierre D.",
-            html=True,
-        )
+        assertContains(response, url)
 
-        response = client.post(url, data={"first_name": "Bertrand", "last_name": "Martin", "email": "beber"})
-        assertContains(response, "Saisissez une adresse e-mail valide.")
-
-        requestor = {"first_name": "Bertrand", "last_name": "Martin", "email": "bertand@wahoo.fr"}
-        response = client.post(url, data=requestor)
+        response = client.post(url)
         assert response.status_code == 302
 
         assert len(mailoutbox) == 1
@@ -554,7 +544,12 @@ class TestPrescriberSignup:
         mail_body = mailoutbox[0].body
         assert prescriber_membership.user.get_full_name() in mail_body
         assert prescriber_membership.organization.display_name in mail_body
-        invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(requestor)}"
+        data = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+        }
+        invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(data)}"
         assert invitation_url in mail_body
 
     def test_hidden_organization_kinds(self, client, mocker):
