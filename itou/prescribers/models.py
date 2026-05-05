@@ -394,7 +394,7 @@ class PrescriberMembership(MembershipAbstract):
     class Meta:
         unique_together = ("user_id", "organization_id")
 
-    def request_for_invitation(self, requestor: dict):
+    def request_for_invitation(self, requestor):
         """
         A new user can ask for an invitation to join a prescriber organization.
         The list of members is sorted by:
@@ -406,15 +406,18 @@ class PrescriberMembership(MembershipAbstract):
         """
         to_user = self.user
         to = [to_user.email]
-        invitation_url = "{}?{}".format(reverse("invitations_views:invite_prescriber_with_org"), urlencode(requestor))
-        # requestor is not a User, get_full_name can't be used in template
-        full_name = f"""{requestor.get("first_name")} {requestor.get("last_name")}"""
+        data = {
+            "first_name": requestor.first_name,
+            "last_name": requestor.last_name,
+            "email": requestor.email,
+        }
+        invitation_url = "{}?{}".format(reverse("invitations_views:invite_prescriber_with_org"), urlencode(data))
         context = {
             "to": to_user,
             "organization": self.organization,
             "requestor": requestor,
-            "full_name": full_name,
-            "email": requestor.get("email"),
+            "full_name": requestor.get_full_name(),
+            "email": requestor.email,
             "invitation_url": get_absolute_url(invitation_url),
         }
         subject = "common/emails/request_for_invitation_subject.txt"

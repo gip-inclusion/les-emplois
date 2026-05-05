@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
@@ -478,38 +479,22 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
 
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
+@require_POST
+def prescriber_request_invitation(request, membership_id):
     prescriber_membership = get_object_or_404(
         PrescriberMembership.objects.select_related("organization", "user"), pk=membership_id
     )
+    # Send e-mail to the member of the organization
+    prescriber_membership.request_for_invitation(request.user).send()
 
-    form = forms.PrescriberRequestInvitationForm(data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        requestor = {
-            "first_name": form.cleaned_data["first_name"],
-            "last_name": form.cleaned_data["last_name"],
-            "email": form.cleaned_data["email"],
-        }
-        # Send e-mail to the member of the organization
-        prescriber_membership.request_for_invitation(requestor).send()
-
-        message = (
-            f"Votre demande d'ajout pour rejoindre « {prescriber_membership.organization.display_name} »"
-            " a bien été envoyée."
-        )
-        messages.success(request, message)
-
-        return redirect("dashboard:index")
-
-    context = {
-        "prescriber": prescriber_membership.user,
-        "organization": prescriber_membership.organization,
-        "form": form,
-        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-        "reset_url": reverse("dashboard:index"),
-    }
-    return render(request, template_name, context)
+    message = (
+        f"Votre demande d'ajout pour rejoindre « {prescriber_membership.organization.display_name} »"
+        " a bien été envoyée."
+    )
+    messages.success(request, message)
+    request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    request.session.modified = True
+    return redirect("dashboard:index")
 
 
 @valid_prescriber_signup_session_required
