@@ -21,9 +21,11 @@
                         {% if hire_process %}
                             Cet espace vous permet de déclarer directement une embauche sans avoir à créer une candidature au préalable.
                             {% if company.kind == CompanyKind.GEIQ %}
+                                <br>
                                 Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
                                 sur <a href="{% url 'apply:start' company_pk=company.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                             {% else %}
+                                <br>
                                 Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=company.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                             {% endif %}
                         {% else %}
@@ -32,6 +34,7 @@
                             {% else %}
                                 Cet espace vous permet d’enregistrer une nouvelle candidature.
                             {% endif %}
+                            <br>
                             Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:start_hire' company_pk=company.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
                         {% endif %}
                     </p>
