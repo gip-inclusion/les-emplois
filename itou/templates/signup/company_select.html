@@ -35,6 +35,7 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form">
                         <form method="get" role="form">
+                            {% csrf_token %}
 
                             {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
