@@ -619,15 +619,18 @@ def assessment_contracts_export(request, pk):
     assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
     contracts_qs = (
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
-        .select_related("employee__assessment")
+        .select_related("employee__assessment__campaign")
         .prefetch_related("employee__prequalifications")
         .order_by("employee__last_name", "employee__first_name", "start_at", "pk")
     )
     export_format = get_export_format(request)
+
+    header_map = {"Nombre de jours réalisés en N-1": f"Nombre de jours réalisés en {assessment.campaign.year}"}
+    headers = [header_map.get(k, k) for k in export_format.keys()]
     return to_streaming_response(
         contracts_qs,
         f"Contrats - {assessment.label_geiq_name} - {timezone.localdate().isoformat()}",
-        list(export_format.keys()),
+        headers,
         partial(serialize_employee_contract, export_format=export_format),
         columns=[column.export_format for column in export_format.values()],
     )
