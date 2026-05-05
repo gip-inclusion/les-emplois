@@ -748,7 +748,7 @@ def facilitator_search(request, template_name="signup/facilitator_search.html"):
     return render(request, template_name, context)
 
 
-def facilitator_join(request):
+def facilitator_join(request, template_name="signup/facilitator_join.html"):
     if ITOU_SESSION_FACILITATOR_SIGNUP_KEY not in request.session:
         return HttpResponseRedirect(reverse("signup:facilitator_search"))
 
@@ -772,7 +772,7 @@ def facilitator_join(request):
         is_searchable=False,  # Wait for admin to check the company
     )
 
-    membership = CompanyMembership.objects.create(
+    CompanyMembership.objects.create(
         user=request.user,
         company=company_to_create,
         is_admin=True,  # by construction, this user is the first of the SIAE.
@@ -781,5 +781,4 @@ def facilitator_join(request):
     # delete session data
     request.session.pop(ITOU_SESSION_FACILITATOR_SIGNUP_KEY)
     request.session.modified = True
-    next_url = get_pro_post_join_redirect_url(request, membership.company)
-    return HttpResponseRedirect(next_url)
+    return render(request, template_name)
