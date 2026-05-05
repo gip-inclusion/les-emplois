@@ -1645,7 +1645,7 @@ class JobSeekerAssignment(models.Model):
         default=ActionKind.CREATE,
     )
     assigned_to_unknown_advisor = models.BooleanField(
-        verbose_name="assigné à un accompagnateur non référencé sur le service",
+        verbose_name="accompagnateur désigné inconnu",
         default=False,
     )
 
