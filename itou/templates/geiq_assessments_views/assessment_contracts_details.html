@@ -153,17 +153,16 @@
                                     </strong>
                                 </li>
                                 <li>
-                                    <small>Dont 90 jours en {{ assessment.campaign.year }}</small>
-                                    <div>
-                                        <strong>
-                                            {% if contract.nb_days_in_campaign_year >= 90 %}
-                                                Oui
-                                            {% else %}
-                                                Non
-                                            {% endif %}
-                                        </strong>
-                                        ({{ contract.nb_days_in_campaign_year }} {{ contract.nb_days_in_campaign_year|pluralizefr:"jour,jours" }})
-                                    </div>
+                                    <small>Nombre de jours en {{ assessment.campaign.year|add:-1 }}</small>
+                                    <strong>{{ contract.nb_days_in_previous_year }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nombre de jours en {{ assessment.campaign.year }}</small>
+                                    <strong>{{ contract.nb_days_in_campaign_year }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nombre de jours en {{ assessment.campaign.year|add:1 }}</small>
+                                    <strong>{{ contract.nb_days_in_following_year }}</strong>
                                 </li>
                             </ul>
                         </div>
