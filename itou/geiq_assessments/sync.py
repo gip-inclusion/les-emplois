@@ -6,6 +6,7 @@ from django.utils import timezone
 from itou.geiq_assessments import models as geiq_assessments_models
 from itou.users.enums import Title
 from itou.utils.apis import geiq_label
+from itou.utils.date import nb_days_in_year
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 
@@ -106,19 +107,6 @@ PREQUALIFICATION_MAPPING = {
 def _cleanup_employee_info(employee_info):
     employee_info["date_naissance"] = convert_iso_datetime_to_date(employee_info["date_naissance"])
     employee_info["sexe"] = {"H": Title.M, "F": Title.MME, "M": Title.M}[employee_info["sexe"]]
-
-
-def _nb_days_in_year(start: datetime.date, end: datetime.date, *, year: int):
-    if start.year < year:
-        start = datetime.date(year, 1, 1)
-    elif start.year > year:
-        # This shouldn't happen
-        return 0
-    if end.year < year:
-        return 0
-    elif end.year > year:
-        end = datetime.date(year, 12, 31)
-    return (end - start).days + 1
 
 
 def sync_employee_and_contracts(assessment):
@@ -241,7 +229,7 @@ def sync_employee_and_contracts(assessment):
         contract = label_data_to_django(data, mapping=mapping, model=model)
         contract.employee = label_id_to_employee[data["salarie"]]
         contract.allowance_granted = False
-        contract.nb_days_in_campaign_year = _nb_days_in_year(
+        contract.nb_days_in_campaign_year = nb_days_in_year(
             contract.start_at,
             contract.end_at or contract.planned_end_at,
             year=assessment.campaign.year,

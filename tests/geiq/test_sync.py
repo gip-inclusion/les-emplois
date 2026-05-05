@@ -1,5 +1,3 @@
-import datetime
-
 import pytest
 
 from itou.geiq_assessments import models, sync
@@ -129,23 +127,3 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
         "Label sync will update nb=0 type=préqualification",
         "Label sync will delete nb=0 type=préqualification",
     ]
-
-
-@pytest.mark.parametrize(
-    "start, end, year, expected",
-    [
-        ("2023-01-01", "2023-03-31", 2023, 90),
-        ("2023-01-01", "2023-03-31", 2024, 0),
-        ("2022-01-01", "2023-03-31", 2023, 90),
-        ("2022-01-02", "2023-01-31", 2023, 31),
-        ("2023-10-01", "2024-03-31", 2023, 92),
-        ("2023-10-02", "2024-01-31", 2023, 91),
-        ("2023-02-14", "2023-05-13", 2023, 89),
-        ("2023-06-14", "2023-09-12", 2023, 91),
-        ("2023-06-14", "2023-06-14", 2023, 1),
-    ],
-)
-def test_nb_days_in_year(start, end, year, expected):
-    start = datetime.date.fromisoformat(start)
-    end = datetime.date.fromisoformat(end)
-    assert sync._nb_days_in_year(start, end, year=year) == expected
