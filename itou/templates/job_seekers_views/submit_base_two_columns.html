@@ -22,13 +22,6 @@
                     {% endif %}
                     {% block left_column %}{% endblock %}
                 </div>
-                <div class="s-section_col col-12 col-xxl-4 col-xxxl-3 d-none d-xxl-block ps-xxxl-5">
-                    <h2 class="h2 ff-extra-01">Où trouver {{ request.user.is_job_seeker|yesno:"mon,le" }} numéro de sécurité sociale ?</h2>
-                    <img class="img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
-                    <p class="ff-extra-01 mb-0">
-                        Il est présent à cet endroit sur {{ request.user.is_job_seeker|yesno:"votre,la" }} carte Vitale.
-                    </p>
-                </div>
             </div>
         </div>
     </section>
