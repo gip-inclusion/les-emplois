@@ -12,9 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobseekerassignment",
             name="assigned_to_unknown_advisor",
-            field=models.BooleanField(
-                default=False, verbose_name="assigné à un accompagnateur non référencé sur le service"
-            ),
+            field=models.BooleanField(default=False, verbose_name="accompagnateur désigné inconnu"),
         ),
         migrations.AddConstraint(
             model_name="jobseekerassignment",
