@@ -625,7 +625,11 @@ def assessment_contracts_export(request, pk):
     )
     export_format = get_export_format(request)
 
-    header_map = {"Nombre de jours réalisés en N-1": f"Nombre de jours réalisés en {assessment.campaign.year}"}
+    header_map = {
+        "Nombre de jours réalisés en N-2": f"Nombre de jours réalisés en {assessment.campaign.year - 1}",
+        "Nombre de jours réalisés en N-1": f"Nombre de jours réalisés en {assessment.campaign.year}",
+        "Nombre de jours réalisés en N": f"Nombre de jours réalisés en {assessment.campaign.year + 1}",
+    }
     headers = [header_map.get(k, k) for k in export_format.keys()]
     return to_streaming_response(
         contracts_qs,
