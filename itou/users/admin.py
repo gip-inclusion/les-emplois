@@ -1176,7 +1176,7 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         "assigned_to_unknown_advisor",
     ]
     list_display_links = ("job_seeker_display",)
-    list_filter = ("last_action_kind",)
+    list_filter = ("last_action_kind", "assigned_to_unknown_advisor")
     search_fields = (
         "job_seeker__first_name",
         "job_seeker__last_name",
