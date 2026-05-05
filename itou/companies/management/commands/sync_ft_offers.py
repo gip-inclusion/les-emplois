@@ -62,17 +62,8 @@ def pe_offer_to_job_description(data, logger):
         logger.warning(f"no job URL in raw offer, skipping {source_id=}")
         return None
 
-    code_postal = int(data["lieuTravail"]["codePostal"])
-    # FIXME(vperron): This makes the PEC jobs have a less accurate position on our site than they had before.
-    # This should and could be removed as soon as the cities sync project has been completed.
-    if 75001 <= code_postal <= 75020:
-        city = City.objects.get(code_insee="75056")
-    elif 69001 <= code_postal <= 69009:
-        city = City.objects.get(code_insee="69123")
-    elif 13001 <= code_postal <= 13016:
-        city = City.objects.get(code_insee="13055")
-    else:
-        city = City.objects.get(code_insee=data["lieuTravail"]["commune"])
+    city = City.objects.get(code_insee=data["lieuTravail"]["commune"])
+
     source_tags = []
     if data["natureContrat"] == pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]:
         source_tags.append(JobSourceTag.FT_PEC_OFFER.value)
