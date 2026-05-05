@@ -15,8 +15,9 @@ from itou.geiq_assessments.models import (
     EmployeeContract,
     EmployeePrequalification,
 )
-from itou.geiq_assessments.sync import CONTRACT_MAPPING, EMPLOYEE_MAPPING, PREQUALIFICATION_MAPPING, _nb_days_in_year
+from itou.geiq_assessments.sync import CONTRACT_MAPPING, EMPLOYEE_MAPPING, PREQUALIFICATION_MAPPING
 from itou.users.enums import Title
+from itou.utils.date import nb_days_in_year
 from tests.files.factories import FileFactory
 from tests.geiq.factories import (
     SalarieContratLabelDataFactory,
@@ -144,7 +145,7 @@ class EmployeeContractFactory(factory.django.DjangoModelFactory):
         lambda obj: obj.planned_end_at - random.randint(0, 1) * datetime.timedelta(days=random.randint(0, 10))
     )
     nb_days_in_campaign_year = factory.LazyAttribute(
-        lambda obj: _nb_days_in_year(
+        lambda obj: nb_days_in_year(
             obj.start_at,
             obj.end_at or obj.planned_end_at,
             year=obj.employee.assessment.campaign.year,
