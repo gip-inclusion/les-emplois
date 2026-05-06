@@ -28,6 +28,9 @@ class EmployeeRecordTransferCommand(BaseCommand):
     # The file naming scheme also disallows creating more than one file in the same seconds.
     MAX_UPLOADED_FILES = 1
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         """Subclasses have a preflight option to check for serialization errors."""
         parser.add_argument(
