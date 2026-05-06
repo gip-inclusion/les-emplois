@@ -1,20 +1,8 @@
 # serializer version: 1
 # name: test_populate_metabase_nexus[SQL queries]
   dict({
-    'num_queries': 6,
+    'num_queries': 5,
     'queries': list([
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'populate_table[nexus/management/commands/populate_metabase_nexus.py]',
-          'Command.populate_users[nexus/management/commands/populate_metabase_nexus.py]',
-          'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
       dict({
         'origin': list([
           'populate_table[nexus/management/commands/populate_metabase_nexus.py]',

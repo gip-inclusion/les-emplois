@@ -119,6 +119,9 @@ def log_retry_attempt(retry_state):
 class Command(BaseCommand):
     help = "Populate nexus metabase database."
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def populate_users(self):
         queryset = User.objects.filter(
             is_active=True, kind__in=UserKind.professionals(), email__isnull=False
