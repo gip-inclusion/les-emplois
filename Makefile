@@ -94,7 +94,7 @@ populate_db: populate_db_with_reference_data
 .PHONY: test
 
 test: $(VIRTUAL_ENV)
-	pytest --numprocesses=logical --create-db $(TARGET)
+	pytest --numprocesses=logical --create-db $(TARGET) $(PYTEST_ARGS)
 
 # Docker shell.
 # =============================================================================
