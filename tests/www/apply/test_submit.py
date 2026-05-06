@@ -446,7 +446,7 @@ class TestApply:
                     f"{u.get_inverted_full_name()}"
                     "</option>"
                 )
-                for u in sorted([user, other_user], key=lambda u: u.last_name)
+                for u in sorted([user, other_user], key=lambda u: (u.last_name, u.first_name))
             ]
         )
         assertContains(
