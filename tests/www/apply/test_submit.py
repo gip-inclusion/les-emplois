@@ -117,6 +117,7 @@ def assert_contains_apply_nir_modal(response, job_seeker, with_personal_informat
 
 
 def assert_contains_apply_email_modal(response, job_seeker, with_personal_information=True, nir_to_add=None):
+    assert False
     add_nir_text = (
         f"""
         <p>

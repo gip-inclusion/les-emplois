@@ -35,6 +35,7 @@ class NexusMixin:
 
     # method_decorator requires the method to exist on the decorated class; define a passthrough.
     def dispatch(self, request, *args, **kwargs):
+        raise ValueError("dummy error")
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
