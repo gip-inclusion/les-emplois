@@ -35,13 +35,13 @@
         {% fragment as c_title__cta %}
             {% if can_invalidate %}
                 {% if assessment.decision_validated_at %}
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#invalidate_modal">
+                    <button type="button" class="btn btn-lg btn-outline-primary" data-bs-toggle="modal" data-bs-target="#invalidate_modal">
                         Modifier la sélection
                     </button>
                 {% else %}
                     <form method="post">
                         {% csrf_token %}
-                        <button class="btn btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
+                        <button class="btn btn-lg btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
                             Modifier la sélection
                         </button>
                     </form>
