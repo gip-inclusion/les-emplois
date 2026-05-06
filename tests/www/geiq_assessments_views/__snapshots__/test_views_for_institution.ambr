@@ -39,7 +39,10 @@
   Institution référente sélectionnée par le GEIQ :
   DDETS 29
   
-  Récapitulatif de la décision enregistrée par la DDETS 29 :
+  Vous trouverez ci-dessous le récapitulatif de la décision enregistrée par la DDETS 29.
+  
+  IMPORTANT : Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
+  Seul le courrier officiel émis par la DDETS 29 pourra confirmer de manière définitive le montant accordé.
   
   Montant total accordé : 80 000 €
   Montant du premier versement déjà réalisé : 50 000 €
@@ -2281,8 +2284,15 @@
                       </dd>
                   </div>
               </dl>
-              <p class="small">
+              <p class="fs-sm">
                   Ces données ont été calculées suite à la sélection que vous avez effectuée.
+              </p>
+              <p class="fs-sm">
+                  Le GEIQ est informé que la décision concernant le montant total accordé reste soumise à validation financière.
+                  <strong>
+                      Seul le courrier officiel émis par vos services pourra confirmer de manière définitive le montant accordé
+                  </strong>
+                  .
               </p>
           </section>
           <section class="mt-5">

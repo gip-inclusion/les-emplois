@@ -9,6 +9,14 @@
             <div class="row">
                 <div class="col-12">
                     <h2>Résultat</h2>
+                    {% component_alert content=content variant="info" icon=False extra_classes="mb-3" %}
+                        {% fragment as content %}
+                            <p class="mb-0">
+                                Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
+                                Seul le courrier officiel émis par la {{ assessment.reviewed_by_institution.name }} pourra confirmer de manière définitive le montant accordé.
+                            </p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
                     <div class="c-box c-box--summary mb-3 mb-md-4">
                         <div class="c-box--summary__header">
                             <h3 class="m-0">Décision</h3>

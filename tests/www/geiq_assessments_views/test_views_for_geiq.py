@@ -1412,7 +1412,9 @@ class TestAssessmentResult:
 
     def test_access(self, client, settings, snapshot):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
-        dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
+        dreets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ, institution__name="DREETS Bretagne"
+        )
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),

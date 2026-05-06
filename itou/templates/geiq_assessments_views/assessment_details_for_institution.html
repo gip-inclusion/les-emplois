@@ -293,15 +293,21 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
-                        La validation entraînera l’envoi d'un email au GEIQ indiquant le montant accordé : {{ assessment.granted_amount|format_int_euros }}.
-                        <br>
-                        {% if assessment.granted_amount > assessment.advance_amount %}
-                            Cette décision implique la mise en place d’un prochain versement de {{ abs_balance_amount|format_int_euros }} au GEIQ, conformément aux modalités habituelles.
-                        {% elif assessment.granted_amount == assessment.advance_amount %}
-                            Cette décision n'entraîne aucun versement complémentaire, la totalité ayant déjà été réglée lors du premier versement.
-                        {% else %}
-                            Cette décision implique la mise en place d’un ordre de reversement de {{ abs_balance_amount|format_int_euros }} adressé au GEIQ, conformément aux modalités habituelles.
-                        {% endif %}
+                        <p>
+                            La validation entraînera l’envoi d'un email au GEIQ indiquant le montant accordé : {{ assessment.granted_amount|format_int_euros }}.
+                            <br>
+                            {% if assessment.granted_amount > assessment.advance_amount %}
+                                Cette décision implique la mise en place d’un prochain versement de {{ abs_balance_amount|format_int_euros }} au GEIQ, conformément aux modalités habituelles.
+                            {% elif assessment.granted_amount == assessment.advance_amount %}
+                                Cette décision n'entraîne aucun versement complémentaire, la totalité ayant déjà été réglée lors du premier versement.
+                            {% else %}
+                                Cette décision implique la mise en place d’un ordre de reversement de {{ abs_balance_amount|format_int_euros }} adressé au GEIQ, conformément aux modalités habituelles.
+                            {% endif %}
+                        </p>
+                        <p class="mb-0">
+                            Le GEIQ sera informé que la décision concernant le montant total accordé reste soumise à validation financière.
+                            <strong>Seul le courrier officiel émis par vos services pourra confirmer de manière définitive le montant accordé.</strong>
+                        </p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
