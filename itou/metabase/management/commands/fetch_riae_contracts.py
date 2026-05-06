@@ -74,7 +74,6 @@ class Command(BaseCommand):
             )
             contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
 
-    @transaction.atomic()
     def _write_contract(self, contracts):
         return len(
             Contract.objects.bulk_create(
@@ -165,8 +164,9 @@ class Command(BaseCommand):
             except Exception:
                 self.logger.exception("Failed to upsert Contract")
 
-        synced += self._write_contract(contracts)
+        with transaction.atomic():
+            synced += self._write_contract(contracts)
+            # Remove old contracts not updated : they don't exist in metabase anymore
+            Contract.objects.filter(updated_at__lte=run_time).delete()
 
-        # Remove old contracts not updated : they don't exist in metabase anymore
-        Contract.objects.filter(updated_at__lte=run_time).delete()
         self.logger.info(f"Synced {synced} Contracts")
