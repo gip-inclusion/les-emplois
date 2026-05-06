@@ -11,6 +11,10 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    # Transaction is handled manually for each datum.
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
