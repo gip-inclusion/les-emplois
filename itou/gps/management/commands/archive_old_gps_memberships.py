@@ -13,11 +13,11 @@ CHUNK_SIZE = 10_000
 
 
 class Command(BaseCommand):
-    """
-    End old FollowUpMemberships
-    """
-
     help = "End old FollowUpMemberships"
+
+    # Transaction is handled manually for each batch of objects.
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
 
     def handle(self, **options):
         two_years_ago = timezone.now() - relativedelta(years=2)
