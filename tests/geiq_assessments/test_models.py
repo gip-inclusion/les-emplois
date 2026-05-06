@@ -6,7 +6,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.geiq_assessments.enums import AllowanceJustificationReason, AssessmentState, AssessmentTransition
+from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason, AssessmentState, AssessmentTransition
 from itou.geiq_assessments.models import AssessmentCampaign, AssessmentTransitionLog
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
@@ -414,6 +414,30 @@ def test_employee_contract_allowance_request_justification_constraint():
             EmployeeContractFactory(
                 allowance_request_justification_reason=None,
                 allowance_request_justification_details="Précision sans motif",
+            )
+
+
+def test_employee_contract_allowance_refusal_constraint():
+    # Filling both fields together is valid.
+    EmployeeContractFactory(
+        allowance_refusal_reason=random.choice(AllowanceRefusalReason.choices)[0],
+        allowance_refusal_details="Précision obligatoire",
+    )
+    # Both fields set to empty string is valid.
+    EmployeeContractFactory(allowance_refusal_reason="", allowance_refusal_details="")
+    # Reason without details: forbidden.
+    with pytest.raises(IntegrityError, match=r".*geiq_allowance_refusal_set.*"):
+        with transaction.atomic():
+            EmployeeContractFactory(
+                allowance_refusal_reason=random.choice(AllowanceRefusalReason.choices)[0],
+                allowance_refusal_details="",
+            )
+    # Details without reason: forbidden.
+    with pytest.raises(IntegrityError, match=r".*geiq_allowance_refusal_set.*"):
+        with transaction.atomic():
+            EmployeeContractFactory(
+                allowance_refusal_reason="",
+                allowance_refusal_details="Précision sans motif",
             )
 
 
