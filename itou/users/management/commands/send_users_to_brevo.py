@@ -60,6 +60,9 @@ def job_seeker_serializer(user):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
