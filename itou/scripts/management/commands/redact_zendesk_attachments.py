@@ -60,6 +60,9 @@ class ZendeskClient:
 class Command(BaseCommand):
     help = "Remove all attachments from solved tickets after a week"
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def handle(self, **options):
         zendesk_client = ZendeskClient()
 
