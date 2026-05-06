@@ -349,18 +349,19 @@
                       <h4>
                           Informations générales
                       </h4>
-                      <h5>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (29)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) GEIQ
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Jean DUPONT - jean.dupont@example.com
                           </li>
@@ -404,18 +405,19 @@
                       <h4>
                           Informations générales
                       </h4>
-                      <h5>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (29)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) GEIQ
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Jean DUPONT - jean.dupont@example.com
                           </li>
@@ -710,18 +712,19 @@
                       <h4>
                           Informations générales
                       </h4>
-                      <h5>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (29)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) GEIQ
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Jean DUPONT - jean.dupont@example.com
                           </li>
@@ -1024,18 +1027,19 @@
                       <h4>
                           Informations générales
                       </h4>
-                      <h5>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (29)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) GEIQ
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Jean DUPONT - jean.dupont@example.com
                           </li>
@@ -1340,18 +1344,19 @@
                       <h4>
                           Informations générales
                       </h4>
-                      <h5>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (29)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) GEIQ
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Jean DUPONT - jean.dupont@example.com
                           </li>
@@ -1647,18 +1652,19 @@
                       <h4>
                           Informations générales
                       </h4>
-                      <h5>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (29)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) GEIQ
-                      </h5>
-                      <ul>
+                      </strong>
+                      <ul class="mb-0">
                           <li>
                               Jean DUPONT - jean.dupont@example.com
                           </li>

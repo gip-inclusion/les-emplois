@@ -262,12 +262,13 @@
                     {% endif %}
                     <div class="c-box mb-3 mb-md-4">
                         <h4>Informations générales</h4>
-                        <h5>Structures concernées par la convention</h5>
-                        <ul>
+                        <strong>Structures concernées par la convention</strong>
+                        <ul class="mb-0">
                             {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
                         </ul>
-                        <h5>Contact(s) GEIQ</h5>
-                        <ul>
+                        <hr class="my-3">
+                        <strong>Contact(s) GEIQ</strong>
+                        <ul class="mb-0">
                             <li>{{ assessment.created_by.get_full_name }} - {{ assessment.created_by.email }}</li>
                             {% if assessment.submitted_by and assessment.submitted_by != assessment.created_by %}
                                 <li>{{ assessment.submitted_by.get_full_name }} - {{ assessment.submitted_by.email }}</li>

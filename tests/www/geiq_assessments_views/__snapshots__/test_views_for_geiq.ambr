@@ -258,9 +258,10 @@
   
                       
                       <div class="c-box mb-3 mb-md-4">
-                          <h4>Informations générales</h4>
-                          <h5>Structures concernées par la convention</h5>
-                          <ul>
+                          <h3>Informations générales</h3>
+                          <strong>Structures concernées par la convention</strong>
+                          <br/>
+                          <ul class="mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
@@ -885,8 +886,8 @@
       }),
       dict({
         'origin': list([
-          'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'IfNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'WithNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
@@ -945,8 +946,8 @@
       }),
       dict({
         'origin': list([
-          'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'IfNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'WithNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
@@ -1235,32 +1236,41 @@
   
                       
                       <div class="c-box mb-3 mb-md-4">
-                          <h4>Informations générales</h4>
-                          <h5>Structures concernées par la convention</h5>
-                          <ul>
+                          <h3>Informations générales</h3>
+                          <strong>Structures concernées par la convention</strong>
+                          <br/>
+                          <ul class="mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
                               
                                   
-                                      <h5>Contact(s) DDETS</h5>
+                                      <hr class="my-3"/>
+                                      
+                                          <strong>Contact(s) DDETS</strong>
+                                          <br/>
+                                      
+                                      <ul class="mb-0">
+                                          
+                                              <li>paul@dd.ets</li>
+                                          
+                                      </ul>
                                   
-                                  <ul>
-                                      
-                                          <li>paul@dd.ets</li>
-                                      
-                                  </ul>
                               
                           
                               
                                   
-                                      <h5>Contact(s) DREETS</h5>
+                                      <hr class="my-3"/>
+                                      
+                                          <strong>Contact(s) DREETS</strong>
+                                          <br/>
+                                      
+                                      <ul class="mb-0">
+                                          
+                                              <li>paul@dre.ets</li>
+                                          
+                                      </ul>
                                   
-                                  <ul>
-                                      
-                                          <li>paul@dre.ets</li>
-                                      
-                                  </ul>
                               
                           
                       </div>
@@ -1556,13 +1566,14 @@
                       </div>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Informations générales
-                      </h4>
-                      <h5>
+                      </h3>
+                      <strong>
                           Structures concernées par la convention
-                      </h5>
-                      <ul>
+                      </strong>
+                      <br/>
+                      <ul class="mb-0">
                           <li>
                               Une antenne (12)
                           </li>
@@ -1570,10 +1581,12 @@
                               Une autre antenne (23)
                           </li>
                       </ul>
-                      <h5>
+                      <hr class="my-3"/>
+                      <strong>
                           Contact(s) DDETS
-                      </h5>
-                      <ul>
+                      </strong>
+                      <br/>
+                      <ul class="mb-0">
                           <li>
                               paul@dd.ets
                           </li>
@@ -2323,9 +2336,10 @@
   
                       
                       <div class="c-box mb-3 mb-md-4">
-                          <h4>Informations générales</h4>
-                          <h5>Structures concernées par la convention</h5>
-                          <ul>
+                          <h3>Informations générales</h3>
+                          <strong>Structures concernées par la convention</strong>
+                          <br/>
+                          <ul class="mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
@@ -2552,9 +2566,10 @@
   
                       
                       <div class="c-box mb-3 mb-md-4">
-                          <h4>Informations générales</h4>
-                          <h5>Structures concernées par la convention</h5>
-                          <ul>
+                          <h3>Informations générales</h3>
+                          <strong>Structures concernées par la convention</strong>
+                          <br/>
+                          <ul class="mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           

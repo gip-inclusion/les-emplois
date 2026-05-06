@@ -43,26 +43,33 @@
                         </div>
                     {% endif %}
                     <div class="c-box mb-3 mb-md-4">
-                        <h4>Informations générales</h4>
-                        <h5>Structures concernées par la convention</h5>
-                        <ul>
+                        <h3>Informations générales</h3>
+                        <strong>Structures concernées par la convention</strong>
+                        <br>
+                        <ul class="mb-0">
                             {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
                         </ul>
                         {% for institution_link in assessment.institution_links.all %}
-                            {% if institution_link.with_convention %}
-                                {% if institution_link.institution.kind == InstitutionKind.DDETS_GEIQ %}
-                                    <h5>Contact(s) DDETS</h5>
-                                {% elif institution_link.institution.kind == InstitutionKind.DREETS_GEIQ %}
-                                    <h5>Contact(s) DREETS</h5>
-                                {% else %}
-                                    <h5>Contact(s) {{ institution_link.institution.kind }}</h5>
+                            {% with institution_link.institution.active_members.all as institution_members %}
+                                {% if institution_link.with_convention and institution_members %}
+                                    <hr class="my-3">
+                                    {% if institution_link.institution.kind == InstitutionKind.DDETS_GEIQ %}
+                                        <strong>Contact(s) DDETS</strong>
+                                        <br>
+                                    {% elif institution_link.institution.kind == InstitutionKind.DREETS_GEIQ %}
+                                        <strong>Contact(s) DREETS</strong>
+                                        <br>
+                                    {% else %}
+                                        <strong>Contact(s) {{ institution_link.institution.kind }}</strong>
+                                        <br>
+                                    {% endif %}
+                                    <ul class="mb-0">
+                                        {% for member in institution_members %}
+                                            {% if member.email != PILOTAGE_INSTITUTION_EMAIL_CONTACT %}<li>{{ member.email }}</li>{% endif %}
+                                        {% endfor %}
+                                    </ul>
                                 {% endif %}
-                                <ul>
-                                    {% for member in institution_link.institution.active_members.all %}
-                                        {% if member.email != PILOTAGE_INSTITUTION_EMAIL_CONTACT %}<li>{{ member.email }}</li>{% endif %}
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
+                            {% endwith %}
                         {% endfor %}
                     </div>
                 </div>
