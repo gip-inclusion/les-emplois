@@ -22,6 +22,12 @@ class AssessmentTransition(enum.StrEnum):
         return {cls.SUBMIT, cls.REVIEW, cls.FINAL_REVIEW}
 
 
+class AllowanceRefusalReason(models.TextChoices):
+    UNCONFIRMED_ELIGIBILITY = "unconfirmed_eligibility", "Éligibilité du salarié non confirmée"
+    ALLOWANCE_ALREADY_GRANTED = "allowance_already_granted", "Aide déjà attribuée"
+    OTHER = "other", "Autre motif"
+
+
 class InstitutionAction(enum.StrEnum):
     REVIEW = "review"
     ASK_FOR_INSTITUTION_FIX = "ask_for_institution_fix"
