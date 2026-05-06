@@ -590,9 +590,13 @@ class EmployeeContract(models.Model):
             ),
         ]
 
-    def duration(self):
-        end = self.end_at or self.planned_end_at
-        return end - self.start_at + timezone.timedelta(days=1)
+    def planned_duration(self):
+        return self.planned_end_at - self.start_at + timezone.timedelta(days=1)
+
+    def real_duration(self):
+        if self.end_at is None:
+            return None
+        return self.end_at - self.start_at + timezone.timedelta(days=1)
 
     def antenna_department(self):
         antenna = self.other_data.get("antenne")

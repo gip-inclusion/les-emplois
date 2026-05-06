@@ -137,8 +137,20 @@
                                     <strong>{{ contract.end_at|date:"d/m/Y"|default:"-" }}</strong>
                                 </li>
                                 <li>
-                                    <small>Durée du contrat réalisée</small>
-                                    <strong>{{ contract.duration.days }} {{ contract.duration.days|pluralizefr:"jour,jours" }}</strong>
+                                    <small>Durée prévisionnelle du contrat</small>
+                                    <strong>{{ contract.planned_duration.days }} {{ contract.planned_duration.days|pluralizefr:"jour,jours" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Durée effective du contrat</small>
+                                    <strong>
+                                        {% with contract.real_duration as real_duration %}
+                                            {% if real_duration %}
+                                                {{ real_duration.days }} {{ real_duration.days|pluralizefr:"jour,jours" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% endwith %}
+                                    </strong>
                                 </li>
                                 <li>
                                     <small>Dont 90 jours en {{ assessment.campaign.year }}</small>

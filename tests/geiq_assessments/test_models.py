@@ -312,16 +312,20 @@ def test_employee_get_prior_actions():
 
 
 @pytest.mark.parametrize(
-    "start,planned_end,end,expected",
+    "start,planned_end,end,planned_expected,real_expected",
     [
-        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), None, 31),
-        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), datetime.date(2024, 1, 31), 31),
-        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), datetime.date(2024, 1, 10), 10),
+        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), None, 31, None),
+        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), datetime.date(2024, 1, 31), 31, 31),
+        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), datetime.date(2024, 1, 10), 31, 10),
     ],
 )
-def test_employee_contract_duration(start, planned_end, end, expected):
+def test_employee_contract_durations(start, planned_end, end, planned_expected, real_expected):
     contract = EmployeeContractFactory(start_at=start, planned_end_at=planned_end, end_at=end)
-    assert contract.duration().days == expected
+    assert contract.planned_duration().days == planned_expected
+    if real_expected is None:
+        assert contract.real_duration() is None
+    else:
+        assert contract.real_duration().days == real_expected
 
 
 def test_employee_contract_antenna_department():

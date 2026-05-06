@@ -60,7 +60,12 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     "Date de début": with_format(Format.DATE, lambda contract: contract.start_at),
     "Date de fin prévisionnelle": with_format(Format.DATE, lambda contract: contract.planned_end_at),
     "Date de fin effective": with_format(Format.DATE, lambda contract: contract.end_at),
-    "Nombre de jours réalisés au total": with_format(Format.INTEGER, lambda contract: contract.duration().days),
+    "Nombre de jours prévisionnels au total": with_format(
+        Format.INTEGER, lambda contract: contract.planned_duration().days
+    ),
+    "Nombre de jours réalisés au total": with_format(
+        Format.INTEGER, lambda contract: duration.days if (duration := contract.real_duration()) else None
+    ),
     "Nombre de jours réalisés en N-1": with_format(Format.INTEGER, lambda contract: contract.nb_days_in_campaign_year),
     "Poste occupé": with_format(Format.TEXT, lambda contract: contract.other_data.get("metier_prepare", "")),
     "Secteur d’activité": with_format(
