@@ -13,6 +13,9 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def _get_riae_contracts_data(self):
         client = Client(settings.METABASE_SITE_URL)
         QUERY_LIMIT = 100_000  # Limit to <100MB data in ram (estimated with pympler.asizeof.asizeof)
