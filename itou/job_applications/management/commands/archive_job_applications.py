@@ -2,6 +2,7 @@ import datetime
 
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES
 from itou.job_applications.models import JobApplication
@@ -9,6 +10,10 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument("--wet-run", dest="wet_run", action="store_true")
+
+    @dry_runnable
     def handle(self, **options):
         now = timezone.now()
         count = JobApplication.objects.filter(

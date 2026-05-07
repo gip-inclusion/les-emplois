@@ -39,7 +39,7 @@
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/run_management_command.sh populate_metabase_emplois --mode all",
   "5 23 * * * $ROOT/clevercloud/run_management_command.sh archive_employee_records --wet-run",
-  "20 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications",
+  "20 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications --wet-run",
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
   "55 23 * * * $ROOT/clevercloud/run_management_command.sh purge_orphaned_support_remarks --wet-run",
 

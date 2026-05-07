@@ -35,8 +35,27 @@ def test_archive(caplog):
         updated_at=cutoff + datetime.timedelta(hours=1),
     )
 
-    call_command("archive_job_applications")
+    already_archived_count = JobApplication.objects.exclude(archived_at=None).count()
+    expected_log = f"Archived {len(ARCHIVABLE_JOB_APPLICATION_STATES)} job applications"
 
+    # Dry run
+    call_command("archive_job_applications")
+    assert caplog.messages[:-1] == [
+        "Command launched with wet_run=False",
+        expected_log,
+        "Setting transaction to be rollback as wet_run=False",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.job_applications.management.commands.archive_job_applications succeeded in"
+    )
+    assert JobApplication.objects.exclude(archived_at=None).count() == already_archived_count
+
+    # Wet run
+    caplog.clear()
+    call_command("archive_job_applications", wet_run=True)
+    assert JobApplication.objects.exclude(archived_at=None).count() == already_archived_count + len(
+        ARCHIVABLE_JOB_APPLICATION_STATES
+    )
     assertQuerySetEqual(
         JobApplication.objects.exclude(archived_at=None),
         [
@@ -51,7 +70,7 @@ def test_archive(caplog):
         ],
         ordered=False,
     )
-    assert caplog.messages[:-1] == [f"Archived {len(ARCHIVABLE_JOB_APPLICATION_STATES)} job applications"]
+    assert caplog.messages[:-1] == [expected_log]
     assert caplog.messages[-1].startswith(
         "Management command itou.job_applications.management.commands.archive_job_applications succeeded in"
     )
