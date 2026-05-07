@@ -26,34 +26,43 @@
                         </p>
                         <p>Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.</p>
                     {% elif warning == LogoutWarning.NO_ORGANIZATION %}
-                        <p>L’accès aux fonctionnalités professionnelles est réservé aux comptes associés à une structure active.</p>
+                        <p>
+                            Afin de garantir un fonctionnement optimal, l’accès aux fonctionnalités professionnelles est restreint aux comptes associés à une structure active.
+                        </p>
+
+
+                        <h3>Pourquoi mon compte n’est pas ou plus rattaché à l’espace de travail de mon organisation ?</h3>
 
                         <ul>
                             <li>
-                                Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a class="btn-link" href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                                Nous avons constaté qu’un grand nombre de professionnels effectuaient sans le savoir leurs démarches sans être associés à leur structure.
+                                Votre compte n’a donc peut-être jamais été rattaché à l’espace de travail de votre organisation.
                             </li>
                             <li>
-                                Si votre compte était précédemment rattaché à une structure : celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
+                                Si votre compte était précédemment rattaché à une structure, celle-ci peut être désormais inactive (par exemple en cas de déconventionnement).
                             </li>
                             <li>
                                 Si vous avez tenté de vous inscrire en tant que facilitateur des clauses sociales, votre statut est actuellement en cours de vérification, nous reviendrons vers vous dans les plus brefs délais.
                             </li>
+                        </ul>
+
+                        <h3>Comment rejoindre l’espace de travail de votre organisation ?</h3>
+
+                        <ul>
                             <li>
-                                Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                                Si l’espace de travail de votre organisation existe déjà et que vos collègues y sont rattachés, veuillez leur demander de vous envoyer une invitation (<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738409239825--Ajouter-mes-collaborateurs-sur-le-compte-de-ma-structure" class="btn-link has-external-link" target="_blank">lien vers la documenation</a>)
                             </li>
                             <li>
-                                <form method="post" action="{% url 'account_logout' %}?next={% url 'signup:choose_user_kind' %}" class="js-prevent-multiple-submit">
-                                    {% csrf_token %}
-                                    Si votre structure ne dispose pas encore d’un espace professionnel sur Les Emplois de l’inclusion et que vous souhaitez en créer un :
-                                    <button type="submit" class="btn-link" aria-label="Se déconnecter">cliquez-ici</button>
-                                    .
-                                </form>
+                                Si l’espace de travail de votre organisation n’existe pas encore ou qu’aucun de vos collègues n’y est inscrit, veuillez <a href="{% url 'signup:choose_pro_membership_kind' %}" class="btn-link">cliquer ici</a>.
+                            </li>
+                            <li>
+                                Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq" class="btn-link">ce formulaire d’aide</a>.
                             </li>
                         </ul>
+
                         <p>
-                            En cas de besoin, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}" class="btn-link has-external-link" target="_blank">contacter notre support technique</a>.
+                            En cas de difficultés, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}" class="btn-link has-external-link" target="_blank">contacter notre support technique</a>. Veuillez noter que la procédure de rattachement via le support technique nécessitera plus de temps car des vérifications sont nécessaires afin de nous assurer de votre lien avec l’organisation concernée.
                         </p>
-                        <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
                     {% endif %}
                     <div class="row">
                         <div class="col-2">
