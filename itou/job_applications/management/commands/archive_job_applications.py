@@ -9,6 +9,9 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def handle(self, **options):
         now = timezone.now()
         count = JobApplication.objects.filter(
