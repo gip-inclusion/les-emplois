@@ -42,6 +42,22 @@
                 <div class="col-12">
                     <div class="tab-content">
                         <h2 class="mb-3 mb-md-4">Salariés et PASS IAE</h2>
+                        {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible=True extra_classes="mb-3" %}
+                            {% fragment as title %}
+                                Webinaire thématique
+                            {% endfragment %}
+                            {% fragment as content %}
+                                <p class="mb-0">
+                                    1 heure pour tout comprendre sur le PASS IAE : simplifiez la gestion de vos PASS IAE (étapes clés, bonnes pratiques et réponses à vos questions en direct).
+                                </p>
+                            {% endfragment %}
+                            {% fragment as call_to_action %}
+                                <a class="btn btn-sm btn-primary has-external-link"
+                                   target="_blank"
+                                   rel="noopener"
+                                   href="https://tally.so/r/b55KY0?event_id=gestion-du-pass-iae-2026-06-16-1777898236003&titre_event=Gestion%20du%20PASS%20IAE&date_event=16%20Juin%202026%20-%2014h00">Je m'inscris</a>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
                         {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
                         <form hx-get="{% url 'approvals:list' %}"
                               hx-trigger="change delay:.5s, change from:#id_job_seeker"
