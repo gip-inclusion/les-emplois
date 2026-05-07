@@ -209,6 +209,9 @@ cta_export_spec = {
     "Utilisateur - e-mail": lambda membership: membership.user.email,
     "Administrateur ?": lambda membership: "Oui" if membership.is_admin else "Non",
     "Utilisateur - date d'inscription": lambda membership: membership.user.date_joined.strftime("%d-%m-%Y"),
+    "Utilisateur - date de dernière connexion": lambda membership: (
+        membership.user.last_login.strftime("%d-%m-%Y") if membership.user.last_login else ""
+    ),
 }
 
 fs_3437_export_spec = {
