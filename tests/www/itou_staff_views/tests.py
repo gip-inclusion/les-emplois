@@ -272,7 +272,9 @@ class TestExportCTA:
     def test_export(self, client, snapshot):
         # generate an approval that should not be found.
         client.force_login(ItouStaffFactory(is_superuser=True))
-        PrescriberMembershipFactory(organization__for_snapshot=True, user__for_snapshot=True)
+        PrescriberMembershipFactory(
+            organization__for_snapshot=True, user__for_snapshot=True, user__last_login=timezone.now()
+        )
         CompanyFactory(with_membership=True, for_snapshot=True)
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
