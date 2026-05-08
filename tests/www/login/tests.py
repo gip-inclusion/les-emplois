@@ -16,7 +16,6 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
-from itou.users import enums as users_enums
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
@@ -25,6 +24,7 @@ from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import (
     DEFAULT_PASSWORD,
+    HASHED_DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
@@ -57,24 +57,29 @@ class TestItouLogin:
 
 
 class TestItouLoginForm:
-    def test_error_if_user_has_sso_provider(self):
+    @pytest.mark.parametrize("identity_provider", IdentityProvider)
+    def test_validate_identity_provider(self, identity_provider):
         """
-        A user has created an account with another identity provider but tries to connect with Django.
-        He should not be able to do it.
+        If an user has an account using an identity provider, they should not be able to connect with Django.
+
         You may wonder how does he know his password? Not that simple but possible.
         This clever user reset his password AND confirmed his e-mail. Voilà.
         We should block him upstream but this means hard work (overriding default Allauth views),
         too long for this quite uncommon use case.
+        Or it can be a professional that had a Django account and logged in with ProConnect at some point
         """
-        user = JobSeekerFactory(identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
+        user = random_user_kind_factory(identity_provider=identity_provider, password=HASHED_DEFAULT_PASSWORD)
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
         request = get_request(AnonymousUser())
         form = ItouLoginForm(data=form_data, request=request)
-        assert not form.is_valid()
-        assert "FranceConnect" in form.errors["__all__"][0]
+        if identity_provider in [IdentityProvider.DJANGO, IdentityProvider.INCLUSION_CONNECT]:
+            assert form.is_valid()
+        else:
+            assert not form.is_valid()
+            assert identity_provider.label in form.errors["__all__"][0]
 
 
 class TestPrescriberLogin:
