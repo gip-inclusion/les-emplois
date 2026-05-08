@@ -736,9 +736,14 @@ class TestProConnectLogin:
 
         # Then log in again.
         pre_login_url = reverse("account_login")
-        response = client.post(pre_login_url, {"email": user.email}, follow=True)
-        assertContains(response, 'class="proconnect-button"')
-        assertContains(response, reverse("pro_connect:authorize"))
+        response = client.post(pre_login_url, {"email": user.email})
+        params = {
+            "user_kind": user.kind,
+            "previous_url": pre_login_url,
+            "user_email": user.email,
+        }
+        pro_connect_url = add_url_params(pro_connect.authorize_url, params)
+        assertRedirects(response, pro_connect_url, fetch_redirect_response=False)
 
         before_auth = timezone.now()
         response = pro_connect.mock_oauth_dance(

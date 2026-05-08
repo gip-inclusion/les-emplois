@@ -87,6 +87,42 @@ class TestPreLogin:
         # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
         assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
 
+    def test_pre_login_redirects_to_pro_connect(self, client, pro_connect):
+        # This only works when ProConnect is configured
+        user = random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        url = reverse("account_login")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {"email": user.email}
+        response = client.post(url, data=form_data)
+        params = {
+            "user_kind": user.kind,
+            "previous_url": url,
+            "user_email": user.email,
+        }
+        pro_connect_url = add_url_params(pro_connect.authorize_url, params)
+        assertRedirects(response, pro_connect_url, fetch_redirect_response=False)
+
+    def test_pre_login_redirects_to_pro_connect_with_next(self, client, pro_connect):
+        # This only works when ProConnect is configured
+        user = random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        next_url = "/next_url"
+        url = reverse("account_login", query={"next": next_url})
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {"email": user.email}
+        response = client.post(url, data=form_data)
+        params = {
+            "user_kind": user.kind,
+            "previous_url": url,
+            "user_email": user.email,
+            "next_url": next_url,
+        }
+        pro_connect_url = add_url_params(pro_connect.authorize_url, params)
+        assertRedirects(response, pro_connect_url, fetch_redirect_response=False)
+
     def test_pre_login_email_unknown(self, client, snapshot):
         url = reverse("account_login")
         response = client.get(url)
@@ -245,7 +281,7 @@ class TestExistingUserLogin:
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
     def test_login(self, client, snapshot, identity_provider):
-        user = random_user_kind_factory(identity_provider=identity_provider)
+        user = random_user_kind_factory(identity_provider=identity_provider, email="test@mailinator.com")
         url = f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={reverse('signup:choose_user_kind')}"
         response = client.get(url)
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
@@ -348,6 +384,7 @@ class TestExistingUserLogin:
         params = {
             "user_kind": user.kind,
             "previous_url": url,
+            "user_email": user.email,
         }
         pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
         assertContains(response, pro_connect_url + '"')
@@ -357,6 +394,7 @@ class TestExistingUserLogin:
         params = {
             "user_kind": user.kind,
             "previous_url": url_with_next,
+            "user_email": user.email,
             "next_url": "/next_url",
         }
         pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
