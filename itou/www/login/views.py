@@ -1,11 +1,13 @@
+from allauth.account.internal.decorators import login_not_required
 from allauth.account.views import LoginView
 from allauth.decorators import rate_limit
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 
@@ -204,3 +206,15 @@ class VerifyOTPView(FormView):
 
     def get_success_url(self):
         return get_safe_url(self.request, REDIRECT_FIELD_NAME, reverse("dashboard:index"))
+
+
+@require_POST
+@login_not_required
+def demo_login_view(request):
+    if settings.SHOW_DEMO_ACCOUNTS_BANNER:
+        form = ItouLoginForm(request=request, data=request.POST)
+        if form.is_valid() and form.cleaned_data.get("demo_banner_account"):
+            form.login(request)
+            return HttpResponseRedirect(reverse("dashboard:index"))
+
+    raise Http404()
