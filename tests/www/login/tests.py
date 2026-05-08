@@ -16,12 +16,18 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
+from itou.openid_connect.pe_connect import constants as pe_constants
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
-from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
+from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance as fc_mock_oauth_dance
+from tests.openid_connect.pe_connect.tests import (
+    PEAMU_USERINFO,
+    TEST_SETTINGS,
+    mock_oauth_dance as pe_mock_oauth_dance,
+)
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     HASHED_DEFAULT_PASSWORD,
@@ -307,6 +313,19 @@ class TestJobSeekerPreLogin:
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
         assertContains(response, reverse("signup:job_seeker_start"))
 
+    def test_rate_limits(self, client):
+        url = reverse("login:job_seeker")
+        form_data = {"email": "any@mailinator.com"}
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
+
+
+class TestJobSeekerLoginFailures:
     @respx.mock
     @override_settings(
         FRANCE_CONNECT_BASE_URL="https://france.connect.fake",
@@ -327,7 +346,7 @@ class TestJobSeekerPreLogin:
         )
 
         # Temporary NIR is not stored with user information.
-        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = fc_mock_oauth_dance(client, expected_route="login:job_seeker")
         assertMessages(
             response,
             [
@@ -341,20 +360,35 @@ class TestJobSeekerPreLogin:
             ],
         )
 
-    def test_rate_limits(self, client):
-        user = JobSeekerFactory()
-        url = reverse("login:job_seeker")
-        form_data = {
-            "login": user.email,
-            "password": "wrong_password",
-        }
-        with freeze_time("2024-09-12T00:00:00Z"):
-            # Default rate limit is 30 requests per minute
-            for i in range(30):
-                response = client.post(url, data=form_data)
-                assert response.status_code == 200
-            response = client.post(url, data=form_data)
-            assertContains(response, "trop de requêtes", status_code=429)
+    @respx.mock
+    @override_settings(**TEST_SETTINGS)
+    @reload_module(pe_constants)
+    def test_conflict_on_email_change_in_pe_connect(self, client):
+        """
+        The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
+        Then he changes the email adresse on FC to use the django account email.
+        """
+        JobSeekerFactory(email=PEAMU_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
+        JobSeekerFactory(
+            username=PEAMU_USERINFO["sub"],
+            email="seconde@email.com",
+            identity_provider=IdentityProvider.PE_CONNECT,
+        )
+
+        # Temporary NIR is not stored with user information.
+        response = pe_mock_oauth_dance(client, expected_route="login:job_seeker")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
+                    "seconde@email.com et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour "
+                    "débloquer la situation en suivant "
+                    f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
+                )
+            ],
+        )
 
 
 class TestExistingUserLogin:
