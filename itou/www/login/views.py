@@ -137,9 +137,10 @@ class JobSeekerPreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView)
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse(
-            "login:existing_user", args=(self.user.public_id,), query={"back_url": reverse("login:job_seeker")}
-        )
+        params = {"back_url": self.request.get_full_path()}
+        if next_url := get_safe_url(self.request, REDIRECT_FIELD_NAME):
+            params[REDIRECT_FIELD_NAME] = next_url
+        return reverse("login:existing_user", args=(self.user.public_id,), query=params)
 
 
 class ExistingUserLoginView(ItouLoginView):
