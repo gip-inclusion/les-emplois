@@ -473,7 +473,6 @@ class TestFranceConnect:
         )
 
     @respx.mock
-    @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
