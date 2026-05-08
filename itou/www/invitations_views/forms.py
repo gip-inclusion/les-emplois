@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import UserKind
 from itou.users.forms import validate_francetravail_email
 from itou.users.models import User
 
@@ -205,7 +206,7 @@ class BaseLaborInspectorInvitationFormSet(BaseInvitationFormSet):
 ###############################################################
 
 
-class NewUserInvitationForm(SignupForm):
+class NewLaborInspectorInvitationForm(SignupForm):
     """
     Signup form shown when a user accepts an invitation.
     """
@@ -242,5 +243,5 @@ class NewUserInvitationForm(SignupForm):
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
         get_adapter().stash_verified_email(request, self.email)
-        self.user_kind = self.invitation.USER_KIND
+        self.user_kind = UserKind.LABOR_INSPECTOR
         return super().save(request)
