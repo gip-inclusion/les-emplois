@@ -14,4 +14,5 @@ urlpatterns = [
     path("itou_staff", views.ItouStaffLoginView.as_view(), name="itou_staff"),
     path("existing/<uuid:user_public_id>", views.ExistingUserLoginView.as_view(), name="existing_user"),
     path("verify", views.VerifyOTPView.as_view(), name="verify_otp"),
+    path("demo", views.demo_login_view, name="demo"),
 ]
