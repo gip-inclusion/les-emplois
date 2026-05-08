@@ -31,6 +31,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
     UserFactory,
+    random_user_kind_factory,
 )
 from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented, reload_module
 
@@ -368,28 +369,32 @@ class TestExistingUserLogin:
             response = client.get(reverse("login:existing_user", args=(user.public_id,)))
             assertContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
 
-    @pytest.mark.parametrize(
-        "identity_provider",
-        [
-            IdentityProvider.DJANGO,
-            IdentityProvider.FRANCE_CONNECT,
-            IdentityProvider.PE_CONNECT,
-            IdentityProvider.PRO_CONNECT,
-        ],
-    )
+    @pytest.mark.parametrize("identity_provider", IdentityProvider)
     @override_settings(
         FRANCE_CONNECT_BASE_URL="http://localhost:8080",
         PEAMU_AUTH_BASE_URL="http://localhost:8080",
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
     def test_login(self, client, snapshot, identity_provider):
-        # Renders only the component for the identity provider in-use by this account
-        user_kind = IDENTITY_PROVIDER_SUPPORTED_USER_KIND[identity_provider][0]
-        user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
+        user = random_user_kind_factory(identity_provider=identity_provider)
         url = f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={reverse('signup:choose_user_kind')}"
         response = client.get(url)
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector=".c-form",
+                    replace_in_attr=[
+                        ("href", str(user.public_id), "[User PublicId]"),
+                        ("data-matomo-category", "employeur inclusif", "[User kind]"),
+                        ("data-matomo-category", "prescripteur", "[User kind]"),
+                        ("href", user.kind, "[User kind]"),
+                    ],
+                )
+            )
+            == snapshot
+        )
 
     @pytest.mark.parametrize(
         "user_factory",

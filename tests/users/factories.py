@@ -434,15 +434,28 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
 
 
 def random_user_kind_factory(**kwargs):
-    return random.choice(
-        [
-            ItouStaffFactory,
-            JobSeekerFactory,
-            functools.partial(PrescriberFactory, membership=True),
-            functools.partial(EmployerFactory, membership=True),
-            functools.partial(LaborInspectorFactory, membership=True),
-        ]
-    )(**kwargs)
+    factory = None
+    if identity_provider := kwargs.get("identity_provider"):
+        if identity_provider in [IdentityProvider.PRO_CONNECT, IdentityProvider.INCLUSION_CONNECT]:
+            factory = random.choice(
+                [
+                    functools.partial(PrescriberFactory, membership=True),
+                    functools.partial(EmployerFactory, membership=True),
+                ]
+            )
+        elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT]:
+            factory = JobSeekerFactory
+    if factory is None:
+        factory = random.choice(
+            [
+                ItouStaffFactory,
+                JobSeekerFactory,
+                functools.partial(PrescriberFactory, membership=True),
+                functools.partial(EmployerFactory, membership=True),
+                functools.partial(LaborInspectorFactory, membership=True),
+            ]
+        )
+    return factory(**kwargs)
 
 
 # Temporary method before merging all 3 user kinds
