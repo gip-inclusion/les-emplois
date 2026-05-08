@@ -27,9 +27,7 @@ class UserKindLoginMixin:
     django-allauth provides the login behaviour, extended by views for each UserKind.
     """
 
-    user_kind = None
-
-    def _get_pro_connect_url(self, context):
+    def _get_pro_connect_url(self):
         if not settings.PRO_CONNECT_BASE_URL:
             return None
 
@@ -40,29 +38,10 @@ class UserKindLoginMixin:
             "user_kind": self.user_kind,
             "previous_url": self.request.get_full_path(),
         }
-        if context["redirect_field_value"]:
-            params["next_url"] = context["redirect_field_value"]
+        if self.next_url:
+            params["next_url"] = self.next_url
 
         return reverse("pro_connect:authorize", query=params)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        extra_context = {
-            "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
-            "pro_connect_url": self._get_pro_connect_url(context),
-        }
-        return context | extra_context
-
-    def dispatch(self, request, *args, **kwargs):
-        if next_url := get_safe_url(request, "next"):
-            if get_url_param_value(next_url, "channel") == ProConnectChannel.MAP_CONSEILLER:
-                query = {
-                    "user_kind": UserKind.PRESCRIBER,
-                    "next_url": next_url,
-                    "channel": ProConnectChannel.MAP_CONSEILLER.value,
-                }
-                return HttpResponseRedirect(reverse("pro_connect:authorize", query=query))
-        return super().dispatch(request, *args, **kwargs)
 
 
 class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
@@ -72,11 +51,19 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
     """
 
     template_name = "account/pre_login.html"
-    user_kind = UserKind.JOB_SEEKER
     form_class = FindExistingUserViaEmailForm
 
     @method_decorator(rate_limit(action="login"))
     def dispatch(self, request, *args, **kwargs):
+        self.next_url = get_safe_url(request, REDIRECT_FIELD_NAME)
+        if self.next_url:
+            if get_url_param_value(self.next_url, "channel") == ProConnectChannel.MAP_CONSEILLER:
+                query = {
+                    "user_kind": UserKind.PRESCRIBER,
+                    "next_url": self.next_url,
+                    "channel": ProConnectChannel.MAP_CONSEILLER.value,
+                }
+                return HttpResponseRedirect(reverse("pro_connect:authorize", query=query))
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -90,9 +77,13 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
 
     def get_success_url(self):
         params = {"back_url": self.request.get_full_path()}
-        if next_url := get_safe_url(self.request, REDIRECT_FIELD_NAME):
-            params[REDIRECT_FIELD_NAME] = next_url
+        if self.next_url:
+            params[REDIRECT_FIELD_NAME] = self.next_url
         return reverse("login:existing_user", args=(self.user.public_id,), query=params)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context | {"redirect_field_value": self.next_url}
 
 
 class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView):
@@ -107,6 +98,7 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
         super().setup(request, *args, **kwargs)
         self.user = get_object_or_404(User, public_id=self.kwargs["user_public_id"])
         self.user_kind = self.user.kind
+        self.next_url = get_safe_url(self.request, REDIRECT_FIELD_NAME)
 
     def get_user_email(self):
         """
@@ -131,13 +123,13 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
             "login_provider": self.user.identity_provider,
             "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
+            "redirect_field_value": self.next_url,
+            "pro_connect_url": self._get_pro_connect_url(),
         }
         return context | extra_context
 
     def get_success_url(self):
-        if next_url := get_safe_url(self.request, REDIRECT_FIELD_NAME):
-            return next_url
-        return super().get_success_url()
+        return self.next_url or super().get_success_url()
 
 
 class VerifyOTPView(FormView):
