@@ -29,7 +29,7 @@ from itou.www.invitations_views.forms import (
     BasePrescriberWithOrgInvitationFormSet,
     EmployerInvitationForm,
     LaborInspectorInvitationForm,
-    NewUserInvitationForm,
+    NewLaborInspectorInvitationForm,
     PrescriberWithOrgInvitationForm,
 )
 from itou.www.invitations_views.helpers import (
@@ -45,7 +45,7 @@ MAX_PENDING_INVITATION = 50
 
 def handle_invited_user_registration_with_django(request, invitation, invitation_type):
     # This view is now only used for labor inspectors
-    form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
+    form = NewLaborInspectorInvitationForm(data=request.POST or None, invitation=invitation)
     if form.is_valid():
         user = form.save(request)
         get_adapter().login(request, user)
