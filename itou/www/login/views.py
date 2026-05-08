@@ -31,12 +31,13 @@ class UserKindLoginMixin:
         if not settings.PRO_CONNECT_BASE_URL:
             return None
 
-        if self.user_kind not in IDENTITY_PROVIDER_SUPPORTED_USER_KIND[IdentityProvider.PRO_CONNECT]:
+        if self.user.kind not in IDENTITY_PROVIDER_SUPPORTED_USER_KIND[IdentityProvider.PRO_CONNECT]:
             return None
 
         params = {
-            "user_kind": self.user_kind,
+            "user_kind": self.user.kind,
             "previous_url": self.request.get_full_path(),
+            "user_email": self.user.email,
         }
         if self.next_url:
             params["next_url"] = self.next_url
@@ -76,6 +77,11 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
+        if self.user.identity_provider == IdentityProvider.PRO_CONNECT:
+            # Handle environments where ProConnect isn't plugged in
+            if pro_connect_url := self._get_pro_connect_url():
+                # We don't need to display the ProConnect button, skip it and just redirect to ProConnect
+                return pro_connect_url
         params = {"back_url": self.request.get_full_path()}
         if self.next_url:
             params[REDIRECT_FIELD_NAME] = self.next_url
@@ -97,7 +103,6 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.user = get_object_or_404(User, public_id=self.kwargs["user_public_id"])
-        self.user_kind = self.user.kind
         self.next_url = get_safe_url(self.request, REDIRECT_FIELD_NAME)
 
     def get_user_email(self):

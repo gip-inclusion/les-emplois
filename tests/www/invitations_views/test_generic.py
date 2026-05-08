@@ -590,6 +590,7 @@ class ProConnectSignupTestAcceptInvitation:
         params = {
             "user_kind": self.user_kind,
             "previous_url": login_url,
+            "user_email": user.email,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
