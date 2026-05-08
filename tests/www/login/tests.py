@@ -287,14 +287,38 @@ class TestJobSeekerPreLogin:
         assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
 
     def test_pre_login_redirects_to_existing_user(self, client):
-        user = JobSeekerFactory()
+        user = random_user_kind_factory()
         url = reverse("login:job_seeker")
         response = client.get(url)
         assert response.status_code == 200
 
         form_data = {"email": user.email}
         response = client.post(url, data=form_data)
-        assertRedirects(response, f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={url}")
+        expected_url = reverse(
+            "login:existing_user",
+            args=(user.public_id,),
+            query={"back_url": url},
+        )
+        assertRedirects(response, expected_url)
+
+        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
+        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
+
+    def test_pre_login_redirects_to_existing_user_with_next(self, client):
+        user = random_user_kind_factory()
+        next_url = "/next_url"
+        url = reverse("login:job_seeker", query={"next": next_url})
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {"email": user.email}
+        response = client.post(url, data=form_data)
+        expected_url = reverse(
+            "login:existing_user",
+            args=(user.public_id,),
+            query={"back_url": url, "next": next_url},
+        )
+        assertRedirects(response, expected_url)
 
         # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
         assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
@@ -311,6 +335,7 @@ class TestJobSeekerPreLogin:
             "Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire."
         ]
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        # FIXME: Go to user kind choice
         assertContains(response, reverse("signup:job_seeker_start"))
 
     def test_rate_limits(self, client):
