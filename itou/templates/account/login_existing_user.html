@@ -23,12 +23,8 @@
                 <div class="s-section__col col-12 col-lg-6">
                     <div class="c-form mb-5">
                         {% if login_provider == "IC" %}
-                            {% component_alert content=content variant="important" icon=False %}
-                                {% fragment as content %}
-                                    <p class="mb-0">Inclusion Connect devient ProConnect</p>
-                                {% endfragment %}
-                            {% endcomponent_alert %}
-                            {% include "pro_connect/includes/button.html" with login=True %}
+                            {# Inclusion Connect users are not asked to use ProConnect for now #}
+                            {% include "account/includes/login_form.html" %}
                         {% elif login_provider == "PC" %}
                             {% include "pro_connect/includes/button.html" with login=True %}
                         {% elif login_provider == "FC" %}

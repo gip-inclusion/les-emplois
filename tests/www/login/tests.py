@@ -324,6 +324,23 @@ class TestExistingUserLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
+    def test_login_inclusion_connect(self, client):
+        # IC old users have the Django login form
+        user = random_user_kind_factory(
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            password=HASHED_DEFAULT_PASSWORD,
+        )
+        url = reverse("login:existing_user", args=(user.public_id,))
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
+
     def test_login_email_prefilled(self, client, snapshot):
         # Login is not pre-filled just by visiting the page.
         # The user must prove they know this information
