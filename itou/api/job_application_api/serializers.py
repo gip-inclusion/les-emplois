@@ -183,7 +183,9 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
     orientation_candidat_cv = serializers.SerializerMethodField(
         label="Lien vers le CV du candidat",
         help_text="""URL stable vers la route de téléchargement du CV. Le suivi du lien nécessite une session \
-        authentifiée côté navigateur : la route redirige alors vers une URL signée S3 fraîchement générée.""",
+        authentifiée côté navigateur : la route redirige alors vers une URL signée S3 fraîchement générée. \
+        Les anciennes URLs publiques (préfixe `resume/`) restent résolvables pendant une période transitoire \
+        mais seront définitivement désactivées d'ici peu.""",
     )
     contrat_date_debut = serializers.DateField(
         source="hiring_start_at",

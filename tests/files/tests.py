@@ -45,12 +45,17 @@ def test_bucket_policy_for_anonymous_user():
     response = httpx.head(f"{base_url}/test_file.pdf")
     assert response.status_code == 403
 
-    # Resumes are no longer publicly readable, they must be served through
-    # a signed URL via the authenticated resume_download view.
+    # Legacy resumes (under `resume/`) remain publicly readable during the sunset window so that
+    # URLs already distributed in emails and API responses keep resolving. New uploads are written
+    # to `resume-private/`, which is never granted public access.
     filename = f"{uuid.uuid4()}.pdf"
     root_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}"
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"resume/{filename}")
     response = httpx.head(f"{root_url}/resume/{filename}")
+    assert response.status_code == 200
+
+    s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"resume-private/{filename}")
+    response = httpx.head(f"{root_url}/resume-private/{filename}")
     assert response.status_code == 403
 
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"news-images/{filename}")

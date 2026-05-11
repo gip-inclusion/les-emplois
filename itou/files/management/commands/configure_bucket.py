@@ -25,15 +25,22 @@ class Command(BaseCommand):
         except client.exceptions.BucketAlreadyOwnedByYou:
             pass
 
+        # `resume/` is publicly readable during the sunset window so that URLs baked into already-sent
+        # emails and already-returned API responses continue to resolve. New uploads are written to
+        # `resume-private/` (see itou/www/apply/views/submit_views.py), which is never listed here.
+        # Remove `resume/` from this list once `migrate_resume_to_private` has copied every legacy
+        # object into `resume-private/` and the sunset date has passed.
         policy_statements = [
             {
                 "Sid": "AllowPublicRead",
                 "Effect": "Allow",
                 "Principal": {"AWS": "*"},
                 "Action": "s3:GetObject",
-                "Resource": f"arn:aws:s3:::{bucket}/{path}/*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket}/resume/*",
+                    f"arn:aws:s3:::{bucket}/news-images/*",
+                ],
             }
-            for path in ["news-images"]
         ]
         client.put_bucket_policy(
             Bucket=bucket,
