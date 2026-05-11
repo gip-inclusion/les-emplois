@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2026-05-11
+
+### Ajouté
+
+- [Candidature : Ajout d'un champ "Accompagnateur du candidat"](https://github.com/gip-inclusion/les-emplois/pull/7842)
+- [GEIQ : Ajout date d'ouverture aux campagnes de bilan d’exécution](https://github.com/gip-inclusion/les-emplois/pull/7821)
+
+### Modifié
+
+- [Admin : Ajout de la date de dernière connexion à l'export des prescripteurs et employeurs](https://github.com/gip-inclusion/les-emplois/pull/7991)
+- [GEIQ : Ajout de nouvelles données sur les durées de contrat](https://github.com/gip-inclusion/les-emplois/pull/7980)
+- [Inscription : Améliorations diverses du parcours d'inscription](https://github.com/gip-inclusion/les-emplois/pull/7954)
+- [Pilotage : Les champs 'structure' de la la table Metabase 'pass_agréments' ne peuvent correspondre à une structure qui n'est pas une SIAE](https://github.com/gip-inclusion/les-emplois/pull/7963)
+- [Professionels : Améliorer le message affiché pour les utilisateurs sans organisation](https://github.com/gip-inclusion/les-emplois/pull/7987)
+- [Tech : Ajout d'infos sur l'objet édité dans l'admin](https://github.com/gip-inclusion/les-emplois/pull/7948)
+- [Tech : Prévention incohérences statut habilitation](https://github.com/gip-inclusion/les-emplois/pull/7937)
+
+### Tech
+
+- [Tech : Ajouter et première utilisation de `diff.CollectionDiffer()` afin de remplacer `yield_sync_diff()`](https://github.com/gip-inclusion/les-emplois/pull/7932)
+
 ## 2026-05-04
 
 ### Modifié
