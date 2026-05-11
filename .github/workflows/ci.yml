@@ -43,13 +43,7 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - uses: ./.github/actions/setup
     - name: 🤹 Django tests
-      run: make test TARGET="--ignore=tests/www" PYTEST_ARGS="--junit-xml=./pytest.junit.xml"
-    - uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386  # v6.4.0
-      if: (!cancelled())
-      with:
-        check_name: "test_core"
-        report_paths: './pytest.junit.xml'
-        skip_success_summary: true
+      run: make test TARGET="--ignore=tests/www"
 
   test_www:
     runs-on: ubuntu-latest
@@ -63,13 +57,7 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - uses: ./.github/actions/setup
     - name: 🤹 Django tests
-      run: make test TARGET="tests/www --ignore=tests/www/apply" PYTEST_ARGS="--junit-xml=./pytest.junit.xml"
-    - uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386  # v6.4.0
-      if: (!cancelled())
-      with:
-        check_name: "test_www"
-        report_paths: './pytest.junit.xml'
-        skip_success_summary: true
+      run: make test TARGET="tests/www --ignore=tests/www/apply"
 
   test_www_apply:
     runs-on: ubuntu-latest
@@ -83,13 +71,7 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - uses: ./.github/actions/setup
     - name: 🤹 Django tests
-      run: make test TARGET="tests/www/apply" PYTEST_ARGS="--junit-xml=./pytest.junit.xml"
-    - uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386  # v6.4.0
-      if: (!cancelled())
-      with:
-        check_name: "test_www_apply"
-        report_paths: './pytest.junit.xml'
-        skip_success_summary: true
+      run: make test TARGET="tests/www/apply"
 
   quality:
       runs-on: ubuntu-latest
