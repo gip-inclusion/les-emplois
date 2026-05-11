@@ -886,7 +886,7 @@ def assessment_details_for_institution(
                 # Unexpected institution kind
                 raise PermissionDenied
 
-        elif action is InstitutionAction.FIX:
+        elif action is InstitutionAction.ASK_FOR_INSTITUTION_FIX:
             if assessment.final_reviewed_at:
                 messages.error(request, "Ce dossier a déjà été validé : vous ne pouvez plus le corriger.")
             elif request.current_organization.kind != InstitutionKind.DREETS_GEIQ:
@@ -894,7 +894,7 @@ def assessment_details_for_institution(
             elif not assessment.reviewed_at:
                 messages.warning(request, "Ce bilan n’a pas encore été contrôlé : il n’y a rien à corriger.")
             else:
-                assessment.institution_fix(user=request.user, institution=request.current_organization)
+                assessment.ask_for_institution_fix(user=request.user, institution=request.current_organization)
                 logger.info(
                     "user=%s asked for a fix of assessment=%s",
                     request.user.pk,

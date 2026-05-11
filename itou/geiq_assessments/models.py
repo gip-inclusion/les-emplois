@@ -82,7 +82,7 @@ class AssessmentWorkflow(xwf_models.Workflow):
             [AssessmentState.SUBMITTED, AssessmentState.REVIEWED],
             AssessmentState.FINAL_REVIEWED,
         ),
-        (AssessmentTransition.INSTITUTION_FIX, AssessmentState.REVIEWED, AssessmentState.SUBMITTED),
+        (AssessmentTransition.ASK_FOR_INSTITUTION_FIX, AssessmentState.REVIEWED, AssessmentState.SUBMITTED),
     )
 
     log_model = "geiq_assessments.AssessmentTransitionLog"
@@ -434,7 +434,7 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
         self.final_reviewed_by_institution = institution
 
     @xwf_models.transition()
-    def institution_fix(self, *, user, institution):
+    def ask_for_institution_fix(self, *, user, institution):
         self.reviewed_at = None
         self.reviewed_by = None
         self.reviewed_by_institution = None

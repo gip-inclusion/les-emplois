@@ -544,7 +544,7 @@ class TestAssessmentDetailsForInstitutionView:
             client.force_login(dreets_membership.user)
             response = client.post(
                 reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
-                data={"action": "fix"},
+                data={"action": "ask_for_institution_fix"},
             )
             assertRedirects(
                 response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
@@ -553,7 +553,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.assessment.reviewed_at is None
             assert transition.assessment.reviewed_by is None
             assert transition.assessment.reviewed_by_institution is None
-            assert transition.transition == AssessmentTransition.INSTITUTION_FIX
+            assert transition.transition == AssessmentTransition.ASK_FOR_INSTITUTION_FIX
             assert transition.user == dreets_membership.user
             assert transition.institution == dreets_membership.institution
 

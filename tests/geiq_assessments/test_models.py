@@ -441,7 +441,7 @@ def test_transition_review():
     assert transition.timestamp == transition.assessment.reviewed_at
 
 
-def test_transition_institution_fix():
+def test_transition_ask_for_institution_fix():
     ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
     dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
     with freeze_time(timezone.now() - datetime.timedelta(hours=1)):
@@ -459,11 +459,11 @@ def test_transition_institution_fix():
         )
     assert assessment.state == AssessmentState.REVIEWED
 
-    assessment.institution_fix(user=dreets_membership.user, institution=dreets_membership.institution)
+    assessment.ask_for_institution_fix(user=dreets_membership.user, institution=dreets_membership.institution)
 
     transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
     assert transition.assessment.state == AssessmentState.SUBMITTED
-    assert transition.transition == AssessmentTransition.INSTITUTION_FIX
+    assert transition.transition == AssessmentTransition.ASK_FOR_INSTITUTION_FIX
     assert transition.user == dreets_membership.user
     assert transition.institution == dreets_membership.institution
 
