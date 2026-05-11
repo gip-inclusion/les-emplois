@@ -13,6 +13,7 @@ from itou.companies.enums import CompanyKind, CompanySource, JobSource
 from itou.companies.models import Company, JobDescription
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
+from tests.approvals.factories import ProlongationRequestFactory
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
@@ -201,6 +202,21 @@ class TestMoveCompanyData:
         assert updated_assignment_3_to_comp.created_at == assignment_3_to_comp.created_at
         assert updated_assignment_3_to_comp.updated_at == assignment_3.updated_at
         assert updated_assignment_3_to_comp.last_action_kind == ActionKind.APPLY
+
+    def test_move_prolongation_requests(self):
+        company_from = companies_factories.CompanyFactory()
+        company_to = companies_factories.CompanyFactory(subject_to_iae_rules=True)
+        request = ProlongationRequestFactory(declared_by_siae=company_from)
+
+        management.call_command(
+            "move_company_data",
+            from_id=company_from.pk,
+            to_id=company_to.pk,
+            wet_run=True,
+        )
+
+        request.refresh_from_db()
+        assert request.declared_by_siae == company_to
 
 
 def test_update_companies_job_app_score(caplog):

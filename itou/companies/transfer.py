@@ -27,6 +27,7 @@ class TransferField(TextChoices):
     MEMBERSHIPS = "memberships", "Utilisateurs membres"
     INVITATIONS = "invitations", "Invitations"
     PROLONGATIONS = "prolongations", "Prolongations déclarées"
+    PROLONGATION_REQUESTS = "demandes de prolongation", "Demandes de prolongation"
     SUSPENSIONS = "suspensions", "Suspensions déclarées"
     BRAND = "brand", models.Company._meta.get_field("brand").verbose_name.capitalize()
     DESCRIPTION = "description", models.Company._meta.get_field("description").verbose_name.capitalize()
@@ -100,6 +101,11 @@ TRANSFER_SPECS = {
                 "email", flat=True
             )
         ),
+    },
+    TransferField.PROLONGATION_REQUESTS: {
+        "related_model": approvals_models.ProlongationRequest,
+        "related_model_field": "declared_by_siae",
+        "iae_only": True,
     },
     TransferField.PROLONGATIONS: {
         "related_model": approvals_models.Prolongation,
