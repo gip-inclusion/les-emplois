@@ -325,28 +325,26 @@ def nav(request):
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
             ]
-            if request.current_organization:
-                jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
-                if request.from_authorized_prescriber:
-                    jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
+            jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
+            if request.from_authorized_prescriber:
+                jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
             menu_items.append(NAV_ENTRIES["gps"])
-            if request.current_organization:
-                organization_items = [
-                    (
-                        NAV_ENTRIES["prescriber-overview"]
-                        if request.current_organization.is_authorized
-                        else NAV_ENTRIES["prescriber-edit-organization"]
-                    ),
-                    NAV_ENTRIES["prescriber-members"],
-                ]
-                menu_items.append(
-                    NavGroup(
-                        label="Organisation",
-                        icon="ri-team-line",
-                        items=organization_items,
-                    )
+            organization_items = [
+                (
+                    NAV_ENTRIES["prescriber-overview"]
+                    if request.current_organization.is_authorized
+                    else NAV_ENTRIES["prescriber-edit-organization"]
+                ),
+                NAV_ENTRIES["prescriber-members"],
+            ]
+            menu_items.append(
+                NavGroup(
+                    label="Organisation",
+                    icon="ri-team-line",
+                    items=organization_items,
                 )
+            )
         elif request.from_employer and request.current_organization:
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
