@@ -596,6 +596,8 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "assessment": assessment,
         "back_url": back_url,
         "contracts_page": contracts_page,
+        "campaign_year": assessment.campaign.year,
+        "previous_campaign_year": assessment.campaign.year - 1,
         "can_validate": can_validate,
         "can_invalidate": can_invalidate,
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,

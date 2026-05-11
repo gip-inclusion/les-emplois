@@ -1522,6 +1522,19 @@ class TestAssessmentContractsListView:
         assert trigger_btn is not None
         assert trigger_btn.get("type") == "button"
 
+    def test_contracts_selection_instructions(self, client):
+        self.assessment.campaign.year = 2025
+        self.assessment.campaign.save(update_fields=("year",))
+
+        response = client.get(self.url)
+
+        assertContains(response, "Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide")
+        assertContains(
+            response,
+            "Les contrats compris dans la période du 1er octobre de l’année 2024 au 31 décembre de l’année 2025 "
+            "sont importés ici depuis le site Label GEIQ.",
+        )
+
     def test_contract_list_htmx_consistency(self, client):
         contract = EmployeeContractFactory(employee__assessment=self.assessment)
 
