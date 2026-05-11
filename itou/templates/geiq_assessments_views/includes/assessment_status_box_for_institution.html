@@ -49,7 +49,7 @@
         {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
             <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.FIX }}">
+                <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.ASK_FOR_INSTITUTION_FIX }}">
                     Renvoyer à la DDETS pour correction
                 </button>
             </form>

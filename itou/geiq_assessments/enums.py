@@ -14,7 +14,7 @@ class AssessmentTransition(enum.StrEnum):
     SUBMIT = "submit"
     REVIEW = "review"
     FINAL_REVIEW = "final_review"
-    INSTITUTION_FIX = "institution_fix"
+    ASK_FOR_INSTITUTION_FIX = "ask_for_institution_fix"
 
     @classmethod
     def with_timestamp_match(cls):
@@ -23,7 +23,7 @@ class AssessmentTransition(enum.StrEnum):
 
 class InstitutionAction(enum.StrEnum):
     REVIEW = "review"
-    FIX = "fix"
+    ASK_FOR_INSTITUTION_FIX = "ask_for_institution_fix"
 
     # Make the Enum work in Django's templates
     # See :
