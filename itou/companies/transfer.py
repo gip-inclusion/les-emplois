@@ -21,6 +21,7 @@ class TransferField(TextChoices):
     GEIQ_DIAG_CREATED = "geiq_diag_created", "Diagnostics GEIQ créés"
     JOB_APPLICATIONS_SENT = "job_applications_sent", "Candidatures envoyées"
     JOB_APPLICATIONS_RECEIVED = "job_applications_received", "Candidatures reçues"
+    JOB_APPLICATIONS_TRANSFERRED = "job_applications_transferred", "Candidatures transférées"
     JOB_SEEKER_ASSIGNMENTS = "job_seeker_assignments", "Affectations candidats"
     EMPLOYEE_RECORDS_CREATED = "employee_records_created", "Fiches salarié (transférées via les candidatures reçues)"
     JOB_DESCRIPTIONS = "job_descriptions", "Fiches de poste"
@@ -58,6 +59,10 @@ TRANSFER_SPECS = {
     TransferField.JOB_APPLICATIONS_RECEIVED: {
         "related_model": job_applications_models.JobApplication,
         "related_model_field": "to_company",
+    },
+    TransferField.JOB_APPLICATIONS_TRANSFERRED: {
+        "related_model": job_applications_models.JobApplication,
+        "related_model_field": "transferred_from_id",
     },
     TransferField.JOB_SEEKER_ASSIGNMENTS: {
         "related_model": users_models.JobSeekerAssignment,

@@ -218,6 +218,24 @@ class TestMoveCompanyData:
         request.refresh_from_db()
         assert request.declared_by_siae == company_to
 
+    def test_move_job_application_transferred_from(self):
+        company_from = companies_factories.CompanyFactory()
+        company_to = companies_factories.CompanyFactory()
+        job_application = JobApplicationFactory(
+            sent_by_employer=True,
+            transferred_from=company_from,
+        )
+
+        management.call_command(
+            "move_company_data",
+            from_id=company_from.pk,
+            to_id=company_to.pk,
+            wet_run=True,
+        )
+
+        job_application.refresh_from_db()
+        assert job_application.transferred_from == company_to
+
 
 def test_update_companies_job_app_score(caplog):
     company_1 = companies_factories.CompanyFactory()
