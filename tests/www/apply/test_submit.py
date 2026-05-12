@@ -3304,10 +3304,12 @@ class TestApplicationView:
 
 
 class TestApplicationEndView:
-    def test_update_job_seeker(self, client):
+    def test_update_job_seeker_forbidden_if_not_proxy(self, client):
         job_application = JobApplicationFactory(sent_by_prescriber=True, job_seeker__with_mocked_address=True)
         job_seeker = job_application.job_seeker
-        # Ensure sender cannot update job seeker infos
+        assert not job_seeker.is_handled_by_proxy
+        # Ensure sender cannot update infos, because the job seeker is
+        # the owner of their account.
         assert job_seeker.address_line_2 == ""
         url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         client.force_login(job_application.sender)
@@ -3323,7 +3325,33 @@ class TestApplicationEndView:
         )
         assert response.status_code == 403
         job_seeker.refresh_from_db()
-        assert job_seeker.address_line_2 == ""
+        assert job_seeker.address_line_2 == ""  # not updated
+
+    def test_update_job_seeker_allowed_if_proxy(self, client):
+        job_application = JobApplicationFactory(sent_by_prescriber=True, job_seeker__with_mocked_address=True)
+        job_seeker = job_application.job_seeker
+        job_seeker.created_by = job_application.sender
+        job_seeker.save()
+        assert job_seeker.is_handled_by_proxy
+        url = reverse(
+            "apply:application_end",
+            kwargs={"application_pk": job_application.pk},
+        )
+        client.force_login(job_application.sender)
+        response = client.post(
+            url,
+            data={
+                "address_line_1": job_seeker.address_line_1,
+                "address_line_2": "something new",
+                "post_code": job_seeker.post_code,
+                "city": job_seeker.city,
+                "phone": job_seeker.phone,
+            },
+            follow=True,
+        )
+        assert response.status_code == 200
+        job_seeker.refresh_from_db()
+        assert job_seeker.address_line_2 == "something new"
 
     def test_wo_phone_number_as_job_seeker(self, client):
         application = JobApplicationFactory(sent_by_job_seeker=True, job_seeker__phone="")

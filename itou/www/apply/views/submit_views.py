@@ -2,6 +2,7 @@ import enum
 import logging
 from datetime import timedelta
 
+from allauth.account.views import method_decorator
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -30,6 +31,7 @@ from itou.utils.perms.utils import can_edit_personal_information, can_view_perso
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
+from itou.utils.views import with_triggers_context
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.apply.views.common import previous_applications_queryset
@@ -715,6 +717,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         }
 
 
+@method_decorator(with_triggers_context, name="post")
 class ApplicationEndView(TemplateView):
     template_name = "apply/submit/application/end.html"
 
