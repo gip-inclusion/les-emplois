@@ -283,6 +283,8 @@ class TestAssessmentContractsListAndToggle:
             planned_end_at=datetime.date(2024, 5, 31),
             allowance_requested=True,
             allowance_granted=False,
+            allowance_refusal_reason=AllowanceRefusalReason.UNCONFIRMED_ELIGIBILITY,
+            allowance_refusal_details="Éligibilité non confirmée",
         )
         EmployeeContractFactory(
             id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
@@ -310,11 +312,36 @@ class TestAssessmentContractsListAndToggle:
             allowance_requested=False,
             allowance_granted=False,
         )
+        refused_contract = EmployeeContractFactory(
+            id=uuid.UUID("44444444-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("44444444-eeee-4444-8888-111111111111"),
+            employee__assessment=assessment,
+            employee__last_name="Dupons",
+            employee__first_name="Pean-Jierre",
+            employee__allowance_amount=1_400,
+            start_at=datetime.date(2024, 6, 1),
+            end_at=datetime.date(2024, 9, 30),
+            planned_end_at=datetime.date(2024, 10, 30),
+            allowance_requested=True,
+            allowance_granted=False,
+            allowance_refusal_reason="",
+            allowance_refusal_details="",
+        )
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(contracts_list_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessments contracts list"
+            name="assessments contracts list with refusal to justify"
         )
+        # One contract's allowance is refused, the user cannot validate
+        response = client.post(contracts_list_url, data={"action": "validate"})
+        assert response.status_code == 403
+        assessment.refresh_from_db()
+        assert assessment.grants_selection_validated_at is None
+
+        # Fill allowance refusal reason and try again
+        refused_contract.allowance_refusal_reason = AllowanceRefusalReason.ALLOWANCE_ALREADY_GRANTED
+        refused_contract.allowance_refusal_details = "Aide déjà attribuée."
+        refused_contract.save()
         response = client.post(contracts_list_url, data={"action": "validate"})
         assertRedirects(
             response,
@@ -333,7 +360,7 @@ class TestAssessmentContractsListAndToggle:
         assert assessment.grants_selection_validated_at is None
         response = client.get(contracts_list_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessments contracts list"
+            name="assessments contracts list with justified refusal"
         )
 
     def test_htmx_toggle_as_geiq(self, client):
