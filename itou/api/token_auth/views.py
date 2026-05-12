@@ -3,9 +3,11 @@ import logging
 from rest_framework import serializers
 from rest_framework.authtoken import views as drf_authtoken_views
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
+from itou.users.enums import IdentityProvider
 from itou.utils.auth import LoginNotRequiredMixin
 
 
@@ -15,7 +17,19 @@ logger = logging.getLogger(__name__)
 TOKEN_ID_STR = "__token__"
 
 
+class ItouAuthTokenSerializer(AuthTokenSerializer):
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        user = attrs["user"]
+        if user.has_sso_provider and user.identity_provider != IdentityProvider.INCLUSION_CONNECT:
+            msg = "Ce compte ne peut pas se connecter avec un username et mot de passe."
+            raise serializers.ValidationError(msg, code="authorization")
+        return attrs
+
+
 class ObtainAuthToken(LoginNotRequiredMixin, drf_authtoken_views.ObtainAuthToken):
+    serializer_class = ItouAuthTokenSerializer
+
     def post(self, request, *args, **kwargs):
         if request.data.get("username") == TOKEN_ID_STR:
             password = request.data.get("password")
@@ -36,9 +50,9 @@ class ObtainAuthToken(LoginNotRequiredMixin, drf_authtoken_views.ObtainAuthToken
 
 
 ObtainAuthToken.__doc__ = f"""\
-**Route majoritairement utilisée pour les comptes n’ayant pas activé ProConnect.**
+**Route utilisée pour les comptes n’ayant pas activé ProConnect.**
 
-Si vous avez activé ProConnect pour votre compte, vous pouvez obtenir un jeton d’accès aux
+Si vous avez activé ProConnect pour votre compte, vous devez obtenir un jeton d’accès aux
 APIs depuis un **compte administrateur de la structure** de la manière suivante :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}
