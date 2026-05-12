@@ -17,6 +17,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -126,6 +129,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -235,6 +241,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -344,6 +353,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -535,6 +547,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -726,6 +741,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -917,6 +935,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -1354,6 +1375,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>
@@ -1791,6 +1815,9 @@
                   Motif
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les rendez-vous
+                  </span>
               </th>
           </tr>
       </thead>

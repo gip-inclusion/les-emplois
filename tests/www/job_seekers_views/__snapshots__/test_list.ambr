@@ -1668,6 +1668,9 @@
                   </button>
               </th>
               <th class="text-end w-100px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les candidats
+                  </span>
               </th>
           </tr>
       </thead>

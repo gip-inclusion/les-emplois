@@ -20,7 +20,11 @@
                     <th scope="col">Nom Prénom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Date d'inscription</th>
-                    {% if user in active_admin_members %}<th scope="col" class="text-end w-50px"></th>{% endif %}
+                    {% if user in active_admin_members %}
+                        <th scope="col" class="text-end w-50px">
+                            <span class="visually-hidden">Actions possibles sur les collaborateurs</span>
+                        </th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>

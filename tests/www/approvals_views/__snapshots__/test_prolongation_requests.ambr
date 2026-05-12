@@ -1172,6 +1172,9 @@
                                       Statut
                                   </th>
                                   <th class="text-end w-50px" scope="col">
+                                      <span class="visually-hidden">
+                                          Actions possibles sur les prolongations de PASS IAE
+                                      </span>
                                   </th>
                               </tr>
                           </thead>
@@ -1783,6 +1786,9 @@
                                       Statut
                                   </th>
                                   <th class="text-end w-50px" scope="col">
+                                      <span class="visually-hidden">
+                                          Actions possibles sur les prolongations de PASS IAE
+                                      </span>
                                   </th>
                               </tr>
                           </thead>
