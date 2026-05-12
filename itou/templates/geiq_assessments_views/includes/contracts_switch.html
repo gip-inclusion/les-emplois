@@ -61,6 +61,7 @@
     {% if from_list and request.htmx and not disable_oob %}
         {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True request=request only %}
         {% include "geiq_assessments_views/includes/contracts_list_justification_alert.html" with contracts_awaiting_justification_nb=stats.contracts_awaiting_allowance_request_justification_nb assessment=assessment request=request hx_swap_oob=True only %}
-        {% include "geiq_assessments_views/includes/contracts_list_validate_button_form.html" with ContractsAction=ContractsAction back_url=back_url primary_disabled=stats.contracts_awaiting_allowance_request_justification_nb csrf_token=csrf_token hx_swap_oob=True only %}
+        {% include "geiq_assessments_views/includes/contracts_list_refusal_warning.html" with stats=stats assessment=assessment request=request hx_swap_oob=True only %}
+        {% include "geiq_assessments_views/includes/contracts_list_validate_button_form.html" with ContractsAction=ContractsAction back_url=back_url stats=stats csrf_token=csrf_token request=request hx_swap_oob=True only %}
     {% endif %}
 {% endwith %}

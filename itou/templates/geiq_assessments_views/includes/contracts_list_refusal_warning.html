@@ -1,0 +1,26 @@
+{% load components %}
+{% load str_filters %}
+<div id="alert-contracts-awaiting-justification"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+    {# FIXME: merge GEIQ and institutions here #}
+    {% if request.from_institution and stats.contracts_awaiting_institution_justification_nb %}
+        {% component_alert title=title content=content variant="warning" extra_classes="mt-2" %}
+            {% fragment as title %}
+                Refus à justifier
+            {% endfragment %}
+            {% fragment as content %}
+                <div class="row">
+                    <div class="col">
+                        <p class="mb-0">
+                            Vous devez encore motiver {{ stats.contracts_awaiting_institution_justification_nb|pluralizefr:"le,les" }} refus d’aide de {{ stats.contracts_awaiting_institution_justification_nb }} {{ stats.contracts_awaiting_institution_justification_nb|pluralizefr:"contrat,contrats" }}.
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-auto align-items-center justify-content-center">
+                        <a type="button" class="btn btn-sm btn-outline-warning" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?allowance_eligibility_off=on#contracts-results-table">
+                            Afficher les contrats concernés
+                        </a>
+                    </div>
+                </div>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+</div>

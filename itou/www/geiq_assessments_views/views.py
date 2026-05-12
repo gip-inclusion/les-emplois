@@ -848,6 +848,8 @@ def assessment_contracts_details(
 def assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
+    back_url = None
+
     if request.from_employer:
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.from_institution:
@@ -878,7 +880,12 @@ def assessment_contracts_toggle(
         and contract.allowance_granted != new_value
     ):
         contract.allowance_granted = new_value
-        contract.save(update_fields=("allowance_granted",))
+        updated_fields = ["allowance_granted"]
+        if contract.allowance_granted and contract.allowance_refusal_reason:
+            contract.allowance_refusal_reason = ""
+            contract.allowance_refusal_details = ""
+            updated_fields += ["allowance_refusal_reason", "allowance_refusal_details"]
+        contract.save(update_fields=updated_fields)
     from_list = bool(request.GET.get("from_list"))
 
     # For the buttons (i.e. cards/boxes inside contract details tabs) not relying on HTMX.
@@ -902,6 +909,7 @@ def assessment_contracts_toggle(
         elif request.from_institution:
             stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
             back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+
     context = {
         "assessment": assessment,
         "contract": contract,

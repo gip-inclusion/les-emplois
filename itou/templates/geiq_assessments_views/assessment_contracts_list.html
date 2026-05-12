@@ -1,5 +1,4 @@
 {% extends "layout/base.html" %}
-{% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
@@ -84,6 +83,7 @@
                             L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                             Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                         </p>
+                        {% include "geiq_assessments_views/includes/contracts_list_refusal_warning.html" with stats=stats assessment=assessment request=request hx_swap_oob=False only %}
                     {% endif %}
                     {% include "geiq_assessments_views/includes/contracts_list_justification_alert.html" with contracts_awaiting_justification_nb=stats.contracts_awaiting_allowance_request_justification_nb assessment=assessment request=request hx_swap_oob=False only %}
                 </div>
@@ -191,7 +191,7 @@
                     {% endpartialdef %}
 
                     {% if can_validate %}
-                        {% include "geiq_assessments_views/includes/contracts_list_validate_button_form.html" with ContractsAction=ContractsAction back_url=back_url primary_disabled=stats.contracts_awaiting_allowance_request_justification_nb csrf_token=csrf_token hx_swap_oob=False only %}
+                        {% include "geiq_assessments_views/includes/contracts_list_validate_button_form.html" with ContractsAction=ContractsAction back_url=back_url stats=stats csrf_token=csrf_token request=request hx_swap_oob=False only %}
                     {% endif %}
                 </div>
             </div>

@@ -1,5 +1,9 @@
 {% load buttons_form %}
 <form method="post" class="js-prevent-multiple-submit" id="validate-contracts-selection-form"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     {% csrf_token %}
-    {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url primary_disabled=primary_disabled show_mandatory_fields_mention=False %}
+    {% if request.from_employer %}
+        {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url primary_disabled=stats.contracts_awaiting_allowance_request_justification_nb show_mandatory_fields_mention=False %}
+    {% elif request.from_institution %}
+        {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url primary_disabled=stats.contracts_awaiting_institution_justification_nb show_mandatory_fields_mention=False %}
+    {% endif %}
 </form>
