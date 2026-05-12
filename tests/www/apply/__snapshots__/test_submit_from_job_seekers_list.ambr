@@ -116,7 +116,7 @@
                                   </a>
                               </div>
                           </div>
-                          <h2>
+                          <h2 class="h3">
                               Préciser la situation administrative du candidat (facultatif)
                           </h2>
                           <hr class="mt-5"/>

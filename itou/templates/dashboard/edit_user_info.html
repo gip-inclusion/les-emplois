@@ -33,7 +33,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form">
-                        <h2>Informations personnelles</h2>
+                        <h2 class="h3">Informations personnelles</h2>
                         {% if request.user.is_job_seeker and not request.user.title %}
                             {% component_alert title=title content=content variant="warning" extra_id="missing-infos-warning" %}
                                 {% fragment as title %}

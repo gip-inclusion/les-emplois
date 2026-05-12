@@ -155,7 +155,7 @@
                                   </a>
                               </div>
                           </div>
-                          <h2>
+                          <h2 class="h3">
                               Préciser la situation administrative du candidat (facultatif)
                           </h2>
                           <hr class="mt-5"/>
@@ -461,7 +461,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_another_employer[allowed]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -506,7 +506,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_another_employer[blocked]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -556,7 +556,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_authorized_prescriber[allowed update diagnosis]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -642,7 +642,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_authorized_prescriber[allowed validate diagnosis]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -728,7 +728,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_authorized_prescriber[blocked]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -788,7 +788,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_job_seeker[allowed]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Vous avez déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -833,7 +833,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_job_seeker[blocked]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Vous avez déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -883,7 +883,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_prescriber[allowed]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>
@@ -928,7 +928,7 @@
 # name: TestCheckPreviousApplicationsView.test_with_previous_as_prescriber[blocked]
   '''
   <div class="c-form">
-      <h2>
+      <h2 class="h3">
           Ce candidat a déjà postulé pour cette entreprise
       </h2>
       <p>

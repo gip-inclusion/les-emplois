@@ -91,7 +91,7 @@
                         </div>
                         {% if not request.user.is_job_seeker %}
                             <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
-                                <h2 class="mb-5">{{ job_application.job_seeker.get_inverted_full_name }}</h2>
+                                <h2 class="h3 mb-5">{{ job_application.job_seeker.get_inverted_full_name }}</h2>
 
                                 <form method="post">
                                     {% csrf_token %}

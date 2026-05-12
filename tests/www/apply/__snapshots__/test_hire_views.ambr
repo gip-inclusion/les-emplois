@@ -2,10 +2,6 @@
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_not_born_in_france][personal-infos]
   '''
   <div class="personal-infos">
-      <h2>
-          Informations personnelles
-      </h2>
-      <hr/>
       <div class="row mb-3">
           <div class="col-12 col-sm">
               <h3 class="mb-0">
@@ -22,7 +18,7 @@
               </a>
           </div>
       </div>
-      <ul class="list-data mb-3">
+      <ul class="list-data">
           <li>
               <small>
                   Civilité
@@ -92,15 +88,11 @@
               </strong>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Coordonnées
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Coordonnées
+      </h3>
+      <ul class="list-data">
           <li>
               <small>
                   Adresse e-mail
@@ -140,15 +132,11 @@
               </address>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Situation
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Situation
+      </h3>
+      <ul class="list-data mb-4">
           <li>
               <small>
                   Inscrit à France Travail depuis
@@ -189,10 +177,6 @@
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_all_datas][personal-infos]
   '''
   <div class="personal-infos">
-      <h2>
-          Informations personnelles
-      </h2>
-      <hr/>
       <div class="row mb-3">
           <div class="col-12 col-sm">
               <h3 class="mb-0">
@@ -209,7 +193,7 @@
               </a>
           </div>
       </div>
-      <ul class="list-data mb-3">
+      <ul class="list-data">
           <li>
               <small>
                   Civilité
@@ -287,15 +271,11 @@
               </strong>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Coordonnées
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Coordonnées
+      </h3>
+      <ul class="list-data">
           <li>
               <small>
                   Adresse e-mail
@@ -335,15 +315,11 @@
               </address>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Situation
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Situation
+      </h3>
+      <ul class="list-data mb-4">
           <li>
               <small>
                   Inscrit à France Travail depuis
@@ -432,10 +408,6 @@
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_few_datas][personal-infos]
   '''
   <div class="personal-infos">
-      <h2>
-          Informations personnelles
-      </h2>
-      <hr/>
       <div class="row mb-3">
           <div class="col-12 col-sm">
               <h3 class="mb-0">
@@ -452,7 +424,7 @@
               </a>
           </div>
       </div>
-      <ul class="list-data mb-3">
+      <ul class="list-data">
           <li>
               <small>
                   Civilité
@@ -500,15 +472,11 @@
               </strong>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Coordonnées
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Coordonnées
+      </h3>
+      <ul class="list-data">
           <li>
               <small>
                   Adresse e-mail
@@ -534,15 +502,11 @@
               </i>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Situation
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Situation
+      </h3>
+      <ul class="list-data mb-4">
           <li>
               <small>
                   Inscrit à France Travail depuis
@@ -583,10 +547,6 @@
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_single_other_data][personal-infos]
   '''
   <div class="personal-infos">
-      <h2>
-          Informations personnelles
-      </h2>
-      <hr/>
       <div class="row mb-3">
           <div class="col-12 col-sm">
               <h3 class="mb-0">
@@ -603,7 +563,7 @@
               </a>
           </div>
       </div>
-      <ul class="list-data mb-3">
+      <ul class="list-data">
           <li>
               <small>
                   Civilité
@@ -681,15 +641,11 @@
               </strong>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Coordonnées
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Coordonnées
+      </h3>
+      <ul class="list-data">
           <li>
               <small>
                   Adresse e-mail
@@ -729,15 +685,11 @@
               </address>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Situation
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Situation
+      </h3>
+      <ul class="list-data mb-4">
           <li>
               <small>
                   Inscrit à France Travail depuis
@@ -785,10 +737,6 @@
 # name: TestCheckJobSeekerInformationsForHire.test_geiq[personal-infos]
   '''
   <div class="personal-infos">
-      <h2>
-          Informations personnelles
-      </h2>
-      <hr/>
       <div class="row mb-3">
           <div class="col-12 col-sm">
               <h3 class="mb-0">
@@ -805,7 +753,7 @@
               </a>
           </div>
       </div>
-      <ul class="list-data mb-3">
+      <ul class="list-data">
           <li>
               <small>
                   Civilité
@@ -855,15 +803,11 @@
               </strong>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Coordonnées
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Coordonnées
+      </h3>
+      <ul class="list-data">
           <li>
               <small>
                   Adresse e-mail
@@ -903,15 +847,11 @@
               </address>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Situation
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Situation
+      </h3>
+      <ul class="list-data mb-4">
           <li>
               <small>
                   Inscrit à France Travail depuis
@@ -2077,10 +2017,6 @@
 # name: TestDirectHireFullProcess.test_hire_as_company[personal-infos]
   '''
   <div class="personal-infos">
-      <h2>
-          Informations personnelles
-      </h2>
-      <hr/>
       <div class="row mb-3">
           <div class="col-12 col-sm">
               <h3 class="mb-0">
@@ -2088,7 +2024,7 @@
               </h3>
           </div>
       </div>
-      <ul class="list-data mb-3">
+      <ul class="list-data">
           <li>
               <small>
                   Civilité
@@ -2166,15 +2102,11 @@
               </strong>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Coordonnées
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Coordonnées
+      </h3>
+      <ul class="list-data">
           <li>
               <small>
                   Adresse e-mail
@@ -2214,15 +2146,11 @@
               </address>
           </li>
       </ul>
-      <hr/>
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Situation
-              </h3>
-          </div>
-      </div>
-      <ul class="list-data mb-3">
+      <hr class="my-4"/>
+      <h3>
+          Situation
+      </h3>
+      <ul class="list-data mb-4">
           <li>
               <small>
                   Inscrit à France Travail depuis
