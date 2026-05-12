@@ -208,6 +208,8 @@ class TestAssessmentContractsListAndToggle:
             planned_end_at=datetime.date(2024, 5, 31),
             allowance_requested=True,
             allowance_granted=False,
+            allowance_refusal_reason=AllowanceRefusalReason.UNCONFIRMED_ELIGIBILITY,
+            allowance_refusal_details="Éligibilité non confirmée",
         )
         EmployeeContractFactory(
             id=uuid.UUID("22222222-4444-4444-4444-444444444444"),

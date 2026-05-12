@@ -4949,7 +4949,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input class="form-check-input" disabled="" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input class="form-check-input" disabled="" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
                                                       Obtenir l’aide
                                                   </label>
@@ -4979,7 +4981,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                                       Obtenir l’aide
                                                   </label>
@@ -5009,7 +5013,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                                       Obtenir l’aide
                                                   </label>
@@ -5188,7 +5194,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
                                                       Obtenir l’aide
                                                   </label>
@@ -5218,7 +5226,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                                       Obtenir l’aide
                                                   </label>
@@ -5248,7 +5258,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                                       Obtenir l’aide
                                                   </label>
@@ -5698,7 +5710,10 @@
                                                                          WHERE "geiq_assessments_employee"."allowance_amount" = %s) AS "allowance_of_0_nb",
                  COUNT("geiq_assessments_employeecontract"."id") FILTER (
                                                                          WHERE ("geiq_assessments_employeecontract"."allowance_granted"
-                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_0_selected_nb"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_0_selected_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE (NOT "geiq_assessments_employeecontract"."allowance_granted"
+                                                                                AND "geiq_assessments_employeecontract"."allowance_refusal_reason" = %s)) AS "contracts_awaiting_institution_justification_nb"
           FROM "geiq_assessments_employeecontract"
           INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
           WHERE ("geiq_assessments_employeecontract"."allowance_requested"
@@ -5981,7 +5996,13 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                      <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/institution-justification">
+                                                          <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                                          </i>
+                                                      </a>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                                       Accorder l’aide
                                                   </label>
@@ -6011,7 +6032,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                                       Accorder l’aide
                                                   </label>
@@ -6180,7 +6203,13 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                      <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/institution-justification">
+                                                          <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                                          </i>
+                                                      </a>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
                                                       Accorder l’aide
                                                   </label>
@@ -6210,7 +6239,9 @@
                                           <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                               <div class="form-check form-switch">
-                                                  <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                  </div>
                                                   <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
                                                       Accorder l’aide
                                                   </label>

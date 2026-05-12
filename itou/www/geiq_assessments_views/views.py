@@ -143,6 +143,9 @@ def get_allowance_stats_for_institution(assessment, *, for_assessment_details=Fa
         else {
             "allowance_of_0_nb": Count("pk", filter=Q(employee__allowance_amount=0)),
             "allowance_of_0_selected_nb": Count("pk", filter=Q(employee__allowance_amount=0, allowance_granted=True)),
+            "contracts_awaiting_institution_justification_nb": Count(
+                "pk", filter=Q(allowance_granted=False, allowance_refusal_reason="")
+            ),
         }
     )
     return EmployeeContract.objects.filter(employee__assessment=assessment, allowance_requested=True).aggregate(
@@ -530,22 +533,25 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
     back_url, can_validate, can_invalidate, stats = None, False, False, None  # defined to please the linters
     if request.from_employer:
+        stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
         back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         if not assessment.submitted_at:
             can_validate = not assessment.contracts_selection_validated_at
             can_invalidate = not can_validate
     elif request.from_institution:
+        stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
         back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
         if not assessment.reviewed_at:
             can_validate = not assessment.grants_selection_validated_at
             can_invalidate = not can_validate
+
     if request.method == "POST":
         try:
             action = ContractsAction(request.POST.get("action"))
         except ValueError:
             raise Http404
         if action == ContractsAction.VALIDATE:
-            if not can_validate:  # FIXME  Vérifier aussi si des contrats sont en attente de justification ?
+            if not can_validate or stats.get("contracts_awaiting_institution_justification_nb", 0):
                 raise PermissionDenied
             if request.from_employer:
                 assessment.contracts_selection_validated_at = timezone.now()
@@ -599,6 +605,12 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
     elif request.from_institution:
         stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
+
+    contracts_qs = (
+        EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
+        .select_related("employee__assessment")
+        .order_by("employee__last_name", "employee__first_name")
+    )
 
     # Initializing the filter form with the raw parameters
     filters_form = ContractFilterForm(data=request.GET, employee_contracts_qs=contracts_qs)
