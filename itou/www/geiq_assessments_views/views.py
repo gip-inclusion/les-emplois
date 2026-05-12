@@ -97,12 +97,21 @@ def get_allowance_stats_for_geiq(assessment, *, for_assessment_details=False):
         if not for_assessment_details
         else {}
     )
-    return EmployeeContract.objects.filter(employee__assessment=assessment).aggregate(
-        allowance_of_814_selected_nb=Count("pk", filter=Q(allowance_requested=True, employee__allowance_amount=814)),
-        allowance_of_1400_selected_nb=Count("pk", filter=Q(allowance_requested=True, employee__allowance_amount=1400)),
-        potential_allowance_amount=Sum("employee__allowance_amount", filter=Q(allowance_requested=True)),
-        with_allowance_granted_previous_year_nb=Count("pk", filter=Q(employee__allowance_granted_previous_year=True)),
-        **extra_stats,
+    return (
+        EmployeeContract.objects.filter(employee__assessment=assessment).aggregate(
+            allowance_of_814_selected_nb=Count(
+                "pk", filter=Q(allowance_requested=True, employee__allowance_amount=814)
+            ),
+            allowance_of_1400_selected_nb=Count(
+                "pk", filter=Q(allowance_requested=True, employee__allowance_amount=1400)
+            ),
+            potential_allowance_amount=Sum("employee__allowance_amount", filter=Q(allowance_requested=True)),
+            with_allowance_granted_previous_year_nb=Count(
+                "pk", filter=Q(employee__allowance_granted_previous_year=True)
+            ),
+            **extra_stats,
+        )
+        | {"contracts_awaiting_justification_nb": None}  # FIXME(ewen/lgavalda): fill this variable with an aggregate)
     )
 
 
@@ -777,6 +786,8 @@ def assessment_contracts_details(
 def assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
+    back_url = None
+
     if request.from_employer:
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.from_institution:
@@ -807,14 +818,22 @@ def assessment_contracts_toggle(
         and contract.allowance_granted != new_value
     ):
         contract.allowance_granted = new_value
-        contract.save(update_fields=("allowance_granted",))
+        updated_fields = ["allowance_granted"]
+        if contract.allowance_granted and contract.allowance_refusal_reason:
+            contract.allowance_refusal_reason = ""
+            contract.allowance_refusal_details = ""
+            updated_fields += ["allowance_refusal_reason", "allowance_refusal_details"]
+        contract.save(update_fields=updated_fields)
     from_list = bool(request.GET.get("from_list"))
     stats = None
     if from_list:
         if request.from_employer:
             stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
+            back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         elif request.from_institution:
             stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
+            back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+
     context = {
         "assessment": assessment,
         "contract": contract,
@@ -822,6 +841,8 @@ def assessment_contracts_toggle(
         "editable": True,
         "value": new_value,
         "stats": stats,
+        "ContractsAction": ContractsAction,
+        "back_url": back_url,
     }
     return render(request, template_name, context)
 
