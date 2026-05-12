@@ -434,6 +434,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+@with_triggers_context
 def create_step_3(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
