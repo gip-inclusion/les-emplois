@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import TemplateView, View
+from itoutils.urls import add_url_params
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
@@ -30,7 +31,7 @@ from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.templatetags.str_filters import mask_unless
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_safe_url, get_url_param_value
 from itou.utils.views import with_triggers_context
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import constants as apply_view_constants
@@ -161,6 +162,15 @@ class StartViewForSubmit(ApplicationPermissionMixin, View):
     def get_reset_url(self):
         return self.reset_url
 
+    def get_search_url(self):
+        search_views = ["search:employers_results", "search:job_descriptions_results"]
+
+        # If the user decides to view the details of a job description or of a company beforehand,
+        # the search results url will be present inside the reset_url as a back_url parameter.
+        search_url = get_url_param_value(self.reset_url, "back_url") or self.reset_url
+
+        return search_url if any(reverse(view) in search_url for view in search_views) else None
+
     def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create(
             request.session,
@@ -197,6 +207,9 @@ class StartViewForSubmit(ApplicationPermissionMixin, View):
 
             if job_seeker:
                 session_data["job_seeker_public_id"] = str(job_seeker.public_id)
+
+            if search_url := self.get_search_url():
+                session_data["search_url"] = search_url
 
         self.apply_session = initialize_apply_session(request, session_data)
 
@@ -615,9 +628,18 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.form = self.form_class(**self.get_form_kwargs())
+        self.search_url = self.apply_session.get("search_url", default=None)
+
+    def get_search_url(self):
+        # If we apply for a job seeker with his NIR, his public id will be missing from the url and will have to be
+        # typed in again once we go back to the search results.
+        if self.search_url and (job_seeker_public_id := str(self.job_seeker.public_id)) not in self.search_url:
+            return add_url_params(self.search_url, {"job_seeker_public_id": job_seeker_public_id})
+        return self.search_url
 
     def get_next_url(self, job_application):
-        return reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
+        return add_url_params(next_url, {"search_url": self.get_search_url()})
 
     def form_valid(self):
         # Fill the job application with the required information
@@ -733,6 +755,10 @@ class ApplicationEndView(TemplateView):
         self.form = CreateOrUpdateJobSeekerStep2Form(
             instance=self.job_application.job_seeker, data=request.POST or None
         )
+        self.search_url = get_safe_url(request, "search_url")
+
+    def get_search_url(self):
+        return self.search_url
 
     def post(self, request, *args, **kwargs):
         if not can_edit_personal_information(self.request, self.job_application.job_seeker):
@@ -740,16 +766,23 @@ class ApplicationEndView(TemplateView):
         if self.form.is_valid():
             self.form.save()
             # Redirect to the same page, so we don't have a POST method
-            return HttpResponseRedirect(request.path_info)
+            url = add_url_params(request.path_info, {"search_url": self.get_search_url()})
+            return HttpResponseRedirect(url)
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
         if self.request.from_employer and self.company == self.request.current_organization:
             page_title = "Auto-prescription enregistrée"
             matomo_custom_title = "Auto-prescription enregistrée"
+            search_url = None
         else:
             page_title = "Candidature envoyée"
             matomo_custom_title = "Candidature soumise"
+            search_url = self.get_search_url()
+
+        reset_url = reverse("apply:application_end", kwargs={"application_pk": self.job_application.pk})
+        reset_url = add_url_params(reset_url, {"search_url": search_url})
+
         return super().get_context_data(**kwargs) | {
             "job_application": self.job_application,
             "form": self.form,
@@ -759,7 +792,8 @@ class ApplicationEndView(TemplateView):
             "can_view_personal_information": can_view_personal_information(
                 self.request, self.job_application.job_seeker
             ),
-            "reset_url": reverse("apply:application_end", kwargs={"application_pk": self.job_application.pk}),
+            "reset_url": reset_url,
+            "search_url": search_url,
             "page_title": page_title,
             "matomo_custom_title": matomo_custom_title,
         }
