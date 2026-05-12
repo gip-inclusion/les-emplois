@@ -3,14 +3,16 @@ from django.urls import reverse
 from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains
+from rest_framework.authtoken.models import Token
 
+from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.companies.factories import CompanyMembershipFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import DEFAULT_PASSWORD, HASHED_DEFAULT_PASSWORD, EmployerFactory
+from tests.users.factories import HASHED_DEFAULT_PASSWORD, EmployerFactory
 
 
 class TestEmployeeRecordAPIPermissions:
@@ -33,7 +35,8 @@ class TestEmployeeRecordAPIPermissions:
         """
         Standard use-case: using external API client with token auth
         """
-        data = {"username": self.user.email, "password": DEFAULT_PASSWORD}
+        token = Token.objects.create(user=self.user)
+        data = {"username": TOKEN_ID_STR, "password": token.key}
         response = api_client.post(self.token_url, data, format="json")
         assert response.status_code == 200
 
@@ -47,7 +50,8 @@ class TestEmployeeRecordAPIPermissions:
         assert response.status_code == 200
 
     def test_permissions_ko_with_token(self, api_client):
-        data = {"username": self.unauthorized_user.email, "password": DEFAULT_PASSWORD}
+        token = Token.objects.create(user=self.unauthorized_user)
+        data = {"username": TOKEN_ID_STR, "password": token.key}
         response = api_client.post(self.token_url, data, format="json")
         assert response.status_code == 200
 
