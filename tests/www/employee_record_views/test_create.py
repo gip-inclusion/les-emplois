@@ -71,7 +71,7 @@ class CreateEmployeeRecordTestMixin:
             kind="EI", name="A-Team", membership__user__first_name="Hannibal", with_membership=True, with_jobs=True
         )
         self.company_bad_kind = CompanyFactory(
-            kind="EA", name="A-Team", membership__user__first_name="Barracus", with_membership=True, with_jobs=True
+            kind="GEIQ", name="A-Team", membership__user__first_name="Barracus", with_membership=True, with_jobs=True
         )
 
         self.user = self.company.members.get(first_name="Elliot")

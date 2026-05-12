@@ -276,7 +276,6 @@ def company_select(request, template_name="signup/company_select.html"):
             # Make sure to look only for active companies.
             Company.objects.active()
             .filter(siret__startswith=siren_form.cleaned_data["siren"])
-            .exclude(kind__in=[CompanyKind.EA, CompanyKind.EATT])  # Dropping EA/EATT companies support
             .distinct("pk")
             .annotate(has_active_members=Exists(CompanyMembership.objects.filter(company=OuterRef("pk"))))
             # Prevents the template from reissuing a request for each member/user.

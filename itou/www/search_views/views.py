@@ -201,7 +201,6 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJ
 
         context = {
             "form": form,
-            "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
             "city": city,
             "distance": distance,
             "filters_query_string": urlencode(

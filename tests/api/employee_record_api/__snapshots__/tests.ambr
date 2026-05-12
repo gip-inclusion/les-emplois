@@ -147,11 +147,11 @@
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -386,12 +386,12 @@
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."is_admin"
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -423,12 +423,12 @@
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."is_admin"
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -950,11 +950,11 @@
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1189,12 +1189,12 @@
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."is_admin"
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1225,12 +1225,12 @@
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."is_admin"
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)

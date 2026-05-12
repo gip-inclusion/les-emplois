@@ -66,7 +66,6 @@ class TestEditJobSeekerInfo:
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__jobseeker_profile__nir="178122978200508",
-            to_company__not_ea_eatt_kind=True,
         )
         user = job_application.to_company.members.first()
 

@@ -46,12 +46,13 @@ class CompanyQuerySet(OrganizationQuerySet):
         # See `self.with_count_recent_received_job_apps`.
         has_active_convention = Exists(SiaeConvention.objects.filter(id=OuterRef("convention_id"), is_active=True))
         return (
-            # GEIQ, EA & EATT have no convention logic and thus are always active.
-            # COMPANY_KIND_RESERVED is also always active.
-            Q(kind__in=[CompanyKind.GEIQ, CompanyKind.EA, CompanyKind.EATT, COMPANY_KIND_RESERVED])
+            # GEIQ have no convention logic and thus are always active,
+            # COMPANY_KIND_RESERVED is also always active,
+            # EA and EATT are disabled as of 11/05/2026
+            Q(kind__in=[CompanyKind.GEIQ, COMPANY_KIND_RESERVED])
             # OPCS need to be specifically searchable to be considered active
             | Q(kind=CompanyKind.OPCS, is_searchable=True)
-            # Staff created companiess are always active until eventually
+            # Staff created companies are always active until eventually
             # converted to ASP source companies by import_siae script.
             # Such companies are created by our staff when ASP data is lacking
             # the most recent data about them.
@@ -222,10 +223,18 @@ class CompanyManager(models.Manager.from_queryset(CompanyQuerySet)):
     use_in_migrations = True
 
     def get_queryset(self):
-        return super().get_queryset().exclude(siret=POLE_EMPLOI_SIRET).defer("fields_history")
+        return (
+            super()
+            .get_queryset()
+            .exclude(siret=POLE_EMPLOI_SIRET)
+            .exclude(kind__in=[CompanyKind.EA, CompanyKind.EATT])
+            .defer("fields_history")
+        )
 
 
 class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
+    # Escape hatch returning every Company including POLE_EMPLOI and EA/EATT.
+    # Use for admin and imports. Public-facing code should use `objects`.
     use_in_migrations = True
 
     def get_queryset(self):
@@ -385,8 +394,11 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
 
     @property
     def is_active(self):
+        if self.kind in [CompanyKind.EA, CompanyKind.EATT]:
+            # EA and EATT are disabled as of 11/05/2026
+            return False
         if not self.should_have_convention:
-            # GEIQ, EA, EATT, OPCS, ... have no convention logic and thus are always active.
+            # GEIQ and OPCS have no convention logic and thus are always active.
             return True
         if self.source == CompanySource.STAFF_CREATED:
             # Staff created companies are always active until eventually
@@ -714,6 +726,13 @@ class JobDescriptionQuerySet(models.QuerySet):
         return self.filter(source_kind__isnull=True)
 
 
+class JobDescriptionManager(models.Manager.from_queryset(JobDescriptionQuerySet)):
+    def get_queryset(self):
+        # EA/EATT are disabled as of 11/05/2026. France Travail EA offers are stored
+        # under COMPANY_KIND_RESERVED so they remain visible through this filter.
+        return super().get_queryset().exclude(company__kind__in=[CompanyKind.EA, CompanyKind.EATT])
+
+
 class JobDescription(models.Model):
     """
     A job description of a position in an SIAE.
@@ -796,7 +815,8 @@ class JobDescription(models.Model):
         default=JobDescriptionSource.MANUALLY,
     )
 
-    objects = JobDescriptionQuerySet.as_manager()
+    objects = JobDescriptionManager()
+    unfiltered_objects = JobDescriptionQuerySet.as_manager()
 
     class Meta:
         verbose_name = "fiche de poste"

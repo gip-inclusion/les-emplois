@@ -1443,12 +1443,13 @@ class TestJobDescriptionSearchView:
             expected_jobs=[displayed_job_ea],
         )
 
-        # Switch EI company to EA: both jobs should be displayed for EA filter now
+        # Switch EI company to EA: only the FT EA offer remains visible,
+        # EA/EATT companies are hidden from the application as of 11/05/2026
         company.kind = CompanyKind.EA
         company.save(update_fields=["kind", "updated_at"])
         assertFilterResults(
             extra_filter={"kinds": [CompanyKind.EA.value]},
-            expected_jobs=[displayed_job_name_1, displayed_job_ea],
+            expected_jobs=[displayed_job_ea],
         )
 
         # Show external company name
@@ -1458,8 +1459,8 @@ class TestJobDescriptionSearchView:
         assertContains(
             response,
             """
-            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
-            <span class="badge badge-sm rounded-pill ms-2">2</span>
+            <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">1</span>
             """,
             html=True,
             count=1,

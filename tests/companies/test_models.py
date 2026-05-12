@@ -363,7 +363,7 @@ class TestCompanyModel:
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
 
         # No job description nor open spontaneous application
-        company = CompanyFactory(spontaneous_applications_open_since=None, not_ea_eatt_kind=True)
+        company = CompanyFactory(spontaneous_applications_open_since=None)
         assert company.has_job_descriptions_not_updated_recently() is False
 
         # Spontaneous application recently updated
@@ -377,12 +377,12 @@ class TestCompanyModel:
         assert company.has_job_descriptions_not_updated_recently() is True
 
         # Recently updated job application
-        company = CompanyFactory(spontaneous_applications_open_since=None, not_ea_eatt_kind=True)
+        company = CompanyFactory(spontaneous_applications_open_since=None)
         JobDescriptionFactory(company=company, created_at=RECENT_DATE, last_employer_update_at=RECENT_DATE)
         assert company.has_job_descriptions_not_updated_recently() is False
 
         # Job application updated a long time ago (>= 60 days)
-        company = CompanyFactory(spontaneous_applications_open_since=None, not_ea_eatt_kind=True)
+        company = CompanyFactory(spontaneous_applications_open_since=None)
         JobDescriptionFactory(company=company, created_at=OLD_DATE, last_employer_update_at=OLD_DATE)
         assert company.has_job_descriptions_not_updated_recently() is True
 

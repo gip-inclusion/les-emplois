@@ -237,9 +237,9 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -251,8 +251,6 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND "companies_company"."siret"::text LIKE %s
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
                  AND NOT EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_companymembership" U0
@@ -317,9 +315,9 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -331,8 +329,6 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND "companies_company"."siret"::text LIKE %s
-                 AND NOT ("companies_company"."kind" IN (%s,
-                                                         %s))
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_companymembership" U0

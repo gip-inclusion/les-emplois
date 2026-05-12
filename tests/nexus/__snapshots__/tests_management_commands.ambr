@@ -230,7 +230,9 @@
                  "cities_city"."last_synced_at"
           FROM "companies_company"
           LEFT OUTER JOIN "cities_city" ON ("companies_company"."insee_city_id" = "cities_city"."id")
-          WHERE NOT ("companies_company"."siret" = %s)
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s)))
           ORDER BY RANDOM() ASC
         ''',
       }),

@@ -23,7 +23,7 @@ class SiaeSearchForm(forms.Form):
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 25
 
-    KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices]
+    KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices if k not in (CompanyKind.EA, CompanyKind.EATT)]
 
     distance = forms.ChoiceField(
         label="Distance",
@@ -50,7 +50,7 @@ class SiaeSearchForm(forms.Form):
 
     kinds = forms.MultipleChoiceField(
         label="Types de structure",
-        choices=KIND_CHOICES,
+        choices=[],  # overridden in __init__
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )
@@ -62,6 +62,9 @@ class SiaeSearchForm(forms.Form):
             # Useful to render the default distance values as checked in radio widgets.
             data = MultiValueDict({**{k: [v] for k, v in initial.items()}, **data})
         super().__init__(data, **kwargs)
+        # dynamic resolution of KIND_CHOICES which isn't the same in this class
+        # and in its child class JobDescriptionSearchForm
+        self.fields["kinds"].choices = self.KIND_CHOICES
 
     def clean_distance(self):
         distance = self.cleaned_data["distance"]
@@ -101,6 +104,8 @@ class SiaeSearchForm(forms.Form):
 
 
 class JobDescriptionSearchForm(SiaeSearchForm):
+    KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices]
+
     CONTRACT_TYPE_CHOICES = sorted(
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
         key=lambda d: d[1],

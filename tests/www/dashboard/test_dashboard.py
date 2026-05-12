@@ -309,14 +309,13 @@ class TestDashboardView:
                 response = client.get(reverse("dashboard:index"))
                 assertContains(response, self.HIRE_LINK_LABEL)
 
-        for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
-            with subtests.test(f"should not display when company_kind={kind}"):
-                company = CompanyFactory(kind=kind, with_membership=True)
-                user = company.members.first()
-                client.force_login(user)
+        with subtests.test(f"should not display when company_kind={CompanyKind.OPCS}"):
+            company = CompanyFactory(kind=CompanyKind.OPCS, with_membership=True)
+            user = company.members.first()
+            client.force_login(user)
 
-                response = client.get(reverse("dashboard:index"))
-                assertNotContains(response, self.HIRE_LINK_LABEL)
+            response = client.get(reverse("dashboard:index"))
+            assertNotContains(response, self.HIRE_LINK_LABEL)
 
     def test_dashboard_job_applications(self, client, subtests):
         APPLICATION_SAVE_LABEL = "Enregistrer une candidature"
@@ -340,7 +339,8 @@ class TestDashboardView:
                 assertContains(response, self.HIRE_LINK_LABEL)
                 assertContains(response, self.apply_start_hire_url(company))
 
-        for kind in set(CompanyKind) - set(display_kinds):
+        # EA and EATT employers no longer have an active organization, so they can't reach the dashboard
+        for kind in set(CompanyKind) - set(display_kinds) - {CompanyKind.EA, CompanyKind.EATT}:
             with subtests.test(f"should not display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
                 user = company.members.first()
@@ -1085,37 +1085,3 @@ def test_stalled_job_seekers_box(client):
     response = client.get(reverse("dashboard:index"))
     assert response.context["stalled_job_seekers_count"] == 1
     assertContains(response, "<span>Candidat sans solution</span>", count=1)
-
-
-@pytest.mark.parametrize(
-    "factory,assertion",
-    [
-        pytest.param(
-            partial(
-                EmployerFactory,
-                membership=True,
-                membership__company__kind=random.choice([CompanyKind.EA, CompanyKind.EATT]),
-            ),
-            assertContains,
-            id="EA/EATT employer kind",
-        ),
-        pytest.param(
-            partial(EmployerFactory, membership=True, membership__company__not_ea_eatt_kind=True),
-            assertNotContains,
-            id="Other employer kind",
-        ),
-    ],
-)
-def test_end_of_support_for_ea_eatt_banner(client, factory, assertion):
-    employer = factory()
-    client.force_login(employer)
-    response = client.get(reverse("dashboard:index"))
-    assertion(
-        response,
-        """
-          À partir du <strong>11 mai 2026</strong>, les comptes EA/EATT seront clôturés.
-          Publiez désormais vos offres sur
-          <a class="has-external-link" href="https://www.francetravail.fr" target="_blank">France Travail</a>.
-        """,
-        html=True,
-    )

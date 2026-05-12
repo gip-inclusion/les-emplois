@@ -43,11 +43,6 @@ def employers_accounts_tag():
             "action_url": action_url,
         },
         {
-            "title": "EA",
-            "email": "demo.emplois+ea@inclusion.gouv.fr",
-            "action_url": action_url,
-        },
-        {
             "title": "AI",
             "email": "demo.emplois+ai@inclusion.gouv.fr",
             "action_url": action_url,

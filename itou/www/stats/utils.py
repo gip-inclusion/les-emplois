@@ -42,7 +42,7 @@ def can_view_stats_siae(request):
         and isinstance(request.current_organization, Company)
         # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
         # we require a convention object to exist here.
-        # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).
+        # Some SIAE don't have a convention (SIAE created by support, GEIQ...).
         and request.current_organization.convention is not None
     )
 

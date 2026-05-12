@@ -433,7 +433,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             assertContains(_response(kind), self.HELP_START_AT)
             assertContains(_response(kind), self.HELP_END_AT)
 
-        for kind in (CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS):
+        # EA and EATT employers can no longer log in, so they're not covered here
+        for kind in (CompanyKind.GEIQ, CompanyKind.OPCS):
             assertNotContains(_response(kind), self.HELP_START_AT)
             assertNotContains(_response(kind), self.HELP_END_AT)
 

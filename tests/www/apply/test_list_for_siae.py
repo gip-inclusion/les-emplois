@@ -211,8 +211,6 @@ class TestProcessListSiae:
         client.force_login(employer)
 
         expect_to_see_criteria = {
-            CompanyKind.EA: False,
-            CompanyKind.EATT: False,
             CompanyKind.EI: True,
             CompanyKind.GEIQ: False,
             CompanyKind.OPCS: False,
@@ -221,7 +219,8 @@ class TestProcessListSiae:
             CompanyKind.EITI: True,
             CompanyKind.ETTI: True,
         }
-        for kind in CompanyKind:
+        # EA and EATT employers can't reach the dashboard as of 11/05/2026
+        for kind in set(CompanyKind) - {CompanyKind.EA, CompanyKind.EATT}:
             with subtests.test(kind=kind.label):
                 company.kind = kind
                 company.save(update_fields=("kind", "updated_at"))
@@ -774,17 +773,14 @@ def test_list_for_siae_no_apply_button(client):
     client.force_login(company.members.get())
     response = client.get(reverse("apply:list_for_siae"))
     assertContains(response, APPLY_TXT)
-    for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
-        company.kind = kind
-        company.save(update_fields=("kind", "updated_at"))
-        response = client.get(reverse("apply:list_for_siae"))
-        assertNotContains(response, APPLY_TXT)
+    company.kind = CompanyKind.OPCS
+    company.save(update_fields=("kind", "updated_at"))
+    response = client.get(reverse("apply:list_for_siae"))
+    assertNotContains(response, APPLY_TXT)
 
 
 def test_list_for_siae_filter_for_different_kind(client, snapshot):
     kind_snapshot = {
-        CompanyKind.EA: "non_iae",
-        CompanyKind.EATT: "non_iae",
         CompanyKind.EI: "iae",
         CompanyKind.GEIQ: "geiq",
         CompanyKind.OPCS: "non_iae",
@@ -793,7 +789,8 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         CompanyKind.EITI: "iae",
         CompanyKind.ETTI: "iae",
     }
-    for kind in CompanyKind:
+    # EA and EATT employers can't reach the dashboard as of 11/05/2026
+    for kind in set(CompanyKind) - {CompanyKind.EA, CompanyKind.EATT}:
         company = CompanyFactory(with_membership=True, kind=kind)
         client.force_login(company.members.get())
         response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
@@ -918,8 +915,6 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
     client.force_login(employer)
 
     expect_to_see_criteria = {
-        CompanyKind.EA: False,
-        CompanyKind.EATT: False,
         CompanyKind.EI: True,
         CompanyKind.GEIQ: False,
         CompanyKind.OPCS: False,
@@ -928,7 +923,8 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
         CompanyKind.EITI: True,
         CompanyKind.ETTI: True,
     }
-    for kind in CompanyKind:
+    # EA and EATT employers can't reach the dashboard as of 11/05/2026
+    for kind in set(CompanyKind) - {CompanyKind.EA, CompanyKind.EATT}:
         with subtests.test(kind=kind.label):
             company.kind = kind
             company.save(update_fields=("kind", "updated_at"))

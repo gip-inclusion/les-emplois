@@ -186,9 +186,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -246,9 +246,9 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -298,9 +298,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -358,9 +358,9 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -423,6 +423,8 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."source" = %s)
                  AND "companies_company"."convention_id" = %s
                  AND "companies_company"."siret"::text LIKE %s)
@@ -465,9 +467,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -525,9 +527,9 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -577,9 +579,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -637,9 +639,9 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -689,9 +691,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -738,9 +740,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -798,9 +800,9 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -863,6 +865,8 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."source" = %s)
                  AND "companies_company"."convention_id" = %s
                  AND "companies_company"."siret"::text LIKE %s)

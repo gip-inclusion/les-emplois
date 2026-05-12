@@ -784,7 +784,9 @@
                  "companies_company"."kind",
                  "companies_company"."brand"
           FROM "companies_company"
-          WHERE NOT ("companies_company"."siret" = %s)
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s)))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -913,16 +915,22 @@
           
                (SELECT COUNT(*) AS "count"
                 FROM "companies_jobdescription" U0
+                INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                 INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                WHERE (U0."company_id" = ("companies_company"."id")
+                WHERE (NOT (U1."kind" IN (%s,
+                                          %s))
+                       AND U0."company_id" = ("companies_company"."id")
                        AND U0."is_active")
                 GROUP BY U0."company_id"
                 LIMIT 1) AS "job_descriptions_active_count",
           
                (SELECT COUNT(*) AS "count"
                 FROM "companies_jobdescription" U0
+                INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                 INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                WHERE (U0."company_id" = ("companies_company"."id")
+                WHERE (NOT (U1."kind" IN (%s,
+                                          %s))
+                       AND U0."company_id" = ("companies_company"."id")
                        AND NOT U0."is_active")
                 GROUP BY U0."company_id"
                 LIMIT 1) AS "job_descriptions_inactive_count"
@@ -930,9 +938,9 @@
              LEFT OUTER JOIN "job_applications_jobapplication" ON ("companies_company"."id" = "job_applications_jobapplication"."to_company_id")
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              WHERE (NOT ("companies_company"."siret" = %s)
+                    AND NOT ("companies_company"."kind" IN (%s,
+                                                            %s))
                     AND ("companies_company"."kind" IN (%s,
-                                                        %s,
-                                                        %s,
                                                         %s)
                          OR ("companies_company"."is_searchable"
                              AND "companies_company"."kind" = %s)
@@ -1576,16 +1584,22 @@
           
             (SELECT COUNT(*) AS "count"
              FROM "companies_jobdescription" U0
+             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
              INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-             WHERE (U0."company_id" = ("companies_company"."id")
+             WHERE (NOT (U1."kind" IN (%s,
+                                       %s))
+                    AND U0."company_id" = ("companies_company"."id")
                     AND U0."is_active")
              GROUP BY U0."company_id"
              LIMIT 1) AS "job_descriptions_active_count",
           
             (SELECT COUNT(*) AS "count"
              FROM "companies_jobdescription" U0
+             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
              INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-             WHERE (U0."company_id" = ("companies_company"."id")
+             WHERE (NOT (U1."kind" IN (%s,
+                                       %s))
+                    AND U0."company_id" = ("companies_company"."id")
                     AND NOT U0."is_active")
              GROUP BY U0."company_id"
              LIMIT 1) AS "job_descriptions_inactive_count",
@@ -1624,9 +1638,9 @@
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
           LEFT OUTER JOIN "cities_city" ON ("companies_company"."insee_city_id" = "cities_city"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1669,6 +1683,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "cities_city" ON ("companies_company"."insee_city_id" = "cities_city"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_company"."convention_id" IN (%s))
           ORDER BY RANDOM() ASC
         ''',
@@ -4112,9 +4128,9 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -4588,9 +4604,9 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -4724,9 +4740,9 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -4819,9 +4835,9 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -4921,24 +4937,27 @@
           FROM
             (SELECT "companies_jobdescription"."id" AS "col1"
              FROM "companies_jobdescription"
+             INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
              LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
-             WHERE "companies_jobdescription"."company_id" IN
-                 (SELECT V0."id"
-                  FROM "companies_company" V0
-                  WHERE (NOT (V0."siret" = %s)
-                         AND (V0."kind" IN (%s,
-                                            %s,
-                                            %s,
-                                            %s)
-                              OR (V0."is_searchable"
-                                  AND V0."kind" = %s)
-                              OR V0."source" = %s
-                              OR EXISTS
-                                (SELECT %s AS "a"
-                                 FROM "companies_siaeconvention" U0
-                                 WHERE (U0."id" = (V0."convention_id")
-                                        AND U0."is_active")
-                                 LIMIT 1))))
+             WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                        %s))
+                    AND "companies_jobdescription"."company_id" IN
+                      (SELECT V0."id"
+                       FROM "companies_company" V0
+                       WHERE (NOT (V0."siret" = %s)
+                              AND NOT (V0."kind" IN (%s,
+                                                     %s))
+                              AND (V0."kind" IN (%s,
+                                                 %s)
+                                   OR (V0."is_searchable"
+                                       AND V0."kind" = %s)
+                                   OR V0."source" = %s
+                                   OR EXISTS
+                                     (SELECT %s AS "a"
+                                      FROM "companies_siaeconvention" U0
+                                      WHERE (U0."id" = (V0."convention_id")
+                                             AND U0."is_active")
+                                      LIMIT 1)))))
              GROUP BY 1) subquery
         ''',
       }),
@@ -5242,23 +5261,25 @@
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
-          WHERE "companies_jobdescription"."company_id" IN
-              (SELECT V0."id"
-               FROM "companies_company" V0
-               WHERE (NOT (V0."siret" = %s)
-                      AND (V0."kind" IN (%s,
-                                         %s,
-                                         %s,
-                                         %s)
-                           OR (V0."is_searchable"
-                               AND V0."kind" = %s)
-                           OR V0."source" = %s
-                           OR EXISTS
-                             (SELECT %s AS "a"
-                              FROM "companies_siaeconvention" U0
-                              WHERE (U0."id" = (V0."convention_id")
-                                     AND U0."is_active")
-                              LIMIT 1))))
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
+                           AND (V0."kind" IN (%s,
+                                              %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))))
           GROUP BY "companies_jobdescription"."id",
                    "jobs_appellation"."code",
                    "jobs_rome"."code",
@@ -7136,9 +7157,9 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -7172,9 +7193,9 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -7260,7 +7281,8 @@
                                                                                          (SELECT V0."id"
                                                                                           FROM "companies_company" V0
                                                                                           WHERE (NOT (V0."siret" = %s)
-                                                                                                 AND (V0."kind" IN (%s, %s, %s, %s)
+                                                                                                 AND NOT (V0."kind" IN (%s, %s))
+                                                                                                 AND (V0."kind" IN (%s, %s)
                                                                                                       OR (V0."is_searchable"
                                                                                                           AND V0."kind" = %s)
                                                                                                       OR V0."source" = %s
@@ -7277,7 +7299,8 @@
                                                                                          (SELECT V0."id"
                                                                                           FROM "companies_company" V0
                                                                                           WHERE (NOT (V0."siret" = %s)
-                                                                                                 AND (V0."kind" IN (%s, %s, %s, %s)
+                                                                                                 AND NOT (V0."kind" IN (%s, %s))
+                                                                                                 AND (V0."kind" IN (%s, %s)
                                                                                                       OR (V0."is_searchable"
                                                                                                           AND V0."kind" = %s)
                                                                                                       OR V0."source" = %s
@@ -7295,7 +7318,8 @@
                                                                                       (SELECT V0."id"
                                                                                        FROM "companies_company" V0
                                                                                        WHERE (NOT (V0."siret" = %s)
-                                                                                              AND (V0."kind" IN (%s, %s, %s, %s)
+                                                                                              AND NOT (V0."kind" IN (%s, %s))
+                                                                                              AND (V0."kind" IN (%s, %s)
                                                                                                    OR (V0."is_searchable"
                                                                                                        AND V0."kind" = %s)
                                                                                                    OR V0."source" = %s

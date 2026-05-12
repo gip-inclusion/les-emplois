@@ -29,6 +29,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -87,6 +89,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 1
@@ -242,6 +246,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -300,6 +306,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 3
@@ -470,6 +478,8 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."source" = %s)
                  AND "companies_company"."convention_id" = %s
                  AND "companies_company"."siret"::text LIKE %s)
@@ -511,6 +521,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -569,6 +581,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 3
@@ -726,6 +740,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -784,6 +800,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 1
@@ -952,6 +970,8 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."source" = %s)
                  AND "companies_company"."convention_id" = %s
                  AND "companies_company"."siret"::text LIKE %s)
@@ -993,6 +1013,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -1051,6 +1073,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 1
@@ -1206,6 +1230,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -1264,6 +1290,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 1
@@ -1419,6 +1447,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),
@@ -1477,6 +1507,8 @@
           FROM "companies_company"
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
           ORDER BY "companies_company"."id" ASC
           LIMIT 1
@@ -1632,6 +1664,8 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT ("companies_company"."kind" = %s))
         ''',
       }),

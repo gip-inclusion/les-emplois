@@ -347,10 +347,10 @@ class TestCompanySignup:
         client.force_login(user)
 
         companies = (
-            CompanyFactory(siret="40219166200001", with_membership=True, not_ea_eatt_kind=True),
-            CompanyFactory(siret="40219166200002", with_membership=True, not_ea_eatt_kind=True),
-            CompanyFactory(siret="40219166200003", with_membership=True, not_ea_eatt_kind=True),
-            CompanyFactory(siret="40219166200004", with_membership=True, not_ea_eatt_kind=True),
+            CompanyFactory(siret="40219166200001", with_membership=True),
+            CompanyFactory(siret="40219166200002", with_membership=True),
+            CompanyFactory(siret="40219166200003", with_membership=True),
+            CompanyFactory(siret="40219166200004", with_membership=True),
             CompanyFactory(siret="40219166200005", kind=CompanyKind.EI, with_membership=True),
             CompanyFactory(siret="40219166200005", kind=CompanyKind.AI, with_membership=True),
         )
@@ -375,7 +375,7 @@ class TestCompanySignup:
     def test_ignores_inactive_members(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
-        company = CompanyFactory(siret="40219166200001", with_jobs=True, not_ea_eatt_kind=True)
+        company = CompanyFactory(siret="40219166200001", with_jobs=True)
         membership_1 = CompanyMembershipFactory(company=company, is_active=False, user__is_active=True)
         membership_2 = CompanyMembershipFactory(company=company, is_active=True, user__is_active=False)
         response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
@@ -385,7 +385,7 @@ class TestCompanySignup:
     def test_admin_users_appears_first(self, client):
         user = random_pro_user_factory()
         client.force_login(user)
-        company = CompanyFactory(siret="40219166200001", not_ea_eatt_kind=True)
+        company = CompanyFactory(siret="40219166200001")
         membership_1 = CompanyMembershipFactory(company=company, is_admin=False)
         response = client.get(reverse("signup:company_select"), {"siren": company.siret[:9]})
         assertContains(response, self.to_join_msg(membership_1.user))
