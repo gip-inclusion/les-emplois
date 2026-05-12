@@ -500,6 +500,8 @@ class TestAssessmentContractsListAndToggle:
             planned_end_at=datetime.date(2024, 6, 30),
             allowance_requested=True,
             allowance_granted=False,
+            allowance_refusal_reason=AllowanceRefusalReason.UNCONFIRMED_ELIGIBILITY,
+            allowance_refusal_details="Détails",
         )
         EmployeeContractFactory(
             id=uuid.UUID("33333333-4444-4444-4444-444444444444"),
@@ -543,6 +545,8 @@ class TestAssessmentContractsListAndToggle:
         assert response.status_code == 200
         contract_2.refresh_from_db()
         assert contract_2.allowance_granted is True
+        response = client.get(url)
+        assertSoupEqual(simulated_page, parse_response_to_soup(response, ".s-section"))
 
     def test_contract_selection_after_ask_for_geiq_fix(self, client):
         """Simulate back and forth exchanges between institution and GEIQ."""

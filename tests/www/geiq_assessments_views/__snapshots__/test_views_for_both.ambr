@@ -5491,7 +5491,7 @@
                           </table>
                       </div>
                   </div>
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="validate-contracts-selection-form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <div class="row">
                           <div class="col-12">
@@ -5634,7 +5634,7 @@
                           </p>
                       </div>
                   </div>
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="validate-contracts-selection-form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <div class="row">
                           <div class="col-12">
@@ -6124,6 +6124,8 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+                  <div id="alert-contracts-awaiting-justification">
+                  </div>
               </div>
           </div>
           <div class="s-section__row row">
@@ -6376,6 +6378,8 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+                  <div id="alert-contracts-awaiting-justification">
+                  </div>
               </div>
           </div>
           <div class="s-section__row row">
@@ -6566,7 +6570,7 @@
                           </table>
                       </div>
                   </div>
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="validate-contracts-selection-form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <div class="row">
                           <div class="col-12">
@@ -6654,6 +6658,31 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+                  <div id="alert-contracts-awaiting-justification">
+                      <div class="alert alert-warning mt-3" role="status">
+                          <div class="row">
+                              <div class="col-auto pe-0">
+                                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                                  </i>
+                              </div>
+                              <div class="col">
+                                  <p class="mb-2">
+                                      <strong>
+                                          Refus à justifier
+                                      </strong>
+                                  </p>
+                                  <p class="mb-0">
+                                      Vous devez encore motiver le refus d’aide de 1 contrat.
+                                  </p>
+                              </div>
+                              <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                  <a class="btn btn-sm btn-primary" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts?allowance_eligibility_off=on#contracts-results-table" type="button">
+                                      Afficher les contrats concernés
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
           </div>
           <div class="s-section__row row">
@@ -6844,7 +6873,7 @@
                           </table>
                       </div>
                   </div>
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="validate-contracts-selection-form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <div class="row">
                           <div class="col-12">
@@ -6860,7 +6889,7 @@
                                       </a>
                                   </div>
                                   <div class="form-group col col-lg-auto order-2 order-lg-3">
-                                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="action" type="submit" value="validate">
+                                      <button class="btn btn-block btn-primary disabled" type="button">
                                           <span>
                                               Valider la sélection
                                           </span>
@@ -6932,6 +6961,8 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+                  <div id="alert-contracts-awaiting-justification">
+                  </div>
               </div>
           </div>
           <div class="s-section__row row">
@@ -6980,7 +7011,7 @@
                           </p>
                       </div>
                   </div>
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="validate-contracts-selection-form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <div class="row">
                           <div class="col-12">
