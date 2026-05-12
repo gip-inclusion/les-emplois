@@ -54,6 +54,7 @@ from itou.www.geiq_assessments_views.export import (
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
     AllowanceRequestJustificationForm,
+    AllowanceRefusalJustificationForm,
     ContractFilterForm,
     CreateForm,
     GeiqCommentForm,
@@ -668,6 +669,7 @@ class AssessmentContractDetailsTab(models.TextChoices):
     SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
     EXIT = "exit", "Sortie"
     ALLOWANCE_REQUEST_JUSTIFICATION = "justification", "Justification"
+    INSTITUTION_JUSTIFICATION = "institution-justification", "Motif de refus"
 
 
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
@@ -694,7 +696,6 @@ def assessment_contracts_details(
     contract = get_object_or_404(contract_qs, pk=contract_pk)
     editable = False
     context = {}
-
     if request.from_employer:
         if not contract.employee.assessment.submitted_at:
             editable = not contract.employee.assessment.contracts_selection_validated_at
@@ -734,6 +735,73 @@ def assessment_contracts_details(
     elif request.from_institution:
         if not contract.employee.assessment.reviewed_at:
             editable = not contract.employee.assessment.grants_selection_validated_at
+        if details_tab == AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION:
+            allowance_refusal_justification_form = AllowanceRefusalJustificationForm(
+                data=request.POST
+                if request.POST.get("action") == InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION
+                else None,
+                initial={
+                    "allowance_refusal_reason": contract.allowance_refusal_reason,
+                    "allowance_refusal_details": contract.allowance_refusal_details,
+                },
+            )
+            if contract.employee.assessment.grants_selection_validated_at:
+                for fieldname in allowance_refusal_justification_form.fields:
+                    allowance_refusal_justification_form.fields[fieldname].disabled = True
+            context |= {"allowance_refusal_justification_form": allowance_refusal_justification_form}
+
+        if request.method == "POST":
+            try:
+                action = InstitutionAction(request.POST.get("action"))
+            except ValueError:
+                raise Http404
+
+            if action in [InstitutionAction.REFUSE_ALLOWANCE, InstitutionAction.GRANT_ALLOWANCE]:
+                redirect_to_tab = None
+                if contract.employee.assessment.grants_selection_validated_at:
+                    messages.error(
+                        request,
+                        "La sélection des contrats a déjà été validée : "
+                        "vous ne pouvez plus accorder ou refuser l’aide pour ce contrat.",
+                    )
+                elif action is InstitutionAction.REFUSE_ALLOWANCE:
+                    contract.allowance_granted = False
+                    contract.save(update_fields=("allowance_granted",))
+
+                    if not contract.allowance_refusal_reason:
+                        redirect_to_tab = AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION.value
+                elif action is InstitutionAction.GRANT_ALLOWANCE:
+                    contract.allowance_granted = True
+                    contract.allowance_refusal_reason = ""
+                    contract.allowance_refusal_details = ""
+                    contract.save(
+                        update_fields=(
+                            "allowance_granted",
+                            "allowance_refusal_reason",
+                            "allowance_refusal_details",
+                        )
+                    )
+                    if details_tab == AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION:
+                        redirect_to_tab = AssessmentContractDetailsTab.EMPLOYEE.value
+                if redirect_to_tab:
+                    return HttpResponseRedirect(
+                        reverse(
+                            "geiq_assessments_views:assessment_contracts_details",
+                            kwargs={"contract_pk": str(contract.pk), "tab": redirect_to_tab},
+                        )
+                    )
+
+            elif (
+                action is InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION
+                and allowance_refusal_justification_form.is_valid()
+            ):
+                contract.allowance_refusal_reason = allowance_refusal_justification_form.cleaned_data[
+                    "allowance_refusal_reason"
+                ]
+                contract.allowance_refusal_details = allowance_refusal_justification_form.cleaned_data[
+                    "allowance_refusal_details"
+                ]
+                contract.save(update_fields=("allowance_refusal_reason", "allowance_refusal_details"))
 
     context |= {
         "back_url": reverse(
@@ -746,6 +814,7 @@ def assessment_contracts_details(
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
         "active_tab": details_tab,
         "MIN_DAYS_IN_YEAR_FOR_ALLOWANCE": MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
+        "InstitutionAction": InstitutionAction,
     }
     return render(request, template_name, context)
 

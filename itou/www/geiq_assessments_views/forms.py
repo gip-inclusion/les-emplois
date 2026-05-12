@@ -4,7 +4,7 @@ from django.utils import timezone
 from django_select2.forms import Select2Widget
 
 from itou.files.forms import ItouFileField
-from itou.geiq_assessments.enums import AllowanceJustificationReason
+from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason
 from itou.geiq_assessments.models import Assessment, Employee
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -391,3 +391,19 @@ class AllowanceRequestJustificationForm(forms.Form):
 
         for choice in self["allowance_request_reason"]:
             choice.description = AllowanceJustificationReason.get_description(choice.data["value"])
+
+
+class AllowanceRefusalJustificationForm(forms.Form):
+    allowance_refusal_reason = forms.ChoiceField(
+        label="Sélectionnez le motif applicable",
+        required=True,
+        choices=AllowanceRefusalReason.choices,
+        widget=forms.RadioSelect,
+    )
+    allowance_refusal_details = forms.CharField(label="Précisions", widget=forms.Textarea(), strip=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for choice in self["allowance_refusal_reason"]:
+            choice.description = AllowanceRefusalReason.get_description(choice.data["value"])

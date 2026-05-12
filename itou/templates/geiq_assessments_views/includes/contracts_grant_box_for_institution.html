@@ -1,0 +1,48 @@
+{% load enums %}
+{% enums "geiq_assessments" "InstitutionAction" as InstitutionAction %}
+<div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+    {% if contract.allowance_granted %}
+        <h3>L’aide financière est accordée</h3>
+        <p>La demande d’aide est approuvée.</p>
+        <p>Vous pouvez refuser la demande pour ce contrat tant que le bilan n’a pas été validé.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-block btn-lg btn-ico" name="action" value="{{ InstitutionAction.REFUSE_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
+                <i class="ri-close-line" aria-hidden="true"></i>
+                <span>Refuser l’aide</span>
+            </button>
+        </form>
+    {% else %}
+        <h3>L’aide financière n’est pas accordée</h3>
+        <p>La demande d’obtention de l’aide est refusée.</p>
+
+        {% if contract.allowance_refusal_reason %}
+            <p>Vous avez déjà motivé votre refus.</p>
+        {% else %}
+            <p>Vous devez obligatoirement justifier votre refus.</p>
+        {% endif %}
+
+        <p>
+            Vous avez la possibilité de modifier votre décision
+            {% if contract.allowance_refusal_reason %}ou le motif de refus{% endif %}
+            tant que le bilan n'a pas été validé.
+        </p>
+        {% if contract.allowance_refusal_reason %}
+            <p>Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.</p>
+        {% endif %}
+
+        {% if active_tab != AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION %}
+            <a class="btn btn-outline-primary btn-block btn-lg mb-2{% if disabled %} disabled{% endif %}"
+               href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION.value %}">
+                <span>{{ contract.allowance_refusal_reason|yesno:"Modifier le motif de refus,Justifier le refus" }}</span>
+            </a>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-block btn-lg" name="action" value="{{ InstitutionAction.GRANT_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
+                <span>Accorder l’aide</span>
+            </button>
+        </form>
+    {% endif %}
+</div>

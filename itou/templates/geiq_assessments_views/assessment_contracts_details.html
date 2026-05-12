@@ -23,22 +23,24 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         {% for tab in AssessmentContractDetailsTab %}
-            {% if tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
-                {# Tab only displayed when appropriate #}
-                {% if request.from_employer and contract.requires_justification %}
-                    <li class="nav-item">
-                        <a class="nav-link{% if active_tab == 'justification' %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
-                            {{ tab.label }}
-                            {% if not contract.allowance_request_justification_reason %}
-                                <i class="ri-error-warning-line ri-xl text-warning ms-2"></i>
-                            {% endif %}
-                        </a>
-                    </li>
-                {% endif %}
-            {% else %}
+            {% if tab != AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION and tab != AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
                 <li class="nav-item">
-                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
+                    </a>
+                </li>
+            {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and request.from_employer and not contract.requires_justification %}
+                <li class="nav-item">
+                    <a class="nav-link{% if active_tab == 'justification' %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
                         {{ tab.label }}
+                        {% if not contract.allowance_request_justification_reason %}
+                            <i class="ri-error-warning-line ri-xl text-warning ms-2"></i>
+                        {% endif %}
+                    </a>
+                </li>
+            {% elif tab == AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION and request.from_institution and not contract.allowance_granted %}
+                <li class="nav-item">
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
+                        {% if not contract.allowance_refusal_reason %}<i class="ri-error-warning-line ri-xl text-warning ms-2"></i>{% endif %}
                     </a>
                 </li>
             {% endif %}
@@ -50,8 +52,13 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <h2>{{ active_tab.label }}</h2>
-                <div class="s-section__col col">
+                {% if request.from_institution %}
+                    <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                        {% include "geiq_assessments_views/includes/contracts_grant_box_for_institution.html" with contract=contract csrf_token=csrf_token AssessmentContractDetailsTab=AssessmentContractDetailsTab active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
+                    </div>
+                {% endif %}
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <h2>{{ active_tab.label }}</h2>
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
@@ -368,16 +375,16 @@
                                 </li>
                             </ul>
                         </div>
-                    {% elif active_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
-                        {% if contract.requires_justification %}
-                            {% if assessment.contracts_selection_validated_at or assessment.submitted_at %}
-                                <div class="mb-3 mb-md-4">
-                                    {% include "geiq_assessments_views/includes/allowance_request_justified_box.html" with MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE contract=contract assessment=assessment request=request only %}
-                                </div>
-                            {% else %}
-                                {% include "geiq_assessments_views/includes/allowance_request_justification_form.html" with back_url=back_url contract=contract assessment=assessment form=allowance_request_justification_form csrf_token=csrf_token only %}
-                            {% endif %}
+                    {% elif active_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and contract.requires_justification %}
+                        {% if assessment.contracts_selection_validated_at or assessment.submitted_at %}
+                            <div class="mb-3 mb-md-4">
+                                {% include "geiq_assessments_views/includes/allowance_request_justified_box.html" with MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE contract=contract assessment=assessment request=request only %}
+                            </div>
+                        {% else %}
+                            {% include "geiq_assessments_views/includes/allowance_request_justification_form.html" with back_url=back_url contract=contract assessment=assessment form=allowance_request_justification_form csrf_token=csrf_token only %}
                         {% endif %}
+                    {% elif active_tab == AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION %}
+                        {% include "geiq_assessments_views/includes/allowance_refusal_justification_form.html" with contract=contract csrf_token=csrf_token form=allowance_refusal_justification_form disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     {% endif %}
                 </div>
                 {% if request.from_employer and editable %}
