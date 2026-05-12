@@ -495,6 +495,14 @@ class TestApply:
         assert assignment.last_action_kind == ActionKind.APPLY
 
 
+@pytest.mark.parametrize("kind", [CompanyKind.EA, CompanyKind.EATT])
+def test_apply_start_is_not_available_for_ea_eatt(client, kind):
+    company = CompanyFactory(kind=kind, with_membership=True)
+    client.force_login(JobSeekerFactory())
+    response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+    assert response.status_code == 404
+
+
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     """Apply as jobseeker."""
 

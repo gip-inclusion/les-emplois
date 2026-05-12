@@ -4,6 +4,7 @@ from pprint import pformat
 from django.contrib import admin, messages
 from django.contrib.admin.utils import display_for_value
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -14,7 +15,7 @@ from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.companies import enums, models, transfer
 from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
-from itou.companies.enums import CompanySource
+from itou.companies.enums import POLE_EMPLOI_SIRET, CompanySource
 from itou.siae_evaluations.models import EvaluatedSiae
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
@@ -192,6 +193,13 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
     inlines = (CompanyMembersInline, JobsInline, PkSupportRemarkInline)
     actions = [export]
 
+    def get_queryset(self, request):
+        # Use unfiltered_objects so EA/EATT remain visible in admin,
+        # but we still don't want to show France Travail as a company
+        return models.Company.unfiltered_objects.exclude(siret=POLE_EMPLOI_SIRET).annotate(
+            _member_count=Count("members", distinct=True)
+        )
+
     def get_export_filename(self, request, queryset, file_format):
         return f"Entreprises-{timezone.now():%Y-%m-%d}.{file_format.get_extension()}"
 
@@ -294,8 +302,13 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
         if not self.has_change_permission(request):
             raise PermissionDenied
 
-        from_company = get_object_or_404(models.Company.objects, pk=from_company_pk)
-        to_company = get_object_or_404(models.Company, pk=to_company_pk) if to_company_pk is not None else None
+        from_company = get_object_or_404(
+            # we might need to transfer data from a EA/EATT, so we need to use unfiltered_objects,
+            # but we still don't want to allow transferring from France Travail
+            models.Company.unfiltered_objects.exclude(siret=POLE_EMPLOI_SIRET),
+            pk=from_company_pk,
+        )
+        to_company = get_object_or_404(models.Company.objects, pk=to_company_pk) if to_company_pk is not None else None
 
         transfer_data = {}
         for transfer_field in transfer.TransferField:
@@ -468,6 +481,10 @@ class JobDescriptionAdmin(ItouModelAdmin):
     @admin.display(description="Intitulé du poste")
     def display_name(self, obj):
         return obj.custom_name if obj.custom_name else obj.appellation
+
+    def get_queryset(self, request):
+        # Use unfiltered_objects so job descriptions tied to EA/EATT remain visible in admin
+        return models.JobDescription.unfiltered_objects.all()
 
 
 @admin.register(models.SiaeConvention)

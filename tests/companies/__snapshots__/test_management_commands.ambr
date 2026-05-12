@@ -58,7 +58,7 @@
             (SELECT %s AS "a"
              FROM "companies_company" V0
              WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (V0."kind" IN (%s, %s, %s, %s)
+                    AND (V0."kind" IN (%s, %s)
                          OR (V0."is_searchable"
                              AND V0."kind" = %s)
                          OR V0."source" = %s
@@ -125,12 +125,14 @@
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -221,8 +223,14 @@
         'sql': '''
           UPDATE "companies_jobdescription"
           SET "is_active" = %s
-          WHERE "companies_jobdescription"."id" IN (%s,
-                                                    %s)
+          WHERE "companies_jobdescription"."id" IN
+              (SELECT U0."id"
+               FROM "companies_jobdescription" U0
+               INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+               WHERE (NOT (U1."kind" IN (%s,
+                                         %s))
+                      AND U0."id" IN (%s,
+                                      %s)))
         ''',
       }),
       dict({
@@ -449,12 +457,15 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "companies_jobdescription"
-          WHERE ("companies_jobdescription"."is_active"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s

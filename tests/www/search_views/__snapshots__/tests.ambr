@@ -38,12 +38,14 @@
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -100,7 +102,7 @@
             (SELECT %s AS "a"
              FROM "companies_company" V0
              WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (V0."kind" IN (%s, %s, %s, %s)
+                    AND (V0."kind" IN (%s, %s)
                          OR (V0."is_searchable"
                              AND V0."kind" = %s)
                          OR V0."source" = %s
@@ -172,12 +174,14 @@
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -273,9 +277,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -359,12 +363,14 @@
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -421,7 +427,7 @@
             (SELECT %s AS "a"
              FROM "companies_company" V0
              WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (V0."kind" IN (%s, %s, %s, %s)
+                    AND (V0."kind" IN (%s, %s)
                          OR (V0."is_searchable"
                              AND V0."kind" = %s)
                          OR V0."source" = %s
@@ -493,12 +499,14 @@
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -594,9 +602,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -713,9 +721,9 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -744,9 +752,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -774,12 +782,14 @@
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -878,8 +888,10 @@
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "companies_jobdescription" U0
+                             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                              INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                             WHERE (U0."company_id" = ("companies_company"."id")
+                             WHERE (NOT (U1."kind" IN (%s, %s))
+                                    AND U0."company_id" = ("companies_company"."id")
                                     AND U0."is_active")
                              GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
@@ -887,8 +899,10 @@
                            AND (COALESCE(
                                            (SELECT COUNT(U0."id") AS "count"
                                             FROM "companies_jobdescription" U0
+                                            INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                            WHERE (NOT (U1."kind" IN (%s, %s))
+                                                   AND U0."company_id" = ("companies_company"."id")
                                                    AND U0."is_active")
                                             GROUP BY U0."company_id"), %s) > %s
                                 OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
@@ -904,9 +918,9 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1024,18 +1038,20 @@
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."company_id" IN
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" IN
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1132,9 +1148,9 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1163,9 +1179,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1192,12 +1208,14 @@
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -1296,8 +1314,10 @@
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "companies_jobdescription" U0
+                             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                              INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                             WHERE (U0."company_id" = ("companies_company"."id")
+                             WHERE (NOT (U1."kind" IN (%s, %s))
+                                    AND U0."company_id" = ("companies_company"."id")
                                     AND U0."is_active")
                              GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
@@ -1305,8 +1325,10 @@
                            AND (COALESCE(
                                            (SELECT COUNT(U0."id") AS "count"
                                             FROM "companies_jobdescription" U0
+                                            INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                            WHERE (NOT (U1."kind" IN (%s, %s))
+                                                   AND U0."company_id" = ("companies_company"."id")
                                                    AND U0."is_active")
                                             GROUP BY U0."company_id"), %s) > %s
                                 OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
@@ -1322,9 +1344,9 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1441,18 +1463,20 @@
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."company_id" IN
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" IN
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1550,9 +1574,9 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1581,9 +1605,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1610,12 +1634,14 @@
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -1714,8 +1740,10 @@
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "companies_jobdescription" U0
+                             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                              INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                             WHERE (U0."company_id" = ("companies_company"."id")
+                             WHERE (NOT (U1."kind" IN (%s, %s))
+                                    AND U0."company_id" = ("companies_company"."id")
                                     AND U0."is_active")
                              GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
@@ -1723,8 +1751,10 @@
                            AND (COALESCE(
                                            (SELECT COUNT(U0."id") AS "count"
                                             FROM "companies_jobdescription" U0
+                                            INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                            WHERE (NOT (U1."kind" IN (%s, %s))
+                                                   AND U0."company_id" = ("companies_company"."id")
                                                    AND U0."is_active")
                                             GROUP BY U0."company_id"), %s) > %s
                                 OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
@@ -1740,9 +1770,9 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1859,18 +1889,20 @@
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."company_id" IN
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" IN
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1967,9 +1999,9 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1998,9 +2030,9 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -2027,12 +2059,14 @@
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."is_active"
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s, %s, %s)
+                           AND (V0."kind" IN (%s, %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
                                 OR V0."source" = %s
@@ -2131,8 +2165,10 @@
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "companies_jobdescription" U0
+                             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                              INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                             WHERE (U0."company_id" = ("companies_company"."id")
+                             WHERE (NOT (U1."kind" IN (%s, %s))
+                                    AND U0."company_id" = ("companies_company"."id")
                                     AND U0."is_active")
                              GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
@@ -2140,8 +2176,10 @@
                            AND (COALESCE(
                                            (SELECT COUNT(U0."id") AS "count"
                                             FROM "companies_jobdescription" U0
+                                            INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
                                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                            WHERE (NOT (U1."kind" IN (%s, %s))
+                                                   AND U0."company_id" = ("companies_company"."id")
                                                    AND U0."is_active")
                                             GROUP BY U0."company_id"), %s) > %s
                                 OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
@@ -2157,9 +2195,9 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -2276,18 +2314,20 @@
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."company_id" IN
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" IN
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)

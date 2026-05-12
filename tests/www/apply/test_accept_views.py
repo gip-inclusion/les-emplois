@@ -1525,9 +1525,8 @@ class TestProcessAcceptViewsInWizard:
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
-        # No eligibility diagnosis for other company kinds.
-        kind = random.choice([x for x in CompanyKind if x not in [*CompanyKind.siae_kinds(), CompanyKind.GEIQ]])
-        company = CompanyFactory(kind=kind, with_membership=True, with_jobs=True)
+        # as of 11/05/2026, OPCS is the only non-SIAE/GEIQ company kind which can be certified
+        company = CompanyFactory(kind=CompanyKind.OPCS, with_membership=True, with_jobs=True)
         IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=self.company if from_kind is AuthorKind.EMPLOYER else None,

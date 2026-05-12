@@ -97,17 +97,22 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
         )
         not_subject_to_iae_rules = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in CompanyKind.siae_kinds()]),
+            kind=factory.fuzzy.FuzzyChoice(
+                [
+                    kind
+                    for kind in CompanyKind
+                    if kind not in CompanyKind.siae_kinds() and kind not in (CompanyKind.EA, CompanyKind.EATT)
+                ]
+            ),
         )
         not_opcs_kind = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind != CompanyKind.OPCS])
+            kind=factory.fuzzy.FuzzyChoice(
+                [kind for kind in CompanyKind if kind not in (CompanyKind.OPCS, CompanyKind.EA, CompanyKind.EATT)]
+            )
         )
         not_geiq_kind = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]),
-        )
-        not_ea_eatt_kind = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice(
-                [kind for kind in CompanyKind if kind not in [CompanyKind.EA, CompanyKind.EATT]]
+                [kind for kind in CompanyKind if kind not in (CompanyKind.GEIQ, CompanyKind.EA, CompanyKind.EATT)]
             ),
         )
         evaluable_kind = factory.Trait(kind=factory.fuzzy.FuzzyChoice(EvaluationSiaesKind.Evaluable))
@@ -160,7 +165,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
-    kind = factory.fuzzy.FuzzyChoice(CompanyKind)
+    kind = factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in (CompanyKind.EA, CompanyKind.EATT)])
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")

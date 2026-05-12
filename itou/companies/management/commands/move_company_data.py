@@ -4,6 +4,7 @@ from django.db import transaction
 from itoutils.django.commands import dry_runnable
 
 from itou.companies import models as companies_models, transfer
+from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.utils.command import BaseCommand
 
 
@@ -94,14 +95,16 @@ class Command(BaseCommand):
             self.stderr.write(f"Unable to use the same company as source and destination (ID {from_id})\n")
             return
 
-        from_company_qs = companies_models.Company.objects.filter(pk=from_id)
+        from_company_qs = companies_models.Company.unfiltered_objects.exclude(siret=POLE_EMPLOI_SIRET).filter(
+            pk=from_id
+        )
         try:
             from_company = from_company_qs.get()
         except companies_models.Company.DoesNotExist:
             self.stderr.write(f"Unable to find the company ID {from_id}\n")
             return
 
-        to_company_qs = companies_models.Company.objects.filter(pk=to_id)
+        to_company_qs = companies_models.Company.unfiltered_objects.filter(pk=to_id)
         try:
             to_company = to_company_qs.get()
         except companies_models.Company.DoesNotExist:

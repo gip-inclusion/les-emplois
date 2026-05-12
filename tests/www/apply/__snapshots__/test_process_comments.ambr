@@ -933,11 +933,11 @@
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -1451,11 +1451,11 @@
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
                  AND ("companies_company"."kind" IN (%s,
-                                                     %s,
-                                                     %s,
                                                      %s)
                       OR ("companies_company"."is_searchable"
                           AND "companies_company"."kind" = %s)
@@ -2305,9 +2305,12 @@
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s)
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
         ''',
@@ -2626,7 +2629,10 @@
         'sql': '''
           SELECT %s AS "a"
           FROM "companies_jobdescription"
-          WHERE ("companies_jobdescription"."company_id" = %s
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."last_employer_update_at" < %s)
           LIMIT 1

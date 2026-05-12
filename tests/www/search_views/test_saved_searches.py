@@ -61,7 +61,7 @@ class TestSavedSearches:
             ({"city": "foo-69"}, assertNotContains),
             ({"city": "lyon-69"}, assertContains),
             ({"city": "lyon-69", "kinds": ["AE"]}, assertNotContains),
-            ({"city": "lyon-69", "kinds": ["EA"]}, assertContains),
+            ({"city": "lyon-69", "kinds": ["EI"]}, assertContains),
         ],
     )
     @pytest.mark.parametrize("url", [EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])

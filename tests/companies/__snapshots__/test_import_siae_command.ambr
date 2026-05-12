@@ -46,6 +46,8 @@
                           "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_company"."auth_email" = %s
                  AND NOT (EXISTS
                             (SELECT %s AS "a"
@@ -105,6 +107,8 @@
                           "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_company"."auth_email" = %s
                  AND NOT (EXISTS
                             (SELECT %s AS "a"
@@ -164,6 +168,8 @@
                           "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_company"."auth_email" = %s
                  AND NOT (EXISTS
                             (SELECT %s AS "a"
@@ -223,6 +229,8 @@
                           "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_company"."auth_email" = %s
                  AND NOT (EXISTS
                             (SELECT %s AS "a"
@@ -282,6 +290,8 @@
                           "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_company"."auth_email" = %s
                  AND NOT (EXISTS
                             (SELECT %s AS "a"

@@ -20,10 +20,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -63,10 +63,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -262,10 +262,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -305,10 +305,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -504,10 +504,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -547,10 +547,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -617,10 +617,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -660,10 +660,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -859,10 +859,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -902,10 +902,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1101,10 +1101,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1144,10 +1144,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1343,10 +1343,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1386,10 +1386,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1585,10 +1585,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1628,10 +1628,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1693,10 +1693,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1736,10 +1736,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1801,10 +1801,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)
@@ -1844,10 +1844,10 @@
                     FROM "companies_company" V0
                     INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
                     WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s,
+                                                  %s))
                            AND V1."user_id" = %s
                            AND (V0."kind" IN (%s,
-                                              %s,
-                                              %s,
                                               %s)
                                 OR (V0."is_searchable"
                                     AND V0."kind" = %s)

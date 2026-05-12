@@ -121,6 +121,17 @@ class TestHire:
             response = client.get(url)
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
+    @pytest.mark.parametrize("kind", [CompanyKind.EA, CompanyKind.EATT])
+    def test_ea_eatt_members_cannot_hire(self, client, kind):
+        # EA/EATT companies are no longer active: their members have no current_organization
+        # and are kicked out via the logout-warning redirect before they reach the view.
+        company = CompanyFactory(kind=kind, with_membership=True)
+        client.force_login(company.members.first())
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}))
+        assertRedirects(
+            response, reverse("logout:warning", kwargs={"kind": "no_organization"}), fetch_redirect_response=False
+        )
+
     def test_we_raise_a_404_on_missing_session(self, client):
         user = JobSeekerFactory()
         client.force_login(user)
@@ -1449,7 +1460,7 @@ class TestCheckPreviousApplicationsForHireView:
 
     def test_other_employer(self, client):
         # not IAE or GEIQ
-        company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)
+        company = CompanyFactory(kind=CompanyKind.OPCS, with_membership=True)
         client.force_login(company.members.first())
         hire_session = fake_session_initialization(client, company, self.job_seeker, {})
 
@@ -1605,7 +1616,7 @@ class TestEligibilityForHire:
         )
 
     def test_not_subject_to_eligibility(self, client):
-        company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)  # We don't want a GEIQ here
+        company = CompanyFactory(kind=CompanyKind.OPCS, with_membership=True)  # We don't want a GEIQ here
         client.force_login(company.members.first())
         hire_session = fake_session_initialization(
             client,

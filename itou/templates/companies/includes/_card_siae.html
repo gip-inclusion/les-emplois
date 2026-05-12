@@ -6,28 +6,21 @@
 {% comment %} takes argument siae <Siae>{% endcomment %}
 <div class="c-box c-box--results has-links-inside mb-3 mb-md-4">
     <div class="c-box--results__header">
-        {% if siae.kind in ea_eatt_kinds %}<div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">{% endif %}
-            <div class="c-box--results__summary{% if siae.kind in ea_eatt_kinds %} flex-grow-1{% endif %}">
-                <i class="ri-community-line" aria-hidden="true"></i>
-                <div>
-                    {% if siae.is_opcs %}
-                        <span>Offres clauses sociales</span>
-                    {% else %}
-                        <span>
-                            {{ siae.kind }} - {{ siae.get_kind_display }}
-                            {# Display non-user-edited name too, but only if it's not the same text #}
-                            {% if siae.brand and siae.brand|lower != siae.name|lower %}<small>&nbsp;({{ siae.name|title }})</small>{% endif %}
-                        </span>
-                    {% endif %}
-                    <h3>{{ siae.display_name }}</h3>
-                </div>
+        <div class="c-box--results__summary">
+            <i class="ri-community-line" aria-hidden="true"></i>
+            <div>
+                {% if siae.is_opcs %}
+                    <span>Offres clauses sociales</span>
+                {% else %}
+                    <span>
+                        {{ siae.kind }} - {{ siae.get_kind_display }}
+                        {# Display non-user-edited name too, but only if it's not the same text #}
+                        {% if siae.brand and siae.brand|lower != siae.name|lower %}<small>&nbsp;({{ siae.name|title }})</small>{% endif %}
+                    </span>
+                {% endif %}
+                <h3>{{ siae.display_name }}</h3>
             </div>
-            {% if siae.kind in ea_eatt_kinds %}
-                <div>
-                    <span class="badge badge-sm rounded-pill bg-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
-                </div>
-            </div>
-        {% endif %}
+        </div>
         <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
             <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                 <li>

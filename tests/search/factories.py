@@ -19,7 +19,7 @@ def generate_query_params():
         }
 
     if random.randint(0, 1):
-        query_dict |= {"kinds": random.choice([["EI"], ["EA", "ETTI"], ["EI", "EA", "ETTI", "GEIQ", "OPCS"]])}
+        query_dict |= {"kinds": random.choice([["EI"], ["ACI", "ETTI"], ["EI", "ACI", "ETTI", "GEIQ", "OPCS"]])}
     if random.randint(0, 1):
         query_dict |= {
             "contract_types": random.choice(

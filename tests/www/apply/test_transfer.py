@@ -12,6 +12,7 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
+from itou.companies.enums import CompanyKind
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
@@ -191,6 +192,26 @@ class TestProcessTransferJobApplication:
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
         response = client.post(transfer_url, data=post_data)
         assert response.status_code == 403
+
+
+@pytest.mark.parametrize("kind", [CompanyKind.EA, CompanyKind.EATT])
+def test_transfer_to_ea_eatt_returns_404(client, kind):
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
+    target_company = CompanyFactory(kind=kind, with_membership=True)
+    client.force_login(job_application.to_company.members.first())
+
+    response = client.post(
+        reverse("apply:transfer", kwargs={"job_application_id": job_application.pk}),
+        data={"target_company_id": target_company.pk},
+    )
+    assert response.status_code == 404
+
+    url = reverse(
+        "apply:job_application_external_transfer_start_session",
+        kwargs={"job_application_id": job_application.pk, "company_pk": target_company.pk},
+    )
+    response = client.get(url)
+    assert response.status_code == 404
 
 
 def test_anonymous_access(client):

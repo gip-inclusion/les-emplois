@@ -305,36 +305,6 @@
 # ---
 # name: test_process_file_from_archive[data]
   list([
-    tuple(
-      'EA',
-      '00000000000001',
-      'EA_EATT',
-      'Dumas Sa',
-      '',
-      'legerdenise@example.org',
-      '1 Rue DE LA MOTTE',
-      '',
-      '77550',
-      None,
-      '',
-      '77',
-      None,
-    ),
-    tuple(
-      'EATT',
-      '00000000000001',
-      'EA_EATT',
-      'Collet Sarl',
-      '',
-      'legerdenise@example.org',
-      '1 Rue DE LA MOTTE',
-      '',
-      '77550',
-      None,
-      '',
-      '77',
-      None,
-    ),
   ])
 # ---
 # name: test_process_file_from_archive[logs]

@@ -475,14 +475,16 @@
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
-                                                                                        %s,
-                                                                                        %s)
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                             %s,
+                                                                                             %s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
         ''',
@@ -575,11 +577,13 @@
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE ("companies_jobdescription"."id") IN ((%s))
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND ("companies_jobdescription"."id") IN ((%s)))
         ''',
       }),
     ]),

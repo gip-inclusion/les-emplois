@@ -62,8 +62,11 @@ class TestListEmployeeRecords:
         """
         Non-eligible SIAE should not be able to access this list
         """
+        # EA and EATT employers can't reach the dashboard as of 11/05/2026
         company = CompanyFactory(
-            kind=factory.fuzzy.FuzzyChoice(set(CompanyKind) - set(Company.ASP_EMPLOYEE_RECORD_KINDS)),
+            kind=factory.fuzzy.FuzzyChoice(
+                set(CompanyKind) - set(Company.ASP_EMPLOYEE_RECORD_KINDS) - {CompanyKind.EA, CompanyKind.EATT}
+            ),
             with_membership=True,
             with_jobs=True,
         )

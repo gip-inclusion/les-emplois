@@ -4,6 +4,8 @@ from django.db import models
 class CompanyKind(models.TextChoices):
     ACI = "ACI", "Atelier chantier d'insertion"
     AI = "AI", "Association intermédiaire"
+    # EA/EATT companies support has been dropped on 11/05/2026,
+    # but we keep historical data for now
     EA = "EA", "Entreprise adaptée"
     EATT = "EATT", "Entreprise adaptée de travail temporaire"
     EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.

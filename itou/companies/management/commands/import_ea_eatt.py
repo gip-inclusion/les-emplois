@@ -53,11 +53,13 @@ def build_ea_eatt(row):
 
 
 class Command(BaseCommand):
-    """
-    Import EA and EATT data into the database using the "flux EA2"
+    """Import EA and EATT data into the database using the "flux EA2".
 
     EA = "Entreprise adaptée".
     EATT = "Entreprise adaptée de travail temporaire".
+
+    As of 11/05/2026, EA and EATT should not be accessible anymore on our platform.
+    However, Le Marché & Data Inclusion still use these data.
     """
 
     ATOMIC_HANDLE = True
