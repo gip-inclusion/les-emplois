@@ -3,8 +3,6 @@
 {% load wording %}
 
 <div class="personal-infos">
-    <h2>Informations personnelles</h2>
-    <hr>
     <div class="row mb-3">
         <div class="col-12 col-sm">
             <h3 class="mb-0">État civil</h3>
@@ -20,8 +18,7 @@
             </div>
         {% endif %}
     </div>
-
-    <ul class="list-data mb-3">
+    <ul class="list-data">
         <li>
             <small>Civilité</small>
             {% if profile.user.title %}
@@ -71,15 +68,9 @@
             {% endif %}
         </li>
     </ul>
-
-    <hr>
-    <div class="row mb-3">
-        <div class="col-12 col-sm">
-            <h3 class="mb-0">Coordonnées</h3>
-        </div>
-    </div>
-
-    <ul class="list-data mb-3">
+    <hr class="my-4">
+    <h3>Coordonnées</h3>
+    <ul class="list-data">
         <li>
             <small>Adresse e-mail</small>
             {% if profile.user.email %}
@@ -109,15 +100,9 @@
             {% endif %}
         </li>
     </ul>
-
-    <hr>
-    <div class="row mb-3">
-        <div class="col-12 col-sm">
-            <h3 class="mb-0">Situation</h3>
-        </div>
-    </div>
-
-    <ul class="list-data mb-3">
+    <hr class="my-4">
+    <h3>Situation</h3>
+    <ul class="list-data mb-4">
         <li>
             <small>Inscrit à France Travail depuis</small>
             {% if profile.pole_emploi_since %}

@@ -520,7 +520,7 @@ def test_step_2(client, snapshot):
     response = client.get(transfer_step_2_url)
 
     assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
-    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
+    assertContains(response, '<h2 class="h3">Sélectionner les métiers recherchés</h2>', html=True)
     assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
 
     response = client.post(transfer_step_2_url, data={"spontaneous_application": "on"})
@@ -544,7 +544,7 @@ def test_step_2(client, snapshot):
     response = client.get(transfer_step_2_url)
 
     assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
-    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
+    assertContains(response, '<h2 class="h3">Sélectionner les métiers recherchés</h2>', html=True)
     assert response.context["form"].initial == {"selected_jobs": [str(job_id)]}
 
     response = client.post(transfer_step_2_url, data={"selected_jobs": [job_id]})
@@ -823,7 +823,7 @@ def test_full_process(client, pdf_file):
 
     # STEP 2
     response = client.get(transfer_step_2_url)
-    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
+    assertContains(response, '<h2 class="h3">Sélectionner les métiers recherchés</h2>', html=True)
     assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
     # Check back_url
     assertContains(response, transfer_step_1_url)
@@ -845,7 +845,7 @@ def test_full_process(client, pdf_file):
 
     # STEP 3
     response = client.get(transfer_step_3_url)
-    assertContains(response, "<h2>Finaliser la candidature</h2>", html=True)
+    assertContains(response, '<h2 class="h3">Finaliser la candidature</h2>', html=True)
     # CHeck back_url
     assertContains(response, transfer_step_2_url)
 

@@ -55,7 +55,7 @@
                             {% csrf_token %}
 
                             {% if wizard_steps.current == RefuseViewStep.REASON %}
-                                <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
+                                <h2 class="h3">Choix du motif de refus</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if with_prescriber %}
                                         Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"le candidat,les candidats" }} comme pour {{ the_prescriber }}. Nous vous encourageons à répondre à chacune des parties.
@@ -64,7 +64,7 @@
                                     {% endif %}
                                 </p>
                             {% elif wizard_steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
-                                <h2 class="mb-3 mb-md-4">Réponse {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}</h2>
+                                <h2 class="h3">Réponse {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if with_prescriber %}
                                         Une copie de ce message sera adressée {{ to_prescriber }}.
@@ -80,7 +80,7 @@
                                     {% endif %}
                                 </p>
                             {% elif wizard_steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
-                                <h2 class="mb-3 mb-md-4">Réponse {{ to_prescriber }}</h2>
+                                <h2 class="h3">Réponse {{ to_prescriber }}</h2>
                                 <p class="mb-3 mb-md-4">
                                     Vous pouvez partager un message {{ to_prescriber }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
                                 </p>
