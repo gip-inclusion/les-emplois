@@ -42,56 +42,66 @@
                             </b>
                         </p>
                         <div id="informations" {% if form.is_bound %}class="d-none"{% endif %} data-swap-element-with=".c-form">
-                            <div class="card c-card c-card--noshadow border-bottom p-3">
-                                <div class="card-header d-flex flex-row align-items-center">
-                                    <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_inverted_full_name }}</h2>
+                            <div class="c-box c-box--results has-links-inside">
+                                <div class="c-box--results__header d-flex flex-row align-items-center">
+                                    <h3 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_inverted_full_name }}</h3>
                                     {% if request.user.is_job_seeker %}
-                                        <a class="btn btn-outline-primary btn-ico btn-sm" href="{% url 'dashboard:edit_user_info' %}">
-                                            <i class="ri-pencil-line" aria-hidden="true"></i>
-                                            <span>Modifier</span>
-                                        </a>
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url 'dashboard:edit_user_info' %}">Modifier</a>
                                     {% elif can_edit_personal_information %}
-                                        <span class="btn btn-outline-primary btn-ico btn-sm" data-swap-element="#informations">
-                                            <i class="ri-pencil-line" aria-hidden="true"></i>
-                                            <span>Modifier</span>
-                                        </span>
+                                        <span class="btn btn-primary btn-block w-100 w-md-auto" data-swap-element="#informations">Modifier</span>
                                     {% endif %}
                                 </div>
-                                <div class="card-body">
-                                    <hr>
-                                    <p>
-                                        <span class="text-muted">Adresse</span>
-                                        <br />
-                                        <b>{{ job_application.job_seeker.address_on_one_line|default:"Non renseigné" }}</b>
-                                        <br />
-                                    </p>
-                                    <hr>
-                                    <p>
-                                        <span class="text-muted">N&deg; de téléphone</span>
-                                        <br />
-                                        {% if job_application.job_seeker.phone %}
-                                            <b>{{ job_application.job_seeker.phone|format_phone }}</b>
-                                        {% elif request.user.is_job_seeker %}
-                                            <b>Non renseigné</b>
-                                            <p class="text-warning fst-italic">
-                                                L’ajout du numéro de téléphone permet à l’employeur de vous contacter plus facilement.
-                                            </p>
-                                        {% else %}
-                                            <b>Non renseigné</b>
-                                            <p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat.</p>
-                                        {% endif %}
-                                    </p>
+                                <hr class="m-0">
+                                <div class="c-box--results__body">
+                                    <ul class="list-data">
+                                        <li>
+                                            <small>Adresse</small>
+                                            {% if job_application.job_seeker.address_on_one_line %}
+                                                <address>{{ job_application.job_seeker.address_on_one_line }}</address>
+                                            {% else %}
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% endif %}
+                                        </li>
+                                        <li>
+                                            {% if job_application.job_seeker.phone %}
+                                                <small>N&deg; de téléphone</small>
+                                                <strong>{{ job_application.job_seeker.phone|format_phone }}</strong>
+                                            {% elif request.user.is_job_seeker %}
+                                                <small>
+                                                    N&deg; de téléphone
+                                                    <i class="ri-information-line text-info"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="L’ajout du numéro de téléphone permet à l’employeur de vous contacter plus facilement."
+                                                       aria-label="L’ajout du numéro de téléphone permet à l’employeur de vous contacter plus facilement."
+                                                       role="button"
+                                                       tabindex="0"></i>
+                                                </small>
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% else %}
+                                                <small>
+                                                    N&deg; de téléphone
+                                                    <i class="ri-information-line text-info"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
+                                                       aria-label="L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
+                                                       role="button"
+                                                       tabindex="0"></i>
+                                                </small>
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
                                 </div>
-                            </div>
-                            <div class="form-row align-items-center justify-content-end gx-3 mt-3">
-                                <div class="form-group col-6 col-lg-auto">
-                                    <a class="btn btn-primary btn-block" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                <div class="c-box--results__footer">
+                                    <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         {% if not request.user.is_job_seeker %}
                             <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
-                                <h2 class="h3 mb-5">{{ job_application.job_seeker.get_inverted_full_name }}</h2>
+                                <h3>{{ job_application.job_seeker.get_inverted_full_name }}</h3>
 
                                 <form method="post">
                                     {% csrf_token %}
@@ -113,11 +123,7 @@
                             </div>
                         {% endif %}
                     {% else %}
-                        <div class="form-row align-items-center justify-content-end gx-3 mt-3">
-                            <div class="form-group col-6 col-lg-auto">
-                                <a class="btn btn-primary btn-block" href="{% url "dashboard:index" %}">Tableau de bord</a>
-                            </div>
-                        </div>
+                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
                     {% endif %}
                 </div>
             </div>
@@ -131,7 +137,6 @@
     {{ form.media.js }}
     {% if request.from_employer or request.from_prescriber %}
         <script async src="{{ TALLY_URL }}/widgets/embed.js"></script>
-        <script src='{% static "js/nps_popup.js" %}' data-delaypopup="false" data-userkind="{% if request.from_employer %}employeur{% else %}prescripteur{% endif %}" data-page="depot-candidature">
-        </script>
+        <script src='{% static "js/nps_popup.js" %}' data-delaypopup="false" data-userkind="{% if request.from_employer %}employeur{% else %}prescripteur{% endif %}" data-page="depot-candidature"></script>
     {% endif %}
 {% endblock %}

@@ -3355,33 +3355,24 @@ class TestApplicationEndView:
 
     def test_wo_phone_number_as_job_seeker(self, client):
         application = JobApplicationFactory(sent_by_job_seeker=True, job_seeker__phone="")
-        expected_html = (
-            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone permet à l’employeur de vous '
-            "contacter plus facilement.</p>"
-        )
+        expected_text = "L’ajout du numéro de téléphone permet à l’employeur de vous contacter plus facilement."
         client.force_login(application.job_seeker)
         response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
-        assertContains(response, expected_html, html=True)
+        assertContains(response, expected_text)
 
     def test_wo_phone_number_as_employer(self, client):
         application = JobApplicationFactory(sent_by_another_employer=True, job_seeker__phone="")
-        expected_html = (
-            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
-            "la prise de contact avec le candidat.</p>"
-        )
+        expected_text = "L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
         client.force_login(application.sender)
         response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
-        assertContains(response, expected_html, html=True)
+        assertContains(response, expected_text)
 
     def test_wo_phone_number_as_prescriber(self, client):
         application = JobApplicationFactory(sent_by_authorized_prescriber=True, job_seeker__phone="")
-        expected_html = (
-            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
-            "la prise de contact avec le candidat.</p>"
-        )
+        expected_text = "L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat."
         client.force_login(application.sender)
         response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
-        assertContains(response, expected_html, html=True)
+        assertContains(response, expected_text)
 
     def test_not_sender(self, client):
         application = JobApplicationFactory(sent_by_prescriber_alone=True)
