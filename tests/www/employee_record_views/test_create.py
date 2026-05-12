@@ -912,11 +912,11 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         assert form.initial["pole_emploi"]
 
         # Fill other mandatory field from fold
-        # POST will fail because if education_level is not filled
+        NEW_POLE_EMPLOI_ID = "12345678"
         data = {
             **self._default_step_3_data(),
             "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "pole_emploi_id": NEW_POLE_EMPLOI_ID,
             "pole_emploi_since": "01",
         }
         response = client.post(self.url, data)
@@ -925,7 +925,8 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "01" == self.job_seeker.jobseeker_profile.pole_emploi_since
+        assert self.job_seeker.jobseeker_profile.pole_emploi_since == "01"
+        assert self.job_seeker.jobseeker_profile.pole_emploi_id == NEW_POLE_EMPLOI_ID
 
     def test_fold_unemployed(self, client):
         response = client.get(self.url)
