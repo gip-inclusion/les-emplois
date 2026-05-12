@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
+from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -3301,6 +3302,163 @@ class TestApplicationView:
         assert AdministrativeCriteriaKind.FLE in prefilled_criteria
         assert response.context["form"].initial["level_1_2"] is True  # ASS criterion
         assert response.context["form"].initial["level_2_17"] is True  # FLE / low_level_in_french criterion
+
+    @pytest.mark.parametrize("is_prescriber", [True, False])
+    @pytest.mark.parametrize("search_from_job_seeker_profile", [True, False])
+    @pytest.mark.parametrize("apply_from_card", [True, False])
+    def test_application_end_displayed_buttons(
+        self, client, is_prescriber, search_from_job_seeker_profile, apply_from_card
+    ):
+        geispolsheim = create_city_geispolsheim()
+        geispolsheim_company = CompanyFactory(
+            romes=("N1101", "N1105"),
+            department="67",
+            coords=geispolsheim.coords,
+            post_code="67118",
+            kind=CompanyKind.AI,
+            with_membership=True,
+            with_jobs=True,
+        )
+        JobDescriptionFactory(company=geispolsheim_company, location=geispolsheim)
+        user = (
+            PrescriberFactory(membership__organization__authorized=True)
+            if is_prescriber
+            else EmployerFactory(membership=True)
+        )
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
+            jobseeker_profile__pole_emploi_id="1234567A",
+            created_by=PrescriberFactory(),
+        )
+
+        client.force_login(user)
+
+        # Step search company
+        # ----------------------------------------------------------------------
+
+        search_params = dict()
+        if search_from_job_seeker_profile:
+            search_params |= {"job_seeker_public_id": job_seeker.public_id}
+        next_url = add_url_params(reverse("search:employers_results"), search_params)
+        response = client.get(next_url)
+
+        # Add filters to search
+        search_params |= {
+            "city": geispolsheim.slug,
+            "distance": 50,
+            "kinds": geispolsheim_company.kind,
+            "department": geispolsheim.department,
+        }
+        search_url = add_url_params(reverse("search:employers_results"), search_params)
+        response = client.get(search_url)
+
+        back_url = search_url
+        url_params = {"back_url": back_url} | (
+            {"job_seeker_public_id": job_seeker.public_id} if search_from_job_seeker_profile else {}
+        )
+
+        # Optional step: visit company card
+        # ----------------------------------------------------------------------
+
+        if apply_from_card:
+            company_card_url = add_url_params(geispolsheim_company.get_card_url(), url_params)
+            url_params["back_url"] = company_card_url
+
+        # Step apply to company
+        # ----------------------------------------------------------------------
+
+        apply_company_url = add_url_params(
+            reverse("apply:start", kwargs={"company_pk": geispolsheim_company.pk}), url_params
+        )
+        response = client.get(apply_company_url, follow=True)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
+
+        if not search_from_job_seeker_profile:
+            job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+            nir_url = reverse(
+                "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+            )
+            assertRedirects(response, nir_url)
+
+            response = client.post(nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1}, follow=True)
+
+        assertRedirects(response, next_url)
+
+        # Step apply to job
+        # ----------------------------------------------------------------------
+
+        response = client.get(next_url)
+        assert response.status_code == 200
+
+        selected_job = geispolsheim_company.job_description_through.first()
+        response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
+
+        assert client.session[apply_session_name] == {
+            "company_pk": geispolsheim_company.pk,
+            "selected_jobs": [selected_job.pk],
+            "reset_url": url_params["back_url"],
+            "search_url": search_url,
+            "job_seeker_public_id": str(job_seeker.public_id),
+        }
+
+        if is_prescriber:
+            next_url = reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session_name})
+            assertRedirects(response, next_url)
+
+            # Step application's eligibility
+            # ----------------------------------------------------------------------
+            # job seeker is getting RSA
+            response = client.post(next_url, {"level_1_1": True})
+
+        next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Step application's resume.
+        # ----------------------------------------------------------------------
+
+        response = client.post(
+            next_url,
+            data={
+                "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            },
+        )
+
+        job_application = JobApplication.objects.get()
+
+        # Before redirecting, add the job seeker public id to the search url if missing
+        if not search_from_job_seeker_profile:
+            search_url = add_url_params(search_url, {"job_seeker_public_id": job_seeker.public_id})
+
+        # Check if search url is present in redirection
+        next_url = add_url_params(
+            reverse("apply:application_end", kwargs={"application_pk": job_application.pk}), {"search_url": search_url}
+        )
+        assertRedirects(response, next_url)
+        response = client.get(next_url)
+
+        if is_prescriber:
+            job_seeker_profile_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+            assertContains(
+                response,
+                f"""
+                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_seeker_profile_url}">
+                    Voir le profil candidat</a>
+                    <a class="btn btn-primary btn-block w-100 w-md-auto" href={search_url}>
+                    Revenir à la recherche pour ce candidat</a>
+                """,
+                html=True,
+            )
+        else:
+            dashboard_url = reverse("dashboard:index")
+            assertContains(
+                response,
+                f"""
+                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
+                    Tableau de bord</a>
+                """,
+                html=True,
+            )
 
 
 class TestApplicationEndView:

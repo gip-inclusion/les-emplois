@@ -94,7 +94,14 @@
                                 </div>
                                 <div class="c-box--results__footer">
                                     <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                        {% partialdef btn-group inline %}
+                                            {% if request.from_prescriber and search_url %}
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "job_seekers_views:details" job_application.job_seeker.public_id %}">Voir le profil candidat</a>
+                                                <a class="btn btn-primary btn-block w-100 w-md-auto" href={{ search_url }}>Revenir à la recherche pour ce candidat</a>
+                                            {% else %}
+                                                <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                                            {% endif %}
+                                        {% endpartialdef %}
                                     </div>
                                 </div>
                             </div>
@@ -123,7 +130,7 @@
                             </div>
                         {% endif %}
                     {% else %}
-                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "dashboard:index" %}">Tableau de bord</a>
+                        {% partial btn-group %}
                     {% endif %}
                 </div>
             </div>
