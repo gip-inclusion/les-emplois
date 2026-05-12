@@ -81,6 +81,9 @@
                                           Date d'inscription
                                       </th>
                                       <th class="text-end w-50px" scope="col">
+                                          <span class="visually-hidden">
+                                              Actions possibles sur les collaborateurs
+                                          </span>
                                       </th>
                                   </tr>
                               </thead>

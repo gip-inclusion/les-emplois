@@ -7458,6 +7458,9 @@
                   Nombre de candidatures
               </th>
               <th class="text-end w-50px" scope="col">
+                  <span class="visually-hidden">
+                      Actions possibles sur les candidatures
+                  </span>
               </th>
           </tr>
       </thead>
@@ -9548,6 +9551,9 @@
                               Statut éligibilité
                           </th>
                           <th class="text-end w-50px" scope="col">
+                              <span class="visually-hidden">
+                                  Actions possibles sur les candidatures
+                              </span>
                           </th>
                       </tr>
                   </thead>
@@ -9846,6 +9852,9 @@
                               Statut éligibilité
                           </th>
                           <th class="text-end w-50px" scope="col">
+                              <span class="visually-hidden">
+                                  Actions possibles sur les candidatures
+                              </span>
                           </th>
                       </tr>
                   </thead>

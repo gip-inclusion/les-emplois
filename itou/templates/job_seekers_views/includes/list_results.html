@@ -24,6 +24,7 @@
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nombre de candidatures" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière action" only %}
                         <th scope="col" class="text-end {% if request.current_organization.is_authorized %}w-100px{% else %}w-50px{% endif %}">
+                            <span class="visually-hidden">Actions possibles sur les candidats</span>
                         </th>
                     </tr>
                 </thead>

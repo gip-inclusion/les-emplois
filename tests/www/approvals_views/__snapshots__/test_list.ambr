@@ -2192,6 +2192,9 @@
                           </i>
                       </th>
                       <th class="text-end w-50px" scope="col">
+                          <span class="visually-hidden">
+                              Actions possibles sur les salariés et PASS IAE
+                          </span>
                       </th>
                   </tr>
               </thead>

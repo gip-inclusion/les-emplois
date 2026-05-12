@@ -5343,6 +5343,9 @@
                           Émetteur
                       </th>
                       <th class="text-end w-100px" scope="col">
+                          <span class="visually-hidden">
+                              Actions possibles sur les suspensions
+                          </span>
                       </th>
                   </tr>
               </thead>
@@ -5463,6 +5466,9 @@
                           Émetteur
                       </th>
                       <th class="text-end w-100px" scope="col">
+                          <span class="visually-hidden">
+                              Actions possibles sur les suspensions
+                          </span>
                       </th>
                   </tr>
               </thead>
@@ -5563,6 +5569,9 @@
                           Émetteur
                       </th>
                       <th class="text-end w-100px" scope="col">
+                          <span class="visually-hidden">
+                              Actions possibles sur les suspensions
+                          </span>
                       </th>
                   </tr>
               </thead>
