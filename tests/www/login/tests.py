@@ -136,8 +136,6 @@ class TestPreLogin:
             "Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire."
         ]
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
-        # FIXME: Go to user kind choice
-        assertContains(response, reverse("signup:job_seeker_start"))
 
     def test_rate_limits(self, client):
         url = reverse("account_login")

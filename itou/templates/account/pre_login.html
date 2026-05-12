@@ -24,8 +24,9 @@
                     <div class="c-form mb-5">
                         <p class="h4 text-primary">Quelle adresse e-mail utilisez-vous ?</p>
                         <p class="text-secondary fs-sm">
-                            Si vous avez un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
-                            merci de renseigner dans ce champ l’adresse e-mail qui y est associée.
+                            Renseignez l’adresse e-mail associée à votre compte.
+                            Si cette adresse est utilisée avec un service de connexion (<strong>FranceConnect</strong>, <strong>France Travail</strong> ou <strong>ProConnect</strong>),
+                            la page de connexion du service concerné s'affichera.
                         </p>
 
                         <form method="post" class="js-prevent-multiple-submit">
@@ -35,19 +36,14 @@
                             <div class="form-group form-group-required text-primary">
                                 {% bootstrap_label "Adresse e-mail" label_for="id_email" %}
                                 {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66 mb-0" show_label=False %}
-                                <div class="form-text">
-                                    <button type="button" class="btn-link fs-sm" data-bs-toggle="modal" data-bs-target="#no-email-modal">
-                                        Pas d'adresse e-mail ?
-                                    </button>
-                                </div>
                             </div>
                             {% url 'home:hp' as reset_url %}
-                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url %}
+                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url show_mandatory_fields_mention=False %}
                         </form>
                     </div>
                     <hr data-it-text="ou" class="my-5">
                     <div class="text-center mb-3">
-                        Vous n'avez pas de compte ? <a href="{% url 'signup:job_seeker_start' %}" class="btn-link">Inscription</a>
+                        Vous n'avez pas de compte ? <a href="{% url 'signup:choose_user_kind' %}" class="btn-link">Inscription</a>
                     </div>
                 </div>
                 <!-- Hide left column on small devices. -->
@@ -59,9 +55,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block modals %}
-    {{ block.super }}
-    {% include "signup/includes/no_email_link.html" with exclude_button=True only %}
 {% endblock %}
