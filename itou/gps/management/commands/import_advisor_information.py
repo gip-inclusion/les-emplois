@@ -14,7 +14,7 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
-from itou.utils.admin import add_support_remark_to_obj
+from itou.utils.admin import bulk_add_support_remark_to_objs
 from itou.utils.command import BaseCommand
 
 
@@ -286,8 +286,8 @@ class Command(BaseCommand):
                     )
                     FollowUpGroupMembership.objects.bulk_create(follow_up_memberships_to_create)
                     PrescriberMembership.objects.bulk_create(prescriber_memberships_to_create)
-                    for prescriber in prescribers_to_create:
-                        add_support_remark_to_obj(prescriber, "Créé par l'import des référents FT pour GPS")
+                    text = "Créé par l'import des référents FT pour GPS"
+                    bulk_add_support_remark_to_objs(prescribers_to_create, text)
 
             created_prescriber_count += len(prescribers_to_create)
 

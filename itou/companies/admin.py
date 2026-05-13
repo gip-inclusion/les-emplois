@@ -24,7 +24,7 @@ from itou.utils.admin import (
     ItouTabularInline,
     PkSupportRemarkInline,
     ReadonlyMixin,
-    add_support_remark_to_obj,
+    bulk_add_support_remark_to_objs,
     get_admin_view_link,
 )
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -395,8 +395,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                                 summary_lines.extend([f"- {report_field.label}:"] + [f"  * {item}" for item in items])
                         summary_lines += ["-" * 20]
                         summary_text = "\n".join(summary_lines)
-                        add_support_remark_to_obj(from_company, summary_text)
-                        add_support_remark_to_obj(to_company, summary_text)
+                        bulk_add_support_remark_to_objs([from_company, to_company], summary_text)
                         message = format_html(
                             "Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}.",
                             from_company=from_company,
