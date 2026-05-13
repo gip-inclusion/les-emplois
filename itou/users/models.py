@@ -740,9 +740,17 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         return self.terms_accepted_at < get_latest_terms_datetime()
 
     @cached_property
+    def last_assignment(self):
+        assignments = self.job_seeker_assignments.all()
+        if assignments:
+            last_assignment = sorted(assignments, key=lambda j: j.updated_at, reverse=True)[0]
+            return last_assignment
+        return None
+
+    @property
     def last_advisor(self):
-        if last_assignment := self.job_seeker_assignments.order_by("-updated_at").first():
-            return None if last_assignment.assigned_to_unknown_advisor else last_assignment.professional
+        if self.last_assignment and not self.last_assignment.assigned_to_unknown_advisor:
+            return self.last_assignment.professional
         return None
 
 
