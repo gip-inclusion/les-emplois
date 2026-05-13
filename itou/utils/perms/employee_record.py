@@ -23,13 +23,6 @@ def tunnel_step_is_allowed(job_application):
     return employee_record.ready.is_available()
 
 
-def siae_is_allowed(job_application, siae):
-    """
-    SIAEs are only allowed to see "their" employee records
-    """
-    return job_application.to_company == siae
-
-
 def can_create_employee_record(request, job_application_id) -> JobApplication:
     """
     Check if conditions / permissions are set to use the employee record views

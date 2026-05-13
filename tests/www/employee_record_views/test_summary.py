@@ -62,6 +62,12 @@ class TestSummaryEmployeeRecords:
         response = client.get(self.url)
         assert response.status_code == 200
 
+    def test_other_company_employee_record_returns_404(self, client):
+        other_employee_record = EmployeeRecordWithProfileFactory()
+        client.force_login(self.user)
+        response = client.get(reverse("employee_record_views:summary", args=(other_employee_record.id,)))
+        assert response.status_code == 404
+
     def test_check_job_seeker_infos(self, client):
         # Must have access
         client.force_login(self.user)
