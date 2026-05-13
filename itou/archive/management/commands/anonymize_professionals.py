@@ -1,22 +1,19 @@
-from allauth.account.models import EmailAddress
 from django.conf import settings
-from django.contrib.auth.hashers import make_password
-from django.db.models import Exists, F, OuterRef, Prefetch, Q
+from django.db.models import F, Q
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
 
+from itou.archive.anonymize import (
+    annotate_and_prefetch_for_anonymization,
+    anonymize_and_delete_professionals,
+    anonymize_professionals_without_deletion,
+)
 from itou.archive.constants import GRACE_PERIOD
-from itou.archive.models import AnonymizedProfessional
 from itou.archive.tasks import async_delete_contact
-from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check, get_year_month_or_none
-from itou.companies.models import CompanyMembership
-from itou.institutions.models import InstitutionMembership
-from itou.prescribers.enums import PrescriberAuthorizationStatus
-from itou.prescribers.models import PrescriberMembership
-from itou.users.models import JobSeekerAssignment, User, UserKind
+from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check
+from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
-from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.command import BaseCommand
 
 
@@ -72,8 +69,8 @@ class Command(BaseCommand):
         for user in users:
             ArchiveUser(user).send()
 
-        self.anonymize_and_delete_professionals(users_to_delete)
-        self.anonymize_professionals_without_deletion(users_to_anonymize)
+        anonymize_and_delete_professionals(users_to_delete)
+        anonymize_professionals_without_deletion(users_to_anonymize)
         self.remove_from_contact(users_to_remove_from_contact)
 
         self.logger.info("Anonymized professionals after grace period, count: %d", len(users))
@@ -95,88 +92,11 @@ class Command(BaseCommand):
 
     def get_users_to_anonymize_and_delete(self, users):
         related_objects_to_check = get_filter_kwargs_on_user_for_related_objects_to_check()
-        has_membership_in_authorized_organization_sqs = PrescriberMembership.include_inactive.filter(
-            user_id=OuterRef("id"), organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
-        )
         return list(
-            User.objects.filter(id__in=[user.id for user in users])
-            .filter(**related_objects_to_check)
-            .annotate(has_membership_in_authorized_organization=Exists(has_membership_in_authorized_organization_sqs))
-            .prefetch_related(
-                Prefetch(
-                    "companymembership_set",
-                    to_attr="prefetched_companymemberships",
-                    queryset=CompanyMembership.include_inactive.all(),
-                ),
-                Prefetch(
-                    "prescribermembership_set",
-                    to_attr="prefetched_prescribermemberships",
-                    queryset=PrescriberMembership.include_inactive.all(),
-                ),
-                Prefetch(
-                    "institutionmembership_set",
-                    to_attr="prefetched_institutionmemberships",
-                    queryset=InstitutionMembership.include_inactive.all(),
-                ),
+            annotate_and_prefetch_for_anonymization(
+                User.objects.filter(id__in=[user.id for user in users]).filter(**related_objects_to_check)
             )
         )
-
-    def make_anonymized_professional(self, user):
-        memberships = [
-            *user.prefetched_companymemberships,
-            *user.prefetched_institutionmemberships,
-            *user.prefetched_prescribermemberships,
-        ]
-        return AnonymizedProfessional(
-            date_joined=get_year_month_or_none(user.date_joined),
-            first_login=get_year_month_or_none(user.first_login),
-            last_login=get_year_month_or_none(user.last_login),
-            department=user.department,
-            title=user.title,
-            kind=user.kind,
-            number_of_memberships=len(memberships),
-            number_of_active_memberships=sum(m.is_active for m in memberships),
-            number_of_memberships_as_administrator=sum(m.is_admin for m in memberships),
-            had_memberships_in_authorized_organization=user.has_membership_in_authorized_organization,
-            identity_provider=user.identity_provider,
-        )
-
-    def anonymize_and_delete_professionals(self, users):
-        AnonymizedProfessional.objects.bulk_create([self.make_anonymized_professional(user) for user in users])
-        User.objects.filter(id__in=[user.id for user in users]).delete()
-
-    def anonymize_professionals_without_deletion(self, users):
-        user_ids = [user.id for user in users]
-        for model in [CompanyMembership, InstitutionMembership, PrescriberMembership]:
-            model.objects.filter(user_id__in=user_ids).update(is_active=False)
-
-        EmailAddress.objects.filter(user_id__in=user_ids).delete()
-
-        # No need to keep assignments from professionals without organization or company. If a professional was
-        # anonymized without deletion just because of an assignment like these, he will be deleted on the next command
-        # run.
-        JobSeekerAssignment.objects.filter(
-            professional_id__in=[user.id for user in users],
-            prescriber_organization_id__isnull=True,
-            company_id__isnull=True,
-        ).delete()
-
-        User.objects.filter(id__in=user_ids).update(
-            is_active=False,
-            password=make_password(None),
-            email=None,
-            phone="",
-            address_line_1="",
-            address_line_2="",
-            post_code="",
-            city="",
-            coords=None,
-            insee_city=None,
-        )
-        for user in users:
-            add_support_remark_to_obj(
-                user, f"{timezone.localtime().replace(microsecond=0)} - Désactivation/archivage de l'utilisateur"
-            )
 
     def remove_from_contact(self, users):
         for user in users:

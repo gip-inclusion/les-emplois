@@ -1523,7 +1523,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1551,7 +1551,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1611,7 +1611,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1636,7 +1636,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1661,7 +1661,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1694,7 +1694,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1719,7 +1719,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1744,7 +1744,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1769,7 +1769,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1800,7 +1800,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1833,7 +1833,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1858,7 +1858,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1883,7 +1883,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1916,7 +1916,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1949,7 +1949,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1974,7 +1974,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -1999,7 +1999,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2024,7 +2024,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2049,7 +2049,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2074,7 +2074,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2099,7 +2099,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2131,7 +2131,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2161,7 +2161,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2186,7 +2186,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2211,7 +2211,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2246,7 +2246,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2281,7 +2281,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2306,7 +2306,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2331,7 +2331,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2356,7 +2356,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2381,7 +2381,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2406,7 +2406,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2449,7 +2449,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2492,7 +2492,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2535,7 +2535,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2578,7 +2578,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2603,7 +2603,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2628,7 +2628,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2653,7 +2653,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2678,7 +2678,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2703,7 +2703,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2740,7 +2740,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2765,7 +2765,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2790,7 +2790,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2815,7 +2815,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2840,7 +2840,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2873,7 +2873,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2898,7 +2898,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2923,7 +2923,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2962,7 +2962,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -2987,7 +2987,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3011,7 +3011,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3035,7 +3035,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3059,7 +3059,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3083,7 +3083,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3107,7 +3107,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3131,7 +3131,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3155,7 +3155,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3179,7 +3179,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3203,7 +3203,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3227,7 +3227,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3251,7 +3251,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3275,7 +3275,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3299,7 +3299,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3323,7 +3323,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3347,7 +3347,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3371,7 +3371,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3395,7 +3395,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
@@ -3419,7 +3419,7 @@
       }),
       dict({
         'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'anonymize_and_delete_professionals[archive/anonymize.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
