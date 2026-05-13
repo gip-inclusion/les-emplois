@@ -78,11 +78,18 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
 
 
 @readonly_view
+@check_request(lambda request: request.from_employer or request.from_institution or request.user.is_staff)
 def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evaluations/campaign_calendar.html"):
-    evaluation_campaign = get_object_or_404(
-        EvaluationCampaign,
-        pk=evaluation_campaign_pk,
-    )
+    if request.user.is_staff:
+        # Allow itou staff to inspect any campaign for support purposes (cf. PR #3216).
+        queryset = EvaluationCampaign.objects.all()
+    elif request.from_institution:
+        institution = get_current_institution_or_404(request)
+        queryset = EvaluationCampaign.objects.for_institution(institution)
+    else:
+        company = get_current_company_or_404(request)
+        queryset = EvaluationCampaign.objects.filter(evaluated_siaes__siae=company)
+    evaluation_campaign = get_object_or_404(queryset, pk=evaluation_campaign_pk)
 
     context = {
         "back_url": reverse("dashboard:index"),

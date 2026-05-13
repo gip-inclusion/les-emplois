@@ -23,7 +23,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
     SanctionsFactory,
 )
-from tests.users.factories import EmployerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -477,6 +477,23 @@ class TestViewProof:
         client.force_login(membership.user)
         response = client.get(url)
         assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "user_factory, expected_status",
+    [
+        (lambda: JobSeekerFactory(), 403),
+        (lambda: PrescriberFactory(membership=True), 403),
+        (lambda: CompanyMembershipFactory(company__evaluable_kind=True).user, 404),
+        (lambda: InstitutionMembershipFactory().user, 404),
+    ],
+    ids=["job_seeker", "prescriber", "unrelated_employer", "unrelated_inspector"],
+)
+def test_campaign_calendar_denies_unauthorized(client, user_factory, expected_status):
+    campaign = EvaluationCampaignFactory()
+    client.force_login(user_factory())
+    response = client.get(reverse("siae_evaluations_views:campaign_calendar", args=[campaign.pk]))
+    assert response.status_code == expected_status
 
 
 def test_active_campaign_calendar_for_admin_no_crash(admin_client):
