@@ -217,9 +217,8 @@ def render_stats_siae(request, page_title, *, filters_param=[mb.C1_SIAE_FILTER_K
             str(membership.company_id) for membership in request.user.active_or_in_grace_period_company_memberships()
         ]
     if mb.ASP_SIAE_FILTER_KEY_FLAVOR3 in filters_param:
-        params[mb.ASP_SIAE_FILTER_KEY_FLAVOR3] = [
-            org.convention.asp_id for org in request.organizations if org.convention is not None
-        ]
+        siaes = [org for org in request.organizations if isinstance(org, Company)]
+        params[mb.ASP_SIAE_FILTER_KEY_FLAVOR3] = [org.convention.asp_id for org in siaes if org.convention is not None]
     return render_stats(
         request=request,
         context=context,
