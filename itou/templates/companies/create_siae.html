@@ -32,6 +32,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form">
+                        <h2 class="h3">Informations générales</h2>
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             {% bootstrap_form_errors form type="all" %}
@@ -52,7 +53,6 @@
                             {% bootstrap_field form.website %}
                             {% bootstrap_field form.description %}
 
-                            <hr>
                             {% component_alert content=content variant="warning" %}
                                 {% fragment as content %}
                                     <p class="mb-0">
