@@ -285,19 +285,14 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         ),
         output_field=IntegerField(),
     )
-    queryset = (
-        User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
-        .select_related("jobseeker_profile")
-        .prefetch_related("approvals")
-        .annotate(
-            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
-            job_applications_nb=Coalesce(subquery_count, 0),
-            last_updated_at=subquery_last_action_at,
-            valid_eligibility_diagnosis=subquery_diagnosis,
-            application_sent_by=ArrayAgg(
-                "job_applications__sender", distinct=True, filter=Q(job_applications__sender__isnull=False)
-            ),
-        )
+    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
+        full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
+        job_applications_nb=Coalesce(subquery_count, 0),
+        last_updated_at=subquery_last_action_at,
+        valid_eligibility_diagnosis=subquery_diagnosis,
+        application_sent_by=ArrayAgg(
+            "job_applications__sender", distinct=True, filter=Q(job_applications__sender__isnull=False)
+        ),
     )
 
     form = FilterForm(
@@ -315,7 +310,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_UPDATED_AT_DESC
-    queryset = queryset.order_by(*order.order_by)
+    queryset = queryset.order_by(*order.order_by).select_related("jobseeker_profile").prefetch_related("approvals")
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     for job_seeker in page_obj:
