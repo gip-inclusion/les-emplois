@@ -4,6 +4,7 @@ import json
 import random
 import re
 import uuid
+from functools import partial
 from operator import attrgetter
 from unittest import mock
 
@@ -1044,6 +1045,80 @@ class TestLastAssignment:
         del job_seeker.last_assignment  # clear cache to retrieve accurate value
         assert job_seeker.last_assignment == job_seeker_assignment_2
         assert job_seeker.last_advisor == job_seeker_assignment_2.professional
+
+    def test_no_last_advisor_with_org(self):
+        job_seeker = JobSeekerFactory()
+        assert job_seeker.last_assignment is None
+        assert job_seeker.last_advisor_with_org == (None, None)
+
+    @pytest.mark.parametrize(
+        "org_factory,job_seeker_assignment_factory",
+        [
+            pytest.param(
+                PrescriberOrganizationFactory,
+                lambda org: partial(JobSeekerAssignmentFactory, prescriber_organization=org),
+                id="unknown_prescriber_advisor",
+            ),
+            pytest.param(
+                CompanyFactory,
+                lambda company: partial(JobSeekerAssignmentFactory, company=company),
+                id="unknown_employer_advisor",
+            ),
+        ],
+    )
+    def test_unknown_advisor_with_org(self, org_factory, job_seeker_assignment_factory):
+        org = org_factory()
+        job_seeker_assignment = job_seeker_assignment_factory(org)(assigned_to_unknown_advisor=True)
+        job_seeker = job_seeker_assignment.job_seeker
+        last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
+        assert job_seeker.last_assignment == job_seeker_assignment
+        assert last_advisor is None
+        assert last_advisor_org == org
+
+    def test_last_advisor_without_org(self):
+        job_seeker_assignment = JobSeekerAssignmentFactory()
+        job_seeker = job_seeker_assignment.job_seeker
+        last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
+        assert job_seeker.last_assignment == job_seeker_assignment
+        assert last_advisor == job_seeker_assignment.professional
+        assert last_advisor_org is None
+
+    @pytest.mark.parametrize(
+        "org_factory,job_seeker_assignment_factory",
+        [
+            pytest.param(
+                PrescriberOrganizationFactory,
+                lambda org: partial(JobSeekerAssignmentFactory, prescriber_organization=org),
+                id="last_advisor_is_prescriber",
+            ),
+            pytest.param(
+                CompanyFactory,
+                lambda company: partial(JobSeekerAssignmentFactory, company=company),
+                id="last_advisor_is_employer",
+            ),
+        ],
+    )
+    def test_last_advisor_with_org(self, org_factory, job_seeker_assignment_factory):
+        updated_at = datetime.datetime(2026, 1, 1, 1, 1, 11, tzinfo=datetime.UTC)
+        org_1 = org_factory()
+        job_seeker_assignment_1 = job_seeker_assignment_factory(org_1)(updated_at=updated_at)
+
+        job_seeker = job_seeker_assignment_1.job_seeker
+
+        last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
+        assert job_seeker.last_assignment == job_seeker_assignment_1
+        assert last_advisor == job_seeker_assignment_1.professional
+        assert last_advisor_org == org_1
+
+        updated_at = datetime.datetime(2026, 4, 21, 12, 12, 11, tzinfo=datetime.UTC)
+        org_2 = org_factory()
+        job_seeker_assignment_2 = job_seeker_assignment_factory(org_2)(updated_at=updated_at, job_seeker=job_seeker)
+
+        del job_seeker.last_assignment  # clear cache to retrieve accurate value
+        last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
+        assert job_seeker.last_assignment == job_seeker_assignment_2
+        assert last_advisor == job_seeker_assignment_2.professional
+        assert last_advisor_org == org_2
 
 
 @pytest.mark.parametrize("initial_asp_uid", ("000000000000000000000000000000", ""))
