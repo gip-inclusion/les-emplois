@@ -1907,11 +1907,11 @@ class TestProcessAcceptViewsInWizard:
         option_fields = "".join(
             [
                 (
-                    f'  <option value="{u.pk}"{" selected" if u.pk == employer.pk else ""}>'
+                    f'<option value="{u.pk}"{" selected" if u.pk == employer.pk else ""}>'
                     f"{u.get_inverted_full_name()}"
                     "</option>"
                 )
-                for u in sorted([employer, colleague], key=lambda u: (u.last_name, u.first_name))
+                for u in sorted([employer, colleague], key=lambda u: (u.last_name, u.first_name, u.pk))
             ]
         )
         assertContains(

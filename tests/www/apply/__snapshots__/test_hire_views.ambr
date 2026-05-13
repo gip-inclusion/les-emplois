@@ -4187,7 +4187,8 @@
                       AND U0."is_active"
                       AND U0."company_id" = %s))
           ORDER BY "users_user"."last_name" ASC,
-                   "users_user"."first_name" ASC
+                   "users_user"."first_name" ASC,
+                   "users_user"."id" ASC
         ''',
       }),
       dict({
@@ -5388,7 +5389,8 @@
                       AND U0."is_active"
                       AND U0."company_id" = %s))
           ORDER BY "users_user"."last_name" ASC,
-                   "users_user"."first_name" ASC
+                   "users_user"."first_name" ASC,
+                   "users_user"."id" ASC
         ''',
       }),
       dict({
@@ -6493,7 +6495,8 @@
                       AND U0."is_active"
                       AND U0."company_id" = %s))
           ORDER BY "users_user"."last_name" ASC,
-                   "users_user"."first_name" ASC
+                   "users_user"."first_name" ASC,
+                   "users_user"."id" ASC
         ''',
       }),
       dict({
