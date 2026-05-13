@@ -128,7 +128,7 @@ class SubmitJobApplicationForm(forms.Form):
         message.help_text = help_text
 
         if user.is_professional:
-            qs = User.objects.order_by("last_name", "first_name")
+            qs = User.objects.order_by("last_name", "first_name", "pk")
             if isinstance(current_organization, PrescriberOrganization):
                 qs = qs.filter(
                     Exists(PrescriberMembership.objects.filter(user=OuterRef("pk"), organization=current_organization))
@@ -485,7 +485,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.fields["location"].label = "Localisation du poste"
 
         qs = User.objects.filter(pk__in=company.memberships.values_list("user", flat=True)).order_by(
-            "last_name", "first_name"
+            "last_name", "first_name", "pk"
         )
         self.fields["advisor"] = get_advisor_choice_field(current_user, job_seeker.get_inverted_full_name(), qs)
 
