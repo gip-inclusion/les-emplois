@@ -94,7 +94,7 @@ def respx_delete_mock(respx_mock):
 @pytest.fixture(autouse=True)
 def mock_make_password():
     with patch(
-        "itou.archive.management.commands.anonymize_professionals.make_password",
+        "itou.archive.anonymize.make_password",
         return_value="pbkdf2_sha256$test$hash",
     ):
         yield
