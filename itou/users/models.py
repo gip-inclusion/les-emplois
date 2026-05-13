@@ -753,6 +753,16 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             return self.last_assignment.professional
         return None
 
+    @property
+    def last_advisor_with_org(self):
+        if self.last_assignment:
+            professional = (
+                None if self.last_assignment.assigned_to_unknown_advisor else self.last_assignment.professional
+            )
+            organization = self.last_assignment.prescriber_organization or self.last_assignment.company
+            return professional, organization
+        return None, None
+
 
 def get_allauth_account_user_display(user):
     return user.email
