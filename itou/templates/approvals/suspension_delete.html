@@ -26,7 +26,9 @@
                             <strong>Étape 2/2</strong> : Confirmation
                         </p>
                     </div>
+
                     <div class="c-form">
+                        <h2 class="h3">Confirmation</h2>
                         <p>
                             <strong>Action choisie</strong> : Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension.
                         </p>
@@ -36,9 +38,7 @@
                             {% endfragment %}
                             {% fragment as content %}
                                 <ul class="mb-0">
-                                    <li>
-                                        <strong>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</strong>
-                                    </li>
+                                    <li>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</li>
                                 </ul>
                             {% endfragment %}
                         {% endcomponent_alert %}

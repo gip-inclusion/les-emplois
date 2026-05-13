@@ -1298,6 +1298,9 @@
 # name: TestApprovalSuspendView.test_delete_suspension[delete_suspension_form]
   '''
   <div class="c-form">
+      <h2 class="h3">
+          Confirmation
+      </h2>
       <p>
           <strong>
               Action choisie
@@ -1322,9 +1325,7 @@
                   </p>
                   <ul class="mb-0">
                       <li>
-                          <strong>
-                              Réduire la durée restante de ce PASS IAE de 1 jour.
-                          </strong>
+                          Réduire la durée restante de ce PASS IAE de 1 jour.
                       </li>
                   </ul>
               </div>
