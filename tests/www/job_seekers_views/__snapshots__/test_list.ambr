@@ -619,7 +619,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 22,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -1007,58 +1007,9 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
-                 "users_jobseekerprofile"."fields_history",
-                 "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."are_allocation_since",
-                 "users_jobseekerprofile"."activity_bonus_since",
-                 "users_jobseekerprofile"."cape_freelance",
-                 "users_jobseekerprofile"."cesa_freelance",
-                 "users_jobseekerprofile"."actor_met_for_business_creation",
-                 "users_jobseekerprofile"."mean_monthly_income_before_process",
-                 "users_jobseekerprofile"."eiti_contributions",
-                 "users_jobseekerprofile"."ase_exit",
-                 "users_jobseekerprofile"."isolated_parent",
-                 "users_jobseekerprofile"."housing_issue",
-                 "users_jobseekerprofile"."refugee",
-                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
-                 "users_jobseekerprofile"."low_level_in_french",
-                 "users_jobseekerprofile"."mobility_issue",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
-                 "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -1067,46 +1018,9 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41,
-                   "users_jobseekerprofile"."user_id"
+                   41
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
-          'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
-                                                   %s,
-                                                   %s)
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -1185,58 +1099,9 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
-                 "users_jobseekerprofile"."fields_history",
-                 "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."are_allocation_since",
-                 "users_jobseekerprofile"."activity_bonus_since",
-                 "users_jobseekerprofile"."cape_freelance",
-                 "users_jobseekerprofile"."cesa_freelance",
-                 "users_jobseekerprofile"."actor_met_for_business_creation",
-                 "users_jobseekerprofile"."mean_monthly_income_before_process",
-                 "users_jobseekerprofile"."eiti_contributions",
-                 "users_jobseekerprofile"."ase_exit",
-                 "users_jobseekerprofile"."isolated_parent",
-                 "users_jobseekerprofile"."housing_issue",
-                 "users_jobseekerprofile"."refugee",
-                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
-                 "users_jobseekerprofile"."low_level_in_french",
-                 "users_jobseekerprofile"."mobility_issue",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
-                 "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -1245,45 +1110,8 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41,
-                   "users_jobseekerprofile"."user_id"
+                   41
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
-          'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
-                                                   %s,
-                                                   %s)
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -1860,7 +1688,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 21,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -2246,58 +2074,9 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
-                 "users_jobseekerprofile"."fields_history",
-                 "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."are_allocation_since",
-                 "users_jobseekerprofile"."activity_bonus_since",
-                 "users_jobseekerprofile"."cape_freelance",
-                 "users_jobseekerprofile"."cesa_freelance",
-                 "users_jobseekerprofile"."actor_met_for_business_creation",
-                 "users_jobseekerprofile"."mean_monthly_income_before_process",
-                 "users_jobseekerprofile"."eiti_contributions",
-                 "users_jobseekerprofile"."ase_exit",
-                 "users_jobseekerprofile"."isolated_parent",
-                 "users_jobseekerprofile"."housing_issue",
-                 "users_jobseekerprofile"."refugee",
-                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
-                 "users_jobseekerprofile"."low_level_in_french",
-                 "users_jobseekerprofile"."mobility_issue",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
-                 "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -2305,45 +2084,9 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41,
-                   "users_jobseekerprofile"."user_id"
+                   41
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
-          'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
-                                                   %s)
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -2421,58 +2164,9 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
-                 "users_jobseekerprofile"."fields_history",
-                 "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."are_allocation_since",
-                 "users_jobseekerprofile"."activity_bonus_since",
-                 "users_jobseekerprofile"."cape_freelance",
-                 "users_jobseekerprofile"."cesa_freelance",
-                 "users_jobseekerprofile"."actor_met_for_business_creation",
-                 "users_jobseekerprofile"."mean_monthly_income_before_process",
-                 "users_jobseekerprofile"."eiti_contributions",
-                 "users_jobseekerprofile"."ase_exit",
-                 "users_jobseekerprofile"."isolated_parent",
-                 "users_jobseekerprofile"."housing_issue",
-                 "users_jobseekerprofile"."refugee",
-                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
-                 "users_jobseekerprofile"."low_level_in_french",
-                 "users_jobseekerprofile"."mobility_issue",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
-                 "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -2480,44 +2174,8 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41,
-                   "users_jobseekerprofile"."user_id"
+                   41
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
-          'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
-                                                   %s)
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
