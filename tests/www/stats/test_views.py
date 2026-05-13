@@ -22,7 +22,7 @@ from itou.www.stats import urls as stats_urls, utils as stats_utils
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import ItouStaffFactory
 
 
@@ -147,6 +147,9 @@ def test_stats_cd_log_visit(client, settings, view_name):
 def test_stats_siae_log_visit(client, settings, view_name):
     company = CompanyFactory(name="El garaje de la esperanza", kind="ACI", with_membership=True)
     user = company.members.get()
+
+    # Add prescriber_organization membership to check we filter companies
+    PrescriberMembershipFactory(user=user)
 
     settings.STATS_SIAE_USER_PK_WHITELIST = [user.pk]
 
