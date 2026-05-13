@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
+from django.db.models.query import Prefetch
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -310,7 +311,19 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_UPDATED_AT_DESC
-    queryset = queryset.order_by(*order.order_by).select_related("jobseeker_profile").prefetch_related("approvals")
+    queryset = (
+        queryset.order_by(*order.order_by)
+        .select_related("jobseeker_profile")
+        .prefetch_related(
+            "approvals",
+            Prefetch(
+                "job_seeker_assignments",
+                queryset=JobSeekerAssignment.objects.select_related(
+                    "professional", "prescriber_organization", "company"
+                ).order_by("-updated_at"),
+            ),
+        )
+    )
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     for job_seeker in page_obj:

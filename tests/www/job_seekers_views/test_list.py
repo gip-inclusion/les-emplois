@@ -17,7 +17,7 @@ from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -25,7 +25,12 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    JobSeekerAssignmentFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import fake_session_initialization
@@ -76,6 +81,16 @@ def assert_update_eligibility(response, can_update):
     assert_function = assertContains if can_update else assertNotContains
     assert_function(response, "Mettre à jour son éligibilité IAE")
     assert_function(response, "Valider son éligibilité IAE")
+
+
+def assert_contains_last_advisor(response, job_seeker_assignment):
+    if job_seeker_assignment.assigned_to_unknown_advisor:
+        last_advisor_name = "Non précisé"
+    else:
+        last_advisor_name = job_seeker_assignment.professional.get_inverted_full_name()
+    last_advisor_org = job_seeker_assignment.prescriber_organization or job_seeker_assignment.company
+    last_advisor_org_name = (last_advisor_org and last_advisor_org.name) or "Non précisé"
+    assertContains(response, f"{last_advisor_name} ({last_advisor_org_name})")
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
@@ -164,6 +179,13 @@ def test_multiple(client, snapshot):
     url = reverse("job_seekers_views:list")
 
     # App with diagnosis but without approval
+    organization = PrescriberOrganizationFactory(for_snapshot=True, authorized=True)
+    prescriber = PrescriberMembershipFactory(
+        user__first_name="Odile", user__last_name="Deray", organization=organization
+    ).user
+    other_prescriber = PrescriberMembershipFactory(
+        user__first_name="Patrick", user__last_name="Bialès", organization=organization
+    ).user
     job_app = JobApplicationFactory(
         job_seeker__first_name="Alain",
         job_seeker__last_name="Zorro",
@@ -172,17 +194,32 @@ def test_multiple(client, snapshot):
         job_seeker__city="Brest",
         job_seeker__jobseeker_profile__is_stalled=True,
         sent_by_authorized_prescriber=True,
-        with_job_seeker_assignment=True,
+        sender=prescriber,
+        sender_prescriber_organization=organization,
         updated_at=timezone.now() - datetime.timedelta(days=1),
         with_iae_eligibility_diagnosis=True,
     )
-    prescriber = job_app.sender
+    job_seeker_assignment = JobSeekerAssignmentFactory(
+        job_seeker=job_app.job_seeker,
+        professional=other_prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
+        updated_at=timezone.now() - datetime.timedelta(days=1),
+    )
+
     # Other app for the same job seeker
     JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
+        sender_prescriber_organization=organization,
         job_seeker=job_app.job_seeker,
-        with_job_seeker_assignment=True,
+        updated_at=timezone.now() - datetime.timedelta(days=2),
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=job_app.job_seeker,
+        professional=prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
         updated_at=timezone.now() - datetime.timedelta(days=2),
     )
     # Other app without diagnosis
@@ -195,7 +232,13 @@ def test_multiple(client, snapshot):
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
         job_seeker__jobseeker_profile__is_stalled=True,
-        with_job_seeker_assignment=True,
+        sender_prescriber_organization=organization,
+    )
+    job_seeker_assignment2 = JobSeekerAssignmentFactory(
+        job_seeker=job_app2.job_seeker,
+        professional=prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
     )
     # Other app with approval
     job_app3 = JobApplicationFactory(
@@ -209,13 +252,32 @@ def test_multiple(client, snapshot):
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
         with_approval=True,
-        with_job_seeker_assignment=True,
+        sender_prescriber_organization=organization,
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=job_app3.job_seeker,
+        professional=prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
+        updated_at=timezone.now() - datetime.timedelta(days=2),
+    )
+
+    company = CompanyFactory(for_snapshot=True)
+    employer = CompanyMembershipFactory(company=company).user
+    job_seeker_assignment3 = JobSeekerAssignmentFactory(
+        job_seeker=job_app3.job_seeker,
+        professional=employer,
+        company=company,
+        last_action_kind=ActionKind.ACCEPT,
+        assigned_to_unknown_advisor=True,
+        updated_at=timezone.now() - datetime.timedelta(days=1),
     )
 
     # Other app without address/city
     job_app4 = JobApplicationFactory(
         sent_by_prescriber_alone=True,
         sender=prescriber,
+        sender_prescriber_organization=organization,
         job_seeker__first_name="David",
         job_seeker__last_name="Waterford",
         job_seeker__public_id="44444444-4444-4444-4444-444444444444",
@@ -245,6 +307,9 @@ def test_multiple(client, snapshot):
         # Address is in search URL
         for i, application in enumerate([job_app, job_app2, job_app3]):
             assert_contains_button_apply_for(response, application.job_seeker, with_city=True)
+
+        for assignment in [job_seeker_assignment, job_seeker_assignment2, job_seeker_assignment3]:
+            assert_contains_last_advisor(response, job_seeker_assignment)
 
         # Job seeker does not have an address, so it is not in the URL
         assert_contains_button_apply_for(response, job_app4.job_seeker, with_city=False)
@@ -278,8 +343,13 @@ def test_pagination(client):
 def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     url_user = reverse("job_seekers_views:list")
     url_organization = reverse("job_seekers_views:list_organization")
-    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
-    [prescriber, other_prescriber] = organization.members.all()
+    organization = PrescriberOrganizationFactory(for_snapshot=True, authorized=True)
+    prescriber = PrescriberMembershipFactory(
+        user__first_name="Emile", user__last_name="Gravier", organization=organization
+    ).user
+    other_prescriber = PrescriberMembershipFactory(
+        user__first_name="Jean-Paul", user__last_name="Martoni", organization=organization
+    ).user
 
     # Job seeker created by this prescriber
     alain = JobSeekerFactory(
@@ -290,7 +360,6 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
-        with_job_seeker_assignment=True,
     )
 
     # Job seeker created by another member of the organization
@@ -302,12 +371,21 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=other_prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
-        with_job_seeker_assignment=True,
+    )
+    bernard_assignment = JobSeekerAssignmentFactory(
+        job_seeker=bernard,
+        professional=other_prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
+        assigned_to_unknown_advisor=True,
     )
 
     # Job seeker created by a member of the organization, but not in the organization anymore
     prescriber_not_in_org_anymore = PrescriberFactory(
-        membership__organization=organization, membership__is_active=False
+        first_name="Simon",
+        last_name="Jérémi",
+        membership__organization=organization,
+        membership__is_active=False,
     )
     charlotte = JobSeekerFactory(
         first_name="Charlotte",
@@ -317,7 +395,24 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         city="Brest",
         created_by=prescriber_not_in_org_anymore,
         jobseeker_profile__created_by_prescriber_organization=organization,
-        with_job_seeker_assignment=True,
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=charlotte,
+        professional=prescriber_not_in_org_anymore,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.CREATE,
+        updated_at=timezone.now() - datetime.timedelta(days=2 * 365),
+    )
+
+    company = CompanyFactory(for_snapshot=True)
+    employer = CompanyMembershipFactory(company=company, user__first_name="Serge", user__last_name="Karamazov").user
+    charlotte_assignment = JobSeekerAssignmentFactory(
+        job_seeker=charlotte,
+        professional=employer,
+        company=company,
+        last_action_kind=ActionKind.ACCEPT,
+        assigned_to_unknown_advisor=True,
+        updated_at=timezone.now() - datetime.timedelta(days=2),
     )
 
     # When applying for a job seeker already in the list, he's not shown twice
@@ -327,7 +422,13 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         sent_by_authorized_prescriber=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
         with_iae_eligibility_diagnosis=True,
-        with_job_seeker_assignment=True,
+    )
+    alain_assignment = JobSeekerAssignmentFactory(
+        job_seeker=alain,
+        professional=prescriber,
+        prescriber_organization=organization,
+        last_action_kind=ActionKind.APPLY,
+        updated_at=timezone.now() - datetime.timedelta(days=1),
     )
 
     # Job seeker created by the prescriber but for another organization; will not be shown
@@ -365,6 +466,9 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         for job_seeker in [alain, bernard, charlotte]:
             assert_contains_job_seeker(response, job_seeker, back_url=url_organization, with_personal_information=True)
             assert_contains_button_apply_for(response, job_seeker, with_city=True)
+
+        for assignment in [alain_assignment, bernard_assignment, charlotte_assignment]:
+            assert_contains_last_advisor(response, assignment)
 
         # Job seeker not displayed for the prescriber
         for job_seeker in [david, edouard]:
