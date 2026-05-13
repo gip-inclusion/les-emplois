@@ -1323,7 +1323,7 @@ class TestJobApplicationNotifications:
         if with_unknown_advisor:
             assert "Non référencé" in email.body
         else:
-            assert job_application.job_seeker.last_advisor.get_full_name() in email.body
+            assert job_application.job_seeker.last_advisor_with_org[0].get_full_name() in email.body
         if is_authorized_prescriber:
             assert job_application.sender_prescriber_organization.accept_survey_url in email.body
 

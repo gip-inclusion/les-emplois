@@ -748,12 +748,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         return None
 
     @property
-    def last_advisor(self):
-        if self.last_assignment and not self.last_assignment.assigned_to_unknown_advisor:
-            return self.last_assignment.professional
-        return None
-
-    @property
     def last_advisor_with_org(self):
         if self.last_assignment:
             professional = (
