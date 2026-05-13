@@ -1004,9 +1004,19 @@ class TestLatestApproval:
         )
 
 
-class TestLastAdvisor:
+class TestLastAssignment:
+    def test_no_last_assignment(self):
+        job_seeker = JobSeekerFactory()
+        assert job_seeker.last_assignment is None
+
+    def test_last_assignment(self):
+        job_seeker = JobSeekerFactory()
+        job_seeker_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
+        assert job_seeker.last_assignment == job_seeker_assignment
+
     def test_no_last_advisor(self):
         job_seeker = JobSeekerFactory()
+        assert job_seeker.last_assignment is None
         assert job_seeker.last_advisor is None
 
     def test_unknown_advisor(self):
@@ -1014,19 +1024,25 @@ class TestLastAdvisor:
             assigned_to_unknown_advisor=True, prescriber_organization=PrescriberOrganizationFactory()
         )
         job_seeker = job_seeker_assignment.job_seeker
+        assert job_seeker.last_assignment == job_seeker_assignment
         assert job_seeker.last_advisor is None
 
     def test_last_advisor(self):
         updated_at = datetime.datetime(2026, 1, 1, 1, 1, 11, tzinfo=datetime.UTC)
         job_seeker_assignment = JobSeekerAssignmentFactory(
-            prescriber_organization=PrescriberOrganizationFactory(),
-            updated_at=updated_at,
-            assigned_to_unknown_advisor=True,
+            prescriber_organization=PrescriberOrganizationFactory(), updated_at=updated_at
         )
+
         job_seeker = job_seeker_assignment.job_seeker
+
+        assert job_seeker.last_assignment == job_seeker_assignment
+        assert job_seeker.last_advisor == job_seeker_assignment.professional
+
         updated_at = datetime.datetime(2026, 4, 21, 12, 12, 11, tzinfo=datetime.UTC)
         job_seeker_assignment_2 = JobSeekerAssignmentFactory(updated_at=updated_at, job_seeker=job_seeker)
 
+        del job_seeker.last_assignment  # clear cache to retrieve accurate value
+        assert job_seeker.last_assignment == job_seeker_assignment_2
         assert job_seeker.last_advisor == job_seeker_assignment_2.professional
 
 
