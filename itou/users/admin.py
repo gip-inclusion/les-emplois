@@ -52,6 +52,7 @@ from itou.utils.admin import (
     PkSupportRemarkInline,
     ReadonlyMixin,
     add_support_remark_to_obj,
+    bulk_add_support_remark_to_objs,
     get_admin_view_link,
     get_organization_view_link,
 )
@@ -834,8 +835,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         + [f"- {item_title} {item} transféré " for item_title, item in transferred_items]
                         + ["-" * 20]
                     )
-                    add_support_remark_to_obj(from_user, summary_text)
-                    add_support_remark_to_obj(to_user, summary_text)
+                    bulk_add_support_remark_to_objs([from_user, to_user], summary_text)
                     message = format_html(
                         "Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}.",
                         from_user=from_user,

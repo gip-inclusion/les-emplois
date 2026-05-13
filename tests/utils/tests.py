@@ -42,7 +42,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
-from itou.utils.admin import add_support_remark_to_obj
+from itou.utils.admin import add_support_remark_to_obj, bulk_add_support_remark_to_objs
 from itou.utils.emails import redact_email_address
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -1868,3 +1868,59 @@ def test_add_support_remark_to_obj(remark_model, obj_factory):
     assert updated_remark.remark == "A remark\nOther remark"
     assert remark.pk == updated_remark.pk
     assert updated_remark.updated_at != remark.updated_at
+
+
+@pytest.mark.parametrize(
+    "remark_model,obj_factory",
+    [
+        (PkSupportRemark, PrescriberFactory),
+        (UUIDSupportRemark, functools.partial(JobApplicationFactory, sent_by_prescriber_alone=True)),
+    ],
+)
+def test_bulk_add_support_remark_to_objs(remark_model, obj_factory):
+    def get_remarks_for(objs):
+        if not objs:
+            return {}
+        return (
+            remark_model.objects.filter(content_type=ContentType.objects.get_for_model(objs[0].__class__))
+            .distinct("object_id")
+            .in_bulk([o.pk for o in objs], field_name="object_id")
+        )
+
+    # Empty input is a no-op and issues no queries.
+    with assertNumQueries(0):
+        assert bulk_add_support_remark_to_objs([], "A remark") == 0
+    assert not remark_model.objects.exists()
+
+    # All-new objects: bulk_create path
+    # Queries: SAVEPOINT + SELECT FOR UPDATE + bulk_create INSERT + RELEASE SAVEPOINT
+    new_objs = [obj_factory(), obj_factory()]
+    with assertNumQueries(4):
+        assert bulk_add_support_remark_to_objs(new_objs, "First") == 2
+    remarks = get_remarks_for(new_objs)
+    assert len(remarks) == 2
+    for obj in new_objs:
+        assert remarks[obj.pk].remark == "First"
+
+    # All-existing objects: bulk_update path appends and bumps updated_at
+    # Queries: SAVEPOINT + SELECT FOR UPDATE + bulk_update UPDATE + RELEASE SAVEPOINT
+    prior_updates = {pk: r.updated_at for pk, r in remarks.items()}
+    with assertNumQueries(4):
+        assert bulk_add_support_remark_to_objs(new_objs, "Second") == 2
+    refreshed = get_remarks_for(new_objs)
+    for obj in new_objs:
+        assert refreshed[obj.pk].remark == "First\nSecond"
+        assert refreshed[obj.pk].pk == remarks[obj.pk].pk
+        assert refreshed[obj.pk].updated_at != prior_updates[obj.pk]
+
+    # Mixed new/existing objects: one bulk_create + one bulk_update in a single call
+    # Queries: SAVEPOINT + SELECT FOR UPDATE + INSERT + UPDATE + RELEASE SAVEPOINT
+    fresh_obj = obj_factory()
+    mixed_objs = [new_objs[0], fresh_obj]  # existing, new
+    with assertNumQueries(5):
+        assert bulk_add_support_remark_to_objs(mixed_objs, "Third") == 2
+    mixed_remarks = get_remarks_for(mixed_objs)
+    assert mixed_remarks[new_objs[0].pk].remark == "First\nSecond\nThird"
+    assert mixed_remarks[fresh_obj.pk].remark == "Third"
+    # The untouched object's remark is unchanged
+    assert get_remarks_for([new_objs[1]])[new_objs[1].pk].remark == "First\nSecond"

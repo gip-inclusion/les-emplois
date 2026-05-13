@@ -10,8 +10,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.forms import fields as gis_fields
 from django.contrib.messages import WARNING
 from django.core.exceptions import FieldDoesNotExist, ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 
@@ -256,19 +257,54 @@ class ItouModelAdmin(ItouModelMixin, ModelAdmin):
     pass
 
 
-def add_support_remark_to_obj(obj, text):
-    if isinstance(obj._meta.pk, models.UUIDField):
+def bulk_add_support_remark_to_objs(objs, text):
+    """Add the same remark to multiple objects in a batch.
+
+    `objs` should be an iterable of instances of the same model. Mixing model types
+    would cause remarks to be written under the wrong content type.
+    """
+    objs_list = list(objs)
+    if not objs_list:
+        return 0
+
+    first_obj_class = objs_list[0].__class__
+    if any(not isinstance(obj, first_obj_class) for obj in objs_list):
+        raise ValueError("All objects must be instances of the same model")
+
+    if isinstance(objs_list[0]._meta.pk, models.UUIDField):
         remark_model = UUIDSupportRemark
     else:
         remark_model = PkSupportRemark
-    obj_content_type = ContentType.objects.get_for_model(obj)
-    try:
-        remark = remark_model.objects.filter(content_type=obj_content_type, object_id=obj.pk).get()
-    except remark_model.DoesNotExist:
-        remark_model.objects.create(content_type=obj_content_type, object_id=obj.pk, remark=text)
-    else:
-        remark.remark += "\n" + text
-        remark.save(update_fields=("remark", "updated_at"))
+    obj_content_type = ContentType.objects.get_for_model(objs_list[0])
+    obj_pks = [obj.pk for obj in objs_list]
+    now = timezone.now()
+
+    with transaction.atomic():
+        # silently keeps only one remark when there are multiple existing remarks for the same object
+        existing_remarks = {
+            remark.object_id: remark
+            for remark in remark_model.objects.select_for_update().filter(
+                content_type=obj_content_type, object_id__in=obj_pks
+            )
+        }
+
+        to_create, to_update = [], []
+        for pk in obj_pks:
+            if remark := existing_remarks.get(pk):
+                remark.remark += "\n" + text
+                remark.updated_at = now
+                to_update.append(remark)
+            else:
+                to_create.append(remark_model(content_type=obj_content_type, object_id=pk, remark=text))
+
+        created = remark_model.objects.bulk_create(to_create) if to_create else []
+        nb_updated = remark_model.objects.bulk_update(to_update, fields=["remark", "updated_at"]) if to_update else 0
+    return nb_updated + len(created)
+
+
+def add_support_remark_to_obj(obj, text):
+    """Add a remark to an object, or update the existing one if it already has a remark."""
+    bulk_add_support_remark_to_objs([obj], text)
 
 
 class ReadonlyMixin:
