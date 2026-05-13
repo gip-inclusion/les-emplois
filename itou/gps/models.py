@@ -110,7 +110,9 @@ class FollowUpGroup(models.Model):
     # until follow up groups are replaced in favor of job seeker assignments
     @property
     def referent(self):
-        if last_advisor := self.beneficiary.last_advisor:
+        last_advisor, _ = self.beneficiary.last_advisor_with_org
+        if last_advisor:
+            last_advisor, _ = self.beneficiary.last_advisor_with_org
             return self.memberships.filter(member=last_advisor.id).first()
         return None
 
