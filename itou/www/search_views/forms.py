@@ -62,9 +62,22 @@ class SiaeSearchForm(forms.Form):
             # Useful to render the default distance values as checked in radio widgets.
             data = MultiValueDict({**{k: [v] for k, v in initial.items()}, **data})
         super().__init__(data, **kwargs)
+
         # dynamic resolution of KIND_CHOICES which isn't the same in this class
         # and in its child class JobDescriptionSearchForm
         self.fields["kinds"].choices = self.KIND_CHOICES
+
+        # user-friendly message when trying to submit EA/EATT kinds which are
+        # available only in JobDescriptionSearchForm
+        excluded_kinds = {CompanyKind.EA, CompanyKind.EATT}
+        submitted_kinds = set(data.getlist("kinds")) if data else set()
+        if submitted_kinds & excluded_kinds:
+            available_kinds = {k for k, _ in self.KIND_CHOICES}
+            if excluded_kinds.isdisjoint(available_kinds):
+                self.fields["kinds"].error_messages["invalid_choice"] = (
+                    "Les filtres EA et EATT sont disponibles uniquement "
+                    'dans l\'onglet "Poste(s) ouvert(s) au recrutement".'
+                )
 
     def clean_distance(self):
         distance = self.cleaned_data["distance"]
