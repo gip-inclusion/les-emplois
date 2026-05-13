@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
 
@@ -30,14 +31,13 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form">
+                        <h2 class="h3">Adresse e-mail</h2>
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
 
                             {% bootstrap_form form alert_error_type="all" %}
 
-                            <div class="text-end">
-                                <button class="btn btn-primary">Enregistrer</button>
-                            </div>
+                            {% itou_buttons_form primary_label="Enregistrer" %}
                         </form>
                     </div>
                 </div>

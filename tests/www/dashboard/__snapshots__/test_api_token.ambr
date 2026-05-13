@@ -31,116 +31,140 @@
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
-                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                      <div class="mt-3">
-                          <div class="card c-card">
-                              <div class="card-body">
-                                  <div class="col-12">
-                                      <p>
-                                          Une API (application programming interface ou « interface de programmation d'application ») est une interface logicielle qui permet de « connecter » le site des emplois de l'inclusion à un autre logiciel ou service afin d'échanger des données et des fonctionnalités.
-                                      </p>
-                                      <p>
-                                          En tant qu’administrateur de structures, vous avez accès aux API suivantes :
-                                      </p>
-                                      <ul>
-                                          <li>
-                                              Fiches salarié (
-                                              <a class="has-external-link" href="/api/v1/redoc/#tag/employee-records" rel="noopener" target="_blank">
-                                                  voir la documentation
-                                              </a>
-                                              ) : cette API est disponible par défaut pour toutes vos structures.
-                                              <div class="alert alert-warning" role="status">
-                                                  <p class="mb-0">
-                                                      Important : Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.
-                                                  </p>
-                                              </div>
-                                          </li>
-                                          <li>
-                                              Candidats  (
-                                              <a class="has-external-link" href="/api/v1/redoc/#tag/candidats" rel="noopener" target="_blank">
-                                                  voir la documentation
-                                              </a>
-                                              ) : cette API est disponible par défaut sur une seule structure mais vous pouvez utiliser
-                                              des paramètres pour accéder aux candidats de toutes vos structures.
-                                              <div class="alert alert-warning" role="status">
-                                                  <p class="mb-0">
-                                                      Important : Vous devez être administrateur de toutes les structures ci-dessous pour utiliser cette API.
-                                                  </p>
-                                              </div>
-                                          </li>
-                                      </ul>
-                                      <p>
-                                          Listes de vos structures :
-                                      </p>
-                                      <div class="table-responsive mt-3 mt-md-4">
-                                          <table class="table table-hover">
-                                              <caption class="visually-hidden">
-                                                  Liste de vos structures
-                                              </caption>
-                                              <thead>
-                                                  <tr>
-                                                      <th scope="col">
-                                                          Nom
-                                                      </th>
-                                                      <th scope="col">
-                                                          Identifiant unique
-                                                      </th>
-                                                      <th scope="col">
-                                                          Administrateur
-                                                      </th>
-                                                  </tr>
-                                              </thead>
-                                              <tbody>
-                                                  <tr>
-                                                      <th scope="row">
-                                                          Job insertion 90
-                                                      </th>
-                                                      <td>
-                                                          42975396-5d50-4dea-aa38-ca498c679672
-                                                      </td>
-                                                      <td>
-                                                          oui
-                                                      </td>
-                                                  </tr>
-                                                  <tr>
-                                                      <th scope="row">
-                                                          Emploi CAPITAL Mais pas que
-                                                      </th>
-                                                      <td>
-                                                          42975396-5d50-4dea-aa38-ca498c679673
-                                                      </td>
-                                                      <td>
-                                                          non
-                                                      </td>
-                                                  </tr>
-                                              </tbody>
-                                          </table>
-                                      </div>
-                                      <p>
-                                          Pour vous connecter à l’API vous devez utiliser l’identifiant "__token__" et comme mot de passe le token suivant.
-                                      </p>
-                                  </div>
-                                  <div class="col-12">
-                                      <div class="form-row align-items-center">
-                                          <div class="form-group mb-0 col-8">
-                                              Votre token d'API est :
-                                              <span>
-                                                  [Token of user]
-                                              </span>
-                                          </div>
-                                          <div class="form-group mb-0 col-4 text-end">
-                                              <button class="btn btn-ico btn-primary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="[Token of user]" type="button">
-                                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                  <div class="s-section__row row">
+                      <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                          <div class="c-box mb-3 mb-md-4">
+                              <h2 class="h3">
+                                  APIs
+                              </h2>
+                              <p>
+                                  Une API (application programming interface ou « interface de programmation d'application ») est une interface logicielle qui permet de « connecter » le site des emplois de l'inclusion à un autre logiciel ou service afin d'échanger des données et des fonctionnalités.
+                              </p>
+                              <p>
+                                  En tant qu’administrateur de structures, vous avez accès aux API suivantes :
+                              </p>
+                              <ul class="list-unstyled">
+                                  <li>
+                                      Fiches salarié (
+                                      <a class="has-external-link" href="/api/v1/redoc/#tag/employee-records" rel="noopener" target="_blank">
+                                          voir la documentation
+                                      </a>
+                                      ) : cette API est disponible par défaut pour toutes vos structures.
+                                      <div class="alert alert-warning" role="status">
+                                          <div class="row">
+                                              <div class="col-auto pe-0">
+                                                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
                                                   </i>
-                                                  <span>
-                                                      Copier le token
-                                                  </span>
-                                              </button>
+                                              </div>
+                                              <div class="col">
+                                                  <p class="mb-0">
+                                                      Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.
+                                                  </p>
+                                              </div>
                                           </div>
                                       </div>
-                                  </div>
-                              </div>
+                                  </li>
+                                  <li>
+                                      Candidats  (
+                                      <a class="has-external-link" href="/api/v1/redoc/#tag/candidats" rel="noopener" target="_blank">
+                                          voir la documentation
+                                      </a>
+                                      ) : cette API est disponible par défaut sur une seule structure mais vous pouvez utiliser
+                                      des paramètres pour accéder aux candidats de toutes vos structures.
+                                      <div class="alert alert-warning" role="status">
+                                          <div class="row">
+                                              <div class="col-auto pe-0">
+                                                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                                                  </i>
+                                              </div>
+                                              <div class="col">
+                                                  <p class="mb-0">
+                                                      Vous devez être administrateur de toutes les structures ci-dessous pour utiliser cette API.
+                                                  </p>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
+                      </div>
+                      <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                          <div class="c-box mb-3 mb-md-4">
+                              <h3>
+                                  Connexion a l'API
+                              </h3>
+                              <p>
+                                  Pour vous connecter à l’API vous devez utiliser l’identifiant "
+                                  <strong>
+                                      __token__
+                                  </strong>
+                                  " et comme mot de passe le token suivant.
+                              </p>
+                              <span class="d-block text-center mb-2">
+                                  Votre token d'API est :
+                                  <strong>
+                                      [Token of user]
+                                  </strong>
+                              </span>
+                              <button class="btn btn-ico btn-primary btn-block" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="[Token of user]" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span>
+                                      Copier le token
+                                  </span>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12">
+                      <div class="table-responsive mt-3 mt-md-4">
+                          <p>
+                              <strong>
+                                  Listes de vos structures :
+                              </strong>
+                          </p>
+                          <table class="table table-hover">
+                              <caption class="visually-hidden">
+                                  Liste de vos structures
+                              </caption>
+                              <thead>
+                                  <tr>
+                                      <th scope="col">
+                                          Nom
+                                      </th>
+                                      <th scope="col">
+                                          Identifiant unique
+                                      </th>
+                                      <th scope="col">
+                                          Administrateur
+                                      </th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                      <th scope="row">
+                                          Job insertion 90
+                                      </th>
+                                      <td>
+                                          42975396-5d50-4dea-aa38-ca498c679672
+                                      </td>
+                                      <td>
+                                          oui
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <th scope="row">
+                                          Emploi CAPITAL Mais pas que
+                                      </th>
+                                      <td>
+                                          42975396-5d50-4dea-aa38-ca498c679673
+                                      </td>
+                                      <td>
+                                          non
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
                       </div>
                   </div>
               </div>
