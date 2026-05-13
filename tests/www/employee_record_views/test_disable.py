@@ -35,6 +35,18 @@ class TestDisableEmployeeRecords:
         response = client.get(self.url)
         assert response.status_code == 200
 
+    def test_other_company_employee_record_returns_404(self, client):
+        other_employee_record = EmployeeRecordWithProfileFactory()
+        other_url = reverse("employee_record_views:disable", args=(other_employee_record.id,))
+        client.force_login(self.user)
+        response = client.get(other_url)
+        assert response.status_code == 404
+
+        response = client.post(other_url, data={"confirm": "true"})
+        assert response.status_code == 404
+        other_employee_record.refresh_from_db()
+        assert other_employee_record.status == Status.NEW
+
     def test_disable_employee_record_new(self, client):
         assert self.employee_record.status == Status.NEW
 

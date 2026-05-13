@@ -24,7 +24,7 @@ from itou.users.models import User
 from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
+from itou.utils.perms.employee_record import can_create_employee_record
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.urls import get_safe_url
 from itou.utils.views import with_triggers_context
@@ -601,11 +601,8 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(EmployeeRecord.objects.full_fetch(), pk=employee_record_id)
+    employee_record = get_object_or_404(EmployeeRecord.objects.for_company(siae).full_fetch(), pk=employee_record_id)
     job_application = employee_record.job_application
-
-    if not siae_is_allowed(job_application, siae):
-        raise PermissionDenied
 
     creations = [
         ("Mouvement de création", asp_batch_file, EmployeeRecordBatch.datetime_from_asp_batch_file(asp_batch_file))
@@ -646,11 +643,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(EmployeeRecord.objects.full_fetch(), pk=employee_record_id)
-    job_application = employee_record.job_application
-
-    if not siae_is_allowed(job_application, siae):
-        raise PermissionDenied
+    employee_record = get_object_or_404(EmployeeRecord.objects.for_company(siae).full_fetch(), pk=employee_record_id)
 
     back_url = reverse("employee_record_views:list", query={"status": employee_record.status})
 
@@ -677,12 +670,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    query_base = EmployeeRecord.objects.full_fetch()
-    employee_record = get_object_or_404(query_base, pk=employee_record_id)
-    job_application = employee_record.job_application
-
-    if not siae_is_allowed(job_application, siae):
-        raise PermissionDenied
+    employee_record = get_object_or_404(EmployeeRecord.objects.for_company(siae).full_fetch(), pk=employee_record_id)
 
     back_url = reverse("employee_record_views:list", query={"status": employee_record.status})
 

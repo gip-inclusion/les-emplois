@@ -32,6 +32,18 @@ class TestReactivateEmployeeRecords:
         )
         self.url = reverse("employee_record_views:reactivate", args=(self.employee_record.id,))
 
+    def test_other_company_employee_record_returns_404(self, client):
+        other_employee_record = EmployeeRecordWithProfileFactory(status=Status.DISABLED)
+        other_url = reverse("employee_record_views:reactivate", args=(other_employee_record.id,))
+        client.force_login(self.user)
+        response = client.get(other_url)
+        assert response.status_code == 404
+
+        response = client.post(other_url, data={"confirm": "true"})
+        assert response.status_code == 404
+        other_employee_record.refresh_from_db()
+        assert other_employee_record.status == Status.DISABLED
+
     def test_reactivate_employee_record(self, client, faker):
         client.force_login(self.user)
 
