@@ -12,7 +12,8 @@ from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
-from tests.approvals.factories import SuspensionFactory
+from tests.approvals.factories import ApprovalFactory, SuspensionFactory
+from tests.companies.factories import CompanyMembershipFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
@@ -504,3 +505,28 @@ class TestApprovalSuspendUpdateEndDateView:
             form.errors["first_day_back_to_work"][0]
             == "Vous ne pouvez pas saisir une date de réintégration postérieure à la fin de la suspension."
         )
+
+
+def test_suspend_other_company_returns_404(client):
+    approval = ApprovalFactory()
+    other_user = CompanyMembershipFactory(company__subject_to_iae_rules=True).user
+    client.force_login(other_user)
+    response = client.get(reverse("approvals:suspend", kwargs={"approval_id": approval.pk}))
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "url_name",
+    [
+        "approvals:suspension_action_choice",
+        "approvals:suspension_update",
+        "approvals:suspension_update_enddate",
+        "approvals:suspension_delete",
+    ],
+)
+def test_suspension_actions_on_other_company_returns_404(client, url_name):
+    suspension = SuspensionFactory()
+    other_user = CompanyMembershipFactory(company__subject_to_iae_rules=True).user
+    client.force_login(other_user)
+    response = client.get(reverse(url_name, kwargs={"suspension_id": suspension.pk}))
+    assert response.status_code == 404

@@ -694,7 +694,18 @@ class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionW
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
     siae = get_current_company_or_404(request)
-    approval = get_object_or_404(Approval, pk=approval_id)
+    approval = get_object_or_404(
+        Approval.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("pk"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        ),
+        pk=approval_id,
+    )
 
     if not approval.can_be_suspended_by_siae(siae):
         raise PermissionDenied()
@@ -738,7 +749,17 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
 def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
-        Suspension.objects.select_related("approval__user").prefetch_related("approval__suspension_set"),
+        Suspension.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("approval_id"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        )
+        .select_related("approval__user")
+        .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
 
@@ -787,7 +808,17 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
-        Suspension.objects.select_related("approval__user").prefetch_related("approval__suspension_set"),
+        Suspension.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("approval_id"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        )
+        .select_related("approval__user")
+        .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
 
@@ -830,7 +861,17 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
-        Suspension.objects.select_related("approval__user").prefetch_related("approval__suspension_set"),
+        Suspension.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("approval_id"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        )
+        .select_related("approval__user")
+        .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
 
@@ -886,7 +927,17 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
-        Suspension.objects.select_related("approval__user").prefetch_related("approval__suspension_set"),
+        Suspension.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("approval_id"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        )
+        .select_related("approval__user")
+        .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
 

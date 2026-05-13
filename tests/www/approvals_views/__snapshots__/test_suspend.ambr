@@ -452,7 +452,14 @@
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
-          WHERE "approvals_suspension"."id" = %s
+          WHERE (EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
+                 AND "approvals_suspension"."id" = %s)
           LIMIT 21
         ''',
       }),
@@ -1093,7 +1100,14 @@
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
-          WHERE "approvals_suspension"."id" = %s
+          WHERE (EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
+                 AND "approvals_suspension"."id" = %s)
           LIMIT 21
         ''',
       }),
@@ -1839,7 +1853,14 @@
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
-          WHERE "approvals_suspension"."id" = %s
+          WHERE (EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
+                 AND "approvals_suspension"."id" = %s)
           LIMIT 21
         ''',
       }),
@@ -2482,7 +2503,14 @@
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
-          WHERE "approvals_suspension"."id" = %s
+          WHERE (EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
+                 AND "approvals_suspension"."id" = %s)
           LIMIT 21
         ''',
       }),
