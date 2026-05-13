@@ -133,6 +133,31 @@ class TestSearchCompany:
         response = client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.EI]})
         assertContains(response, "Aucun résultat")
 
+    def test_kinds_ea_eatt_custom_error_on_employer_tab(self, client):
+        city = create_city_saint_andre()
+        custom_message = (
+            'Les filtres EA et EATT sont disponibles uniquement dans l\'onglet "Poste(s) ouvert(s) au recrutement".'
+        )
+        default_message = "Sélectionnez un choix valide"
+
+        for kind in [CompanyKind.EA, CompanyKind.EATT]:
+            response = client.get(self.URL, {"city": city.slug, "kinds": [kind.value]})
+            assertContains(response, escape(custom_message))
+            assertNotContains(response, default_message)
+
+        # An invalid kind that is not EA/EATT keeps Django's default message
+        response = client.get(self.URL, {"city": city.slug, "kinds": ["BOGUS"]})
+        assertContains(response, default_message)
+        assertNotContains(response, escape(custom_message))
+
+        # The job-descriptions tab still accepts EA and shows no error
+        response = client.get(
+            reverse("search:job_descriptions_results"),
+            {"city": city.slug, "kinds": [CompanyKind.EA.value]},
+        )
+        assertNotContains(response, escape(custom_message))
+        assertNotContains(response, default_message)
+
     def test_distance(self, client):
         # 3 companies in two departments to test distance and department filtering
         vannes = create_city_vannes()
