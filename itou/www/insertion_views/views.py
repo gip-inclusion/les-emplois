@@ -53,7 +53,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     )
     slug_field = "uid"
     slug_url_kwarg = "service_uid"
-    template_name = "insertion/service_detail.html"
+    template_name = "insertion/service_card.html"
     context_object_name = "service"
 
     def get_context_data(self, **kwargs):
