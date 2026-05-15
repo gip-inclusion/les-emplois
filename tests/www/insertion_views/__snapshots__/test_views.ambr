@@ -104,7 +104,7 @@
                               <p>
                                   Ma structure de test
                               </p>
-                              <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="#" type="button">
+                              <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-uid/card" type="button">
                                   Voir la fiche structure
                               </a>
                           </div>
@@ -484,7 +484,7 @@
                           <p>
                               Structure complète
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="#" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-full-uid/card" type="button">
                               Voir la fiche structure
                           </a>
                       </div>

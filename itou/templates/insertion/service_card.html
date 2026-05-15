@@ -26,7 +26,6 @@
         <div class="form-row align-items-center gx-3">
             {% if service.is_orientable_with_form or service.mobilization_link %}
                 <div class="form-group col-12 col-lg-auto">
-                    {#                    todo: put the correct link to Dora with the token #}
                     {% if user.is_authenticated %}
                         <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                            rel="noopener"
@@ -273,8 +272,7 @@
                 <div class="c-box mb-3 mb-md-4">
                     <h2 class="h4">Informations de la structure</h2>
                     <p>{{ service.structure.name }}</p>
-                    {# TODO: replace with {% url 'structures:detail' service.structure.uid %} once the structures app exists #}
-                    <a href="#" type="button" class="btn btn-secondary w-100" {% matomo_event "fiche-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
+                    <a href="{% url 'insertion_views:structure_card' structure_uid=service.structure.uid %}" type="button" class="btn btn-secondary w-100" {% matomo_event "fiche-service" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
                 </div>
             </div>
 
