@@ -6,7 +6,7 @@
           <div class="row">
               <div class="col-12 col-md-9">
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           Rechercher parmi tous les salariés
                       </h2>
                       <form method="post">
@@ -66,7 +66,7 @@
           <div class="row">
               <div class="col-12 col-md-9">
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           FAVRISEAU Fabienne
                       </h2>
                       <p>
@@ -97,7 +97,7 @@
           <div class="row">
               <div class="col-12 col-md-9">
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           EMERY Eliott
                       </h2>
                       <p>
@@ -136,7 +136,7 @@
           <div class="row">
               <div class="col-12 col-md-9">
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           DANONE Damien
                       </h2>
                       <p>
@@ -176,7 +176,7 @@
           <div class="row">
               <div class="col-12 col-md-9">
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           BEAUREGARD Béatrice
                       </h2>
                       <p>
@@ -200,7 +200,7 @@
           <div class="row">
               <div class="col-12 col-md-9">
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           ALONSO André
                       </h2>
                       <p>
