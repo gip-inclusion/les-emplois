@@ -1,3 +1,4 @@
+from allauth.account import views as account_views
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
@@ -7,6 +8,7 @@ from django.views.generic import RedirectView, TemplateView
 from itou.utils import redirect_legacy_views
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.urls import SiretConverter
+from itou.utils.views import with_triggers_context
 from itou.www.dashboard import views as dashboard_views
 from itou.www.error import server_error
 from itou.www.legal_views.views import legal_terms, legal_terms_version
@@ -48,6 +50,13 @@ urlpatterns = [
     re_path(
         r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
         signup_views.ItouPasswordResetFromKeyView.as_view(),
+    ),
+    # --------------------------------------------------------------------------------------
+    # Override allauth email confirmation to include triggers
+    re_path(
+        r"^accounts/confirm-email/(?P<key>[-:\w]+)/$",
+        with_triggers_context(account_views.confirm_email, methods=["GET", "HEAD"]),
+        name="account_confirm_email",
     ),
     # --------------------------------------------------------------------------------------
     # Other allauth URLs.
