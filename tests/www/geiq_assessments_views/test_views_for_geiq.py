@@ -18,7 +18,7 @@ from pytest_django.asserts import (
 )
 
 from itou.companies.enums import CompanyKind
-from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
+from itou.geiq_assessments.enums import AllowanceRefusalReason, AssessmentState, AssessmentTransition
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, AssessmentTransitionLog, LabelInfos
 from itou.institutions.enums import InstitutionKind
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -625,6 +625,16 @@ class TestAssessmentDetailsForGEIQView:
             planned_end_at=datetime.date(2024, 6, 30),
             allowance_requested=False,
         )
+        requested_contract_refused = EmployeeContractFactory(
+            employee__assessment=assessment,
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+            allowance_refusal_reason=AllowanceRefusalReason.OTHER,
+            allowance_refusal_details="Ce contrat n’aura pas d’aide.",
+        )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
             institution=ddets_membership.institution,
@@ -642,9 +652,11 @@ class TestAssessmentDetailsForGEIQView:
         assert transition.user == membership.user
         assert transition.timestamp == transition.assessment.submitted_at
         requested_contract.refresh_from_db()
-        # Requested allowance are automatically granted by default
+        # Requested allowance are automatically granted by default…
         assert requested_contract.allowance_granted is True
         assert not_requested_contract.allowance_granted is False
+        # …except for the ones that have a refusal reason
+        assert requested_contract_refused.allowance_granted is False
 
         assert len(mailoutbox) == 1
         email = mailoutbox[0]

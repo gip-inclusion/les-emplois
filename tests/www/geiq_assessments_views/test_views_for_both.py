@@ -11,6 +11,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments.enums import AllowanceRefusalReason
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
@@ -560,14 +561,31 @@ class TestAssessmentContractsListAndToggle:
             allowance_requested=True,
             allowance_granted=True,
         )
+        contract_2 = EmployeeContractFactory(
+            id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+            allowance_granted=False,
+            allowance_refusal_reason=AllowanceRefusalReason.ALLOWANCE_ALREADY_GRANTED,
+            allowance_refusal_details="Ce contrat n’aura pas d’aide.",
+        )
         assessment.ask_for_geiq_fix(
             user=ddets_membership.user, institution=ddets_membership.institution, comment="À revoir"
         )
 
         # Sending the assessment back to the GEIQ for correction unsets allowance_granted
         contract_1.refresh_from_db()
+        contract_2.refresh_from_db()
         assert contract_1.allowance_requested is True
         assert contract_1.allowance_granted is False
+        assert contract_2.allowance_requested is True
+        assert contract_2.allowance_granted is False
 
         client.force_login(geiq_membership.user)
 
@@ -586,6 +604,9 @@ class TestAssessmentContractsListAndToggle:
         assert contract_1.allowance_requested is False
         assert contract_1.allowance_granted is False
 
+        # The GEIQ submits a corrected assessment, the DDETS/DREETS preselection is updated
+        client.post(reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}))
+
         # The work done by the institution was not lost
         assessment.refresh_from_db()
         assert assessment.review_comment == "Bon bilan."
@@ -593,8 +614,13 @@ class TestAssessmentContractsListAndToggle:
         assert assessment.granted_amount == 9_000
         assert assessment.advance_amount == 0
 
-        # FIXME(ewen): when refusal and refusal_reason are ready, update this test as we'll use these fields
-        # to automatically unselect the contracts in the institution's view.
+        # The contracts with allowance_refusal_reason are automatically unselected
+        contract_1.refresh_from_db()
+        contract_2.refresh_from_db()
+        assert contract_1.allowance_requested is False  # Was unselected by GEIQ
+        assert contract_1.allowance_granted is False
+        assert contract_2.allowance_requested is True
+        assert contract_2.allowance_granted is False  # Had non empty allowance_refusal_reason
 
 
 class TestAssessmentContractsDetails:
