@@ -2592,20 +2592,20 @@
       <div class="s-section__container container">
           <div class="s-section__row row">
               <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                  <h2 class="h4">
-                      1. Téléchargez le modèle du document
-                  </h2>
-                  <a class="btn btn-ico btn-outline-primary mb-3" href="/static/pdf/cerfa_15059-02.pdf" rel="noopener" target="_blank">
-                      <span>
-                          Modèle bilan financier de l’action
-                      </span>
-                      <i aria-hidden="true" class="ri-download-line fw-medium">
-                      </i>
-                  </a>
-                  <h2 class="h4">
-                      2. Déposez ici le document rempli
-                  </h2>
                   <div class="c-form">
+                      <h2 class="h3">
+                          1. Téléchargez le modèle du document
+                      </h2>
+                      <a class="btn btn-ico btn-outline-primary mb-3" href="/static/pdf/cerfa_15059-02.pdf" rel="noopener" target="_blank">
+                          <span>
+                              Modèle bilan financier de l’action
+                          </span>
+                          <i aria-hidden="true" class="ri-download-line fw-medium">
+                          </i>
+                      </a>
+                      <h2 class="h3">
+                          2. Déposez ici le document rempli
+                      </h2>
                       <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <div class="form-group form-group-required">
@@ -2751,7 +2751,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   
                                   <fieldset>
-                                      <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
@@ -2767,11 +2767,11 @@
   
   </select></div>
                                   </fieldset>
-                                  <hr/>
-                                  <fieldset>
-                                      <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
-                                      <h5>GEIQ principal:</h5>
   
+                                  <hr class="my-4"/>
+                                  <fieldset>
+                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <strong class="d-block">GEIQ principal:</strong>
                                       
                                           <div class="form-group">
                                               <div class="form-check">
@@ -2781,7 +2781,7 @@
                                               </div>
                                           </div>
                                       
-                                      <h5>Antennes:</h5>
+                                      <strong class="d-block">Antennes:</strong>
                                       
                                           
                                               <div class="form-group">
@@ -2809,7 +2809,7 @@
                                       
                                   </fieldset>
                                   
-  <div class="c-info c-info--borderless mt-3 mb-3">
+  <div class="c-info mt-3 mb-3">
       
           <span class="c-info__summary">
                                           Les données des structures sélectionnées apparaitront dans le bilan
@@ -2869,7 +2869,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   
                                   <fieldset>
-                                      <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
@@ -2885,15 +2885,15 @@
   
   </select></div>
                                   </fieldset>
-                                  <hr/>
-                                  <fieldset>
-                                      <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
-                                      <h5>GEIQ principal:</h5>
   
+                                  <hr class="my-4"/>
+                                  <fieldset>
+                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <strong class="d-block">GEIQ principal:</strong>
                                       
                                           <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label></div></div>
                                       
-                                      <h5>Antennes:</h5>
+                                      <strong class="d-block">Antennes:</strong>
                                       
                                           
                                               <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_2345" name="antenna_2345" type="checkbox"/><label class="form-check-label" for="id_antenna_2345">Une antenne</label></div></div>
@@ -2909,7 +2909,7 @@
                                       
                                   </fieldset>
                                   
-  <div class="c-info c-info--borderless mt-3 mb-3">
+  <div class="c-info mt-3 mb-3">
       
           <span class="c-info__summary">
                                           Les données des structures sélectionnées apparaitront dans le bilan
@@ -3006,7 +3006,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   
                                   <fieldset>
-                                      <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
@@ -3022,21 +3022,21 @@
   
   </select></div>
                                   </fieldset>
-                                  <hr/>
-                                  <fieldset>
-                                      <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
-                                      <h5>GEIQ principal:</h5>
   
+                                  <hr class="my-4"/>
+                                  <fieldset>
+                                      <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <strong class="d-block">GEIQ principal:</strong>
                                       
                                           <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label></div></div>
                                       
-                                      <h5>Antennes:</h5>
+                                      <strong class="d-block">Antennes:</strong>
                                       
                                           Aucune
                                       
                                   </fieldset>
                                   
-  <div class="c-info c-info--borderless mt-3 mb-3">
+  <div class="c-info mt-3 mb-3">
       
           <span class="c-info__summary">
                                           Les données des structures sélectionnées apparaitront dans le bilan
@@ -3091,7 +3091,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
-                          Les données LABEL ne sont pas encore disponibles.
+                          <p>Les données LABEL ne sont pas encore disponibles.</p>
                       
                   </div>
               </div>
@@ -3106,7 +3106,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
-                          Le SIRET (12345678901234) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                          <p>Le SIRET (12345678901234) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.</p>
                       
                   </div>
               </div>
