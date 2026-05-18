@@ -1042,7 +1042,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def resume_link(self):
         if self.resume_id:
-            return self.resume.public_url()
+            return get_absolute_url(reverse("apply:resume_download", kwargs={"job_application_id": self.pk}))
         return ""
 
     def get_sender_kind_display(self):

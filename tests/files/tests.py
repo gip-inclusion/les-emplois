@@ -8,7 +8,7 @@ import httpx
 import pytest
 from botocore.config import Config
 from django.conf import settings
-from django.core.files.storage import default_storage, storages
+from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.utils import timezone
 
@@ -32,7 +32,6 @@ def test_urls():
         default_storage.save("test_file.pdf", content)
 
     assert file.url() == default_storage.url(file.key)
-    assert file.public_url() == storages["public"].url(file.key)
 
 
 @pytest.mark.usefixtures("temporary_bucket")
@@ -46,12 +45,13 @@ def test_bucket_policy_for_anonymous_user():
     response = httpx.head(f"{base_url}/test_file.pdf")
     assert response.status_code == 403
 
-    # Anything under the resume prefix is public.
+    # Resumes are no longer publicly readable, they must be served through
+    # a signed URL via the authenticated resume_download view.
     filename = f"{uuid.uuid4()}.pdf"
     root_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}"
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"resume/{filename}")
     response = httpx.head(f"{root_url}/resume/{filename}")
-    assert response.status_code == 200
+    assert response.status_code == 403
 
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"news-images/{filename}")
     response = httpx.head(f"{root_url}/news-images/{filename}")
@@ -215,7 +215,7 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
             {"folder": "folder", "anonymize_filename": False},
             "folder/tests/data/empty.pdf",
         ],
-        [{"folder": "folder/", "storage": storages["public"]}, "folder/11111111-1111-1111-1111-111111111111.pdf"],
+        [{"folder": "folder/"}, "folder/11111111-1111-1111-1111-111111111111.pdf"],
     ],
 )
 @pytest.mark.usefixtures("temporary_bucket")
@@ -224,12 +224,7 @@ def test_save_file(mocker, pdf_file, params, expected_filename):
     file = save_file(file=pdf_file, **params)
     assert file.key == expected_filename
     assert File.objects.get(key=expected_filename)
-    if "storage" in params:
-        assert params["storage"].listdir("folder")[-1] == ["11111111-1111-1111-1111-111111111111.pdf"]
-    else:
-        assert default_storage_ls_files("/".join(expected_filename.split("/")[:-1])) == [
-            expected_filename.split("/")[-1]
-        ]
+    assert default_storage_ls_files("/".join(expected_filename.split("/")[:-1])) == [expected_filename.split("/")[-1]]
 
 
 def test_save_file_options(pdf_file):

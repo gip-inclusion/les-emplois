@@ -604,7 +604,7 @@ def test_step_3(client, snapshot, pdf_file):
         sent_by_prescriber_alone=True,
         state=JobApplicationState.REFUSED,
         for_snapshot=True,
-        resume__key="resume/old_file.pdf",
+        resume__key="resume-private/old_file.pdf",
         with_file=pdf_file,
     )
     employer = job_application.to_company.members.get()
@@ -643,7 +643,7 @@ def test_step_3(client, snapshot, pdf_file):
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
     assert new_job_application.state == JobApplicationState.NEW
-    assert re.match(r"resume/[-0-9a-z]*.pdf", new_job_application.resume.key)
+    assert re.match(r"resume-private/[-0-9a-z]*.pdf", new_job_application.resume.key)
     assert new_job_application.resume.key != job_application.resume.key
 
     transfer_log = job_application.logs.last()
@@ -692,7 +692,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
-    assert new_job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+    assert new_job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
     assert new_job_application.state == JobApplicationState.NEW
 
 
@@ -778,7 +778,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
-    assert new_job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+    assert new_job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
     assert new_job_application.state == JobApplicationState.NEW
 
 

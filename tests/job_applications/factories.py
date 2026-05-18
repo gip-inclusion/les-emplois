@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
-from django.core.files.storage import storages
+from django.core.files.storage import default_storage
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
@@ -215,8 +215,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     @factory.post_generation
     def with_file(self, create, extracted, **kwargs):
         if create and extracted:
-            public_storage = storages["public"]
-            public_storage.save(self.resume.key, extracted)
+            default_storage.save(self.resume.key, extracted)
 
     @factory.post_generation
     def with_job_seeker_assignment(self, create, extracted, **kwargs):

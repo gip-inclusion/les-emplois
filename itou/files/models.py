@@ -1,14 +1,13 @@
 import pathlib
 import uuid
 
-from django.core.files.storage import default_storage, storages
+from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
 
 
-def save_file(folder, file, storage=None, anonymize_filename=True):
-    if not storage:
-        storage = default_storage
+def save_file(folder, file, anonymize_filename=True):
+    storage = default_storage
     if len(pathlib.Path(folder).parts) > 1:
         raise NotImplementedError("File tree depth is too deep. Only one level is allowed.", folder)
     # Only keep the final part to avoid subfolders.
@@ -41,6 +40,3 @@ class File(models.Model):
 
     def url(self, *args, **kwargs):
         return default_storage.url(self.key, *args, **kwargs)
-
-    def public_url(self, *args, **kwargs):
-        return storages["public"].url(self.key, *args, **kwargs)

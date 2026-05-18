@@ -180,9 +180,10 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "**Il conviendra de les échapper ou de les convertir au besoin.**"
         ),
     )
-    orientation_candidat_cv = serializers.CharField(
-        source="resume_link",
+    orientation_candidat_cv = serializers.SerializerMethodField(
         label="Lien vers le CV du candidat",
+        help_text="""URL stable vers la route de téléchargement du CV. Le suivi du lien nécessite une session \
+        authentifiée côté navigateur : la route redirige alors vers une URL signée S3 fraîchement générée.""",
     )
     contrat_date_debut = serializers.DateField(
         source="hiring_start_at",
@@ -259,6 +260,16 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
     def get_orientation_emetteur_organisme_telephone(self, obj) -> str | None:
         if sender_org := self._get_sender_org(obj):
             return sender_org.phone
+
+    def get_orientation_candidat_cv(self, obj) -> str:
+        """Return the stable resume_download route.
+
+        This API targets browser-session consumers: the resume_download route enforces
+        auth via session middleware and redirects to a freshly-signed S3 URL.
+
+        A raw signed URL would expire too quickly to be a useful contract.
+        """
+        return obj.resume_link
 
 
 class JobApplicationSearchRequestSerializer(serializers.Serializer):

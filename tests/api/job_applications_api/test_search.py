@@ -183,8 +183,8 @@ class TestJobApplicationSearchApi:
         job_application.selected_jobs.set({job_application.hired_job})
 
         mocker.patch(
-            "itou.job_applications.models.JobApplication.resume_link",
-            "https://server.com/rockie-balboa.pdf",
+            "itou.files.models.File.url",
+            return_value="https://server.com/rockie-balboa.pdf",
         )
         response = api_client.post(
             self.ENDPOINT_URL,
