@@ -64,7 +64,7 @@ class TestChangeEmailView:
             assert second_email.to == [new_email]
 
             # Confirm email : email is changed
-            response = client.post(confirm_email_url)
+            response = client.get(confirm_email_url)
             assert response.status_code == 302
             assert response.url == reverse("welcoming_tour:index")
             response = client.get(response.url)
