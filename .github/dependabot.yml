@@ -17,6 +17,8 @@ updates:
       interval: "daily"
     cooldown:
       default-days: 5
+      exclude:
+        - "itoutils"
     commit-message:
       prefix: "requirement"
       prefix-development: "dev requirement"
