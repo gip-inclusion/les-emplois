@@ -324,8 +324,8 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
             )
         else:
             assessment.submit(user=request.user)
-            # Preselect all contracts for institution validation
-            EmployeeContract.objects.filter(employee__assessment=assessment).update(
+            # Preselect contracts for institution validation, those that have not been already refused (with a reason)
+            EmployeeContract.objects.filter(employee__assessment=assessment, allowance_refusal_reason="").update(
                 allowance_granted=F("allowance_requested")
             )
             institution_members = {
