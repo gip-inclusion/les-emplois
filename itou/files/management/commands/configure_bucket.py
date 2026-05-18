@@ -33,7 +33,7 @@ class Command(BaseCommand):
                 "Action": "s3:GetObject",
                 "Resource": f"arn:aws:s3:::{bucket}/{path}/*",
             }
-            for path in ["resume", "news-images"]
+            for path in ["news-images"]
         ]
         client.put_bucket_policy(
             Bucket=bucket,

@@ -3031,3 +3031,96 @@ class TestJobApplicationSenderLeftOrg:
     def test_sender_left_org_job_seeker(self):
         job_app = JobApplicationFactory(sent_by_job_seeker=True)
         assert job_application_sender_left_org(job_app) is False
+
+
+class TestResumeDownload:
+    def _job_seeker_setup():
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
+        return job_application, job_application.job_seeker
+
+    def _employer_setup():
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
+        return job_application, job_application.to_company.members.first()
+
+    def _prescriber_setup():
+        prescriber_membership = PrescriberMembershipFactory()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            sender=prescriber_membership.user,
+            sender_prescriber_organization=prescriber_membership.organization,
+        )
+        return job_application, prescriber_membership.user
+
+    @pytest.mark.parametrize(
+        "job_application_n_user",
+        [
+            pytest.param(_job_seeker_setup, id="job_seeker"),
+            pytest.param(_employer_setup, id="employer"),
+            pytest.param(_prescriber_setup, id="prescriber"),
+        ],
+    )
+    def test_redirects_to_signed_url(self, client, job_application_n_user):
+        job_application, user = job_application_n_user()
+        client.force_login(user)
+        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 302
+        assert "X-Amz-Signature" in response.url
+
+    def test_404_for_unrelated_user(self, client):
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
+        client.force_login(JobSeekerFactory())
+        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 404
+
+    def test_redirects_to_login_when_anonymous(self, client):
+        job_application = JobApplicationFactory(sent_by_job_seeker=True)
+        url = reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assert response.status_code == 302
+        assert "/login" in response.url or reverse("account_login") in response.url
+
+    def test_404_when_no_resume(self, client):
+        job_application = JobApplicationFactory(sent_by_job_seeker=True, resume=None)
+        client.force_login(job_application.to_company.members.first())
+        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 404
+
+    def test_redirects_for_sender_employer_from_another_company(self, client):
+        """Employers acting as "prescribers" can access the resume of applications they sent."""
+        job_application = JobApplicationFactory(sent_by_another_employer=True)
+        sender = job_application.sender_company.members.first()
+        assert sender not in job_application.to_company.members.all()
+        client.force_login(sender)
+        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 302
+        assert "X-Amz-Signature" in response.url
+
+    def test_404_for_unrelated_employer(self, client):
+        """An employer who neither received nor sent the application gets 404."""
+        job_application = JobApplicationFactory(sent_by_another_employer=True)
+        unrelated_company = CompanyFactory(with_membership=True)
+        unrelated_employer = unrelated_company.members.first()
+        assert unrelated_employer not in job_application.to_company.members.all()
+        assert unrelated_employer not in job_application.sender_company.members.all()
+        client.force_login(unrelated_employer)
+        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 404
+
+    def test_successfully_redirects_prescriber_with_unrelated_current_organization(self, client):
+        # Users following a CV link from their mail client often land with the wrong current
+        # organization selected. Access must not depend on which org is currently active.
+        sending_membership = PrescriberMembershipFactory()
+        unrelated_membership = PrescriberMembershipFactory(user=sending_membership.user)
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber=True,
+            sender=sending_membership.user,
+            sender_prescriber_organization=sending_membership.organization,
+        )
+        client.force_login(sending_membership.user)
+        # Switch the active org to the unrelated one.
+        session = client.session
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = unrelated_membership.organization.pk
+        session.save()
+        response = client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 302
+        assert "X-Amz-Signature" in response.url

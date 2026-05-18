@@ -679,7 +679,7 @@ class TestApplyAsJobSeeker:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
         assert default_storage_ls_files() == [job_application.resume.key]
 
         assert apply_session_name not in client.session
@@ -1239,7 +1239,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
         assert default_storage_ls_files() == [job_application.resume.key]
 
         assert apply_session_name not in client.session
@@ -1612,7 +1612,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
         assert default_storage_ls_files() == [job_application.resume.key]
 
         assert apply_session_name not in client.session
@@ -2107,7 +2107,7 @@ class TestApplyAsPrescriber:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
         assert default_storage_ls_files() == [job_application.resume.key]
 
         assert apply_session_name not in client.session
@@ -2870,7 +2870,7 @@ class TestApplyAsCompany:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert job_application.resume.key == "resume-private/11111111-1111-1111-1111-111111111111.pdf"
         assert default_storage_ls_files() == [job_application.resume.key]
 
         assert apply_session_name not in client.session

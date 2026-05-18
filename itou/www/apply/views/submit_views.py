@@ -7,7 +7,6 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import storages
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -666,7 +665,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             job_application.sender_company = self.request.current_organization
 
         if resume := self.form.cleaned_data.get("resume"):
-            file = save_file(folder="resume/", file=resume, storage=storages["public"])
+            file = save_file(folder="resume-private/", file=resume)
             job_application.resume = file
 
         # Save the job application

@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import pathlib
 from urllib.parse import urljoin
 
 import httpx
@@ -8,15 +9,17 @@ import sentry_sdk
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Exists, F, OuterRef
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.db.models import Exists, F, OuterRef, Q
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
 from django.utils import formats, timezone
+from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
 from django_xworkflows import models as xwf_models
 
+from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import (
@@ -24,11 +27,13 @@ from itou.job_applications.models import (
     JobApplicationComment,
     PriorAction,
 )
+from itou.prescribers.models import PrescriberMembership
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title
 from itou.utils.auth import check_request
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AddToPoolForm,
@@ -412,6 +417,31 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     }
 
     return render(request, template_name, context)
+
+
+@readonly_view
+def resume_download(request, job_application_id):
+    user = request.user
+    queryset = JobApplication.objects.filter(
+        Q(job_seeker=user)
+        | Q(sender=user)
+        | Exists(CompanyMembership.objects.filter(user=user, company=OuterRef("to_company")))
+        | Exists(
+            PrescriberMembership.objects.filter(user=user, organization=OuterRef("sender_prescriber_organization"))
+        )
+        | Exists(CompanyMembership.objects.filter(user=user, company=OuterRef("sender_company")))
+    )
+    job_application = get_object_or_404(queryset.select_related("resume"), id=job_application_id)
+    if job_application.resume_id is None:
+        raise Http404
+    suffix = pathlib.Path(job_application.resume.key).suffix
+    filename = f"CV_{timezone.localtime(timezone.now()).strftime('%Y_%m_%d_%H_%M')}{suffix}"
+    logger.info("resume_download user_id=%s job_application_id=%s", user.pk, job_application.pk)
+    return HttpResponseRedirect(
+        job_application.resume.url(
+            parameters={"ResponseContentDisposition": content_disposition_header(False, filename)}
+        )
+    )
 
 
 @require_POST
