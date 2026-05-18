@@ -75,24 +75,17 @@
                             {% bootstrap_form_errors form type='non_fields' %}
 
                             <fieldset>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <legend>Conventionnement</legend>
-                                        {% bootstrap_field form.convention_amount %}
-                                    </div>
-                                </div>
+                                <legend>Conventionnement</legend>
+                                {% bootstrap_field form.convention_amount %}
                             </fieldset>
-                            <hr>
+
+                            <hr class="my-4">
                             <fieldset id="decision-box">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <legend>Décision</legend>
-                                        {% bootstrap_field form.granted_amount %}
-                                        {% bootstrap_field form.advance_amount %}
-                                        {% bootstrap_field form.balance_amount %}
-                                        {% bootstrap_field form.refund_amount %}
-                                    </div>
-                                </div>
+                                <legend>Décision</legend>
+                                {% bootstrap_field form.granted_amount %}
+                                {% bootstrap_field form.advance_amount %}
+                                {% bootstrap_field form.balance_amount %}
+                                {% bootstrap_field form.refund_amount %}
                             </fieldset>
                             {% bootstrap_field form.review_comment %}
                             {% if not assessment.reviewed_at %}
@@ -103,14 +96,14 @@
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     <div class="c-box mb-3 mb-md-4">
-                        <h4>Structures concernées par la convention</h4>
-                        <ul>
+                        <h3>Structures concernées par la convention</h3>
+                        <ul class="mb-0">
                             {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
                         </ul>
                     </div>
                     <div class="c-box mb-3 mb-md-4">
-                        <h4>Historique</h4>
-                        <ul class="list-step">
+                        <h3>Historique</h3>
+                        <ul class="list-step mb-0">
                             {% if assessment.final_reviewed_at %}
                                 <li>
                                     <time datetime="{{ assessment.final_reviewed_at.isoformat }}">

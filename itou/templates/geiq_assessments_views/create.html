@@ -42,26 +42,26 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% if not campaign_label_infos %}
-                        Les données LABEL ne sont pas encore disponibles.
+                        <p>Les données LABEL ne sont pas encore disponibles.</p>
                     {% elif not geiq_info %}
-                        Le SIRET ({{ siret }}) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                        <p>Le SIRET ({{ siret }}) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.</p>
                     {% else %}
                         <div class="c-form">
                             <form method="post">
                                 {% csrf_token %}
                                 {% bootstrap_form_errors form alert_error_type="all" %}
                                 <fieldset>
-                                    <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                    <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                     {% bootstrap_field form.convention_with_ddets %}
                                     {% bootstrap_field form.ddets wrapper_class=form.ddets.field.form_group_class %}
                                     {% bootstrap_field form.convention_with_dreets %}
                                     {% bootstrap_field form.dreets wrapper_class=form.dreets.field.form_group_class %}
                                 </fieldset>
-                                <hr>
-                                <fieldset>
-                                    <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
-                                    <h5>GEIQ principal:</h5>
 
+                                <hr class="my-4">
+                                <fieldset>
+                                    <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
+                                    <strong class="d-block">GEIQ principal:</strong>
                                     {% if form.main_geiq.field.disabled %}
                                         <div class="form-group">
                                             <div class="form-check">
@@ -76,7 +76,7 @@
                                     {% else %}
                                         {% bootstrap_field form.main_geiq %}
                                     {% endif %}
-                                    <h5>Antennes:</h5>
+                                    <strong class="d-block">Antennes:</strong>
                                     {% for field in form.iter_antenna_field %}
                                         {% if field.field.disabled %}
                                             <div class="form-group">
@@ -96,7 +96,7 @@
                                         Aucune
                                     {% endfor %}
                                 </fieldset>
-                                {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-3 mb-3" %}
+                                {% component_info c_info__summary=c_info__summary extra_classes="mt-3 mb-3" %}
                                     {% fragment as c_info__summary %}
                                         Les données des structures sélectionnées apparaitront dans le bilan
                                     {% endfragment %}

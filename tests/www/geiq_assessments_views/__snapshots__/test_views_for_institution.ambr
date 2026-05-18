@@ -2084,52 +2084,44 @@
                       <form class="js-prevent-multiple-submit" id="review_form" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <fieldset>
-                              <div class="row">
-                                  <div class="col-12">
-                                      <legend>
-                                          Conventionnement
-                                      </legend>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_convention_amount">
-                                              Montant conventionné (convention initiale + avenants)
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
-                                      </div>
-                                  </div>
+                              <legend>
+                                  Conventionnement
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_convention_amount">
+                                      Montant conventionné (convention initiale + avenants)
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
                               </div>
                           </fieldset>
-                          <hr/>
+                          <hr class="my-4"/>
                           <fieldset id="decision-box">
-                              <div class="row">
-                                  <div class="col-12">
-                                      <legend>
-                                          Décision
-                                      </legend>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_granted_amount">
-                                              Montant total accordé
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
-                                      </div>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_advance_amount">
-                                              Premier versement déjà réalisé
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
-                                      </div>
-                                      <div class="form-group">
-                                          <label class="form-label" for="id_balance_amount">
-                                              Deuxième versement à prévoir
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
-                                      </div>
-                                      <div class="form-group">
-                                          <label class="form-label" for="id_refund_amount">
-                                              Ordre de reversement
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
-                                      </div>
-                                  </div>
+                              <legend>
+                                  Décision
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_granted_amount">
+                                      Montant total accordé
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_advance_amount">
+                                      Premier versement déjà réalisé
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_balance_amount">
+                                      Deuxième versement à prévoir
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_refund_amount">
+                                      Ordre de reversement
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
                               </div>
                           </fieldset>
                           <div class="form-group form-group-required">
@@ -2143,10 +2135,10 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Structures concernées par la convention
-                      </h4>
-                      <ul>
+                      </h3>
+                      <ul class="mb-0">
                           <li>
                               Siège (29)
                           </li>
@@ -2156,10 +2148,10 @@
                       </ul>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Historique
-                      </h4>
-                      <ul class="list-step">
+                      </h3>
+                      <ul class="list-step mb-0">
                           <li>
                               <time datetime="2025-05-21T19:00:00+00:00">
                                   Le 21/05/2025
@@ -2257,52 +2249,44 @@
                       <form class="js-prevent-multiple-submit" id="review_form" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <fieldset>
-                              <div class="row">
-                                  <div class="col-12">
-                                      <legend>
-                                          Conventionnement
-                                      </legend>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_convention_amount">
-                                              Montant conventionné (convention initiale + avenants)
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
-                                      </div>
-                                  </div>
+                              <legend>
+                                  Conventionnement
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_convention_amount">
+                                      Montant conventionné (convention initiale + avenants)
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
                               </div>
                           </fieldset>
-                          <hr/>
+                          <hr class="my-4"/>
                           <fieldset id="decision-box">
-                              <div class="row">
-                                  <div class="col-12">
-                                      <legend>
-                                          Décision
-                                      </legend>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_granted_amount">
-                                              Montant total accordé
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
-                                      </div>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_advance_amount">
-                                              Premier versement déjà réalisé
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
-                                      </div>
-                                      <div class="form-group">
-                                          <label class="form-label" for="id_balance_amount">
-                                              Deuxième versement à prévoir
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
-                                      </div>
-                                      <div class="form-group">
-                                          <label class="form-label" for="id_refund_amount">
-                                              Ordre de reversement
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
-                                      </div>
-                                  </div>
+                              <legend>
+                                  Décision
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_granted_amount">
+                                      Montant total accordé
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_advance_amount">
+                                      Premier versement déjà réalisé
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_balance_amount">
+                                      Deuxième versement à prévoir
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_refund_amount">
+                                      Ordre de reversement
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
                               </div>
                           </fieldset>
                           <div class="form-group form-group-required">
@@ -2316,10 +2300,10 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Structures concernées par la convention
-                      </h4>
-                      <ul>
+                      </h3>
+                      <ul class="mb-0">
                           <li>
                               Siège (29)
                           </li>
@@ -2329,10 +2313,10 @@
                       </ul>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Historique
-                      </h4>
-                      <ul class="list-step">
+                      </h3>
+                      <ul class="list-step mb-0">
                           <li>
                               <time datetime="2025-05-21T18:00:00+00:00">
                                   Le 21/05/2025
@@ -2631,52 +2615,44 @@
                       <form class="js-prevent-multiple-submit" id="review_form" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <fieldset>
-                              <div class="row">
-                                  <div class="col-12">
-                                      <legend>
-                                          Conventionnement
-                                      </legend>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_convention_amount">
-                                              Montant conventionné (convention initiale + avenants)
-                                          </label>
-                                          <input class="form-control" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
-                                      </div>
-                                  </div>
+                              <legend>
+                                  Conventionnement
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_convention_amount">
+                                      Montant conventionné (convention initiale + avenants)
+                                  </label>
+                                  <input class="form-control" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
                               </div>
                           </fieldset>
-                          <hr/>
+                          <hr class="my-4"/>
                           <fieldset id="decision-box">
-                              <div class="row">
-                                  <div class="col-12">
-                                      <legend>
-                                          Décision
-                                      </legend>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_granted_amount">
-                                              Montant total accordé
-                                          </label>
-                                          <input class="form-control" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
-                                      </div>
-                                      <div class="form-group form-group-required">
-                                          <label class="form-label" for="id_advance_amount">
-                                              Premier versement déjà réalisé
-                                          </label>
-                                          <input class="form-control" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
-                                      </div>
-                                      <div class="form-group">
-                                          <label class="form-label" for="id_balance_amount">
-                                              Deuxième versement à prévoir
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
-                                      </div>
-                                      <div class="form-group">
-                                          <label class="form-label" for="id_refund_amount">
-                                              Ordre de reversement
-                                          </label>
-                                          <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
-                                      </div>
-                                  </div>
+                              <legend>
+                                  Décision
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_granted_amount">
+                                      Montant total accordé
+                                  </label>
+                                  <input class="form-control" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_advance_amount">
+                                      Premier versement déjà réalisé
+                                  </label>
+                                  <input class="form-control" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_balance_amount">
+                                      Deuxième versement à prévoir
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_refund_amount">
+                                      Ordre de reversement
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
                               </div>
                           </fieldset>
                           <div class="form-group form-group-required">
@@ -2716,10 +2692,10 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Structures concernées par la convention
-                      </h4>
-                      <ul>
+                      </h3>
+                      <ul class="mb-0">
                           <li>
                               Siège (29)
                           </li>
@@ -2729,10 +2705,10 @@
                       </ul>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
-                      <h4>
+                      <h3>
                           Historique
-                      </h4>
-                      <ul class="list-step">
+                      </h3>
+                      <ul class="list-step mb-0">
                           <li>
                               <time datetime="2025-05-21T15:00:00+00:00">
                                   Le 21/05/2025
