@@ -118,8 +118,42 @@ class TestApplyAsPrescriber:
             reverse("apply:start", kwargs={"company_pk": guerande_company.pk})
             + f"?job_seeker_public_id={job_seeker.public_id}"
         )
+
+        # Check previous applications if there are any
+        previous_jobapp = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=guerande_company,
+            sent_by_job_seeker=True,
+        )
         response = client.get(apply_company_url)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Cannot continue if the job application was sent in the last 24 hours
+        response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}))
+        assert response.status_code == 403
+
+        previous_jobapp.created_at = timezone.now() - relativedelta(days=7)
+        previous_jobapp.save()
+
+        # Session needs to be recreated after it was deleted by trying to access the jobs view
+        response = client.get(apply_company_url)
+        new_apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        assert new_apply_session_name != apply_session_name
+
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"session_uuid": new_apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Can still proceed if the job application was sent more than 24 hours ago
+        response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": new_apply_session_name}))
+        assert response.status_code == 200
+
+        previous_jobapp.delete()
+
+        response = client.get(apply_company_url, follow=True)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[new_apply_session_name])
 
         next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
@@ -287,8 +321,42 @@ class TestApplyAsPrescriber:
             reverse("apply:start", kwargs={"company_pk": guerande_company.pk})
             + f"?job_seeker_public_id={job_seeker.public_id}"
         )
+
+        # Check previous applications if there are any
+        previous_jobapp = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=guerande_company,
+            sent_by_job_seeker=True,
+        )
         response = client.get(apply_company_url)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Cannot continue if the job application was sent in the last 24 hours
+        response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}))
+        assert response.status_code == 403
+
+        previous_jobapp.created_at = timezone.now() - relativedelta(days=7)
+        previous_jobapp.save()
+
+        # Session needs to be recreated after it was deleted by trying to access the jobs view
+        response = client.get(apply_company_url)
+        new_apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        assert new_apply_session_name != apply_session_name
+
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"session_uuid": new_apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Can still proceed if the job application was sent more than 24 hours ago
+        response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": new_apply_session_name}))
+        assert response.status_code == 200
+
+        previous_jobapp.delete()
+
+        response = client.get(apply_company_url, follow=True)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[new_apply_session_name])
 
         next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
@@ -444,8 +512,42 @@ class TestApplyAsCompany:
             reverse("apply:start", kwargs={"company_pk": other_company.pk})
             + f"?job_seeker_public_id={job_seeker.public_id}"
         )
+
+        # Check previous applications if there are any
+        previous_jobapp = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=other_company,
+            sent_by_job_seeker=True,
+        )
         response = client.get(apply_company_url)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Cannot continue if the job application was sent in the last 24 hours
+        response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}))
+        assert response.status_code == 403
+
+        previous_jobapp.created_at = timezone.now() - relativedelta(days=7)
+        previous_jobapp.save()
+
+        # Session needs to be recreated after it was deleted by trying to access the jobs view
+        response = client.get(apply_company_url)
+        new_apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        assert new_apply_session_name != apply_session_name
+
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"session_uuid": new_apply_session_name})
+        assertRedirects(response, next_url)
+
+        # Can still proceed if the job application was sent more than 24 hours ago
+        response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": new_apply_session_name}))
+        assert response.status_code == 200
+
+        previous_jobapp.delete()
+
+        response = client.get(apply_company_url, follow=True)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[new_apply_session_name])
 
         next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
