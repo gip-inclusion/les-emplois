@@ -212,11 +212,11 @@ class StartViewForSubmit(ApplicationPermissionMixin, View):
 
         self.apply_session = initialize_apply_session(request, session_data)
 
-        # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
+        # Go directly to step CheckPreviousApplicationsForSubmitView if we're carrying the job seeker public id with us
         if job_seeker_tunnel == "sender" and job_seeker:
             return HttpResponseRedirect(
                 reverse(
-                    "apply:application_jobs",
+                    "apply:step_check_prev_applications",
                     kwargs={"session_uuid": self.apply_session.name},
                     query={"job_description_id": job_description_id} if job_description_id else {},
                 )
