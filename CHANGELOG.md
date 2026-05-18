@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2026-05-18
+
+### Ajouté
+
+- [Admin : Suivi des modifications effectuées sur les utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/6620)
+- [GEIQ : Donner la possibilité aux DDETS/DREETS de redonner la main au GEIQ pour corriger un bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7928)
+
+### Modifié
+
+- [API : Bloquer les demandes de token par des utilisateurs n'utilisant pas ProConnect](https://github.com/gip-inclusion/les-emplois/pull/7999)
+- [GEIQ : Précisions concernant les modalités d'obtention de l'aide](https://github.com/gip-inclusion/les-emplois/pull/8001)
+- [Inscription : Les entreprises sans membre actif ne sont plus proposées lors la recherche via SIREN](https://github.com/gip-inclusion/les-emplois/pull/7880)
+- [Interface : Ajout d’une mention de décision dans les bilans d'éxécutions](https://github.com/gip-inclusion/les-emplois/pull/7986)
+- [Pilotage : Résoudre un bug empêchant un employeur d'accéder à ses tableaux de bord s’il est également membre d’une organisation prescriptrice](https://github.com/gip-inclusion/les-emplois/pull/8034)
+
+### Tech
+
+- [Candidature : Une candidature non acceptée ne peut plus être liée à un diagnostic d'éligibilité ou à un PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/7920)
+- [Tech : Amélioration de l'accès au calendrier de la campagne de contrôle](https://github.com/gip-inclusion/les-emplois/pull/8039)
+- [Tech : Amélioration de l'accès à des vues de suspension de PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/8040)
+
 ## 2026-05-11
 
 ### Ajouté
