@@ -9,8 +9,8 @@
 {% enums "companies" "CompanyKind" as CompanyKind %}
 <div class="s-section__row row">
     <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+        <h2>Situation du {{ request.current_organization|worker_denomination }}</h2>
         <div class="c-form">
-            <h2>Situation du {{ request.current_organization|worker_denomination }}</h2>
             <form method="post" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 {% bootstrap_form_errors form type="all" %}
@@ -20,6 +20,7 @@
                     {% bootstrap_field form.low_level_in_french %}
                 </fieldset>
 
+                <hr class="mt-2 mb-3">
                 <fieldset>
                     <legend>Ressources</legend>
                     {% bootstrap_field form.resourceless %}
@@ -40,6 +41,7 @@
                     </div>
                 </fieldset>
 
+                <hr class="mt-2 mb-3">
                 <fieldset>
                     <legend>Situation professionnelle</legend>
                     {% collapse_field form.unemployed target_id="collapse_unemployed" %}
@@ -62,12 +64,14 @@
                     {% endif %}
                 </fieldset>
 
+                <hr class="mt-2 mb-3">
                 <fieldset>
                     <legend>Situation de handicap</legend>
                     {% bootstrap_field form.rqth_employee %}
                     {% bootstrap_field form.oeth_employee %}
                 </fieldset>
 
+                <hr class="mt-2 mb-3">
                 <fieldset>
                     <legend>Situation familiale</legend>
                     {% bootstrap_field form.isolated_parent %}
@@ -75,6 +79,7 @@
                 </fieldset>
 
                 {% if request.current_organization.kind == CompanyKind.EITI %}
+                    <hr class="mt-2 mb-3">
                     <fieldset>
                         <legend>Informations spécifiques au travailleur indépendant</legend>
                         {% collapse_field form.are_allocation target_id="collapse_are_allocation" %}
@@ -95,6 +100,7 @@
                     </fieldset>
                 {% endif %}
 
+                <hr class="mt-2 mb-3">
                 <fieldset>
                     <legend>Autres situations</legend>
                     {% bootstrap_field form.housing_issue %}

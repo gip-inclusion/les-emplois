@@ -23,9 +23,9 @@
                     </div>
                     <div class="c-form mb-3 mb-md-4">
                         {% if wizard_steps.current == "choose-employee" %}
-                            <h2>Rechercher un salarié</h2>
+                            <h2 class="h3">Rechercher un salarié</h2>
                         {% else %}
-                            <h2>Rechercher un PASS IAE</h2>
+                            <h2 class="h3">Rechercher un PASS IAE</h2>
                         {% endif %}
                         <form method="post">
                             {% csrf_token %}

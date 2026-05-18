@@ -747,7 +747,7 @@
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           Rechercher un PASS IAE
                       </h2>
                       <form method="post">
@@ -1412,7 +1412,7 @@
                       </p>
                   </div>
                   <div class="c-form mb-3 mb-md-4">
-                      <h2>
+                      <h2 class="h3">
                           Rechercher un salarié
                       </h2>
                       <form method="post">
