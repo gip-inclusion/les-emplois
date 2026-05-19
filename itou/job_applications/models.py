@@ -202,7 +202,6 @@ class JobApplicationQuerySet(models.QuerySet):
     def get_unique_fk_qs(self, fk_field):
         """
         Get unique foreign key objects in a single query.
-        TODO: move this method in a custom manager since it's not chainable.
         """
         # FIXME: Replace that static list by a dynamic one
         if fk_field not in [
