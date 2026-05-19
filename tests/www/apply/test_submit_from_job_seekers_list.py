@@ -61,7 +61,7 @@ class TestApplyAsPrescriber:
             f"""
             <a class="btn btn-sm btn-link btn-ico-only"
                 data-bs-toggle="tooltip"
-                data-bs-title="Postuler pour ce candidat"
+                data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
@@ -86,7 +86,7 @@ class TestApplyAsPrescriber:
                     data-matomo-action="clic"
                     data-matomo-option="postuler-pour-ce-candidat">
                     <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
-                    <span>Postuler pour ce candidat</span>
+                    <span>Postuler pour cet usager</span>
                 </a>
                 """
             ),
@@ -231,7 +231,7 @@ class TestApplyAsPrescriber:
             f"""
             <a class="btn btn-sm btn-link btn-ico-only"
                 data-bs-toggle="tooltip"
-                data-bs-title="Postuler pour ce candidat"
+                data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
@@ -255,7 +255,7 @@ class TestApplyAsPrescriber:
                     data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                     data-matomo-option="postuler-pour-ce-candidat">
                     <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
-                    <span>Postuler pour ce candidat</span>
+                    <span>Postuler pour cet usager</span>
                 </a>
                 """
             ),
@@ -414,7 +414,7 @@ class TestApplyAsCompany:
                     data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                     data-matomo-option="postuler-pour-ce-candidat">
                     <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
-                    <span>Postuler pour ce candidat</span>
+                    <span>Postuler pour cet usager</span>
                 </a>
                 """
             ),

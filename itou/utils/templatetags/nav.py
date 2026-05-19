@@ -126,7 +126,7 @@ NAV_ENTRIES = {
     ),
     # Prescribers.
     "prescriber-jobseekers-user": NavItem(
-        label="Mes candidats",
+        label="Mes accompagnements",
         target=reverse("job_seekers_views:list"),
         active_view_names=["job_seekers_views:list"],
         matomo_event_category="offcanvasNav",
@@ -134,7 +134,7 @@ NAV_ENTRIES = {
         matomo_event_option="candidats-utilisateur",
     ),
     "prescriber-jobseekers-organization": NavItem(
-        label="Tous les candidats de la structure",
+        label="Tous les accompagnements de la structure",
         target=reverse("job_seekers_views:list_organization"),
         active_view_names=["job_seekers_views:list_organization"],
         matomo_event_category="offcanvasNav",
@@ -328,7 +328,7 @@ def nav(request):
             jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
             if request.from_authorized_prescriber:
                 jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
-            menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
+            menu_items.append(NavGroup(label="Accompagnements", icon="ri-user-line", items=jobseekers_items))
             menu_items.append(NAV_ENTRIES["gps"])
             organization_items = [
                 (

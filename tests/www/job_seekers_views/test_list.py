@@ -48,7 +48,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
         f"""
             <a class="btn btn-sm btn-link btn-ico-only"
                 data-bs-toggle="tooltip"
-                data-bs-title="Postuler pour ce candidat"
+                data-bs-title="Postuler pour cet usager"
                 data-matomo-event="true"
                 data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
@@ -146,7 +146,7 @@ def test_displayed_tabs(client, user_factory, assertion):
     assertion(
         response,
         f"""<a class="nav-link" href="{reverse("job_seekers_views:list_organization")}">
-        Tous les candidats de la structure</a>""",
+        Tous les accompagnements de la structure</a>""",
         html=True,
     )
 

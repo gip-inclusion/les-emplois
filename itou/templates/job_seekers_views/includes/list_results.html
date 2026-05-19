@@ -8,14 +8,14 @@
         <div class="text-center my-3 my-md-4">
             <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
             <p class="mb-1 mt-3">
-                <strong>Aucun candidat pour le moment</strong>
+                <strong>Aucun usager pour le moment</strong>
             </p>
         </div>
     {% else %}
         <div class="table-responsive mt-3 mt-md-4">
             <table class="table table-hover table-sortable">
                 <caption class="visually-hidden">
-                    Liste des candidats (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)
+                    Liste des usagers (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)
                 </caption>
                 <thead>
                     <tr>
@@ -25,7 +25,7 @@
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nombre de candidatures" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière action" only %}
                         <th scope="col" class="text-end {% if request.current_organization.is_authorized %}w-100px{% else %}w-50px{% endif %}">
-                            <span class="visually-hidden">Actions possibles sur les candidats</span>
+                            <span class="visually-hidden">Actions possibles sur les usagers</span>
                         </th>
                     </tr>
                 </thead>
@@ -35,7 +35,7 @@
                             <td>
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
                                 {% if job_seeker.jobseeker_profile.is_considered_stalled %}
-                                    <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning" aria-label="Candidat sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Candidat sans solution" data-bs-toggle="tooltip"></i></span>
+                                    <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning" aria-label="Usager sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Usager sans solution" data-bs-toggle="tooltip"></i></span>
                                 {% endif %}
                             </td>
                             <td>
@@ -53,7 +53,7 @@
                                 {% else %}
                                     {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                 {% endif %}
-                                <a class="btn btn-sm btn-link btn-ico-only" href="{{ url_query }}" data-bs-toggle="tooltip" data-bs-title="Postuler pour ce candidat" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
+                                <a class="btn btn-sm btn-link btn-ico-only" href="{{ url_query }}" data-bs-toggle="tooltip" data-bs-title="Postuler pour cet usager" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
                                     <i class="ri-draft-line" aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
                                 </a>
                                 {% if request.current_organization.is_authorized %}
@@ -83,9 +83,9 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="is_not_stalled_anymore" value="{{ job_seeker.jobseeker_profile.is_not_stalled_anymore|yesno:"0,1" }}">
                                                     {% if job_seeker.jobseeker_profile.is_not_stalled_anymore %}
-                                                        <button type="submit" class="dropdown-item">Le candidat est sans solution</button>
+                                                        <button type="submit" class="dropdown-item">L'usager est sans solution</button>
                                                     {% else %}
-                                                        <button type="submit" class="dropdown-item">Le candidat n'est plus sans solution</button>
+                                                        <button type="submit" class="dropdown-item">L'usager n'est plus sans solution</button>
                                                     {% endif %}
                                                 </form>
                                             {% endif %}

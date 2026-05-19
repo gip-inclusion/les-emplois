@@ -434,7 +434,7 @@ def test_apply_for_button_as_authorized_prescriber(client):
             'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
             'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
             '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
-            "<span>Postuler pour ce candidat</span>"
+            "<span>Postuler pour cet usager</span>"
             "</a>"
         ),
         html=True,
@@ -453,7 +453,7 @@ def test_apply_for_button_as_authorized_prescriber(client):
             'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
             'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
             '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
-            "<span>Postuler pour ce candidat</span>"
+            "<span>Postuler pour cet usager</span>"
             "</a>"
         ),
         html=True,
@@ -486,7 +486,7 @@ def test_apply_for_button_as_unauthorized_prescriber(client):
             'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
             'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
             '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
-            "<span>Postuler pour ce candidat</span>"
+            "<span>Postuler pour cet usager</span>"
             "</a>"
         ),
         html=True,

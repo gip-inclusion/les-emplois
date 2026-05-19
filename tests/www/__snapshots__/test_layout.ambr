@@ -1210,23 +1210,23 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
+                      <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-user-line fw-medium">
                           </i>
                           <span>
-                              Candidats
+                              Accompagnements
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-candidats">
+                      <div class="collapse" id="collapse-nav-accompagnements">
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
+                                      Mes accompagnements
                                   </a>
                               </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les candidats de la structure
+                                      Tous les accompagnements de la structure
                                   </a>
                               </li>
                               <li>
@@ -1553,23 +1553,23 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
+                      <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-user-line fw-medium">
                           </i>
                           <span>
-                              Candidats
+                              Accompagnements
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-candidats">
+                      <div class="collapse" id="collapse-nav-accompagnements">
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
+                                      Mes accompagnements
                                   </a>
                               </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les candidats de la structure
+                                      Tous les accompagnements de la structure
                                   </a>
                               </li>
                           </ul>
@@ -2246,23 +2246,23 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
+                      <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-user-line fw-medium">
                           </i>
                           <span>
-                              Candidats
+                              Accompagnements
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-candidats">
+                      <div class="collapse" id="collapse-nav-accompagnements">
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
+                                      Mes accompagnements
                                   </a>
                               </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les candidats de la structure
+                                      Tous les accompagnements de la structure
                                   </a>
                               </li>
                           </ul>
@@ -2514,23 +2514,23 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
+                      <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-user-line fw-medium">
                           </i>
                           <span>
-                              Candidats
+                              Accompagnements
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-candidats">
+                      <div class="collapse" id="collapse-nav-accompagnements">
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
+                                      Mes accompagnements
                                   </a>
                               </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les candidats de la structure
+                                      Tous les accompagnements de la structure
                                   </a>
                               </li>
                           </ul>
@@ -2826,23 +2826,23 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
+                      <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-user-line fw-medium">
                           </i>
                           <span>
-                              Candidats
+                              Accompagnements
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-candidats">
+                      <div class="collapse" id="collapse-nav-accompagnements">
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
+                                      Mes accompagnements
                                   </a>
                               </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les candidats de la structure
+                                      Tous les accompagnements de la structure
                                   </a>
                               </li>
                           </ul>
@@ -3153,23 +3153,23 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
+                      <button aria-controls="collapse-nav-accompagnements" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-accompagnements" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-user-line fw-medium">
                           </i>
                           <span>
-                              Candidats
+                              Accompagnements
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-candidats">
+                      <div class="collapse" id="collapse-nav-accompagnements">
                           <ul>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
-                                      Mes candidats
+                                      Mes accompagnements
                                   </a>
                               </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
-                                      Tous les candidats de la structure
+                                      Tous les accompagnements de la structure
                                   </a>
                               </li>
                           </ul>
