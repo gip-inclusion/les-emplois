@@ -612,12 +612,18 @@ class TestAssessmentContractsDetails:
         def check_user_access_to_all_tabs(user, *, access):
             client.force_login(user)
             user_label = "GEIQ" if user == geiq_membership.user else "DDETS"
+            if user == geiq_membership.user:
+                user_label = "GEIQ"
+                viewable_tabs_for_user = AssessmentContractDetailsTab.get_common_tabs()
+            else:
+                user_label = "DDETS"
+                viewable_tabs_for_user = AssessmentContractDetailsTab.get_institution_tabs()
             for tab in AssessmentContractDetailsTab:
                 tab_url = reverse(
                     "geiq_assessments_views:assessment_contracts_details",
                     kwargs={"contract_pk": str(contract.pk), "tab": tab.value},
                 )
-                if access:
+                if access and tab in viewable_tabs_for_user:
                     with assertSnapshotQueries(snapshot(name=f"SQL queries for {tab=} as {user_label}")):
                         response = client.get(tab_url)
                     assertContains(response, "DUPONT Jean")
@@ -655,7 +661,7 @@ class TestAssessmentContractsDetails:
             allowance_requested=random.choice([True, False]),
         )
         client.force_login(geiq_membership.user)
-        for tab in AssessmentContractDetailsTab:
+        for tab in AssessmentContractDetailsTab.get_common_tabs():
             current_value = contract.allowance_requested
             tab_url = reverse(
                 "geiq_assessments_views:assessment_contracts_details",

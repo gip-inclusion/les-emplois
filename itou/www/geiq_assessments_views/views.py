@@ -671,6 +671,14 @@ class AssessmentContractDetailsTab(models.TextChoices):
     ALLOWANCE_REQUEST_JUSTIFICATION = "justification", "Justification"
     INSTITUTION_JUSTIFICATION = "institution-justification", "Motif de refus"
 
+    @classmethod
+    def get_common_tabs(cls):
+        return [cls.EMPLOYEE, cls.CONTRACT, cls.SUPPORT_AND_TRAINING, cls.EXIT]
+
+    @classmethod
+    def get_institution_tabs(cls):
+        return cls.get_common_tabs() + [cls.INSTITUTION_JUSTIFICATION]
+
 
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_contracts_details(
@@ -681,8 +689,12 @@ def assessment_contracts_details(
     except ValueError:
         raise Http404
     if request.from_employer:
+        if tab not in AssessmentContractDetailsTab.get_common_tabs():
+            raise Http404
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.from_institution:
+        if tab not in AssessmentContractDetailsTab.get_institution_tabs():
+            raise Http404
         filter_kwargs = {
             "employee__assessment__institutions": request.current_organization,
             "employee__assessment__submitted_at__isnull": False,

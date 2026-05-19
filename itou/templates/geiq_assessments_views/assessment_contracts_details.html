@@ -383,7 +383,7 @@
                         {% else %}
                             {% include "geiq_assessments_views/includes/allowance_request_justification_form.html" with back_url=back_url contract=contract assessment=assessment form=allowance_request_justification_form csrf_token=csrf_token only %}
                         {% endif %}
-                    {% elif active_tab == AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION %}
+                    {% elif request.from_institution and active_tab == AssessmentContractDetailsTab.INSTITUTION_JUSTIFICATION %}
                         {% include "geiq_assessments_views/includes/allowance_refusal_justification_form.html" with contract=contract csrf_token=csrf_token form=allowance_refusal_justification_form disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     {% endif %}
                 </div>
