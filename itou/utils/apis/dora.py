@@ -77,3 +77,14 @@ class DoraAPIClient:
             r["source"] + "--" + r["structure_id"]
             for r in self._request("/disabled-dora-form-di-structures/", params).json()
         }
+
+    def safe_upload(self, file_name: str, file_obj: object) -> None:
+        try:
+            self.client.post(
+                f"/safe-upload/{file_name}",
+                files={"file": file_obj},
+                timeout=httpx.Timeout(5, read=60),
+            ).raise_for_status()
+        except httpx.HTTPError as exc:
+            logger.info("DORA safe-upload error file_name=%r error=%s", file_name, exc)
+            raise DoraAPIException()

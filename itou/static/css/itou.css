@@ -116,6 +116,10 @@ input[type="file"] {
     width: 1px;
 }
 
+.c-multi-file-input {
+    position: relative;
+}
+
 /* Dropdown menus.
 --------------------------------------------------------------------------- */
 

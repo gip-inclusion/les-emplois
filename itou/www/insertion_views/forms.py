@@ -1,25 +1,13 @@
 from django import forms
-from django.core.validators import FileExtensionValidator
-from django.utils.formats import localize
+from django.urls import reverse_lazy
 
-from itou.files.forms import ItouFileInput
+from itou.files.forms import ItouMultiFileField
 from itou.utils.constants import MB
 
 
 ORIENTATION_FILE_EXTENSIONS = ["doc", "docx", "pdf", "png", "jpeg", "jpg", "odt", "xls", "xlsx", "ods"]
 ORIENTATION_FILE_CONTENT_TYPES = ".doc,.docx,.pdf,.png,.jpeg,.jpg,.odt,.xls,.xlsx,.ods"
 ORIENTATION_FILE_MAX_SIZE_MB = 5
-
-
-def _orientation_file_field(**kwargs: object) -> forms.FileField:
-    return forms.FileField(
-        widget=ItouFileInput(
-            content_type=ORIENTATION_FILE_CONTENT_TYPES,
-            max_upload_size_mb=ORIENTATION_FILE_MAX_SIZE_MB,
-        ),
-        validators=[FileExtensionValidator(ORIENTATION_FILE_EXTENSIONS)],
-        **kwargs,
-    )
 
 
 class OrientationConformityForm(forms.Form):
@@ -46,13 +34,21 @@ class OrientationReferentForm(forms.Form):
 
 
 class OrientationDocumentsForm(forms.Form):
-    credentials_documents_files = _orientation_file_field(
+    credentials_documents_files = ItouMultiFileField(
         required=False,
         label="Documents à compléter",
+        content_type=ORIENTATION_FILE_CONTENT_TYPES,
+        max_upload_size=ORIENTATION_FILE_MAX_SIZE_MB * MB,
+        allowed_extensions=ORIENTATION_FILE_EXTENSIONS,
+        upload_url=reverse_lazy("insertion_views:safe_upload"),
     )
-    credentials_proof_files = _orientation_file_field(
+    credentials_proof_files = ItouMultiFileField(
         required=False,
         label="Pré-requis et justificatifs",
+        content_type=ORIENTATION_FILE_CONTENT_TYPES,
+        max_upload_size=ORIENTATION_FILE_MAX_SIZE_MB * MB,
+        allowed_extensions=ORIENTATION_FILE_EXTENSIONS,
+        upload_url=reverse_lazy("insertion_views:safe_upload"),
     )
     gdpr_consent = forms.BooleanField(
         required=True,
@@ -61,17 +57,3 @@ class OrientationDocumentsForm(forms.Form):
             "dans le cadre de cette orientation"
         ),
     )
-
-    def clean(self) -> dict:
-        cleaned_data = super().clean()
-        max_size = ORIENTATION_FILE_MAX_SIZE_MB * MB
-        for field_name in ("credentials_documents_files", "credentials_proof_files"):
-            file = cleaned_data.get(field_name)
-            if file and file.size > max_size:
-                self.add_error(
-                    field_name,
-                    forms.ValidationError(
-                        f"Le fichier doit faire moins de {localize(ORIENTATION_FILE_MAX_SIZE_MB)} Mo."
-                    ),
-                )
-        return cleaned_data

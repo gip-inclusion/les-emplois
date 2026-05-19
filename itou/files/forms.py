@@ -111,7 +111,7 @@ class ItouFileField(forms.FileField):
                 matomo_event("ajout-fichier-candidature", "clic", "clic-sur-lien-aide-pdf"),
             )
 
-    def clean(self, data, initial=None):
+    def clean(self, data: object, initial: object = None) -> object:
         cleaned_data = super().clean(data, initial=initial)
         if data:
             if data.size > self.max_upload_size:
@@ -119,3 +119,74 @@ class ItouFileField(forms.FileField):
             validator = self.CONTENT_TYPE_TO_VALIDATOR[self.content_type]
             validator(data)
         return cleaned_data
+
+
+class ItouMultiFileInput(forms.FileInput):
+    allow_multiple_selected = True
+    template_name = "utils/widgets/multi_file_input.html"
+
+    def __init__(
+        self,
+        *,
+        attrs: dict | None = None,
+        content_type: str,
+        max_upload_size_mb: float,
+        accepted_formats_label: str,
+        upload_url: str = "",
+    ) -> None:
+        if attrs is None:
+            attrs = {}
+        else:
+            attrs = attrs.copy()
+        attrs.setdefault("accept", content_type)
+        super().__init__(attrs=attrs)
+        self.content_type = content_type
+        self.max_upload_size_mb = max_upload_size_mb
+        self.accepted_formats_label = accepted_formats_label
+        self.upload_url = upload_url
+
+    def get_context(self, name: str, value: object, attrs: dict | None) -> dict:
+        context = super().get_context(name, value, attrs)
+        context["widget"]["max_upload_size_mb"] = self.max_upload_size_mb
+        context["widget"]["accepted_formats_label"] = self.accepted_formats_label
+        context["widget"]["upload_url"] = self.upload_url
+        return context
+
+
+class ItouMultiFileField(forms.FileField):
+    def __init__(
+        self,
+        *args: object,
+        content_type: str,
+        max_upload_size: int,
+        allowed_extensions: list[str],
+        upload_url: str = "",
+        **kwargs: object,
+    ) -> None:
+        max_upload_size_mb = max_upload_size / MB
+        kwargs.setdefault(
+            "widget",
+            ItouMultiFileInput(
+                content_type=content_type,
+                max_upload_size_mb=max_upload_size_mb,
+                accepted_formats_label=", ".join(allowed_extensions),
+                upload_url=upload_url,
+            ),
+        )
+        super().__init__(*args, **kwargs)
+        self.max_upload_size = max_upload_size
+        self.max_upload_size_mb = max_upload_size_mb
+        self.validators.append(FileExtensionValidator(allowed_extensions))
+
+    def clean(self, data: object, initial: object = None) -> list:
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            files = [single_file_clean(d, initial) for d in data]
+        else:
+            files = [single_file_clean(data, initial)]
+        for file in files:
+            if file.size > self.max_upload_size:
+                raise forms.ValidationError(
+                    f"Chaque fichier doit faire moins de {localize(self.max_upload_size_mb)} Mo."
+                )
+        return files

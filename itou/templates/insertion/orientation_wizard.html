@@ -1,8 +1,13 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}Orienter vers un service d'insertion{{ block.super }}{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/multi_file_input.js' %}"></script>
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

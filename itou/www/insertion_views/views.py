@@ -1,14 +1,16 @@
 import enum
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Prefetch
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 
@@ -17,6 +19,7 @@ from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import get_orientation_jwt
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
@@ -99,6 +102,23 @@ class OrientationStep(enum.StrEnum):
 
 
 @login_required
+@require_POST
+def safe_upload_proxy(request: HttpRequest) -> JsonResponse:
+    f = request.FILES.get("file")
+    if not f:
+        return JsonResponse({"error": "Aucun fichier fourni."}, status=400)
+    try:
+        with DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN) as client:
+            client.safe_upload(f.name, f)
+    except DoraAPIException:
+        return JsonResponse(
+            {"error": f"Une erreur est survenue lors du transfert du fichier « {f.name} »."},
+            status=502,
+        )
+    return JsonResponse({"name": f.name})
+
+
+@login_required
 def start_orientation(request: HttpRequest, service_uid: str) -> HttpResponse:
     service = get_object_or_404(Service, uid=service_uid)
     if not service.is_orientable_with_form:
@@ -170,12 +190,10 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
                 cleaned = self.form.cleaned_data
                 stored_data = {"gdpr_consent": cleaned["gdpr_consent"]}
                 for field_name in ("credentials_documents_files", "credentials_proof_files"):
-                    file = cleaned.get(field_name)
-                    if file:
-                        s3_key = default_storage.save(f"temporary_storage/orientation/{file.name}", file)
-                        stored_data[field_name] = s3_key
-                    else:
-                        stored_data[field_name] = None
+                    files = cleaned.get(field_name) or []
+                    stored_data[field_name] = [
+                        default_storage.save(f"temporary_storage/orientation/{f.name}", f) for f in files
+                    ]
                 self.wizard_session.set(self.step, stored_data)
                 if self.next_step:
                     return HttpResponseRedirect(self.get_step_url(self.next_step))
