@@ -302,43 +302,75 @@ JOBSEEKERPROFILE_EMPTY_FIELDS = {
 }
 
 
-@pytest.mark.parametrize(
-    "submitted_asp_uid, expected_asp_uid, expected_error",
-    [
-        ("000000000000000000000000000001", "000000000000000000000000000001", False),
-        ("", "e596c650a312ad6142c30d84c771eb", False),
-        ("e53ff9a0-2e52-46b2-bda1-76083b", "000000000000000000000000000000", True),
-    ],
-)
-def test_change_asp_uid(admin_client, submitted_asp_uid, expected_asp_uid, expected_error):
+def test_change_asp_uid_explicit(admin_client):
+    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
+
+    admin_client.post(
+        reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk}),
+        {
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+            "user": profile.user.pk,
+            "asp_uid": "000000000000000000000000000001",
+            **JOBSEEKERPROFILE_EMPTY_FIELDS,
+            **JOBSEEKERPROFILE_FORMSETS_PAYLOAD,
+        },
+    )
+    profile.refresh_from_db()
+    assert profile.asp_uid == "000000000000000000000000000001"
+    assert normalize_fields_history(profile.fields_history) == [
+        {
+            "_context": {"request_id": "[REQUEST ID]", "user": get_user(admin_client).pk},
+            "_timestamp": "[TIMESTAMP]",
+            "before": {"asp_uid": "000000000000000000000000000000"},
+            "after": {"asp_uid": "000000000000000000000000000001"},
+        }
+    ]
+
+
+def test_change_asp_uid_auto_generated(admin_client):
     # force user_id to get a deterministic asp_uid
-    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000", user__pk=696)
+    profile = JobSeekerProfileFactory(user__pk=696)
+
+    admin_client.post(
+        reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk}),
+        {
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+            "user": profile.user.pk,
+            "asp_uid": "",
+            **JOBSEEKERPROFILE_EMPTY_FIELDS,
+            **JOBSEEKERPROFILE_FORMSETS_PAYLOAD,
+        },
+    )
+    profile.refresh_from_db()
+    assert profile.asp_uid == "e596c650a312ad6142c30d84c771eb"
+    assert normalize_fields_history(profile.fields_history) == [
+        {
+            "_context": {"request_id": "[REQUEST ID]", "user": get_user(admin_client).pk},
+            "_timestamp": "[TIMESTAMP]",
+            "before": {"asp_uid": "000000000000000000000000000000"},
+            "after": {"asp_uid": "e596c650a312ad6142c30d84c771eb"},
+        }
+    ]
+
+
+def test_change_asp_uid_invalid_format(admin_client):
+    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
 
     response = admin_client.post(
         reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk}),
         {
             "_continue": "Enregistrer+et+continuer+les+modifications",
             "user": profile.user.pk,
-            "asp_uid": submitted_asp_uid,
+            "asp_uid": "e53ff9a0-2e52-46b2-bda1-76083b",
             **JOBSEEKERPROFILE_EMPTY_FIELDS,
             **JOBSEEKERPROFILE_FORMSETS_PAYLOAD,
         },
     )
     profile.refresh_from_db()
-    assert profile.asp_uid == expected_asp_uid
-    if expected_error:
-        assertContains(
-            response, "L'ID unique envoyé à l'ASP ne doit contenir que des caractères alphanumériques.", html=True
-        )
-        return
-    assert normalize_fields_history(profile.fields_history) == [
-        {
-            "_context": {"request_id": "[REQUEST ID]", "user": get_user(admin_client).pk},
-            "_timestamp": "[TIMESTAMP]",
-            "before": {"asp_uid": "000000000000000000000000000000"},
-            "after": {"asp_uid": expected_asp_uid},
-        }
-    ]
+    assert profile.asp_uid == "000000000000000000000000000000"
+    assertContains(
+        response, "L'ID unique envoyé à l'ASP ne doit contenir que des caractères alphanumériques.", html=True
+    )
 
 
 def test_nir_modification_request_changelist(admin_client):
