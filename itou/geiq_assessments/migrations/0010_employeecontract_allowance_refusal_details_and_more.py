@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("geiq_assessments", "0008_assessmenttransitionlog_comment_and_more"),
+        ("geiq_assessments", "0009_employeecontract_allowance_request_justification_details_and_more"),
     ]
 
     operations = [
