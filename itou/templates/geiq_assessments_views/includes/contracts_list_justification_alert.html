@@ -1,6 +1,6 @@
 {% load components %}
 {% load str_filters %}
-<div id="alert-contracts-awaiting-justification"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+<div id="alert-contracts-awaiting-justification-employer"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     {% if contracts_awaiting_justification_nb %}
         {% if request.from_employer %}
             {% component_alert title=title content=content variant="warning" extra_classes="mt-2" %}

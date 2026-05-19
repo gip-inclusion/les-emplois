@@ -1,6 +1,6 @@
 {% load components %}
 {% load str_filters %}
-<div id="alert-contracts-awaiting-justification"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+<div id="alert-contracts-awaiting-justification-institution"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     {# FIXME: merge GEIQ and institutions here #}
     {% if request.from_institution and stats.contracts_awaiting_institution_justification_nb %}
         {% component_alert title=title content=content variant="warning" extra_classes="mt-2" %}
