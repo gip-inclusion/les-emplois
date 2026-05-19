@@ -39,10 +39,10 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-md-1 pe-xxl-5">
                     <div class="c-stepper mb-3 mb-md-4">
                         <div class="progress">
-                            <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
                             </div>
                         </div>
-                        <p>
+                        <p id="currentProgressState">
                             {% block progress_title %}{% endblock %}
                         </p>
                     </div>

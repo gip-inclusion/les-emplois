@@ -27,10 +27,15 @@
                             {% if pstep == step %}
                                 <div class="c-stepper">
                                     <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width:{% widthratio percent_steps 1 pstep %}%" aria-valuenow="{% widthratio percent_steps 1 pstep %}" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
+                                        <div class="progress-bar"
+                                             role="progressbar"
+                                             style="width:{% widthratio percent_steps 1 pstep %}%"
+                                             aria-valuenow="{% widthratio percent_steps 1 pstep %}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             aria-labelledby="currentProgressState"></div>
                                     </div>
-                                    <p>
+                                    <p id="currentProgressState">
                                         <strong>Étape {{ pstep }}</strong>/{{ total_steps }} : {{ label }}
                                     </p>
                                 </div>
