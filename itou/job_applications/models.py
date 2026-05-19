@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator, MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Case, Count, Exists, F, Func, Max, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models import Case, Count, Exists, F, ForeignKey, Func, Max, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -199,23 +199,16 @@ class JobApplicationQuerySet(models.QuerySet):
     def created_on_given_year_and_month(self, year, month):
         return self.filter(created_at__year=year, created_at__month=month)
 
-    def get_unique_fk_qs(self, fk_field):
+    def get_unique_fk_qs(self, fk_field_name):
         """
         Get unique foreign key objects in a single query.
         """
-        # FIXME: Replace that static list by a dynamic one
-        if fk_field not in [
-            "approval",
-            "job_seeker",
-            "sender",
-            "sender_company",
-            "sender_prescriber_organization",
-            "to_company",
-        ]:
-            raise RuntimeError("Unauthorized fk_field")
+        fk_field = self.model._meta.get_field(fk_field_name)
+        if not isinstance(fk_field, ForeignKey):
+            raise RuntimeError(f"Not a foreign key: {fk_field_name}")
 
         # Use the `_id` field because ordering by a ForeignKey will follow the Meta.ordering but the distinct will not.
-        return self.order_by(f"{fk_field}_id").distinct(f"{fk_field}_id").select_related(fk_field)
+        return self.order_by(f"{fk_field_name}_id").distinct(f"{fk_field_name}_id").select_related(fk_field_name)
 
     def get_unique_fk_objects(self, fk_field):
         return [
