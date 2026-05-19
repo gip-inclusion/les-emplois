@@ -10,6 +10,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import File
 from itou.geiq_assessments.enums import (
+    AllowanceJustificationReason,
     AllowanceRefusalReason,
     AssessmentState,
     AssessmentTransition,
@@ -617,7 +618,7 @@ class EmployeeContract(models.Model):
     allowance_request_justification_reason = models.CharField(
         verbose_name="motif de la demande d'aide (GEIQ)",
         max_length=30,
-        choices=geiq_enums.AllowanceJustificationReason,
+        choices=AllowanceJustificationReason,
         blank=True,
     )
     allowance_request_justification_details = models.TextField(
