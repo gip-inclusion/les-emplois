@@ -894,6 +894,11 @@ class JobSeekerProfile(models.Model):
         max_length=30,
         blank=True,
         unique=True,
+        validators=[
+            RegexValidator(
+                r"^[a-zA-Z0-9]+$", "L'ID unique envoyé à l'ASP ne doit contenir que des caractères alphanumériques."
+            )
+        ],
     )
 
     education_level = models.CharField(
