@@ -57,7 +57,7 @@
                     <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                         {% include "geiq_assessments_views/includes/contracts_grant_box_for_institution.html" with contract=contract csrf_token=csrf_token AssessmentContractDetailsTab=AssessmentContractDetailsTab active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     </div>
-                {% elif request.from_employer and editable %}
+                {% elif request.from_employer %}
                     <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                         {% if contract.allowance_requested %}
                             {% if contract.requires_justification %}
