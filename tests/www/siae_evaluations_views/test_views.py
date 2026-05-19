@@ -485,7 +485,8 @@ class TestViewProof:
         (lambda: JobSeekerFactory(), 403),
         (lambda: PrescriberFactory(membership=True), 403),
         (lambda: CompanyMembershipFactory(company__evaluable_kind=True).user, 404),
-        (lambda: InstitutionMembershipFactory().user, 404),
+        # '12' below could actually be anything else than 14, see also EvaluationCampaignFactory
+        (lambda: InstitutionMembershipFactory(institution__department="12").user, 404),
     ],
     ids=["job_seeker", "prescriber", "unrelated_employer", "unrelated_inspector"],
 )
