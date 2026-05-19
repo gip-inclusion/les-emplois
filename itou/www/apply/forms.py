@@ -3,7 +3,6 @@ import logging
 from functools import wraps
 from operator import itemgetter
 
-import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.db.models import Exists, OuterRef, Q, TextChoices
@@ -981,7 +980,6 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 autocomplete_view_name, kwargs={"field_name": model_field_name}
             )
 
-    @sentry_sdk.trace
     def __init__(self, job_applications_qs, *args, list_kind, request, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
