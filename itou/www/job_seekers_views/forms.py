@@ -23,10 +23,10 @@ from itou.utils.widgets import DuetDatePickerWidget
 class FilterForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=False,
-        label="Nom du candidat",
+        label="Nom de l'usager",
         widget=Select2Widget(
             attrs={
-                "data-placeholder": "Nom du candidat",
+                "data-placeholder": "Nom de l'usager",
             }
         ),
     )
@@ -38,7 +38,7 @@ class FilterForm(forms.Form):
     pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
     no_pass_iae = forms.BooleanField(label="Aucun", required=False)
 
-    is_stalled = forms.BooleanField(label="N’afficher que les candidats sans solution", required=False)
+    is_stalled = forms.BooleanField(label="N’afficher que les usagers sans solution", required=False)
 
     organization_members = forms.MultipleChoiceField(
         label="Nom de la personne", required=False, widget=Select2MultipleWidget

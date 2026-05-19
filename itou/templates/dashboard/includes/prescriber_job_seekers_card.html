@@ -8,12 +8,12 @@
 <div class="col mb-3 mb-md-4">
     {% component_box_dashboard title=title cta=cta list=list extra_boxes=extra_boxes %}
         {% fragment as title %}
-            Candidats
+            Accompagnements
         {% endfragment %}
         {% fragment as cta %}
             <a href="{% url 'job_seekers_views:list' %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
                 <i class="ri-user-line ri-lg fw-normal" aria-hidden="true"></i>
-                <span>Liste de mes candidats</span>
+                <span>Mes accompagnements</span>
             </a>
         {% endfragment %}
         {% fragment as list %}
@@ -41,7 +41,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="{% url "job_seekers_views:list" %}?is_stalled=on" class="text-warning fw-bold text-decoration-none btn-ico" {% matomo_event "dashboard" "clic" "candidats-sans-solution" %}>
                             <i class="ri-user-forbid-line fw-normal" aria-hidden="true"></i>
-                            <span>Candidat{{ stalled_job_seekers_count|pluralizefr }} sans solution</span>
+                            <span>Usager{{ stalled_job_seekers_count|pluralizefr }} sans solution</span>
                         </a>
                         <span class="badge rounded-pill badge-xs bg-warning-light text-warning">{{ stalled_job_seekers_count }}</span>
                     </div>

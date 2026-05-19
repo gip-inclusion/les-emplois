@@ -134,7 +134,7 @@ class TestDashboardView:
 
         response = client.get(reverse("dashboard:index"))
         assertContains(response, format_siret(prescriber_organization.siret))
-        assertContains(response, "Liste de mes candidats")
+        assertContains(response, "Mes accompagnements")
 
     def test_dashboard_displays_asp_badge(self, client):
         WARNING_CLASS = "bg-warning"
@@ -1084,4 +1084,4 @@ def test_stalled_job_seekers_box(client):
 
     response = client.get(reverse("dashboard:index"))
     assert response.context["stalled_job_seekers_count"] == 1
-    assertContains(response, "<span>Candidat sans solution</span>", count=1)
+    assertContains(response, "<span>Usager sans solution</span>", count=1)
