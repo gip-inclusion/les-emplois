@@ -12,7 +12,7 @@ from itou.utils import triggers
 def test_context(context):
     with triggers.connection_wrapper(), assertNumQueries(2):
         with triggers.context(**context), connection.cursor() as cursor:
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(context),)
 
 
@@ -20,15 +20,15 @@ def test_context_stacking():
     with triggers.connection_wrapper(), assertNumQueries(6), connection.cursor() as cursor:
         context_1 = {"level": 1}
         with triggers.context(**context_1):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(context_1),)
 
             context_2 = {"level": 1, "sublevel": 1}
             with triggers.context(**context_2):
-                cursor.execute("SELECT current_setting('itou.context')")
+                cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(context_2),)
 
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(context_1),)
 
 
@@ -37,24 +37,24 @@ def test_context_stacking_with_different_data():
     # 5 different contexts defined and queried: 10 queries
     with triggers.connection_wrapper(), assertNumQueries(10), connection.cursor() as cursor:
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
             new_uuid = str(uuid.uuid4())
             with triggers.context(uuid=new_uuid):
-                cursor.execute("SELECT current_setting('itou.context')")
+                cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps({"uuid": new_uuid, "foo": "bar"}),)
 
             with triggers.context(uuid=new_uuid, replace_existing=True):
-                cursor.execute("SELECT current_setting('itou.context')")
+                cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps({"uuid": new_uuid}),)
 
             with triggers.context():
-                cursor.execute("SELECT current_setting('itou.context')")
+                cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
             with triggers.context(replace_existing=True):
-                cursor.execute("SELECT current_setting('itou.context')")
+                cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == ("{}",)
 
 
@@ -62,11 +62,11 @@ def test_context_stacking_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
     with triggers.connection_wrapper(), assertNumQueries(3), connection.cursor() as cursor:
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
             with triggers.context(**expected):
-                cursor.execute("SELECT current_setting('itou.context')")
+                cursor.execute("SELECT current_setting('itou.context')")  # 1 query: current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
 
@@ -74,11 +74,11 @@ def test_context_consecutively_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
     with triggers.connection_wrapper(), assertNumQueries(4), connection.cursor() as cursor:
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
         assert cursor.fetchone() == (json.dumps(expected),)
 
 
@@ -86,17 +86,17 @@ def test_context_consecutively_with_same_data():
 def test_context_savepoint_rollback():
     expected = {"uuid": str(uuid.uuid4())}
     with transaction.atomic(), triggers.connection_wrapper(), assertNumQueries(7), connection.cursor() as cursor:
-        savepoint_id = transaction.savepoint()
+        savepoint_id = transaction.savepoint()  # 1 query: SAVEPOINT
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
-        transaction.savepoint_rollback(savepoint_id)
-        cursor.execute("SELECT current_setting('itou.context')")
+        transaction.savepoint_rollback(savepoint_id)  # 1 query: ROLLBACK TO SAVEPOINT
+        cursor.execute("SELECT current_setting('itou.context')")  # 1 query: current_setting
         assert cursor.fetchone() == ("",)
 
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
 
@@ -104,7 +104,7 @@ def test_context_laziness():
     expected = {"uuid": str(uuid.uuid4())}
     with triggers.connection_wrapper(), assertNumQueries(2), connection.cursor() as cursor:
         with triggers.context(**{"uuid": str(uuid.uuid4())}), triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
 
