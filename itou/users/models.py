@@ -937,6 +937,12 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         max_length=30,
         blank=True,
         unique=True,
+        validators=[
+            RegexValidator(
+                r"^[0-9a-f]{30}$",
+                "L'ID unique envoyé à l'ASP doit être composé de 30 caractères hexadécimaux.",
+            ),
+        ],
     )
 
     education_level = models.CharField(

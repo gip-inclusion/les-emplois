@@ -809,6 +809,12 @@ class Migration(migrations.Migration):
                         max_length=30,
                         unique=True,
                         verbose_name="ID unique envoyé à l'ASP",
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                r"^[0-9a-f]{30}$",
+                                "L'ID unique envoyé à l'ASP doit être composé de 30 caractères hexadécimaux.",
+                            ),
+                        ],
                     ),
                 ),
                 (
