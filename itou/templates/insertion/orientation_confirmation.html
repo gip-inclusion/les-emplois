@@ -1,0 +1,23 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Demande d'orientation transmise{{ block.super }}{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8">
+                    <div class="c-box text-center">
+                        <i class="ri-checkbox-circle-line ri-3x text-success mb-3" aria-hidden="true"></i>
+                        <h1>Votre demande a bien été transmise !</h1>
+                        <p>
+                            La demande d'orientation vers <strong>{{ service.name }}</strong>
+                            a été envoyée. Une confirmation a été adressée à {{ job_seeker.email }}.
+                        </p>
+                        <a href="{% url 'dashboard:index' %}" class="btn btn-primary mt-3">Retour à l'accueil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
