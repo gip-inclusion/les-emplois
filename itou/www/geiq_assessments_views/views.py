@@ -53,8 +53,8 @@ from itou.www.geiq_assessments_views.export import (
 )
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
-    AllowanceRequestJustificationForm,
     AllowanceRefusalJustificationForm,
+    AllowanceRequestJustificationForm,
     ContractFilterForm,
     CreateForm,
     GeiqCommentForm,
@@ -680,12 +680,16 @@ class AssessmentContractDetailsTab(models.TextChoices):
     CONTRACT = "contract", "Contrat"
     SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
     EXIT = "exit", "Sortie"
-    ALLOWANCE_REQUEST_JUSTIFICATION = "justification", "Justification"
+    ALLOWANCE_REQUEST_JUSTIFICATION = "employer-justification", "Justification"
     INSTITUTION_JUSTIFICATION = "institution-justification", "Motif de refus"
 
     @classmethod
     def get_common_tabs(cls):
         return [cls.EMPLOYEE, cls.CONTRACT, cls.SUPPORT_AND_TRAINING, cls.EXIT]
+
+    @classmethod
+    def get_employer_tabs(cls):
+        return cls.get_common_tabs() + [cls.ALLOWANCE_REQUEST_JUSTIFICATION]
 
     @classmethod
     def get_institution_tabs(cls):
@@ -701,7 +705,7 @@ def assessment_contracts_details(
     except ValueError:
         raise Http404
     if request.from_employer:
-        if tab not in AssessmentContractDetailsTab.get_common_tabs():
+        if tab not in AssessmentContractDetailsTab.get_employer_tabs():
             raise Http404
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.from_institution:

@@ -28,9 +28,10 @@
                     <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
                     </a>
                 </li>
-            {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and request.from_employer and not contract.requires_justification %}
+            {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and request.from_employer and contract.requires_justification %}
                 <li class="nav-item">
-                    <a class="nav-link{% if active_tab == 'justification' %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                    <a class="nav-link{% if active_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %} active{% endif %}"
+                       href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
                         {{ tab.label }}
                         {% if not contract.allowance_request_justification_reason %}
                             <i class="ri-error-warning-line ri-xl text-warning ms-2"></i>
@@ -52,13 +53,8 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                {% if request.from_institution %}
-                    <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                        {% include "geiq_assessments_views/includes/contracts_grant_box_for_institution.html" with contract=contract csrf_token=csrf_token AssessmentContractDetailsTab=AssessmentContractDetailsTab active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
-                    </div>
-                {% endif %}
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
-                    <h2>{{ active_tab.label }}</h2>
+                <h2>{{ active_tab.label }}</h2>
+                <div class="s-section__col col col-xxl-8 col-xxxl-9">
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
@@ -449,6 +445,10 @@
                                 </form>
                             </div>
                         {% endif %}
+                    </div>
+                {% elif request.from_institution and editable %}
+                    <div class="s-section__col col-5">
+                        {% include "geiq_assessments_views/includes/contracts_grant_box_for_institution.html" with contract=contract csrf_token=csrf_token AssessmentContractDetailsTab=AssessmentContractDetailsTab active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     </div>
                 {% endif %}
             </div>
