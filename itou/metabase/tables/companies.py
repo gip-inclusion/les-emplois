@@ -105,8 +105,6 @@ TABLE.add_columns(
                 2,
             ),
         },
-        # FIXME(vperron) Sur ce cas précis ça vaudrait le coup d'exporter chaque jour le contenu de la table
-        # plutot que de s'écrire des agrégations à l'infini
         {
             "name": "total_auto_prescriptions",
             "type": "integer",
