@@ -1,3 +1,4 @@
+import contextlib
 import logging
 
 import httpx
@@ -9,6 +10,7 @@ from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
 from itou.users import enums as users_enums
+from itou.utils import triggers
 
 
 # PE Connect API data retrieval tools
@@ -265,11 +267,13 @@ def import_user_pe_data(
     user,
     token,
     pe_data_import=None,
+    triggers_context=None,
 ):
     """
     Import external user data via PE Connect
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
     """
+
     if not pe_data_import:
         pe_data_import = ExternalDataImport.objects.create(
             source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user, status=ExternalDataImport.STATUS_PENDING
@@ -278,7 +282,10 @@ def import_user_pe_data(
         try:
             # External requests
             status, user_data = get_aggregated_user_data(token)
-            with transaction.atomic():
+            with (
+                transaction.atomic(),
+                triggers.context(**triggers_context) if triggers_context is not None else contextlib.nullcontext(),
+            ):
                 # A refactoring would be helpful to split user/job seeker saving
                 # and to use the status before calling save()
                 # Save user and job seeker data

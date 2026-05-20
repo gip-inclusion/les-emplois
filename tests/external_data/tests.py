@@ -9,6 +9,7 @@ import itou.external_data.apis.pe_connect as pec
 from itou.external_data.apis.pe_connect import import_user_pe_data
 from itou.external_data.models import ExternalDataImport
 from itou.users.enums import IdentityProvider
+from itou.utils import triggers
 from tests.users.factories import JobSeekerFactory
 
 
@@ -110,14 +111,14 @@ def mock_api_esd(settings):
 
 class TestExternalDataImport:
     @respx.mock
-    @pytest.mark.usefixtures("trigger_context")
     def test_status_ok(self):
         user = JobSeekerFactory()
 
         # Mock all PE APIs
         _mock_status_ok()
 
-        result = import_user_pe_data(user, FOO_TOKEN)
+        with triggers.connection_wrapper():
+            result = import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         assert result.status == ExternalDataImport.STATUS_OK
 
         report = result.report
@@ -129,12 +130,12 @@ class TestExternalDataImport:
         assert 12 == len(report.get("fields_fetched"))
 
     @respx.mock
-    @pytest.mark.usefixtures("trigger_context")
     def test_status_partial(self):
         user = JobSeekerFactory()
         _mock_status_partial()
 
-        result = import_user_pe_data(user, FOO_TOKEN)
+        with triggers.connection_wrapper():
+            result = import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         assert result.status == ExternalDataImport.STATUS_PARTIAL
 
         report = result.report
@@ -161,14 +162,14 @@ class TestExternalDataImport:
 
 class TestJobSeekerExternalData:
     @respx.mock
-    @pytest.mark.usefixtures("trigger_context")
     def test_import_ok(self):
         _mock_status_ok()
 
         # Check override of birthdate / of a field
         user = JobSeekerFactory(jobseeker_profile__birthdate=None)
 
-        result = import_user_pe_data(user, FOO_TOKEN)
+        with triggers.connection_wrapper():
+            result = import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
         assert user.has_external_data
 
@@ -190,7 +191,8 @@ class TestJobSeekerExternalData:
         user = JobSeekerFactory()
         birthdate = user.jobseeker_profile.birthdate
 
-        report = import_user_pe_data(user, FOO_TOKEN).report
+        with triggers.connection_wrapper():
+            report = import_user_pe_data(user, FOO_TOKEN, triggers_context={}).report
 
         user.refresh_from_db()
 
@@ -199,12 +201,12 @@ class TestJobSeekerExternalData:
         assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock
-    @pytest.mark.usefixtures("trigger_context")
     def test_import_partial(self):
         _mock_status_partial()
 
         user = JobSeekerFactory()
-        import_user_pe_data(user, FOO_TOKEN)
+        with triggers.connection_wrapper():
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
         assert user.has_external_data
 
@@ -232,14 +234,14 @@ class TestJobSeekerExternalData:
         assert data.has_minimal_social_allowance is None
 
     @respx.mock
-    @pytest.mark.usefixtures("trigger_context")
     def test_has_external_data(self):
         _mock_status_ok()
 
         user1 = JobSeekerFactory()
         user2 = JobSeekerFactory()
 
-        import_user_pe_data(user1, FOO_TOKEN)
+        with triggers.connection_wrapper():
+            import_user_pe_data(user1, FOO_TOKEN, triggers_context={})
         user1.refresh_from_db()
 
         assert user1.has_external_data
