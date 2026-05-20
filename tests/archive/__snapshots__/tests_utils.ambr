@@ -1,116 +1,339 @@
 # serializer version: 1
-# name: TestRelatedObjectsConsistency.test_get_filter_kwargs_on_user_for_related_objects_to_check[filter_kwargs_on_user_for_related_objects_to_check]
-  dict({
-    'approval__isnull': True,
-    'approval_manually_delivered__isnull': True,
-    'approval_manually_refused__isnull': True,
-    'approvals__isnull': True,
-    'approvals_suspended_set__isnull': True,
-    'assessmenttransitionlog__isnull': True,
-    'authorization_status_set__isnull': True,
-    'contracts__isnull': True,
-    'created_assessments__isnull': True,
-    'created_company_set__isnull': True,
-    'created_follow_up_groups__isnull': True,
-    'created_prescriber_organization_set__isnull': True,
-    'eligibilitydiagnosis__isnull': True,
-    'final_reviewed_assessments__isnull': True,
-    'geiqeligibilitydiagnosis__isnull': True,
-    'job_applications__isnull': True,
-    'job_applications_sent__isnull': True,
-    'jobapplication__isnull': True,
-    'jobapplicationcomment__isnull': True,
-    'jobapplicationtransitionlog__isnull': True,
-    'professional_assignments__isnull': True,
-    'prolongationrequest_processed__isnull': True,
-    'prolongationrequests_assigned__isnull': True,
-    'prolongationrequests_created__isnull': True,
-    'prolongationrequests_declared__isnull': True,
-    'prolongationrequests_updated__isnull': True,
-    'prolongations_created__isnull': True,
-    'prolongations_declared__isnull': True,
-    'prolongations_updated__isnull': True,
-    'prolongations_validated__isnull': True,
-    'reactivated_siae_convention_set__isnull': True,
-    'reviewed_assessments__isnull': True,
-    'submitted_assessments__isnull': True,
-    'suspension__isnull': True,
-    'updated_companymembership_set__isnull': True,
-    'updated_institutionmembership_set__isnull': True,
-    'updated_prescribermembership_set__isnull': True,
-    'user__isnull': True,
-  })
-# ---
-# name: TestRelatedObjectsConsistency.test_user_related_objects_deleted_on_cascade[user_related_objects_deleted_on_cascade]
+# name: TestRelatedObjectsConsistency.test_user_related_objects_blocking_deletion[False]
   list([
     dict({
-      'logentry': <class 'django.contrib.admin.models.LogEntry'>,
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'approvals.Approval',
     }),
     dict({
-      'auth_token': <class 'rest_framework.authtoken.models.Token'>,
+      'field': 'user',
+      'hidden': False,
+      'model': 'approvals.Approval',
     }),
     dict({
-      'totpdevice': <class 'django_otp.plugins.otp_totp.models.TOTPDevice'>,
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'approvals.Prolongation',
     }),
     dict({
-      'emailaddress': <class 'allauth.account.models.EmailAddress'>,
+      'field': 'declared_by',
+      'hidden': False,
+      'model': 'approvals.Prolongation',
     }),
     dict({
-      'companymembership': <class 'itou.companies.models.CompanyMembership'>,
+      'field': 'updated_by',
+      'hidden': False,
+      'model': 'approvals.Prolongation',
     }),
     dict({
-      'jobseeker_profile': <class 'itou.users.models.JobSeekerProfile'>,
+      'field': 'validated_by',
+      'hidden': False,
+      'model': 'approvals.Prolongation',
     }),
     dict({
-      'job_seeker_assignments': <class 'itou.users.models.JobSeekerAssignment'>,
+      'field': 'assigned_to',
+      'hidden': False,
+      'model': 'approvals.ProlongationRequest',
     }),
     dict({
-      'prescribermembership': <class 'itou.prescribers.models.PrescriberMembership'>,
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'approvals.ProlongationRequest',
     }),
     dict({
-      'institutionmembership': <class 'itou.institutions.models.InstitutionMembership'>,
+      'field': 'declared_by',
+      'hidden': False,
+      'model': 'approvals.ProlongationRequest',
     }),
     dict({
-      'geiq_eligibility_diagnoses': <class 'itou.eligibility.models.geiq.GEIQEligibilityDiagnosis'>,
+      'field': 'processed_by',
+      'hidden': False,
+      'model': 'approvals.ProlongationRequest',
     }),
     dict({
-      'eligibility_diagnoses': <class 'itou.eligibility.models.iae.EligibilityDiagnosis'>,
+      'field': 'updated_by',
+      'hidden': False,
+      'model': 'approvals.ProlongationRequest',
     }),
     dict({
-      'prescriber_org_invitations': <class 'itou.invitations.models.PrescriberWithOrgInvitation'>,
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'approvals.Suspension',
     }),
     dict({
-      'company_invitations': <class 'itou.invitations.models.EmployerInvitation'>,
+      'field': 'updated_by',
+      'hidden': False,
+      'model': 'approvals.Suspension',
     }),
     dict({
-      'institution_invitations': <class 'itou.invitations.models.LaborInspectorInvitation'>,
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'companies.Company',
     }),
     dict({
-      'externaldataimport': <class 'itou.external_data.models.ExternalDataImport'>,
+      'field': 'updated_by',
+      'hidden': False,
+      'model': 'companies.CompanyMembership',
     }),
     dict({
-      'jobseekerexternaldata': <class 'itou.external_data.models.JobSeekerExternalData'>,
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'companies.Contract',
     }),
     dict({
-      'saved_searches': <class 'itou.search.models.SavedSearch'>,
+      'field': 'reactivated_by',
+      'hidden': False,
+      'model': 'companies.SiaeConvention',
     }),
     dict({
-      'notification_settings': <class 'itou.communications.models.NotificationSettings'>,
+      'field': 'author',
+      'hidden': False,
+      'model': 'eligibility.EligibilityDiagnosis',
     }),
     dict({
-      'follow_up_group': <class 'itou.gps.models.FollowUpGroup'>,
+      'field': 'author',
+      'hidden': False,
+      'model': 'eligibility.GEIQEligibilityDiagnosis',
     }),
     dict({
-      'follow_up_groups': <class 'itou.gps.models.FollowUpGroupMembership'>,
+      'field': 'user',
+      'hidden': True,
+      'model': 'employee_record.EmployeeRecordTransitionLog',
     }),
     dict({
-      'rdvi_invitation_requests': <class 'itou.rdv_insertion.models.InvitationRequest'>,
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'geiq_assessments.Assessment',
     }),
     dict({
-      'rdvi_participations': <class 'itou.rdv_insertion.models.Participation'>,
+      'field': 'final_reviewed_by',
+      'hidden': False,
+      'model': 'geiq_assessments.Assessment',
     }),
     dict({
-      'activated_services': <class 'itou.nexus.models.ActivatedService'>,
+      'field': 'reviewed_by',
+      'hidden': False,
+      'model': 'geiq_assessments.Assessment',
+    }),
+    dict({
+      'field': 'submitted_by',
+      'hidden': False,
+      'model': 'geiq_assessments.Assessment',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'geiq_assessments.AssessmentTransitionLog',
+    }),
+    dict({
+      'field': 'creator',
+      'hidden': False,
+      'model': 'gps.FollowUpGroupMembership',
+    }),
+    dict({
+      'field': 'updated_by',
+      'hidden': False,
+      'model': 'institutions.InstitutionMembership',
+    }),
+    dict({
+      'field': 'approval_manually_delivered_by',
+      'hidden': False,
+      'model': 'job_applications.JobApplication',
+    }),
+    dict({
+      'field': 'approval_manually_refused_by',
+      'hidden': False,
+      'model': 'job_applications.JobApplication',
+    }),
+    dict({
+      'field': 'archived_by',
+      'hidden': True,
+      'model': 'job_applications.JobApplication',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'job_applications.JobApplication',
+    }),
+    dict({
+      'field': 'sender',
+      'hidden': False,
+      'model': 'job_applications.JobApplication',
+    }),
+    dict({
+      'field': 'transferred_by',
+      'hidden': False,
+      'model': 'job_applications.JobApplication',
+    }),
+    dict({
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'job_applications.JobApplicationComment',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'job_applications.JobApplicationTransitionLog',
+    }),
+    dict({
+      'field': 'updated_by',
+      'hidden': False,
+      'model': 'prescribers.PrescriberMembership',
+    }),
+    dict({
+      'field': 'authorization_updated_by',
+      'hidden': False,
+      'model': 'prescribers.PrescriberOrganization',
+    }),
+    dict({
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'prescribers.PrescriberOrganization',
+    }),
+    dict({
+      'field': 'professional',
+      'hidden': False,
+      'model': 'users.JobSeekerAssignment',
+    }),
+    dict({
+      'field': 'requested_by',
+      'hidden': True,
+      'model': 'users.NirModificationRequest',
+    }),
+    dict({
+      'field': 'created_by',
+      'hidden': False,
+      'model': 'users.User',
+    }),
+  ])
+# ---
+# name: TestRelatedObjectsConsistency.test_user_related_objects_blocking_deletion[True]
+  list([
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'account.EmailAddress',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'admin.LogEntry',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'authtoken.Token',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'communications.NotificationSettings',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'companies.CompanyMembership',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'eligibility.EligibilityDiagnosis',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'eligibility.GEIQEligibilityDiagnosis',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'external_data.ExternalDataImport',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'external_data.JobSeekerExternalData',
+    }),
+    dict({
+      'field': 'beneficiary',
+      'hidden': False,
+      'model': 'gps.FollowUpGroup',
+    }),
+    dict({
+      'field': 'member',
+      'hidden': False,
+      'model': 'gps.FollowUpGroupMembership',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'institutions.InstitutionMembership',
+    }),
+    dict({
+      'field': 'sender',
+      'hidden': False,
+      'model': 'invitations.EmployerInvitation',
+    }),
+    dict({
+      'field': 'sender',
+      'hidden': False,
+      'model': 'invitations.LaborInspectorInvitation',
+    }),
+    dict({
+      'field': 'sender',
+      'hidden': False,
+      'model': 'invitations.PrescriberWithOrgInvitation',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'nexus.ActivatedService',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'otp_totp.TOTPDevice',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'prescribers.PrescriberMembership',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'rdv_insertion.InvitationRequest',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'rdv_insertion.Participation',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'search.SavedSearch',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'users.JobSeekerAssignment',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'users.JobSeekerProfile',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': True,
+      'model': 'users.User_groups',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': True,
+      'model': 'users.User_user_permissions',
     }),
   ])
 # ---

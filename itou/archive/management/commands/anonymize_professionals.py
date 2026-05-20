@@ -11,7 +11,7 @@ from itou.archive.anonymize import (
 )
 from itou.archive.constants import GRACE_PERIOD
 from itou.archive.tasks import async_delete_contact
-from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check
+from itou.archive.utils import exclude_users_with_blocking_relations
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand
@@ -91,10 +91,9 @@ class Command(BaseCommand):
         )
 
     def get_users_to_anonymize_and_delete(self, users):
-        related_objects_to_check = get_filter_kwargs_on_user_for_related_objects_to_check()
         return list(
             annotate_and_prefetch_for_anonymization(
-                User.objects.filter(id__in=[user.id for user in users]).filter(**related_objects_to_check)
+                exclude_users_with_blocking_relations(User.objects.filter(id__in=[user.id for user in users]))
             )
         )
 

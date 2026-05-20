@@ -13,16 +13,38 @@ from itou.siae_evaluations.models import EvaluatedJobApplication
 from itou.users.models import User, UserKind
 
 
-def get_filter_kwargs_on_user_for_related_objects_to_check():
+def get_user_reverse_relations(is_cascade):
+    fields = []
+    for field in User._meta.get_fields(include_hidden=True):
+        if not (field.is_relation and field.auto_created and not field.concrete):
+            continue
+        on_delete = getattr(field, "on_delete", None)
+        if not on_delete:
+            continue
+        if is_cascade != (on_delete == models.CASCADE):
+            continue
+        fields.append(field)
+    return fields
+
+
+def exclude_users_with_blocking_relations(qs):
+    """Narrow a `User` queryset to users that have no non-CASCADE reverse FK rows pointing at them.
+
+    Returned instances correspond to users we can actually `.delete()` without hitting `RestrictedError`
+    or `ProtectedError`.
+
+    This function also covers relations declared with `related_name="+"`, which `User._meta.related_objects`
+    silently skips because Django marks them hidden. Using `_base_manager` is intentional: a soft-deleted
+    related row or a filtered-by-default row hidden by a custom default manager could still hold the FK that
+    would block `.delete()`.
     """
-    Returns a dictionary of filter parameters to check for objects related
-    to the User model that are not cascade deleted.
-    """
-    return {
-        f"{obj.name}__isnull": True
-        for obj in User._meta.related_objects
-        if getattr(obj, "on_delete", None) and obj.on_delete != models.CASCADE
-    }
+    exists_clauses = [
+        Exists(field.related_model._base_manager.filter(**{field.field.name: OuterRef("pk")}))
+        for field in get_user_reverse_relations(is_cascade=False)
+    ]
+    if not exists_clauses:
+        return qs
+    return qs.exclude(Q(*exists_clauses, _connector=Q.OR))
 
 
 def get_year_month_or_none(date=None):
