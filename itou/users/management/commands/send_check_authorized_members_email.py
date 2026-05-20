@@ -20,6 +20,9 @@ class Command(BaseCommand):
     access to the organization data.
     """
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def build_query(self, queryset):
         TODAY = timezone.localdate()
 
