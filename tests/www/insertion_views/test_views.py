@@ -24,6 +24,8 @@ def service(db):
         uid="test-service-uid",
         name="Mon service de test",
         updated_on="2025-01-15",
+        source__value="dora",
+        source__label="Dora",
         structure__uid="test-structure-uid",
         structure__name="Ma structure de test",
         structure__updated_on="2025-01-15",
