@@ -20,14 +20,15 @@ _context = threading.local()
 
 
 def _set_context_connection_wrapper(execute, sql, params, many, context):
+    connection = context["connection"]
     context_is_outdated = getattr(_context, "last_data_set", None) != getattr(_context, "data", None)
-    if context_is_outdated and not context["connection"].in_atomic_block and getattr(_context, "data", None) is None:
+    if context_is_outdated and not connection.in_atomic_block and getattr(_context, "data", None) is None:
         # If we aren't in a transaction then the context has already been flushed so we don't need
         # to call `set_config()` to empty it as `None` is the default sentinel value for `_context.data`.
         _context.last_data_set = None
         context_is_outdated = False
     if context_is_outdated:
-        if not context["connection"].in_atomic_block:
+        if not connection.in_atomic_block:
             # This should not happen since set_config is called with is_local=true
             error_msg = "Trying to define a context outside a transaction"
             if settings.ITOU_ENVIRONMENT in [ItouEnvironment.DEV, ItouEnvironment.TEST]:
