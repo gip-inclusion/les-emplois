@@ -679,9 +679,9 @@ httpx==0.28.1 \
     # via
     #   -r base.in
     #   itoutils
-huey==3.0.0 \
-    --hash=sha256:0cfc83617b90132b0d375a3a3726aa7263cd461e7ae12af79b3a94e2630afaf5 \
-    --hash=sha256:b92087253ab6e7c806e9ce3602d6f546eefb7c1b1ee7d1dc5be2b9691d23b28c
+huey==3.0.1 \
+    --hash=sha256:5de8ff852021da670efe8d4d78db8719c0255ebbde0772766a0114f997ea61f6 \
+    --hash=sha256:83ca54fa77c4ee27349393212fc13088142244f491be903f620a9e46e8fca4ce
     # via -r base.in
 idna==3.15 \
     --hash=sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8 \
