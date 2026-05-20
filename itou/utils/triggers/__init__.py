@@ -74,6 +74,10 @@ def context(*, replace_existing: bool = False, **kwargs):
         _context.data, _context.last_data_set = previous_data, None
 
 
+def get_current_context():
+    return getattr(_context, "data", None)
+
+
 class FieldsHistory(core.Trigger):
     when: core.When = core.Before
     operation: core.Operation = core.Update
