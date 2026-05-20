@@ -28,7 +28,7 @@ from itou.openid_connect.pe_connect import constants
 from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.openid_connect.utils import init_user_nir_from_session
 from itou.users.enums import IdentityProvider, UserKind
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_absolute_url
 from itou.utils.views import with_triggers_context
@@ -196,7 +196,8 @@ def pe_connect_callback(request):
     if latest_pe_data_import is None or latest_pe_data_import.status != ExternalDataImport.STATUS_OK:
         # No data for user or the import failed last time
         # Async via Huey
-        huey_import_user_pe_data(user, access_token, latest_pe_data_import)
+        triggers_context = triggers.get_current_context() or {}
+        huey_import_user_pe_data(user, access_token, latest_pe_data_import, triggers_context)
 
     login(request, user)
     # Keep token_data["id_token"] to logout from PEAMU
