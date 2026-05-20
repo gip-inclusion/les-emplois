@@ -7,11 +7,13 @@ from django.core.management import call_command
 from itou.archive.models import AnonymizedProfessional
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
-from itou.users.models import User
+from itou.users.models import NirModificationRequest, User
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.employee_record.factories import EmployeeRecordTransitionLogFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.users.factories import JobSeekerFactory
 
 
 pytestmark = pytest.mark.django_db
@@ -94,6 +96,54 @@ class TestCleanupEaEattMembers:
         assert user.is_active is False
         assert user.email is None
         assert user.phone == ""
+        assert AnonymizedProfessional.objects.count() == 0
+
+    def test_user_with_archived_job_application_is_anonymized_without_deletion(self):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.EA, user__email="pro@example.com")
+        user = membership.user
+        job_app = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            archived_at="2025-01-01T00:00:00Z",
+            archived_by=user,
+        )
+
+        call_command("cleanup_ea_eatt_members", wet_run=True)
+
+        user.refresh_from_db()
+        assert user.is_active is False
+        assert user.email is None
+        assert AnonymizedProfessional.objects.count() == 0
+        job_app.refresh_from_db()
+        assert job_app.archived_by_id == user.id
+
+    def test_user_with_nir_modification_request_is_anonymized_without_deletion(self):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.EA, user__email="pro@example.com")
+        user = membership.user
+        job_seeker = JobSeekerFactory()
+        NirModificationRequest.objects.create(
+            jobseeker_profile=job_seeker.jobseeker_profile,
+            nir="269054958815780",
+            requested_by=user,
+        )
+
+        call_command("cleanup_ea_eatt_members", wet_run=True)
+
+        user.refresh_from_db()
+        assert user.is_active is False
+        assert user.email is None
+        assert AnonymizedProfessional.objects.count() == 0
+        assert NirModificationRequest.objects.filter(requested_by=user).exists()
+
+    def test_user_with_employee_record_transition_log_is_anonymized_without_deletion(self):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.EA, user__email="pro@example.com")
+        user = membership.user
+        EmployeeRecordTransitionLogFactory(user=user)
+
+        call_command("cleanup_ea_eatt_members", wet_run=True)
+
+        user.refresh_from_db()
+        assert user.is_active is False
+        assert user.email is None
         assert AnonymizedProfessional.objects.count() == 0
 
     def test_dry_run_makes_no_changes(self):

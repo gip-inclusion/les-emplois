@@ -8,7 +8,7 @@ from itou.archive.anonymize import (
     anonymize_professionals_without_deletion,
 )
 from itou.archive.tasks import async_delete_contact
-from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check
+from itou.archive.utils import exclude_users_with_blocking_relations
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.institutions.models import InstitutionMembership
@@ -97,9 +97,10 @@ class Command(BaseCommand):
         total_anonymized = 0
         total_removed_from_contact = 0
         for batch_ids in self._batched(user_ids):
-            related_objects_to_check = get_filter_kwargs_on_user_for_related_objects_to_check()
             deletable_ids = set(
-                User.objects.filter(id__in=batch_ids).filter(**related_objects_to_check).values_list("id", flat=True)
+                exclude_users_with_blocking_relations(User.objects.filter(id__in=batch_ids)).values_list(
+                    "id", flat=True
+                )
             )
 
             users = list(annotate_and_prefetch_for_anonymization(User.objects.filter(id__in=batch_ids)))
