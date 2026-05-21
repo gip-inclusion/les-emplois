@@ -1,0 +1,23 @@
+{% load components %}
+
+{% component_alert variant="danger" title=title content=content %}
+    {% fragment as title %}
+        Informations à vérifier
+    {% endfragment %}
+
+    {% fragment as content %}
+        <p class="mb-0">
+            Le champ "Nom de naissance" a été ajouté récemment. Merci
+            de vérifier et/ou de compléter les informations
+            ci-dessous :
+        </p>
+        <ul class="mb-0">
+            <li>
+                <strong>Nom de naissance</strong>
+            </li>
+            <li>
+                <strong>Nom d’usage</strong>
+            </li>
+        </ul>
+    {% endfragment %}
+{% endcomponent_alert %}
