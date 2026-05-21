@@ -275,35 +275,39 @@ class TestApprovalModel:
         assert not approval1.can_be_prolonged
         assert approval2.can_be_prolonged
 
-    @freeze_time("2022-11-17")
-    def test_is_open_to_prolongation(self):
-        # Ensure that "now" is "before" the period open to prolongations (12 months before approval end)
-        approval = ApprovalFactory(
-            start_at=datetime.date(2021, 11, 17),
-            end_at=datetime.date(2023, 11, 18),
-        )
-        assert not approval.is_open_to_prolongation
+    @pytest.mark.parametrize(
+        "end_at_delta,expected",
+        [
+            (relativedelta(months=-12, days=-1), False),
+            (relativedelta(months=-12), True),
+            (relativedelta(months=-8), True),
+            (relativedelta(months=4), True),
+            (relativedelta(months=6), True),
+            (relativedelta(months=6, days=1), False),
+        ],
+        ids=[
+            "before_lower_bound",
+            "at_lower_bound",
+            "within_window_before_end",
+            "within_window_post_end",
+            "at_upper_bound",
+            "past_upper_bound",
+        ],
+    )
+    def test_is_open_to_prolongation(self, end_at_delta, expected):
+        approval = ApprovalFactory(start_at=datetime.date(2021, 11, 17))
+        with freeze_time(approval.end_at + end_at_delta):
+            assert approval.is_open_to_prolongation is expected
 
-        # Ensure "now" is in the period open to prolongations.
-        approval = ApprovalFactory(
-            start_at=datetime.date(2021, 6, 16),
-            end_at=datetime.date(2023, 6, 15),
+    def test_cannot_be_prolonged_when_a_newer_approval_exists(self):
+        initial_approval = ApprovalFactory(start_at=timezone.localdate() - relativedelta(years=2, months=3))
+        recent_approval = ApprovalFactory(
+            start_at=timezone.localdate() - relativedelta(months=1),
+            user=initial_approval.user,
         )
-        assert approval.is_open_to_prolongation
-
-        # users are not allowed to make a prolongation 3 months after the approval end anymore.
-        approval = ApprovalFactory(
-            start_at=datetime.date(2020, 8, 18),
-            end_at=datetime.date(2022, 8, 17),
-        )
-        assert not approval.is_open_to_prolongation
-
-        # Ensure "now" is "after" the period open to prolongations.
-        approval = ApprovalFactory(
-            start_at=datetime.date(2020, 8, 17),
-            end_at=datetime.date(2022, 8, 16),
-        )
-        assert not approval.is_open_to_prolongation
+        assert initial_approval.user.latest_approval == recent_approval
+        assert initial_approval.is_open_to_prolongation is True
+        assert initial_approval.can_be_prolonged is False
 
     def test_can_be_unsuspended_without_suspension(self):
         today = timezone.localdate()
