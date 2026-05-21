@@ -42,6 +42,7 @@ class EditJobSeekerInfoForm(
     """
 
     PROFILE_FIELDS = [
+        "birth_name",
         "birthdate",
         "birth_place",
         "birth_country",
