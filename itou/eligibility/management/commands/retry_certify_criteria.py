@@ -67,6 +67,10 @@ class Command(BaseCommand):
                             Q(**{f"eligibility_diagnosis__job_seeker__jobseeker_profile__{field}": None})
                             for field in profile_required_fields
                         ],
+                        Q(
+                            eligibility_diagnosis__job_seeker__jobseeker_profile__birth_name="",
+                            eligibility_diagnosis__job_seeker__last_name="",
+                        ),
                         Q(last_certification_attempt_at__gte=now - timedelta(days=7)),
                     ],
                 )
