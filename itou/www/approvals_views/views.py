@@ -166,7 +166,7 @@ class ApprovalListView(ReadonlyViewMixin, ApprovalBaseViewMixin, ListView):
         return (
             queryset.filter(*form_filters)
             .distinct()  # Because of the suspended_qs_filter that looks into suspensions
-            .select_related("user")
+            .select_related("user", "user__jobseeker_profile")
             .prefetch_related("suspension_set")
         )
 
