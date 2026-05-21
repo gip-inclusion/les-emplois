@@ -21,8 +21,8 @@
             <div class="row">
                 <div class="col-12">
                     {% if request.method == "POST" %}
-                        <div class="c-box mb-5">
-                            <h2>Résultats de l’import</h2>
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Résultats de l’import</h2>
                             <p>{{ sirets_in_file }} SIRET dans le document.</p>
 
                             <h3>Ajouté{{ to_add|length|pluralizefr }}</h3>
@@ -46,7 +46,7 @@
                     {% endif %}
 
                     <div class="c-form">
-                        <h2>Fichier à importer</h2>
+                        <h2 class="h3">Fichier à importer</h2>
                         <p>
                             Le fichier peut contenir plusieurs feuilles. Dans chaque feuille, une colonne intitulée « SIRET » doit contenir le SIRET d’une ACI Convergence ou PHC. Les espaces et caractères spéciaux sont ignorés.
                         </p>

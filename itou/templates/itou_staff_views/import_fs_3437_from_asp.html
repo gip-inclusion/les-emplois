@@ -21,8 +21,8 @@
             <div class="row">
                 <div class="col-12">
                     {% if request.method == "POST" %}
-                        <div class="c-box mb-5">
-                            <h2>Résultats de l’import</h2>
+                        <div class="c-box mb-3 md-md-4">
+                            <h2 class="h3">Résultats de l’import</h2>
                             <p>{{ results|length }} ligne{{ results|pluralizefr }} traitée{{ results|pluralizefr }}.</p>
                             {% component_alert content=content variant=wet_run|yesno:"success,warning" %}
                                 {% fragment as content %}
@@ -73,7 +73,7 @@
                     {% endif %}
 
                     <div class="c-form">
-                        <h2>Fichier à importer</h2>
+                        <h2 class="h3">Fichier à importer</h2>
                         <p>
                             Dans la feuille principale, une colonne intitulée « idItou » doit contenir l’ancien identifiant itou et la colonne Commentaires le nouveau.
                         </p>
