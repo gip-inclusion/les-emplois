@@ -797,13 +797,16 @@ class TestJobSeekerProfileModel:
             {"jobseeker_profile__birth_country": None, "with_birth_place": True},
         ],
     )
-    @pytest.mark.usefixtures("trigger_context")
     def test_valid_birth_place_and_country_constraint(self, factory_kwargs):
         profile = JobSeekerFactory().jobseeker_profile
         profile_values = JobSeekerFactory.build(**factory_kwargs).jobseeker_profile
-        with pytest.raises(
-            IntegrityError,
-            match='new row for relation ".*" violates check constraint "jobseekerprofile_birth_country_and_place"',
+        with (
+            triggers.fake_context(),
+            pytest.raises(
+                IntegrityError,
+                match='new row for relation ".*" violates check constraint "jobseekerprofile_birth_country_and_place"',
+            ),
+            transaction.atomic(),
         ):
             # Use update query to bypass model validation
             JobSeekerProfile.objects.filter(pk=profile.pk).update(
@@ -1217,7 +1220,6 @@ def test_save_creates_a_job_seeker_profile(user_kind, profile_expected):
 
 
 @freezegun.freeze_time("2022-08-10")
-@pytest.mark.usefixtures("trigger_context")
 def test_save_erases_ft_fields_if_details_change():
     UserFactory(
         email="foobar@truc.com",
@@ -1246,7 +1248,8 @@ def test_save_erases_ft_fields_if_details_change():
     reset_profile()
     profile = JobSeekerProfile.objects.get(user__email="foobar@truc.com")
     profile.nir = "1234567890123"
-    profile.save()
+    with triggers.fake_context():
+        profile.save()
     profile.refresh_from_db()
     assert profile.pe_obfuscated_nir is None
     assert profile.pe_last_certification_attempt_at is None
@@ -1256,7 +1259,8 @@ def test_save_erases_ft_fields_if_details_change():
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
     user.jobseeker_profile.birthdate = datetime.date(2018, 8, 22)
-    user.jobseeker_profile.save()
+    with triggers.fake_context():
+        user.jobseeker_profile.save()
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
@@ -1266,7 +1270,8 @@ def test_save_erases_ft_fields_if_details_change():
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
     user.first_name = "Wazzzzaaaa"
-    user.save()
+    with triggers.fake_context():
+        user.save()
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
@@ -1276,7 +1281,8 @@ def test_save_erases_ft_fields_if_details_change():
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
     user.last_name = "Heyyyyyyyyy"
-    user.save()
+    with triggers.fake_context():
+        user.save()
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
@@ -1289,7 +1295,8 @@ def test_save_erases_ft_fields_if_details_change():
     user.first_name = "Wazzzzaaaa"
     user.last_name = "Heyyyyyyyyy"
     user.email = "brutal@toto.at"  # change the email though
-    user.save()
+    with triggers.fake_context():
+        user.save()
     user.jobseeker_profile.birthdate = datetime.date(2018, 8, 22)
     user.jobseeker_profile.nir = "1234567890123"
     user.jobseeker_profile.save()
