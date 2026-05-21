@@ -235,7 +235,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_birth_fields_conflict_invalid_nir
-  '<div class="modal-body"><p><strong>Un compte est déjà enregistré avec l’adresse e-mail j*******@t***.l****.</strong></p><ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si vous avez oublié votre mot de passe, veuillez cliquer sur <a href="/accounts/password/reset/">Réinitialiser mon mot de passe</a>.</li><li>Si cette adresse e-mail n’est pas la vôtre vous pouvez <strong>continuez l’inscription</strong></li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Continuer l’inscription</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte est déjà enregistré avec l’adresse e-mail j*******@t***.l****.</strong></p><ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si vous avez oublié votre mot de passe, veuillez cliquer sur <a href="/accounts/password/reset/">Réinitialiser mon mot de passe</a>.</li><li>Si cette adresse e-mail n’est pas la vôtre vous pouvez <strong>continuez l’inscription</strong></li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Continuer l’inscription</button><a href="/accounts/login/" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_birth_fields_conflict_invalid_nir[birth_fields_conflict_title]
   '''
@@ -246,7 +246,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_birth_fields_conflict_redefine_nir
-  '<div class="modal-body"><p><strong>Un compte est déjà enregistré avec l’adresse e-mail j*******@t***.l****.</strong></p><ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si vous avez oublié votre mot de passe, veuillez cliquer sur <a href="/accounts/password/reset/">Réinitialiser mon mot de passe</a>.</li><li>Si cette adresse e-mail n’est pas la vôtre vous pouvez <strong>continuez l’inscription</strong></li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Continuer l’inscription</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte est déjà enregistré avec l’adresse e-mail j*******@t***.l****.</strong></p><ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si vous avez oublié votre mot de passe, veuillez cliquer sur <a href="/accounts/password/reset/">Réinitialiser mon mot de passe</a>.</li><li>Si cette adresse e-mail n’est pas la vôtre vous pouvez <strong>continuez l’inscription</strong></li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Continuer l’inscription</button><a href="/accounts/login/" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_birth_fields_conflict_redefine_nir[birth_fields_conflict_title]
   '''
@@ -433,13 +433,13 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_email_invalid_nir
-  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_email_not_verified
-  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec cette adresse e-mail.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si le compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse e-mail.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec cette adresse e-mail.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si le compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse e-mail.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields0-email_conflict][email_conflict]
-  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec cette adresse e-mail.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si le compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse e-mail.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec cette adresse e-mail.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si le compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse e-mail.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields0-email_conflict][email_conflict_title]
   '''
@@ -450,7 +450,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields1-email_and_name_conflict][email_and_name_conflict]
-  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec cette adresse e-mail.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si le compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse e-mail.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec cette adresse e-mail.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si le compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse e-mail.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields1-email_and_name_conflict][email_and_name_conflict_title]
   '''
@@ -461,7 +461,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields2-nir_conflict][nir_conflict]
-  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec ce NIR.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si ce NIR est bien le vôtre mais que ce n’est pas votre compte veuillez contacter <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" target="_blank">notre support</a>.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec ce NIR.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si ce NIR est bien le vôtre mais que ce n’est pas votre compte veuillez contacter <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" target="_blank">notre support</a>.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/accounts/login/" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields2-nir_conflict][nir_conflict_title]
   '''
@@ -472,7 +472,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields3-missing_only_nir][missing_only_nir]
-  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields3-missing_only_nir][missing_only_nir_title]
   '''
@@ -483,7 +483,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields4-missing_only_last_name][missing_only_last_name]
-  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields4-missing_only_last_name][missing_only_last_name_title]
   '''
@@ -494,7 +494,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields5-missing_only_first_name][missing_only_first_name]
-  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields5-missing_only_first_name][missing_only_first_name_title]
   '''
@@ -505,7 +505,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields6-missing_only_birthdate][missing_only_birthdate]
-  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte similaire a déjà été enregistré.</strong></p>Si ce compte est bien le vôtre, vous pouvez vous connecter en cliquant sur <strong>"Je me connecte avec ce compte".</strong></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields6-missing_only_birthdate][missing_only_birthdate_title]
   '''
@@ -516,7 +516,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields7-missing_only_email][missing_only_email]
-  '<div class="modal-body"><p><strong>Un compte est déjà enregistré avec l’adresse e-mail j*******@t***.l****.</strong></p><ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si vous avez oublié votre mot de passe, veuillez cliquer sur <a href="/accounts/password/reset/">Réinitialiser mon mot de passe</a>.</li><li>Si cette adresse e-mail n’est pas la vôtre veuillez contacter <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" target="_blank">notre support</a>.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte est déjà enregistré avec l’adresse e-mail j*******@t***.l****.</strong></p><ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si vous avez oublié votre mot de passe, veuillez cliquer sur <a href="/accounts/password/reset/">Réinitialiser mon mot de passe</a>.</li><li>Si cette adresse e-mail n’est pas la vôtre veuillez contacter <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" target="_blank">notre support</a>.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/accounts/login/" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields7-missing_only_email][missing_only_email_title]
   '''
@@ -527,7 +527,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields8-complete_match][complete_match]
-  '<div class="modal-body"><p><strong>Un compte associé à ces informations existe déjà.</strong></p><p>Vous pouvez vous connecter directement en cliquant sur le bouton <strong>"Je me connecte avec ce compte".</strong></p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte associé à ces informations existe déjà.</strong></p><p>Vous pouvez vous connecter directement en cliquant sur le bouton <strong>"Je me connecte avec ce compte".</strong></p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields8-complete_match][complete_match_title]
   '''
@@ -538,7 +538,7 @@
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields9-nir_plus_mispelled_name][nir_plus_mispelled_name]
-  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec ce NIR.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si ce NIR est bien le vôtre mais que ce n’est pas votre compte veuillez contacter <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" target="_blank">notre support</a>.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
+  '<div class="modal-body"><p><strong>Un compte au nom de J… D… a déjà été enregistré avec ce NIR.</strong></p><ul><li>Si ce compte est bien le vôtre, connectez-vous en cliquant sur <strong>"Je me connecte avec ce compte".</strong></li><li>Si ce NIR est bien le vôtre mais que ce n’est pas votre compte veuillez contacter <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" target="_blank">notre support</a>.</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/accounts/login/" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_fields[erroneous_fields9-nir_plus_mispelled_name][nir_plus_mispelled_name_title]
   '''

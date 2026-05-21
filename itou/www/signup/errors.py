@@ -11,6 +11,7 @@ from itou.users.models import User
 from itou.utils.emails import redact_email_address
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_zendesk_form_url
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 
 
 ConflictFields = namedtuple("ConflictFields", ["email", "nir", "first_name", "last_name", "birthdate"])
@@ -107,11 +108,16 @@ class JobSeekerSignupConflictModalResolver:
 
     # Modals for the different variations of conflicting fields
     def _send_error_modal(self, request, html_content, modal_title_name, dismiss_text="Retour"):
+        if self.fields.email:
+            request.session[ITOU_SESSION_LOGIN_EMAIL_KEY] = self.existing_user.email
+            url = reverse("login:existing_user")
+        else:
+            url = reverse("account_login")
         messages.error(
             request,
             format_error_modal_content(
                 html_content,
-                reverse("login:existing_user", args=(self.existing_user.public_id,)),
+                url,
                 "Je me connecte avec ce compte",
                 dismiss_text,
             ),

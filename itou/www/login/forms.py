@@ -12,7 +12,6 @@ from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
-from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 
 
 class FindExistingUserViaEmailForm(forms.Form):
@@ -52,7 +51,6 @@ class FindExistingUserViaEmailForm(forms.Form):
                 extra_tags="modal login_failure email_does_not_exist",
             )
             raise ValidationError("Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire.")
-        self.request.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] = email
         return email
 
 

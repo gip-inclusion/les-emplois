@@ -4,7 +4,6 @@ from allauth.decorators import rate_limit
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
@@ -16,7 +15,7 @@ from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOU
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import get_safe_url, get_url_param_value
-from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm, VerifyOTPForm
 
 
@@ -85,7 +84,8 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
         params = {"back_url": self.request.get_full_path()}
         if self.next_url:
             params[REDIRECT_FIELD_NAME] = self.next_url
-        return reverse("login:existing_user", args=(self.user.public_id,), query=params)
+        self.request.session[ITOU_SESSION_LOGIN_EMAIL_KEY] = self.user.email
+        return reverse("login:existing_user", query=params)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -102,21 +102,24 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.user = get_object_or_404(User, public_id=self.kwargs["user_public_id"])
+        self.user = None
+        if email := self.request.session.get(ITOU_SESSION_LOGIN_EMAIL_KEY):
+            self.user = User.objects.filter(email=email).first()
         self.next_url = get_safe_url(self.request, REDIRECT_FIELD_NAME)
 
-    def get_user_email(self):
-        """
-        This template can optionally have the email of the user displayed, if it is safe to do so.
-        This is done using the session and comparing the stashed value to the user concerned by this view.
-        """
-        stashed_email = self.request.session.get(ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY, None)
-        return stashed_email if stashed_email == self.user.email else None
+    def dispatch(self, request, *args, **kwargs):
+        if self.user is None:
+            return HttpResponseRedirect(reverse("account_login"))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["user_email"] = self.get_user_email()
+        kwargs["user_email"] = self.user.email
         return kwargs
+
+    def form_valid(self, form):
+        del self.request.session[ITOU_SESSION_LOGIN_EMAIL_KEY]
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

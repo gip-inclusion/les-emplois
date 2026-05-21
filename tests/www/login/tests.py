@@ -19,7 +19,7 @@ from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.pe_connect import constants as pe_constants
 from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
-from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance as fc_mock_oauth_dance
@@ -61,13 +61,10 @@ class TestPreLogin:
         response = client.post(url, data=form_data)
         expected_url = reverse(
             "login:existing_user",
-            args=(user.public_id,),
             query={"back_url": url},
         )
         assertRedirects(response, expected_url)
-
-        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
-        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
 
     def test_pre_login_redirects_to_existing_user_with_next(self, client):
         user = random_user_kind_factory()
@@ -80,13 +77,10 @@ class TestPreLogin:
         response = client.post(url, data=form_data)
         expected_url = reverse(
             "login:existing_user",
-            args=(user.public_id,),
             query={"back_url": url, "next": next_url},
         )
         assertRedirects(response, expected_url)
-
-        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
-        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
 
     def test_pre_login_redirects_to_pro_connect(self, client, pro_connect):
         # This only works when ProConnect is configured
@@ -281,7 +275,10 @@ class TestExistingUserLogin:
 
     def test_rate_limits(self, client):
         user = random_user_kind_factory(identity_provider=IdentityProvider.DJANGO)
-        url = reverse("login:existing_user", args=(user.public_id,))
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        url = reverse("login:existing_user")
         form_data = {
             "login": "any@mailinator.com",
             "password": "wrong_password",
@@ -304,8 +301,11 @@ class TestExistingUserLogin:
             return context
 
         user = JobSeekerFactory()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
         with patch.object(ExistingUserLoginView, "get_context_data", override_identity_provider_in_context):
-            response = client.get(reverse("login:existing_user", args=(user.public_id,)))
+            response = client.get(reverse("login:existing_user"))
             assertContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
 
     @override_settings(
@@ -315,7 +315,10 @@ class TestExistingUserLogin:
     )
     def test_login(self, client, snapshot):
         for name, user in self._get_login_form_cases():
-            url = reverse("login:existing_user", args=(user.public_id,))
+            session = client.session
+            session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+            session.save()
+            url = reverse("login:existing_user")
             response = client.get(url)
             assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
             assert pretty_indented(
@@ -323,7 +326,6 @@ class TestExistingUserLogin:
                     response,
                     selector=".c-form",
                     replace_in_attr=[
-                        ("href", str(user.public_id), "[User PublicId]"),
                         ("data-matomo-category", "employeur inclusif", "[User kind]"),
                         ("data-matomo-category", "prescripteur", "[User kind]"),
                         ("href", user.kind, "[User kind]"),
@@ -343,7 +345,10 @@ class TestExistingUserLogin:
     )
     def test_login_django(self, client, user_factory):
         user = user_factory(identity_provider=IdentityProvider.DJANGO)
-        url = reverse("login:existing_user", args=(user.public_id,))
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        url = reverse("login:existing_user")
         response = client.get(url)
         assert response.status_code == 200
 
@@ -360,7 +365,10 @@ class TestExistingUserLogin:
             identity_provider=IdentityProvider.INCLUSION_CONNECT,
             password=HASHED_DEFAULT_PASSWORD,
         )
-        url = reverse("login:existing_user", args=(user.public_id,))
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        url = reverse("login:existing_user")
         response = client.get(url)
         assert response.status_code == 200
 
@@ -371,42 +379,6 @@ class TestExistingUserLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_email_prefilled(self, client, snapshot):
-        # Login is not pre-filled just by visiting the page.
-        # The user must prove they know this information
-        user = JobSeekerFactory(for_snapshot=True)
-        url = reverse("login:existing_user", args=(user.public_id,))
-        response = client.get(url)
-        assert response.status_code == 200
-
-        assert response.context["form"]["login"].initial is None
-        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(
-            name="login_not_prefilled"
-        )
-
-        # If the email has been populated in the session, but the email populated does not match the user requested,
-        # then it is ignored.
-        session = client.session
-        session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] = "someoneelse@emaildomain.xyz"
-        session.save()
-        response = client.get(url)
-        assert response.status_code == 200
-        assert response.context["form"]["login"].initial is None
-        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(
-            name="login_not_prefilled"
-        )
-
-        # If the login has been populated in the session with the correct email,
-        # then the user will not need to re-enter it a second time.
-        session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] = user.email
-        session.save()
-        response = client.get(url)
-        assert response.status_code == 200
-        assert response.context["form"]["login"].initial == user.email
-        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(
-            name="login_prefilled"
-        )
-
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
         PEAMU_AUTH_BASE_URL=None,
@@ -414,17 +386,30 @@ class TestExistingUserLogin:
     )
     def test_login_disabled_provider(self, client, snapshot):
         for name, user in self._get_login_form_cases():
-            response = client.get(reverse("login:existing_user", args=(user.public_id,)))
+            session = client.session
+            session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+            session.save()
+            response = client.get(reverse("login:existing_user"))
             assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
             assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(name=name)
 
-    def test_login_404(self, client):
-        response = client.get(reverse("login:existing_user", args=("c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",)))
-        assert response.status_code == 404
+    def test_login_no_session(self, client):
+        response = client.get(reverse("login:existing_user"))
+        assertRedirects(response, reverse("account_login"))
+
+    def test_login_unknown_email_in_session(self, client):
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = "john.doe@mailinator.com"
+        session.save()
+        response = client.get(reverse("login:existing_user"))
+        assertRedirects(response, reverse("account_login"))
 
     def test_pro_connect_user(self, client, pro_connect):
         user = random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT)
-        url = reverse("login:existing_user", args=(user.public_id,))
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        url = reverse("login:existing_user")
         response = client.get(url)
         pro_connect.assertContainsButton(response)
         params = {
@@ -435,7 +420,7 @@ class TestExistingUserLogin:
         pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
         assertContains(response, pro_connect_url + '"')
 
-        url_with_next = reverse("login:existing_user", args=(user.public_id,), query={"next": "/next_url"})
+        url_with_next = reverse("login:existing_user", query={"next": "/next_url"})
         response = client.get(url_with_next)
         params = {
             "user_kind": user.kind,
@@ -479,7 +464,7 @@ class TestItouStaffLogin:
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
         pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
         login_url = add_url_params(
-            reverse("login:existing_user", args=(user.public_id,)),
+            reverse("login:existing_user"),
             {"back_url": pre_login_url, "next": admin_url},
         )
         verify_otp_url = reverse("login:verify_otp")
@@ -501,6 +486,10 @@ class TestItouStaffLogin:
         assertRedirects(response, setup_otp_url)
 
         # Same with an unconfirmed device
+        client.logout()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
         device = TOTPDevice.objects.create(user=user, confirmed=False)
         response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, setup_otp_url)
@@ -508,6 +497,10 @@ class TestItouStaffLogin:
         # With a confirmed device the user is redirected to the OTP code form
         device.confirmed = True
         device.save()
+        client.logout()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
         response = client.post(login_url, data=form_data, follow=True)
         next_url = add_url_params(verify_otp_url, {"next": admin_url})
         assertRedirects(response, next_url)
@@ -549,7 +542,7 @@ class TestItouStaffLogin:
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
         pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
         login_url = add_url_params(
-            reverse("login:existing_user", args=(user.public_id,)),
+            reverse("login:existing_user"),
             {"back_url": pre_login_url, "next": admin_url},
         )
 
@@ -568,6 +561,10 @@ class TestItouStaffLogin:
         assertRedirects(response, admin_url)
 
         # Same with an device
+        client.logout()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
         TOTPDevice.objects.create(user=user)
         response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)

@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from itou.utils.emails import redact_email_address
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 
 
 def format_error_modal_content(message_body, action_url, action_text, dismiss_text="Retour"):
@@ -26,6 +27,7 @@ def format_error_modal_content(message_body, action_url, action_text, dismiss_te
 
 def redirect_with_error_sso_email_conflict_on_registration(request, user, sso_name):
     redirect_url = reverse("signup:choose_user_kind")
+    request.session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
     messages.error(
         request,
         format_error_modal_content(
@@ -38,7 +40,7 @@ def redirect_with_error_sso_email_conflict_on_registration(request, user, sso_na
                 sso_name,
                 redact_email_address(user.email),
             ),
-            f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={quote(redirect_url)}",
+            f"{reverse('login:existing_user')}?back_url={quote(redirect_url)}",
             "Je me connecte avec ce compte",
         ),
         extra_tags="modal sso_email_conflict_registration_failure",

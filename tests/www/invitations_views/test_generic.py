@@ -20,6 +20,7 @@ from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.invitations.factories import (
@@ -393,10 +394,10 @@ class BaseTestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
         login_url = reverse(
             "login:existing_user",
-            args=(user.public_id,),
             query={"next": invitation.acceptance_url_for_existing_user},
         )
         assertRedirects(response, login_url)
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
         assert not invitation.accepted_at
 
         response = client.post(
@@ -420,7 +421,10 @@ class BaseTestAcceptInvitation:
         )
         invitation = self.invitation_factory(email=user.email)
 
-        login_url = reverse("login:existing_user", args=(user.public_id,))
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        login_url = reverse("login:existing_user")
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
@@ -580,10 +584,10 @@ class ProConnectSignupTestAcceptInvitation:
 
         login_url = reverse(
             "login:existing_user",
-            args=(user.public_id,),
             query={"next": invitation.acceptance_url_for_existing_user},
         )
         assertRedirects(response, login_url)
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == user.email
         assert not invitation.accepted_at
 
         next_url = self.join_url(invitation)
