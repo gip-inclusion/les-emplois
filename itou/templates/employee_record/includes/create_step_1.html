@@ -10,7 +10,7 @@
             <form method="post" class="js-prevent-multiple-submit" data-matomo-name="employee-record-identity">
                 {% csrf_token %}
                 <fieldset>
-                    <legend class="h3">Etat civil du salarié</legend>
+                    <legend class="h3">État civil du salarié</legend>
                     {% include "job_seekers_views/includes/warning_new_birth_name_field.html" %}
                     {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
                     {% bootstrap_form_errors form type="all" %}
