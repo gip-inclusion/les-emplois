@@ -157,6 +157,22 @@ class TestManager:
         )
 
 
+class TestUserQuerySet:
+    def test_annotate_with_last_name_for_display(self):
+        user1 = PrescriberFactory(last_name="1")
+        user2 = PrescriberFactory(last_name="5")
+        user3 = JobSeekerFactory(last_name="", jobseeker_profile__birth_name="3")
+        user4 = JobSeekerFactory(last_name="4", jobseeker_profile__birth_name="2")
+
+        users = User.objects.annotate_with_last_name_for_display().order_by("last_name_for_display").all()
+
+        assertQuerySetEqual(users, [user1, user3, user4, user2])
+        assert users[0].last_name_for_display == "1"
+        assert users[1].last_name_for_display == "3"
+        assert users[2].last_name_for_display == "4"
+        assert users[3].last_name_for_display == "5"
+
+
 class TestModel:
     def test_generate_unique_username(self):
         unique_username = User.generate_unique_username()
@@ -181,6 +197,13 @@ class TestModel:
             user = User.create_job_seeker_by_proxy(
                 proxy_user, acting_organization=PrescriberOrganizationFactory(for_snapshot=True), **user_data
             )
+        # Callers of `create_job_seeker_by_proxy` also set the birth
+        # name. Do the same here, otherwise the test fails below
+        # because the user is redirected to the edit form to provide a
+        # birth name (and not to the welcoming tour page).
+        with triggers.connection_wrapper(), triggers.context():
+            user.jobseeker_profile.birth_name = "Smith"
+            user.jobseeker_profile.save()
 
         assert user.kind == UserKind.JOB_SEEKER
         assert user.password is not None
@@ -571,37 +594,71 @@ class TestModel:
         )
 
     @pytest.mark.parametrize(
-        "first_name,last_name,expected",
+        "first_name,last_name,birth_name,expected",
         [
-            ("Johan Sebastian", "Bach", "J***n S*******n B**h"),
-            ("Max", "Weber", "M** W***r"),
-            ("Charlemagne", "", "C*********e"),
-            ("Salvador Felipe Jacinto", "Dalí y Domenech", "S******r F****e J*****o D**í Y D******h"),
-            ("Harald", "Blue-tooth", "H****d B********h"),
-            ("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch", "", "L**********h"),
-            ("Max", "", "M**"),
-            ("", "", ""),
+            ("Johan Sebastian", "", "Bach", "J***n S*******n B**h"),
+            ("Max", "Weber", "Erfurt", "M** W***r"),
+            ("Charlemagne", "", "", "C*********e"),
+            ("Salvador Felipe Jacinto", "", "Dalí y Domenech", "S******r F****e J*****o D**í Y D******h"),
+            ("Harald", "", "Blue-tooth", "H****d B********h"),
+            ("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch", "", "", "L**********h"),
+            ("Max", "", "", "M**"),
+            ("", "", "", ""),
         ],
     )
-    def test_get_redacted_full_name(self, first_name, last_name, expected):
-        user = JobSeekerFactory(first_name=first_name, last_name=last_name)
+    def test_get_redacted_full_name(self, first_name, last_name, birth_name, expected):
+        user = JobSeekerFactory(
+            first_name=first_name,
+            last_name=last_name,
+            jobseeker_profile__birth_name=birth_name,
+        )
         assert user.get_redacted_full_name() == expected
 
     @pytest.mark.parametrize(
-        "first_name,last_name,expected",
+        "first_name,last_name,birth_name,expected",
         [
-            ("Johan Sebastian", "Bach", "Johan Sebastian B."),
-            ("Max", "Weber", "Max W."),
-            ("Charlemagne", "", "Charlemagne"),
-            ("Salvador Felipe Jacinto", "Dalí y Domenech", "Salvador Felipe Jacinto D."),
-            ("Harald", "Blue-tooth", "Harald B."),
-            ("", "", ""),
-            ("", "Dalí", ""),
+            ("Johan Sebastian", "", "Bach", "Johan Sebastian B."),
+            ("Max", "Weber", "Erfurt", "Max W."),
+            ("Charlemagne", "", "", "Charlemagne"),
+            ("Salvador Felipe Jacinto", "", "Dalí y Domenech", "Salvador Felipe Jacinto D."),
+            ("Harald", "", "Blue-tooth", "Harald B."),
+            ("", "", "", ""),
+            ("", "", "Dalí", ""),
         ],
     )
-    def test_get_truncated_full_name(self, first_name, last_name, expected):
-        user = JobSeekerFactory(first_name=first_name, last_name=last_name)
+    def test_get_truncated_full_name(self, first_name, last_name, birth_name, expected):
+        user = JobSeekerFactory(
+            first_name=first_name,
+            last_name=last_name,
+            jobseeker_profile__birth_name=birth_name,
+        )
         assert user.get_truncated_full_name() == expected
+
+    @pytest.mark.parametrize(
+        "usage_name,birth_name,expected",
+        [
+            # None means that the user is _not_ a job seeker
+            ("Smith", None, "Smith"),
+            ("", None, ""),
+            ("Smith", "", "Smith"),
+            ("Smith", "Doe", "Smith"),
+            ("", "Smith", "Smith"),
+        ],
+    )
+    def test_get_last_name_for_display(
+        self,
+        usage_name,
+        birth_name,
+        expected,
+    ):
+        factory = PrescriberFactory
+        kwargs = {"last_name": usage_name}
+        if birth_name is not None:
+            factory = JobSeekerFactory
+            kwargs["jobseeker_profile__birth_name"] = birth_name
+        user = factory(**kwargs)
+
+        assert user.get_last_name_for_display() == expected
 
 
 class TestJobSeekerProfileModel:
