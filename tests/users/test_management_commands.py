@@ -978,11 +978,12 @@ def test_pe_certify_users_retry(caplog, snapshot):
         call_command("pe_certify_users", wet_run=True)
 
     def recherche_call(user, swap):
+        birth_name = user.jobseeker_profile.birth_name or user.last_name
         return mock.call(
-            user.first_name if not swap else user.last_name,
-            user.last_name if not swap else user.first_name,
-            user.jobseeker_profile.birthdate,
-            user.jobseeker_profile.nir,
+            first_name=user.first_name if not swap else birth_name,
+            birth_name=birth_name if not swap else user.first_name,
+            birthdate=user.jobseeker_profile.birthdate,
+            nir=user.jobseeker_profile.nir,
         )
 
     assert recherche.mock_calls == [
