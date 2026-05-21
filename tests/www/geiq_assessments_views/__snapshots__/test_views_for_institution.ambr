@@ -81,6 +81,28 @@
   http://localhost:8000/
   '''
 # ---
+# name: TestAssessmentDetailsForInstitutionView.test_ddets_review_dreets_ask_for_institution_fix_and_dreets_review[body of mail sent to DDETS user]
+  '''
+  Bonjour,
+  
+  La DREETS Bretagne a demandé une correction du bilan d’exécution.
+  
+  Structure concernée :
+  Une antenne (29)
+  
+  Commentaire de la DREETS Bretagne :
+  Revue à corriger.
+  
+  Une fois les corrections effectuées, vous pourrez à nouveau valider le contrôle.
+  
+  Cordialement,
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
 # name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section after geiq fix request]
   '''
   <section class="s-section">

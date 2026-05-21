@@ -496,9 +496,11 @@ class TestAssessmentDetailsForInstitutionView:
             assert email.body == snapshot(name="body of mail sent to GEIQ members")
             assert email.cc == sorted([ddets_membership.user.email, other_ddets_membership.user.email])
 
-    def test_ddets_review_dreets_ask_for_institution_fix_and_dreets_review(self, client, snapshot):
+    def test_ddets_review_dreets_ask_for_institution_fix_and_dreets_review(self, client, snapshot, mailoutbox):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
-        dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
+        dreets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ, institution__name="DREETS Bretagne"
+        )
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
             user__first_name="Paul",
@@ -594,6 +596,12 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.transition == AssessmentTransition.ASK_FOR_INSTITUTION_FIX
             assert transition.user == dreets_membership.user
             assert transition.institution == dreets_membership.institution
+            assert len(mailoutbox) == 2  # (review by DDETS, ask_for_institution_fix by DREETS)
+            email = mailoutbox[1]
+            assert f"[TEST] Bilan d’exécution à corriger - {assessment.label_geiq_name}" == email.subject
+            assert email.to[0] == ddets_membership.user.email
+            assert email.body == snapshot(name="body of mail sent to DDETS user")
+            assert email.cc == []
 
         # DREETS review
         with freeze_time(timezone.now() + datetime.timedelta(hours=6)):

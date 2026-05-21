@@ -84,3 +84,14 @@ class AssessmentFixRequestedForGeiqNotification(EmailNotification):
         # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
         email_message.cc = sorted(cc_user.email for cc_user in cc_users)
         return email_message
+
+
+@notifications_registry.register
+class AssessmentFixRequestedForInstitutionNotification(EmailNotification):
+    """Notification sent to the DDETS member who reviewed the assessment for which a fix is requested"""
+
+    name = "Demande de correction du contrôle du bilan d’exécution GEIQ"
+    category = NotificationCategory.GEIQ_IMPLEMENTATION_ASSESSMENT
+    can_be_disabled = False
+    subject_template = "geiq_assessments/email/assessment_fix_requested_for_institution_subject.txt"
+    body_template = "geiq_assessments/email/assessment_fix_requested_for_institution_body.txt"
