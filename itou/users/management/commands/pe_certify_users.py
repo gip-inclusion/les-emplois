@@ -42,11 +42,12 @@ class Command(BaseCommand):
             retry=tenacity.retry_if_exception_type(PoleEmploiRateLimitException),
         )
         def pe_check_user_details(user, client, *, swap=False):
+            birth_name = user.jobseeker_profile.birth_name or user.last_name
             return client.recherche_individu_certifie(
-                user.first_name if not swap else user.last_name,
-                user.last_name if not swap else user.first_name,
-                user.jobseeker_profile.birthdate,
-                user.jobseeker_profile.nir,
+                first_name=user.first_name if not swap else birth_name,
+                birth_name=birth_name if not swap else user.first_name,
+                birthdate=user.jobseeker_profile.birthdate,
+                nir=user.jobseeker_profile.nir,
             )
 
         active_job_seekers = (
@@ -61,7 +62,10 @@ class Command(BaseCommand):
         self.logger.info("about to resolve first_name and last_name for count=%d users", active_job_seekers.count())
 
         eligible_users = active_job_seekers.exclude(
-            Q(jobseeker_profile__nir="") | Q(jobseeker_profile__birthdate=None) | Q(first_name="") | Q(last_name="")
+            Q(jobseeker_profile__nir="")
+            | Q(jobseeker_profile__birthdate=None)
+            | Q(first_name="")
+            | Q(last_name="", jobseeker_profile__birth_name="")
         )
         self.logger.info("only count=%d users have the necessary data to be resolved", eligible_users.count())
 
