@@ -1801,6 +1801,7 @@
       
       
       
+      
       <div class="alert alert-info mb-3" role="status">
           
           
@@ -1935,6 +1936,7 @@
   
   
   
+      
       
       
       
@@ -2716,7 +2718,9 @@
                   
                       <div class="col-auto pe-0">
                           
-                              <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger"></i>
+                              
+                                  <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger"></i>
+                              
                           
                       </div>
                   
@@ -2971,7 +2975,9 @@
                   
                       <div class="col-auto pe-0">
                           
-                              <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger"></i>
+                              
+                                  <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger"></i>
+                              
                           
                       </div>
                   

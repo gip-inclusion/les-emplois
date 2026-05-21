@@ -9,6 +9,7 @@
     dismissible: True | False (default: False)
     dismissible_once: True | False (default: False . Must be associated with extra_id=)
     icon: True | False (default: True)
+    customIcon: string (optional, ex: "ri-file-warning-line")
     call_to_action: HTML fragment (optional)
     form_error: True | False (default: False) if alert contains form errors (tabindex="0" data-emplois-give-focus-if-exist)
     extra_id="...": extra ID attribute on main div.alert
@@ -17,7 +18,7 @@
     Documentation -> https://gip-inclusion.github.io/itou-theme/doc/?path=/docs/components-alerts--docs
 {% endcomment %}
 
-{% with is_dismissible=dismissible|default:False is_dismissible_once=dismissible_once|default:False has_icon=icon|default_if_invalid:True has_title=title|default:"" has_call_to_action=call_to_action|default:"" has_extra_id=extra_id|default:"" %}
+{% with is_dismissible=dismissible|default:False is_dismissible_once=dismissible_once|default:False has_icon=icon|default_if_invalid:True has_title=title|default:"" has_call_to_action=call_to_action|default:"" has_extra_id=extra_id|default:"" custom_icon=customIcon|default:"" %}
     {% if variant != "info" and variant != "success" and variant != "warning" and variant != "danger" and variant != "important" %}
         {% should_not_happen "Unexpected variant for alert component: '%s'" variant %}
     {% endif %}
@@ -26,6 +27,9 @@
     {% endif %}
     {% if is_dismissible_once and is_dismissible %}
         {% should_not_happen "dismissible_once and dismissible can't go together" %}
+    {% endif %}
+    {% if custom_icon and custom_icon|slice:":3" != "ri-" %}
+        {% should_not_happen "Unexpected prefix in customIcon, it should start with 'ri-': '%s'" custom_icon %}
     {% endif %}
     <div class="alert alert-{{ variant }}{% if is_dismissible %} alert-dismissible fade show{% endif %}{% if is_dismissible_once %} alert-dismissible-once d-none{% endif %}{% if extra_classes|default:"" %} {{ extra_classes }}{% endif %}"
          role="{% if variant == "danger" %}alert{% else %}status{% endif %}"
@@ -47,16 +51,21 @@
             <div class="row">
                 {% if has_icon %}
                     <div class="col-auto pe-0">
-                        {% if variant == "info" %}
-                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                        {% elif variant == "success" %}
-                            <i class="ri-checkbox-circle-line ri-xl text-success" aria-hidden="true"></i>
-                        {% elif variant == "warning" %}
-                            <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
-                        {% elif variant == "danger" %}
-                            <i class="ri-close-circle-line ri-xl text-danger" aria-hidden="true"></i>
-                        {% elif variant == "important" %}
-                            <i class="ri-alert-line ri-xl text-important" aria-hidden="true"></i>
+                        {% if custom_icon %}
+                            <i class="{{ custom_icon }} ri-xl {% if variant == "info" %}text-info{% elif variant == "success" %}text-success{% elif variant == "warning" %}text-warning{% elif variant == "danger" %}text-danger{% elif variant == "important" %}text-important{% endif %}"
+                               aria-hidden="true"></i>
+                        {% else %}
+                            {% if variant == "info" %}
+                                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                            {% elif variant == "success" %}
+                                <i class="ri-checkbox-circle-line ri-xl text-success" aria-hidden="true"></i>
+                            {% elif variant == "warning" %}
+                                <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
+                            {% elif variant == "danger" %}
+                                <i class="ri-close-circle-line ri-xl text-danger" aria-hidden="true"></i>
+                            {% elif variant == "important" %}
+                                <i class="ri-alert-line ri-xl text-important" aria-hidden="true"></i>
+                            {% endif %}
                         {% endif %}
                     </div>
                 {% endif %}
