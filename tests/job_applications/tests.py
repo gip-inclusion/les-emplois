@@ -2480,7 +2480,7 @@ class TestJobApplicationXlsxExport:
             list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
-                job_seeker.last_name,
+                job_seeker.get_last_name_for_display(),
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
@@ -2530,7 +2530,7 @@ class TestJobApplicationXlsxExport:
             list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
-                job_seeker.last_name,
+                job_seeker.get_last_name_for_display(),
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
@@ -2578,7 +2578,7 @@ class TestJobApplicationXlsxExport:
             list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 job_seeker.title,
-                job_seeker.last_name,
+                job_seeker.get_last_name_for_display(),
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
@@ -2724,7 +2724,7 @@ class TestJobApplicationXlsxExport:
             list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
-                job_seeker.last_name,
+                job_seeker.get_last_name_for_display(),
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
