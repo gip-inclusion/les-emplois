@@ -6,7 +6,7 @@
     'codeCogInseePaysNaissance': '99100',
     'jourDateNaissance': 1,
     'moisDateNaissance': 1,
-    'nomNaissance': 'DOE',
+    'nomNaissance': 'SMITH',
     'prenoms[]': list([
       'JANE',
     ]),
