@@ -359,9 +359,64 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("approvals_approval"."id" IN
                    (SELECT V0."id"
                     FROM "approvals_approval" V0
@@ -373,7 +428,7 @@
                                 AND U0."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
-          ORDER BY "users_user"."last_name" ASC,
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
@@ -586,9 +641,59 @@
                           "users_user"."address_filled_at",
                           "users_user"."first_login",
                           "users_user"."upcoming_deletion_notified_at",
-                          "users_user"."allow_next_sso_sub_update"
+                          "users_user"."allow_next_sso_sub_update",
+                          "users_jobseekerprofile"."fields_history",
+                          "users_jobseekerprofile"."user_id",
+                          "users_jobseekerprofile"."birth_name",
+                          "users_jobseekerprofile"."birthdate",
+                          "users_jobseekerprofile"."birth_place_id",
+                          "users_jobseekerprofile"."birth_country_id",
+                          "users_jobseekerprofile"."nir",
+                          "users_jobseekerprofile"."lack_of_nir_reason",
+                          "users_jobseekerprofile"."pole_emploi_id",
+                          "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                          "users_jobseekerprofile"."ft_gps_id",
+                          "users_jobseekerprofile"."asp_uid",
+                          "users_jobseekerprofile"."education_level",
+                          "users_jobseekerprofile"."resourceless",
+                          "users_jobseekerprofile"."rqth_employee",
+                          "users_jobseekerprofile"."oeth_employee",
+                          "users_jobseekerprofile"."pole_emploi_since",
+                          "users_jobseekerprofile"."unemployed_since",
+                          "users_jobseekerprofile"."has_rsa_allocation",
+                          "users_jobseekerprofile"."rsa_allocation_since",
+                          "users_jobseekerprofile"."ass_allocation_since",
+                          "users_jobseekerprofile"."aah_allocation_since",
+                          "users_jobseekerprofile"."are_allocation_since",
+                          "users_jobseekerprofile"."activity_bonus_since",
+                          "users_jobseekerprofile"."cape_freelance",
+                          "users_jobseekerprofile"."cesa_freelance",
+                          "users_jobseekerprofile"."actor_met_for_business_creation",
+                          "users_jobseekerprofile"."mean_monthly_income_before_process",
+                          "users_jobseekerprofile"."eiti_contributions",
+                          "users_jobseekerprofile"."ase_exit",
+                          "users_jobseekerprofile"."isolated_parent",
+                          "users_jobseekerprofile"."housing_issue",
+                          "users_jobseekerprofile"."refugee",
+                          "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                          "users_jobseekerprofile"."low_level_in_french",
+                          "users_jobseekerprofile"."mobility_issue",
+                          "users_jobseekerprofile"."hexa_lane_number",
+                          "users_jobseekerprofile"."hexa_std_extension",
+                          "users_jobseekerprofile"."hexa_non_std_extension",
+                          "users_jobseekerprofile"."hexa_lane_type",
+                          "users_jobseekerprofile"."hexa_lane_name",
+                          "users_jobseekerprofile"."hexa_additional_address",
+                          "users_jobseekerprofile"."hexa_post_code",
+                          "users_jobseekerprofile"."hexa_commune_id",
+                          "users_jobseekerprofile"."pe_obfuscated_nir",
+                          "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                          "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                          "users_jobseekerprofile"."is_stalled",
+                          "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
                     FROM "job_applications_jobapplication" U0
@@ -1008,9 +1113,64 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("approvals_approval"."id" IN
                    (SELECT V0."id"
                     FROM "approvals_approval" V0
@@ -1022,7 +1182,7 @@
                                 AND U0."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
-          ORDER BY "users_user"."last_name" ASC,
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
@@ -1235,9 +1395,59 @@
                           "users_user"."address_filled_at",
                           "users_user"."first_login",
                           "users_user"."upcoming_deletion_notified_at",
-                          "users_user"."allow_next_sso_sub_update"
+                          "users_user"."allow_next_sso_sub_update",
+                          "users_jobseekerprofile"."fields_history",
+                          "users_jobseekerprofile"."user_id",
+                          "users_jobseekerprofile"."birth_name",
+                          "users_jobseekerprofile"."birthdate",
+                          "users_jobseekerprofile"."birth_place_id",
+                          "users_jobseekerprofile"."birth_country_id",
+                          "users_jobseekerprofile"."nir",
+                          "users_jobseekerprofile"."lack_of_nir_reason",
+                          "users_jobseekerprofile"."pole_emploi_id",
+                          "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                          "users_jobseekerprofile"."ft_gps_id",
+                          "users_jobseekerprofile"."asp_uid",
+                          "users_jobseekerprofile"."education_level",
+                          "users_jobseekerprofile"."resourceless",
+                          "users_jobseekerprofile"."rqth_employee",
+                          "users_jobseekerprofile"."oeth_employee",
+                          "users_jobseekerprofile"."pole_emploi_since",
+                          "users_jobseekerprofile"."unemployed_since",
+                          "users_jobseekerprofile"."has_rsa_allocation",
+                          "users_jobseekerprofile"."rsa_allocation_since",
+                          "users_jobseekerprofile"."ass_allocation_since",
+                          "users_jobseekerprofile"."aah_allocation_since",
+                          "users_jobseekerprofile"."are_allocation_since",
+                          "users_jobseekerprofile"."activity_bonus_since",
+                          "users_jobseekerprofile"."cape_freelance",
+                          "users_jobseekerprofile"."cesa_freelance",
+                          "users_jobseekerprofile"."actor_met_for_business_creation",
+                          "users_jobseekerprofile"."mean_monthly_income_before_process",
+                          "users_jobseekerprofile"."eiti_contributions",
+                          "users_jobseekerprofile"."ase_exit",
+                          "users_jobseekerprofile"."isolated_parent",
+                          "users_jobseekerprofile"."housing_issue",
+                          "users_jobseekerprofile"."refugee",
+                          "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                          "users_jobseekerprofile"."low_level_in_french",
+                          "users_jobseekerprofile"."mobility_issue",
+                          "users_jobseekerprofile"."hexa_lane_number",
+                          "users_jobseekerprofile"."hexa_std_extension",
+                          "users_jobseekerprofile"."hexa_non_std_extension",
+                          "users_jobseekerprofile"."hexa_lane_type",
+                          "users_jobseekerprofile"."hexa_lane_name",
+                          "users_jobseekerprofile"."hexa_additional_address",
+                          "users_jobseekerprofile"."hexa_post_code",
+                          "users_jobseekerprofile"."hexa_commune_id",
+                          "users_jobseekerprofile"."pe_obfuscated_nir",
+                          "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                          "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                          "users_jobseekerprofile"."is_stalled",
+                          "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
                     FROM "job_applications_jobapplication" U0
@@ -1660,9 +1870,15 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display"
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("approvals_approval"."id" IN
                    (SELECT V0."id"
                     FROM "approvals_approval" V0
@@ -1674,7 +1890,7 @@
                                 AND U0."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
-          ORDER BY "users_user"."last_name" ASC,
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
