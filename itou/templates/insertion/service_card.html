@@ -1,5 +1,4 @@
 {% extends "layout/base.html" %}
-{% load dora %}
 {% load matomo %}
 {% load str_filters %}
 
@@ -28,9 +27,8 @@
                 <div class="form-group col-12 col-lg-auto">
                     {% if user.is_authenticated %}
                         <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
-                           rel="noopener"
-                           target="_blank"
-                           href="{% if service.is_orientable_with_form %}{% dora_orientation_url service orientation_jwt=orientation_jwt source=request.user.kind|default:"accueil" %}{% else %}{{ service.mobilization_modes_professionals_external_form_link }}{% endif %}"
+                           {% if not service.is_orientable_with_form %}rel="noopener" target="_blank"{% endif %}
+                           href="{% if service.is_orientable_with_form %}{% url 'insertion_views:start_orientation' service_uid=service.uid %}{% else %}{{ service.mobilization_modes_professionals_external_form_link }}{% endif %}"
                            {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
                             <span>
                                 {% if service.is_orientable_with_form %}
