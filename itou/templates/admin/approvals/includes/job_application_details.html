@@ -9,9 +9,9 @@
     <ul>
         <li>
             <b>Nom : </b>
-            {{ job_seeker.last_name|upper }}
+            {{ job_seeker.get_last_name_for_display|upper }}
             <small>
-                (<a href="{% url "admin:approvals_approval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">Rechercher dans les PASS IAE</a>)
+                (<a href="{% url "admin:approvals_approval_changelist" %}?q={{ job_seeker.get_last_name_for_display|upper|urlencode }}" target="_blank">Rechercher dans les PASS IAE</a>)
             </small>
         </li>
         <li>
