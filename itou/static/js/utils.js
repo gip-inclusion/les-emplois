@@ -166,6 +166,48 @@ htmx.onLoad((target) => {
   }
   querySelectorAllIncludingTarget(target, ".file-dropzone").forEach(initDropZone);
 
+  /*
+   * Multi-file selector.
+   */
+  function initMultiFileInput(container) {
+    const fileInput = container.querySelector("input[type=file]");
+    const fileList = container.querySelector(".c-multi-file-input__list");
+    const dt = new DataTransfer();
+
+    function renderFileList() {
+      fileList.innerHTML = "";
+      Array.from(dt.files).forEach((file, idx) => {
+        const li = document.createElement("li");
+        li.className = "d-flex align-items-center gap-2 py-1";
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-sm btn-ico btn-link text-danger p-0";
+        btn.innerHTML = '<i class="ri-delete-bin-line ri-lg" aria-hidden="true"></i>';
+        btn.setAttribute("aria-label", `Retirer ${file.name}`);
+        btn.addEventListener("click", () => {
+          dt.items.remove(idx);
+          fileInput.files = dt.files;
+          renderFileList();
+        });
+
+        const name = document.createElement("span");
+        name.className = "fs-sm";
+        name.textContent = file.name;
+
+        li.append(btn, name);
+        fileList.appendChild(li);
+      });
+      fileInput.files = dt.files;
+    }
+
+    fileInput.addEventListener("change", () => {
+      Array.from(fileInput.files).forEach(f => dt.items.add(f));
+      renderFileList();
+    });
+  }
+  querySelectorAllIncludingTarget(target, ".c-multi-file-input").forEach(initMultiFileInput);
+
   /**
    * JS to add the birthdate parameter when querying Commune for birthplace
    **/
