@@ -3,12 +3,20 @@
 
 <h2 class="h3">Candidat</h2>
 
+{% if form_personal_data.birth_name %}
+    {% include "job_seekers_views/includes/warning_new_birth_name_field.html" %}
+{% endif %}
+
 {% if form_personal_data %}
     {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
     {% if form_personal_data.pole_emploi_id_error %}{{ form_personal_data.pole_emploi_id_error }}{% endif %}
 
     {% include "includes/job_seekers/readonly_form.html" with form=form_personal_data request=request only %}
     {% bootstrap_form_errors form_personal_data type='non_fields' %}
+    {% if form_personal_data.birth_name %}
+        {% bootstrap_field form_personal_data.birth_name %}
+        {% bootstrap_field form_personal_data.last_name %}
+    {% endif %}
     {% if form_personal_data.nir %}
         {% bootstrap_field form_personal_data.nir wrapper_class="form-group form-group-input-w-lg-66" %}
         {% collapse_field form_personal_data.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
