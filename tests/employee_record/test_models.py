@@ -620,11 +620,12 @@ class TestEmployeeRecordLifeCycle:
         with pytest.raises(xworkflows.ForbiddenTransition):
             self.employee_record.archive()
 
-        # Make the approval expires
+        # Make the approval expired and out of the post-end prolongation window
         approval.start_at = timezone.localdate() - timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
-        approval.end_at = timezone.localdate() - relativedelta(months=1)
+        approval.end_at = timezone.localdate() - relativedelta(months=7)
         approval.save()
         assert not approval.is_valid()
+        assert not approval.can_be_prolonged
 
         self.employee_record.archive()
         # Check correct status and empty archived JSON

@@ -393,6 +393,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     # The period of time during which it is possible to prolong a PASS IAE.
     IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END = 12
+    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END = 6
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = (
@@ -839,11 +840,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def is_open_to_prolongation(self):
         now = timezone.localdate()
         lower_bound = self.end_at - relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END)
-        return lower_bound <= now <= self.end_at
+        upper_bound = self.end_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END)
+        return lower_bound <= now <= upper_bound
 
     @cached_property
     def can_be_prolonged(self):
-        # Since it is possible to prolong even 3 months after the end of a PASS IAE,
+        # Since it is possible to prolong even a few months after the end of a PASS IAE,
         # it is possible that another one has been issued in the meantime. Thus we
         # have to ensure that the current PASS IAE is the most recent for the user
         # before allowing a prolongation.
