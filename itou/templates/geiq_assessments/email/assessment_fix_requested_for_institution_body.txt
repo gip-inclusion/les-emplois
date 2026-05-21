@@ -1,0 +1,17 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load str_filters %}
+{% block body %}
+Bonjour,
+
+La {{ institution.name }} a demandé une correction du bilan d’exécution.
+
+{{ assessment.label_antenna_names|pluralizefr:"Structure concernée,Structures concernées" }} :
+{% for antenna_name in assessment.label_antenna_names %}{{ antenna_name }}{% if not forloop.last %}; {% endif %}{% endfor %}
+
+Commentaire de la {{ institution.name }} :
+{{ comment }}
+
+Une fois les corrections effectuées, vous pourrez à nouveau valider le contrôle.
+
+Cordialement,
+{% endblock body %}

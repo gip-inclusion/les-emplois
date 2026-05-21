@@ -33,6 +33,7 @@ from itou.geiq_assessments.models import (
 )
 from itou.geiq_assessments.notifications import (
     AssessmentFixRequestedForGeiqNotification,
+    AssessmentFixRequestedForInstitutionNotification,
     AssessmentReviewedForDREETSLaborInspectorNotification,
     AssessmentReviewedForGeiqNotification,
     AssessmentSubmittedForLaborInspectorNotification,
@@ -921,6 +922,12 @@ def assessment_details_for_institution(
                     messages.warning(request, "Ce bilan n’a pas encore été contrôlé : il n’y a rien à corriger.")
                 else:
                     comment = ask_for_institution_fix_comment_form.cleaned_data["comment"]
+                    AssessmentFixRequestedForInstitutionNotification(
+                        assessment.reviewed_by,
+                        assessment=assessment,
+                        institution=request.current_organization,
+                        comment=comment,
+                    ).send()
                     assessment.ask_for_institution_fix(
                         user=request.user, institution=request.current_organization, comment=comment
                     )
