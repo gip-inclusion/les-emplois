@@ -104,6 +104,7 @@ def get_allowance_stats_for_geiq(assessment, *, for_assessment_details=False):
         allowance_of_814_selected_nb=Count("pk", filter=Q(allowance_requested=True, employee__allowance_amount=814)),
         allowance_of_1400_selected_nb=Count("pk", filter=Q(allowance_requested=True, employee__allowance_amount=1400)),
         potential_allowance_amount=Sum("employee__allowance_amount", filter=Q(allowance_requested=True)),
+        with_allowance_granted_previous_year_nb=Count("pk", filter=Q(employee__allowance_granted_previous_year=True)),
         **extra_stats,
     )
 
@@ -140,6 +141,7 @@ def get_allowance_stats_for_institution(assessment, *, for_assessment_details=Fa
         allowance_of_1400_nb=Count("pk", filter=Q(employee__allowance_amount=1400)),
         allowance_of_1400_selected_nb=Count("pk", filter=Q(employee__allowance_amount=1400, allowance_granted=True)),
         potential_allowance_amount=Sum("employee__allowance_amount", filter=Q(allowance_granted=True)),
+        with_allowance_granted_previous_year_nb=Count("pk", filter=Q(employee__allowance_granted_previous_year=True)),
         **extra_stats,
     )
 

@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import AssessmentInstitutionLink
@@ -114,6 +114,7 @@ class TestAssessmentContractsListAndToggle:
             employee__last_name="Dupond",
             employee__first_name="Jean-Pierre",
             employee__allowance_amount=1_400,
+            employee__allowance_granted_previous_year=True,  # To test icon in list
             start_at=datetime.date(2024, 4, 1),
             end_at=datetime.date(2024, 6, 30),
             planned_end_at=datetime.date(2024, 6, 30),
@@ -144,6 +145,83 @@ class TestAssessmentContractsListAndToggle:
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments contracts list"
         )
+
+    def test_allowance_granted_previous_year(self, client, settings, snapshot):
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
+        assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            created_by__first_name="Jean",
+            created_by__last_name="Dupont",
+            created_by__email="jean.dupont@example.com",
+            label_geiq_name="Un Joli GEIQ",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
+            with_submission_requirements=True,
+            contracts_selection_validated_at=None,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+        contract = EmployeeContractFactory(
+            id=uuid.UUID("11111111-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("11111111-eeee-4444-8888-111111111111"),
+            employee__assessment=assessment,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+        )
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+        client.force_login(geiq_membership.user)
+
+        SINGULAR_PREVIOUS_YEAR_WARNING = (
+            "Un contrat concerne un salarié déjà présent dans le bilan précédent. "
+            "Nous vous invitons à vérifier la liste."
+        )
+        PLURAL_PREVIOUS_YEAR_WARNING = (
+            "Des contrats concernent des salariés déjà présents dans le bilan précédent. "
+            "Nous vous invitons à vérifier la liste."
+        )
+
+        response = client.get(contracts_list_url)
+        assertNotContains(response, SINGULAR_PREVIOUS_YEAR_WARNING)
+        assertNotContains(response, PLURAL_PREVIOUS_YEAR_WARNING)
+
+        contract.employee.allowance_granted_previous_year = True
+        contract.employee.save()
+        response = client.get(contracts_list_url)
+        assertContains(response, SINGULAR_PREVIOUS_YEAR_WARNING)
+        assertNotContains(response, PLURAL_PREVIOUS_YEAR_WARNING)
+
+        EmployeeContractFactory(
+            id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
+            employee__id=uuid.UUID("22222222-eeee-4444-8888-222222222222"),
+            employee__assessment=assessment,
+            employee__last_name="Martin",
+            employee__first_name="Cécile",
+            employee__allowance_amount=814,
+            employee__allowance_granted_previous_year=True,
+            start_at=datetime.date(2024, 2, 1),
+            end_at=datetime.date(2024, 3, 30),
+            planned_end_at=datetime.date(2024, 6, 30),
+            allowance_requested=False,
+        )
+        response = client.get(contracts_list_url)
+        assertNotContains(response, SINGULAR_PREVIOUS_YEAR_WARNING)
+        assertContains(response, PLURAL_PREVIOUS_YEAR_WARNING)
 
     @override_settings(PAGE_SIZE_LARGE=1)
     def test_pagination(self, client, settings):
@@ -227,6 +305,7 @@ class TestAssessmentContractsListAndToggle:
             employee__last_name="Dupond",
             employee__first_name="Jean-Pierre",
             employee__allowance_amount=1_400,
+            employee__allowance_granted_previous_year=True,  # To test icon in list
             start_at=datetime.date(2024, 4, 1),
             end_at=datetime.date(2024, 6, 30),
             planned_end_at=datetime.date(2024, 6, 30),
@@ -583,7 +662,11 @@ class TestAssessmentContractsDetails:
             allowance_requested=True,
         )
 
-        def check_user_access_to_all_tabs(user, *, access):
+        PREVIOUS_YEAR_WARNING = (
+            "Ce salarié figurait déjà dans le bilan précédent, nous vous invitons à vérifier ce contrat."
+        )
+
+        def check_user_access_to_all_tabs(user, *, access, with_previous_year_warning=False):
             client.force_login(user)
             user_label = "GEIQ" if user == geiq_membership.user else "DDETS"
             for tab in AssessmentContractDetailsTab:
@@ -595,6 +678,10 @@ class TestAssessmentContractsDetails:
                     with assertSnapshotQueries(snapshot(name=f"SQL queries for {tab=} as {user_label}")):
                         response = client.get(tab_url)
                     assertContains(response, "DUPONT Jean")
+                    if with_previous_year_warning:
+                        assertContains(response, PREVIOUS_YEAR_WARNING)
+                    else:
+                        assertNotContains(response, PREVIOUS_YEAR_WARNING)
                 else:
                     response = client.get(tab_url)
                     assert response.status_code == 404
@@ -613,6 +700,14 @@ class TestAssessmentContractsDetails:
         contract.save()
         check_user_access_to_all_tabs(geiq_membership.user, access=True)
         check_user_access_to_all_tabs(ddets_membership.user, access=False)
+
+        # Now for contract with previous year info
+        contract.employee.allowance_granted_previous_year = True
+        contract.employee.save()
+        contract.allowance_requested = True
+        contract.save()
+        check_user_access_to_all_tabs(ddets_membership.user, access=True, with_previous_year_warning=True)
+        check_user_access_to_all_tabs(geiq_membership.user, access=True, with_previous_year_warning=True)
 
     def test_contract_toggle_as_geiq(self, client, settings):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
