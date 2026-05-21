@@ -177,7 +177,7 @@ class JobApplicationInline(ReadonlyMixin, ItouTabularInline):
     extra = 0
     fields = ("pk_link", "created_at", "sender_kind", "to_company_link", "state")
     readonly_fields = fields
-    list_select_related = ("to_company", "job_seeker")
+    list_select_related = ("to_company", "job_seeker", "job_seeker__jobseeker_profile")
 
     @admin.display(description="PK")
     def pk_link(self, obj):
@@ -298,7 +298,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         "pk",
         "email",
         "first_name",
-        "last_name",
+        "last_name_overriden",
+        "birth_name",
         "birthdate",
         "kind",
         "identity_provider",
@@ -360,6 +361,15 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     @admin.display(description="historique des champs modifiés sur le modèle")
     def fields_history_formatted(self, obj):
         return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
+
+    # overridden for custom description
+    @admin.display(description="nom d’usage")
+    def last_name_overriden(self, obj):
+        return obj.last_name
+
+    @admin.display(description="nom de naissance")
+    def birth_name(self, obj):
+        return obj.jobseeker_profile.birth_name if obj.is_job_seeker else None
 
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
@@ -597,6 +607,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             if "@" not in search_term:
                 search_fields.append("first_name__unaccent")
                 search_fields.append("last_name__unaccent")
+                search_fields.append("jobseeker_profile__birth_name__unaccent")
             if is_france_travail_id_format(search_term):
                 search_fields.append("jobseeker_profile__pole_emploi_id__iexact")
         return search_fields
@@ -1011,6 +1022,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                 "fields": (
                     "user",
                     "asp_uid",
+                    "birth_name",
                     "birthdate",
                     "birth_place",
                     "birth_country",
@@ -1140,6 +1152,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         else:
             search_fields.append("user__email")
             if "@" not in search_term:
+                search_fields.append("birth_name__unaccent")
                 search_fields.append("user__first_name__unaccent")
                 search_fields.append("user__last_name__unaccent")
             if is_france_travail_id_format(search_term):
@@ -1187,6 +1200,7 @@ class NirModificationRequestAdmin(ItouModelAdmin):
             if "@" not in search_term:
                 search_fields.append("jobseeker_profile__user__first_name__unaccent")
                 search_fields.append("jobseeker_profile__user__last_name__unaccent")
+                search_fields.append("jobseeker_profile__birth_name__unaccent")
         return search_fields
 
     @admin.display(description="Type de compte de l'auteur")
@@ -1209,6 +1223,7 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
     search_fields = (
         "job_seeker__first_name",
         "job_seeker__last_name",
+        "job_seeker__jobseeker_profile__birth_name",
         "job_seeker__email",
         "professional__first_name",
         "professional__last_name",
