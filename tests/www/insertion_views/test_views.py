@@ -10,7 +10,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def detail_url(service):
-    return reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+    return reverse("insertion_views:service_card", kwargs={"service_uid": service.uid})
 
 
 @pytest.fixture
