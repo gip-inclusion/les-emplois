@@ -1002,7 +1002,7 @@ class TestDashboardView:
         assertRedirects(response, reverse("dashboard:edit_user_info"))
 
         setattr(user, field, data)
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user.save(update_fields=(field,))
 
         response = client.get(reverse("dashboard:index"))

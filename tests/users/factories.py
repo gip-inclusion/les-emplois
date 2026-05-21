@@ -326,7 +326,7 @@ class JobSeekerFactory(UserFactory):
         self.insee_city = city
 
         if create:
-            with triggers.connection_wrapper(), triggers.context():
+            with triggers.fake_context(with_ban_api_mocked_address=True):
                 self.save()
 
     @factory.post_generation
@@ -345,7 +345,7 @@ class JobSeekerFactory(UserFactory):
         self.geocoding_score = address.get("score")
         self.coords = f"POINT({address.get('longitude')} {address.get('latitude')})"
         if create:
-            with triggers.connection_wrapper(), triggers.context():
+            with triggers.fake_context(with_mocked_address=True):
                 self.save()
 
     @factory.post_generation

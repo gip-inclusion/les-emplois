@@ -200,7 +200,7 @@ class CreateEmployeeRecordTestMixin:
         self.job_seeker = self.job_application.job_seeker
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
@@ -404,7 +404,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
@@ -438,7 +438,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
         JobSeekerFactory(jobseeker_profile__nir=valid_nir_for_birthdate)
 
@@ -461,7 +461,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
     def test_lack_of_nir_with_ntt(self, client):
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)
@@ -548,7 +548,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         client.force_login(self.user)

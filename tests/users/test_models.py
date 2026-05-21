@@ -1071,14 +1071,14 @@ def test_job_seeker_profile_asp_uid_field_history():
     assert profile.fields_history == []
 
     profile.asp_uid = "000000000000000000000000000001"
-    with triggers.connection_wrapper(), triggers.context():
+    with triggers.fake_context():
         profile.save()
     assert normalize_fields_history(profile.fields_history) == [
         {
             "before": {"asp_uid": "000000000000000000000000000000"},
             "after": {"asp_uid": "000000000000000000000000000001"},
             "_timestamp": "[TIMESTAMP]",
-            "_context": {},
+            "_context": {"fake_context": True},
         }
     ]
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -1086,20 +1086,20 @@ def test_job_seeker_profile_asp_uid_field_history():
     )
 
     profile.asp_uid = "000000000000000000000000000002"
-    with triggers.connection_wrapper(), triggers.context(profile=profile.pk):
+    with triggers.fake_context(profile=profile.pk):
         profile.save()
     assert normalize_fields_history(profile.fields_history) == [
         {
             "before": {"asp_uid": "000000000000000000000000000000"},
             "after": {"asp_uid": "000000000000000000000000000001"},
             "_timestamp": "[TIMESTAMP]",
-            "_context": {},
+            "_context": {"fake_context": True},
         },
         {
             "before": {"asp_uid": "000000000000000000000000000001"},
             "after": {"asp_uid": "000000000000000000000000000002"},
             "_timestamp": "[TIMESTAMP]",
-            "_context": {"profile": profile.pk},
+            "_context": {"fake_context": True, "profile": profile.pk},
         },
     ]
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -1154,7 +1154,7 @@ def test_user_and_job_seeker_profile_field_history(obj_attr, field, value):
     assert obj.fields_history == []
 
     setattr(obj, field, value)
-    with triggers.connection_wrapper(), triggers.context():
+    with triggers.fake_context():
         obj.save(update_fields=[field])
     assert field in obj.fields_history[0]["after"].keys()
 

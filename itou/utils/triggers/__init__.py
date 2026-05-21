@@ -79,6 +79,21 @@ def get_current_context():
     return getattr(_context, "data", None)
 
 
+@contextlib.contextmanager
+def fake_context(**kwargs):
+    # This should only be used in tests & is completely incompatible with concurrent uses
+    # of _set_context_connection_wrapper
+    assert _set_context_connection_wrapper not in connection.execute_wrappers
+    context = {"fake_context": True, **kwargs}
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT set_config('itou.context', %s, true)",
+            [json.dumps(context)],
+        )
+        yield
+        cursor.execute("SELECT set_config('itou.context', '', true)")
+
+
 class FieldsHistory(core.Trigger):
     when: core.When = core.Before
     operation: core.Operation = core.Update

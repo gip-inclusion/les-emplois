@@ -442,7 +442,7 @@ class TestGroupDetailsMembershipTab:
 
         # Membership card: missing member information.
         participant.phone = ""
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             participant.save()
         response = client.get(url)
         assertContains(response, display_email_txt, count=1)

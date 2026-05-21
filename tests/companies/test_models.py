@@ -656,7 +656,7 @@ def test_company_siret_field_history():
     assert company.fields_history == []
 
     company.siret = "00000000000001"
-    with triggers.connection_wrapper(), triggers.context():
+    with triggers.fake_context():
         company.save()
     company.refresh_from_db()
     assert normalize_fields_history(company.fields_history) == [
@@ -666,7 +666,7 @@ def test_company_siret_field_history():
                 "siret": "00000000000001",
             },
             "_timestamp": "[TIMESTAMP]",
-            "_context": {},
+            "_context": {"fake_context": True},
         }
     ]
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -674,7 +674,7 @@ def test_company_siret_field_history():
     )
 
     company.siret = "00000000000002"
-    with triggers.connection_wrapper(), triggers.context(company=company.pk):
+    with triggers.fake_context(company=company.pk):
         company.save()
     company.refresh_from_db()
     assert normalize_fields_history(company.fields_history) == [
@@ -682,13 +682,13 @@ def test_company_siret_field_history():
             "before": {"siret": "00000000000000"},
             "after": {"siret": "00000000000001"},
             "_timestamp": "[TIMESTAMP]",
-            "_context": {},
+            "_context": {"fake_context": True},
         },
         {
             "before": {"siret": "00000000000001"},
             "after": {"siret": "00000000000002"},
             "_timestamp": "[TIMESTAMP]",
-            "_context": {"company": company.pk},
+            "_context": {"fake_context": True, "company": company.pk},
         },
     ]
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
