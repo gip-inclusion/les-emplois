@@ -35,6 +35,7 @@ class TestJobApplicationSearchApi:
         settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] |= {"job-applications-search": "10/minute"}
 
         self.job_seeker_1 = JobSeekerFactory(
+            jobseeker_profile__birth_name="Martin",
             jobseeker_profile__nir="269054958815780",
             jobseeker_profile__birthdate=date(1969, 5, 12),
             last_name="Durand",
@@ -43,6 +44,7 @@ class TestJobApplicationSearchApi:
             with_address=True,
         )
         self.job_seeker_2 = JobSeekerFactory(
+            jobseeker_profile__birth_name="",
             jobseeker_profile__nir="199127524528683",
             jobseeker_profile__birthdate=date(1999, 12, 3),
             last_name="Dupont-Maréchal",
@@ -103,6 +105,14 @@ class TestJobApplicationSearchApi:
     def test_exact_match(self, api_client):
         api_client.force_authenticate(ServiceAccount(), self.token)
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
+        assert response.status_code == 200
+        assert len(response.json()["results"]) == 3
+
+    def test_match_birth_name(self, api_client):
+        api_client.force_authenticate(ServiceAccount(), self.token)
+        payload = VALID_SEARCH_DATA
+        payload["nom"] = self.job_seeker_1.jobseeker_profile.birth_name
+        response = api_client.post(self.ENDPOINT_URL, payload, format="json")
         assert response.status_code == 200
         assert len(response.json()["results"]) == 3
 

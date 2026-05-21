@@ -61,6 +61,7 @@ class TestJobSeekerSignup:
             "nir": nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
@@ -178,6 +179,7 @@ class TestJobSeekerSignup:
             "nir": nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
@@ -195,6 +197,11 @@ class TestJobSeekerSignup:
         # NIR is not stored with user information.
         assert user.jobseeker_profile.nir == ""
 
+    def test_job_seeker_no_last_name(self, client, snapshot, mailoutbox):
+        nir = "141068078200557"
+        user = self._test_job_seeker_signup_forms(client, nir, last_name="")
+        assert user.last_name == user.jobseeker_profile.birth_name
+
     def test_job_seeker_signup_invalid_nir_resubmission(self, client):
         nir = "1234567895GHTUI"
 
@@ -203,6 +210,7 @@ class TestJobSeekerSignup:
             "nir": nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
@@ -227,6 +235,7 @@ class TestJobSeekerSignup:
             "nir": nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": "Invalid birthdate",
@@ -258,7 +267,8 @@ class TestJobSeekerSignup:
             {
                 "title": "MME",
                 "first_name": "Alice",
-                "last_name": "Evil",
+                "birth_name": "Evil",
+                "last_name": "",
                 "email": "alice@evil.com",
                 "birthdate": alice.jobseeker_profile.birthdate,
                 "birth_place": alice.jobseeker_profile.birth_place_id,
@@ -290,6 +300,7 @@ class TestJobSeekerSignup:
             "nir": job_seeker_data.jobseeker_profile.nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": birthdate,
@@ -333,6 +344,7 @@ class TestJobSeekerSignup:
                 "nir": job_seeker_data.jobseeker_profile.nir,
                 "title": job_seeker_data.title,
                 "first_name": job_seeker_data.first_name,
+                "birth_name": job_seeker_data.jobseeker_profile.birth_name,
                 "last_name": job_seeker_data.last_name,
                 "email": job_seeker_data.email,
                 "birthdate": birthdate,
@@ -371,6 +383,7 @@ class TestJobSeekerSignup:
                 "nir": "111111111111120",
                 "title": Title.M,
                 "first_name": "Léon",
+                "birth_name": "Nettoyeur",
                 "last_name": "Nettoyeur",
                 "email": "leon@w3.blizz",
                 "birthdate": "1933-11-02",
@@ -387,6 +400,7 @@ class TestJobSeekerSignup:
         assert user.first_name == job_seeker_data.first_name
         assert user.last_name == job_seeker_data.last_name
         assert user.email == job_seeker_data.email
+        assert user.jobseeker_profile.birth_name == job_seeker_data.jobseeker_profile.birth_name
         assert user.jobseeker_profile.nir == job_seeker_data.jobseeker_profile.nir
         assert user.jobseeker_profile.birthdate == job_seeker_data.jobseeker_profile.birthdate
         assert user.jobseeker_profile.birth_place_id == birth_place.pk
@@ -400,6 +414,7 @@ class TestJobSeekerSignup:
                 "nir": job_seeker_data.jobseeker_profile.nir,
                 "title": job_seeker_data.title,
                 "first_name": job_seeker_data.first_name,
+                "birth_name": job_seeker_data.jobseeker_profile.birth_name,
                 "last_name": job_seeker_data.last_name,
                 "email": job_seeker_data.email,
                 "birthdate": job_seeker_data.jobseeker_profile.birthdate,
@@ -444,6 +459,7 @@ class TestJobSeekerSignup:
                 "nir": job_seeker_data.jobseeker_profile.nir,
                 "title": job_seeker_data.title,
                 "first_name": job_seeker_data.first_name,
+                "birth_name": job_seeker_data.jobseeker_profile.birth_name,
                 "last_name": job_seeker_data.last_name,
                 "email": job_seeker_data.email,
                 "birthdate": birthdate,
@@ -494,6 +510,7 @@ class TestJobSeekerSignup:
             "nir": nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
@@ -536,6 +553,7 @@ class TestJobSeekerSignup:
             "nir": nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
@@ -564,14 +582,14 @@ class TestJobSeekerSignup:
         "erroneous_fields,snapshot_name",
         [
             (["email"], "email_conflict"),
-            (["email", "first_name", "last_name"], "email_and_name_conflict"),
+            (["email", "first_name", "last_name", "birth_name"], "email_and_name_conflict"),
             (["nir"], "nir_conflict"),
-            (["email", "first_name", "last_name", "birthdate"], "missing_only_nir"),
-            (["email", "nir", "first_name", "birthdate"], "missing_only_last_name"),
-            (["email", "nir", "last_name", "birthdate"], "missing_only_first_name"),
-            (["email", "nir", "first_name", "last_name"], "missing_only_birthdate"),
-            (["nir", "first_name", "last_name", "birthdate"], "missing_only_email"),
-            (["email", "nir", "first_name", "last_name", "birthdate"], "complete_match"),
+            (["email", "first_name", "last_name", "birth_name", "birthdate"], "missing_only_nir"),
+            (["email", "nir", "first_name", "birth_name", "birthdate"], "missing_only_last_name"),
+            (["email", "nir", "last_name", "birth_name", "birthdate"], "missing_only_first_name"),
+            (["email", "nir", "first_name", "last_name", "birth_name"], "missing_only_birthdate"),
+            (["nir", "first_name", "last_name", "birth_name", "birthdate"], "missing_only_email"),
+            (["email", "nir", "first_name", "last_name", "birth_name", "birthdate"], "complete_match"),
             (["nir", "birthdate"], "nir_plus_mispelled_name"),
         ],
     )
@@ -587,6 +605,7 @@ class TestJobSeekerSignup:
             "nir": job_seeker_data.jobseeker_profile.nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": str(job_seeker_data.jobseeker_profile.birthdate),
@@ -631,6 +650,7 @@ class TestJobSeekerSignup:
             "nir": job_seeker_data.jobseeker_profile.nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "last_name": job_seeker_data.last_name,
             "email": unverified_email_address.email,  # email conflict
             "birthdate": str(job_seeker_data.jobseeker_profile.birthdate),
@@ -652,6 +672,7 @@ class TestJobSeekerSignup:
             "nir": "1234567895GHTUI",
             "title": existing_user.title,
             "first_name": existing_user.first_name,
+            "birth_name": existing_user.jobseeker_profile.birth_name,
             "last_name": existing_user.last_name,
             "email": existing_user.email,  # email conflict
             "birthdate": str(existing_user.jobseeker_profile.birthdate),
@@ -673,6 +694,7 @@ class TestJobSeekerSignup:
             "nir": "1234567895GHTUI",
             "title": existing_user.title,
             "first_name": existing_user.first_name,
+            "birth_name": existing_user.jobseeker_profile.birth_name,
             "last_name": existing_user.last_name,
             "email": "afreshemail@adomain.org",  # no email conflict
             "birthdate": str(existing_user.jobseeker_profile.birthdate),
@@ -699,6 +721,7 @@ class TestJobSeekerSignup:
             "nir": "141068078200557",
             "title": existing_user.title,
             "first_name": existing_user.first_name,
+            "birth_name": existing_user.jobseeker_profile.birth_name,
             "last_name": existing_user.last_name,
             "email": "afreshemail@adomain.org",  # no email conflict
             "birthdate": str(existing_user.jobseeker_profile.birthdate),
@@ -728,6 +751,7 @@ class TestJobSeekerSignup:
             "nir": "141068078200557",
             "title": existing_user.title,
             "first_name": existing_user.first_name,
+            "birth_name": "whatever, employers do not have a birth name",
             "last_name": existing_user.last_name,
             "email": existing_user.email,  # Conflict on email
             "birthdate": birthdate,
@@ -755,6 +779,7 @@ class TestJobSeekerSignup:
             "nir": "",
             "title": existing_user.title,
             "first_name": existing_user.first_name,
+            "birth_name": existing_user.jobseeker_profile.birth_name,
             "last_name": existing_user.last_name,
             "email": existing_user.email,
             "birthdate": existing_user.jobseeker_profile.birthdate,

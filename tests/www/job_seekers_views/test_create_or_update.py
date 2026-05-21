@@ -365,6 +365,7 @@ class TestGetOrCreateForSender:
             {
                 "title": Title.M,
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "nir": "133116411111133",
                 "birthdate": birthdate.isoformat(),
@@ -403,6 +404,7 @@ class TestGetOrCreateForSender:
             {
                 "title": Title.M,
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "nir": "133116411111133",
                 "birthdate": birthdate.isoformat(),
@@ -444,6 +446,7 @@ class TestGetOrCreateForSender:
             {
                 "title": Title.M,
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "nir": "133111111111109",
                 "birthdate": "1933-11-01",
@@ -849,6 +852,7 @@ class TestStandaloneCreateAsPrescriber:
         post_data = {
             "title": "MME",  # inconsistent title
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -860,6 +864,7 @@ class TestStandaloneCreateAsPrescriber:
         post_data = {
             "title": "M",
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
             "lack_of_nir": False,
@@ -875,6 +880,7 @@ class TestStandaloneCreateAsPrescriber:
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
@@ -884,6 +890,7 @@ class TestStandaloneCreateAsPrescriber:
             "nationality": Nationality.FR.value,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1041,7 +1048,12 @@ class TestCreateForOrientation:
 
         response = client.post(
             step_1_url,
-            data={"first_name": "Michel", "last_name": "Durant", "birthdate": datetime.date(1978, 12, 20)},
+            data={
+                "first_name": "Michel",
+                "birth_name": "Dupond",
+                "last_name": "Durant",
+                "birthdate": datetime.date(1978, 12, 20),
+            },
         )
         step_2_url = reverse(
             "job_seekers_views:create_job_seeker_step_2_for_orientation", kwargs={"session_uuid": session_name}
@@ -1083,6 +1095,7 @@ class TestCreateForOrientation:
         assert session_name not in client.session
         assert (job_seeker.first_name, job_seeker.last_name) == ("Michel", "Durant")
         assert job_seeker.created_by == prescriber
+        assert job_seeker.jobseeker_profile.birth_name == "Dupond"
         assert job_seeker.jobseeker_profile.birthdate == datetime.date(1978, 12, 20)
         assert job_seeker.jobseeker_profile.nir == ""
         assert job_seeker.jobseeker_profile.creation_source == "orientation"
@@ -1139,6 +1152,7 @@ class TestCreateForOrientation:
             ),
             data={
                 "first_name": job_seeker.first_name,
+                "birth_name": job_seeker.jobseeker_profile.birth_name,
                 "last_name": job_seeker.last_name,
                 "birthdate": datetime.date(1978, 12, 20),
             },
@@ -1329,6 +1343,7 @@ class TestUpdateForSender:
             {
                 "title": Title.M,
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "birthdate": birthdate.isoformat(),
                 **(
@@ -1374,6 +1389,7 @@ class TestUpdateForSender:
             {
                 "title": Title.M,
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "birthdate": birthdate.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
@@ -1422,6 +1438,7 @@ class TestUpdateForSender:
             {
                 "title": Title.M,
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "birthdate": "1933-11-01",
                 # No birth_place
@@ -1446,7 +1463,8 @@ class TestUpdateForSender:
             count=1,
         )
 
-    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
+    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, certified_name):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         job_seeker = JobSeekerFactory(
@@ -1455,6 +1473,8 @@ class TestUpdateForSender:
             born_in_france=True,
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
+            last_name="" if certified_name == "birth_name" else "Initial",
+            jobseeker_profile__birth_name="Initial" if certified_name == "birth_name" else "",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -1494,6 +1514,7 @@ class TestUpdateForSender:
             {
                 "title": Title.M,
                 "first_name": "Bob",
+                "birth_name": "Le Friant",
                 "last_name": "Saint Clair",
                 "birthdate": new_birth_date.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", new_birth_date).pk,
@@ -1509,9 +1530,13 @@ class TestUpdateForSender:
         )
         session_data = client.session[job_seeker_session_name]
         session_user = session_data["user"]
-        for attr in ["title", "first_name", "last_name"]:
-            assert session_user[attr] == getattr(job_seeker, attr)
         session_profile = session_data["profile"]
+        for attr in ["title", "first_name"]:
+            assert session_user[attr] == getattr(job_seeker, attr)
+        if certified_name == "birth_name":
+            assert session_profile["birth_name"] == job_seeker.jobseeker_profile.birth_name
+        else:
+            assert session_user["last_name"] == job_seeker.last_name
         assert session_profile["birthdate"] == job_seeker.jobseeker_profile.birthdate
         assert session_profile["birth_place"] == job_seeker.jobseeker_profile.birth_place_id
         assert session_profile["birth_country"] == job_seeker.jobseeker_profile.birth_country_id
