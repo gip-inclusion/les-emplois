@@ -385,10 +385,7 @@ class TestApprovalDetailView:
         # since the repo might contain a future version of the 'CGU' (not yet in force),
         # explicitly calling 'accept_legal_terms' below is a tricky alternative
         settings.BYPASS_TERMS_ACCEPTANCE = True
-        TOO_SOON = (
-            "Les prolongations ne sont possibles qu’entre le 12ème mois avant la "
-            "fin d’un PASS IAE et jusqu’à son dernier jour de validité."
-        )
+        TOO_SOON = "Les prolongations sont possibles à partir du 12ème mois avant la fin d’un PASS IAE."
         REQUEST_PENDING = "Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois."
         TOO_LATE = "Il est impossible de faire une prolongation de PASS IAE expiré."
 
@@ -439,10 +436,30 @@ class TestApprovalDetailView:
             check_prolongation_url_and_reason(employer, with_url=False, expected_reason=REQUEST_PENDING)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
-        # Too late: the approval has expired
+        approval.prolongationrequest_set.all().delete()
+
+        # Right after the end: prolongation is still possible for employer
         with freeze_time(approval.end_at + datetime.timedelta(days=1)):
             approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
+            assert approval.can_be_prolonged is True
+            check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
+            check_prolongation_url_and_reason(employer, with_url=True, expected_reason=None)
+            check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
+
+            # With a pending prolongation request: impossible to prolong
+            ProlongationRequestFactory(approval=approval)
+            approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
             assert not approval.can_be_prolonged
+            check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
+            check_prolongation_url_and_reason(employer, with_url=False, expected_reason=REQUEST_PENDING)
+            check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
+
+        approval.prolongationrequest_set.all().delete()
+
+        # Too late: past the post-end window
+        with freeze_time(approval.end_at + relativedelta(months=6, days=1)):
+            approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
+            assert approval.can_be_prolonged is False
             check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_prolongation_url_and_reason(employer, with_url=False, expected_reason=TOO_LATE)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
