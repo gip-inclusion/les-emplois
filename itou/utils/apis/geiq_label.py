@@ -49,7 +49,7 @@ class LabelApiClient:
                 .json()
             )
         except (httpx.HTTPError, json.JSONDecodeError) as exc:
-            raise LabelAPIError("Error requesting Label API") from exc
+            raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
         if response_data.get("status") != "Success":
             raise LabelAPIError(f"Received response with status={response_data.get('Status')}")
         return response_data["result"]
@@ -84,7 +84,7 @@ class LabelApiClient:
                 params={"id": geiq_id},
             ).raise_for_status()
         except httpx.HTTPError as exc:
-            raise LabelAPIError("Error requesting Label API") from exc
+            raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
         if response_data.headers["content-type"] != "application/pdf":
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
         return response_data.content
@@ -97,7 +97,7 @@ class LabelApiClient:
                 timeout=httpx.Timeout(API_TIMEOUT_SECONDS, read=10),  # this endpoint can be slow to generate the PDF
             ).raise_for_status()
         except httpx.HTTPError as exc:
-            raise LabelAPIError("Error requesting Label API") from exc
+            raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
         if response_data.headers["content-type"] != "application/pdf":
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
         return response_data.content
