@@ -72,6 +72,20 @@
                             Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.
                         </p>
                         <small>(Erreur {{ employee_record.asp_processing_code }})</small>
+                    {% elif employee_record.asp_processing_code == "3437" %}
+                        <p class="mb-0">
+                            Un salarié existe déjà pour cette structure avec un identifiant Plateforme de l'inclusion différent.
+                        </p>
+                        <p class="mb-0">
+                            Les fiches salarié en erreur 3437 font l'objet d'un traitement spécifique visant à les régulariser.
+                            Merci de vous référer à ce
+                            <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/46417946551313--Fiche-salari%C3%A9-en-code-erreur-3437"
+                               target="_blank"
+                               rel="noreferrer noopener"
+                               class="has-external-link"
+                               aria-label="Mode d'emploi de régularisation des fiches salarié en erreur 3437">mode d'emploi</a>.
+                        </p>
+                        <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                     {% else %}
                         <p class="mb-0">
                             Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small>
