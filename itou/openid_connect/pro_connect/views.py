@@ -92,38 +92,35 @@ def _generate_pro_params_from_session(pc_data):
         "state": state,
         "nonce": nonce,
     }
-    if settings.FEATURE_ENABLE_PROCONNECT_SOFT_MFA:
-        data.update(
-            {
-                "claims": json.dumps(
-                    {
-                        "id_token": {
-                            # Ask ProConnect to return the `amr` claim, which
-                            # tells us which authentication methods have been
-                            # used.
-                            "amr": {"essential": True},
-                            # Request the use of 2FA _if possible_. Until all
-                            # identity providers implement 2FA, we must NOT
-                            # mention `"essential": True`. If we do, we'll get
-                            # an error in `pro_connect_callback` (missing
-                            # "code" ) that says that the requested ACRs could
-                            # not be satisfied.
-                            "acr": {
-                                "essential": False,
-                                "values": [
-                                    "eidas2",
-                                    "eidas3",
-                                    "https://proconnect.gouv.fr/assurance/self-asserted-2fa",
-                                    "https://proconnect.gouv.fr/assurance/consistency-checked-2fa",
-                                ],
-                            },
+    data.update(
+        {
+            "claims": json.dumps(
+                {
+                    "id_token": {
+                        # Ask ProConnect to return the `amr` claim, which
+                        # tells us which authentication methods have been
+                        # used.
+                        "amr": {"essential": True},
+                        # Request the use of 2FA _if possible_. Until all
+                        # identity providers implement 2FA, we must NOT
+                        # mention `"essential": True`. If we do, we'll get
+                        # an error in `pro_connect_callback` (missing
+                        # "code" ) that says that the requested ACRs could
+                        # not be satisfied.
+                        "acr": {
+                            "essential": False,
+                            "values": [
+                                "eidas2",
+                                "eidas3",
+                                "https://proconnect.gouv.fr/assurance/self-asserted-2fa",
+                                "https://proconnect.gouv.fr/assurance/consistency-checked-2fa",
+                            ],
                         },
-                    }
-                )
-            }
-        )
-    else:
-        data["acr_values"] = "eidas1"
+                    },
+                }
+            )
+        }
+    )
 
     if pc_data.get("channel") == ProConnectChannel.MAP_CONSEILLER:
         data["idp_hint"] = constants.PRO_CONNECT_FT_IDP_HINT
@@ -367,26 +364,25 @@ def pro_connect_callback(request):
         next_url = f"{reverse('pro_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
 
-    if settings.FEATURE_ENABLE_PROCONNECT_SOFT_MFA:
-        amr = idp_id = None
-        try:
-            id_token_data = _decode_token(token_data["id_token"])
-            amr = id_token_data.get("amr", ())
-            idp_id = user_data.get("idp_id", "")
-            ProConnectAuthentication.objects.create(
-                user_public_id=user.public_id,
-                amr=amr,
-                idp_id=idp_id,
-            )
-        except Exception:
-            logger.exception(
-                "Could not record ProConnect authentication",
-                extra={
-                    "user_public_id": user.public_id,
-                    "amr": amr,
-                    "idp_id": idp_id,
-                },
-            )
+    amr = idp_id = None
+    try:
+        id_token_data = _decode_token(token_data["id_token"])
+        amr = id_token_data.get("amr", ())
+        idp_id = user_data.get("idp_id", "")
+        ProConnectAuthentication.objects.create(
+            user_public_id=user.public_id,
+            amr=amr,
+            idp_id=idp_id,
+        )
+    except Exception:
+        logger.exception(
+            "Could not record ProConnect authentication",
+            extra={
+                "user_public_id": user.public_id,
+                "amr": amr,
+                "idp_id": idp_id,
+            },
+        )
 
     login(request, user)
 

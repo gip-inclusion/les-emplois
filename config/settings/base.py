@@ -762,8 +762,6 @@ DORA_WWW_BASE_URL = os.getenv("DORA_WWW_BASE_URL", "https://dora.inclusion.gouv.
 DORA_API_BASE_URL = os.getenv("DORA_API_BASE_URL", "https://api.dora.inclusion.gouv.fr")
 DORA_API_TOKEN = os.getenv("DORA_API_TOKEN")
 
-FEATURE_ENABLE_PROCONNECT_SOFT_MFA = os.getenv("FEATURE_ENABLE_PROCONNECT_SOFT_MFA", "True") == "True"
-
 # GPS
 # ------------------------------------------------------------------------------
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
