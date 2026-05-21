@@ -17,6 +17,7 @@
             {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
             {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
             {% bootstrap_field form.first_name %}
+            {% bootstrap_field form.birth_name %}
             {% bootstrap_field form.last_name %}
             <hr class="mt-2 mb-3">
             {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
