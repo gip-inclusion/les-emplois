@@ -272,7 +272,12 @@ class PENotificationMixin(models.Model):
 
 
 class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
-    user_last_name = models.CharField(verbose_name="nom demandeur d'emploi")
+    user_birth_name = models.CharField(
+        verbose_name="nom de naissance demandeur d'emploi",
+        default="",
+        db_default="",
+    )
+    user_last_name = models.CharField(verbose_name="nom d'usage demandeur d'emploi")
     user_first_name = models.CharField(verbose_name="prénom demandeur d'emploi")
     user_nir = models.CharField(verbose_name="NIR demandeur d'emploi", blank=True)
     user_birthdate = models.DateField(
@@ -331,7 +336,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
         if not all(
             [
                 self.user_first_name,
-                self.user_last_name,
+                self.user_birth_name or self.user_last_name,
                 self.user_nir,
                 self.user_birthdate,
             ]
@@ -340,7 +345,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 "approval is missing information in fields: %s",
                 [
                     f
-                    for f in ("user_first_name", "user_last_name", "user_nir", "user_birthdate")
+                    for f in ("user_first_name", "user_last_name", "user_birth_name", "user_nir", "user_birthdate")
                     if not getattr(self, f)
                 ],
             )
@@ -356,7 +361,9 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             try:
                 id_national = pe_client.recherche_individu_certifie(
                     first_name=self.user_first_name,
-                    last_name=self.user_last_name,
+                    # `user_birth_name` is a new field and may be empty.
+                    # Fallback to `user_last_name`, which has always existed.
+                    birth_name=self.user_birth_name or self.user_last_name,
                     nir=self.user_nir,
                     birthdate=self.user_birthdate,
                 )
@@ -575,6 +582,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             start_at=self.start_at,
             end_at=self.end_at,
             number=self.number,
+            user_birth_name=self.user.jobseeker_profile.birth_name,
             user_last_name=self.user.last_name,
             user_first_name=self.user.first_name,
             user_nir=self.user.jobseeker_profile.nir,
@@ -995,7 +1003,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         if not all(
             [
                 self.user.first_name,
-                self.user.last_name,
+                self.user.jobseeker_profile.birth_name or self.user.last_name,
                 self.user.jobseeker_profile.nir,
                 self.user.jobseeker_profile.birthdate,
             ]
@@ -1013,7 +1021,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             try:
                 id_national = pe_client.recherche_individu_certifie(
                     first_name=self.user.first_name,
-                    last_name=self.user.last_name,
+                    # `user_birth_name` is a new field and may be empty.
+                    # Fallback to `last_name`, which has always existed.
+                    birth_name=self.user.jobseeker_profile.birth_name or self.user.last_name,
                     nir=self.user.jobseeker_profile.nir,
                     birthdate=self.user.jobseeker_profile.birthdate,
                 )
