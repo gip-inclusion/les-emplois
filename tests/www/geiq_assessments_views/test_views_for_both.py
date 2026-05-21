@@ -688,15 +688,23 @@ class TestAssessmentContractsDetails:
             "Ce salarié figurait déjà dans le bilan précédent, nous vous invitons à vérifier ce contrat."
         )
 
-        def check_user_access_to_all_tabs(user, *, access, with_previous_year_warning=False):
+        def check_user_access_to_tabs(
+            user, *, access, tabs=AssessmentContractDetailsTab, with_previous_year_warning=False
+        ):
             client.force_login(user)
             user_label = "GEIQ" if user == geiq_membership.user else "DDETS"
-            for tab in AssessmentContractDetailsTab:
+            if user == geiq_membership.user:
+                user_label = "GEIQ"
+                viewable_tabs_for_user = AssessmentContractDetailsTab.get_common_tabs()
+            else:
+                user_label = "DDETS"
+                viewable_tabs_for_user = AssessmentContractDetailsTab.get_institution_tabs()
+            for tab in tabs:
                 tab_url = reverse(
                     "geiq_assessments_views:assessment_contracts_details",
                     kwargs={"contract_pk": str(contract.pk), "tab": tab.value},
                 )
-                if access:
+                if access and tab in viewable_tabs_for_user:
                     with assertSnapshotQueries(snapshot(name=f"SQL queries for {tab=} as {user_label}")):
                         response = client.get(tab_url)
                     assertContains(response, "DUPONT Jean")
@@ -708,28 +716,38 @@ class TestAssessmentContractsDetails:
                     response = client.get(tab_url)
                     assert response.status_code == 404
 
-        check_user_access_to_all_tabs(geiq_membership.user, access=True)
+        check_user_access_to_tabs(geiq_membership.user, access=True)
 
         # DDETS user should not access the contract details before submission
-        check_user_access_to_all_tabs(ddets_membership.user, access=False)
+        check_user_access_to_tabs(ddets_membership.user, access=False)
 
         # Submit the assessment
         assessment.submit(user=geiq_membership.user)
-        check_user_access_to_all_tabs(ddets_membership.user, access=True)
+        check_user_access_to_tabs(ddets_membership.user, access=True)
 
         # Now for contract without allowance requested
         contract.allowance_requested = False
         contract.save()
-        check_user_access_to_all_tabs(geiq_membership.user, access=True)
-        check_user_access_to_all_tabs(ddets_membership.user, access=False)
+        check_user_access_to_tabs(geiq_membership.user, access=True)
+        check_user_access_to_tabs(ddets_membership.user, access=False)
 
         # Now for contract with previous year info
         contract.employee.allowance_granted_previous_year = True
         contract.employee.save()
         contract.allowance_requested = True
         contract.save()
-        check_user_access_to_all_tabs(ddets_membership.user, access=True, with_previous_year_warning=True)
-        check_user_access_to_all_tabs(geiq_membership.user, access=True, with_previous_year_warning=True)
+        check_user_access_to_tabs(ddets_membership.user, access=True, with_previous_year_warning=True)
+        check_user_access_to_tabs(geiq_membership.user, access=True, with_previous_year_warning=True)
+
+        # Now for contract with allowance_granted
+        contract.allowance_granted = True
+        contract.save()
+        check_user_access_to_tabs(
+            geiq_membership.user, access=False, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION]
+        )
+        check_user_access_to_tabs(
+            ddets_membership.user, access=False, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION]
+        )
 
     def test_contract_toggle_as_geiq(self, client):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -745,7 +763,7 @@ class TestAssessmentContractsDetails:
             allowance_requested=random.choice([True, False]),
         )
         client.force_login(geiq_membership.user)
-        for tab in AssessmentContractDetailsTab:
+        for tab in AssessmentContractDetailsTab.get_common_tabs():
             current_value = contract.allowance_requested
             tab_url = reverse(
                 "geiq_assessments_views:assessment_contracts_details",
