@@ -2,6 +2,14 @@
 {% load components %}
 
 <div class="c-form">
+    <h2 class="h3">
+        {% if action == "remove" %}
+            Retirer
+        {% else %}
+            Ajouter
+        {% endif %}
+        les droits d'administrateur
+    </h2>
     {% with request.from_employer|yesno:"structure,organisation" as org_display %}
         {% component_alert content=content variant="warning" icon=False %}
             {% fragment as content %}
