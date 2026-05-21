@@ -121,7 +121,7 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
-            "back_url": get_safe_url(self.request, "back_url"),
+            "back_url": get_safe_url(self.request, "back_url", reverse("account_login")),
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.user.kind]
             if self.user.kind in MATOMO_ACCOUNT_TYPE
             else self.user.kind,
