@@ -802,7 +802,7 @@ class TestCommandSendUsersToBrevo:
 
 
 @freeze_time("2023-05-01")
-def test_update_job_seeker_coords(settings, capsys, respx_mock):
+def test_update_job_seeker_coords(settings, caplog, capsys, respx_mock):
     js1 = JobSeekerFactory(
         with_address=True, coords="POINT (2.387311 48.917735)", geocoding_score=0.65
     )  # score too low
@@ -823,27 +823,48 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
         ),
     )
 
-    call_command("update_job_seeker_coords", wet_run=True, verbosity=2)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == [
-        "> about to geolocate count=3 objects without geolocation or with a low score.",
-        "> count=3 of these have an address and a post code.",
-        "API result score=0.77 label='7 rue de Laroche' "
-        f"searched_address='{js1.address_line_1} {js1.post_code}' object_pk={js1.id}",
-        "API result score=0.32 label='5 rue Bigot' "
-        f"searched_address='{js2.address_line_1} {js2.post_code}' object_pk={js2.id}",
-        "API result score=0.83 label='9 avenue Delorme 92220 Boulogne' "
-        f"searched_address='{js3.address_line_1} {js3.post_code}' object_pk={js3.id}",
-        "> count=1 job seekers geolocated with a high score.",
-    ]
+    for wet_run in [False, True]:
+        caplog.clear()
+        call_command("update_job_seeker_coords", wet_run=wet_run, verbosity=2)
+        stdout, stderr = capsys.readouterr()
+        assert stderr == ""
+        assert stdout.splitlines() == [
+            "> about to geolocate count=3 objects without geolocation or with a low score.",
+            "> count=3 of these have an address and a post code.",
+            "API result score=0.77 label='7 rue de Laroche' "
+            f"searched_address='{js1.address_line_1} {js1.post_code}' object_pk={js1.id}",
+            "API result score=0.32 label='5 rue Bigot' "
+            f"searched_address='{js2.address_line_1} {js2.post_code}' object_pk={js2.id}",
+            "API result score=0.83 label='9 avenue Delorme 92220 Boulogne' "
+            f"searched_address='{js3.address_line_1} {js3.post_code}' object_pk={js3.id}",
+        ]
+        expected_logs = [
+            'HTTP Request: POST https://geo.foo/geocodage/search/csv/ "HTTP/1.1 200 OK"',
+        ]
+        if not wet_run:
+            expected_logs.append("Command launched with wet_run=False")
+        expected_logs.append("count=1 job seekers geolocated with a high score.")
+        if not wet_run:
+            expected_logs.append("Setting transaction to be rollback as wet_run=False")
+        assert caplog.messages[:-1] == expected_logs
+        assert caplog.messages[-1].startswith(
+            "Management command itou.users.management.commands.update_job_seeker_coords succeeded in"
+        )
 
-    js3.refresh_from_db()
-    assert js3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
-    assert js3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.UTC)
-    assert js3.geocoding_score == 0.83
-    assert js3.coords.x == 13.13
-    assert js3.coords.y == 42.42
+        js3.refresh_from_db()
+        if wet_run:
+            assert js3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
+            assert js3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.UTC)
+            assert js3.geocoding_score == 0.83
+            assert js3.coords.x == 13.13
+            assert js3.coords.y == 42.42
+        else:
+            # Values are unchanged
+            assert js3.ban_api_resolved_address is None
+            assert js3.geocoding_updated_at is None
+            assert js3.geocoding_score == 0.76
+            assert js3.coords.x == 5.43567
+            assert js3.coords.y == 12.123876
 
 
 @freeze_time("2022-09-13")

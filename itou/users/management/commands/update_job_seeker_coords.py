@@ -19,6 +19,8 @@ get the best possible geolocation for our users.
 
 """
 
+from itoutils.django.commands import dry_runnable
+
 from itou.common_apps.address.models import geolocate_qs
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -26,6 +28,9 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--wet-run",
@@ -37,10 +42,13 @@ class Command(BaseCommand):
         users = User.objects.filter(kind=UserKind.JOB_SEEKER, is_active=True)
 
         users_to_save = list(geolocate_qs(users, is_verbose=verbosity > 1))
-        if wet_run:
-            User.objects.bulk_update(
-                users_to_save,
-                ["coords", "geocoding_score", "ban_api_resolved_address", "geocoding_updated_at"],
-                batch_size=1000,
-            )
-            self.stdout.write(f"> count={len(users_to_save)} job seekers geolocated with a high score.")
+        self.update_users(users_to_save, wet_run=wet_run)
+
+    @dry_runnable
+    def update_users(self, users_to_save, wet_run):
+        User.objects.bulk_update(
+            users_to_save,
+            ["coords", "geocoding_score", "ban_api_resolved_address", "geocoding_updated_at"],
+            batch_size=1000,
+        )
+        self.logger.info("count=%d job seekers geolocated with a high score.", len(users_to_save))
