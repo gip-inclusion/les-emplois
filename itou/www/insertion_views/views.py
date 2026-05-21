@@ -1,15 +1,32 @@
+import enum
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import models
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 
-from itou.insertion.models import GenericReferenceItem, Service, Structure
+from itou.insertion import models as insertion_models
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import get_orientation_jwt
+from itou.users.enums import UserKind
+from itou.users.models import User
+from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.pagination import pager
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
+from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
+from itou.www.insertion_views.forms import (
+    OrientationConformityForm,
+    OrientationDocumentsForm,
+    OrientationReferentForm,
+)
+from itou.www.utils.wizard import WizardView
 
 
 class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
@@ -18,26 +35,35 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
     def setup(self, request, structure_uid, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.structure = get_object_or_404(
-            Structure.objects.select_related("source").prefetch_related(
+            insertion_models.Structure.objects.select_related("source").prefetch_related(
                 Prefetch(
                     "services",
-                    queryset=Service.objects.order_by("name").select_related("kind"),
+                    queryset=insertion_models.Service.objects.order_by("name").select_related("kind"),
                 ),
             ),
             uid=structure_uid,
         )
 
     def get_context_data(self, **kwargs):
+        services_page = pager(self.structure.services.all(), self.request.GET.get("page"), items_per_page=5)
+
         return super().get_context_data(**kwargs) | {
             "structure": self.structure,
             "matomo_custom_title": "Fiche structure d’insertion",
             "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("home:hp")),
+            "active_tab": "services" if self.request.GET.get("page") else "description",
+            "services_page": services_page,
         }
 
+    def get_template_names(self):
+        if self.request.htmx:
+            return ["insertion/includes/structure_card_tab_services.html"]
+        return [self.template_name]
 
-class ServiceDetailView(LoginNotRequiredMixin, DetailView):
-    model = Service
-    queryset = Service.objects.select_related(
+
+class ServiceCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, DetailView):
+    model = insertion_models.Service
+    queryset = insertion_models.Service.objects.select_related(
         "source",
         "fee",
         "kind",
@@ -47,7 +73,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     ).prefetch_related(
         "thematics",
         "publics",
-        Prefetch("receptions", queryset=GenericReferenceItem.objects.order_by("label")),
+        models.Prefetch("receptions", queryset=insertion_models.GenericReferenceItem.objects.order_by("label")),
         "mobilizations",
         "mobilization_publics",
     )
@@ -63,3 +89,83 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         context["matomo_custom_title"] = "Fiche de la service d'insértion"
         context["orientation_jwt"] = get_orientation_jwt(self.request)
         return context
+
+
+class OrientationStep(enum.StrEnum):
+    CONFORMITY = "valider-conformite"
+    REFERENT = "completer-demande"
+    DOCUMENTS = "documents-justificatifs"
+    do_not_call_in_templates = enum.nonmember(True)
+
+
+@login_required
+def start_orientation(request, service_uid):
+    service = get_object_or_404(insertion_models.Service, uid=service_uid, is_orientable_with_form=True)
+    job_seeker = get_object_or_404(User, public_id=request.GET.get("job_seeker_public_id"), kind=UserKind.JOB_SEEKER)
+    return OrientationWizardView.initialize_session_and_start(
+        request,
+        reset_url=reverse("insertion_views:service_card", kwargs={"service_uid": service.uid}),
+        extra_session_data={
+            "service_uid": service.uid,
+            "job_seeker_public_id": str(job_seeker.public_id),
+        },
+    )
+
+
+class OrientationWizardView(LoginRequiredMixin, WizardView):
+    url_name = "insertion_views:orientation_steps"
+    expected_session_kind = "orientation"
+    template_name = "insertion/orientation_wizard.html"
+    steps_config = {
+        OrientationStep.CONFORMITY: OrientationConformityForm,
+        OrientationStep.REFERENT: OrientationReferentForm,
+        OrientationStep.DOCUMENTS: OrientationDocumentsForm,
+    }
+
+    def setup_wizard(self):
+        self.dora_client = DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN)
+        self.service = get_object_or_404(insertion_models.Service, uid=self.wizard_session.get("service_uid"))
+        self.job_seeker = get_object_or_404(
+            User, public_id=self.wizard_session.get("job_seeker_public_id"), kind=UserKind.JOB_SEEKER
+        )
+
+    def get_form(self, step, data):
+        files = self.request.FILES if self.request.method == "POST" else None
+        return self.get_form_class(step)(
+            initial=self.get_form_initial(step), data=data, files=files, **self.get_form_kwargs(step)
+        )
+
+    def get_form_initial(self, step):
+        if step == OrientationStep.REFERENT and self.wizard_session.get(step) is self.wizard_session.NOT_SET:
+            user = self.request.user
+            return {
+                "referent_last_name": user.last_name,
+                "referent_first_name": user.first_name,
+                "referent_phone": user.phone,
+                "referent_email": user.email,
+            }
+        return super().get_form_initial(step)
+
+    def post(self, request, *args, **kwargs):
+        if self.step == OrientationStep.DOCUMENTS and self.form.is_valid():
+            cleaned = self.form.cleaned_data
+            try:
+                for field in ("credentials_documents_files", "credentials_proof_files"):
+                    # upload the list of documents to dora for each category
+                    cleaned[field] = [self.dora_client.safe_upload(f.name, f) for f in cleaned.get(field) or []]
+            except DoraAPIException:
+                self.form.add_error(
+                    None, "Une erreur est survenue lors du transfert des fichiers. Merci de réessayer."
+                )
+                return self.render_to_response(self.get_context_data(**kwargs))
+        return super().post(request, *args, **kwargs)
+
+    def done(self):
+        return reverse("insertion_views:service_card", kwargs={"service_uid": self.service.uid})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "service": self.service,
+            "job_seeker": self.job_seeker,
+            "OrientationStep": OrientationStep,
+        }
