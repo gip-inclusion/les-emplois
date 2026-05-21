@@ -13,9 +13,9 @@
 
     {% fragment as c_title__cta %}
         {% if services_search_url %}
-            <a href="{{ services_search_url }}" class="btn btn-lg bin-ico btn-secondary" {% matomo_event "candidat" "clic" service_search_event_option %} id="introjs-orienter-vers-service-insertion">
+            <a href="{{ services_search_url }}" class="btn btn-lg btn-ico btn-secondary" {% matomo_event "candidat" "clic" service_search_event_option %} id="introjs-orienter-vers-service-insertion">
                 <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
-                Orienter vers un service d’insertion
+                <span>Orienter vers un service d’insertion</span>
             </a>
         {% endif %}
         {% url 'search:employers_results' as search_url %}
@@ -40,6 +40,5 @@
             <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
             <span>Postuler pour cet usager</span>
         </a>
-
     {% endfragment %}
 {% endcomponent_title %}

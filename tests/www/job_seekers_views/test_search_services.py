@@ -11,14 +11,14 @@ from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 def details_markup(expected_url):
     return f"""<a href="{escape(expected_url)}"
-                  class="btn btn-lg bin-ico btn-secondary"
+                  class="btn btn-lg btn-ico btn-secondary"
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
                   data-matomo-option="services-search-from-details-general"
                   id="introjs-orienter-vers-service-insertion">
                    <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
-                   Orienter vers un service d’insertion
+                   <span>Orienter vers un service d’insertion</span>
                </a>"""
 
 
@@ -28,14 +28,14 @@ def details_url(job_seeker):
 
 def job_applications_markup(expected_url):
     return f"""<a href="{escape(expected_url)}"
-                  class="btn btn-lg bin-ico btn-secondary"
+                  class="btn btn-lg btn-ico btn-secondary"
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
                   data-matomo-option="services-search-from-details-job-applications"
                   id="introjs-orienter-vers-service-insertion">
                    <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
-                   Orienter vers un service d’insertion
+                   <span>Orienter vers un service d’insertion</span>
                </a>"""
 
 

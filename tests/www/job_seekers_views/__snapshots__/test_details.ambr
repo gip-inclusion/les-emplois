@@ -35,10 +35,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-contracts" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fcontracts%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-contracts" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fcontracts%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
@@ -267,7 +269,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -561,7 +563,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -800,10 +802,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
@@ -849,7 +853,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -1040,10 +1044,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
@@ -1089,7 +1095,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -1380,10 +1386,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
@@ -1429,7 +1437,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -1706,10 +1714,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
@@ -2936,10 +2946,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
@@ -4248,7 +4260,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -4518,10 +4530,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
@@ -4567,7 +4581,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -4845,7 +4859,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -5068,7 +5082,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -5314,10 +5328,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
@@ -5363,7 +5379,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -5641,7 +5657,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12">
+                                  <div class="col-12 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -5832,10 +5848,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
@@ -5874,7 +5892,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -6018,7 +6036,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
                                       <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
                                           <div class="mb-3 mb-md-4">
                                               <span class="badge badge-base rounded-pill bg-success text-white">
@@ -7173,10 +7191,12 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
+                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
                                   <i aria-hidden="true" class="ri-user-location-line fw-medium">
                                   </i>
-                                  Orienter vers un service d’insertion
+                                  <span>
+                                      Orienter vers un service d’insertion
+                                  </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
@@ -7215,7 +7235,7 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 order-3 order-xxl-2">
                                       <h2>
                                           Informations générales
                                       </h2>
@@ -7409,7 +7429,7 @@
                                           </div>
                                       </div>
                                   </div>
-                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
                                       <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
                                           <div class="mb-3 mb-md-4">
                                               <span class="badge badge-base rounded-pill bg-success text-white">
