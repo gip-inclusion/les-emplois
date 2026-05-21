@@ -2,18 +2,17 @@
 {% load django_bootstrap5 %}
 
 <form method="post" role="form" class="js-prevent-multiple-submit">
+    <h2 class="h3">Critères administratifs déclarés lors de l'embauche</h2>
 
     {% csrf_token %}
-
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
-    <h3 class="h2">Critères administratifs déclarés lors de l'embauche</h3>
     <p>
         Vous devez justifier l’embauche du salarié en sélectionnant soit 1 critère administratif de niveau 1, soit {{ form_administrative_criteria.num_level2_admin_criteria }} critères administratifs de niveau 2.
     </p>
 
     {% if level_1_fields %}
-        <h3>Niveau 1</h3>
+        <h3 class="h4">Niveau 1</h3>
 
         {% for field in level_1_fields %}
             {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
@@ -21,7 +20,7 @@
     {% endif %}
 
     {% if level_2_fields %}
-        <h3>Niveau 2</h3>
+        <h3 class="h4">Niveau 2</h3>
 
         {% for field in level_2_fields %}
             {# notice that eligibility/includes/iae/criteria_input.html requires form_administrative_criteria.OBJECTS #}
