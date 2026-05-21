@@ -4766,7 +4766,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -5136,7 +5144,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -5490,7 +5506,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -5796,7 +5820,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -6880,6 +6912,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -8645,6 +8678,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -9519,6 +9553,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -10064,7 +10099,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -10449,7 +10492,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -10803,7 +10854,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -11102,7 +11161,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -11463,7 +11530,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -11812,7 +11887,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -12111,7 +12194,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -12585,6 +12676,7 @@
                      LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -13457,7 +13549,15 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Nom
+                                                      Nom de naissance
+                                                  </small>
+                                                  <strong>
+                                                      SMITH
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom d’usage
                                                   </small>
                                                   <strong>
                                                       DOE
@@ -14040,6 +14140,7 @@
                      LIMIT 1)) AS "last_contract_ended_with_valid_approval",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",

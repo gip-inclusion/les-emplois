@@ -415,7 +415,8 @@ DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = re.compile(
 
 AUTH_USER_MODEL = "users.User"
 
-AUTHENTICATION_BACKENDS = ("allauth.account.auth_backends.AuthenticationBackend",)
+AUTHENTICATION_BACKENDS = ("itou.utils.auth.AuthenticationBackend",)
+
 
 SILENCED_SYSTEM_CHECKS = ["slippers.E001"]  # We register the components differently
 

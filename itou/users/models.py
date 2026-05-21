@@ -16,7 +16,8 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
+from django.db.models import Case, Count, Exists, F, OuterRef, Q, Subquery, When
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -94,6 +95,23 @@ class UserQuerySet(models.QuerySet):
 
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+    @staticmethod
+    def last_name_annotation(*, prefix=""):
+        def apply_prefix(lookup: str):
+            if prefix:
+                return f"{prefix}{LOOKUP_SEP}{lookup}"
+            return lookup
+
+        lookups = {
+            apply_prefix("last_name"): "",
+            apply_prefix("kind"): UserKind.JOB_SEEKER,
+        }
+        return Case(
+            When(**lookups, then=F(apply_prefix("jobseeker_profile__birth_name"))),
+            default=F(apply_prefix("last_name")),
+            output_field=models.CharField(),
+        )
 
     def with_advisors_count(self, active=True):
         status_filter = Q()
@@ -909,6 +927,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     FIELDS_HISTORY_TRIGGER_FIELDS = [
         "asp_uid",
         "birth_country",
+        "birth_name",
         "birth_place",
         "birthdate",
         "is_not_stalled_anymore",
@@ -947,6 +966,14 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         related_name="jobseeker_profile",
     )
 
+    birth_name = models.CharField(
+        max_length=150,  # same as `AbstractUser.last_name`
+        verbose_name="nom de naissance",
+        blank=True,
+        null=False,
+        default="",
+        db_default="",
+    )
     birthdate = models.DateField(
         verbose_name="date de naissance",
         null=True,
@@ -1363,7 +1390,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
             self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
+        if self.has_data_changed(["birth_name", "birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
@@ -1593,6 +1620,10 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                 case IdentityCertificationAuthorities.API_PARTICULIER:
                     blocked_fields.update(api_particulier.USER_REQUIRED_FIELDS)
                     blocked_fields.update(api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS)
+                    if self.birth_name:
+                        blocked_fields.add("birth_name")
+                    else:
+                        blocked_fields.add("last_name")
 
                     # These fields can be empty even after the certification, generating an error
                     # when the form is validated. Hence we allow the edition of this field.

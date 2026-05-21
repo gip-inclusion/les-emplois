@@ -210,6 +210,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
+        if not request.user.jobseeker_profile.birth_name:
+            return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
         iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(request.user)
         geiq_eligibility_diagnosis = (

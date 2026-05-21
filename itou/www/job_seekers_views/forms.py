@@ -354,7 +354,15 @@ class JobSeekerExistsForm(forms.Form):
 
 
 class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfileModelForm):
-    PROFILE_FIELDS = ["nationality", "birth_country", "birthdate", "birth_place", "nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = [
+        "nationality",
+        "birth_name",
+        "birth_country",
+        "birthdate",
+        "birth_place",
+        "nir",
+        "lack_of_nir_reason",
+    ]
 
     class Meta(JobSeekerProfileModelForm.Meta):
         pass
@@ -371,8 +379,8 @@ class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
 
 
 class CreateJobSeekerForOrientationStep1Form(JobSeekerProfileModelForm):
-    PROFILE_FIELDS = ["birthdate"]
-    REQUIRED_FIELDS = ["first_name", "last_name", "birthdate"]
+    PROFILE_FIELDS = ["birth_name", "birthdate"]
+    REQUIRED_FIELDS = ["first_name", "birth_name", "birthdate"]
 
     email = forms.EmailField(label="Adresse électronique personnelle", disabled=True)
 
