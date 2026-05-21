@@ -55,7 +55,12 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                {% if request.from_institution %}
+                    <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                        {% include "geiq_assessments_views/includes/contracts_grant_allowance_box_for_institution.html" with contract=contract csrf_token=csrf_token active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
+                    </div>
+                {% endif %}
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>{{ active_tab.label }}</h2>
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
                         <div class="c-box mb-3 mb-md-4">
@@ -368,6 +373,8 @@
                                 </li>
                             </ul>
                         </div>
+                    {% elif request.from_institution and active_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
+                        {% include "geiq_assessments_views/includes/allowance_refusal_justification_form.html" with contract=contract csrf_token=csrf_token form=allowance_refusal_justification_form disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     {% endif %}
                 </div>
             </div>

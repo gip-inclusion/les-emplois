@@ -3477,6 +3477,169 @@
     ]),
   })
 # ---
+# name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with granted allowance]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          L’aide financière est accordée
+      </h3>
+      <p>
+          La demande d’aide est approuvée.
+      </p>
+      <p>
+          Vous pouvez refuser la demande pour ce contrat tant que le bilan n’a pas été validé.
+      </p>
+      <form method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary btn-block btn-lg btn-ico" name="action" type="submit" value="refuse_allowance">
+              <i aria-hidden="true" class="ri-close-line">
+              </i>
+              <span>
+                  Refuser l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with refused allowance, filled reason, common tab]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          L’aide financière n’est pas accordée
+      </h3>
+      <p>
+          La demande d’obtention de l’aide est refusée.
+      </p>
+      <p>
+          Vous avez déjà motivé votre refus.
+      </p>
+      <p>
+          Vous avez la possibilité de modifier votre décision
+              ou le motif de refus
+              tant que le bilan n'a pas été validé.
+      </p>
+      <p>
+          Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.
+      </p>
+      <a class="btn btn-outline-primary btn-block btn-lg mb-2" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+          <span>
+              Modifier le motif de refus
+          </span>
+      </a>
+      <form method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary btn-block btn-lg" name="action" type="submit" value="grant_allowance">
+              <span>
+                  Accorder l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with refused allowance, missing reason, common tab]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          L’aide financière n’est pas accordée
+      </h3>
+      <p>
+          La demande d’obtention de l’aide est refusée.
+      </p>
+      <p>
+          Vous devez obligatoirement justifier votre refus.
+      </p>
+      <p>
+          Vous avez la possibilité de modifier votre décision
+              
+              tant que le bilan n'a pas été validé.
+      </p>
+      <a class="btn btn-outline-primary btn-block btn-lg mb-2" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+          <span>
+              Justifier le refus
+          </span>
+      </a>
+      <form method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary btn-block btn-lg" name="action" type="submit" value="grant_allowance">
+              <span>
+                  Accorder l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with refused allowance, missing reason, justification tab]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          L’aide financière n’est pas accordée
+      </h3>
+      <p>
+          La demande d’obtention de l’aide est refusée.
+      </p>
+      <p>
+          Vous devez obligatoirement justifier votre refus.
+      </p>
+      <p>
+          Vous avez la possibilité de modifier votre décision
+              
+              tant que le bilan n'a pas été validé.
+      </p>
+      <form method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary btn-block btn-lg" name="action" type="submit" value="grant_allowance">
+              <span>
+                  Accorder l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution_after_selection_validation[contract detail side box with refused allowance and validated selection]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          L’aide financière n’est pas accordée
+      </h3>
+      <p>
+          La demande d’obtention de l’aide est refusée.
+      </p>
+      <p>
+          Vous avez déjà motivé votre refus.
+      </p>
+      <p>
+          Vous avez la possibilité de modifier votre décision
+              ou le motif de refus
+              tant que le bilan n'a pas été validé.
+      </p>
+      <p>
+          Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.
+      </p>
+      <a class="btn btn-outline-primary btn-block btn-lg mb-2 disabled" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+          <span>
+              Modifier le motif de refus
+          </span>
+      </a>
+      <form method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary btn-block btn-lg" disabled="" name="action" type="submit" value="grant_allowance">
+              <span>
+                  Accorder l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
 # name: TestAssessmentContractsExportView.test_export[SQL queries]
   dict({
     'num_queries': 17,
