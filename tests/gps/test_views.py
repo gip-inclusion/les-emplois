@@ -1760,7 +1760,7 @@ class TestJoinGroupFromNameAndEmail:
 
         # Unknown email -> redirect to job seeker creation flow
         # ----------------------------------------------------------------------
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(last_name="Smith")
         first_name = job_seeker.first_name if known_name else "John"
         last_name = job_seeker.last_name if known_name else "Snow"
         post_data = {
