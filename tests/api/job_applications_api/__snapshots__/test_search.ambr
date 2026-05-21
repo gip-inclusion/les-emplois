@@ -18,13 +18,14 @@
           WHERE ("users_user"."first_name" %% %s
                  AND "users_jobseekerprofile"."birthdate" = %s
                  AND "users_jobseekerprofile"."nir" = %s
-                 AND "users_user"."last_name" %% %s
                  AND COALESCE(
                                 (SELECT U0."timestamp" AS "timestamp"
                                  FROM "job_applications_jobapplicationtransitionlog" U0
                                  WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
                                  ORDER BY 1 DESC
-                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
+                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s
+                 AND ("users_user"."last_name" %% %s
+                      OR "users_jobseekerprofile"."birth_name" %% %s))
         ''',
       }),
       dict({
@@ -125,6 +126,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -332,13 +334,14 @@
           WHERE ("users_user"."first_name" %% %s
                  AND "users_jobseekerprofile"."birthdate" = %s
                  AND "users_jobseekerprofile"."nir" = %s
-                 AND "users_user"."last_name" %% %s
                  AND COALESCE(
                                 (SELECT U0."timestamp" AS "timestamp"
                                  FROM "job_applications_jobapplicationtransitionlog" U0
                                  WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
                                  ORDER BY 1 DESC
-                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
+                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s
+                 AND ("users_user"."last_name" %% %s
+                      OR "users_jobseekerprofile"."birth_name" %% %s))
           ORDER BY 45 DESC
           LIMIT 3
         ''',

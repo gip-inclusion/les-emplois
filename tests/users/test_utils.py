@@ -14,7 +14,9 @@ from itou.users.enums import Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.utils import (
     RSA_CERTIFICATION_RETRY_DELAY,
+    GuessLastNameMode,
     deactivate_users,
+    guess_last_name,
     refresh_rsa_certification,
 )
 from itou.utils import triggers
@@ -427,3 +429,25 @@ class TestRSACertificationInvalidation:
             job_seeker.save(update_fields=["phone"])
 
         self.assert_kept(job_seeker)
+
+
+@pytest.mark.parametrize(
+    "mode,last_name,birth_name,expected",
+    (
+        (GuessLastNameMode.BEFORE_DISPLAY, "", "", ""),
+        (GuessLastNameMode.BEFORE_DISPLAY, "", "Smith", ""),
+        (GuessLastNameMode.BEFORE_DISPLAY, "Doe", "Smith", "Doe"),
+        (GuessLastNameMode.BEFORE_DISPLAY, "Doe", "Doe", ""),
+        (GuessLastNameMode.BEFORE_DISPLAY, "Doe", "DOE", ""),
+        (GuessLastNameMode.BEFORE_DISPLAY, "Doß", "DOSS", ""),
+        (GuessLastNameMode.BEFORE_SAVE, "", "", ""),
+        # should not happen because birth name is required
+        (GuessLastNameMode.BEFORE_SAVE, "Smith", "", "Smith"),
+        (GuessLastNameMode.BEFORE_SAVE, "", "Doe", "Doe"),
+        (GuessLastNameMode.BEFORE_SAVE, "Smith", "Doe", "Smith"),
+        (GuessLastNameMode.BEFORE_SAVE, "DOE", "Doe", "Doe"),
+        (GuessLastNameMode.BEFORE_SAVE, "Doss", "Doß", "Doß"),
+    ),
+)
+def test_guess_last_name(mode, last_name, birth_name, expected):
+    assert guess_last_name(last_name, birth_name, mode) == expected

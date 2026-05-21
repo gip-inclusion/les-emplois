@@ -1143,19 +1143,26 @@ class TestDashboardView:
             pytest.param("address_line_1", "1 rue du bac", id="address_line_1"),
             pytest.param("post_code", "59140", id="post_code"),
             pytest.param("city", "Dunkerque", id="city"),
+            pytest.param("jobseeker_profile__birth_name", "Doe", id="birth_name"),
         ],
     )
     def test_job_seeker_without_required_field_redirected(self, client, field, data):
-        empty_field = {field: ""}
-        user = JobSeekerFactory(with_address=True, **empty_field)
+        kwargs = {"last_name": "Doe", "jobseeker_profile__birth_name": "Smith"} | {field: ""}
+        user = JobSeekerFactory(with_address=True, **kwargs)
         client.force_login(user)
 
         response = client.get(reverse("dashboard:index"))
         assertRedirects(response, reverse("dashboard:edit_user_info"))
 
-        setattr(user, field, data)
-        with triggers.fake_context():
-            user.save(update_fields=(field,))
+        if field.startswith("jobseeker_profile__"):
+            profile_field_name = field[len("jobseeker_profile__") :]
+            setattr(user.jobseeker_profile, profile_field_name, data)
+            with triggers.fake_context():
+                user.jobseeker_profile.save(update_fields=(profile_field_name,))
+        else:
+            setattr(user, field, data)
+            with triggers.fake_context():
+                user.save(update_fields=(field,))
 
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200

@@ -42,11 +42,12 @@ class Command(BaseCommand):
             retry=tenacity.retry_if_exception_type(PoleEmploiRateLimitException),
         )
         def pe_check_user_details(user, client, *, swap=False):
+            birth_name = user.jobseeker_profile.birth_name or user.last_name
             return client.recherche_individu_certifie(
-                user.first_name if not swap else user.last_name,
-                user.last_name if not swap else user.first_name,
-                user.jobseeker_profile.birthdate,
-                user.jobseeker_profile.nir,
+                first_name=user.first_name if not swap else birth_name,
+                birth_name=birth_name if not swap else user.first_name,
+                birthdate=user.jobseeker_profile.birthdate,
+                nir=user.jobseeker_profile.nir,
             )
 
         active_job_seekers = (
@@ -69,6 +70,7 @@ class Command(BaseCommand):
         certified_profiles = []
         identity_certifications = []
         swapped_users = []
+        swapped_profiles = []
 
         def certify_user(user, id_certifie):
             user.jobseeker_profile.pe_obfuscated_nir = id_certifie
@@ -100,17 +102,33 @@ class Command(BaseCommand):
                         )
                     else:
                         self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
-                        user.last_name, user.first_name = user.first_name, user.last_name
+                        # If the birth name was not known (which means
+                        # that the last name _was_ known, otherwise we
+                        # would not end up in this function), then
+                        # according to France Travail certification
+                        # the last name was actually the first name,
+                        # and the first name was actually the _birth_
+                        # name. The last name being unknown, we set it
+                        # as the birth name as well.
+                        clear_last_name = not user.jobseeker_profile.birth_name
+                        user.jobseeker_profile.birth_name, user.first_name = (
+                            user.first_name,
+                            user.jobseeker_profile.birth_name or user.last_name,
+                        )
+                        if clear_last_name:
+                            user.last_name = user.jobseeker_profile.birth_name
                         certify_user(user, response2)
                         swapped_users.append(user)
+                        swapped_profiles.append(user.jobseeker_profile)
                 else:
                     certify_user(user, response)
 
         self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
         JobSeekerProfile.objects.bulk_update(
-            certified_profiles,
+            certified_profiles + swapped_profiles,
             [
+                "birth_name",
                 "pe_obfuscated_nir",
                 "pe_last_certification_attempt_at",
             ],
