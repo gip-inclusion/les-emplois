@@ -35,7 +35,7 @@ def export_row(spec, obj):
 job_app_export_spec = {
     "job_seeker_title": lambda job_app: job_app.job_seeker.title,
     "job_seeker_first_name": lambda job_app: job_app.job_seeker.first_name,
-    "job_seeker_last_name": lambda job_app: job_app.job_seeker.last_name,
+    "job_seeker_last_name": lambda job_app: job_app.job_seeker.get_last_name_for_display(),
     "job_seeker_nir": lambda job_app: job_app.job_seeker.jobseeker_profile.nir,
     "job_seeker_france_travail_id": lambda job_app: job_app.job_seeker.jobseeker_profile.pole_emploi_id,
     "job_seeker_ft_obfuscated_nir": lambda job_app: job_app.job_seeker.jobseeker_profile.pe_obfuscated_nir,
@@ -216,7 +216,7 @@ cta_export_spec = {
 
 fs_3437_export_spec = {
     "idItou": lambda er: er.job_application.job_seeker.jobseeker_profile.asp_uid,
-    "nomUsage": lambda er: er.job_application.job_seeker.last_name,
+    "nomUsage": lambda er: er.job_application.job_seeker.get_last_name_for_display(),
     "prenom": lambda er: er.job_application.job_seeker.first_name,
     "dateNaissance": lambda er: er.job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
     "numeroIDE": lambda er: er.job_application.job_seeker.jobseeker_profile.pole_emploi_id,

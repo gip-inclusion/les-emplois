@@ -63,7 +63,7 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         label="Numéro de sécurité sociale du candidat",
     )
     candidat_nom = serializers.CharField(
-        source="job_seeker.last_name",
+        source="job_seeker.get_last_name_for_display",
         label="Nom de famille du candidat",
     )
     candidat_prenom = serializers.CharField(
