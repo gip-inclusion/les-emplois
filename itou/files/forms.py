@@ -116,6 +116,6 @@ class ItouFileField(forms.FileField):
         if data:
             if data.size > self.max_upload_size:
                 raise forms.ValidationError(f"Le fichier doit faire moins de {localize(self.max_upload_size_mb)} Mo.")
-            validator = self.CONTENT_TYPE_TO_VALIDATOR[self.content_type]
-            validator(data)
+            if validator := self.CONTENT_TYPE_TO_VALIDATOR.get(self.content_type):
+                validator(data)
         return cleaned_data
