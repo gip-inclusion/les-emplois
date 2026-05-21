@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 from django.contrib import messages
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -14,7 +15,7 @@ from itou.utils.urls import get_zendesk_form_url
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 
 
-ConflictFields = namedtuple("ConflictFields", ["email", "nir", "first_name", "last_name", "birthdate"])
+ConflictFields = namedtuple("ConflictFields", ["email", "nir", "first_name", "last_name", "birthdate", "birth_name"])
 
 
 class JobSeekerSignupConflictModalResolver:
@@ -46,12 +47,27 @@ class JobSeekerSignupConflictModalResolver:
             nir_conflict_user
             or email_conflict_user
             or (
-                all(key in cleaned_data for key in ["birthdate", "first_name", "last_name"])
+                all(key in cleaned_data for key in ["birthdate", "first_name", "last_name", "birth_name"])
                 and job_seekers.filter(
                     jobseeker_profile__birthdate=cleaned_data["birthdate"],
                     first_name__unaccent__iexact=cleaned_data["first_name"],
-                    last_name__unaccent__iexact=cleaned_data["last_name"],
-                ).first()
+                )
+                .filter(
+                    Q(
+                        jobseeker_profile__birth_name__iexact=cleaned_data["birth_name"],
+                        last_name__unaccent__iexact=cleaned_data["last_name"],
+                    )
+                    | Q(
+                        # Match recent users who changed their last name.
+                        jobseeker_profile__birth_name__iexact=cleaned_data["birth_name"],
+                    )
+                    | Q(
+                        # Match for older users who have an empty birth name.
+                        jobseeker_profile__birth_name="",
+                        last_name__unaccent__iexact=cleaned_data["birth_name"] or cleaned_data["last_name"],
+                    )
+                )
+                .first()
             )
         )
 
@@ -71,6 +87,11 @@ class JobSeekerSignupConflictModalResolver:
             nir=(nir_conflict_user is not None),
             first_name=compare_name("first_name"),
             last_name=compare_name("last_name"),
+            birth_name="birth_name" in cleaned_data
+            and (
+                cleaned_data["birth_name"] == self.existing_user.jobseeker_profile.birth_name
+                or cleaned_data["birth_name"] == self.existing_user.last_name
+            ),
             birthdate=(
                 "birthdate" in cleaned_data
                 and cleaned_data["birthdate"] == self.existing_user.jobseeker_profile.birthdate
