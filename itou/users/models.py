@@ -1673,6 +1673,8 @@ class JobSeekerAssignment(models.Model):
         verbose_name="accompagnateur désigné inconnu",
         default=False,
     )
+    started_at = models.DateField(verbose_name="date de début de l'accompagnement", null=True, blank=True)
+    ended_at = models.DateField(verbose_name="date de fin de l'accompagnement", null=True, blank=True)
 
     objects = JobSeekerAssignmentManager()
 

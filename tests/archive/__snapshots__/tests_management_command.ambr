@@ -1946,7 +1946,9 @@
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
-                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
           FROM "users_jobseekerassignment"
           WHERE "users_jobseekerassignment"."professional_id" IN (%s,
                                                                   %s,
