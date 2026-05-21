@@ -139,6 +139,7 @@ class TestEditJobSeekerInfo:
             ban_api_resolved_address="12 rue Georges Bizet, 35000 Rennes",
             born_in_france=born_in_france,
             born_outside_france=(not born_in_france),
+            jobseeker_profile__birth_name="Smith",
             jobseeker_profile__birthdate=birthdate,
             jobseeker_profile__nir="290010101010125",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -163,6 +164,7 @@ class TestEditJobSeekerInfo:
         post_data = {
             "email": job_seeker.email,
             "title": job_seeker.title,
+            "birth_name": job_seeker.jobseeker_profile.birth_name,
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "phone": job_seeker.phone,
@@ -193,6 +195,7 @@ class TestEditJobSeekerInfo:
             "email": job_seeker.email,
             "title": job_seeker.title,
             "first_name": "Odile",
+            "birth_name": "Hodéi-El",
             "last_name": "Deray",
             "phone": "0700000070",
             "ban_api_resolved_address": "23 avenue de Nantes, 86000 Poitiers",
@@ -240,6 +243,7 @@ class TestEditJobSeekerInfo:
         assert job_seeker.address_line_1 == post_data["address_line_1"]
         assert job_seeker.post_code == post_data["post_code"]
         assert job_seeker.city == post_data["city"]
+        assert job_seeker.jobseeker_profile.birth_name == post_data["birth_name"]
         assert job_seeker.jobseeker_profile.birthdate == birthdate
         assert job_seeker.jobseeker_profile.birth_place_id == post_data.get("birth_place")
         assert (

@@ -1,5 +1,5 @@
 from dateutil.relativedelta import relativedelta
-from django.db.models import F, OuterRef, Prefetch, Subquery
+from django.db.models import F, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
@@ -138,9 +138,10 @@ class JobApplicationSearchView(
         validated_data = self.request_serializer.validated_data
         three_months_ago = timezone.now() - relativedelta(months=3)
         return self.queryset.filter(
+            Q(job_seeker__last_name__trigram_similar=validated_data["nom"])
+            | Q(job_seeker__jobseeker_profile__birth_name__trigram_similar=validated_data["nom"]),
             job_seeker__jobseeker_profile__nir=validated_data["nir"],
             job_seeker__jobseeker_profile__birthdate=validated_data["date_naissance"],
-            job_seeker__last_name__trigram_similar=validated_data["nom"],
             job_seeker__first_name__trigram_similar=validated_data["prenom"],
             last_modification_at__gte=three_months_ago,
         )
