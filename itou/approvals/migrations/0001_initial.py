@@ -1153,7 +1153,7 @@ class Migration(migrations.Migration):
                         verbose_name="numéro",
                     ),
                 ),
-                ("user_last_name", models.CharField(verbose_name="nom demandeur d'emploi")),
+                ("user_last_name", models.CharField(verbose_name="nom d'usage demandeur d'emploi")),
                 ("user_first_name", models.CharField(verbose_name="prénom demandeur d'emploi")),
                 ("user_nir", models.CharField(blank=True, verbose_name="NIR demandeur d'emploi")),
                 (

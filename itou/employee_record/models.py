@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, OuterRef, Q, Subquery
+from django.db.models import Case, Exists, F, OuterRef, Q, Subquery, When
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -199,6 +199,19 @@ class EmployeeRecordQuerySet(models.QuerySet):
                 .order_by("-timestamp")
                 .values("timestamp")[:1],
                 output_field=models.DateTimeField(),
+            )
+        )
+
+    def with_job_seeker_last_name_for_display(self):
+        # Must be kept in sync with `User.annotate_with_last_name_for_display()`.
+        return self.annotate(
+            job_seeker_last_name_for_display=Case(
+                When(
+                    job_application__job_seeker__last_name="",
+                    then=F("job_application__job_seeker__jobseeker_profile__birth_name"),
+                ),
+                default=F("job_application__job_seeker__last_name"),
+                output_field=models.CharField(),
             )
         )
 
