@@ -7,12 +7,9 @@ from itou.www.login import views
 app_name = "login"
 
 urlpatterns = [
-    path("prescriber", views.PrescriberLoginView.as_view(), name="prescriber"),
-    path("employer", views.EmployerLoginView.as_view(), name="employer"),
-    path("labor_inspector", views.LaborInspectorLoginView.as_view(), name="labor_inspector"),
-    path("job_seeker", views.JobSeekerPreLoginView.as_view(), name="job_seeker"),
-    path("itou_staff", views.ItouStaffLoginView.as_view(), name="itou_staff"),
     path("existing/<uuid:user_public_id>", views.ExistingUserLoginView.as_view(), name="existing_user"),
     path("verify", views.VerifyOTPView.as_view(), name="verify_otp"),
     path("demo", views.demo_login_view, name="demo"),
+    # Retro compatibility url
+    path("job_seeker", views.PreLoginView.as_view(), name="job_seeker"),  # FIXME use redirect instead ?
 ]

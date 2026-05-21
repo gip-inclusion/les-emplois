@@ -1262,7 +1262,7 @@ class TestJobApplicationNotifications:
         for job in job_application.selected_jobs.all():
             assert job.display_name in email.body
         assert job_application.to_company.display_name in email.body
-        assert reverse("login:job_seeker") in email.body
+        assert reverse("account_login") in email.body
         assert reverse("account_reset_password") in email.body
         assert job_application.resume_link in email.body
 

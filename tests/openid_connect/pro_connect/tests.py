@@ -46,11 +46,7 @@ from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import (
-    DEFAULT_PASSWORD,
-    PrescriberFactory,
-    UserFactory,
-)
+from tests.users.factories import PrescriberFactory, UserFactory
 from tests.utils.testing import accept_legal_terms, get_request
 
 
@@ -731,8 +727,8 @@ class TestProConnectLogin:
         pro_connect.assert_and_mock_forced_logout(client, response)
 
         # Then log in again.
-        login_url = reverse("login:prescriber")
-        response = client.get(login_url)
+        pre_login_url = reverse("account_login")
+        response = client.post(pre_login_url, {"email": user.email}, follow=True)
         assertContains(response, 'class="proconnect-button"')
         assertContains(response, reverse("pro_connect:authorize"))
 
@@ -743,47 +739,6 @@ class TestProConnectLogin:
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.last_login > before_auth
-
-    def test_old_django_account(self, client, pro_connect, settings):
-        """
-        A user has a Django account.
-        He clicks on ProConnect button and creates his account.
-        His old Django account should now be considered as an ProConnect one.
-        """
-        user_info = pro_connect.oidc_userinfo
-        user = PrescriberFactory(
-            has_completed_welcoming_tour=True,
-            **ProConnectPrescriberData.user_info_mapping_dict(user_info),
-            identity_provider=IdentityProvider.DJANGO,
-            with_verified_email=True,
-            membership=True,
-        )
-
-        # Existing user connects with Proconnect which results in:
-        # - ProConnect side: account creation
-        # - Django side: account update.
-        # This logic is already tested here: ProConnectModelTest
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
-        assert auth.get_user(client).is_authenticated
-        user.refresh_from_db()
-        assert user.identity_provider == IdentityProvider.PRO_CONNECT
-
-        response = client.post(reverse("account_logout"))
-        pro_connect.assert_and_mock_forced_logout(client, response)
-        assert not auth.get_user(client).is_authenticated
-
-        # Try to login with Django.
-        # This is already tested in itou.www.login.tests but only at form level.
-        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        response = client.post(reverse("login:prescriber"), data=post_data)
-        error_message = "Votre compte est relié à ProConnect."
-        assertContains(response, error_message)
-        assert not auth.get_user(client).is_authenticated
-
-        # Still forbidden when ProConnect is not enforced for all pro users
-        settings.FORCE_PROCONNECT_LOGIN = False
-        response = client.post(reverse("login:prescriber"), data=post_data)
-        assertContains(response, error_message)
 
 
 class TestProConnectLogout:

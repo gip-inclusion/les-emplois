@@ -22,7 +22,7 @@ from itou.openid_connect.models import (
     MultipleUsersFoundException,
 )
 from itou.openid_connect.utils import init_user_nir_from_session
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_absolute_url
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     messages.error(request, error_msg, extra_tags)
-    return HttpResponseRedirect(reverse("login:job_seeker"))
+    return HttpResponseRedirect(reverse("account_login"))
 
 
 def get_es256_key():
@@ -195,7 +195,7 @@ def france_connect_callback(request):
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         logger.info("FranceConnect login attempt with invalid user kind: %s", e.user.kind)
-        return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
+        return HttpResponseRedirect(reverse("account_login"))
     except MultipleSubSameEmailException as e:
         logger.info("FranceConnect multiple subs with same email")
         return _redirect_to_job_seeker_login_on_error(

@@ -324,7 +324,7 @@ class TestPoleEmploiConnect:
             is_active=False,
             identity_provider=IdentityProvider.PE_CONNECT,
         )
-        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = mock_oauth_dance(client, expected_route="account_login")
         assertMessages(
             response,
             [
@@ -346,7 +346,7 @@ class TestPoleEmploiConnect:
 
         for kind in UserKind.professionals():
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
-            mock_oauth_dance(client, expected_route=f"login:{kind}")
+            mock_oauth_dance(client, expected_route="account_login")
             user.delete()
 
     @respx.mock
@@ -369,7 +369,7 @@ class TestPoleEmploiConnect:
         )
 
         # Test redirection and modal content
-        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = mock_oauth_dance(client, expected_route="account_login")
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
         # If we allow the update
@@ -396,7 +396,7 @@ class TestPoleEmploiConnect:
         state = PoleEmploiConnectState.save_state()
         url = reverse("pe_connect:callback")
         response = client.get(url, data={"code": "123", "state": state}, follow=True)
-        assertRedirects(response, reverse("login:job_seeker"))
+        assertRedirects(response, reverse("account_login"))
         assertMessages(
             response,
             [
@@ -416,7 +416,7 @@ class TestPoleEmploiConnect:
         state = PoleEmploiConnectState.save_state()
         url = reverse("pe_connect:callback")
         response = client.get(url, data={"code": "123", "state": state}, follow=True)
-        assertRedirects(response, reverse("login:job_seeker"))
+        assertRedirects(response, reverse("account_login"))
         assertMessages(
             response,
             [

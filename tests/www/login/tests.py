@@ -1,4 +1,3 @@
-from functools import partial
 from unittest.mock import patch
 from urllib.parse import urlencode
 
@@ -17,7 +16,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.pe_connect import constants as pe_constants
-from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
@@ -36,7 +35,6 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    UserFactory,
     random_user_kind_factory,
 )
 from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented, reload_module
@@ -45,28 +43,82 @@ from tests.utils.testing import get_request, parse_response_to_soup, pretty_inde
 PRO_CONNECT_BTN = 'class="proconnect-button"'
 
 
-class TestItouLogin:
-    def test_generic_view(self, client):
-        # If a user type cannot be determined, don't prevent login.
-        # Just show a generic login form.
-        user = JobSeekerFactory()
+class TestPreLogin:
+    def test_pre_login_email_invalid(self, client):
+        form_data = {"email": "emailinvalid"}
+        response = client.post(reverse("account_login"), data=form_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
+
+    def test_pre_login_redirects_to_existing_user(self, client):
+        user = random_user_kind_factory()
         url = reverse("account_login")
         response = client.get(url)
         assert response.status_code == 200
 
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
+        form_data = {"email": user.email}
         response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
+        expected_url = reverse(
+            "login:existing_user",
+            args=(user.public_id,),
+            query={"back_url": url},
+        )
+        assertRedirects(response, expected_url)
+
+        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
+        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
+
+    def test_pre_login_redirects_to_existing_user_with_next(self, client):
+        user = random_user_kind_factory()
+        next_url = "/next_url"
+        url = reverse("account_login", query={"next": next_url})
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {"email": user.email}
+        response = client.post(url, data=form_data)
+        expected_url = reverse(
+            "login:existing_user",
+            args=(user.public_id,),
+            query={"back_url": url, "next": next_url},
+        )
+        assertRedirects(response, expected_url)
+
+        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
+        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
+
+    def test_pre_login_email_unknown(self, client, snapshot):
+        url = reverse("account_login")
+        response = client.get(url)
+
+        form_data = {"email": "doesnotexist@test.fr"}
+        response = client.post(url, data=form_data)
+        assert response.status_code == 200
+
+        assert response.context["form"].errors["email"] == [
+            "Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire."
+        ]
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        # FIXME: Go to user kind choice
+        assertContains(response, reverse("signup:job_seeker_start"))
+
+    def test_rate_limits(self, client):
+        url = reverse("account_login")
+        form_data = {"email": "any@mailinator.com"}
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
 
 
 class TestItouLoginForm:
     @pytest.mark.parametrize("identity_provider", IdentityProvider)
     def test_validate_identity_provider(self, identity_provider):
         """
-        If an user has an account using an identity provider, they should not be able to connect with Django.
+        If an user has an account using an active identity provider, they should not be able to connect with Django.
 
         You may wonder how does he know his password? Not that simple but possible.
         This clever user reset his password AND confirmed his e-mail. Voilà.
@@ -86,268 +138,6 @@ class TestItouLoginForm:
         else:
             assert not form.is_valid()
             assert identity_provider.label in form.errors["__all__"][0]
-
-
-class TestPrescriberLogin:
-    def test_login_options(self, client, pro_connect):
-        url = reverse("login:prescriber")
-        response = client.get(url)
-        pro_connect.assertContainsButton(response)
-        params = {
-            "user_kind": UserKind.PRESCRIBER,
-            "previous_url": url,
-        }
-        pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
-        assertContains(response, pro_connect_url + '"')
-        assertContains(response, "Adresse e-mail")
-        assertContains(response, "Mot de passe")
-
-        url_with_next = reverse("login:prescriber", query={"next": "/next_url"})
-        response = client.get(url_with_next)
-        params = {
-            "user_kind": UserKind.PRESCRIBER,
-            "previous_url": url_with_next,
-            "next_url": "/next_url",
-        }
-        pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
-        assertContains(response, pro_connect_url + '"')
-
-    def test_login_using_django(self, client, pro_connect):
-        user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
-        url = reverse("login:prescriber")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
-
-    def test_login_using_django_with_sso_provider(self, client, settings):
-        user = PrescriberFactory(with_password=True)
-        url = reverse("login:prescriber")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertContains(
-            response,
-            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
-        )
-
-        # Still forbidden when ProConnect is not enforced for all pro users
-        settings.FORCE_PROCONNECT_LOGIN = False
-        response = client.post(url, data=form_data)
-        assertContains(
-            response,
-            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
-        )
-
-    def test_rate_limits(self, client):
-        user = PrescriberFactory()
-        url = reverse("login:prescriber")
-        form_data = {
-            "login": user.email,
-            "password": "wrong_password",
-        }
-        with freeze_time("2024-09-12T00:00:00Z"):
-            # Default rate limit is 30 requests per minute
-            for i in range(30):
-                response = client.post(url, data=form_data)
-                assert response.status_code == 200
-            response = client.post(url, data=form_data)
-            assertContains(response, "trop de requêtes", status_code=429)
-
-
-class TestEmployerLogin:
-    def test_login_options(self, client, pro_connect):
-        url = reverse("login:employer")
-        response = client.get(url)
-        assertContains(response, 'class="proconnect-button"')
-        params = {
-            "user_kind": UserKind.EMPLOYER,
-            "previous_url": url,
-        }
-        pro_connect_url = escape(reverse("pro_connect:authorize", query=params))
-        assertContains(response, pro_connect_url + '"')
-        assertContains(response, "Adresse e-mail")
-        assertContains(response, "Mot de passe")
-
-        url_with_next = reverse("login:employer", query={"next": "/next_url"})
-        response = client.get(url_with_next)
-        params = {
-            "user_kind": UserKind.EMPLOYER,
-            "previous_url": url_with_next,
-            "next_url": "/next_url",
-        }
-        pro_connect_url = escape(reverse("pro_connect:authorize", query=params))
-        assertContains(response, pro_connect_url + '"')
-
-    def test_login_using_django(self, client, pro_connect):
-        user = EmployerFactory(identity_provider=IdentityProvider.DJANGO)
-        url = reverse("login:employer")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
-
-    def test_login_using_django_with_sso_provider(self, client, settings):
-        user = EmployerFactory(with_password=True)
-        url = reverse("login:employer")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertContains(
-            response,
-            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
-        )
-
-        # Still forbidden when ProConnect is not enforced for all pro users
-        settings.FORCE_PROCONNECT_LOGIN = False
-        response = client.post(url, data=form_data)
-        assertContains(
-            response,
-            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
-        )
-
-    def test_rate_limits(self, client):
-        user = EmployerFactory()
-        url = reverse("login:employer")
-        form_data = {
-            "login": user.email,
-            "password": "wrong_password",
-        }
-        with freeze_time("2024-09-12T00:00:00Z"):
-            # Default rate limit is 30 requests per minute
-            for i in range(30):
-                response = client.post(url, data=form_data)
-                assert response.status_code == 200
-            response = client.post(url, data=form_data)
-            assertContains(response, "trop de requêtes", status_code=429)
-
-
-class TestLaborInspectorLogin:
-    def test_login_options(self, client):
-        url = reverse("login:labor_inspector")
-        response = client.get(url)
-        assertNotContains(response, PRO_CONNECT_BTN)
-        assertContains(response, "Adresse e-mail")
-        assertContains(response, "Mot de passe")
-
-    def test_login(self, client):
-        user = LaborInspectorFactory()
-        url = reverse("login:labor_inspector")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
-
-    def test_rate_limits(self, client):
-        user = LaborInspectorFactory()
-        url = reverse("login:labor_inspector")
-        form_data = {
-            "login": user.email,
-            "password": "wrong_password",
-        }
-        with freeze_time("2024-09-12T00:00:00Z"):
-            # Default rate limit is 30 requests per minute
-            for i in range(30):
-                response = client.post(url, data=form_data)
-                assert response.status_code == 200
-            response = client.post(url, data=form_data)
-            assertContains(response, "trop de requêtes", status_code=429)
-
-
-class TestJobSeekerPreLogin:
-    def test_pre_login_email_invalid(self, client):
-        form_data = {"email": "emailinvalid"}
-        response = client.post(reverse("login:job_seeker"), data=form_data)
-        assert response.status_code == 200
-        assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
-
-    def test_pre_login_redirects_to_existing_user(self, client):
-        user = random_user_kind_factory()
-        url = reverse("login:job_seeker")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {"email": user.email}
-        response = client.post(url, data=form_data)
-        expected_url = reverse(
-            "login:existing_user",
-            args=(user.public_id,),
-            query={"back_url": url},
-        )
-        assertRedirects(response, expected_url)
-
-        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
-        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
-
-    def test_pre_login_redirects_to_existing_user_with_next(self, client):
-        user = random_user_kind_factory()
-        next_url = "/next_url"
-        url = reverse("login:job_seeker", query={"next": next_url})
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {"email": user.email}
-        response = client.post(url, data=form_data)
-        expected_url = reverse(
-            "login:existing_user",
-            args=(user.public_id,),
-            query={"back_url": url, "next": next_url},
-        )
-        assertRedirects(response, expected_url)
-
-        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
-        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
-
-    def test_pre_login_email_unknown(self, client, snapshot):
-        url = reverse("login:job_seeker")
-        response = client.get(url)
-
-        form_data = {"email": "doesnotexist@test.fr"}
-        response = client.post(url, data=form_data)
-        assert response.status_code == 200
-
-        assert response.context["form"].errors["email"] == [
-            "Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire."
-        ]
-        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
-        # FIXME: Go to user kind choice
-        assertContains(response, reverse("signup:job_seeker_start"))
-
-    def test_rate_limits(self, client):
-        url = reverse("login:job_seeker")
-        form_data = {"email": "any@mailinator.com"}
-        with freeze_time("2024-09-12T00:00:00Z"):
-            # Default rate limit is 30 requests per minute
-            for i in range(30):
-                response = client.post(url, data=form_data)
-                assert response.status_code == 200
-            response = client.post(url, data=form_data)
-            assertContains(response, "trop de requêtes", status_code=429)
 
 
 class TestJobSeekerLoginFailures:
@@ -371,7 +161,7 @@ class TestJobSeekerLoginFailures:
         )
 
         # Temporary NIR is not stored with user information.
-        response = fc_mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = fc_mock_oauth_dance(client, expected_route="account_login")
         assertMessages(
             response,
             [
@@ -401,7 +191,7 @@ class TestJobSeekerLoginFailures:
         )
 
         # Temporary NIR is not stored with user information.
-        response = pe_mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = pe_mock_oauth_dance(client, expected_route="account_login")
         assertMessages(
             response,
             [
@@ -418,6 +208,21 @@ class TestJobSeekerLoginFailures:
 
 class TestExistingUserLogin:
     UNSUPPORTED_IDENTITY_PROVIDER_TEXT = "Le mode de connexion associé à ce compte est désactivé"
+
+    def test_rate_limits(self, client):
+        user = random_user_kind_factory(identity_provider=IdentityProvider.DJANGO)
+        url = reverse("login:existing_user", args=(user.public_id,))
+        form_data = {
+            "login": "any@mailinator.com",
+            "password": "wrong_password",
+        }
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
 
     def test_hypothetical_identity_provider_failure(self, client):
         # test_login ensures that every IdentityProvider is supported by the existing-login view
@@ -465,7 +270,7 @@ class TestExistingUserLogin:
         [
             JobSeekerFactory,
             PrescriberFactory,
-            partial(EmployerFactory, membership=True),
+            EmployerFactory,
             LaborInspectorFactory,
             ItouStaffFactory,
         ],
@@ -519,23 +324,14 @@ class TestExistingUserLogin:
             name="login_prefilled"
         )
 
-    @pytest.mark.parametrize(
-        "identity_provider",
-        [
-            IdentityProvider.DJANGO,
-            IdentityProvider.FRANCE_CONNECT,
-            IdentityProvider.PE_CONNECT,
-            IdentityProvider.PRO_CONNECT,
-        ],
-    )
+    @pytest.mark.parametrize("identity_provider", IdentityProvider)
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
         PEAMU_AUTH_BASE_URL=None,
         PRO_CONNECT_BASE_URL=None,
     )
     def test_login_disabled_provider(self, client, snapshot, identity_provider):
-        user_kind = IDENTITY_PROVIDER_SUPPORTED_USER_KIND[identity_provider][0]
-        user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
+        user = random_user_kind_factory(identity_provider=identity_provider, for_snapshot=True)
         response = client.get(reverse("login:existing_user", args=(user.public_id,)))
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
         assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot
@@ -543,6 +339,28 @@ class TestExistingUserLogin:
     def test_login_404(self, client):
         response = client.get(reverse("login:existing_user", args=("c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",)))
         assert response.status_code == 404
+
+    def test_pro_connect_user(self, client, pro_connect):
+        user = random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT)
+        url = reverse("login:existing_user", args=(user.public_id,))
+        response = client.get(url)
+        pro_connect.assertContainsButton(response)
+        params = {
+            "user_kind": user.kind,
+            "previous_url": url,
+        }
+        pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
+        assertContains(response, pro_connect_url + '"')
+
+        url_with_next = reverse("login:existing_user", args=(user.public_id,), query={"next": "/next_url"})
+        response = client.get(url_with_next)
+        params = {
+            "user_kind": user.kind,
+            "previous_url": url_with_next,
+            "next_url": "/next_url",
+        }
+        pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
+        assertContains(response, pro_connect_url + '"')
 
 
 @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory])
@@ -572,42 +390,41 @@ def test_pro_connect_activation_view(client, pro_connect, factory):
 
 
 class TestItouStaffLogin:
-    def test_login_options(self, client):
-        url = reverse("login:itou_staff")
-        response = client.get(url)
-        assertNotContains(response, PRO_CONNECT_BTN)
-        assertContains(response, "Adresse e-mail")
-        assertContains(response, "Mot de passe")
-
     def test_login(self, client, settings):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
-        login_url = reverse("login:itou_staff")
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user", args=(user.public_id,)),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
         verify_otp_url = reverse("login:verify_otp")
         setup_otp_url = reverse("itou_staff_views:otp_devices")
         settings.REQUIRE_OTP_FOR_STAFF = True
 
         response = client.get(admin_url)
-        next_url = add_url_params(login_url, {"next": admin_url})
-        assertRedirects(response, next_url)
+        assertRedirects(response, pre_login_url)
+
+        response = client.post(pre_login_url, {"email": user.email})
+        assertRedirects(response, login_url)
 
         # Without a device, the user is redirected to the otp setup page
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = client.post(next_url, data=form_data, follow=True)
+        response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, setup_otp_url)
 
         # Same with an unconfirmed device
         device = TOTPDevice.objects.create(user=user, confirmed=False)
-        response = client.post(next_url, data=form_data, follow=True)
+        response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, setup_otp_url)
 
         # With a confirmed device the user is redirected to the OTP code form
         device.confirmed = True
         device.save()
-        response = client.post(next_url, data=form_data, follow=True)
+        response = client.post(login_url, data=form_data, follow=True)
         next_url = add_url_params(verify_otp_url, {"next": admin_url})
         assertRedirects(response, next_url)
 
@@ -645,37 +462,28 @@ class TestItouStaffLogin:
 
     def test_login_otp_not_required(self, client):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
-        login_url = reverse("login:itou_staff")
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user", args=(user.public_id,)),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
 
         response = client.get(admin_url)
-        next_url = add_url_params(login_url, {"next": admin_url})
-        assertRedirects(response, next_url)
+        assertRedirects(response, pre_login_url)
+
+        response = client.post(pre_login_url, {"email": user.email})
+        assertRedirects(response, login_url)
 
         # Without a device, the user is logged and redirected to the next_url
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = client.post(next_url, data=form_data, follow=True)
+        response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
 
         # Same with an device
         TOTPDevice.objects.create(user=user)
-        response = client.post(next_url, data=form_data, follow=True)
+        response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
-
-    def test_rate_limits(self, client):
-        user = ItouStaffFactory()
-        url = reverse("login:itou_staff")
-        form_data = {
-            "login": user.email,
-            "password": "wrong_password",
-        }
-        with freeze_time("2024-09-12T00:00:00Z"):
-            # Default rate limit is 30 requests per minute
-            for i in range(30):
-                response = client.post(url, data=form_data)
-                assert response.status_code == 200
-            response = client.post(url, data=form_data)
-            assertContains(response, "trop de requêtes", status_code=429)
