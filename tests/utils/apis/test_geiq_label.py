@@ -1,3 +1,4 @@
+import httpx
 import pytest
 from django.core.exceptions import ImproperlyConfigured
 
@@ -19,6 +20,12 @@ def test_improperly_configured(settings):
 
 def test_error_response(respx_mock, label_settings):
     client = geiq_label.get_client()
+
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").mock(
+        side_effect=httpx.ReadTimeout
+    )
+    with pytest.raises(geiq_label.LabelAPIError, match="Error requesting Label API: ReadTimeout"):
+        client.get_all_geiq()
 
     respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(400)
     with pytest.raises(geiq_label.LabelAPIError):
