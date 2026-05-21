@@ -257,11 +257,11 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     employee_record_order_by = {
         EmployeeRecordOrder.NAME_ASC: (
-            "job_application__job_seeker__last_name",
+            "job_seeker_last_name_for_display",
             "job_application__job_seeker__first_name",
         ),
         EmployeeRecordOrder.NAME_DESC: (
-            "-job_application__job_seeker__last_name",
+            "-job_seeker_last_name_for_display",
             "-job_application__job_seeker__first_name",
         ),
         EmployeeRecordOrder.HIRING_START_AT_ASC: ("job_application__hiring_start_at",),
@@ -271,6 +271,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         EmployeeRecord.objects.full_fetch()
         .for_company(siae)
         .with_siret_from_asp_source()
+        .with_job_seeker_last_name_for_display()
         .order_by(*employee_record_order_by)
     )
     show_siret_has_changed_warning = (
