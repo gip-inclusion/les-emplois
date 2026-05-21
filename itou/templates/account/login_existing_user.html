@@ -24,7 +24,7 @@
                     <div class="c-form mb-5">
                         {% if login_provider == "IC" %}
                             {# Inclusion Connect users are not asked to use ProConnect for now #}
-                            {% include "account/includes/login_form.html" %}
+                            {% include "account/includes/login_generic.html" %}
                         {% elif login_provider == "PC" %}
                             {% include "pro_connect/includes/button.html" with login=True %}
                         {% elif login_provider == "FC" %}
@@ -56,7 +56,7 @@
                                 {% endcomponent_alert %}
                             {% endif %}
                         {% elif login_provider == "DJANGO" %}
-                            {% include "account/includes/login_form.html" %}
+                            {% include "account/includes/login_generic.html" %}
                         {% else %}
                             {% component_alert content=content variant="info" icon=False %}
                                 {% fragment as content %}

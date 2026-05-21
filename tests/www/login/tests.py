@@ -1,3 +1,4 @@
+import random
 from unittest.mock import patch
 from urllib.parse import urlencode
 
@@ -245,6 +246,41 @@ class TestJobSeekerLoginFailures:
 class TestExistingUserLogin:
     UNSUPPORTED_IDENTITY_PROVIDER_TEXT = "Le mode de connexion associé à ce compte est désactivé"
 
+    def _get_login_form_cases(self):
+        # get data for subtests
+        return [
+            (
+                "DJANGO",
+                random.choice([JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])(
+                    identity_provider=IdentityProvider.DJANGO, email="django@mailinator.com"
+                ),
+            ),
+            (
+                "DJANGO+PC",
+                random.choice([PrescriberFactory, EmployerFactory])(
+                    identity_provider=IdentityProvider.DJANGO, email="django+pc@mailinator.com"
+                ),
+            ),
+            (
+                "IC",
+                random_user_kind_factory(
+                    identity_provider=IdentityProvider.INCLUSION_CONNECT, email="ic@mailinator.com"
+                ),
+            ),
+            (
+                "PC",
+                random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT, email="pc@mailinator.com"),
+            ),
+            (
+                "PE",
+                random_user_kind_factory(identity_provider=IdentityProvider.PE_CONNECT, email="pe@mailinator.com"),
+            ),
+            (
+                "FC",
+                random_user_kind_factory(identity_provider=IdentityProvider.FRANCE_CONNECT, email="fc@mailinator.com"),
+            ),
+        ]
+
     def test_rate_limits(self, client):
         user = random_user_kind_factory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:existing_user", args=(user.public_id,))
@@ -274,19 +310,17 @@ class TestExistingUserLogin:
             response = client.get(reverse("login:existing_user", args=(user.public_id,)))
             assertContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
 
-    @pytest.mark.parametrize("identity_provider", IdentityProvider)
     @override_settings(
         FRANCE_CONNECT_BASE_URL="http://localhost:8080",
         PEAMU_AUTH_BASE_URL="http://localhost:8080",
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
-    def test_login(self, client, snapshot, identity_provider):
-        user = random_user_kind_factory(identity_provider=identity_provider, email="test@mailinator.com")
-        url = f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={reverse('signup:choose_user_kind')}"
-        response = client.get(url)
-        assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-        assert (
-            pretty_indented(
+    def test_login(self, client, snapshot):
+        for name, user in self._get_login_form_cases():
+            url = reverse("login:existing_user", args=(user.public_id,))
+            response = client.get(url)
+            assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+            assert pretty_indented(
                 parse_response_to_soup(
                     response,
                     selector=".c-form",
@@ -297,9 +331,7 @@ class TestExistingUserLogin:
                         ("href", user.kind, "[User kind]"),
                     ],
                 )
-            )
-            == snapshot
-        )
+            ) == snapshot(name=name)
 
     @pytest.mark.parametrize(
         "user_factory",
@@ -377,17 +409,16 @@ class TestExistingUserLogin:
             name="login_prefilled"
         )
 
-    @pytest.mark.parametrize("identity_provider", IdentityProvider)
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
         PEAMU_AUTH_BASE_URL=None,
         PRO_CONNECT_BASE_URL=None,
     )
-    def test_login_disabled_provider(self, client, snapshot, identity_provider):
-        user = random_user_kind_factory(identity_provider=identity_provider, for_snapshot=True)
-        response = client.get(reverse("login:existing_user", args=(user.public_id,)))
-        assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot
+    def test_login_disabled_provider(self, client, snapshot):
+        for name, user in self._get_login_form_cases():
+            response = client.get(reverse("login:existing_user", args=(user.public_id,)))
+            assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+            assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(name=name)
 
     def test_login_404(self, client):
         response = client.get(reverse("login:existing_user", args=("c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",)))

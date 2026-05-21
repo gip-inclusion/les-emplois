@@ -130,6 +130,7 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
             "redirect_field_value": self.next_url,
             "pro_connect_url": self._get_pro_connect_url(),
+            "uses_pro_connect": self.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER],
         }
         return context | extra_context
 
