@@ -1607,6 +1607,7 @@ class TestJoinGroupFromNir:
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
@@ -1614,6 +1615,7 @@ class TestJoinGroupFromNir:
             "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1818,6 +1820,7 @@ class TestJoinGroupFromNameAndEmail:
             "title": dummy_job_seeker.title,
             "first_name": first_name,
             "last_name": last_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "birthdate": birthdate,
             "nir": existing_nir,
             "lack_of_nir": False,
@@ -1837,7 +1840,7 @@ class TestJoinGroupFromNameAndEmail:
         response = client.post(next_url, data=post_data)
         assertRedirects(response, step2_url)
         expected_job_seeker_session["profile"] = {}
-        for key in ["nir", "birthdate", "lack_of_nir_reason", "birth_place", "birth_country"]:
+        for key in ["birth_name", "nir", "birthdate", "lack_of_nir_reason", "birth_place", "birth_country"]:
             expected_job_seeker_session["profile"][key] = post_data.pop(key)
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
