@@ -851,6 +851,13 @@ def assessment_details_for_institution(
         .prefetch_related("logs"),
         pk=pk,
     )
+    ask_for_institution_fix_comment_form = None
+    if request.current_organization.kind == InstitutionKind.DREETS_GEIQ:
+        ask_for_institution_fix_comment_form = AskForFixCommentForm(
+            data=request.POST
+            if request.POST and request.POST.get("action") == InstitutionAction.ASK_FOR_INSTITUTION_FIX
+            else None
+        )
     ask_for_geiq_fix_comment_form = AskForFixCommentForm(
         data=request.POST
         if request.POST and request.POST.get("action") == InstitutionAction.ASK_FOR_GEIQ_FIX
@@ -902,20 +909,27 @@ def assessment_details_for_institution(
                 raise PermissionDenied
 
         elif action is InstitutionAction.ASK_FOR_INSTITUTION_FIX:
-            if assessment.final_reviewed_at:
-                messages.error(request, "Ce dossier a déjà été validé : vous ne pouvez plus le corriger.")
-            elif request.current_organization.kind != InstitutionKind.DREETS_GEIQ:
-                messages.error(request, "Seules les DREETS peuvent corriger un dossier.")
-            elif not assessment.reviewed_at:
-                messages.warning(request, "Ce bilan n’a pas encore été contrôlé : il n’y a rien à corriger.")
+            if not ask_for_institution_fix_comment_form.is_valid():
+                # Auto-show the modal and the form with errors
+                redirect_to_details = False
             else:
-                assessment.ask_for_institution_fix(user=request.user, institution=request.current_organization)
-                logger.info(
-                    "user=%s asked for an institution fix of assessment=%s",
-                    request.user.pk,
-                    assessment.pk,
-                    extra={"geiq_assessment": assessment.pk},
-                )
+                if assessment.final_reviewed_at:
+                    messages.error(request, "Ce dossier a déjà été validé : vous ne pouvez plus le corriger.")
+                elif request.current_organization.kind != InstitutionKind.DREETS_GEIQ:
+                    messages.error(request, "Seules les DREETS peuvent corriger un dossier.")
+                elif not assessment.reviewed_at:
+                    messages.warning(request, "Ce bilan n’a pas encore été contrôlé : il n’y a rien à corriger.")
+                else:
+                    comment = ask_for_institution_fix_comment_form.cleaned_data["comment"]
+                    assessment.ask_for_institution_fix(
+                        user=request.user, institution=request.current_organization, comment=comment
+                    )
+                    logger.info(
+                        "user=%s asked for an institution fix of assessment=%s",
+                        request.user.pk,
+                        assessment.pk,
+                        extra={"geiq_assessment": assessment.pk},
+                    )
 
         elif action is InstitutionAction.ASK_FOR_GEIQ_FIX:
             if not ask_for_geiq_fix_comment_form.is_valid():
@@ -969,6 +983,7 @@ def assessment_details_for_institution(
         ),
         "matomo_custom_title": "Bilan d’exécution - page de detail Institution",
         "InstitutionAction": InstitutionAction,
+        "ask_for_institution_fix_comment_form": ask_for_institution_fix_comment_form,
         "ask_for_geiq_fix_comment_form": ask_for_geiq_fix_comment_form,
         "abs_balance_amount": abs(assessment.granted_amount - assessment.advance_amount),
         "last_geiq_fix_transition": last_geiq_fix_transition,

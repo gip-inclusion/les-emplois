@@ -61,7 +61,7 @@
             </button>
             <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.ASK_FOR_INSTITUTION_FIX }}">
+                <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#ask_for_institution_fix_modal">
                     Renvoyer à la DDETS pour correction
                 </button>
             </form>
