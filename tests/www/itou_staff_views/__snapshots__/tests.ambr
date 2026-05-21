@@ -2796,8 +2796,8 @@
 # ---
 # name: TestImportAciConvergencePHC.test_import_file_summary
   '''
-  <div class="c-box mb-5">
-      <h2>
+  <div class="c-box mb-3 mb-md-4">
+      <h2 class="h3">
           Résultats de l’import
       </h2>
       <p>
@@ -2825,8 +2825,8 @@
 # ---
 # name: TestImportFS3437FromAsp.test_import_file[dry run]
   '''
-  <div class="c-box mb-5">
-      <h2>
+  <div class="c-box mb-3 md-md-4">
+      <h2 class="h3">
           Résultats de l’import
       </h2>
       <p>
@@ -2934,8 +2934,8 @@
 # ---
 # name: TestImportFS3437FromAsp.test_import_file[wet run]
   '''
-  <div class="c-box mb-5">
-      <h2>
+  <div class="c-box mb-3 md-md-4">
+      <h2 class="h3">
           Résultats de l’import
       </h2>
       <p>
