@@ -51,7 +51,9 @@ class MembershipsFiltersForm(forms.Form):
                     ),
                 ),
             )
-            for beneficiary in beneficiaries.order_by("last_name", "first_name")
+            for beneficiary in beneficiaries.annotate_with_last_name_for_display().order_by(
+                "last_name_for_display", "first_name"
+            )
             if beneficiary.get_inverted_full_name()
         ]
         return beneficiaries
