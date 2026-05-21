@@ -2,6 +2,7 @@
 {% load components %}
 
 <div class="c-form">
+    <h2 class="h3">Retirer de la structure</h2>
     {% with request.from_employer|yesno:"structure,organisation" as org_display %}
         {% component_alert content=content variant="warning" icon=False %}
             {% fragment as content %}
