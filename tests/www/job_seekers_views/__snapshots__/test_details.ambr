@@ -269,10 +269,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -563,10 +569,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -809,13 +821,6 @@
                                       Orienter vers un service d’insertion
                                   </span>
                               </a>
-                              <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Valider son éligibilité IAE
-                                  </span>
-                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>
@@ -853,10 +858,23 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Valider son éligibilité IAE
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -1051,13 +1069,6 @@
                                       Orienter vers un service d’insertion
                                   </span>
                               </a>
-                              <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Mettre à jour son éligibilité IAE
-                                  </span>
-                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>
@@ -1095,10 +1106,23 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Mettre à jour son éligibilité IAE
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -1393,13 +1417,6 @@
                                       Orienter vers un service d’insertion
                                   </span>
                               </a>
-                              <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Valider son éligibilité IAE
-                                  </span>
-                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>
@@ -1437,10 +1454,23 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Valider son éligibilité IAE
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -4260,10 +4290,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -4537,13 +4573,6 @@
                                       Orienter vers un service d’insertion
                                   </span>
                               </a>
-                              <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Valider son éligibilité IAE
-                                  </span>
-                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>
@@ -4581,10 +4610,23 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Valider son éligibilité IAE
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -4859,10 +4901,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -5082,10 +5130,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -5335,13 +5389,6 @@
                                       Orienter vers un service d’insertion
                                   </span>
                               </a>
-                              <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Mettre à jour son éligibilité IAE
-                                  </span>
-                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>
@@ -5379,10 +5426,23 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Mettre à jour son éligibilité IAE
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -5657,10 +5717,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
                                   <div class="col-12 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -5892,10 +5958,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
@@ -7235,10 +7307,16 @@
                       <div class="tab-content">
                           <div class="tab-pane fade show active">
                               <div class="row">
-                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 order-3 order-xxl-2">
-                                      <h2>
-                                          Informations générales
-                                      </h2>
+                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                                          <h2 class="mb-0">
+                                              Informations générales
+                                          </h2>
+                                          <div class="d-flex flex-column flex-md-row gap-2">
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
