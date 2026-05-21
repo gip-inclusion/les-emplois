@@ -689,6 +689,7 @@ class TestProcessViews:
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Supersecretname",
             job_seeker__last_name="Unknown",
+            job_seeker__jobseeker_profile__birth_name="Confidential",
             job_seeker__jobseeker_profile__nir="11111111111111",
             job_seeker__post_code="59140",
             sender=prescriber,
@@ -698,7 +699,8 @@ class TestProcessViews:
         response = client.get(url)
         assertNotContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         assertContains(response, "<small>Prénom</small><strong>S…</strong>", html=True)
-        assertContains(response, "<small>Nom</small><strong>U…</strong>", html=True)
+        assertContains(response, "<small>Nom de naissance</small><strong>C…</strong>", html=True)
+        assertContains(response, "<small>Nom d’usage</small><strong>U…</strong>", html=True)
         assertContains(response, "U… S…")
         assertNotContains(response, job_application.job_seeker.email)
         assertNotContains(response, job_application.job_seeker.phone)
@@ -707,7 +709,7 @@ class TestProcessViews:
         assertNotContains(response, "Unknown")
 
     def test_details_for_job_seeker(self, client, snapshot):
-        """As a job seeker, I can access the job_applications details for job seekers."""
+        """As a job seeker, I can access the job_applications details for job seekers."""
         job_seeker = JobSeekerFactory()
 
         job_application = JobApplicationFactory(
@@ -727,10 +729,19 @@ class TestProcessViews:
         assertContains(response, job_seeker.address_line_1)
         assertContains(response, job_seeker.city)
         assertContains(response, f"<small>Prénom</small><strong>{job_seeker.first_name}</strong>", html=True)
-        assertContains(response, f"<small>Nom</small><strong>{job_seeker.last_name.upper()}</strong>", html=True)
         assertContains(
             response,
-            f"{job_seeker.first_name} {job_seeker.last_name.upper()}",
+            f"<small>Nom de naissance</small><strong>{job_seeker.jobseeker_profile.birth_name.upper()}</strong>",
+            html=True,
+        )
+        assertContains(
+            response,
+            f"<small>Nom d’usage</small><strong>{job_seeker.last_name.upper()}</strong>",
+            html=True,
+        )
+        assertContains(
+            response,
+            f"{job_seeker.first_name} {job_seeker.get_last_name_for_display().upper()}",
             html=True,
         )
 
@@ -2208,17 +2219,12 @@ class TestProcessViews:
         assert pretty_indented(content) == snapshot()
 
     def test_display_prescriber_count(self, client, snapshot):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(for_snapshot=True)
 
         # text displayed if 2 prescribers are following this job seeker
-        TWO_PRESCRIBERS_TEXT = (
-            f"Découvrez l'autre intervenant qui a accompagné {job_seeker.last_name.upper()} {job_seeker.first_name}"
-        )
+        TWO_PRESCRIBERS_TEXT = "Découvrez l'autre intervenant qui a accompagné DOE Jane"
         # text displayed if more than 2 prescribers are following this job seeker
-        MORE_THAN_2_PRESCRIBERS_TEXT = (
-            "Découvrez les 2 autres intervenants qui ont accompagné "
-            f"{job_seeker.last_name.upper()} {job_seeker.first_name}"
-        )
+        MORE_THAN_2_PRESCRIBERS_TEXT = "Découvrez les 2 autres intervenants qui ont accompagné DOE Jane"
 
         prescriber = PrescriberFactory(
             membership=True,

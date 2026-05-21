@@ -105,6 +105,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -175,6 +176,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -231,6 +233,7 @@ class TestEditJobSeekerInfo:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -353,7 +356,7 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
         assert response.status_code == 403
 
-    def test_name_is_required(self, client):
+    def test_birth_name_is_required(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
@@ -393,11 +396,11 @@ class TestEditJobSeekerInfo:
             response,
             """
             <div class="form-group is-invalid form-group-required">
-            <label class="form-label" for="id_last_name">Nom</label>
-            <input type="text" name="last_name" maxlength="150" class="form-control is-invalid"
-                   aria-describedby="id_last_name_error"
-                    required aria-invalid="true" id="id_last_name">
-            <div id="id_last_name_error" class="w-100">
+            <label class="form-label" for="id_birth_name">Nom de naissance</label>
+            <input type="text" name="birth_name" maxlength="150" class="form-control is-invalid"
+                   aria-describedby="id_birth_name_error"
+                    required aria-invalid="true" id="id_birth_name">
+            <div id="id_birth_name_error" class="w-100">
              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
             </div>
             </div>
@@ -440,6 +443,7 @@ class TestEditJobSeekerInfo:
         post_data = {
             "title": "M",
             "first_name": "Manuel",
+            "birth_name": "Schafer",
             "last_name": "Calavera",
             "email": new_email,
             "birthdate": birthdate.isoformat(),
@@ -500,6 +504,7 @@ class TestEditJobSeekerInfo:
         post_data = {
             "title": "M",
             "first_name": "Manuel",
+            "birth_name": "Schafer",
             "last_name": "Calavera",
             "email": new_email,
             "birthdate": birthdate.isoformat(),
@@ -583,6 +588,7 @@ class TestEditJobSeekerInfo:
             {
                 "title": "M",
                 "first_name": "Manuel",
+                "birth_name": "Schafer",
                 "last_name": "Calavera",
                 "email": job_seeker.email,
                 "birthdate": new_birthdate.isoformat(),

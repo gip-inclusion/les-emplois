@@ -78,10 +78,18 @@
                               <ul class="list-data">
                                   <li>
                                       <small>
-                                          Nom
+                                          Nom de naissance
                                       </small>
                                       <strong>
                                           D…
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Nom d’usage
+                                      </small>
+                                      <strong>
+                                          S…
                                       </strong>
                                   </li>
                                   <li>
@@ -173,10 +181,18 @@
                               <ul class="list-data">
                                   <li>
                                       <small>
-                                          Nom
+                                          Nom de naissance
                                       </small>
                                       <strong>
                                           DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Nom d’usage
+                                      </small>
+                                      <strong>
+                                          SMITH
                                       </strong>
                                   </li>
                                   <li>
@@ -325,10 +341,18 @@
                               <ul class="list-data">
                                   <li>
                                       <small>
-                                          Nom
+                                          Nom de naissance
                                       </small>
                                       <strong>
                                           DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Nom d’usage
+                                      </small>
+                                      <strong>
+                                          SMITH
                                       </strong>
                                   </li>
                                   <li>
@@ -470,10 +494,18 @@
                               <ul class="list-data">
                                   <li>
                                       <small>
-                                          Nom
+                                          Nom de naissance
                                       </small>
                                       <strong>
                                           DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Nom d’usage
+                                      </small>
+                                      <strong>
+                                          SMITH
                                       </strong>
                                   </li>
                                   <li>
@@ -649,10 +681,18 @@
                               <ul class="list-data">
                                   <li>
                                       <small>
-                                          Nom
+                                          Nom de naissance
                                       </small>
                                       <strong>
                                           DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Nom d’usage
+                                      </small>
+                                      <strong>
+                                          SMITH
                                       </strong>
                                   </li>
                                   <li>
@@ -2091,11 +2131,17 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" IN (%s,
                                       %s)
-          ORDER BY "users_user"."last_name" ASC,
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
@@ -2913,10 +2959,16 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
+                 "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."id" IN (%s)
-          ORDER BY "users_user"."last_name" ASC,
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
