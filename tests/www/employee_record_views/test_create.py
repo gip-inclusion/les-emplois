@@ -43,6 +43,7 @@ def _get_user_form_data(user):
         "title": user.title,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "birth_name": user.jobseeker_profile.birth_name,
         "birthdate": user.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         "nir": user.jobseeker_profile.nir,
     }
