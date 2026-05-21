@@ -121,3 +121,26 @@ class ItouFileField(forms.FileField):
             if validator := self.CONTENT_TYPE_TO_VALIDATOR.get(self.content_type):
                 validator(data)
         return cleaned_data
+
+
+class ItouMultiFileInput(ItouFileInput):
+    allow_multiple_selected = True
+    template_name = "utils/widgets/multi_file_input.html"
+
+
+class ItouMultiFileField(ItouFileField):
+    def __init__(self, *args, content_type, max_upload_size, allowed_extensions, **kwargs):
+        kwargs.setdefault(
+            "widget",
+            ItouMultiFileInput(
+                content_type=content_type,
+                max_upload_size_mb=max_upload_size / MB,
+                accepted_formats_label=", ".join(allowed_extensions),
+            ),
+        )
+        super().__init__(*args, content_type=content_type, max_upload_size=max_upload_size, **kwargs)
+        self.validators.append(FileExtensionValidator(allowed_extensions))
+
+    def clean(self, data, initial=None):
+        files = data if isinstance(data, (list, tuple)) else [data]
+        return [super().clean(f, initial) for f in files]
