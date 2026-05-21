@@ -653,6 +653,15 @@ class AssessmentContractDetailsTab(models.TextChoices):
     CONTRACT = "contract", "Contrat"
     SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
     EXIT = "exit", "Sortie"
+    ALLOWANCE_REFUSAL_JUSTIFICATION = "refusal-justification", "Motif de refus"
+
+    @classmethod
+    def get_common_tabs(cls):
+        return [cls.EMPLOYEE, cls.CONTRACT, cls.SUPPORT_AND_TRAINING, cls.EXIT]
+
+    @classmethod
+    def get_institution_tabs(cls):
+        return cls.get_common_tabs() + [cls.ALLOWANCE_REFUSAL_JUSTIFICATION]
 
 
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
@@ -664,8 +673,12 @@ def assessment_contracts_details(
     except ValueError:
         raise Http404
     if request.from_employer:
+        if tab not in AssessmentContractDetailsTab.get_common_tabs():
+            raise Http404
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.from_institution:
+        if tab not in AssessmentContractDetailsTab.get_institution_tabs():
+            raise Http404
         filter_kwargs = {
             "employee__assessment__institutions": request.current_organization,
             "employee__assessment__submitted_at__isnull": False,
@@ -685,6 +698,9 @@ def assessment_contracts_details(
     elif request.from_institution:
         if not contract.employee.assessment.reviewed_at:
             editable = not contract.employee.assessment.grants_selection_validated_at
+        if details_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
+            if contract.allowance_granted:
+                raise Http404
     context = {
         "back_url": reverse(
             "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
