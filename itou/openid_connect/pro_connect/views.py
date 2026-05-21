@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
+from django_otp import login as otp_login
 from itoutils.urls import add_url_params
 
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
@@ -31,6 +32,7 @@ from itou.openid_connect.pro_connect.models import (
     ProConnectState,
     ProConnectUserData,
 )
+from itou.otp.utils import create_placeholder_for_external_totp_device
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
@@ -350,7 +352,8 @@ def pro_connect_callback(request):
         next_url = f"{reverse('pro_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
 
-    amr = idp_id = None
+    amr = ()
+    idp_id = None
     try:
         id_token_data = _decode_token(token_data["id_token"])
         amr = id_token_data.get("amr", ())
@@ -370,7 +373,27 @@ def pro_connect_callback(request):
             },
         )
 
+    if not amr:
+        # According to ProConnect documentation, the AMR should be
+        # returned... but it's not always the case. We can report
+        # these cases to ProConnect.
+        logger.warning(
+            "Pro Connect did not return AMR for user=%s, idp_id=%s",
+            user.id,
+            idp_id,
+        )
+
     login(request, user)
+
+    if "mfa" in amr:
+        # If the user used an MFA through ProConnect, mark it as such
+        # to avoid requiring our own MFA verification, by simulating
+        # what django_otp.OTPMiddleware does.
+        logger.info(
+            "User authenticated through ProConnect with MFA (idp_id=%s), sidestep from our own MFA",
+            extra={"idp_id": idp_id},
+        )
+        otp_login(request, create_placeholder_for_external_totp_device(user))
 
     accept_all_pending_invitations(request)
 

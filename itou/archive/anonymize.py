@@ -7,6 +7,7 @@ from itou.archive.models import AnonymizedProfessional
 from itou.archive.utils import get_year_month_or_none
 from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
+from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import JobSeekerAssignment, User
@@ -70,6 +71,9 @@ def anonymize_professionals_without_deletion(users):
         model.objects.filter(user_id__in=user_ids).update(is_active=False)
 
     EmailAddress.objects.filter(user_id__in=user_ids).delete()
+
+    ItouTOTPDevice.objects.filter(user_id__in=user_ids).delete()
+    ItouStaticDevice.objects.filter(user_id__in=user_ids).delete()
 
     # No need to keep assignments from professionals without organization or company.
     # If a professional was anonymized without deletion just because of an assignment

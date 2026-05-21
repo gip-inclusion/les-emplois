@@ -285,6 +285,7 @@ def get_response_for_middlewaremixin(request):
 
 
 def get_request(user, with_perms_middleware=True):
+    from itou.otp.middleware import OtpMiddleware
     from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 
     factory = RequestFactory()
@@ -293,6 +294,9 @@ def get_request(user, with_perms_middleware=True):
     SessionMiddleware(get_response_for_middlewaremixin)(request)
     MessageMiddleware(get_response_for_middlewaremixin)(request)
     if with_perms_middleware:
+        # `ItouCurrentOrganizationMiddleware` uses `User.is_verified`,
+        # which is set by needs `OtpMiddleware`
+        OtpMiddleware(get_response_for_middlewaremixin)(request)
         ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
     return request
 

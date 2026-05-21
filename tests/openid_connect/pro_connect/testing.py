@@ -1,3 +1,4 @@
+from copy import deepcopy
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
@@ -46,11 +47,16 @@ ID_TOKEN_DATA = {
     # There are other attributes, but they are not needed.
 }
 
-ID_TOKEN_ENCODED = jwt.encode(
-    payload=ID_TOKEN_DATA,
-    key=TEST_SETTINGS["PRO_CONNECT_CLIENT_SECRET"],
-    algorithm="HS256",
-)
+
+def _encode_id_token(id_token_data):
+    return jwt.encode(
+        payload=id_token_data,
+        key=TEST_SETTINGS["PRO_CONNECT_CLIENT_SECRET"],
+        algorithm="HS256",
+    )
+
+
+ID_TOKEN_ENCODED = _encode_id_token(ID_TOKEN_DATA)
 
 
 # Make sure to use respx_mock fixture or @respx.mock decorator on tests using this helper.
@@ -63,7 +69,11 @@ def mock_oauth_dance(
     user_info_email=None,
     channel=None,
     oidc_userinfo=None,
+    id_token_data=None,
 ):
+    user_info = oidc_userinfo or OIDC_USERINFO.copy()
+    id_token_data = id_token_data or deepcopy(ID_TOKEN_DATA)
+
     # Authorize params depend on user kind.
     authorize_params = {
         "previous_url": previous_url,
@@ -82,11 +92,10 @@ def mock_oauth_dance(
         "access_token": "access_token",
         "token_type": "Bearer",
         "expires_in": 60,
-        "id_token": ID_TOKEN_ENCODED,
+        "id_token": _encode_id_token(id_token_data),
     }
     respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
-    user_info = oidc_userinfo or OIDC_USERINFO.copy()
     if user_info_email:
         user_info["email"] = user_info_email
     # Put a issued at in the future to ensure we don't check it

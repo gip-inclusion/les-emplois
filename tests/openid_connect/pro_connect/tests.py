@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 from django.utils import timezone
+from django_otp.oath import TOTP
 from freezegun import freeze_time
 from itoutils.urls import add_url_params
 from pytest_django.asserts import (
@@ -42,7 +43,8 @@ from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
-from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
+from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA, ID_TOKEN_ENCODED
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -646,6 +648,63 @@ class TestProConnectLogin:
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.last_login > before_auth
+
+
+class TestProConnectLoginWithRequiredMfa:
+    def test_mfa_provided_by_proconnect(self, client, settings, pro_connect):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        PrescriberFactory(
+            email=pro_connect.oidc_userinfo["email"],
+            membership=True,
+            has_completed_welcoming_tour=True,
+        )
+
+        response = pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=reverse("dashboard:index"),
+            id_token_data=ID_TOKEN_DATA | {"amr": ["pwd", "mfa"]},
+        )
+        response = client.get(response.url)
+        assertContains(response, "Tableau de bord")
+
+    def test_mfa_not_provided_by_proconnect_with_no_device(self, client, settings, pro_connect):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        PrescriberFactory(
+            email=pro_connect.oidc_userinfo["email"],
+            membership=True,
+            has_completed_welcoming_tour=True,
+        )
+
+        response = pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=reverse("dashboard:index"),
+            id_token_data=ID_TOKEN_DATA | {"amr": ["pwd"]},  # "mfa" is missing
+        )
+        response = client.get(response.url)
+        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"))
+
+    def test_mfa_not_provided_by_proconnect_with_existing_device(self, client, settings, pro_connect):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = PrescriberFactory(
+            email=pro_connect.oidc_userinfo["email"],
+            membership=True,
+            has_completed_welcoming_tour=True,
+        )
+        device = ItouTOTPDeviceFactory(user=user)
+
+        dashboard_url = reverse("dashboard:index")
+        response = pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=dashboard_url,
+            id_token_data=ID_TOKEN_DATA | {"amr": ["pwd"]},  # "mfa" is missing
+        )
+        response = client.get(response.url)
+        verify_otp_url = reverse("otp_views:verify_otp")
+        assertRedirects(response, add_url_params(verify_otp_url, {"next": dashboard_url}))
+
+        otp = TOTP(device.bin_key).token()
+        response = client.post(verify_otp_url, data={"otp_token": otp})
+        assertRedirects(response, dashboard_url)
 
 
 class TestProConnectLogout:

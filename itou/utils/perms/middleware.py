@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
@@ -6,12 +8,15 @@ from itoutils.urls import add_url_params
 
 from itou.companies.models import Company, CompanyMembership
 from itou.institutions.models import Institution, InstitutionMembership
-from itou.otp.utils import get_user_devices
+from itou.otp.utils import get_user_devices, require_otp
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.www.logout.enums import LogoutWarning
+
+
+logger = logging.getLogger(__name__)
 
 
 def extract_membership_infos_and_update_session(
@@ -192,13 +197,8 @@ class ItouCurrentOrganizationMiddleware:
         ):
             return self.get_response(request)
 
-        # Force OTP for staff users
-        if (
-            settings.REQUIRE_OTP_FOR_STAFF
-            and user.is_authenticated
-            and user.kind == UserKind.ITOU_STAFF
-            and not user.is_verified()
-        ):
+        if require_otp(user):
+            logger.info("Requiring internal OTP for user %d", user.id)
             login_verify_otp_url = reverse("otp_views:verify_otp")
             login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
             if get_user_devices(user):

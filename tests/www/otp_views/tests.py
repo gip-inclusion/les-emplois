@@ -46,9 +46,9 @@ def attach_device_to_user_session(client, device):
     "factory,expected_status",
     [
         (JobSeekerFactory, 403),
-        (partial(EmployerFactory, membership=True), 403),
-        (partial(PrescriberFactory, membership=True), 403),
-        (partial(LaborInspectorFactory, membership=True), 403),
+        (partial(EmployerFactory, membership=True), 200),
+        (partial(PrescriberFactory, membership=True), 200),
+        (partial(LaborInspectorFactory, membership=True), 200),
         (ItouStaffFactory, 200),
     ],
 )

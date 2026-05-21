@@ -1,7 +1,10 @@
+from django.conf import settings
+
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.utils.emails import get_email_message
 
 
+FAKE_DEVICE_MODEL = "fake-for-external-totp-device"
 STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
 
 
@@ -29,3 +32,53 @@ def notify_backup_code_has_been_used(user):
         body="common/emails/used_otp_backup_code_body.txt",
     )
     email.send()
+
+
+def require_otp(user):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_verified():  # user has already authenticated with MFA
+        return False
+
+    if settings.REQUIRE_OTP_FOR_STAFF and user.is_itou_staff:
+        return True
+
+    if settings.REQUIRE_MFA_FOR_PROS and user.is_professional:
+        return True
+
+    return False
+
+
+def create_placeholder_for_external_totp_device(user):
+    """When a user connects through ProConnect with MFA, we do not
+    want to ask again for our own MFA process. Instead, we create a
+    fake TOTPDevice that is seen by django_otp but is invisible from
+    the user.
+    """
+    return ExternalTOTPDevice(user.id)
+
+
+def load_placeholder_for_external_totp_device(persistent_id):
+    """Load placeholder from session.
+
+    See `create_placeholder_for_external_totp_device` for further
+    details.
+    """
+    try:
+        model_label, user_id = persistent_id.split("/")
+        user_id = int(user_id)
+    except ValueError:  # unexpected format, should not happen
+        return None
+    if model_label != FAKE_DEVICE_MODEL:
+        return None
+    return ExternalTOTPDevice(user_id)
+
+
+class ExternalTOTPDevice:
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    @property
+    def persistent_id(self):
+        return f"{FAKE_DEVICE_MODEL}/{self.user_id}"
