@@ -555,6 +555,9 @@ class Employee(models.Model):
     assessment = models.ForeignKey(
         Assessment, verbose_name="bilan d’exécution", on_delete=models.CASCADE, related_name="employees"
     )
+    allowance_granted_previous_year = models.BooleanField(
+        verbose_name="aide accordée l’année précédente", db_default=False
+    )
     label_id = models.IntegerField(verbose_name="ID label")
     last_name = models.CharField(verbose_name="nom de famille")
     first_name = models.CharField(verbose_name="prénom")

@@ -6,7 +6,7 @@ from tests.geiq.factories import (
     SalarieContratLabelDataFactory,
     SalariePreQualificationLabelDataFactory,
 )
-from tests.geiq_assessments.factories import AssessmentFactory
+from tests.geiq_assessments.factories import AssessmentFactory, EmployeeContractFactory
 
 
 @pytest.fixture
@@ -18,7 +18,6 @@ def label_settings(settings):
 
 def test_sync_employee_and_contracts(caplog, label_settings, mocker):
     assessment = AssessmentFactory(campaign__year=2023, with_main_geiq=True, label_antennas=[])
-
     prequal_only = SalariePreQualificationLabelDataFactory(
         salarie__geiq_id=assessment.label_geiq_id,
         date_debut="2023-01-01T00:00:00+01:00",
@@ -64,6 +63,22 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
         date_fin="2024-01-31:00:00+01:00",
     )
 
+    EmployeeContractFactory(
+        allowance_requested=True,
+        allowance_granted=True,
+        employee__label_id=contract["salarie"]["id"],
+        employee__assessment__label_geiq_id=assessment.label_geiq_id,
+        employee__assessment__campaign__year=2022,
+    )
+
+    EmployeeContractFactory(
+        allowance_requested=True,
+        allowance_granted=True,
+        employee__label_id=contract_with_prequal["salarie"]["id"],
+        employee__assessment__label_geiq_id=assessment.label_geiq_id,
+        employee__assessment__campaign__year=2021,
+    )
+
     def _fake_get_all_contracts(self, geiq_id, date_fin=None):
         assert geiq_id == assessment.label_geiq_id
         return [dict(c) for c in (contract, contract_with_prequal, contract_of_antenna, contract_without_allowance)]
@@ -89,24 +104,29 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
     mocker.patch.object(geiq_label.LabelApiClient, "get_all_prequalifications", _fake_get_all_prequalifications)
     mocker.patch.object(geiq_label.LabelApiClient, "get_taux_geiq", _fake_get_taux_geiq)
     sync.sync_employee_and_contracts(assessment)
-    employees = models.Employee.objects.order_by("label_id")
+    employees = models.Employee.objects.filter(assessment=assessment).order_by("label_id")
     assert len(employees) == 3
     assert prequal_only["salarie"]["id"] not in {employee.label_id for employee in employees}
     assert contract_ending_before_2023["salarie"]["id"] not in {employee.label_id for employee in employees}
     assert contract["salarie"]["id"] == employees[0].label_id
     assert contract_with_prequal["salarie"]["id"] == employees[1].label_id
 
+    assert employees[0].label_id == contract["salarie"]["id"]
     assert employees[0].allowance_amount == 1400
+    assert employees[0].allowance_granted_previous_year is True
     contract0 = employees[0].contracts.first()
     assert contract0.nb_days_in_campaign_year == 365
     assert contract0.allowance_requested is True
     assert contract0.allowance_granted is False
+    assert employees[1].label_id == contract_with_prequal["salarie"]["id"]
     assert employees[1].allowance_amount == 814
+    assert employees[1].allowance_granted_previous_year is False
     contract1 = employees[1].contracts.first()
     assert contract1.nb_days_in_campaign_year == 17
     assert contract1.allowance_requested is False  # Since less than 90 days
     assert contract1.allowance_granted is False
     assert employees[2].allowance_amount == 0
+    assert employees[2].allowance_granted_previous_year is False
     contract2 = employees[2].contracts.first()
     assert contract2.allowance_requested is False  # Since no potential allowance
     assert contract2.allowance_granted is False

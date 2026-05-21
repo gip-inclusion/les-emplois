@@ -139,6 +139,15 @@ def sync_employee_and_contracts(assessment):
     employee_infos = {}
     employee_support_periods = {}
     employees_in_assessment_year = set()
+    label_employee_ids_with_allowance_granted_previous_year = set(
+        EmployeeContract.objects.filter(
+            allowance_granted=True,
+            employee__assessment__label_geiq_id=geiq_id,
+            employee__assessment__campaign__year=assessment.campaign.year - 1,
+        )
+        .values_list("employee__label_id", flat=True)
+        .distinct()
+    )
 
     limit_end_date = datetime.date(assessment.campaign.year - 1, 10, 1)
     label_rates = client.get_taux_geiq(geiq_id=geiq_id)[0]
@@ -212,6 +221,9 @@ def sync_employee_and_contracts(assessment):
     def employee_data_to_django(data, *, mapping, model):
         employee = label_data_to_django(data, mapping=mapping, model=model)
         employee.assessment = assessment
+        employee.allowance_granted_previous_year = (
+            employee.label_id in label_employee_ids_with_allowance_granted_previous_year
+        )
         return employee
 
     sync_to_db(
