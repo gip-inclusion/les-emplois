@@ -37,6 +37,7 @@ from itou.www.invitations_views.helpers import (
     handle_labor_inspector_invitation,
     handle_prescriber_invitation,
 )
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.signup import forms as signup_forms
 
 
@@ -107,10 +108,10 @@ def new_user(request, invitation_type, invitation_id):
             return redirect(invitation.acceptance_url_for_existing_user)
 
         # The user exists but he should log in first.
+        request.session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
         return redirect(
             reverse(
                 "login:existing_user",
-                args=(user.public_id,),
                 query={"next": invitation.acceptance_url_for_existing_user},
             )
         )

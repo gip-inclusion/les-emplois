@@ -16,7 +16,7 @@ from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
@@ -131,7 +131,10 @@ class TestJobSeekerSignup:
 
         # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:existing_user", args=(user.public_id,))
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        url = reverse("login:existing_user")
         response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert response.url == reverse("account_email_verification_sent")
@@ -599,10 +602,12 @@ class TestJobSeekerSignup:
         assert pretty_indented(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
             name=f"{snapshot_name}_title"
         )
-        assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
-
-        # Important that the email is not saved in the session, in the subsequent step the user must prove they know it
-        assert ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY not in client.session
+        if "email" in erroneous_fields:
+            assertContains(response, reverse("login:existing_user"))
+            assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == existing_user.email
+        else:
+            assertContains(response, reverse("account_login"))
+            assert ITOU_SESSION_LOGIN_EMAIL_KEY not in client.session
 
         # NOTE: error is rendered for the case that the user ignores the modal
         if "email" in erroneous_fields:
@@ -632,7 +637,8 @@ class TestJobSeekerSignup:
         # Modal is rendered with expected error message according to the conflicting fields
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
         assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
-        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+        assertContains(response, reverse("login:existing_user"))
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == existing_user.email
 
     def test_job_seeker_signup_with_conflicting_email_invalid_nir(self, client, snapshot):
         existing_user = JobSeekerFactory(for_snapshot=True)
@@ -652,7 +658,8 @@ class TestJobSeekerSignup:
 
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
         assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
-        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+        assertContains(response, reverse("login:existing_user"))
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == existing_user.email
 
     def test_job_seeker_signup_birth_fields_conflict_invalid_nir(self, client, snapshot):
         existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
@@ -677,7 +684,8 @@ class TestJobSeekerSignup:
         assert pretty_indented(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
             name="birth_fields_conflict_title"
         )
-        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+        assertContains(response, reverse("account_login"))
+        assert ITOU_SESSION_LOGIN_EMAIL_KEY not in client.session
 
     def test_job_seeker_signup_birth_fields_conflict_redefine_nir(self, client, snapshot):
         existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
@@ -701,7 +709,8 @@ class TestJobSeekerSignup:
         assert pretty_indented(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
             name="birth_fields_conflict_title"
         )
-        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+        assertContains(response, reverse("account_login"))
+        assert ITOU_SESSION_LOGIN_EMAIL_KEY not in client.session
 
     def test_job_seeker_signup_cannot_conflict_with_other_user_type(self, client):
         # If a user exists with the requested email, but they are not a candidate,
@@ -727,7 +736,8 @@ class TestJobSeekerSignup:
 
         # No modal presented.
         assertMessages(response, [])
-        assertNotContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+        assertNotContains(response, reverse("login:existing_user"))
+        assert ITOU_SESSION_LOGIN_EMAIL_KEY not in client.session
 
     def test_job_seeker_signup_email_and_nir_priorities(self, client):
         """
@@ -753,4 +763,5 @@ class TestJobSeekerSignup:
         assert "Vous possédez déjà un compte" in str(
             parse_response_to_soup(response, selector="#message-modal-1-label")
         )
-        assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
+        assertContains(response, reverse("login:existing_user"))
+        assert client.session[ITOU_SESSION_LOGIN_EMAIL_KEY] == existing_user.email
