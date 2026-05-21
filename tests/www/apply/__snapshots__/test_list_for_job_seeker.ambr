@@ -135,7 +135,7 @@
 # ---
 # name: test_list_for_job_seeker_queries[SQL queries in list mode]
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -195,6 +195,65 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
+          FROM "users_jobseekerprofile"
+          WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
         ''',
       }),
@@ -269,17 +328,26 @@
                                AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                                AND U0."status" = %s)
                         ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
-                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name"
+                    CASE
+                        WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                        ELSE "users_user"."last_name"
+                    END AS "job_seeker_last_name_for_display",
+                    (COALESCE(LOWER(CASE
+                                        WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                        ELSE "users_user"."last_name"
+                                    END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
              WHERE "job_applications_jobapplication"."job_seeker_id" = %s
              GROUP BY "job_applications_jobapplication"."id",
                       2,
                       3,
                       6,
                       7,
-                      8) subquery
+                      8,
+                      9) subquery
         ''',
       }),
       dict({
@@ -394,7 +462,14 @@
                             AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                             AND U0."status" = %s)
                      ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
-                 (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                 CASE
+                     WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "job_seeker_last_name_for_display",
+                 (COALESCE(LOWER(CASE
+                                     WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                     ELSE "users_user"."last_name"
+                                 END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -434,6 +509,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -667,6 +743,7 @@
                    50,
                    51,
                    52,
+                   53,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -800,7 +877,7 @@
 # ---
 # name: test_list_for_job_seeker_queries[SQL queries in table mode]
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
@@ -906,15 +983,24 @@
                                              ORDER BY U0."created_at" DESC
                                              LIMIT 1)))
                 ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
-                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name"
+                    CASE
+                        WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                        ELSE "users_user"."last_name"
+                    END AS "job_seeker_last_name_for_display",
+                    (COALESCE(LOWER(CASE
+                                        WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                        ELSE "users_user"."last_name"
+                                    END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
              WHERE "job_applications_jobapplication"."job_seeker_id" = %s
              GROUP BY "job_applications_jobapplication"."id",
                       2,
                       3,
-                      5) subquery
+                      5,
+                      6) subquery
         ''',
       }),
       dict({
@@ -1001,7 +1087,14 @@
                                           ORDER BY U0."created_at" DESC
                                           LIMIT 1)))
              ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
-                 (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                 CASE
+                     WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "job_seeker_last_name_for_display",
+                 (COALESCE(LOWER(CASE
+                                     WHEN "users_user"."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                     ELSE "users_user"."last_name"
+                                 END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "job_seeker_full_name",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1041,6 +1134,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1272,6 +1366,7 @@
                    46,
                    47,
                    49,
+                   50,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -1372,6 +1467,74 @@
           LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s)
           ORDER BY "approvals_approval"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.get_last_name_for_display[users/models.py]',
+          'User.get_full_name[users/models.py]',
+          'IfNode[layout/_header_user_dropdown_menu.html]',
+          'IncludeNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_job_seeker.html]',
+          'list_for_job_seeker[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore"
+          FROM "users_jobseekerprofile"
+          WHERE "users_jobseekerprofile"."user_id" = %s
+          LIMIT 21
         ''',
       }),
     ]),

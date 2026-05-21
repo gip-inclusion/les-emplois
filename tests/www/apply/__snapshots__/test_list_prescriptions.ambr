@@ -3173,7 +3173,14 @@
                                             OR U0."author_prescriber_organization_id" IS NOT NULL))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_geiq_eligibility_diagnosis_id",
-                    (COALESCE(LOWER(T6."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                    CASE
+                        WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                        ELSE T6."last_name"
+                    END AS "job_seeker_last_name_for_display",
+                    (COALESCE(LOWER(CASE
+                                        WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                        ELSE T6."last_name"
+                                    END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
           
                (SELECT U1."start_at" AS "appointment__start_at"
                 FROM "rdv_insertion_participation" U0
@@ -3205,6 +3212,7 @@
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
+             LEFT OUTER JOIN "users_jobseekerprofile" ON (T6."id" = "users_jobseekerprofile"."user_id")
              WHERE ((("job_applications_jobapplication"."sender_id" = %s
                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
@@ -3215,8 +3223,9 @@
                       5,
                       6,
                       7,
-                      9,
-                      10) subquery
+                      8,
+                      10,
+                      11) subquery
         ''',
       }),
       dict({
@@ -3321,7 +3330,14 @@
                                          OR U0."author_prescriber_organization_id" IS NOT NULL))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_geiq_eligibility_diagnosis_id",
-                 (COALESCE(LOWER(T6."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                 CASE
+                     WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                     ELSE T6."last_name"
+                 END AS "job_seeker_last_name_for_display",
+                 (COALESCE(LOWER(CASE
+                                     WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                     ELSE T6."last_name"
+                                 END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
           
             (SELECT U1."start_at" AS "appointment__start_at"
              FROM "rdv_insertion_participation" U0
@@ -3389,6 +3405,7 @@
                  T6."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -3625,8 +3642,9 @@
                    49,
                    50,
                    51,
-                   53,
+                   52,
                    54,
+                   55,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -4197,6 +4215,7 @@
                  T6."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -5627,7 +5646,14 @@
                                             OR U0."author_prescriber_organization_id" IS NOT NULL))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_geiq_eligibility_diagnosis_id",
-                    (COALESCE(LOWER(T6."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                    CASE
+                        WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                        ELSE T6."last_name"
+                    END AS "job_seeker_last_name_for_display",
+                    (COALESCE(LOWER(CASE
+                                        WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                        ELSE T6."last_name"
+                                    END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
           
                (SELECT U1."start_at" AS "appointment__start_at"
                 FROM "rdv_insertion_participation" U0
@@ -5659,6 +5685,7 @@
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
+             LEFT OUTER JOIN "users_jobseekerprofile" ON (T6."id" = "users_jobseekerprofile"."user_id")
              WHERE ((("job_applications_jobapplication"."sender_id" = %s
                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
@@ -5669,8 +5696,9 @@
                       5,
                       6,
                       7,
-                      9,
-                      10) subquery
+                      8,
+                      10,
+                      11) subquery
         ''',
       }),
       dict({
@@ -5775,7 +5803,14 @@
                                          OR U0."author_prescriber_organization_id" IS NOT NULL))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_geiq_eligibility_diagnosis_id",
-                 (COALESCE(LOWER(T6."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                 CASE
+                     WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                     ELSE T6."last_name"
+                 END AS "job_seeker_last_name_for_display",
+                 (COALESCE(LOWER(CASE
+                                     WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                     ELSE T6."last_name"
+                                 END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
           
             (SELECT U1."start_at" AS "appointment__start_at"
              FROM "rdv_insertion_participation" U0
@@ -5843,6 +5878,7 @@
                  T6."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -6079,8 +6115,9 @@
                    49,
                    50,
                    51,
-                   53,
+                   52,
                    54,
+                   55,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -6727,10 +6764,18 @@
                                             OR U0."author_prescriber_organization_id" IS NOT NULL))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_geiq_eligibility_diagnosis_id",
-                    (COALESCE(LOWER(T6."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name"
+                    CASE
+                        WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                        ELSE T6."last_name"
+                    END AS "job_seeker_last_name_for_display",
+                    (COALESCE(LOWER(CASE
+                                        WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                        ELSE T6."last_name"
+                                    END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
+             LEFT OUTER JOIN "users_jobseekerprofile" ON (T6."id" = "users_jobseekerprofile"."user_id")
              WHERE ((("job_applications_jobapplication"."sender_id" = %s
                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
@@ -6740,7 +6785,8 @@
                       3,
                       5,
                       6,
-                      7) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -6845,7 +6891,14 @@
                                          OR U0."author_prescriber_organization_id" IS NOT NULL))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_geiq_eligibility_diagnosis_id",
-                 (COALESCE(LOWER(T6."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
+                 CASE
+                     WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                     ELSE T6."last_name"
+                 END AS "job_seeker_last_name_for_display",
+                 (COALESCE(LOWER(CASE
+                                     WHEN T6."last_name" = %s THEN "users_jobseekerprofile"."birth_name"
+                                     ELSE T6."last_name"
+                                 END), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."first_name"), %s)), %s)) AS "job_seeker_full_name",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -6885,6 +6938,7 @@
                  T6."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -7121,6 +7175,7 @@
                    49,
                    50,
                    51,
+                   52,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
