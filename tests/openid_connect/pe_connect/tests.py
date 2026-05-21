@@ -289,6 +289,7 @@ class TestPoleEmploiConnect:
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
             "last_name": job_seeker_data.last_name,
+            "birth_name": job_seeker_data.jobseeker_profile.birth_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
             "birth_place": job_seeker_data.jobseeker_profile.birth_place_id,
