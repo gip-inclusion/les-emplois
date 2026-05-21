@@ -1,0 +1,9 @@
+<div class="c-multi-file-input position-relative">
+    {% include "django/forms/widgets/file.html" %}
+
+    <label for="{{ widget.attrs.id }}" class="btn btn-outline-primary btn-sm">Importer un fichier</label>
+    <div class="mt-1 mb-2">{% include "utils/widgets/file_input_constraints.html" %}</div>
+
+    <ul class="c-multi-file-input__list list-unstyled mb-0">
+    </ul>
+</div>
