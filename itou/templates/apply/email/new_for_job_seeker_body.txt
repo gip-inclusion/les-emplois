@@ -36,7 +36,7 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 
 *Informations transmises à la structure* :
 
-- Nom : {{ job_application.job_seeker.last_name|upper }}
+- Nom : {{ job_application.job_seeker.get_last_name_for_display|upper }}
 - Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}
 - Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
 - Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate %}
