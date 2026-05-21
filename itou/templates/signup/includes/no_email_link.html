@@ -2,7 +2,7 @@
 {% load static %}
 
 {% if not exclude_button|default:False %}
-    <a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">{{ link_text }}</a>
+    <a href="#" class="btn-link" data-bs-toggle="modal" data-bs-target="#no-email-modal">{{ link_text }}</a>
 {% endif %}
 
 <div class="modal fade" id="no-email-modal" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
