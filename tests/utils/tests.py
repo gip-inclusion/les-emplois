@@ -124,7 +124,7 @@ class TestItouCurrentOrganizationMiddleware:
         with assertNumQueries(0):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
-        assert request.session.is_empty()
+        assert set(request.session.keys()) == {global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY}
 
     def test_employer(self, mocked_get_response_for_middlewaremixin):
         company = CompanyMembershipFactory().company

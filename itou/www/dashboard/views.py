@@ -340,6 +340,8 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
     if request.method == "POST" and form.is_valid():
         form.save()
+        if global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY in request.session:
+            del request.session[global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY]
         messages.success(request, "Les informations de votre profil ont bien été mises à jour.", extra_tags="toast")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
