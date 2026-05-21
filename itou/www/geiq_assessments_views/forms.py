@@ -370,7 +370,7 @@ class ContractFilterForm(forms.Form):
         return count
 
 
-class GeiqFixCommentForm(forms.Form):
+class AskForFixCommentForm(forms.Form):
     comment = forms.CharField(
         label="Précisez les corrections à apporter au dossier", widget=forms.Textarea(), strip=True
     )

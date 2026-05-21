@@ -49,10 +49,10 @@ from itou.www.geiq_assessments_views.export import (
 )
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
+    AskForFixCommentForm,
     ContractFilterForm,
     CreateForm,
     GeiqCommentForm,
-    GeiqFixCommentForm,
     ReviewForm,
 )
 
@@ -851,7 +851,7 @@ def assessment_details_for_institution(
         .prefetch_related("logs"),
         pk=pk,
     )
-    geiq_fix_comment_form = GeiqFixCommentForm(
+    ask_for_geiq_fix_comment_form = AskForFixCommentForm(
         data=request.POST
         if request.POST and request.POST.get("action") == InstitutionAction.ASK_FOR_GEIQ_FIX
         else None
@@ -918,7 +918,7 @@ def assessment_details_for_institution(
                 )
 
         elif action is InstitutionAction.ASK_FOR_GEIQ_FIX:
-            if not geiq_fix_comment_form.is_valid():
+            if not ask_for_geiq_fix_comment_form.is_valid():
                 # Auto-show the modal and the form with errors
                 redirect_to_details = False
             else:
@@ -932,7 +932,7 @@ def assessment_details_for_institution(
                         "Ce bilan n’a pas encore été transmis par le GEIQ : vous ne pouvez pas le renvoyer au GEIQ.",
                     )
                 else:
-                    comment = geiq_fix_comment_form.cleaned_data["comment"]
+                    comment = ask_for_geiq_fix_comment_form.cleaned_data["comment"]
                     AssessmentFixRequestedForGeiqNotification(
                         assessment.submitted_by,
                         assessment=assessment,
@@ -969,7 +969,7 @@ def assessment_details_for_institution(
         ),
         "matomo_custom_title": "Bilan d’exécution - page de detail Institution",
         "InstitutionAction": InstitutionAction,
-        "geiq_fix_comment_form": geiq_fix_comment_form,
+        "ask_for_geiq_fix_comment_form": ask_for_geiq_fix_comment_form,
         "abs_balance_amount": abs(assessment.granted_amount - assessment.advance_amount),
         "last_geiq_fix_transition": last_geiq_fix_transition,
     }

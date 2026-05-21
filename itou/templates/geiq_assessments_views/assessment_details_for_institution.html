@@ -328,17 +328,17 @@
         </div>
     {% endif %}
     {% if assessment.submitted_at and not assessment.final_reviewed_at %}
-        <div id="send_back_for_correction_modal" class="modal" tabindex="-1" aria-labelledby="send_back_for_correction_modal_title" aria-hidden="true">
+        <div id="ask_for_geiq_fix_modal" class="modal" tabindex="-1" aria-labelledby="ask_for_geiq_fix_modal_title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <form method="post">
                         {% csrf_token %}
                         <div class="modal-header">
-                            <h2 class="modal-title" id="send_back_for_correction_modal_title">Renvoyer le bilan d’exécution au GEIQ</h2>
+                            <h2 class="modal-title" id="ask_for_geiq_fix_modal_title">Renvoyer le bilan d’exécution au GEIQ</h2>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
-                            {% bootstrap_field geiq_fix_comment_form.comment %}
+                            {% bootstrap_field ask_for_geiq_fix_comment_form.comment %}
                             <br>
                         </div>
                         <div class="modal-footer">
@@ -356,14 +356,14 @@
 
 {% block script %}
     {{ block.super }}
-    {% if geiq_fix_comment_form.errors %}
+    {% if ask_for_geiq_fix_comment_form.errors %}
         {# Show the confirmation modal after submitting the form. #}
         <script nonce="{{ csp_nonce }}">
             document.addEventListener("DOMContentLoaded", function() {
                 // Adding the "show" CSS class is not enough and not documented.
                 // A JS initialization is recommended.
-                const sendBackForCorrectionModal = new bootstrap.Modal("#send_back_for_correction_modal");
-                sendBackForCorrectionModal.show();
+                const askForGeiqFixModal = new bootstrap.Modal("#ask_for_geiq_fix_modal");
+                askForGeiqFixModal.show();
             });
         </script>
     {% endif %}

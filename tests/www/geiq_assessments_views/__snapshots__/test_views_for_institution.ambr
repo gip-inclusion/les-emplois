@@ -358,7 +358,7 @@
                               </strong>
                           </li>
                       </ul>
-                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#send_back_for_correction_modal" data-bs-toggle="modal" type="button">
+                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
                           Renvoyer au GEIQ pour correction
                       </button>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
@@ -721,7 +721,7 @@
                       <p>
                           Vous avez jusqu’au 26/07/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
-                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#send_back_for_correction_modal" data-bs-toggle="modal" type="button">
+                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
                           Renvoyer au GEIQ pour correction
                       </button>
                       <form method="post">
@@ -1359,7 +1359,7 @@
                               </strong>
                           </li>
                       </ul>
-                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#send_back_for_correction_modal" data-bs-toggle="modal" type="button">
+                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
                           Renvoyer au GEIQ pour correction
                       </button>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
