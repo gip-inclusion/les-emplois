@@ -19,6 +19,7 @@ class FranceConnectUserData(OIDConnectUserData):
     # Attributes are User model ones.
     # Mapping is made in self.user_info_mapping_dict.
     phone: str | None = None
+    birth_name: str = ""
     birthdate: datetime.date | None = None
     address_line_1: str | None = None
     post_code: str | None = None
@@ -39,6 +40,8 @@ class FranceConnectUserData(OIDConnectUserData):
             user_info=user_info
         )
         attrs = standard_attrs | {
+            "last_name": user_info.get("preferred_username"),
+            "birth_name": user_info.get("family_name"),
             "birthdate": datetime.date.fromisoformat(user_info["birthdate"]) if user_info.get("birthdate") else None,
         }
         with contextlib.suppress(KeyError):
