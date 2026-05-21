@@ -1366,6 +1366,9 @@ def test_user_first_login(client):
 
 
 class TestJobSeekerAssignment:
+    def setup_method(self):
+        self.action_kind_choices = [value for value in set(ActionKind.values) - {ActionKind.COMPLETE.value}]
+
     @pytest.mark.parametrize(
         "prescriber_organization_factory,company_factory",
         [(PrescriberOrganizationFactory, None), (None, CompanyFactory), (None, None)],
@@ -1387,7 +1390,7 @@ class TestJobSeekerAssignment:
 
         with pytest.raises(AssertionError):
             JobSeekerAssignment.objects.upsert_assignment(
-                not_a_job_seeker, prescriber, None, random.choice(ActionKind.values)
+                not_a_job_seeker, prescriber, None, random.choice(self.action_kind_choices)
             )
 
     @pytest.mark.parametrize("factory", [JobSeekerFactory, ItouStaffFactory])
@@ -1396,7 +1399,7 @@ class TestJobSeekerAssignment:
         job_seeker = JobSeekerFactory()
 
         JobSeekerAssignment.objects.upsert_assignment(
-            job_seeker, not_a_professional, None, random.choice(ActionKind.values)
+            job_seeker, not_a_professional, None, random.choice(self.action_kind_choices)
         )
         assert caplog.messages[0] == ERROR_LOG_NOT_PROFESSIONAL % not_a_professional.pk
 
@@ -1412,12 +1415,14 @@ class TestJobSeekerAssignment:
         prescriber_organization = PrescriberOrganizationFactory()
 
         # organization is not mandatory
-        JobSeekerAssignment.objects.upsert_assignment(job_seeker, professional, None, random.choice(ActionKind.values))
+        JobSeekerAssignment.objects.upsert_assignment(
+            job_seeker, professional, None, random.choice(self.action_kind_choices)
+        )
 
         # professional is mandatory
         with pytest.raises(AttributeError):
             JobSeekerAssignment.objects.upsert_assignment(
-                job_seeker, None, prescriber_organization, random.choice(ActionKind.values)
+                job_seeker, None, prescriber_organization, random.choice(self.action_kind_choices)
             )
 
     def test_unique_constraint(self):
@@ -1427,12 +1432,32 @@ class TestJobSeekerAssignment:
 
         # upsert_assignment updates the existing assignment
         JobSeekerAssignment.objects.upsert_assignment(
-            assignment.job_seeker, professional, organization, random.choice(ActionKind.values)
+            assignment.job_seeker, professional, organization, last_action_kind=random.choice(self.action_kind_choices)
         )
 
         # no error with another value for prescriber_organization
         JobSeekerAssignmentFactory(
-            job_seeker=assignment.job_seeker, professional=professional, prescriber_organization=None
+            job_seeker=assignment.job_seeker,
+            professional=professional,
+            prescriber_organization=None,
+        )
+
+        # complete the assignment
+        assignment.ended_at = datetime.date(2026, 5, 22)
+        assignment.last_action_kind = ActionKind.COMPLETE
+        assignment.save()
+
+        # no exception should be raised if the assignment is complete and a new assignment will be created
+        JobSeekerAssignment.objects.upsert_assignment(
+            assignment.job_seeker, professional, organization, last_action_kind=random.choice(self.action_kind_choices)
+        )
+        assert (
+            JobSeekerAssignment.include_complete.filter(
+                job_seeker=assignment.job_seeker,
+                professional=professional,
+                prescriber_organization=organization,
+            ).count()
+            == 2
         )
 
         with pytest.raises(IntegrityError):
@@ -1452,7 +1477,7 @@ class TestJobSeekerAssignment:
                 professional=professional,
                 prescriber_organization=prescriber_organization,
                 company=company,
-                last_action_kind=random.choice(ActionKind.values),
+                last_action_kind=random.choice(self.action_kind_choices),
             ).save()
 
     def test_constraint_unknown_advisor_without_organization_or_company(self):
@@ -1465,7 +1490,7 @@ class TestJobSeekerAssignment:
                 professional=professional,
                 prescriber_organization=None,
                 company=None,
-                last_action_kind=random.choice(ActionKind.values),
+                last_action_kind=random.choice(self.action_kind_choices),
                 assigned_to_unknown_advisor=True,
             ).save()
 
@@ -1551,3 +1576,8 @@ class TestJobSeekerAssignment:
             [assignment_no_organization, assignment_with_organization, assignment_coworker_organization],
             ordered=False,
         )
+
+    def test_active(self):
+        assignment = JobSeekerAssignmentFactory()
+        JobSeekerAssignmentFactory(ended_at=datetime.date(2026, 5, 22), last_action_kind=ActionKind.COMPLETE)
+        assertQuerySetEqual(JobSeekerAssignment.objects.all(), [assignment])

@@ -1,11 +1,40 @@
 # serializer version: 1
 # name: TestJobSeekerAssignment.test_assign_job_seeker[False-False][assignment creation sql queries]
   dict({
-    'num_queries': 1,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+          'JobSeekerAssignmentQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."company_id" IS NULL
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                 AND "users_jobseekerassignment"."professional_id" = %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerAssignment.save[<site-packages>/django/db/models/base.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
         ]),
         'sql': '''
           INSERT INTO "users_jobseekerassignment" ("created_at",
@@ -18,11 +47,7 @@
                                                    "assigned_to_unknown_advisor",
                                                    "started_at",
                                                    "ended_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
-          UPDATE
-          SET "updated_at" = EXCLUDED."updated_at",
-              "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -30,28 +55,54 @@
 # ---
 # name: TestJobSeekerAssignment.test_assign_job_seeker[False-False][assignment update sql queries]
   dict({
-    'num_queries': 1,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+          'JobSeekerAssignmentQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
         ]),
         'sql': '''
-          INSERT INTO "users_jobseekerassignment" ("created_at",
-                                                   "updated_at",
-                                                   "job_seeker_id",
-                                                   "professional_id",
-                                                   "prescriber_organization_id",
-                                                   "company_id",
-                                                   "last_action_kind",
-                                                   "assigned_to_unknown_advisor",
-                                                   "started_at",
-                                                   "ended_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
-          UPDATE
-          SET "updated_at" = EXCLUDED."updated_at",
-              "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."company_id" IS NULL
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                 AND "users_jobseekerassignment"."professional_id" = %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerAssignment.save[<site-packages>/django/db/models/base.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          UPDATE "users_jobseekerassignment"
+          SET "created_at" = %s,
+              "updated_at" = %s,
+              "job_seeker_id" = %s,
+              "professional_id" = %s,
+              "prescriber_organization_id" = NULL,
+              "company_id" = NULL,
+              "last_action_kind" = %s,
+              "assigned_to_unknown_advisor" = %s,
+              "started_at" = NULL,
+              "ended_at" = NULL
+          WHERE "users_jobseekerassignment"."id" = %s
         ''',
       }),
     ]),
@@ -59,11 +110,40 @@
 # ---
 # name: TestJobSeekerAssignment.test_assign_job_seeker[False-True][assignment creation sql queries]
   dict({
-    'num_queries': 1,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+          'JobSeekerAssignmentQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."company_id" = %s
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                 AND "users_jobseekerassignment"."professional_id" = %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerAssignment.save[<site-packages>/django/db/models/base.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
         ]),
         'sql': '''
           INSERT INTO "users_jobseekerassignment" ("created_at",
@@ -76,11 +156,7 @@
                                                    "assigned_to_unknown_advisor",
                                                    "started_at",
                                                    "ended_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
-          UPDATE
-          SET "updated_at" = EXCLUDED."updated_at",
-              "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -88,28 +164,54 @@
 # ---
 # name: TestJobSeekerAssignment.test_assign_job_seeker[False-True][assignment update sql queries]
   dict({
-    'num_queries': 1,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+          'JobSeekerAssignmentQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
         ]),
         'sql': '''
-          INSERT INTO "users_jobseekerassignment" ("created_at",
-                                                   "updated_at",
-                                                   "job_seeker_id",
-                                                   "professional_id",
-                                                   "prescriber_organization_id",
-                                                   "company_id",
-                                                   "last_action_kind",
-                                                   "assigned_to_unknown_advisor",
-                                                   "started_at",
-                                                   "ended_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
-          UPDATE
-          SET "updated_at" = EXCLUDED."updated_at",
-              "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."company_id" = %s
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                 AND "users_jobseekerassignment"."professional_id" = %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerAssignment.save[<site-packages>/django/db/models/base.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          UPDATE "users_jobseekerassignment"
+          SET "created_at" = %s,
+              "updated_at" = %s,
+              "job_seeker_id" = %s,
+              "professional_id" = %s,
+              "prescriber_organization_id" = NULL,
+              "company_id" = %s,
+              "last_action_kind" = %s,
+              "assigned_to_unknown_advisor" = %s,
+              "started_at" = NULL,
+              "ended_at" = NULL
+          WHERE "users_jobseekerassignment"."id" = %s
         ''',
       }),
     ]),
@@ -117,11 +219,40 @@
 # ---
 # name: TestJobSeekerAssignment.test_assign_job_seeker[True-False][assignment creation sql queries]
   dict({
-    'num_queries': 1,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+          'JobSeekerAssignmentQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."company_id" IS NULL
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                 AND "users_jobseekerassignment"."professional_id" = %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerAssignment.save[<site-packages>/django/db/models/base.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
         ]),
         'sql': '''
           INSERT INTO "users_jobseekerassignment" ("created_at",
@@ -134,11 +265,7 @@
                                                    "assigned_to_unknown_advisor",
                                                    "started_at",
                                                    "ended_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
-          UPDATE
-          SET "updated_at" = EXCLUDED."updated_at",
-              "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -146,28 +273,54 @@
 # ---
 # name: TestJobSeekerAssignment.test_assign_job_seeker[True-False][assignment update sql queries]
   dict({
-    'num_queries': 1,
+    'num_queries': 2,
     'queries': list([
       dict({
         'origin': list([
-          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+          'JobSeekerAssignmentQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
         ]),
         'sql': '''
-          INSERT INTO "users_jobseekerassignment" ("created_at",
-                                                   "updated_at",
-                                                   "job_seeker_id",
-                                                   "professional_id",
-                                                   "prescriber_organization_id",
-                                                   "company_id",
-                                                   "last_action_kind",
-                                                   "assigned_to_unknown_advisor",
-                                                   "started_at",
-                                                   "ended_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
-          UPDATE
-          SET "updated_at" = EXCLUDED."updated_at",
-              "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."started_at",
+                 "users_jobseekerassignment"."ended_at"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."company_id" IS NULL
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
+                 AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                 AND "users_jobseekerassignment"."professional_id" = %s
+                 AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerAssignment.save[<site-packages>/django/db/models/base.py]',
+          'JobSeekerAssignmentQuerySet.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          UPDATE "users_jobseekerassignment"
+          SET "created_at" = %s,
+              "updated_at" = %s,
+              "job_seeker_id" = %s,
+              "professional_id" = %s,
+              "prescriber_organization_id" = %s,
+              "company_id" = NULL,
+              "last_action_kind" = %s,
+              "assigned_to_unknown_advisor" = %s,
+              "started_at" = NULL,
+              "ended_at" = NULL
+          WHERE "users_jobseekerassignment"."id" = %s
         ''',
       }),
     ]),

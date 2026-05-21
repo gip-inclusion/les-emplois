@@ -19,4 +19,15 @@ class Migration(migrations.Migration):
             name="started_at",
             field=models.DateField(blank=True, null=True, verbose_name="date de début de l'accompagnement"),
         ),
+        migrations.AddConstraint(
+            model_name="jobseekerassignment",
+            constraint=models.CheckConstraint(
+                condition=models.Q(("ended_at__isnull", True), ("last_action_kind", "COMPLETE"), _negated=True),
+                name="ended_at_not_null_if_last_action_kind_is_complete",
+                violation_error_message=(
+                    "Une affectation doit comporter une date de fin d'accompagnement si "
+                    "la dernière action effectuée concerne la fin de l'accompagnement."
+                ),
+            ),
+        ),
     ]

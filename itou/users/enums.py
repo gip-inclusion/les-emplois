@@ -86,3 +86,4 @@ class ActionKind(models.TextChoices):
     ACCEPT = "ACCEPT", "acceptation de candidature"
     IAE_ELIGIBILITY = "IAE_ELIGIBILITY", "validation de l'éligibilité IAE"
     GEIQ_ELIGIBILITY = "GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"
+    COMPLETE = "COMPLETE", "fin de l'accompagnement"

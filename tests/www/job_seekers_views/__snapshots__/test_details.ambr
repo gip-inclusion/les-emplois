@@ -2720,7 +2720,8 @@
         'sql': '''
           SELECT %s AS "a"
           FROM "users_jobseekerassignment"
-          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
                  AND "users_jobseekerassignment"."prescriber_organization_id" = %s
                  AND "users_jobseekerassignment"."updated_at" >= %s
                  AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
@@ -3956,7 +3957,8 @@
         'sql': '''
           SELECT %s AS "a"
           FROM "users_jobseekerassignment"
-          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
                  AND "users_jobseekerassignment"."prescriber_organization_id" = %s
                  AND "users_jobseekerassignment"."updated_at" >= %s
                  AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
@@ -6988,7 +6990,8 @@
         'sql': '''
           SELECT %s AS "a"
           FROM "users_jobseekerassignment"
-          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s
                  AND "users_jobseekerassignment"."prescriber_organization_id" = %s
                  AND "users_jobseekerassignment"."updated_at" >= %s
                  AND NOT ("users_jobseekerassignment"."last_action_kind" = %s))
@@ -7145,12 +7148,13 @@
           WHERE EXISTS
               (SELECT %s AS "a"
                FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
+               WHERE (NOT (U0."last_action_kind" = %s)
+                      AND ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s
+                               AND U0."professional_id" = %s))
                       AND U0."job_seeker_id" = ("users_user"."id"))
                LIMIT 1)
           LIMIT 1
@@ -8597,12 +8601,13 @@
           WHERE EXISTS
               (SELECT %s AS "a"
                FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
+               WHERE (NOT (U0."last_action_kind" = %s)
+                      AND ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s
+                               AND U0."professional_id" = %s))
                       AND U0."job_seeker_id" = ("users_user"."id"))
                LIMIT 1)
           LIMIT 1

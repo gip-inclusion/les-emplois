@@ -612,7 +612,8 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_jobseekerassignment"
-          WHERE "users_jobseekerassignment"."professional_id" = %s
+          WHERE (NOT ("users_jobseekerassignment"."last_action_kind" = %s)
+                 AND "users_jobseekerassignment"."professional_id" = %s)
         ''',
       }),
       dict({

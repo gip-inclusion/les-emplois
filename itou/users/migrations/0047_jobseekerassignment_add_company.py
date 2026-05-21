@@ -30,6 +30,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobseekerassignment",
             constraint=models.UniqueConstraint(
+                condition=models.Q(("last_action_kind", "COMPLETE"), _negated=True),
                 fields=(
                     "job_seeker",
                     "professional",
@@ -38,7 +39,7 @@ class Migration(migrations.Migration):
                 ),
                 name="unique_jobseekerassignment_assignment_per_jobseeker",
                 nulls_distinct=False,
-                violation_error_message="Une affectation existe déjà entre le candidat, le prescripteur et "
+                violation_error_message="Une affectation en cours existe déjà entre le candidat, le prescripteur et "
                 "l'organisation prescriptrice ou l'entreprise.",
             ),
         ),

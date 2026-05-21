@@ -1584,7 +1584,10 @@ class IdentityCertification(models.Model):
         ]
 
 
-class JobSeekerAssignmentManager(models.Manager):
+class JobSeekerAssignmentQuerySet(models.QuerySet):
+    def active(self):
+        return self.exclude(last_action_kind=ActionKind.COMPLETE)
+
     def upsert_assignment(
         self, job_seeker, professional, organization, last_action_kind, assigned_to_unknown_advisor=False
     ):
@@ -1598,20 +1601,34 @@ class JobSeekerAssignmentManager(models.Manager):
         prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
         company = organization if isinstance(organization, Company) else None
 
-        assignment = JobSeekerAssignment(
-            job_seeker=job_seeker,
-            professional=professional,
-            prescriber_organization=prescriber_organization,
-            company=company,
-            last_action_kind=last_action_kind,
-            assigned_to_unknown_advisor=assigned_to_unknown_advisor,
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker=job_seeker,
+                professional=professional,
+                prescriber_organization=prescriber_organization,
+                company=company,
+            )
+            .exclude(last_action_kind=ActionKind.COMPLETE)
+            .first()
         )
-        JobSeekerAssignment.objects.bulk_create(
-            [assignment],
-            update_conflicts=True,
-            update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor"],
-            unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
-        )
+
+        if assignment:
+            if assignment.last_action_kind == ActionKind.COMPLETE:
+                assignment.ended_at = None
+            assignment.last_action_kind = last_action_kind
+            assignment.assigned_to_unknown_advisor = assigned_to_unknown_advisor
+            assignment.updated_at = timezone.now()
+            assignment.save()
+        else:
+            JobSeekerAssignment.objects.create(
+                job_seeker=job_seeker,
+                professional=professional,
+                prescriber_organization=prescriber_organization,
+                company=company,
+                last_action_kind=last_action_kind,
+                assigned_to_unknown_advisor=assigned_to_unknown_advisor,
+                updated_at=timezone.now(),
+            )
 
     def assigned_to(self, professional, organization, from_all_coworkers=False):
         filters = [Q(professional=professional, prescriber_organization__isnull=True, company__isnull=True)]
@@ -1626,6 +1643,11 @@ class JobSeekerAssignmentManager(models.Manager):
                 )
 
         return JobSeekerAssignment.objects.filter(or_queries(filters))
+
+
+class JobSeekerAssignmentManager(models.Manager.from_queryset(JobSeekerAssignmentQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().active()
 
 
 class JobSeekerAssignment(models.Model):
@@ -1677,6 +1699,7 @@ class JobSeekerAssignment(models.Model):
     ended_at = models.DateField(verbose_name="date de fin de l'accompagnement", null=True, blank=True)
 
     objects = JobSeekerAssignmentManager()
+    include_complete = JobSeekerAssignmentQuerySet.as_manager()
 
     class Meta:
         verbose_name = "affectation candidat"
@@ -1686,9 +1709,10 @@ class JobSeekerAssignment(models.Model):
             models.UniqueConstraint(
                 name="unique_%(class)s_assignment_per_jobseeker",
                 fields=["job_seeker", "professional", "prescriber_organization", "company"],
+                condition=~models.Q(last_action_kind=ActionKind.COMPLETE),
                 nulls_distinct=False,
                 violation_error_message=(
-                    "Une affectation existe déjà entre le candidat, le prescripteur "
+                    "Une affectation en cours existe déjà entre le candidat, le prescripteur "
                     "et l'organisation prescriptrice ou l'entreprise."
                 ),
             ),
@@ -1707,6 +1731,14 @@ class JobSeekerAssignment(models.Model):
                 violation_error_message=(
                     "Une affectation doit comporter une organisation prescriptrice ou une entreprise "
                     "si elle est liée à un accompagnateur non référencé sur le service."
+                ),
+            ),
+            models.CheckConstraint(
+                name="ended_at_not_null_if_last_action_kind_is_complete",
+                condition=~models.Q(ended_at__isnull=True, last_action_kind=ActionKind.COMPLETE),
+                violation_error_message=(
+                    "Une affectation doit comporter une date de fin d'accompagnement si la dernière action "
+                    "effectuée concerne la fin de l'accompagnement."
                 ),
             ),
         ]

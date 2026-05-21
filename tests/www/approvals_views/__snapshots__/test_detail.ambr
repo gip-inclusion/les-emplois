@@ -2301,12 +2301,13 @@
           WHERE EXISTS
               (SELECT %s AS "a"
                FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
+               WHERE (NOT (U0."last_action_kind" = %s)
+                      AND ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s
+                               AND U0."professional_id" = %s))
                       AND U0."job_seeker_id" = ("users_user"."id"))
                LIMIT 1)
           LIMIT 1
@@ -4981,12 +4982,13 @@
           WHERE EXISTS
               (SELECT %s AS "a"
                FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
+               WHERE (NOT (U0."last_action_kind" = %s)
+                      AND ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s
+                               AND U0."professional_id" = %s))
                       AND U0."job_seeker_id" = ("users_user"."id"))
                LIMIT 1)
           LIMIT 1
