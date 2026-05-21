@@ -277,29 +277,41 @@ def test_assessment_state_final_reviewed_at_constraint():
     assessment.save()
 
 
-def test_transition_ask_for_geiq_fix_constraint():
-    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+def test_transition_ask_for_institution_or_geiq_fix_constraint():
+    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
     assessment = AssessmentFactory()
 
     # No comment with ASK_FOR_GEIQ_FIX
-    with pytest.raises(IntegrityError, match=r".*ask_for_geiq_fix_transition_with_comment.*"):
+    with pytest.raises(IntegrityError, match=r".*ask_for_fix_transition_with_comment.*"):
         with transaction.atomic():
             AssessmentTransitionLog.objects.create(
                 assessment=assessment,
-                user=ddets_membership.user,
-                institution=ddets_membership.institution,
+                user=dreets_membership.user,
+                institution=dreets_membership.institution,
                 transition=AssessmentTransition.ASK_FOR_GEIQ_FIX,
                 from_state=AssessmentState.SUBMITTED,
                 to_state=AssessmentState.NEW,
             )
 
-    # A comment for something else than ASK_FOR_GEIQ_FIX
-    with pytest.raises(IntegrityError, match=r".*ask_for_geiq_fix_transition_with_comment.*"):
+    # No comment with ASK_FOR_INSTITUTION_FIX
+    with pytest.raises(IntegrityError, match=r".*ask_for_fix_transition_with_comment.*"):
         with transaction.atomic():
             AssessmentTransitionLog.objects.create(
                 assessment=assessment,
-                user=ddets_membership.user,
-                institution=ddets_membership.institution,
+                user=dreets_membership.user,
+                institution=dreets_membership.institution,
+                transition=AssessmentTransition.ASK_FOR_INSTITUTION_FIX,
+                from_state=AssessmentState.REVIEWED,
+                to_state=AssessmentState.SUBMITTED,
+            )
+
+    # A comment for something else than ASK_FOR_INSTITUTION_FIX or ASK_FOR_GEIQ_FIX
+    with pytest.raises(IntegrityError, match=r".*ask_for_fix_transition_with_comment.*"):
+        with transaction.atomic():
+            AssessmentTransitionLog.objects.create(
+                assessment=assessment,
+                user=dreets_membership.user,
+                institution=dreets_membership.institution,
                 transition=AssessmentTransition.REVIEW,
                 from_state=AssessmentState.SUBMITTED,
                 to_state=AssessmentState.REVIEWED,
@@ -513,12 +525,17 @@ def test_transition_ask_for_institution_fix():
         )
     assert assessment.state == AssessmentState.REVIEWED
 
-    assessment.ask_for_institution_fix(user=dreets_membership.user, institution=dreets_membership.institution)
+    assessment.ask_for_institution_fix(
+        user=dreets_membership.user,
+        institution=dreets_membership.institution,
+        comment="Pouvez-vous revoir s’il vous plaît ?",
+    )
 
     transition = AssessmentTransitionLog.objects.filter(assessment=assessment).get()
     assert transition.assessment.state == AssessmentState.SUBMITTED
     assert transition.transition == AssessmentTransition.ASK_FOR_INSTITUTION_FIX
     assert transition.user == dreets_membership.user
+    assert transition.comment == "Pouvez-vous revoir s’il vous plaît ?"
     assert transition.institution == dreets_membership.institution
 
 
@@ -590,8 +607,26 @@ def test_transition_ask_for_geiq_fix():
     assert contract.allowance_granted is False
 
 
-def test_transition_ask_for_geiq_fix_with_errors():
-    ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+@pytest.mark.parametrize(
+    "transition,from_state",
+    [
+        (AssessmentTransition.ASK_FOR_GEIQ_FIX, AssessmentState.SUBMITTED),
+        (AssessmentTransition.ASK_FOR_INSTITUTION_FIX, AssessmentState.REVIEWED),
+    ],
+)
+def test_transition_ask_for_institution_or_geiq_fix_with_errors(transition, from_state):
+    dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
+
+    assessment_kwargs = (
+        {
+            "review_comment": "Bravo !",
+            "reviewed_at": timezone.now() + datetime.timedelta(hours=1.5),
+            "reviewed_by": dreets_membership.user,
+            "reviewed_by_institution": dreets_membership.institution,
+        }
+        if from_state == AssessmentState.REVIEWED
+        else {}
+    )
 
     assessment = AssessmentFactory(
         campaign__year=2023,
@@ -600,25 +635,30 @@ def test_transition_ask_for_geiq_fix_with_errors():
         submitted_by=EmployerFactory(),
         grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
         decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+        **assessment_kwargs,
     )
-    assert assessment.state == AssessmentState.SUBMITTED
+    assert assessment.state == from_state
 
-    with pytest.raises(IntegrityError, match=r".*ask_for_geiq_fix_transition_with_comment.*"):
+    with pytest.raises(IntegrityError, match=r".*ask_for_fix_transition_with_comment.*"):
         with transaction.atomic():
-            assessment.ask_for_geiq_fix(
-                user=ddets_membership.user, institution=ddets_membership.institution, comment=""
-            )
+            kwargs = {"user": dreets_membership.user, "institution": dreets_membership.institution, "comment": ""}
+            if transition == AssessmentTransition.ASK_FOR_GEIQ_FIX:
+                assessment.ask_for_geiq_fix(**kwargs)
+            elif transition == AssessmentTransition.ASK_FOR_INSTITUTION_FIX:
+                assessment.ask_for_institution_fix(**kwargs)
     assessment.refresh_from_db()
-    assert assessment.state == AssessmentState.SUBMITTED
+    assert assessment.state == from_state
     assert AssessmentTransitionLog.objects.exists() is False
 
     with pytest.raises(IntegrityError, match=r".*null value in column \"comment\".*"):
         with transaction.atomic():
-            assessment.ask_for_geiq_fix(
-                user=ddets_membership.user, institution=ddets_membership.institution, comment=None
-            )
+            kwargs = {"user": dreets_membership.user, "institution": dreets_membership.institution, "comment": None}
+            if transition == AssessmentTransition.ASK_FOR_GEIQ_FIX:
+                assessment.ask_for_geiq_fix(**kwargs)
+            elif transition == AssessmentTransition.ASK_FOR_INSTITUTION_FIX:
+                assessment.ask_for_institution_fix(**kwargs)
     assessment.refresh_from_db()
-    assert assessment.state == AssessmentState.SUBMITTED
+    assert assessment.state == from_state
     assert AssessmentTransitionLog.objects.exists() is False
 
 

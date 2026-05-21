@@ -439,7 +439,7 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
         self.final_reviewed_by_institution = institution
 
     @xwf_models.transition()
-    def ask_for_institution_fix(self, *, user, institution):
+    def ask_for_institution_fix(self, *, user, institution, comment):
         self.reviewed_at = None
         self.reviewed_by = None
         self.reviewed_by_institution = None
@@ -478,10 +478,26 @@ class AssessmentTransitionLog(xwf_models.BaseTransitionLog):
         ordering = ["-timestamp"]
         constraints = [
             models.CheckConstraint(
-                name="ask_for_geiq_fix_transition_with_comment",
-                violation_error_message=("Une demande de correction GEIQ doit être accompagnée d'un commentaire"),
-                condition=(models.Q(transition=AssessmentTransition.ASK_FOR_GEIQ_FIX) & ~models.Q(comment=""))
-                | (~models.Q(transition=AssessmentTransition.ASK_FOR_GEIQ_FIX) & models.Q(comment="")),
+                name="ask_for_fix_transition_with_comment",
+                violation_error_message=("Une demande de correction doit être accompagnée d'un commentaire"),
+                condition=(
+                    models.Q(
+                        transition__in=[
+                            AssessmentTransition.ASK_FOR_GEIQ_FIX,
+                            AssessmentTransition.ASK_FOR_INSTITUTION_FIX,
+                        ]
+                    )
+                    & ~models.Q(comment="")
+                )
+                | (
+                    ~models.Q(
+                        transition__in=[
+                            AssessmentTransition.ASK_FOR_GEIQ_FIX,
+                            AssessmentTransition.ASK_FOR_INSTITUTION_FIX,
+                        ]
+                    )
+                    & models.Q(comment="")
+                ),
             ),
         ]
 

@@ -496,7 +496,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert email.body == snapshot(name="body of mail sent to GEIQ members")
             assert email.cc == sorted([ddets_membership.user.email, other_ddets_membership.user.email])
 
-    def test_ddets_review_dreets_fix_and_dreets_review(self, client, snapshot):
+    def test_ddets_review_dreets_ask_for_institution_fix_and_dreets_review(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
@@ -553,17 +553,41 @@ class TestAssessmentDetailsForInstitutionView:
             assert transition.institution == ddets_membership.institution
             assert transition.timestamp == transition.assessment.reviewed_at
 
-        # DREETS fix
+        # DREETS ask for institution fix
         with freeze_time(timezone.now() + datetime.timedelta(hours=6)):
             client.force_login(dreets_membership.user)
             response = client.post(
                 reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
-                data={"action": "ask_for_institution_fix"},
+                data={"action": "ask_for_institution_fix"},  # no comment
+            )
+            assertContains(response, "Ce champ est obligatoire")
+            assessment.refresh_from_db()
+            assert assessment.reviewed_at is not None
+            assert not AssessmentTransitionLog.objects.filter(
+                transition=AssessmentTransition.ASK_FOR_INSTITUTION_FIX
+            ).exists()
+
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_institution_fix", "comment": " "},  # empty comment (space will be trimmed)
+            )
+            assertContains(response, "Ce champ est obligatoire")
+            assessment.refresh_from_db()
+            assert assessment.reviewed_at is not None
+            assert not AssessmentTransitionLog.objects.filter(
+                transition=AssessmentTransition.ASK_FOR_INSTITUTION_FIX
+            ).exists()
+
+            response = client.post(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+                data={"action": "ask_for_institution_fix", "comment": "Revue à corriger."},
             )
             assertRedirects(
                 response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
             )
-            transition = AssessmentTransitionLog.objects.filter(assessment=assessment).first()
+            transition = AssessmentTransitionLog.objects.filter(
+                assessment=assessment, transition=AssessmentTransition.ASK_FOR_INSTITUTION_FIX
+            ).get()
             assert transition.assessment.reviewed_at is None
             assert transition.assessment.reviewed_by is None
             assert transition.assessment.reviewed_by_institution is None

@@ -352,6 +352,36 @@
             </div>
         </div>
     {% endif %}
+    {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ and assessment.reviewed_at and not assessment.final_reviewed_at %}
+        <div id="ask_for_institution_fix_modal" class="modal fade" tabindex="-1" aria-labelledby="ask_for_institution_fix_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="ask_for_institution_fix_modal_title">Renvoyer le bilan d’exécution à la DDETS</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                À noter qu’une fois la demande de correction confirmée, vous aurez également la possibilité d’effectuer directement les corrections nécessaires. Dans ce cas, merci de le préciser dans votre message afin que la DDETS en soit informée.
+                            </p>
+                            {% bootstrap_field ask_for_institution_fix_comment_form.comment %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-ico btn-link ps-0 me-auto" data-bs-dismiss="modal">
+                                <i class="ri-close-line ri-xl fw-medium" aria-hidden="true"></i>
+                                <span>Annuler</span>
+                            </button>
+                            <button class="btn btn-sm btn-primary" name="action" value="{{ InstitutionAction.ASK_FOR_INSTITUTION_FIX }}">
+                                Confirmer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block script %}
@@ -364,6 +394,17 @@
                 // A JS initialization is recommended.
                 const askForGeiqFixModal = new bootstrap.Modal("#ask_for_geiq_fix_modal");
                 askForGeiqFixModal.show();
+            });
+        </script>
+    {% endif %}
+    {% if ask_for_institution_fix_comment_form.errors %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ csp_nonce }}">
+            document.addEventListener("DOMContentLoaded", function() {
+                // Adding the "show" CSS class is not enough and not documented.
+                // A JS initialization is recommended.
+                const askForInstitutionFixModal = new bootstrap.Modal("#ask_for_institution_fix_modal");
+                askForInstitutionFixModal.show();
             });
         </script>
     {% endif %}
