@@ -104,6 +104,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -117,6 +118,7 @@ class TestEditUserInfoView:
         assert user.first_name == post_data["first_name"]
         assert user.last_name == post_data["last_name"]
         assert user.phone == post_data["phone"]
+        assert user.jobseeker_profile.birth_name == post_data["birth_name"]
         assert user.jobseeker_profile.birthdate == birthdate
         self._test_address_autocomplete(user=user, post_data=post_data)
 
@@ -134,6 +136,7 @@ class TestEditUserInfoView:
             "email": user.email,
             "title": "",
             "first_name": user.first_name,
+            "birth_name": user.jobseeker_profile.birth_name,
             "last_name": user.last_name,
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -163,6 +166,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "MME",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": original_birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -185,6 +189,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": new_birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -220,6 +225,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -249,6 +255,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": "20/11/1979",
             "birth_place": birth_place.pk,
@@ -284,6 +291,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": title,
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -327,6 +335,7 @@ class TestEditUserInfoView:
             "title": "M",
             "email": "bob@saintclar.net",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -384,6 +393,7 @@ class TestEditUserInfoView:
             "title": "M",
             "email": "bob@saintclar.net",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -423,6 +433,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -458,6 +469,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -490,6 +502,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -518,6 +531,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_country": birth_country.pk,
@@ -544,6 +558,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_country": birth_country.pk,
@@ -587,6 +602,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_country": birth_country.pk,
@@ -656,6 +672,7 @@ class TestEditUserInfoView:
                 "email": "bob@saintclar.net",
                 "title": "M",
                 "first_name": "Bob",
+                "birth_name": "Le Friant",
                 "last_name": "Saint Clar",
                 "birthdate": birthdate.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
@@ -674,7 +691,7 @@ class TestEditUserInfoView:
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
+        for attr in ["birth_name", "birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
     @freeze_time("2023-03-10")
@@ -685,6 +702,7 @@ class TestEditUserInfoView:
             first_name="Not Bob",
             last_name="Not Saint Clar",
             jobseeker_profile__birthdate=date(1970, 1, 1),
+            jobseeker_profile__birth_name="initial",
             title="M",
         )
         client.force_login(user)
@@ -698,6 +716,7 @@ class TestEditUserInfoView:
             "email": "bob@saintclar.net",
             "title": "MME",
             "first_name": "Bob",
+            "birth_name": "Le Friant",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
@@ -710,6 +729,7 @@ class TestEditUserInfoView:
 
         user = User.objects.get(id=user.id)
         assert user.phone == post_data["phone"]
+        assert user.jobseeker_profile.birth_name == post_data["birth_name"]
         self._test_address_autocomplete(user=user, post_data=post_data)
 
         # Ensure that the job seeker cannot update data retrieved from the SSO here.
@@ -766,6 +786,7 @@ class TestEditUserInfoView:
             "email": user.email,
             "title": user.title,
             "first_name": user.first_name,
+            "birth_name": user.jobseeker_profile.birth_name,
             "last_name": user.last_name,
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,

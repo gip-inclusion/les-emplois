@@ -26,10 +26,19 @@
           <input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text"/>
       </div>
       <div class="form-group form-group-required">
-          <label class="form-label" for="id_last_name">
-              Nom de famille
+          <label class="form-label" for="id_birth_name">
+              Nom de naissance
           </label>
-          <input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text"/>
+          <input class="form-control" id="id_birth_name" maxlength="150" name="birth_name" required="" type="text"/>
+      </div>
+      <div class="form-group">
+          <label class="form-label" for="id_last_name">
+              Nom d’usage
+          </label>
+          <input aria-describedby="id_last_name_helptext" class="form-control" id="id_last_name" maxlength="150" name="last_name" type="text"/>
+          <div class="form-text" id="id_last_name_helptext">
+              À renseigner si différent du nom de naissance (Exemple : nom marital)
+          </div>
       </div>
       <div class="form-group form-group-input-w-lg-33 form-group-required">
           <label class="form-label" for="id_birthdate">
@@ -276,8 +285,14 @@
           </ul>
       </div>
       <div class="form-group">
+          <label class="form-label" for="id_birth_name">
+              Nom de naissance
+          </label>
+          <input class="form-control is-valid" disabled="" id="id_birth_name" name="birth_name" type="text" value="Smith"/>
+      </div>
+      <div class="form-group">
           <label class="form-label" for="id_last_name">
-              Nom
+              Nom d’usage
           </label>
           <input class="form-control is-valid" disabled="" id="id_last_name" name="last_name" type="text" value="Doe"/>
       </div>
