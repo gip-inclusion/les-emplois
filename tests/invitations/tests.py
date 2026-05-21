@@ -100,7 +100,7 @@ class TestPrescriberWithOrgInvitation:
         invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
         PrescriberFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
-        invitation.add_invited_user_to_organization()
+        invitation.add_invited_user()
         org_members_after = invitation.organization.members.count()
         assert org_members + 1 == org_members_after
 
@@ -111,7 +111,7 @@ class TestPrescriberWithOrgInvitation:
         )
         org_members = invitation.organization.members.count()
         org_active_members = invitation.organization.active_members.count()
-        invitation.add_invited_user_to_organization()
+        invitation.add_invited_user()
         org_members_after = invitation.organization.members.count()
         org_active_members_after = invitation.organization.active_members.count()
         assert org_members == org_members_after
@@ -122,7 +122,7 @@ class TestPrescriberWithOrgInvitation:
         invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
-        invitation.add_invited_user_to_organization()
+        invitation.add_invited_user()
         org_members_after = invitation.organization.members.count()
         assert org_members + 1 == org_members_after
 
@@ -130,7 +130,7 @@ class TestPrescriberWithOrgInvitation:
         invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
         LaborInspectorFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
-        invitation.add_invited_user_to_organization()
+        invitation.add_invited_user()
         org_members_after = invitation.organization.members.count()
         assert org_members + 1 == org_members_after
 
@@ -175,7 +175,7 @@ class TestCompanyInvitation:
         invitation = EmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
         employers = invitation.company.members.count()
-        invitation.add_invited_user_to_company()
+        invitation.add_invited_user()
         employers_after = invitation.company.members.count()
         assert employers + 1 == employers_after
 
@@ -184,7 +184,7 @@ class TestCompanyInvitation:
         CompanyMembershipFactory(company=invitation.company, user__email=invitation.email, is_active=False)
         employers = invitation.company.members.count()
         company_active_members = invitation.company.active_members.count()
-        invitation.add_invited_user_to_company()
+        invitation.add_invited_user()
         employers_after = invitation.company.members.count()
         company_active_members_after = invitation.company.active_members.count()
         assert employers == employers_after
@@ -195,7 +195,7 @@ class TestCompanyInvitation:
         invitation = EmployerInvitationFactory(email="hey@you.com")
         PrescriberFactory(email=invitation.email)
         employers = invitation.company.members.count()
-        invitation.add_invited_user_to_company()
+        invitation.add_invited_user()
         employers_after = invitation.company.members.count()
         assert employers + 1 == employers_after
 
@@ -203,7 +203,7 @@ class TestCompanyInvitation:
         invitation = EmployerInvitationFactory(email="hey@you.com")
         LaborInspectorFactory(email=invitation.email)
         employers = invitation.company.members.count()
-        invitation.add_invited_user_to_company()
+        invitation.add_invited_user()
         employers_after = invitation.company.members.count()
         assert employers + 1 == employers_after
 

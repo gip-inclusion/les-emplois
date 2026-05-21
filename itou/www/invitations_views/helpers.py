@@ -6,11 +6,11 @@ from itou.users.enums import UserKind
 
 
 def handle_prescriber_invitation(invitation, request):
-    if not invitation.guest_can_join_organization(request):
+    if not invitation.guest_can_join(request):
         raise PermissionDenied()
 
     if invitation.can_be_accepted:
-        invitation.add_invited_user_to_organization()
+        invitation.add_invited_user()
         # Send an email after the model changes
         invitation.accept()
         messages.success(
@@ -21,13 +21,13 @@ def handle_prescriber_invitation(invitation, request):
 
 
 def handle_employer_invitation(invitation, request):
-    if not invitation.guest_can_join_company(request):
+    if not invitation.guest_can_join(request):
         raise PermissionDenied()
 
     if not invitation.company.is_active:
         messages.error(request, "Cette structure n'est plus active.")
     elif invitation.can_be_accepted:
-        invitation.add_invited_user_to_company()
+        invitation.add_invited_user()
         invitation.accept()
         messages.success(request, f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
     elif not invitation.accepted_at:
@@ -35,11 +35,11 @@ def handle_employer_invitation(invitation, request):
 
 
 def handle_labor_inspector_invitation(invitation, request):
-    if not invitation.guest_can_join_institution(request):
+    if not invitation.guest_can_join(request):
         raise PermissionDenied()
 
     if invitation.can_be_accepted:
-        invitation.add_invited_user_to_institution()
+        invitation.add_invited_user()
         invitation.accept()
         messages.success(
             request, f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}."

@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 
 from itou.invitations.notifications import InvitationAcceptedNotification
-from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, UserKind
 from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -87,7 +87,9 @@ class InvitationAbstract(models.Model):
         """
         Link present in the invitation email.
         """
-        raise NotImplementedError
+        return get_absolute_url(
+            reverse("invitations_views:new_user", kwargs={"invitation_type": self.USER_KIND, "invitation_id": self.pk})
+        )
 
     @property
     def acceptance_url_for_existing_user(self):
@@ -127,26 +129,49 @@ class InvitationAbstract(models.Model):
     # Notifications
     @property
     def notifications_accepted_notif_sender(self):
-        """
-        Emails content depend on the guest kind.
-        """
-        raise NotImplementedError
+        return InvitationAcceptedNotification(
+            self.sender,
+            self.target,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            email=self.email,
+            establishment_name=self.target.display_name,
+        )
 
     # Emails
     @property
     def email_invitation(self):
-        """
-        Emails content depend on the guest kind.
-        """
-        raise NotImplementedError
+        to = [self.email]
+        context = {
+            "acceptance_link": self.acceptance_link,
+            "expiration_date": self.expiration_date,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "sender": self.sender,
+            "establishment": self.target,
+        }
+        subject = "invitations_views/email/invitation_establishment_subject.txt"
+        body = "invitations_views/email/invitation_establishment_body.txt"
+        return get_email_message(to, context, subject, body)
 
     @property
     def target(self):
         """The AbstractOrganization child targeted by the invitation"""
         raise NotImplementedError
 
+    def guest_can_join(self, request):
+        user = get_object_or_404(User, email=self.email)
+        return user == request.user and user.is_professional
+
+    def add_invited_user(self):
+        user = User.objects.get(email=self.email)
+        self.target.add_or_activate_membership(user)
+        user.save()
+
 
 class PrescriberWithOrgInvitation(InvitationAbstract):
+    USER_KIND = UserKind.PRESCRIBER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
@@ -162,54 +187,8 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         verbose_name_plural = "invitations prescripteurs"
 
     @property
-    def acceptance_link(self):
-        return get_absolute_url(
-            reverse(
-                "invitations_views:new_user", kwargs={"invitation_type": KIND_PRESCRIBER, "invitation_id": self.pk}
-            )
-        )
-
-    @property
     def acceptance_url_for_existing_user(self):
         return reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": self.pk})
-
-    def add_invited_user_to_organization(self):
-        user = User.objects.get(email=self.email)
-        self.organization.add_or_activate_membership(user)
-        user.save()
-
-    def guest_can_join_organization(self, request):
-        user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_professional
-
-    # Notifications
-    @property
-    def notifications_accepted_notif_sender(self):
-        return InvitationAcceptedNotification(
-            self.sender,
-            self.organization,
-            first_name=self.first_name,
-            last_name=self.last_name,
-            email=self.email,
-            establishment_name=self.organization.display_name,
-        )
-
-    # Emails
-    @property
-    def email_invitation(self):
-        to = [self.email]
-        context = {
-            "acceptance_link": self.acceptance_link,
-            "expiration_date": self.expiration_date,
-            "email": self.email,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "sender": self.sender,
-            "establishment": self.organization,
-        }
-        subject = "invitations_views/email/invitation_establishment_subject.txt"
-        body = "invitations_views/email/invitation_establishment_body.txt"
-        return get_email_message(to, context, subject, body)
 
     @property
     def target(self):
@@ -217,6 +196,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
 
 class EmployerInvitation(InvitationAbstract):
+    USER_KIND = UserKind.EMPLOYER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
@@ -230,52 +210,8 @@ class EmployerInvitation(InvitationAbstract):
         verbose_name_plural = "invitations employeurs"
 
     @property
-    def acceptance_link(self):
-        return get_absolute_url(
-            reverse("invitations_views:new_user", kwargs={"invitation_type": KIND_EMPLOYER, "invitation_id": self.pk})
-        )
-
-    @property
     def acceptance_url_for_existing_user(self):
         return reverse("invitations_views:join_company", kwargs={"invitation_id": self.pk})
-
-    def add_invited_user_to_company(self):
-        user = User.objects.get(email=self.email)
-        self.company.add_or_activate_membership(user)
-        user.save()
-
-    def guest_can_join_company(self, request):
-        user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_professional
-
-    # Notifications
-    @property
-    def notifications_accepted_notif_sender(self):
-        return InvitationAcceptedNotification(
-            self.sender,
-            self.company,
-            first_name=self.first_name,
-            last_name=self.last_name,
-            email=self.email,
-            establishment_name=self.company.display_name,
-        )
-
-    # Emails
-    @property
-    def email_invitation(self):
-        to = [self.email]
-        context = {
-            "acceptance_link": self.acceptance_link,
-            "expiration_date": self.expiration_date,
-            "email": self.email,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "sender": self.sender,
-            "establishment": self.company,
-        }
-        subject = "invitations_views/email/invitation_establishment_subject.txt"
-        body = "invitations_views/email/invitation_establishment_body.txt"
-        return get_email_message(to, context, subject, body)
 
     @property
     def target(self):
@@ -283,6 +219,7 @@ class EmployerInvitation(InvitationAbstract):
 
 
 class LaborInspectorInvitation(InvitationAbstract):
+    USER_KIND = UserKind.LABOR_INSPECTOR
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
@@ -296,55 +233,8 @@ class LaborInspectorInvitation(InvitationAbstract):
         verbose_name_plural = "invitations inspecteurs du travail"
 
     @property
-    def acceptance_link(self):
-        return get_absolute_url(
-            reverse(
-                "invitations_views:new_user",
-                kwargs={"invitation_type": KIND_LABOR_INSPECTOR, "invitation_id": self.pk},
-            )
-        )
-
-    @property
     def acceptance_url_for_existing_user(self):
         return reverse("invitations_views:join_institution", kwargs={"invitation_id": self.pk})
-
-    def add_invited_user_to_institution(self):
-        user = User.objects.get(email=self.email)
-        self.institution.add_or_activate_membership(user)
-        user.save()
-
-    def guest_can_join_institution(self, request):
-        user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_professional
-
-    # Notifications
-    @property
-    def notifications_accepted_notif_sender(self):
-        return InvitationAcceptedNotification(
-            self.sender,
-            self.institution,
-            first_name=self.first_name,
-            last_name=self.last_name,
-            email=self.email,
-            establishment_name=self.institution.display_name,
-        )
-
-    # Emails
-    @property
-    def email_invitation(self):
-        to = [self.email]
-        context = {
-            "acceptance_link": self.acceptance_link,
-            "expiration_date": self.expiration_date,
-            "email": self.email,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "sender": self.sender,
-            "establishment": self.institution,
-        }
-        subject = "invitations_views/email/invitation_establishment_subject.txt"
-        body = "invitations_views/email/invitation_establishment_body.txt"
-        return get_email_message(to, context, subject, body)
 
     @property
     def target(self):
