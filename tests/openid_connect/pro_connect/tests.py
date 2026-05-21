@@ -15,7 +15,6 @@ from django.contrib.messages import Message
 from django.core import signing
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -397,13 +396,6 @@ class TestProConnectCallbackView:
         assert record.user_public_id == user.public_id
         assert record.amr == ["pwd"]
         assert record.idp_id == "3a47433c-9bf2-48ec-9ac5-33d4fe3afdf7"
-
-    @override_settings(FEATURE_ENABLE_PROCONNECT_SOFT_MFA=False)
-    def test_callback_do_not_record_authentication_if_disabled(self, client, pro_connect):
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user is not None
-        assert ProConnectAuthentication.objects.count() == 0
 
     def test_callback_existing_django_user(self, client, pro_connect):
         # User created with django already exists on Itou but some attributes differs.
