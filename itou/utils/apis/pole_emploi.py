@@ -273,7 +273,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
     # France Travail also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
     REALM = "/partenaire"
 
-    def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
+    def recherche_individu_certifie(self, first_name, birth_name, birthdate, nir):
         """API documentation:
         https://francetravail.io/produits-partages/catalogue/recherche-individu-certifie/documentation
         (This documentation needs you to be logged-in.)
@@ -299,7 +299,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
             {
                 "dateNaissance": birthdate.strftime(DATE_FORMAT) if birthdate else "",
                 "nirCertifie": nir[:MAX_NIR_CHARACTERS] if nir else "",
-                "nomNaissance": _pole_emploi_name(last_name),
+                "nomNaissance": _pole_emploi_name(birth_name),
                 "prenom": _pole_emploi_name(first_name, hyphenate=True, max_len=13),
             },
         )
