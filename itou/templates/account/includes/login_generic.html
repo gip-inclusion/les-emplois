@@ -1,0 +1,17 @@
+{% if uses_pro_connect %}
+    {% include "pro_connect/includes/button.html" with login=True %}
+    <hr class="my-5" data-it-text="ou">
+    <div class="text-center">
+        <button class="btn btn-link collapseConnectionForm mb-3{% if form.errors %} d-none{% else %} show has-no-transition{% endif %}"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target=".collapseConnectionForm"
+                aria-expanded="false"
+                aria-controls="collapseConnectionForm">Utiliser mes identifiants</button>
+    </div>
+    <div class="collapse collapseConnectionForm{% if form.errors %} show{% endif %}" id="collapseConnectionForm">
+        {% include "account/includes/login_form.html" %}
+    </div>
+{% else %}
+    {% include "account/includes/login_form.html" %}
+{% endif %}
