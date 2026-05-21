@@ -55,6 +55,14 @@ class ItouTOTPDevice(
             )
         ]
 
+    @classmethod
+    def from_persistent_id(cls, persistent_id, for_verify=False):
+        from itou.otp.utils import load_placeholder_for_external_totp_device
+
+        if placeholder := load_placeholder_for_external_totp_device(persistent_id):
+            return placeholder
+        return super().from_persistent_id(persistent_id, for_verify=for_verify)
+
     # Override `Device._filter_persistent_id()` for our UUID primary key.
     # https://github.com/django-otp/django-otp/pull/29
     @classmethod

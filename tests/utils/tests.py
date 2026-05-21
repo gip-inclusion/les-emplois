@@ -38,6 +38,7 @@ from itou.common_apps.address.departments import DEPARTMENTS, department_from_po
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState
+from itou.otp.middleware import OtpMiddleware
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
@@ -104,14 +105,21 @@ def mocked_get_response_for_middlewaremixin(mocker):
 
 
 class TestItouCurrentOrganizationMiddleware:
+    def _get_request(self, user):
+        request = get_request(user, with_perms_middleware=False)
+        # `ItouCurrentOrganizationMiddleware` uses `User.is_verified`,
+        # which is set by needs `OtpMiddleware`
+        OtpMiddleware(get_response_for_middlewaremixin)(request)
+        return request
+
     def test_anonymous_user(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(AnonymousUser(), with_perms_middleware=False)
+        request = self._get_request(AnonymousUser())
         with assertNumQueries(0):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
 
     def test_job_seeker(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(JobSeekerFactory(), with_perms_middleware=False)
+        request = self._get_request(JobSeekerFactory())
         with assertNumQueries(0):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
@@ -119,7 +127,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_employer(self, mocked_get_response_for_middlewaremixin):
         company = CompanyMembershipFactory().company
-        request = get_request(company.members.first(), with_perms_middleware=False)
+        request = self._get_request(company.members.first())
         with assertNumQueries(
             3  # Retrieve user memberships
             + 1  # Check if siaes are active or in grace period
@@ -137,7 +145,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_siae_no_member(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(EmployerFactory(), with_perms_middleware=False)
+        request = self._get_request(EmployerFactory())
         with assertNumQueries(3):  # Retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
@@ -154,7 +162,7 @@ class TestItouCurrentOrganizationMiddleware:
         employer = company_1.members.first()
         company_2 = CompanyFactory(name="2", kind=CompanyKind.EI)
         company_2.members.add(employer)
-        request = get_request(employer, with_perms_middleware=False)
+        request = self._get_request(employer)
 
         with assertNumQueries(
             3  # Retrieve user memberships
@@ -178,7 +186,7 @@ class TestItouCurrentOrganizationMiddleware:
         employer = company_1.members.first()
         company_2 = CompanyFactory(name="2", kind=CompanyKind.EI)
         company_2.members.add(employer)
-        request = get_request(employer, with_perms_middleware=False)
+        request = self._get_request(employer)
 
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company_2.organization_switch_key
         request.session.save()
@@ -200,9 +208,8 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(
-            CompanyMembershipFactory(company__subject_to_iae_rules=True, company__convention=None).user,
-            with_perms_middleware=False,
+        request = self._get_request(
+            CompanyMembershipFactory(company__subject_to_iae_rules=True, company__convention=None).user
         )
         with assertNumQueries(
             3  # Retrieve user memberships
@@ -220,7 +227,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_employer_of_siae_in_grace_period(self, mocked_get_response_for_middlewaremixin):
         company = CompanyFactory(subject_to_iae_rules=True, convention__pending_grace_period=True)
-        request = get_request(CompanyMembershipFactory(company=company).user, with_perms_middleware=False)
+        request = self._get_request(CompanyMembershipFactory(company=company).user)
         with assertNumQueries(
             3  # Retrieve user memberships
             + 1  # Check if siaes are active or in grace period
@@ -239,7 +246,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_employer_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
         company = CompanyFactory(name="1", subject_to_iae_rules=True, convention__pending_grace_period=True)
-        request = get_request(CompanyMembershipFactory(company=company).user, with_perms_middleware=False)
+        request = self._get_request(CompanyMembershipFactory(company=company).user)
         # OPCS ensures that the siae is active (since it is not subject to eligibility) and also that
         # the ordering based on kind will put it in second position for request.organizations
         active_company = CompanyMembershipFactory(
@@ -263,7 +270,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(PrescriberFactory(), with_perms_middleware=False)
+        request = self._get_request(PrescriberFactory())
         with assertNumQueries(3):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
@@ -277,7 +284,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_prescriber_with_organization(self, mocked_get_response_for_middlewaremixin):
         organization = PrescriberOrganizationFactory(with_membership=True)
-        request = get_request(organization.members.first(), with_perms_middleware=False)
+        request = self._get_request(organization.members.first())
         with assertNumQueries(3):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
@@ -294,7 +301,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_prescriber_with_authorized_organization(self, mocked_get_response_for_middlewaremixin):
         organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
-        request = get_request(organization.members.first(), with_perms_middleware=False)
+        request = self._get_request(organization.members.first())
         with assertNumQueries(3):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
@@ -314,7 +321,7 @@ class TestItouCurrentOrganizationMiddleware:
         prescriber = organization1.members.first()
         organization2 = PrescriberOrganizationFactory(name="2")
         organization2.members.add(prescriber)
-        request = get_request(prescriber, with_perms_middleware=False)
+        request = self._get_request(prescriber)
         with assertNumQueries(3):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
@@ -334,7 +341,7 @@ class TestItouCurrentOrganizationMiddleware:
         prescriber = organization1.members.first()
         organization2 = PrescriberOrganizationFactory(name="2")
         organization2.members.add(prescriber)
-        request = get_request(prescriber, with_perms_middleware=False)
+        request = self._get_request(prescriber)
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization2.organization_switch_key
         request.session.save()
         with assertNumQueries(3):  # retrieve user memberships
@@ -352,7 +359,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(PrescriberFactory(), with_perms_middleware=False)
+        request = self._get_request(PrescriberFactory())
         organization = PrescriberOrganizationFactory()
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization.organization_switch_key
         request.session.save()
@@ -368,7 +375,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_prescriber_wrong_org_in_session_with_other_org(self, mocked_get_response_for_middlewaremixin):
         prescriber = PrescriberFactory()
-        request = get_request(prescriber, with_perms_middleware=False)
+        request = self._get_request(prescriber)
         bad_organization = PrescriberOrganizationFactory()
         organization = PrescriberMembershipFactory(user=prescriber).organization
 
@@ -385,7 +392,7 @@ class TestItouCurrentOrganizationMiddleware:
         )
 
     def test_ft_prescriber_with_no_ft_organization(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(PrescriberFactory(email="prenom.nom@francetravail.fr"), with_perms_middleware=False)
+        request = self._get_request(PrescriberFactory(email="prenom.nom@francetravail.fr"))
         PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.AFPA)
         with assertNumQueries(3):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -405,7 +412,7 @@ class TestItouCurrentOrganizationMiddleware:
 
     def test_labor_inspector_admin_member(self, mocked_get_response_for_middlewaremixin):
         institution = InstitutionFactory(with_membership=True)
-        request = get_request(institution.members.first(), with_perms_middleware=False)
+        request = self._get_request(institution.members.first())
         with assertNumQueries(3):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
@@ -426,7 +433,7 @@ class TestItouCurrentOrganizationMiddleware:
         institution2 = InstitutionMembershipFactory(
             is_admin=False, user=labor_inspector, institution__name="2", institution__department="02"
         ).institution
-        request = get_request(labor_inspector, with_perms_middleware=False)
+        request = self._get_request(labor_inspector)
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = institution2.organization_switch_key
         request.session.save()
         with assertNumQueries(3):  # retrieve user memberships
@@ -444,7 +451,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
     def test_labor_inspector_no_member(self, mocked_get_response_for_middlewaremixin):
-        request = get_request(LaborInspectorFactory(), with_perms_middleware=False)
+        request = self._get_request(LaborInspectorFactory())
         with assertNumQueries(3):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0

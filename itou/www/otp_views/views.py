@@ -23,7 +23,7 @@ from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeF
 
 
 logger = logging.getLogger(__name__)
-check_user_for_otp = check_user(lambda user: user.is_staff)
+check_user_for_otp = check_user(lambda user: user.is_staff or user.is_professional)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
