@@ -4072,7 +4072,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
         self.job_seeker.jobseeker_profile.birth_place = geispolsheim_commune
         self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
         self._check_only_administrative_allowed(client, self.company.members.first())
 
@@ -4097,7 +4097,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
         self.job_seeker.created_by = EmployerFactory()

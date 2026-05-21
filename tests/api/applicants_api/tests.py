@@ -217,7 +217,7 @@ class TestApplicantsAPI:
         job_seeker1.address_line_2 = "address 2"
         job_seeker1.post_code = "37000"
         job_seeker1.city = "TOURS"
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             job_seeker1.save()
         job_seeker2 = JobApplicationFactory(
             sent_by_prescriber_alone=True, to_company=company, job_seeker__born_in_france=True
@@ -227,7 +227,7 @@ class TestApplicantsAPI:
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"
         job_seeker2.city = "LILLE"
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             job_seeker2.save()
         user = company.members.first()
 

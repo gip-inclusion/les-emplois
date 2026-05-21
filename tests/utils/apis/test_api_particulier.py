@@ -25,7 +25,7 @@ def test_build_params_from(snapshot):
     job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
         "07141", job_seeker.jobseeker_profile.birthdate
     )
-    with triggers.connection_wrapper(), triggers.context():
+    with triggers.fake_context():
         job_seeker.jobseeker_profile.save(update_fields=["birth_place"])
     assert api_particulier._build_params_from(job_seeker) == snapshot(name="api_particulier_build_params")
     assert api_particulier.has_required_info(job_seeker) is True

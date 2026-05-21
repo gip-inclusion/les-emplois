@@ -348,7 +348,7 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         response = client.get(self.URL, data={"status": Status.NEW})

@@ -147,7 +147,7 @@ class TestPoleEmploiConnect:
 
         # Update user
         peamu_user_data.last_name = "DUPUIS"
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user, created = peamu_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
@@ -164,7 +164,7 @@ class TestPoleEmploiConnect:
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.PE_CONNECT,
         )
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user, created = peamu_user_data.create_or_update_user()
         assert not created
         assert user.last_name == PEAMU_USERINFO["family_name"]
@@ -210,7 +210,7 @@ class TestPoleEmploiConnect:
             certifiable_by_api_particulier=True,
         )
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user, created = peamu_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
@@ -254,7 +254,7 @@ class TestPoleEmploiConnect:
         assert user.jobseeker_profile.birthdate == datetime.date(2000, 1, 1)
 
         user.jobseeker_profile.birthdate = datetime.date(2001, 1, 1)
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user.jobseeker_profile.save()
 
         # Don't call import_user_pe_data on second login (and don't update user data)

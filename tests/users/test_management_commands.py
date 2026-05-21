@@ -264,7 +264,7 @@ class TestCommandSendUsersToBrevo:
             user__identity_provider=IdentityProvider.DJANGO,
         ).user
         changed_email.email = "changed@mailinator.com"
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             changed_email.save(update_fields=["email"])
 
         annie = EmployerFactory(
@@ -400,7 +400,7 @@ class TestCommandSendUsersToBrevo:
                 user__identity_provider=IdentityProvider.DJANGO,
             ).user
             changed_email.email = f"changed+{organization}@mailinator.com"
-            with triggers.connection_wrapper(), triggers.context():
+            with triggers.fake_context():
                 changed_email.save(update_fields=["email"])
 
         import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
@@ -474,7 +474,7 @@ class TestCommandSendUsersToBrevo:
         # New email not verified is ignored.
         changed_email = PrescriberFactory(with_verified_email=True, identity_provider=IdentityProvider.DJANGO)
         changed_email.email = "changed@mailinator.com"
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             changed_email.save(update_fields=["email"])
 
         import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(

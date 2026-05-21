@@ -87,7 +87,7 @@ class TestSummaryEmployeeRecords:
 
         profile.nir = ""
         profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             profile.save()
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
@@ -102,7 +102,7 @@ class TestSummaryEmployeeRecords:
         job_seeker.first_name = "John"
         job_seeker.last_name = "Doe"
         job_seeker.title = Title.M
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             job_seeker.save()
         job_seeker.jobseeker_profile.birthdate = datetime.date(1990, 1, 1)
         job_seeker.jobseeker_profile.birth_country = Country.objects.get(name="BORA-BORA")
@@ -138,7 +138,7 @@ class TestSummaryEmployeeRecords:
         job_seeker.jobseeker_profile.mean_monthly_income_before_process = "123.45"
         job_seeker.jobseeker_profile.eiti_contributions = EITIContributions.UNDETERMINED
 
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             job_seeker.jobseeker_profile.save()
 
         self.employee_record.ntt = "1234567890ABC"  # No validation here, just display since NIR is missing
@@ -162,7 +162,7 @@ class TestSummaryEmployeeRecords:
             new_nir = ("1" if job_seeker.title == Title.M else "2") + job_seeker.jobseeker_profile.nir[1:-2]
             new_nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
             job_seeker.jobseeker_profile.nir = new_nir
-            with triggers.connection_wrapper(), triggers.context():
+            with triggers.fake_context():
                 job_seeker.jobseeker_profile.save(update_fields=("nir",))
 
         client.force_login(self.user)
@@ -190,7 +190,7 @@ class TestSummaryEmployeeRecords:
 
         # No NIR, NTT but nothing in archived_json
         self.job_application.job_seeker.jobseeker_profile.nir = ""
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             self.job_application.job_seeker.jobseeker_profile.save()
         self.employee_record.archived_json = None
         self.employee_record.save()

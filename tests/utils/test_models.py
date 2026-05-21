@@ -64,7 +64,7 @@ class TestAbstractFieldsHistoryModel:
         assert instance.fields_history == []
 
         setattr(instance, test_params["test_field"], test_params["update"])
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             instance.save()
         # No need for refresh_from_db()
         assert len(instance.fields_history) == 1

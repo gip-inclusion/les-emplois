@@ -728,7 +728,7 @@ class TestEditUserInfoView:
         # Phone but no title and no birthdate
         user.phone = "0123456789"
         user.address_line_1 = "123 rue de"
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user.save(
                 update_fields=(
                     "address_line_1",
@@ -736,7 +736,7 @@ class TestEditUserInfoView:
                 )
             )
         user.jobseeker_profile.birthdate = None
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user.jobseeker_profile.save(update_fields={"birthdate"})
         response = client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
@@ -745,7 +745,7 @@ class TestEditUserInfoView:
         # No phone but title
         user.phone = ""
         user.title = Title.MME
-        with triggers.connection_wrapper(), triggers.context():
+        with triggers.fake_context():
             user.save(update_fields=("phone", "title"))
         response = client.get(url)
         assertNotContains(response, MISSING_INFOS_WARNING_ID)
