@@ -4345,6 +4345,8 @@
                                                                                 AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_1400_selected_nb",
                  SUM("geiq_assessments_employee"."allowance_amount") FILTER (
                                                                              WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "potential_allowance_amount",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employee"."allowance_granted_previous_year") AS "with_allowance_granted_previous_year_nb",
                  COUNT("geiq_assessments_employeecontract"."id") AS "contracts_nb",
                  COUNT("geiq_assessments_employeecontract"."id") FILTER (
                                                                          WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_selected_nb",
@@ -4593,6 +4595,19 @@
                       Sélectionnez les contrats pour lesquels vous sollicitez l’aide à l’accompagnement.
                               Conformément à l’accord conclu entre la FFGEIQ et la DGEFP, les DDETS/DREETS en charge de votre dossier peuvent accéder à l’ensemble des contrats importés.
                   </p>
+                  <div class="alert alert-warning mt-3 mb-0" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i aria-hidden="true" class="ri-file-warning-line ri-xl text-warning">
+                              </i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-0">
+                                  Un contrat concerne un salarié déjà présent dans le bilan précédent. Nous vous invitons à vérifier la liste.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
               </div>
           </div>
           <div class="s-section__row row">
@@ -4674,6 +4689,8 @@
                                           <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
                                               DUPOND Jean-Pierre
                                           </a>
+                                          <i aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." class="ri-file-warning-line ri-lg text-warning" data-bs-placement="top" data-bs-title="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                          </i>
                                       </td>
                                       <td>
                                           01/04/2024
@@ -4832,6 +4849,19 @@
                       Sélectionnez les contrats pour lesquels vous sollicitez l’aide à l’accompagnement.
                               Conformément à l’accord conclu entre la FFGEIQ et la DGEFP, les DDETS/DREETS en charge de votre dossier peuvent accéder à l’ensemble des contrats importés.
                   </p>
+                  <div class="alert alert-warning mt-3 mb-0" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i aria-hidden="true" class="ri-file-warning-line ri-xl text-warning">
+                              </i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-0">
+                                  Un contrat concerne un salarié déjà présent dans le bilan précédent. Nous vous invitons à vérifier la liste.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
               </div>
           </div>
           <div class="s-section__row row">
@@ -4913,6 +4943,8 @@
                                           <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
                                               DUPOND Jean-Pierre
                                           </a>
+                                          <i aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." class="ri-file-warning-line ri-lg text-warning" data-bs-placement="top" data-bs-title="Salarié dont un des contrats a bénéficié d’une aide l’année dernière." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                          </i>
                                       </td>
                                       <td>
                                           01/04/2024
@@ -5436,6 +5468,8 @@
                                                                                 AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_1400_selected_nb",
                  SUM("geiq_assessments_employee"."allowance_amount") FILTER (
                                                                              WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employee"."allowance_granted_previous_year") AS "with_allowance_granted_previous_year_nb",
                  COUNT("geiq_assessments_employeecontract"."id") FILTER (
                                                                          WHERE "geiq_assessments_employee"."allowance_amount" = %s) AS "allowance_of_0_nb",
                  COUNT("geiq_assessments_employeecontract"."id") FILTER (
