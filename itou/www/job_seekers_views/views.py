@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -546,7 +546,8 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             )
 
     queryset = (
-        queryset.annotate(
+        queryset.annotate_with_last_name_for_display()
+        .annotate(
             full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
             job_applications_nb=Coalesce(subquery_count, 0),
             last_action_at=subquery_last_action_at,
@@ -1123,10 +1124,11 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         context = self.get_context_data(**kwargs)
         if self.form.is_valid():
             existing_job_seeker = User.objects.filter(
+                Q(last_name__unaccent__iexact=self.form.cleaned_data["last_name"])
+                | Q(jobseeker_profile__birth_name__unaccent__iexact=self.form.cleaned_data["last_name"]),
                 kind=UserKind.JOB_SEEKER,
                 jobseeker_profile__birthdate=self.form.cleaned_data["birthdate"],
                 first_name__unaccent__iexact=self.form.cleaned_data["first_name"],
-                last_name__unaccent__iexact=self.form.cleaned_data["last_name"],
             ).first()
             if existing_job_seeker and not self.form.data.get("confirm"):
                 # If an existing job seeker matches the info, a confirmation is required
