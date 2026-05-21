@@ -27,11 +27,7 @@ class UserKindLoginMixin:
     django-allauth provides the login behaviour, extended by views for each UserKind.
     """
 
-    form_class = ItouLoginForm
     user_kind = None
-
-    # Allow users to choose their account type
-    template_name = "account/account_type_selection.html"
 
     def _get_pro_connect_url(self, context):
         if not settings.PRO_CONNECT_BASE_URL:
@@ -69,59 +65,13 @@ class UserKindLoginMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class ItouLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView):
-    """Generic authentication entry point."""
-
-    pass
-
-
-class PrescriberLoginView(ItouLoginView):
-    template_name = "account/login_generic.html"
-    user_kind = UserKind.PRESCRIBER
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        extra_context = {
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
-            "uses_pro_connect": True,
-        }
-        return context | extra_context
-
-
-class EmployerLoginView(ItouLoginView):
-    template_name = "account/login_generic.html"
-    user_kind = UserKind.EMPLOYER
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        extra_context = {
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
-            "uses_pro_connect": True,
-        }
-        return context | extra_context
-
-
-class LaborInspectorLoginView(ItouLoginView):
-    template_name = "account/login_generic.html"
-    user_kind = UserKind.LABOR_INSPECTOR
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        extra_context = {
-            "uses_pro_connect": False,
-        }
-        return context | extra_context
-
-
-class JobSeekerPreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
+class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
     """
-    JobSeeker's do not log in directly.
-    Instead they enter their email and they are redirected to the login method configured on their account.
+    Generic login for all users:
+    They enter their email and are redirected to the login method configured on their account.
     """
 
-    template_name = "account/login_job_seeker.html"
+    template_name = "account/pre_login.html"
     user_kind = UserKind.JOB_SEEKER
     form_class = FindExistingUserViaEmailForm
 
@@ -145,12 +95,13 @@ class JobSeekerPreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView)
         return reverse("login:existing_user", args=(self.user.public_id,), query=params)
 
 
-class ExistingUserLoginView(ItouLoginView):
+class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView):
     """
     Allows a user to login with the provider configured on their account.
     """
 
     template_name = "account/login_existing_user.html"
+    form_class = ItouLoginForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -183,14 +134,10 @@ class ExistingUserLoginView(ItouLoginView):
         }
         return context | extra_context
 
-
-class ItouStaffLoginView(ItouLoginView):
-    template_name = "account/login_generic.html"
-    user_kind = UserKind.ITOU_STAFF
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context | {"uses_pro_connect": False}
+    def get_success_url(self):
+        if next_url := get_safe_url(self.request, REDIRECT_FIELD_NAME):
+            return next_url
+        return super().get_success_url()
 
 
 class VerifyOTPView(FormView):

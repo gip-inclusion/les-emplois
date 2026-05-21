@@ -50,7 +50,6 @@ class PrescriberMixin:
     invitation_model = PrescriberWithOrgInvitation
     invitation_url = reverse_lazy("invitations_views:invite_prescriber_with_org")
     members_url = reverse_lazy("prescribers_views:members")
-    login_url = reverse_lazy("login:prescriber")
 
     def join_url(self, invitation):
         return reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
@@ -66,7 +65,6 @@ class CompanyMixin:
     invitation_model = EmployerInvitation
     invitation_url = reverse_lazy("invitations_views:invite_employer")
     members_url = reverse_lazy("companies_views:members")
-    login_url = reverse_lazy("login:employer")
 
     def join_url(self, invitation):
         return reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
@@ -82,7 +80,6 @@ class InstitutionMixin:
     invitation_model = LaborInspectorInvitation
     invitation_url = reverse_lazy("invitations_views:invite_labor_inspector")
     members_url = reverse_lazy("institutions_views:members")
-    login_url = reverse_lazy("login:labor_inspector")
 
     def join_url(self, invitation):
         return reverse("invitations_views:join_institution", kwargs={"invitation_id": invitation.id})
@@ -394,7 +391,12 @@ class BaseTestAcceptInvitation:
         invitation = self.invitation_factory(email=user.email)
 
         response = client.get(invitation.acceptance_link, follow=True)
-        assert str(self.login_url) in response.wsgi_request.get_full_path()
+        login_url = reverse(
+            "login:existing_user",
+            args=(user.public_id,),
+            query={"next": invitation.acceptance_url_for_existing_user},
+        )
+        assertRedirects(response, login_url)
         assert not invitation.accepted_at
 
         response = client.post(
@@ -418,11 +420,12 @@ class BaseTestAcceptInvitation:
         )
         invitation = self.invitation_factory(email=user.email)
 
+        login_url = reverse("login:existing_user", args=(user.public_id,))
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = client.post(self.login_url, data=form_data, follow=True)
+        response = client.post(login_url, data=form_data, follow=True)
         if self.user_kind == UserKind.LABOR_INSPECTOR:
             assertRedirects(response, reverse("dashboard:index"))
         else:
@@ -574,14 +577,19 @@ class ProConnectSignupTestAcceptInvitation:
             has_completed_welcoming_tour=True,
         )
         response = client.get(invitation.acceptance_link, follow=True)
-        assert str(self.login_url) in response.wsgi_request.get_full_path()
+
+        login_url = reverse(
+            "login:existing_user",
+            args=(user.public_id,),
+            query={"next": invitation.acceptance_url_for_existing_user},
+        )
+        assertRedirects(response, login_url)
         assert not invitation.accepted_at
 
         next_url = self.join_url(invitation)
-        previous_url = f"{self.login_url}?{urlencode({'next': next_url})}"
         params = {
             "user_kind": self.user_kind,
-            "previous_url": previous_url,
+            "previous_url": login_url,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -592,7 +600,7 @@ class ProConnectSignupTestAcceptInvitation:
             self.user_kind,
             user_email=user.email,
             channel="invitation",
-            previous_url=previous_url,
+            previous_url=login_url,
             next_url=next_url,
         )
         response = client.get(response.url, follow=True)

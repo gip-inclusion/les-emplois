@@ -2148,53 +2148,13 @@
               </a>
           </li>
           <li class="dropdown dropdown-login">
-              <button aria-controls="loginUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-ico btn-primary" data-bs-toggle="dropdown">
+              <a class="btn btn-ico btn-primary" href="/accounts/login/">
                   <i aria-hidden="true" class="ri-login-box-line">
                   </i>
                   <span>
                       Se connecter
                   </span>
-              </button>
-              <div class="dropdown-menu" id="loginUserDropdown">
-                  <ul class="list-unstyled">
-                      <li>
-                          <a class="dropdown-item dropdown-item__summary" href="/login/job_seeker">
-                              <i aria-hidden="true" class="ri-user-line">
-                              </i>
-                              <strong>
-                                  Candidat
-                              </strong>
-                          </a>
-                      </li>
-                      <li>
-                          <a class="dropdown-item dropdown-item__summary" href="/login/prescriber">
-                              <i aria-hidden="true" class="ri-home-smile-2-line">
-                              </i>
-                              <strong>
-                                  Prescripteur
-                              </strong>
-                          </a>
-                      </li>
-                      <li>
-                          <a class="dropdown-item dropdown-item__summary" href="/login/employer">
-                              <i aria-hidden="true" class="ri-community-line">
-                              </i>
-                              <strong>
-                                  Employeur inclusif
-                              </strong>
-                          </a>
-                      </li>
-                      <li>
-                          <a class="dropdown-item dropdown-item__summary" href="/login/labor_inspector">
-                              <i aria-hidden="true" class="ri-government-line">
-                              </i>
-                              <strong>
-                                  Institution partenaire
-                              </strong>
-                          </a>
-                      </li>
-                  </ul>
-              </div>
+              </a>
           </li>
       </ul>
   </nav>

@@ -423,7 +423,7 @@ class TestFranceConnect:
     @respx.mock
     def test_callback_mismatched_nonce(self, client):
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
-        response = mock_oauth_dance(client, expected_route="login:job_seeker", matching_nonces=False)
+        response = mock_oauth_dance(client, expected_route="account_login", matching_nonces=False)
         assert User.objects.count() == 0
         assertMessages(
             response,
@@ -438,7 +438,7 @@ class TestFranceConnect:
     @respx.mock
     def test_callback_invalid_id_token(self, client):
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
-        response = mock_oauth_dance(client, expected_route="login:job_seeker", valid_id_token=False)
+        response = mock_oauth_dance(client, expected_route="account_login", valid_id_token=False)
         assert User.objects.count() == 0
         assertMessages(
             response,
@@ -461,7 +461,7 @@ class TestFranceConnect:
             is_active=False,
             identity_provider=IdentityProvider.FRANCE_CONNECT,
         )
-        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = mock_oauth_dance(client, expected_route="account_login")
         assertMessages(
             response,
             [
@@ -483,7 +483,7 @@ class TestFranceConnect:
 
         for kind in UserKind.professionals():
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
-            mock_oauth_dance(client, expected_route=f"login:{kind}")
+            mock_oauth_dance(client, expected_route="account_login")
             user.delete()
 
     @respx.mock
@@ -504,7 +504,7 @@ class TestFranceConnect:
         )
 
         # Test redirection and modal content
-        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = mock_oauth_dance(client, expected_route="account_login")
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
         # If we force the update

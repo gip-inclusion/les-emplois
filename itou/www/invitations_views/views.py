@@ -100,17 +100,20 @@ def new_user(request, invitation_type, invitation_id):
         messages.error(request, "La structure que vous souhaitez rejoindre n'est plus active.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
-    if User.objects.filter(email__iexact=invitation.email).exists():
+    if user := User.objects.filter(email__iexact=invitation.email).first():
         if request.user.is_authenticated:
             # We know that request.user.email & invitation.email match
             # so let's skip the login dance
             return redirect(invitation.acceptance_url_for_existing_user)
 
         # The user exists but he should log in first.
-        login_url = reverse(
-            f"login:{invitation.USER_KIND}", query={"next": invitation.acceptance_url_for_existing_user}
+        return redirect(
+            reverse(
+                "login:existing_user",
+                args=(user.public_id,),
+                query={"next": invitation.acceptance_url_for_existing_user},
+            )
         )
-        return redirect(login_url)
 
     # A new user should be created before joining
     handle_registration = {

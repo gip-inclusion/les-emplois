@@ -89,6 +89,8 @@ class ItouLoginForm(LoginForm):
             # Bypass sso login error if we show the test account banner and the form received the hidden field value
             and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_DEMO_ACCOUNTS_BANNER)
         ):
+            # On prod, We should never get here since this form is only available
+            # through ExitingUserLoginView which only displays it for Django users
             identity_provider = IdentityProvider(user.identity_provider)
             error_message = (
                 f"Votre compte est relié à {identity_provider.label}. Merci de vous connecter avec ce service."

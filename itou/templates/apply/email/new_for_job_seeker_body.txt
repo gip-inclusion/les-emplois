@@ -56,7 +56,7 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 {% endif %}
 
 ---
-Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'login:job_seeker' %}
+Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'account_login' %}
 Mot de passe oublié ? Cliquez ici : {{ base_url }}{% url 'account_reset_password' %}
 
 {% endblock body %}

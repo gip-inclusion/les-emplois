@@ -1,4 +1,5 @@
 {% load nav %}
+{% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
 
@@ -35,13 +36,10 @@
                                 </a>
                             </li>
                             <li class="dropdown dropdown-login">
-                                <button class="btn btn-ico btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
+                                <a href="{% url 'account_login' %}{% redirection_url redirect_field_value|default:"" %}" class="btn btn-ico btn-primary">
                                     <i class="ri-login-box-line" aria-hidden="true"></i>
                                     <span>Se connecter</span>
-                                </button>
-                                <div class="dropdown-menu" id="loginUserDropdown">
-                                    {% include "layout/_header_login.html" with redirect_field_value=redirect_field_value|default:"" only %}
-                                </div>
+                                </a>
                             </li>
                         </ul>
                     </nav>
@@ -76,13 +74,10 @@
         <div class="offcanvas-footer flex-column align-items-stretch">
             <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
                 <div class="dropup-center dropdown-login">
-                    <button class="btn btn-block btn-ico btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdownMobile" aria-expanded="false">
+                    <a href="{% url 'account_login' %}{% redirection_url redirect_field_value|default:"" %}" class="btn btn-block btn-ico btn-primary">
                         <i class="ri-login-box-line" aria-hidden="true"></i>
                         <span>Se connecter</span>
-                    </button>
-                    <div class="dropdown-menu" id="loginUserDropdownMobile">
-                        {% include "layout/_header_login.html" with redirect_field_value=redirect_field_value|default:"" only %}
-                    </div>
+                    </a>
                 </div>
                 <a class="btn btn-block btn-ico btn-outline-primary my-3" href="{% url "signup:choose_user_kind" %}">
                     <i class="ri-user-add-line" aria-hidden="true"></i>

@@ -176,9 +176,7 @@ class ItouCurrentOrganizationMiddleware:
 
         # Log staff users in dedicated login page
         if not user.is_authenticated and request.path.startswith("/admin"):
-            return HttpResponseRedirect(
-                reverse("login:itou_staff", query={REDIRECT_FIELD_NAME: request.get_full_path()})
-            )
+            return HttpResponseRedirect(reverse("account_login", query={REDIRECT_FIELD_NAME: request.get_full_path()}))
 
         # Nexus : Whitelist for Nexus views
         # FIXME: Remove once we merge prescribers and employers

@@ -27,7 +27,7 @@ from itou.openid_connect.models import (
 from itou.openid_connect.pe_connect import constants
 from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.openid_connect.utils import init_user_nir_from_session
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants, triggers
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_absolute_url
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     messages.error(request, error_msg, extra_tags)
-    return HttpResponseRedirect(reverse("login:job_seeker"))
+    return HttpResponseRedirect(reverse("account_login"))
 
 
 @login_not_required
@@ -164,9 +164,9 @@ def pe_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(
             e.format_message_html(IdentityProvider.PE_CONNECT), request=request
         )
-    except InvalidKindException as e:
+    except InvalidKindException:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
-        return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
+        return HttpResponseRedirect(reverse("account_login"))
     except MultipleSubSameEmailException as e:
         return _redirect_to_job_seeker_login_on_error(
             e.format_message_html(IdentityProvider.PE_CONNECT), request=request
