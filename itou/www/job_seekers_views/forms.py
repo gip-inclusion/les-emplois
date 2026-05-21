@@ -9,9 +9,15 @@ from itou.approvals.models import Approval
 from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
-from itou.users.enums import LackOfPoleEmploiId, UserKind
+from itou.users.enums import ActionKind, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, JobSeekerProfileQuerySet, NirModificationRequest, User
+from itou.users.models import (
+    JobSeekerAssignment,
+    JobSeekerProfile,
+    JobSeekerProfileQuerySet,
+    NirModificationRequest,
+    User,
+)
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
@@ -473,3 +479,72 @@ class NirModificationRequestForm(forms.ModelForm):
         nir_modification_request.requested_by = self.requested_by
         nir_modification_request.save()
         return nir_modification_request
+
+
+class JobSeekerAssignmentForm(forms.ModelForm):
+    ONGOING_CHOICES = (("True", "Accompagnement en cours"), ("False", "Accompagnement terminé"))
+    is_ongoing = forms.ChoiceField(
+        label="Date de fin",
+        widget=forms.RadioSelect(attrs={"data-disable-target": "duet-date-picker[identifier=id_ended_at]"}),
+        choices=ONGOING_CHOICES,
+    )
+
+    class Meta:
+        model = JobSeekerAssignment
+        fields = ["started_at", "ended_at"]
+        labels = {
+            "started_at": "Date de début",
+            "ended_at": "Date de fin",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["started_at"].widget = DuetDatePickerWidget(attrs={"max": timezone.localdate()})
+        self.fields["ended_at"].widget = DuetDatePickerWidget(attrs={"max": timezone.localdate()})
+        self.initial["started_at"] = self.instance.started_at or self.instance.created_at.date()
+        self.initial["is_ongoing"] = True
+
+    def clean_started_at(self):
+        started_at = self.cleaned_data["started_at"]
+        if started_at and started_at > timezone.localdate():
+            raise forms.ValidationError("Ce champ ne peut pas être dans le futur.")
+        return started_at
+
+    def clean_ended_at(self):
+        ended_at = self.cleaned_data["ended_at"]
+        if ended_at and ended_at > timezone.localdate():
+            raise forms.ValidationError("Ce champ ne peut pas être dans le futur.")
+        return ended_at
+
+    def get_changed_data(self):
+        # Return changed_data based on cleaned_data
+        changed_data = []
+        for fieldname, value in self.cleaned_data.items():
+            if fieldname == "is_ongoing":
+                continue
+            field = self.fields[fieldname]
+            if field.has_changed(self.initial[fieldname], value):
+                changed_data.append(fieldname)
+        return changed_data
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.errors:
+            # No need for additional checks that will not work since some fields are missing from cleaned_data
+            return
+
+        # Drop ended_at value if "ongoing" is selected
+        if cleaned_data["is_ongoing"] == "True":
+            cleaned_data["ended_at"] = None
+        else:
+            if cleaned_data["ended_at"] is None:
+                cleaned_data["ended_at"] = timezone.localdate()
+            elif cleaned_data["ended_at"] < cleaned_data["started_at"]:
+                self.add_error("ended_at", "La date de fin ne peut pas être avant la date de début.")
+
+    def save(self):
+        instance = super().save(commit=False)
+        if self.cleaned_data.get("is_ongoing") == "False":
+            instance.last_action_kind = ActionKind.COMPLETE
+        instance.save()

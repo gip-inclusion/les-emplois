@@ -1,5 +1,10 @@
+import datetime
+
+from django.utils import timezone
+
 from itou.www.job_seekers_views import forms as job_seekers_forms
 from tests.users.factories import (
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     PrescriberFactory,
@@ -53,3 +58,39 @@ class TestCheckJobSeekerNirForm:
             "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
             "n'est pas associé à un compte candidat."
         ) == form.errors["__all__"][0]
+
+
+class TestJobSeekerAssignmentForm:
+    def test_form_update_assignment(self):
+        assignment = JobSeekerAssignmentFactory()
+        form_data = {"started_at": assignment.created_at.date(), "is_ongoing": True}
+        form = job_seekers_forms.JobSeekerAssignmentForm(data=form_data)
+        assert form.is_valid()
+
+        form_data = {"started_at": assignment.created_at.date(), "ended_at": timezone.localdate(), "is_ongoing": False}
+        form = job_seekers_forms.JobSeekerAssignmentForm(data=form_data)
+        assert form.is_valid()
+
+    def test_form_not_valid(self):
+        started_at = timezone.localdate() + datetime.timedelta(days=1)
+        form_data = {"started_at": started_at, "is_ongoing": True}
+        form = job_seekers_forms.JobSeekerAssignmentForm(data=form_data)
+        assert not form.is_valid()
+        error_msg = form.errors["started_at"][0]
+        assert "Ce champ ne peut pas être dans le futur." in error_msg
+
+        started_at = timezone.localdate() - datetime.timedelta(days=6 * 30)
+        ended_at = timezone.localdate() + datetime.timedelta(days=1)
+        form_data = {"started_at": started_at, "ended_at": ended_at, "is_ongoing": False}
+        form = job_seekers_forms.JobSeekerAssignmentForm(data=form_data)
+        assert not form.is_valid()
+        error_msg = form.errors["ended_at"][0]
+        assert "Ce champ ne peut pas être dans le futur." in error_msg
+
+        started_at = timezone.localdate()
+        ended_at = timezone.localdate() - datetime.timedelta(days=1)
+        form_data = {"started_at": started_at, "ended_at": ended_at, "is_ongoing": False}
+        form = job_seekers_forms.JobSeekerAssignmentForm(data=form_data)
+        assert not form.is_valid()
+        error_msg = form.errors["ended_at"][0]
+        assert "La date de fin ne peut pas être avant la date de début." in error_msg

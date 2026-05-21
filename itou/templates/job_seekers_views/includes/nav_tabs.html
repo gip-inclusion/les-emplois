@@ -18,4 +18,11 @@
                {% matomo_event "candidat" "clic-onglet" "suivi contrats iae" %}>Suivi des contrats IAE</a>
         </li>
     {% endif %}
+    {% if has_assignment %}
+        <li class="nav-item">
+            <a class="nav-link{% if active_nav_tab == "assignment-edit" %} active{% endif %}"
+               href="{% url 'job_seekers_views:assignment_edit' public_id=job_seeker.public_id %}?back_url={{ back_url }}"
+               {% matomo_event "candidat" "clic-onglet" "accompagnement" %}>Mon accompagnement</a>
+        </li>
+    {% endif %}
 </ul>

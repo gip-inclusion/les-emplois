@@ -2,6 +2,7 @@ import datetime
 import random
 import uuid
 
+import pytest
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -12,6 +13,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
@@ -19,7 +21,7 @@ from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -405,6 +407,31 @@ def test_job_application_tab(client, snapshot):
         ],
     )
     assert pretty_indented(soup) == snapshot
+
+
+@pytest.mark.parametrize("with_assignment", [True, False])
+def test_job_seeker_assignment_tab(client, with_assignment):
+    organization = PrescriberOrganizationFactory()
+    prescriber = PrescriberMembershipFactory(organization=organization).user
+    job_seeker = JobSeekerFactory()
+    if with_assignment:
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=prescriber, prescriber_organization=organization
+        )
+
+    client.force_login(prescriber)
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    response = client.get(url)
+    next_url = reverse("job_seekers_views:assignment_edit", kwargs={"public_id": job_seeker.public_id})
+    if with_assignment:
+        assertContains(response, "Mon accompagnement")
+        assertContains(response, next_url)
+        response = client.get(next_url)
+        assertContains(response, assignment.created_at.date())
+    else:
+        assertNotContains(response, "Mon accompagnement")
+        assertNotContains(response, next_url)
 
 
 @freeze_time("2024-08-14")
@@ -800,3 +827,55 @@ class TestContracts:
             client.force_login(user)
             response = client.get(reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
             assert response.status_code == expected_status
+
+
+class TestAssignment:
+    @freeze_time("2026-05-22")
+    def test_for_prescriber(self, client):
+        organization = PrescriberOrganizationFactory()
+        prescriber = PrescriberMembershipFactory(organization=organization).user
+        job_seeker = JobSeekerFactory()
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=job_seeker,
+            professional=prescriber,
+            prescriber_organization=organization,
+            created_at=timezone.now() - datetime.timedelta(days=6 * 30),
+        )
+
+        prescriber = assignment.professional
+        job_seeker = assignment.job_seeker
+
+        client.force_login(prescriber)
+        assignment_edit_url = reverse("job_seekers_views:assignment_edit", kwargs={"public_id": job_seeker.public_id})
+        response = client.get(assignment_edit_url)
+
+        # creation date is used to fill in missing starting date
+        assertContains(response, assignment.created_at.date())
+
+        job_seekers_list_url = reverse("job_seekers_views:list")
+        response = client.post(
+            assignment_edit_url, data={"started_at": assignment.created_at.date(), "is_ongoing": True}
+        )
+        assertRedirects(response, job_seekers_list_url)
+        assignment.refresh_from_db()
+        assert assignment.started_at == assignment.created_at.date()
+
+        started_at = assignment.created_at.date() - datetime.timedelta(days=30)
+        assignment.started_at = started_at
+        assignment.save()
+
+        response = client.get(assignment_edit_url)
+        assertContains(response, started_at)
+        ended_at = timezone.localdate() - datetime.timedelta(days=1)
+        response = client.post(
+            assignment_edit_url,
+            data={
+                "started_at": started_at,
+                "ended_at": ended_at,
+                "is_ongoing": False,
+            },
+        )
+        assertRedirects(response, job_seekers_list_url)
+        assignment.refresh_from_db()
+        assert assignment.ended_at == ended_at
+        assert assignment.last_action_kind == ActionKind.COMPLETE

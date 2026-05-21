@@ -22,6 +22,11 @@ urlpatterns = [
         name="contracts",
     ),
     path(
+        "assignment_edit/<uuid:public_id>",
+        views.JobSeekerAssignmentEdition.as_view(),
+        name="assignment_edit",
+    ),
+    path(
         "switch_stalled_status/<uuid:public_id>",
         views.switch_stalled_status,
         name="switch_stalled_status",

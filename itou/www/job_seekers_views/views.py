@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
-from django.views.generic import DetailView, TemplateView, View
+from django.views.generic import DetailView, TemplateView, UpdateView, View
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
@@ -29,6 +29,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import can_prefill_orientation_on_dora
@@ -53,10 +54,12 @@ from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep2Form,
     CreateOrUpdateJobSeekerStep3Form,
     FilterForm,
+    JobSeekerAssignmentForm,
     JobSeekerExistsForm,
     NirModificationRequestForm,
     SwitchStalledStatusForm,
 )
+from itou.www.job_seekers_views.utils import get_organization_of_type
 
 
 logger = logging.getLogger(__name__)
@@ -150,6 +153,14 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
+        has_assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=self.object,
+            professional=self.request.user,
+            prescriber_organization=get_organization_of_type(self.request, PrescriberOrganization),
+            company=get_organization_of_type(self.request, Company),
+            assigned_to_unknown_advisor=False,
+        ).exists()
+
         fallback_back_url = (
             reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
         )
@@ -175,6 +186,7 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
+            "has_assignment": has_assignment,
             "group": group,
             "user_in_group": user_in_group,
         }
@@ -196,6 +208,43 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
         if not request.from_authorized_prescriber or not approval:
             return Contract.objects.none()
         return get_contracts(approval)
+
+
+class JobSeekerAssignmentEdition(UpdateView):
+    model = JobSeekerAssignment
+    form_class = JobSeekerAssignmentForm
+    template_name = "job_seekers_views/assignment_edit.html"
+
+    def setup(self, request, *args, **kwargs):
+        if request.from_prescriber or request.from_employer:
+            self.assignment = get_object_or_404(
+                JobSeekerAssignment.objects.select_related("job_seeker").filter(
+                    job_seeker__public_id=kwargs["public_id"], assigned_to_unknown_advisor=False
+                ),
+                professional=request.user,
+                prescriber_organization=get_organization_of_type(request, PrescriberOrganization),
+                company=get_organization_of_type(request, Company),
+            )
+        super().setup(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.assignment
+
+    def get_success_url(self):
+        return reverse("job_seekers_views:list")
+
+    def get_context_data(self, **kwargs):
+        fallback_back_url = (
+            reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
+        )
+
+        return super().get_context_data(**kwargs) | {
+            "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
+            "matomo_custom_title": "Détail candidat",
+            "job_seeker": self.object.job_seeker,
+            "services_search_url": build_services_search_url(self.request, job_seeker=self.object.job_seeker),
+            "can_view_personal_information": can_view_personal_information(self.request, self.object.job_seeker),
+        }
 
 
 def can_see_external_job_applications(job_seeker, request):
