@@ -9,6 +9,7 @@
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
         <div class="c-form">
+            <h2 class="h3">Créer un compte pour votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}</h2>
             {% if nir %}
                 <div class="form-group form-group-required form-group-input-w-lg-66">
                     <label for="id_nir">Numéro de sécurité sociale du {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}</label>
@@ -16,13 +17,12 @@
                 </div>
             {% endif %}
 
-            {% component_alert title=title content=content variant="info" extra_classes="mb-3" %}
-                {% fragment as title %}
-                    Créer un compte pour votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
-                {% endfragment %}
+            {% component_alert content=content variant="info" extra_classes="mb-3" %}
                 {% fragment as content %}
                     <p class="mb-0">
-                        Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }} pour l'inscrire.
+                        Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale.
+                        <br>
+                        Merci de renseigner l'adresse e-mail de votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }} pour l'inscrire.
                     </p>
                 {% endfragment %}
             {% endcomponent_alert %}

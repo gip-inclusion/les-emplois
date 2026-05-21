@@ -47,6 +47,7 @@
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
         <div class="c-form">
+            <h2 class="h3">{% include 'apply/includes/_submit_title.html' %}</h2>
             {% csrf_token %}
 
             {% bootstrap_form_errors form type="all" %}

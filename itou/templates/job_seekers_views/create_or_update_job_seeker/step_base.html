@@ -47,7 +47,7 @@
                         </p>
                     </div>
                     <div class="c-form">
-                        <h2>
+                        <h2 class="h3">
                             {% block step_title %}{% endblock %}
                         </h2>
                         {% if readonly_form %}
@@ -61,7 +61,6 @@
                                 {% endfragment %}
                             {% endcomponent_alert %}
                         {% endif %}
-                        <hr class="mt-5">
                         {% bootstrap_form_errors form type="all" %}
                         <form method="post" class="js-collapsable-subfields js-format-nir"{% if matomo_form_name|default:"" %} data-matomo-name="{{ matomo_form_name }}"{% endif %}>
                             {% csrf_token %}
