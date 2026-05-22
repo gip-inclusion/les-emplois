@@ -15,6 +15,9 @@ class Command(BaseCommand, XlsxExportMixin):
     Export job seekers from given deparment for GPS
     """
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     help = "Export job seekers to give to FT in order to retrieve advisor contact information."
 
     def add_arguments(self, parser):
