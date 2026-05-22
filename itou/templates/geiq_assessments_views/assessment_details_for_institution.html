@@ -328,27 +328,27 @@
         </div>
     {% endif %}
     {% if assessment.submitted_at and not assessment.final_reviewed_at %}
-        <div id="ask_for_geiq_fix_modal" class="modal" tabindex="-1" aria-labelledby="ask_for_geiq_fix_modal_title" aria-hidden="true">
+        <div id="ask_for_geiq_fix_modal" class="modal fade" tabindex="-1" aria-labelledby="ask_for_geiq_fix_modal_title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form method="post">
-                        {% csrf_token %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-content">
                         <div class="modal-header">
                             <h2 class="modal-title" id="ask_for_geiq_fix_modal_title">Renvoyer le bilan d’exécution au GEIQ</h2>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
-                        <div class="modal-body">
-                            {% bootstrap_field ask_for_geiq_fix_comment_form.comment %}
-                            <br>
-                        </div>
+                        <div class="modal-body">{% bootstrap_field ask_for_geiq_fix_comment_form.comment %}</div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-ico btn-link ps-0 me-auto" data-bs-dismiss="modal">
+                                <i class="ri-close-line ri-xl fw-medium" aria-hidden="true"></i>
+                                <span>Annuler</span>
+                            </button>
                             <button class="btn btn-sm btn-primary" name="action" value="{{ InstitutionAction.ASK_FOR_GEIQ_FIX }}">
                                 Confirmer
                             </button>
-                            <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     {% endif %}
