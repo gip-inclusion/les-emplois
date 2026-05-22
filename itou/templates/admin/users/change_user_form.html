@@ -3,7 +3,7 @@
 
 {% block object-tools-items %}
 
-    {% url 'account_login' as login_url %}
+    {% url 'dashboard:index' as login_url %}
     {% if request.user|can_hijack:original %}
         <li>{% include 'hijack/contrib/admin/button.html' with another_user=original is_user_admin=True next=login_url %}</li>
     {% endif %}
