@@ -19,6 +19,11 @@ logger = logging.getLogger(__name__)
 _context = threading.local()
 
 
+def get_main_atomic_block(connection):
+    # Find the outermost atomic block, ignoring the special one added by django around tests
+    return next((atomic_block for atomic_block in connection.atomic_blocks if not atomic_block._from_testcase), None)
+
+
 def _set_context_connection_wrapper(execute, sql, params, many, context):
     connection = context["connection"]
     context_is_outdated = getattr(_context, "last_data_set", None) != getattr(_context, "data", None)
@@ -55,14 +60,8 @@ def connection_wrapper():
 
 @contextlib.contextmanager
 def context(*, replace_existing: bool = False, **kwargs):
-    if not connection.in_atomic_block:
-        # This should never happen but is hard to detect in tests since
-        # most our tests run in transaction
-        error_msg = "Entering trigger context outside a transaction"
-        if settings.ITOU_ENVIRONMENT in [ItouEnvironment.DEV, ItouEnvironment.TEST]:
-            raise RuntimeError(error_msg)
-        else:
-            logger.error(error_msg)  # Notify issue to sentry
+    if get_main_atomic_block(connection) is None:
+        raise RuntimeError("Entering trigger context outside a transaction")
     if _set_context_connection_wrapper not in connection.execute_wrappers:
         raise RuntimeError("triggers.context called without _set_context_connection_wrapper in place")
 

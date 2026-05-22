@@ -10,14 +10,14 @@ from itou.utils import triggers
 
 @pytest.mark.parametrize("context", [{}, {"key": "value"}], ids=["empty", "non-empty"])
 def test_context(context):
-    with triggers.connection_wrapper(), assertNumQueries(2):
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(2):
         with triggers.context(**context), connection.cursor() as cursor:
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(context),)
 
 
 def test_context_stacking():
-    with triggers.connection_wrapper(), assertNumQueries(6), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(6), connection.cursor() as cursor:
         context_1 = {"level": 1}
         with triggers.context(**context_1):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
@@ -35,7 +35,7 @@ def test_context_stacking():
 def test_context_stacking_with_different_data():
     expected = {"uuid": str(uuid.uuid4()), "foo": "bar"}
     # 5 different contexts defined and queried: 10 queries
-    with triggers.connection_wrapper(), assertNumQueries(10), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(10), connection.cursor() as cursor:
         with triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
@@ -60,7 +60,7 @@ def test_context_stacking_with_different_data():
 
 def test_context_stacking_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
-    with triggers.connection_wrapper(), assertNumQueries(3), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(3), connection.cursor() as cursor:
         with triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
@@ -72,7 +72,7 @@ def test_context_stacking_with_same_data():
 
 def test_context_consecutively_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
-    with triggers.connection_wrapper(), assertNumQueries(4), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(4), connection.cursor() as cursor:
         with triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
@@ -102,7 +102,7 @@ def test_context_savepoint_rollback():
 
 def test_context_laziness():
     expected = {"uuid": str(uuid.uuid4())}
-    with triggers.connection_wrapper(), assertNumQueries(2), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(2), connection.cursor() as cursor:
         with triggers.context(**{"uuid": str(uuid.uuid4())}), triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
