@@ -17,14 +17,42 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-lg-6">
+                <div class="s-section__col">
                     <div class="c-form mb-5">
+                        <h2>Double authentification</h2>
+
+                        {% component_alert title=title content=content variant="info" %}
+                            {% fragment as title %}
+                                Ouvrez l’un de vos appareils configurés et recopiez le code affiché :
+                            {% endfragment %}
+                            {% fragment as content %}
+                                <ol class="list-unstyled">
+                                    {% for device in devices %}
+                                        <li>
+                                            {{ device.name }}
+                                            {% if device.last_used_at %}
+                                                &ndash;
+                                                Dernière utilisation le
+                                                {{ device.last_used_at|date:"d F Y à H\hi" }}
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                                {% comment %}
+                                FIXME (dbaty): add link to recovery form once it is implemented
+                                <p class="mb-0">
+                                    <strong>Vous n’avez plus accès à votre appareil ?</strong>
+                                    <a href="..." class="btn-link">Cliquez ici pour entrer votre code de récupération</a>
+                                </p>
+                                {% endcomment %}
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <fieldset>
-                                <p class="h4">Saisir le code OTP</p>
                                 {% bootstrap_form_errors form type="all" %}
-                                {% bootstrap_field form.otp_token show_label=False %}
+                                {% bootstrap_field form.otp_token %}
                             </fieldset>
                             {% itou_buttons_form primary_label="Valider" reset_url=None %}
                         </form>

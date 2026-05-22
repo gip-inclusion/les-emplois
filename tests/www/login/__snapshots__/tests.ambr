@@ -427,6 +427,73 @@
   
   '''
 # ---
+# name: TestItouStaffLogin.test_login_shows_list_of_devices
+  '''
+  <div class="c-form mb-5">
+      <h2>
+          Double authentification
+      </h2>
+      <div class="alert alert-info" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Ouvrez l’un de vos appareils configurés et recopiez le code affiché :
+                      </strong>
+                  </p>
+                  <ol class="list-unstyled">
+                      <li>
+                          Mon appareil
+                                              
+                                                  –
+                                                  Dernière utilisation le
+                                                  01 juin 2026 à 12h00
+                      </li>
+                  </ol>
+              </div>
+          </div>
+      </div>
+      <form class="js-prevent-multiple-submit" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <fieldset>
+              <div class="form-group form-group-required">
+                  <label class="form-label" for="id_otp_token">
+                      Entrez le code de validation unique (OTP)
+                  </label>
+                  <input aria-describedby="id_otp_token_helptext" autocomplete="one-time-code" autofocus="" class="form-control" id="id_otp_token" max_length="6" name="otp_token" required="" type="text"/>
+                  <div class="form-text" id="id_otp_token_helptext">
+                      Code à 6 chiffres généré par votre application mobile ou votre gestionnaire de mot de passe sur votre ordinateur
+                  </div>
+              </div>
+          </fieldset>
+          <div class="row">
+              <div class="col-12">
+                  <hr class="mb-3"/>
+                  <small class="d-inline-block mb-3">
+                      * champs obligatoires
+                  </small>
+                  <div class="form-row align-items-center justify-content-end gx-3">
+                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      </div>
+                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Valider
+                              </span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+  
+  '''
+# ---
 # name: TestPreLogin.test_pre_login_email_unknown
   '<div class="modal-body"><p>Cette adresse e-mail est inconnue de nos services.</p><p>Si vous êtes déjà inscrit(e), assurez-vous de saisir correctement votre adresse e-mail.</p><p>Si vous n\'êtes pas encore inscrit(e), nous vous invitons à cliquer sur Inscription pour créer votre compte.</p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/signup/" class="btn btn-sm btn-primary">Inscription</a></div>'
 # ---

@@ -1,3 +1,4 @@
+import datetime
 import random
 from unittest.mock import patch
 from urllib.parse import urlencode
@@ -8,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import escape
 from django_otp.oath import TOTP
 from django_otp.plugins.otp_totp.models import TOTPDevice
@@ -493,14 +495,18 @@ class TestItouStaffLogin:
         }
         response = client.post(next_url, data=post_data)
         assert response.status_code == 200
-        assert response.context["form"].errors == {"otp_token": ["code invalide"]}
+        assert response.context["form"].errors == {
+            "otp_token": ["Le code de validation unique (OTP) n’est pas correct."]
+        }
 
         # there's throttling
         totp = TOTP(device.bin_key)
         post_data["otp_token"] = totp.token()
         response = client.post(next_url, data=post_data)
         assert response.status_code == 200
-        assert response.context["form"].errors == {"otp_token": ["code invalide"]}
+        assert response.context["form"].errors == {
+            "otp_token": ["Le code de validation unique (OTP) n’est pas correct."]
+        }
 
         # When resetting the failure count it works
         device.throttling_failure_timestamp = None
@@ -540,3 +546,30 @@ class TestItouStaffLogin:
         TOTPDevice.objects.create(user=user)
         response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
+
+    def test_login_shows_list_of_devices(self, client, snapshot, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        TOTPDevice.objects.create(
+            name="Mon appareil",
+            user=user,
+            last_used_at=timezone.make_aware(datetime.datetime(2026, 6, 1, 12, 0)),
+        )
+
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user"),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
+        client.post(pre_login_url, {"email": user.email})
+        login_url = reverse("login:existing_user")
+        data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(login_url, data=data, follow=True)
+
+        response = client.get(reverse("login:verify_otp"))
+
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot()
