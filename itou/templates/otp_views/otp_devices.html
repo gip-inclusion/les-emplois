@@ -64,11 +64,11 @@
                             {% else %}
                                 <p>Vous n'avez pas configuré d'appareil OTP.</p>
                             {% endif %}
-                            <button type="submit" class="btn btn-block btn-primary" name="action" value="new">
+                            <a href="{% url 'otp_views:enrollment_step_1_choose_device_type' %}" class="btn btn-block btn-primary">
                                 Configurer un
                                 {% if devices %}nouvel{% endif %}
                                 appareil
-                            </button>
+                            </a>
 
                             {# modals to confirm device deletion #}
                             {% for device in devices %}

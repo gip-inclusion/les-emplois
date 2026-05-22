@@ -1,0 +1,101 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}Configuration 2FA {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Sécurisez votre accès</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    {% component_alert title=title content=content variant="warning" %}
+        {% fragment as title %}
+            Pour continuer, la sécurisation de votre compte est nécéssaire.
+        {% endfragment %}
+        {% fragment as content %}
+            <p class="mb-0">
+                Pour garantir la sécurité des données des personnes
+                accompagnées, la double authentification est obligatoire sur la
+                plateforme Les emplois de l’inclusion.
+                <br>
+                Configurez-la pour accéder à votre espace.
+            </p>
+        {% endfragment %}
+    {% endcomponent_alert %}
+{% endblock %}
+
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <h2 class="h3">Comment configurer la double authentification ?</h2>
+                    <p>Nous vous guidons étape par étape, comptez environ 5 minutes.</p>
+                </div>
+            </div>
+
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-md-4 mb-3 mb-md-4">
+                    <div class="c-box h-100">
+                        <div class="d-flex flex-column align-items-center text-center gap-0 row-gap-2 my-3">
+                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">1</span>
+                            <strong>Choisissez votre méthode</strong>
+                            <p class="mb-0">Application mobile ou ordinateur</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-md-4 mb-3 mb-md-4">
+                    <div class="c-box h-100">
+                        <div class="d-flex flex-column align-items-center text-center gap-0 row-gap-2 my-3">
+                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">2</span>
+                            <strong>Associez votre compte</strong>
+                            <p class="mb-0">Via code ou QR code</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-md-4 mb-3 mb-md-4">
+                    <div class="c-box h-100">
+                        <div class="d-flex flex-column align-items-center text-center gap-0 row-gap-2 my-3">
+                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">3</span>
+                            <strong>Sauvegardez</strong>
+                            <p class="mb-0">Votre code de récupération</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseDoubleAuth" extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Qu’est-ce que la double authentification ?
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
+                            <p>
+                                Votre mot de passe seul ne suffit plus à protéger votre compte. S’il est découvert ou volé, n’importe qui pourrait accéder aux données des personnes que vous accompagnez.
+                            </p>
+                            <p>
+                                La double authentification ajoute une deuxième vérification au moment de la connexion. En plus de votre mot de passe, on vous demande un code à 6 chiffres généré par une application sur votre téléphone ou votre gestionnaire de mots de passe sur votre ordinateur. Ce code change toutes les 30 secondes et n’est valable qu’une seule fois.
+                            </p>
+                            <p>Concrètement, à chaque connexion :</p>
+                            <ol>
+                                <li>Vous saisissez votre identifiant et votre mot de passe.</li>
+                                <li>Vous ouvrez votre application ou votre gestionnaire de mots de passe et recopiez le code affiché.</li>
+                                <li>Vous accédez à votre espace.</li>
+                            </ol>
+                            <p>Même si quelqu’un obtient votre mot de passe, il ne peut pas se connecter sans avoir accès à votre appareil.</p>
+                        {% endfragment %}
+                    {% endcomponent_info %}
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ next_step_url }}" class="btn btn-primary">Configurer pas à pas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
