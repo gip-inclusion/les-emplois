@@ -2,6 +2,7 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Case, F, Value, When
 from django.urls import reverse
 from django.utils import timezone
@@ -10,6 +11,7 @@ from django.utils.http import urlencode
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
+from itou.utils import triggers
 from itou.utils.command import BaseCommand
 from itou.utils.management_commands import DeprecatedLoggerMixin, XlsxExportMixin
 from itou.utils.urls import get_absolute_url
@@ -42,6 +44,9 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
     To merge duplicates job seekers in the database:
         django-admin deduplicate_job_seekers
     """
+
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
 
     help = "Deduplicate job seekers."
 
@@ -104,7 +109,8 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             target.jobseeker_profile.nir = nirs[0]
             target.jobseeker_profile.lack_of_nir_reason = ""
             if self.wet_run:
-                target.jobseeker_profile.save()
+                with transaction.atomic(), triggers.context(**self.get_trigger_context()):
+                    target.jobseeker_profile.save()
 
     def handle_hard_duplicates(self, duplicates):
         """
