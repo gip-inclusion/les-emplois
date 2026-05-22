@@ -105,9 +105,22 @@ class ItouLoginForm(LoginForm):
 
 
 class VerifyOTPForm(forms.Form):
-    otp_token = forms.CharField(required=True)
+    otp_token = forms.CharField(
+        required=True,
+        label="Entrez le code de validation unique (OTP)",
+        help_text=(
+            "Code à 6 chiffres généré par votre application mobile "
+            "ou votre gestionnaire de mot de passe sur votre ordinateur"
+        ),
+    )
 
-    otp_token.widget.attrs.update({"max_length": 6, "autocomplete": "one-time-code", "autofocus": True})
+    otp_token.widget.attrs.update(
+        {
+            "max_length": 6,
+            "autocomplete": "one-time-code",
+            "autofocus": True,
+        }
+    )
 
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
@@ -118,7 +131,7 @@ class VerifyOTPForm(forms.Form):
 
         device = match_token(self.user, otp_token)
         if device is None:
-            raise ValidationError("code invalide")
+            raise ValidationError("Le code de validation unique (OTP) n’est pas correct.")
         self.user.otp_device = device
 
         return otp_token
