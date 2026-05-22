@@ -39,6 +39,9 @@ class Command(BaseCommand):
     Import advisors from an Excel file (GPS)
     """
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     help = "Import advisor contact information for existing job seeker profiles from GPS excel file."
 
     def add_arguments(self, parser):
