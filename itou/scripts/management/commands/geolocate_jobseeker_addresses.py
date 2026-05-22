@@ -44,6 +44,9 @@ class Command(BaseCommand):
     more than 4k lookups per call.
     """
 
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument(
             "action",
