@@ -1,0 +1,55 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}Actions recommandées - Mon portefeuille {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Mon portefeuille</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+
+{% block content %}
+    <section class="s-section" id="gps-my-groups">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        <p class="mb-0 flex-grow-1" id="results">
+                            {% with memberships_page.paginator.count as counter %}
+                                {{ counter }} {{ counter|pluralizefr:"résultat,résultats" }}
+                            {% endwith %}
+                        </p>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <caption class="visually-hidden">Liste des personnes accompagnées</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="w-40px"></th>
+                                    <th scope="col">Informations générales</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Structure référente &amp; modalité</th>
+                                    <th scope="col" class="text-end w-50px"></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+{% endblock %}
