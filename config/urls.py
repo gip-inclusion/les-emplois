@@ -94,6 +94,7 @@ urlpatterns = [
     path("login/", include("itou.www.login.urls")),
     path("logout/", include("itou.www.logout.urls")),
     path("signup/", include("itou.www.signup.urls")),
+    path("recommendations/", include("itou.www.recommendations.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("announcements/", include("itou.www.announcements.urls")),
     path("versions/", include("itou.www.releases.urls")),
