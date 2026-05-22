@@ -25,6 +25,9 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = False
+    AUTO_TRIGGER_CONTEXT = False
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--wet-run",
