@@ -200,12 +200,13 @@ class ItouCurrentOrganizationMiddleware:
             and not user.is_verified()
         ):
             login_verify_otp_url = reverse("login:verify_otp")
-            if user_has_device(user) and request.path != login_verify_otp_url:
-                return HttpResponseRedirect(
-                    add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
-                )
-            if not request.path.startswith("/otp"):
-                return HttpResponseRedirect(reverse("otp_views:otp_devices"))
+            if user_has_device(user):
+                if request.path != login_verify_otp_url:
+                    return HttpResponseRedirect(
+                        add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
+                    )
+            elif not request.path.startswith("/otp/enrollment"):
+                return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))

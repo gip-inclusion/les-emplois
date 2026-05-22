@@ -1,57 +1,94 @@
-from base64 import b32encode
+import base64
+import binascii
 
 import segno
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django_otp import devices_for_user, login as otp_login
-from django_otp.plugins.otp_totp.models import TOTPDevice
+from django_otp import login as otp_login
+from django_otp.plugins.otp_totp.models import TOTPDevice, default_key as generate_otp_key
 
+from itou.otp.utils import get_user_devices
 from itou.utils.auth import check_user
 from itou.utils.readonly import http_methods
+from itou.www.otp_views.enums import DeviceType
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 
 
+check_user_for_otp = check_user(lambda user: user.is_staff)
+
+
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_user(lambda user: user.is_staff)
+@check_user_for_otp
 def otp_devices(request, template_name="otp_views/otp_devices.html"):
+    devices = get_user_devices(request.user)
     if request.method == "POST":
-        if request.POST.get("action") == "new":
-            device, _ = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
-            return HttpResponseRedirect(reverse("otp_views:otp_confirm_device", kwargs={"device_id": device.pk}))
         if device_id := request.POST.get("delete-device"):
             device = get_object_or_404(TOTPDevice.objects.filter(user=request.user), pk=device_id)
             if device != request.user.otp_device:
                 messages.success(request, "L’appareil a été supprimé.")
                 device.delete()
+                devices = get_user_devices(request.user)
             else:
                 messages.error(request, "Impossible de supprimer l’appareil qui a été utilisé pour se connecter.")
 
-    context = {"devices": sorted(devices_for_user(request.user), key=lambda device: device.created_at)}
+    context = {"devices": devices}
+    return render(request, template_name, context)
+
+
+@check_user_for_otp
+def enrollment_step_0_intro(request, template_name="otp_views/enrollment_step_0_intro.html"):
+    context = {"next_step_url": reverse("otp_views:enrollment_step_1_choose_device_type")}
+    return render(request, template_name, context)
+
+
+@check_user_for_otp
+def enrollment_step_1_choose_device_type(request, template_name="otp_views/enrollment_step_1_choose_device_type.html"):
+    context = {"next_step_url": reverse("otp_views:enrollment_step_2_confirm_device")}
     return render(request, template_name, context)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_user(lambda user: user.is_staff)
-def otp_confirm_device(request, device_id, template_name="otp_views/otp_confirm_device.html"):
-    device = get_object_or_404(TOTPDevice.objects.filter(user=request.user, confirmed=False), pk=device_id)
+@check_user_for_otp
+def enrollment_step_2_confirm_device(request, template_name="otp_views/enrollment_step_2_confirm_device.html"):
+    previous_step_url = reverse("otp_views:enrollment_step_1_choose_device_type")
+    device_type = request.GET.get("device_type") or request.POST.get("device_type")
+    if device_type not in DeviceType:
+        # should not happen, unless user manipulates the request
+        return HttpResponseRedirect(previous_step_url)
 
-    form = ConfirmTOTPDeviceForm(data=request.POST or None, device=device)
+    unsaved_device = TOTPDevice(
+        user=request.user,
+        key=binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
+        if request.POST
+        else generate_otp_key(),
+    )
+    # Disable `throttle_increment()`, which is called when failing to
+    # verify a token (via our form validation) and saves the instance
+    # (which we don't want). The instance will be saved below only if
+    # the form is valid.
+    unsaved_device.throttle_increment = lambda *args, **kwargs: 1
+
+    form = ConfirmTOTPDeviceForm(
+        data=request.POST or None,
+        device_type=device_type,
+        device=unsaved_device,
+    )
     if request.method == "POST" and form.is_valid():
-        device.confirmed = True
-        device.name = form.cleaned_data["name"]
-        device.save(update_fields=["name", "confirmed"])
+        unsaved_device.name = form.cleaned_data["name"]
+        unsaved_device.save()
+        device = unsaved_device
         messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
         # Mark the user as verified
         otp_login(request, device)
+        # FIXME (dbaty): redirect to step 3 (recovery code).
         return HttpResponseRedirect(reverse("otp_views:otp_devices"))
 
     context = {
+        "previous_step_url": previous_step_url,
         "form": form,
-        "otp_secret": b32encode(device.bin_key).decode(),
-        # Generate svg data uri qrcode
-        "qrcode": segno.make(device.config_url).svg_data_uri(),
-        "otp_verified": False,
+        "otp_secret": form.fields["key"].initial,
+        "qrcode": segno.make(unsaved_device.config_url).svg_data_uri(),
     }
     return render(request, template_name, context)

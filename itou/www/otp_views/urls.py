@@ -7,5 +7,19 @@ app_name = "otp_views"
 
 urlpatterns = [
     path("devices", views.otp_devices, name="otp_devices"),
-    path("confirm/<int:device_id>", views.otp_confirm_device, name="otp_confirm_device"),
+    path(
+        "enrollment_step_0",
+        views.enrollment_step_0_intro,
+        name="enrollment_step_0_intro",
+    ),
+    path(
+        "enrollment_step_1",
+        views.enrollment_step_1_choose_device_type,
+        name="enrollment_step_1_choose_device_type",
+    ),
+    path(
+        "enrollment_step_2",
+        views.enrollment_step_2_confirm_device,
+        name="enrollment_step_2_confirm_device",
+    ),
 ]

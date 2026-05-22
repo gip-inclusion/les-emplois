@@ -142,6 +142,8 @@ class VerifyOTPView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # FIXME (dbaty): use `itoui.otp.utils.get_user_devices()` once
+        # we have a unique constraint on `Device.name`.
         devices = sorted(devices_for_user(self.request.user), key=lambda d: (d.name, d.pk))
         return context | {"devices": devices}
 
