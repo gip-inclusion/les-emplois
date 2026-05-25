@@ -564,9 +564,9 @@ django-htmx==1.27.0 \
     --hash=sha256:036e5da801bfdf5f1ca815f21592cfb9f004a898f330c842f15e55c70e301a75 \
     --hash=sha256:13e1e13b87d39b57f95aae6e4987cb3df056d0b1373a41f4a94504a00298ffd8
     # via -r test.txt
-django-markdownify==0.9.6 \
-    --hash=sha256:9863b2bfa6d159ad1423dc93bf0d6eadc6413776de304049aa9fcfa5edd2ce1c \
-    --hash=sha256:edcf47b2026d55a8439049d35c8b54e11066a4856c4fad1060e139cb3d2eee52
+django-markdownify==0.9.7 \
+    --hash=sha256:2e59dfd445ad6362288f7bc1574e45d8356848463e261b878fd70df6a272c47f \
+    --hash=sha256:ca3a6361f952d1c1b661c13229f69219a36e745358aa0f377212aef8f09e4cf3
     # via -r test.txt
 django-otp==1.7.0 \
     --hash=sha256:406d2d7f797dc313569270e06d6c360c7d986c9f653eab80b190d663ed5f1133 \
