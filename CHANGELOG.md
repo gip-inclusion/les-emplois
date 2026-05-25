@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## 2026-05-25
+
+### Ajouté
+
+- [Candidature : Permettre au professionnel de revenir sur la page de recherche après avoir postulé pour un candidat](https://github.com/gip-inclusion/les-emplois/pull/7965)
+- [Interface : Ajout du champ "Dernier accompagnateur connu" au tableau de suivi de l'espace "Candidats"](https://github.com/gip-inclusion/les-emplois/pull/8002)
+- [Services : Import des données data·inclusion et DORA](https://github.com/gip-inclusion/les-emplois/pull/7776)
+- [SPS - Prescripteur : Mise en place d'un outil de recommandation pour FranceTravail](https://github.com/gip-inclusion/les-emplois/pull/8049)
+
+### Modifié
+
+- [Connexion : Fusion des vues de connexion de tous les utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/7992)
+- [GEIQ : Notifier la DDETS lorsque la DREETS demande une correction avec un commentaire](https://github.com/gip-inclusion/les-emplois/pull/8084)
+- [Interface : Remplacer "Candidats" par "Accompagnements"](https://github.com/gip-inclusion/les-emplois/pull/8051)
+
+### Supprimé
+
+- [Connexion : Désactivation des EA/EATT](https://github.com/gip-inclusion/les-emplois/pull/8036)
+- [Interface : Décommissionnement des EA / EATT](https://github.com/gip-inclusion/les-emplois/pull/7997)
+
+### Tech
+
+- [Tech : Amélioration de l'accès à des vues des fiches salarié](https://github.com/gip-inclusion/les-emplois/pull/8041)
+
 ## 2026-05-18
 
 ### Ajouté
