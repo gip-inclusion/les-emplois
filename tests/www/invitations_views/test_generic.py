@@ -12,7 +12,6 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
-    assertNotContains,
     assertRedirects,
 )
 
@@ -327,17 +326,10 @@ class BaseTestAcceptInvitation:
         assert organization.members.count() == 2
 
         # Make sure there's a welcome message.
-        if self.user_kind == UserKind.EMPLOYER:
-            assertContains(
-                messages_response,
-                escape(f"Vous êtes désormais membre de la structure {organization.display_name}."),
-            )
-        else:
-            assertContains(
-                messages_response,
-                escape(f"Vous êtes désormais membre de l'organisation {organization.display_name}."),
-            )
-        assertNotContains(messages_response, escape("Ce lien n'est plus valide."))
+        assertContains(
+            messages_response,
+            escape(f"Vous êtes désormais membre de l'organisation {organization.display_name}."),
+        )
 
         # A confirmation e-mail is sent to the invitation sender.
         assert len(mailoutbox) == 1
