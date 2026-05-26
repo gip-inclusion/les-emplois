@@ -718,10 +718,11 @@
                                              "website",
                                              "email",
                                              "phone",
+                                             "opening_hours",
                                              "updated_on",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -750,10 +751,11 @@
                                              "website",
                                              "email",
                                              "phone",
+                                             "opening_hours",
                                              "updated_on",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -782,10 +784,11 @@
                                              "website",
                                              "email",
                                              "phone",
+                                             "opening_hours",
                                              "updated_on",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({

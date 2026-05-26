@@ -222,6 +222,8 @@ class Command(BaseCommand):
         structure.phone = data["telephone"] or ""
         self._void_if_max_len(structure, "phone")
 
+        structure.opening_hours = data["horaires_accueil"] or ""
+
         self._fill_geolocation_from_api_data(structure, data)
 
         structure.updated_on = data["date_maj"]

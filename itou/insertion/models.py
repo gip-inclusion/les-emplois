@@ -116,6 +116,8 @@ class Structure(GeolocatedAddressMixin, models.Model):
     email = models.EmailField(verbose_name="e-mail", blank=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
+    opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
+
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)

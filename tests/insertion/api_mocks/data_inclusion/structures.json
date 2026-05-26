@@ -62,7 +62,7 @@
       "telephone": null,
       "courriel": null,
       "site_web": "https://inclusion.gouv.fr/",
-      "horaires_accueil": null,
+      "horaires_accueil": "Mo-Fr 09:00-12:00,14:00-17:00",
       "accessibilite_lieu": null,
       "reseaux_porteurs": null
     }

@@ -51,6 +51,7 @@ class StructureAdmin(InsertionAdmin):
             "Adresse",
             {"fields": ["address_line_1", "address_line_2", "post_code", "city", "insee_city", "coordinates"]},
         ),
+        ("Horaires", {"fields": ["opening_hours"]}),
         ("Dates", {"fields": ["updated_on", "created_at", "updated_at"]}),
     ]
 
