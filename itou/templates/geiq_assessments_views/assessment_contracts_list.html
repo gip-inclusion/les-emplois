@@ -2,6 +2,7 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load format_filters %}
 {% load static %}
 {% load str_filters %}
@@ -155,6 +156,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {% enums "geiq_assessments" "AssessmentContractDetailsTab" as AssessmentContractDetailsTab %}
                                             {% for contract in contracts_page %}
                                                 <tr>
                                                     <td>

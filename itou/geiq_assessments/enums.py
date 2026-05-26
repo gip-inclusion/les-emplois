@@ -3,6 +3,22 @@ import enum
 from django.db import models
 
 
+class AssessmentContractDetailsTab(models.TextChoices):
+    EMPLOYEE = "employee", "Informations salarié"
+    CONTRACT = "contract", "Contrat"
+    SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
+    EXIT = "exit", "Sortie"
+    ALLOWANCE_REFUSAL_JUSTIFICATION = "refusal-justification", "Motif de refus"
+
+    @classmethod
+    def get_common_tabs(cls):
+        return [cls.EMPLOYEE, cls.CONTRACT, cls.SUPPORT_AND_TRAINING, cls.EXIT]
+
+    @classmethod
+    def get_institution_tabs(cls):
+        return cls.get_common_tabs() + [cls.ALLOWANCE_REFUSAL_JUSTIFICATION]
+
+
 class AssessmentState(models.TextChoices):
     NEW = "new", "À compléter"
     SUBMITTED = "submitted", "Envoyé"

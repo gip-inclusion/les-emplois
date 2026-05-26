@@ -11,11 +11,10 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.geiq_assessments.enums import AllowanceRefusalReason, InstitutionAction
+from itou.geiq_assessments.enums import AllowanceRefusalReason, AssessmentContractDetailsTab, InstitutionAction
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
-from itou.www.geiq_assessments_views.views import AssessmentContractDetailsTab
 from tests.companies.factories import CompanyMembershipFactory
 from tests.geiq_assessments.factories import (
     AssessmentFactory,
