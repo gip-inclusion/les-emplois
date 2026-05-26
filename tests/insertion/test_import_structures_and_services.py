@@ -55,7 +55,6 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         transform=attrgetter("uid"),
         ordered=False,
     )
-    # A service enriched with DORA data is marked as synced, a non-DORA service is not.
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").dora_synced_at is not None
     assert Service.objects.get(uid="emplois-de-linclusion--null").dora_synced_at is None
 
@@ -76,7 +75,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
 
 
 def test_full_import_dry_run(caplog, snapshot, apis_mocks):
-    call_command("import_structures_and_services")  # Not specifying `wet_run=False` to also test default value
+    call_command("import_structures_and_services")
 
     assert Structure.objects.count() == 0
     assert Service.objects.count() == 0
