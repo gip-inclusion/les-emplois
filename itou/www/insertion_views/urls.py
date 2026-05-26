@@ -7,5 +7,5 @@ app_name = "insertion_views"
 
 urlpatterns = [
     path("structure/<str:structure_uid>/card", views.StructureCardView.as_view(), name="structure_card"),
-    path("service/<str:service_uid>/card", views.ServiceDetailView.as_view(), name="service_detail"),
+    path("service/<str:service_uid>/card", views.ServiceCardView.as_view(), name="service_card"),
 ]
