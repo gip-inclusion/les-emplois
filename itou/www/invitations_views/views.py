@@ -32,11 +32,7 @@ from itou.www.invitations_views.forms import (
     NewLaborInspectorInvitationForm,
     PrescriberWithOrgInvitationForm,
 )
-from itou.www.invitations_views.helpers import (
-    handle_employer_invitation,
-    handle_labor_inspector_invitation,
-    handle_prescriber_invitation,
-)
+from itou.www.invitations_views.helpers import handle_invitation
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.signup import forms as signup_forms
 
@@ -235,7 +231,7 @@ class InvitePrescriberView(BaseInviteUserView):
 @bypass_terms_acceptance
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
-    handle_prescriber_invitation(invitation, request)
+    handle_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
         invitation.organization.organization_switch_key
     )
@@ -260,7 +256,7 @@ class InviteEmployerView(BaseInviteUserView):
 @bypass_terms_acceptance
 def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
-    handle_employer_invitation(invitation, request)
+    handle_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
         invitation.company.organization_switch_key
     )
@@ -285,7 +281,7 @@ class InviteLaborInspectorView(BaseInviteUserView):
 @bypass_terms_acceptance
 def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
-    handle_labor_inspector_invitation(invitation, request)
+    handle_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
         invitation.institution.organization_switch_key
     )
