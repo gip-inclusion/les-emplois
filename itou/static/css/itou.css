@@ -116,6 +116,13 @@ input[type="file"] {
     width: 1px;
 }
 
+.c-multi-file-input input[type="file"] {
+    opacity: 1;
+    position: static;
+    z-index: auto;
+    width: auto;
+}
+
 /* Dropdown menus.
 --------------------------------------------------------------------------- */
 

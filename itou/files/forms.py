@@ -13,7 +13,7 @@ from itou.utils.templatetags.matomo import matomo_event
 class ItouFileInput(forms.FileInput):
     template_name = "utils/widgets/file_input.html"
 
-    def __init__(self, *, attrs=None, content_type, max_upload_size_mb):
+    def __init__(self, *, attrs=None, content_type, max_upload_size_mb, accepted_formats_label=None):
         if attrs is None:
             attrs = {}
         else:
@@ -22,11 +22,13 @@ class ItouFileInput(forms.FileInput):
         super().__init__(attrs=attrs)
         self.content_type = content_type
         self.max_upload_size_mb = max_upload_size_mb
+        self.accepted_formats_label = accepted_formats_label
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context["widget"]["content_type"] = self.content_type
         context["widget"]["max_upload_size_mb"] = self.max_upload_size_mb
+        context["widget"]["accepted_formats_label"] = self.accepted_formats_label
         return context
 
 
@@ -119,3 +121,26 @@ class ItouFileField(forms.FileField):
             if validator := self.CONTENT_TYPE_TO_VALIDATOR.get(self.content_type):
                 validator(data)
         return cleaned_data
+
+
+class ItouMultiFileInput(ItouFileInput):
+    allow_multiple_selected = True
+    template_name = "utils/widgets/multi_file_input.html"
+
+
+class ItouMultiFileField(ItouFileField):
+    def __init__(self, *args, content_type, max_upload_size, allowed_extensions, **kwargs):
+        kwargs.setdefault(
+            "widget",
+            ItouMultiFileInput(
+                content_type=content_type,
+                max_upload_size_mb=max_upload_size / MB,
+                accepted_formats_label=", ".join(allowed_extensions),
+            ),
+        )
+        super().__init__(*args, content_type=content_type, max_upload_size=max_upload_size, **kwargs)
+        self.validators.append(FileExtensionValidator(allowed_extensions))
+
+    def clean(self, data, initial=None):
+        files = data if isinstance(data, (list, tuple)) else [data]
+        return [super().clean(f, initial) for f in files]
