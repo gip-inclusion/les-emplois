@@ -133,6 +133,22 @@
               </div>
           </div>
       </div>
+      <h3 class="my-3">
+          custom icon
+      </h3>
+      <div class="alert alert-warning" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-file-warning-line ri-xl text-warning">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-0">
+                      Un contrat concerne un salarié déjà présent dans le bilan précédent. Nous vous invitons à vérifier la liste.
+                  </p>
+              </div>
+          </div>
+      </div>
   </section>
   
   '''
