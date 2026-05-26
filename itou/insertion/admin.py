@@ -1,5 +1,6 @@
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 
 from itou.insertion.models import GenericReferenceItem, Service, Structure
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
@@ -37,6 +38,7 @@ class StructureAdmin(InsertionAdmin):
     list_display_links = ["pk", "name"]
     list_filter = ["source"]
     list_select_related = ["source"]
+    show_full_result_count = False
     date_hierarchy = "updated_on"
     ordering = ["-updated_at", "-created_at"]
     search_fields = ["uid", "siret", "name", "city", "post_code"]
@@ -53,7 +55,13 @@ class StructureAdmin(InsertionAdmin):
     ]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(_services_count=Count("services"))
+        services_count = (
+            Service.objects.filter(structure=OuterRef("pk"))
+            .values("structure")
+            .annotate(count=Count("pk"))
+            .values("count")
+        )
+        return super().get_queryset(request).annotate(_services_count=Coalesce(Subquery(services_count), 0))
 
     @admin.display(description="services", ordering="_services_count")
     def services_count(self, obj):
@@ -66,6 +74,7 @@ class ServiceAdmin(InsertionAdmin):
     list_display_links = ["pk", "name"]
     list_filter = ["source", "kind", "is_orientable_with_form", "contact_is_public"]
     list_select_related = ["structure", "source", "kind"]
+    show_full_result_count = False
     date_hierarchy = "updated_on"
     ordering = ["-updated_at", "-created_at"]
     search_fields = ["uid", "name", "structure__name", "city"]
