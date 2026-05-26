@@ -1,17 +1,22 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
 
 def index(request):
     user = request.user
-    template_name = "welcoming_tour/job_seeker.html"
 
-    if request.from_employer:
+    template_name = None
+    if request.user.is_job_seeker:
+        template_name = "welcoming_tour/job_seeker.html"
+    elif request.from_employer:
         template_name = "welcoming_tour/employer.html"
-
-    if request.from_prescriber:
+    elif request.from_prescriber:
         template_name = "welcoming_tour/prescriber.html"
 
-    user.has_completed_welcoming_tour = True
-    user.save()
-
-    return render(request, template_name)
+    if template_name:
+        user.has_completed_welcoming_tour = True
+        user.save()
+        return render(request, template_name)
+    else:
+        return HttpResponseRedirect(reverse("dashboard:index"))

@@ -44,7 +44,7 @@ class UserAdapter(DefaultAccountAdapter):
 
     def get_login_redirect_url(self, request):
         url = reverse("dashboard:index")
-        if not request.user.has_completed_welcoming_tour:
+        if not request.user.has_completed_welcoming_tour and not request.from_institution:
             url = reverse("welcoming_tour:index")
         return url
 
