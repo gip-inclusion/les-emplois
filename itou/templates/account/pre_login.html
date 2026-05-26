@@ -29,7 +29,7 @@
                             la page de connexion du service concerné s'affichera.
                         </p>
 
-                        <form method="post" class="js-prevent-multiple-submit">
+                        <form method="post">
                             {% csrf_token %}
                             {% redirection_input_field value=redirect_field_value %}
 
