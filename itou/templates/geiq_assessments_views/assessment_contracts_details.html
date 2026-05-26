@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load format_filters %}
 {% load str_filters %}
 
@@ -26,6 +27,7 @@
 {% endblock %}
 
 {% block title_extra %}
+    {% enums "geiq_assessments" "AssessmentContractDetailsTab" as AssessmentContractDetailsTab %}
     {% if contract.employee.allowance_granted_previous_year %}
         {% component_alert content=content variant="warning" extra_classes="mb-0" %}
             {% fragment as content %}
@@ -52,6 +54,7 @@
 {% endblock %}
 
 {% block content %}
+    {% enums "geiq_assessments" "AssessmentContractDetailsTab" as AssessmentContractDetailsTab %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">

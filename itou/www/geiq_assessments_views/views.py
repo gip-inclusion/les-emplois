@@ -22,7 +22,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.geiq_assessments import sync
-from itou.geiq_assessments.enums import AssessmentTransition, InstitutionAction
+from itou.geiq_assessments.enums import AssessmentContractDetailsTab, AssessmentTransition, InstitutionAction
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -604,7 +604,6 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "previous_campaign_year": assessment.campaign.year - 1,
         "can_validate": can_validate,
         "can_invalidate": can_invalidate,
-        "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
         "ContractsAction": ContractsAction,
         "stats": stats,
         "filters_form": filters_form,
@@ -647,22 +646,6 @@ def assessment_contracts_export(request, pk):
         partial(serialize_employee_contract, export_format=export_format),
         columns=[column.export_format for column in export_format.values()],
     )
-
-
-class AssessmentContractDetailsTab(models.TextChoices):
-    EMPLOYEE = "employee", "Informations salarié"
-    CONTRACT = "contract", "Contrat"
-    SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
-    EXIT = "exit", "Sortie"
-    ALLOWANCE_REFUSAL_JUSTIFICATION = "refusal-justification", "Motif de refus"
-
-    @classmethod
-    def get_common_tabs(cls):
-        return [cls.EMPLOYEE, cls.CONTRACT, cls.SUPPORT_AND_TRAINING, cls.EXIT]
-
-    @classmethod
-    def get_institution_tabs(cls):
-        return cls.get_common_tabs() + [cls.ALLOWANCE_REFUSAL_JUSTIFICATION]
 
 
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
@@ -783,7 +766,6 @@ def assessment_contracts_details(
         "editable": editable,
         "contract": contract,
         "matomo_custom_title": f"Bilan d’exécution - page de detail d’un contrat - {tab}",
-        "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
         "active_tab": details_tab,
     }
     return render(request, template_name, context)
