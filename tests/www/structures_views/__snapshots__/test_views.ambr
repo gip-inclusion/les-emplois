@@ -25,6 +25,7 @@
                  "insertion_structure"."website",
                  "insertion_structure"."email",
                  "insertion_structure"."phone",
+                 "insertion_structure"."opening_hours",
                  "insertion_structure"."updated_on",
                  "insertion_structure"."created_at",
                  "insertion_structure"."updated_at",
