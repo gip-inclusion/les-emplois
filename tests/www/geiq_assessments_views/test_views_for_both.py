@@ -432,7 +432,7 @@ class TestAssessmentContractsListAndToggle:
             + "?from_list=1",
             headers={"HX-Request": "true"},
         )
-        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_1.pk}", response)
+        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_1.pk} > form", response)
         assert response.status_code == 200
         contract_1.refresh_from_db()
         assert contract_1.allowance_requested is False
@@ -446,7 +446,7 @@ class TestAssessmentContractsListAndToggle:
             + "?from_list=1",
             headers={"HX-Request": "true"},
         )
-        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_2.pk}", response)
+        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_2.pk} > form", response)
         assert response.status_code == 200
         contract_2.refresh_from_db()
         assert contract_2.allowance_requested is True
@@ -525,7 +525,7 @@ class TestAssessmentContractsListAndToggle:
             + "?from_list=1",
             headers={"HX-Request": "true"},
         )
-        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_1.pk}", response)
+        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_1.pk} > form", response)
         assert response.status_code == 200
         contract_1.refresh_from_db()
         assert contract_1.allowance_granted is False
@@ -539,7 +539,7 @@ class TestAssessmentContractsListAndToggle:
             + "?from_list=1",
             headers={"HX-Request": "true"},
         )
-        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_2.pk}", response)
+        update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_2.pk} > form", response)
         assert response.status_code == 200
         contract_2.refresh_from_db()
         assert contract_2.allowance_granted is True
@@ -804,7 +804,7 @@ class TestAssessmentContractsDetails:
             )
             contract.refresh_from_db()
             assert contract.allowance_requested != current_value
-            update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract.pk}", response)
+            update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract.pk} > form", response)
             response = client.get(tab_url)
             fresh_page = parse_response_to_soup(response, selector="#main")
             assertSoupEqual(simulated_page, fresh_page)
