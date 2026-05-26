@@ -1,4 +1,4 @@
-from itou.geiq_assessments.enums import AllowanceRefusalReason
+from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason
 from itou.utils.export import Format
 
 
@@ -188,6 +188,12 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     "Type de rupture anticipée": with_format(Format.TEXT, lambda contract: contract.rupture_kind_display()),
     "Situation post-contrat": with_format(
         Format.TEXT, lambda contract: get_libelle(contract.other_data.get("emploi_sorti", {}))
+    ),
+    "Motif de dérogation": with_format(
+        Format.TEXT,
+        lambda contract: get_choice_label(
+            contract.allowance_request_justification_reason, AllowanceJustificationReason
+        ),
     ),
 }
 
