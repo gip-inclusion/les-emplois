@@ -1591,6 +1591,9 @@ class TestAssessmentContractsExportView:
             allowance_requested=False,
             allowance_granted=False,
         )
+        allowance_justification_reason = random.choice(
+            AllowanceJustificationReason.choices
+        )  # tuple: first value is value, second one is label
         allowance_refusal_reason = random.choice(
             AllowanceRefusalReason.choices
         )  # tuple: first value is value, second one is label
@@ -1603,9 +1606,11 @@ class TestAssessmentContractsExportView:
             employee__birthdate="1992-02-02",
             employee__allowance_amount=814,
             start_at=datetime.date(2024, 2, 1),
-            end_at=datetime.date(2024, 3, 30),
+            end_at=datetime.date(2024, 3, 30),  # less than 90 days
             planned_end_at=datetime.date(2024, 6, 30),
             allowance_requested=True,
+            allowance_request_justification_reason=allowance_justification_reason[0],
+            allowance_request_justification_details="Détails de la dérogation.",
             allowance_granted=False,
             allowance_refusal_reason=allowance_refusal_reason[0],
             allowance_refusal_details="Détails de la justification",
@@ -1637,6 +1642,7 @@ class TestAssessmentContractsExportView:
         assert excel_export[0] == snapshot(name="excel export headers for the employer")
         rupture_anticipee_idx = excel_export[0].index("Date de rupture anticipée")
         allowance_requested_idx = excel_export[0].index("Demande d’aide")
+        allowance_justification_reason_idx = excel_export[0].index("Motif de dérogation")
         assert excel_export[1][:4] == [
             "Dupond",
             "Jean-Pierre",
@@ -1653,12 +1659,14 @@ class TestAssessmentContractsExportView:
         ]
         assert excel_export[2][rupture_anticipee_idx] == datetime.datetime(2024, 4, 30)
         assert excel_export[2][allowance_requested_idx] == "Non"
+        assert excel_export[2][allowance_justification_reason_idx] == ""
         assert excel_export[3][:4] == [
             "Martin",
             "Cécile",
             "F",
             datetime.datetime(1992, 2, 2, 0, 0),
         ]
+        assert excel_export[3][allowance_justification_reason_idx] == allowance_justification_reason[1]
         assert excel_export[3][rupture_anticipee_idx] == datetime.datetime(2024, 3, 30)
         assert excel_export[3][allowance_requested_idx] == "Oui"
 
@@ -1671,6 +1679,7 @@ class TestAssessmentContractsExportView:
         assert response["Content-Disposition"] == 'attachment; filename="Contrats - Un Joli GEIQ - 2025-06-01.xlsx"'
         assert len(excel_export) == 3  # 2 contracts + header
         assert excel_export[0] == snapshot(name="excel export headers for the DDETS")
+        allowance_justification_reason_idx = excel_export[0].index("Motif de dérogation")
         allowance_granted_idx = excel_export[0].index("Éligible à l’aide")
         assert excel_export[1][:4] == [
             "Dupond",
@@ -1678,6 +1687,7 @@ class TestAssessmentContractsExportView:
             "H",
             datetime.datetime(1993, 3, 3, 0, 0),
         ]
+        assert excel_export[1][allowance_justification_reason_idx] == ""
         assert excel_export[1][allowance_granted_idx] == "Oui"
         assert excel_export[1][-1] == ""  # allowance refusal reason
         assert excel_export[2][:4] == [
@@ -1686,5 +1696,6 @@ class TestAssessmentContractsExportView:
             "F",
             datetime.datetime(1992, 2, 2, 0, 0),
         ]
+        assert excel_export[2][allowance_justification_reason_idx] == allowance_justification_reason[1]
         assert excel_export[2][allowance_granted_idx] == "Non"
         assert excel_export[2][-1] == allowance_refusal_reason[1]  # allowance refusal reason

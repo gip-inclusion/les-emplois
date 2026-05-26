@@ -5025,6 +5025,7 @@
     'Date de rupture anticipée',
     'Type de rupture anticipée',
     'Situation post-contrat',
+    'Motif de dérogation',
     'Éligible à l’aide',
     'Motif de refus',
   ])
@@ -5089,6 +5090,7 @@
     'Date de rupture anticipée',
     'Type de rupture anticipée',
     'Situation post-contrat',
+    'Motif de dérogation',
     'Demande d’aide',
   ])
 # ---
