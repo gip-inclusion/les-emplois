@@ -1,3 +1,4 @@
+from itou.geiq_assessments.enums import AllowanceRefusalReason
 from itou.utils.export import Format
 
 
@@ -10,6 +11,12 @@ def get_libelle(item):
     if not item:  # item can be a dict or False
         return ""
     return item.get("libelle", "")
+
+
+def get_choice_label(choice, choice_class):
+    if not choice:  # choice can be empty
+        return ""
+    return choice_class(choice).label
 
 
 def oui_non(value):
@@ -194,6 +201,9 @@ def get_export_format(request):
     elif request.from_institution:
         user_fields["Éligible à l’aide"] = with_format(
             Format.TEXT, lambda contract: oui_non(contract.allowance_granted)
+        )
+        user_fields["Motif de refus"] = with_format(
+            Format.TEXT, lambda contract: get_choice_label(contract.allowance_refusal_reason, AllowanceRefusalReason)
         )
     return {**EMPLOYEE_CONTRACT_XLSX_FORMAT, **user_fields}
 

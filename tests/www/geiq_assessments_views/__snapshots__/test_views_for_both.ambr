@@ -5026,6 +5026,7 @@
     'Type de rupture anticipée',
     'Situation post-contrat',
     'Éligible à l’aide',
+    'Motif de refus',
   ])
 # ---
 # name: TestAssessmentContractsExportView.test_export[excel export headers for the employer]
