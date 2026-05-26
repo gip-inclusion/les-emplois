@@ -12,16 +12,7 @@
             <i class="ri-folder-line ri-xl" aria-hidden="true"></i>
             <span>Rechercher dans vos fichiers</span>
         </label>
-        <p class="small text-nuance-06 mb-0">
-            Taille maximale : {{ widget.max_upload_size_mb|floatformat }} Mo
-            {% if widget.content_type == "application/pdf" %}
-                <br>
-                Type de fichier : PDF
-            {% elif widget.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" %}
-                <br>
-                Type de fichier : Excel / XLSX
-            {% endif %}
-        </p>
+        {% include "utils/widgets/file_input_constraints.html" %}
     </div>
 
     <div class="file-dropzone-preview d-none p-5">
