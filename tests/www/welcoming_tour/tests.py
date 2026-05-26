@@ -1,14 +1,14 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 from django.urls import reverse
-from pytest_django.asserts import assertTemplateUsed
+from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, LaborInspectorFactory
 from tests.utils.testing import accept_legal_terms
 
 
@@ -88,6 +88,16 @@ class TestWelcomingTour:
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         assertTemplateUsed(response, "welcoming_tour/employer.html")
+
+    def test_new_labor_inspector_does_not_see_welcoming_tour(self, client):
+        user = LaborInspectorFactory(membership=True)
+        client.force_login(user)
+
+        response = client.get(reverse("welcoming_tour:index"))
+        assertRedirects(response, reverse("dashboard:index"))
+
+        user.refresh_from_db()
+        assert user.has_completed_welcoming_tour is False
 
 
 class TestWelcomingTourExceptions:
