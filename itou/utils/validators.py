@@ -12,6 +12,9 @@ alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Seuls les caractères alphanum
 
 validate_code_safir = RegexValidator(r"^[0-9]{5}$", "Le code SAFIR doit être composé de 5 chiffres.")
 
+validate_france_travail_id_new_format = RegexValidator(
+    r"^[0-9]{11}$", "L'identifiant France Travail doit être composé de 11 chiffres."
+)
 
 # Regex shared between validate_ntt and EmployeeRecord model constraint
 NTT_REGEX = r"[12][0-9]{9}[0-9a-zA-Z]{1,30}"

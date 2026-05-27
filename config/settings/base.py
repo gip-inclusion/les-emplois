@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     "itou.archive",
     "itou.nexus",
     "itou.insertion",
+    "itou.recommendations",
 ]
 
 MIDDLEWARE = [
