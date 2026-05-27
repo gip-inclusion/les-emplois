@@ -2,7 +2,7 @@ import datetime
 import random
 import re
 from unittest.mock import patch
-from uuid import uuid1, uuid4
+from uuid import uuid4
 
 import httpx
 import pytest
@@ -956,7 +956,7 @@ class TestAnonymizeJobseekersManagementCommand:
             **kwargs,
             user__email="test@example.com",
             user__jobseeker_profile__nir="2857612352678",
-            user__jobseeker_profile__asp_uid=uuid1(),
+            user__jobseeker_profile__asp_uid="",  # Force regeneration (because it's fixed by `for_snapshot` trait)
             user__public_id=uuid4(),
         )
 
@@ -969,7 +969,7 @@ class TestAnonymizeJobseekersManagementCommand:
             **kwargs,
             user__email="test2@example.com",
             user__jobseeker_profile__nir="2857612352679",
-            user__jobseeker_profile__asp_uid=uuid1(),
+            user__jobseeker_profile__asp_uid="",
             user__public_id=uuid4(),
         )
         ProlongationFactory(approval=approval_with_few_datas, for_snapshot=True, start_at=datetime.date(2022, 5, 17))
@@ -999,7 +999,7 @@ class TestAnonymizeJobseekersManagementCommand:
             **kwargs,
             user__email="test3@example.com",
             user__jobseeker_profile__nir="2857612352670",
-            user__jobseeker_profile__asp_uid=uuid1(),
+            user__jobseeker_profile__asp_uid="",
             user__public_id=uuid4(),
         )
         for start_at in [datetime.date(2022, 5, 17), datetime.date(2022, 7, 16), datetime.date(2022, 9, 16)]:
