@@ -3929,8 +3929,8 @@
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -3993,8 +3993,8 @@
         'origin': list([
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4014,8 +4014,8 @@
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4077,8 +4077,8 @@
           'get_advisor_choice_field[www/apply/forms.py]',
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4137,8 +4137,8 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4147,8 +4147,8 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4167,8 +4167,8 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4178,8 +4178,8 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4188,8 +4188,8 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -4204,8 +4204,8 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -5108,8 +5108,8 @@
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -5172,8 +5172,8 @@
         'origin': list([
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -5193,8 +5193,8 @@
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -5256,8 +5256,8 @@
           'get_advisor_choice_field[www/apply/forms.py]',
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForHireView.missing_steps_redirect[www/apply/views/hire_views.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForHireView.steps_redirect[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',

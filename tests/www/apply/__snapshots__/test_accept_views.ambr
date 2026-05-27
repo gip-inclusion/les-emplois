@@ -764,8 +764,8 @@
         'origin': list([
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -784,8 +784,8 @@
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -846,8 +846,8 @@
           'get_advisor_choice_field[www/apply/forms.py]',
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -905,8 +905,8 @@
       dict({
         'origin': list([
           'JobApplication.clean[job_applications/models.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -956,8 +956,8 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -965,8 +965,8 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -984,8 +984,8 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -994,8 +994,8 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -1003,8 +1003,8 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -1018,8 +1018,8 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -1998,8 +1998,8 @@
         'origin': list([
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -2018,8 +2018,8 @@
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -2080,8 +2080,8 @@
           'get_advisor_choice_field[www/apply/forms.py]',
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
@@ -2139,8 +2139,8 @@
       dict({
         'origin': list([
           'JobApplication.clean[job_applications/models.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
-          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/accept_views.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.steps_redirect[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.dispatch[www/apply/views/common.py]',
           'wrapper[utils/views.py]',
         ]),
