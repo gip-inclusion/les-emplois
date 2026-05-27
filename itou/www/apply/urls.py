@@ -20,7 +20,7 @@ urlpatterns = [
     path("<int:company_pk>/start", submit_views.StartViewForSubmit.as_view(), name="start"),
     path(
         "<int:company_pk>/hire",
-        hire_views.StartViewForHire.as_view(),
+        hire_views.start_hire_wizard,
         name="start_hire",
     ),
     # Submit - sender.

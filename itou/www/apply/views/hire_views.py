@@ -8,7 +8,8 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import TemplateView, View
+from django.views.decorators.http import require_safe
+from django.views.generic import TemplateView
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -18,6 +19,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.auth import check_request
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -35,51 +37,29 @@ def initialize_hire_session(request, data):
     return SessionNamespace.create(request.session, HIRE_SESSION_KIND, data)
 
 
-class HirePermissionMixin:
-    """
-    This mixin requires the following argument that must be setup by the child view
+@require_safe
+@check_request(lambda request: request.from_employer)
+def start_hire_wizard(request, company_pk):
+    company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+    if company not in request.organizations:
+        raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+    reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
+    hire_session = initialize_hire_session(request, {"reset_url": reset_url, "company_pk": company.pk})
 
-    company: Company
-    """
-
-    def get_reset_url(self):
-        raise NotImplementedError
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.from_employer:
-            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
-        if not self.company.has_member(request.user):
-            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-        return super().dispatch(request, *args, **kwargs)
-
-
-class StartViewForHire(HirePermissionMixin, View):
-    def setup(self, request, company_pk, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
-
-    def get_reset_url(self):
-        return self.reset_url
-
-    def get(self, request, *args, **kwargs):
-        self.hire_session = initialize_hire_session(
-            request, {"reset_url": self.reset_url, "company_pk": self.company.pk}
+    return HttpResponseRedirect(
+        reverse(
+            "job_seekers_views:get_or_create_start",
+            query={
+                "tunnel": "hire",
+                "hire_session_uuid": hire_session.name,
+                "company": company.pk,
+                "from_url": reset_url,
+            },
         )
-
-        params = {
-            "tunnel": "hire",
-            "hire_session_uuid": self.hire_session.name,
-            "company": self.company.pk,
-            "from_url": self.get_reset_url(),
-        }
-
-        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
-        return HttpResponseRedirect(next_url)
+    )
 
 
-class HireWizardMixin(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNeededMixin):
+class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
     def __init__(self):
         super().__init__()
         self.hire_session = None
@@ -117,6 +97,10 @@ class HireWizardMixin(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosi
             )
 
     def dispatch(self, request, *args, **kwargs):
+        if not request.from_employer:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
+        if not self.company.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
         if (
             self.is_iae_eligibility_diagnosis_needed()
             # For employer diagnosis, the sanction presence must be checked
