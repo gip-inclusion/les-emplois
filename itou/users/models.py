@@ -365,6 +365,17 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     | models.Q(kind=UserKind.LABOR_INSPECTOR)
                 ),
             ),
+            models.CheckConstraint(
+                name="identity_provider_kind",
+                violation_error_message="Le type SSO n'est pas compatible avec ce type d’utilisateur.",
+                condition=(
+                    models.Q(identity_provider=IdentityProvider.DJANGO)
+                    | models.Q(identity_provider=IdentityProvider.FRANCE_CONNECT, kind=UserKind.JOB_SEEKER)
+                    | models.Q(identity_provider=IdentityProvider.PE_CONNECT, kind=UserKind.JOB_SEEKER)
+                    | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind__in=UserKind.professionals())
+                    | models.Q(identity_provider=IdentityProvider.INCLUSION_CONNECT, kind__in=UserKind.professionals())
+                ),
+            ),
         ]
         permissions = [
             ("hijack", "Can impersonate (hijack) other accounts"),
@@ -394,19 +405,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     return True
         return False
 
-    def validate_identity_provider(self):
-        if self.identity_provider == IdentityProvider.FRANCE_CONNECT and self.kind != UserKind.JOB_SEEKER:
-            raise ValidationError("France connect n'est utilisable que par un candidat.")
-
-        if self.identity_provider == IdentityProvider.PE_CONNECT and self.kind != UserKind.JOB_SEEKER:
-            raise ValidationError("PE connect n'est utilisable que par un candidat.")
-
-        if self.identity_provider == IdentityProvider.INCLUSION_CONNECT and self.kind not in [
-            UserKind.PRESCRIBER,
-            UserKind.EMPLOYER,
-        ]:
-            raise ValidationError("Inclusion connect n'est utilisable que par un prescripteur ou employeur.")
-
     def save(self, *args, **kwargs):
         must_create_profile = self._state.adding and self._auto_create_job_seeker_profile
 
@@ -422,7 +420,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             self.is_staff = False
 
         self.validate_constraints()
-        self.validate_identity_provider()
 
         # Capture Django update_last_login signal
         if self.first_login is None and self.last_login is not None:
