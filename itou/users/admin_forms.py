@@ -77,7 +77,10 @@ class JobSeekerProfileAdminForm(forms.ModelForm):
         }
 
     def clean_asp_uid(self):
-        return self.cleaned_data.get("asp_uid").lower()
+        asp_uid = self.cleaned_data.get("asp_uid")
+        if not asp_uid:
+            return self.instance._default_asp_uid()
+        return asp_uid.lower()
 
 
 FakeField = namedtuple("FakeField", ("name",))
