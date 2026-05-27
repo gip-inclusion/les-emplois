@@ -49,5 +49,6 @@ addopts = [
     "--strict-markers",
 ]
 markers = [
-    "no_django_db: mark tests that should not be marked with django_db."
+    "no_django_db: mark tests that should not be marked with django_db.",
+    "snapshot: automic mark added to tests using snapshots",
 ]
