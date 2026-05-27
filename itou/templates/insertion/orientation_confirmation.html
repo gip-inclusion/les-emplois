@@ -1,0 +1,35 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load str_filters %}
+
+{% block title %}Demande d'orientation transmise{{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Orienter {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} vers un service d'insertion
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <div class="c-form">
+                        <h2 class="h3">Votre demande a bien été transmise !</h2>
+                        <p>
+                            Le récapitulatif de la demande vous a été envoyé, ainsi qu'à l'adresse e-mail de
+                            {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} :
+                            {{ job_seeker.email|mask_unless:can_view_personal_information }}.
+                        </p>
+                        <a href="{% url 'dashboard:index' %}" class="btn btn-primary">Retour à l'accueil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

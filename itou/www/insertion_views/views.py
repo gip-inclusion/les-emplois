@@ -1,6 +1,7 @@
 import enum
 import logging
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -18,6 +19,7 @@ from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import get_orientation_jwt
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_view_personal_information
@@ -30,6 +32,7 @@ from itou.www.insertion_views.forms import (
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
 )
+from itou.www.insertion_views.orientation import build_dora_orientation_payload
 from itou.www.utils.wizard import WizardView
 
 
@@ -137,6 +140,24 @@ def start_orientation(request, service_uid):
     )
 
 
+class OrientationResultView(LoginRequiredMixin, TemplateView):
+    matomo_custom_title = None
+
+    def get_context_data(self, **kwargs):
+        service = get_object_or_404(insertion_models.Service, uid=self.kwargs["service_uid"])
+        job_seeker = get_object_or_404(
+            User.objects.select_related("jobseeker_profile"),
+            public_id=self.request.GET.get("job_seeker_public_id"),
+            kind=UserKind.JOB_SEEKER,
+        )
+        return super().get_context_data(**kwargs) | {
+            "service": service,
+            "job_seeker": job_seeker,
+            "can_view_personal_information": can_view_personal_information(self.request, job_seeker),
+            "matomo_custom_title": self.matomo_custom_title,
+        }
+
+
 class OrientationSelectJobSeekerView(LoginRequiredMixin, FormView):
     form_class = OrientationSelectJobSeekerForm
     template_name = "insertion/orientation_select_job_seeker.html"
@@ -183,6 +204,16 @@ class OrientationSelectJobSeekerView(LoginRequiredMixin, FormView):
         }
 
 
+class OrientationConfirmationView(OrientationResultView):
+    template_name = "insertion/orientation_confirmation.html"
+    matomo_custom_title = "Demande d'orientation transmise"
+
+
+class OrientationErrorView(OrientationResultView):
+    template_name = "insertion/orientation_error.html"
+    matomo_custom_title = "Erreur lors de la demande d'orientation"
+
+
 class OrientationWizardView(LoginRequiredMixin, WizardView):
     url_name = "insertion_views:orientation_steps"
     expected_session_kind = "orientation"
@@ -194,6 +225,7 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
     }
 
     def setup_wizard(self):
+        self.dora_client = DoraAPIClient(settings.DORA_API_BASE_URL, settings.DORA_API_TOKEN)
         self.service = get_object_or_404(
             insertion_models.Service.objects.select_related("kind", "structure"),
             uid=self.wizard_session.get("service_uid"),
@@ -220,6 +252,24 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
                 "referent_email": user.email,
             }
         return super().get_form_initial(step)
+
+    def _orientation_error_url(self):
+        return reverse(
+            "insertion_views:orientation_error",
+            kwargs={"service_uid": self.service.uid},
+            query={"job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def _redirect_on_submission_error(self, request, reason):
+        logger.info(
+            "orientation wizard submission_failed reason=%s user=%s service_uid=%s job_seeker=%s",
+            reason,
+            request.user.pk,
+            self.service.uid,
+            self.job_seeker.public_id,
+        )
+        self.wizard_session.delete()
+        return HttpResponseRedirect(self._orientation_error_url())
 
     def get(self, request, *args, **kwargs):
         logger.info(
@@ -252,8 +302,39 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
         if not self.form.is_valid():
             return self.render_to_response(self.get_context_data(**kwargs))
 
+        cleaned = self.form.cleaned_data
+        attachments = []
+        for field in ("credentials_documents_files", "credentials_proof_files"):
+            for uploaded_file in cleaned.get(field) or []:
+                uploaded_file.seek(0)
+                attachments.append((uploaded_file.name, uploaded_file))
+
+        payload = build_dora_orientation_payload(
+            service=self.service,
+            job_seeker=self.job_seeker,
+            referent_data=self.wizard_session.get(OrientationStep.REFERENT),
+            documents_data=cleaned,
+            prescriber=request.user,
+            organization=request.current_organization,
+        )
+        try:
+            self.dora_client.create_orientation(payload, attachments)
+        except DoraAPIException:
+            return self._redirect_on_submission_error(request, "create_orientation")
+
+        logger.info(
+            "orientation wizard submitted user=%s service_uid=%s job_seeker=%s",
+            request.user.pk,
+            self.service.uid,
+            self.job_seeker.public_id,
+        )
+        confirmation_url = reverse(
+            "insertion_views:orientation_confirmation",
+            kwargs={"service_uid": self.service.uid},
+            query={"job_seeker_public_id": self.job_seeker.public_id},
+        )
         self.wizard_session.delete()
-        return HttpResponseRedirect(self.reset_url)
+        return HttpResponseRedirect(confirmation_url)
 
     def get_context_data(self, **kwargs):
         matomo_titles = {

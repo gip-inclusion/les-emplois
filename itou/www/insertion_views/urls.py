@@ -19,4 +19,14 @@ urlpatterns = [
         views.OrientationWizardView.as_view(),
         name="orientation_steps",
     ),
+    path(
+        "orienter/<str:service_uid>/confirmation/",
+        views.OrientationConfirmationView.as_view(),
+        name="orientation_confirmation",
+    ),
+    path(
+        "orienter/<str:service_uid>/erreur/",
+        views.OrientationErrorView.as_view(),
+        name="orientation_error",
+    ),
 ]
