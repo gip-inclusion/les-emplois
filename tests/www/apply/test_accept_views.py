@@ -41,7 +41,7 @@ from itou.users.enums import (
     LackOfPoleEmploiId,
 )
 from itou.users.models import IdentityCertification, JobSeekerAssignment, User
-from itou.utils import triggers
+from itou.utils import constants as global_constants, triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
@@ -86,6 +86,23 @@ NEXT_BUTTON_MARKUP = (
     "<span>Suivant</span>"
     "</button>"
 )
+
+
+def test_start_accept_with_other_company(client):
+    employer = CompanyMembershipFactory().user
+    other_membership = CompanyMembershipFactory(user=employer)
+    client.force_login(employer)
+    job_application = JobApplicationFactory(to_company=other_membership.company, sent_by_job_seeker=True)
+
+    response = client.get(reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk}))
+    assert response.status_code == 404
+    session = client.session
+    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+        job_application.to_company.organization_switch_key
+    )
+    session.save()
+    response = client.get(reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk}))
+    assert response.status_code == 302
 
 
 class TestProcessAcceptViewsInWizard:

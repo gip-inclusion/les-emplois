@@ -41,8 +41,8 @@ def initialize_hire_session(request, data):
 @check_request(lambda request: request.from_employer)
 def start_hire_wizard(request, company_pk):
     company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-    if company not in request.organizations:
-        raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+    if company != request.current_organization:
+        raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans la structure active.")
     reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
     hire_session = initialize_hire_session(request, {"reset_url": reset_url, "company_pk": company.pk})
 
@@ -70,6 +70,8 @@ class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
         self.geiq_eligibility_missing = False
 
     def setup(self, request, *args, session_uuid, **kwargs):
+        if not request.from_employer:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
         super().setup(request, *args, **kwargs)
         try:
             self.hire_session = SessionNamespace(request.session, HIRE_SESSION_KIND, session_uuid)
@@ -78,6 +80,8 @@ class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
         self.company = get_object_or_404(
             Company.objects.with_has_active_members(), pk=self.hire_session.get("company_pk")
         )
+        if self.company != request.current_organization:
+            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans la structure active.")
 
         job_seeker_public_id = self.hire_session.get("job_seeker_public_id") or request.GET.get("job_seeker_public_id")
         self.job_seeker = get_object_or_404(
@@ -97,10 +101,6 @@ class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
             )
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.from_employer:
-            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
-        if not self.company.has_member(request.user):
-            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
         if (
             self.is_iae_eligibility_diagnosis_needed()
             # For employer diagnosis, the sanction presence must be checked
