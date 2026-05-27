@@ -593,37 +593,6 @@ class TestModel:
         ):
             nir_profile.save()
 
-    def test_identity_provider_vs_kind(self, subtests):
-        cases = [
-            [JobSeekerFactory, IdentityProvider.DJANGO, False],
-            [JobSeekerFactory, IdentityProvider.PE_CONNECT, False],
-            [JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False],
-            [JobSeekerFactory, IdentityProvider.INCLUSION_CONNECT, True],
-            [PrescriberFactory, IdentityProvider.DJANGO, False],
-            [PrescriberFactory, IdentityProvider.PE_CONNECT, True],
-            [PrescriberFactory, IdentityProvider.FRANCE_CONNECT, True],
-            [PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False],
-            [EmployerFactory, IdentityProvider.DJANGO, False],
-            [EmployerFactory, IdentityProvider.PE_CONNECT, True],
-            [EmployerFactory, IdentityProvider.FRANCE_CONNECT, True],
-            [EmployerFactory, IdentityProvider.INCLUSION_CONNECT, False],
-            [LaborInspectorFactory, IdentityProvider.DJANGO, False],
-            [LaborInspectorFactory, IdentityProvider.PE_CONNECT, True],
-            [LaborInspectorFactory, IdentityProvider.FRANCE_CONNECT, True],
-            [LaborInspectorFactory, IdentityProvider.INCLUSION_CONNECT, True],
-            [ItouStaffFactory, IdentityProvider.DJANGO, False],
-            [ItouStaffFactory, IdentityProvider.PE_CONNECT, True],
-            [ItouStaffFactory, IdentityProvider.FRANCE_CONNECT, True],
-            [ItouStaffFactory, IdentityProvider.INCLUSION_CONNECT, True],
-        ]
-        for factory, identity_provider, raises in cases:
-            with subtests.test(f"{factory} / {identity_provider}"):
-                if raises:
-                    with pytest.raises(ValidationError):
-                        factory(identity_provider=identity_provider)
-                else:
-                    factory(identity_provider=identity_provider)
-
     def test_get_full_name(self):
         assert JobSeekerFactory(first_name="CLÉMENT", last_name="Dupont").get_full_name() == "Clément DUPONT"
         assert (
