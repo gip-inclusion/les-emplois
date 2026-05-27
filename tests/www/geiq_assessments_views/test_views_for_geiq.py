@@ -1089,7 +1089,7 @@ class TestAssessmentComment:
         assessment.refresh_from_db()
         assert assessment.geiq_comment == some_updated_comment
 
-    def test_no_access_after_submission(self, client, snapshot):
+    def test_no_access_after_submission(self, client):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         origin_comment = "Un commentaire initial"
         assessment = AssessmentFactory(
