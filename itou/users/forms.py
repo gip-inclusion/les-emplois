@@ -62,14 +62,13 @@ class JobSeekerProfileFieldsMixin:
             setattr(jobseeker_profile, k, v)
         # super()._post_clean() calls full_clean() on self.instance, which calls self.instance.clean_fields()
         # Let's do the same on self.instance.jobseeker_profile (but only for our fields)
+        excluded_fields = {f.name for f in JobSeekerProfile._meta.fields if f.name not in self.PROFILE_FIELDS}
         try:
-            jobseeker_profile.clean_fields(
-                exclude={f.name for f in JobSeekerProfile._meta.fields if f.name not in self.PROFILE_FIELDS}
-            )
+            jobseeker_profile.clean_fields(exclude=excluded_fields)
         except ValidationError as e:
             self._update_errors(e)
         try:
-            jobseeker_profile.validate_constraints()
+            jobseeker_profile.validate_constraints(exclude=excluded_fields)
         except ValidationError as e:
             self._update_errors(e)
 
