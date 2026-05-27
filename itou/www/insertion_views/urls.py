@@ -10,6 +10,11 @@ urlpatterns = [
     path("service/<str:service_uid>/card", views.ServiceCardView.as_view(), name="service_card"),
     path("orienter/<str:service_uid>/start/", views.start_orientation, name="start_orientation"),
     path(
+        "orienter/<str:service_uid>/usager/",
+        views.OrientationSelectJobSeekerView.as_view(),
+        name="orientation_select_job_seeker",
+    ),
+    path(
         "orienter/<uuid:session_uuid>/<slug:step>/",
         views.OrientationWizardView.as_view(),
         name="orientation_steps",

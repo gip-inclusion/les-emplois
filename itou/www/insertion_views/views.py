@@ -3,12 +3,15 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import Prefetch
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
 
 from itou.insertion import models as insertion_models
 from itou.insertion.opening_hours import format_osm_hours
@@ -21,6 +24,7 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
+from itou.www.insertion_views.forms import OrientationSelectJobSeekerForm
 from itou.www.utils.wizard import WizardView
 
 
@@ -99,7 +103,19 @@ class OrientationStep(enum.StrEnum):
 @login_required
 def start_orientation(request, service_uid):
     service = get_object_or_404(insertion_models.Service, uid=service_uid, is_orientable_with_form=True)
-    job_seeker = get_object_or_404(User, public_id=request.GET.get("job_seeker_public_id"), kind=UserKind.JOB_SEEKER)
+    if not (job_seeker_public_id := request.GET.get("job_seeker_public_id")):
+        logger.info(
+            "orientation wizard start_without_job_seeker user=%s service_uid=%s",
+            request.user.pk,
+            service.uid,
+        )
+        return HttpResponseRedirect(
+            reverse(
+                "insertion_views:orientation_select_job_seeker",
+                kwargs={"service_uid": service.uid},
+            )
+        )
+    job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
     logger.info(
         "orientation wizard start user=%s service_uid=%s job_seeker=%s",
         request.user.pk,
@@ -114,6 +130,52 @@ def start_orientation(request, service_uid):
             "job_seeker_public_id": str(job_seeker.public_id),
         },
     )
+
+
+class OrientationSelectJobSeekerView(LoginRequiredMixin, FormView):
+    form_class = OrientationSelectJobSeekerForm
+    template_name = "insertion/orientation_select_job_seeker.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.from_employer or request.from_prescriber):
+            raise PermissionDenied("Vous n'êtes pas autorisé à orienter un usager.")
+        return super().dispatch(request, *args, **kwargs)
+
+    def setup(self, request, *args, service_uid, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.service = get_object_or_404(
+            insertion_models.Service.objects.select_related("kind", "structure"),
+            uid=service_uid,
+            is_orientable_with_form=True,
+        )
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"request": self.request}
+
+    def form_valid(self, form):
+        return HttpResponseRedirect(
+            reverse(
+                "insertion_views:start_orientation",
+                kwargs={"service_uid": self.service.uid},
+                query={"job_seeker_public_id": form.cleaned_data["job_seeker"]},
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        service_card_url = reverse("insertion_views:service_card", kwargs={"service_uid": self.service.uid})
+        return super().get_context_data(**kwargs) | {
+            "service": self.service,
+            "reset_url": service_card_url,
+            "create_job_seeker_url": reverse(
+                "job_seekers_views:get_or_create_start",
+                query={
+                    "tunnel": "orientation",
+                    "from_url": service_card_url,
+                    "service_uid": self.service.uid,
+                },
+            ),
+            "matomo_custom_title": "Orientation service - rechercher un usager",
+        }
 
 
 class OrientationWizardView(LoginRequiredMixin, WizardView):

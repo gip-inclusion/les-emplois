@@ -1,0 +1,56 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+
+{% block title %}Orienter vers un service d'insertion{{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=reset_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Orienter vers un service d'insertion</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    <div class="c-box c-box--action d-flex align-items-center justify-content-between">
+        <div>
+            {% if service.kind %}<small class="d-block text-uppercase">{{ service.kind.label }}</small>{% endif %}
+            <strong>{{ service.name }}</strong>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Rechercher un usager</h2>
+                        <p>Dans le menu déroulant ci-dessous, vous trouverez la liste de vos usagers.</p>
+                        <form method="post" class="c-form js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            {% bootstrap_form_errors form type="all" %}
+                            {% bootstrap_field form.job_seeker wrapper_class="form-group form-group-input-w-lg-66" %}
+                            {% itou_buttons_form reset_url=reset_url primary_label="Suivant" %}
+                        </form>
+                    </div>
+                    <p class="text-center text-muted mb-2">ou</p>
+                    <p class="text-center mb-0">
+                        Votre usager n'a pas encore de compte ?
+                        <a href="{{ create_job_seeker_url }}" {% matomo_event "compte-candidat" "clic" "creer-un-compte-candidat-orientation" %}>
+                            Créer un compte usager
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
