@@ -76,15 +76,11 @@ def employer_has_access_to_assessments(request):
     """
     Return True if the user can access the GEIQ assessment module.
 
-    Access is restricted to:
-    - GEIQ organization admins within the configured campaign regions
+    Access is restricted to GEIQ organization admins
     """
 
     if (organization := getattr(request, "current_organization", None)) and organization.kind == CompanyKind.GEIQ:
-        return (
-            organization.post_code.startswith(tuple(settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES))
-            and request.is_current_organization_admin
-        )
+        return request.is_current_organization_admin
     return False
 
 
