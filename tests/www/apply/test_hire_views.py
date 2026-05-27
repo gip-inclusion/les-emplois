@@ -2620,7 +2620,7 @@ class TestHireContract:
             ("prescriber_diag_hiring_outside_validity_period", "redirect_to:hire_confirmation"),
             ("employer_diag_hiring_today", "redirect_to:hire_confirmation"),
             ("employer_diag_hiring_in_more_than_92_days", "form_error:AFTER_EMPLOYER_DIAGNOSIS_VALIDITY"),
-            ("employer_diag_hiring_outside_validity_period", "redirect_to:hire_confirmation"),  # This will change
+            ("employer_diag_hiring_outside_validity_period", "redirect_to:iae_eligibility_for_hire"),
             ("valid_approval_hiring_inside_validity_period", "redirect_to:hire_confirmation"),
             ("valid_approval_hiring_outside_validity_period", "form_error:OUTSIDE_APPROVAL_BOUNDS"),
         ],
