@@ -1,10 +1,14 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.utils.apis.dora import DoraAPIException
-from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
+from itou.www.insertion_views.views import (
+    ORIENTATION_DORA_VALIDATION_ERRORS_SESSION_KEY,
+    OrientationStep,
+    OrientationWizardView,
+)
 from tests.insertion.factories import ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
@@ -220,19 +224,27 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
     session_uuid = _reach_documents_step(client, prescriber, job_seeker, service)
 
     mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
-    mock_dora.return_value.create_orientation.side_effect = DoraAPIException
+    mock_dora.return_value.create_orientation.side_effect = DoraAPIException(
+        validation_errors={
+            "emplois_data": {
+                "structure_siret": ["Ce champ est obligatoire."],
+            }
+        },
+        status_code=400,
+    )
 
+    error_url = reverse(
+        "insertion_views:orientation_error",
+        kwargs={"service_uid": service.uid},
+        query={"job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(_step_url(session_uuid, OrientationStep.DOCUMENTS), _documents_post_data())
 
-    assertRedirects(
-        response,
-        reverse(
-            "insertion_views:orientation_error",
-            kwargs={"service_uid": service.uid},
-            query={"job_seeker_public_id": job_seeker.public_id},
-        ),
-        fetch_redirect_response=False,
-    )
+    assertRedirects(response, error_url, fetch_redirect_response=False)
+
+    response = client.get(error_url)
+    assertContains(response, "structure_siret")
+    assertContains(response, "Ce champ est obligatoire.")
 
 
 def test_orientation_error_page(client, db):
@@ -254,6 +266,36 @@ def test_orientation_error_page(client, db):
     assertContains(response, "Un problème technique est survenu")
     assertContains(response, "Votre demande n'a pas été transmise suite à un problème technique")
     assertContains(response, reverse("insertion_views:service_card", kwargs={"service_uid": service.uid}))
+
+
+def test_orientation_error_page_displays_dora_validation_errors(client, db):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory(first_name="Michel", last_name="DURANT")
+    service = ServiceFactory(is_orientable_with_form=True)
+
+    session = client.session
+    session[ORIENTATION_DORA_VALIDATION_ERRORS_SESSION_KEY] = {
+        "emplois_data": {
+            "structure_siret": ["Ce champ est obligatoire."],
+        }
+    }
+    session.save()
+
+    client.force_login(prescriber)
+    response = client.get(
+        reverse(
+            "insertion_views:orientation_error",
+            kwargs={"service_uid": service.uid},
+            query={"job_seeker_public_id": job_seeker.public_id},
+        )
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "Votre demande n'a pas pu être transmise")
+    assertContains(response, "structure_siret")
+    assertContains(response, "Ce champ est obligatoire.")
+    assertNotContains(response, "Un problème technique est survenu")
+    assert ORIENTATION_DORA_VALIDATION_ERRORS_SESSION_KEY not in client.session
 
 
 def test_orientation_confirmation_page(client, db):

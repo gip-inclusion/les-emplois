@@ -16,17 +16,29 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8">
-                    {% component_alert title=alert_title content=alert_content variant="warning" %}
-                        {% fragment as alert_title %}
-                            Un problème technique est survenu
-                        {% endfragment %}
-                        {% fragment as alert_content %}
-                            <p class="mb-0">
-                                Votre demande n'a pas été transmise suite à un problème technique.
-                                Merci de bien vouloir réessayer plus tard.
-                            </p>
-                        {% endfragment %}
-                    {% endcomponent_alert %}
+                    {% if dora_validation_errors %}
+                        {% component_alert title=alert_title content=alert_content variant="danger" %}
+                            {% fragment as alert_title %}
+                                Votre demande n'a pas pu être transmise
+                            {% endfragment %}
+                            {% fragment as alert_content %}
+                                <p>Des informations nécessaires à la transmission de la demande sont manquantes ou invalides&nbsp;:</p>
+                                <pre class="mb-0">{{ dora_validation_errors }}</pre>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    {% else %}
+                        {% component_alert title=alert_title content=alert_content variant="warning" %}
+                            {% fragment as alert_title %}
+                                Un problème technique est survenu
+                            {% endfragment %}
+                            {% fragment as alert_content %}
+                                <p class="mb-0">
+                                    Votre demande n'a pas été transmise suite à un problème technique.
+                                    Merci de bien vouloir réessayer plus tard.
+                                </p>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    {% endif %}
                     <a href="{% url 'insertion_views:service_card' service_uid=service.uid %}" class="btn btn-primary mt-3">Retour à la fiche service</a>
                 </div>
             </div>

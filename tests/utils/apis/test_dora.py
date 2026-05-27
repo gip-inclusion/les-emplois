@@ -56,5 +56,25 @@ def test_create_orientation_without_attachments_sends_data_only(dora_client):
 def test_create_orientation_raises_on_http_error(dora_client):
     with respx.mock(base_url=f"{DORA_BASE_URL}/api/emplois/") as respx_mock:
         respx_mock.post("/orientations/").respond(500)
-        with pytest.raises(DoraAPIException):
+        with pytest.raises(DoraAPIException) as exc_info:
             dora_client.create_orientation({"di_service_id": "soliguide--svc-1"})
+
+    assert exc_info.value.validation_errors is None
+    assert exc_info.value.status_code == 500
+
+
+def test_create_orientation_raises_with_validation_errors_on_bad_request(dora_client):
+    validation_errors = {
+        "emplois_data": {
+            "structure_siret": ["Ce champ est obligatoire."],
+            "prescriber_phone": ["Ce champ est obligatoire."],
+        }
+    }
+
+    with respx.mock(base_url=f"{DORA_BASE_URL}/api/emplois/") as respx_mock:
+        respx_mock.post("/orientations/").respond(400, json=validation_errors)
+        with pytest.raises(DoraAPIException) as exc_info:
+            dora_client.create_orientation({"di_service_id": "soliguide--svc-1"})
+
+    assert exc_info.value.validation_errors == validation_errors
+    assert exc_info.value.status_code == 400

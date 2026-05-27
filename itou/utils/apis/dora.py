@@ -9,7 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class DoraAPIException(Exception):
-    pass
+    def __init__(self, *, validation_errors=None, status_code=None):
+        self.validation_errors = validation_errors
+        self.status_code = status_code
+        super().__init__()
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
@@ -80,6 +83,18 @@ class DoraAPIClient:
             for r in self._request("/disabled-dora-form-di-structures/", params).json()
         }
 
+    @staticmethod
+    def _parse_error_response(response):
+        if response is None:
+            return None
+        try:
+            body = response.json()
+        except (json.JSONDecodeError, ValueError):
+            return None
+        if isinstance(body, dict):
+            return body
+        return None
+
     def create_orientation(self, payload: dict, attachments=()) -> dict:
         files = [("attachments", (file_name, file_obj)) for file_name, file_obj in attachments]
         try:
@@ -90,12 +105,17 @@ class DoraAPIClient:
                 timeout=httpx.Timeout(5, read=60),
             ).raise_for_status()
         except httpx.HTTPError as exc:
+            response = getattr(exc, "response", None)
             logger.info(
-                "DORA create-orientation error di_service_id=%r error=%s",
+                "DORA create-orientation error di_service_id=%r status=%s error=%s",
                 payload.get("di_service_id"),
+                getattr(response, "status_code", None),
                 exc,
             )
-            raise DoraAPIException()
+            raise DoraAPIException(
+                validation_errors=self._parse_error_response(response),
+                status_code=getattr(response, "status_code", None),
+            ) from exc
         orientation_response = response.json()
         logger.info(
             "DORA create-orientation success di_service_id=%r orientation_id=%s",

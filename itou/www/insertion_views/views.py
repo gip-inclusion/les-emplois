@@ -1,4 +1,5 @@
 import enum
+import json
 import logging
 
 from django.conf import settings
@@ -37,6 +38,8 @@ from itou.www.utils.wizard import WizardView
 
 
 logger = logging.getLogger(__name__)
+
+ORIENTATION_DORA_VALIDATION_ERRORS_SESSION_KEY = "orientation_dora_validation_errors"
 
 
 class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
@@ -213,6 +216,14 @@ class OrientationErrorView(OrientationResultView):
     template_name = "insertion/orientation_error.html"
     matomo_custom_title = "Erreur lors de la demande d'orientation"
 
+    def get_context_data(self, **kwargs):
+        dora_validation_errors = self.request.session.pop(ORIENTATION_DORA_VALIDATION_ERRORS_SESSION_KEY, None)
+        return super().get_context_data(**kwargs) | {
+            "dora_validation_errors": json.dumps(dora_validation_errors, ensure_ascii=False, indent=2)
+            if dora_validation_errors
+            else None,
+        }
+
 
 class OrientationWizardView(LoginRequiredMixin, WizardView):
     url_name = "insertion_views:orientation_steps"
@@ -260,7 +271,7 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
             query={"job_seeker_public_id": self.job_seeker.public_id},
         )
 
-    def _redirect_on_submission_error(self, request, reason):
+    def _redirect_on_submission_error(self, request, reason, dora_exception=None):
         logger.info(
             "orientation wizard submission_failed reason=%s user=%s service_uid=%s job_seeker=%s",
             reason,
@@ -268,6 +279,8 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
             self.service.uid,
             self.job_seeker.public_id,
         )
+        if dora_exception and dora_exception.validation_errors:
+            request.session[ORIENTATION_DORA_VALIDATION_ERRORS_SESSION_KEY] = dora_exception.validation_errors
         self.wizard_session.delete()
         return HttpResponseRedirect(self._orientation_error_url())
 
@@ -319,8 +332,8 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
         )
         try:
             self.dora_client.create_orientation(payload, attachments)
-        except DoraAPIException:
-            return self._redirect_on_submission_error(request, "create_orientation")
+        except DoraAPIException as exc:
+            return self._redirect_on_submission_error(request, "create_orientation", dora_exception=exc)
 
         logger.info(
             "orientation wizard submitted user=%s service_uid=%s job_seeker=%s",
