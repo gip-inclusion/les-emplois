@@ -44,14 +44,15 @@ class TestAssessmentContractsListAndToggle:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == expected_status
 
-    def test_access_as_geiq(self, client, settings, snapshot):
+    def test_access_as_geiq(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -59,7 +60,6 @@ class TestAssessmentContractsListAndToggle:
             user__last_name="Martin",
             user__email="paul.martin@example.com",
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             campaign__year=2024,
@@ -146,7 +146,7 @@ class TestAssessmentContractsListAndToggle:
             name="assessments contracts list"
         )
 
-    def test_allowance_granted_previous_year(self, client, settings, snapshot):
+    def test_allowance_granted_previous_year(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -154,7 +154,6 @@ class TestAssessmentContractsListAndToggle:
             user__last_name="Martin",
             user__email="paul.martin@example.com",
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             campaign__year=2024,
@@ -224,11 +223,10 @@ class TestAssessmentContractsListAndToggle:
         assertContains(response, PLURAL_PREVIOUS_YEAR_WARNING)
 
     @override_settings(PAGE_SIZE_LARGE=1)
-    def test_pagination(self, client, settings):
+    def test_pagination(self, client):
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             campaign__year=2024,
             companies=[geiq_membership.company],
@@ -338,7 +336,7 @@ class TestAssessmentContractsListAndToggle:
             name="assessments contracts list"
         )
 
-    def test_htmx_toggle_as_geiq(self, client, settings):
+    def test_htmx_toggle_as_geiq(self, client):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -346,7 +344,6 @@ class TestAssessmentContractsListAndToggle:
             user__last_name="Martin",
             user__email="paul.martin@example.com",
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             campaign__year=2024,
@@ -520,7 +517,7 @@ class TestAssessmentContractsListAndToggle:
         contract_2.refresh_from_db()
         assert contract_2.allowance_granted is True
 
-    def test_contract_selection_after_ask_for_geiq_fix(self, settings, client):
+    def test_contract_selection_after_ask_for_geiq_fix(self, client):
         """Simulate back and forth exchanges between institution and GEIQ."""
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
@@ -529,7 +526,6 @@ class TestAssessmentContractsListAndToggle:
             user__last_name="Martin",
             user__email="paul.martin@example.com",
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             campaign__year=2024,
@@ -622,14 +618,15 @@ class TestAssessmentContractsDetails:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == expected_status
 
-    def test_contract_details_access(self, client, settings, snapshot):
+    def test_contract_details_access(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -637,7 +634,6 @@ class TestAssessmentContractsDetails:
             user__last_name="Martin",
             user__email="paul.martin@example.com",
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             campaign__year=2024,
@@ -709,7 +705,7 @@ class TestAssessmentContractsDetails:
         check_user_access_to_all_tabs(ddets_membership.user, access=True, with_previous_year_warning=True)
         check_user_access_to_all_tabs(geiq_membership.user, access=True, with_previous_year_warning=True)
 
-    def test_contract_toggle_as_geiq(self, client, settings):
+    def test_contract_toggle_as_geiq(self, client):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
@@ -718,7 +714,6 @@ class TestAssessmentContractsDetails:
             with_submission_requirements=True,
             contracts_selection_validated_at=None,
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         contract = EmployeeContractFactory(
             employee__assessment=assessment,
             allowance_requested=random.choice([True, False]),
@@ -788,7 +783,7 @@ class TestAssessmentContractsDetails:
 
 
 class TestEmployeeContractToggleView:
-    def test_contract_toggle_as_geiq_noop_after_selection_validated_at(self, client, settings):
+    def test_contract_toggle_as_geiq_noop_after_selection_validated_at(self, client):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
@@ -796,7 +791,6 @@ class TestEmployeeContractToggleView:
             companies=[geiq_membership.company],
             with_submission_requirements=True,
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         contract = EmployeeContractFactory(employee__assessment=assessment, allowance_requested=True)
         client.force_login(geiq_membership.user)
         response = client.post(
@@ -901,7 +895,8 @@ class TestAssessmentContractsExportView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(membership=True), 403),
-            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -909,7 +904,7 @@ class TestAssessmentContractsExportView:
             assert response.status_code == expected_status
 
     @freeze_time("2025-06-01 12:00:00")
-    def test_export(self, client, settings, snapshot):
+    def test_export(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -917,7 +912,6 @@ class TestAssessmentContractsExportView:
             user__last_name="Martin",
             user__email="paul.martin@example.com",
         )
-        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             campaign__year=2024,
