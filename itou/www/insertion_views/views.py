@@ -24,7 +24,11 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
-from itou.www.insertion_views.forms import OrientationSelectJobSeekerForm
+from itou.www.insertion_views.forms import (
+    OrientationConformityForm,
+    OrientationReferentForm,
+    OrientationSelectJobSeekerForm,
+)
 from itou.www.utils.wizard import WizardView
 
 
@@ -182,7 +186,10 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
     url_name = "insertion_views:orientation_steps"
     expected_session_kind = "orientation"
     template_name = "insertion/orientation_wizard.html"
-    steps_config = {}
+    steps_config = {
+        OrientationStep.CONFORMITY: OrientationConformityForm,
+        OrientationStep.REFERENT: OrientationReferentForm,
+    }
 
     def setup_wizard(self):
         self.service = get_object_or_404(
@@ -195,13 +202,50 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
             kind=UserKind.JOB_SEEKER,
         )
 
+    def get_form_initial(self, step):
+        if step == OrientationStep.REFERENT and self.wizard_session.get(step) is self.wizard_session.NOT_SET:
+            user = self.request.user
+            return {
+                "referent_last_name": user.last_name,
+                "referent_first_name": user.first_name,
+                "referent_phone": user.phone,
+                "referent_email": user.email,
+            }
+        return super().get_form_initial(step)
+
+    def get(self, request, *args, **kwargs):
+        logger.info(
+            "orientation wizard step_viewed step=%s user=%s service_uid=%s job_seeker=%s",
+            self.step,
+            request.user.pk,
+            self.service.uid,
+            self.job_seeker.public_id,
+        )
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            logger.info(
+                "orientation wizard step_completed step=%s user=%s service_uid=%s job_seeker=%s",
+                self.step,
+                request.user.pk,
+                self.service.uid,
+                self.job_seeker.public_id,
+            )
+        return super().post(request, *args, **kwargs)
+
     def done(self):
         return self.reset_url
 
     def get_context_data(self, **kwargs):
+        matomo_titles = {
+            OrientationStep.CONFORMITY: "Orientation service - valider conformité",
+            OrientationStep.REFERENT: "Orientation service - compléter demande",
+        }
         return super().get_context_data(**kwargs) | {
             "service": self.service,
             "job_seeker": self.job_seeker,
             "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
             "OrientationStep": OrientationStep,
+            "matomo_custom_title": matomo_titles[self.step],
         }

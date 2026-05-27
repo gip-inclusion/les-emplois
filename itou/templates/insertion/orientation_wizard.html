@@ -32,6 +32,93 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% include "insertion/includes/orientation_rappel_alert.html" %}
                     {% include "insertion/includes/orientation_wizard_stepper.html" %}
+
+                    {% if wizard_steps.current == OrientationStep.CONFORMITY %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Informations du candidat</h2>
+                            <ul class="list-data">
+                                <li>
+                                    <small>Nom</small>
+                                    <strong>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</strong>
+                                </li>
+                                {% if job_seeker.phone %}
+                                    <li>
+                                        <small>Téléphone</small>
+                                        <strong>{{ job_seeker.phone|mask_unless:can_view_personal_information }}</strong>
+                                    </li>
+                                {% endif %}
+                                {% if job_seeker.address_on_one_line %}
+                                    <li>
+                                        <small>Adresse</small>
+                                        <strong>{{ job_seeker.address_on_one_line|mask_unless:can_view_personal_information }}</strong>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Conditions d'accès au service</h2>
+                            {% if service.fee or service.fee_details %}
+                                <div class="mb-3">
+                                    <strong>Frais :</strong>
+                                    {% if service.fee %}{{ service.fee }}{% endif %}
+                                    {% if service.fee_details %}
+                                        <br>
+                                        {{ service.fee_details }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            {% if service.access_conditions_di or service.access_conditions_dora %}
+                                <div class="mb-3">
+                                    <strong>Conditions d'accès :</strong>
+                                    <ul>
+                                        {% if service.access_conditions_di %}<li>{{ service.access_conditions_di }}</li>{% endif %}
+                                        {% for condition in service.access_conditions_dora %}<li>{{ condition }}</li>{% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="c-form mb-3 mb-md-4">
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+                                {% bootstrap_field form.confirms_conditions %}
+                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" %}
+                            </form>
+                        </div>
+
+                    {% elif wizard_steps.current == OrientationStep.REFERENT %}
+                        <div class="c-form mb-3 mb-md-4">
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+
+                                <h2 class="h3">Conseiller ou conseillère référent(e)</h2>
+                                <p>
+                                    Personne en charge de l'accompagnement et du suivi professionnel, ainsi que
+                                    l'interlocuteur(trice) privilégié(e) pour le service.
+                                </p>
+
+                                {% bootstrap_field form.referent_last_name wrapper_class="form-group form-group-input-w-lg-66" %}
+                                {% bootstrap_field form.referent_first_name wrapper_class="form-group form-group-input-w-lg-66" %}
+                                {% bootstrap_field form.referent_phone wrapper_class="form-group form-group-input-w-lg-66" %}
+                                {% bootstrap_field form.referent_email wrapper_class="form-group form-group-input-w-lg-66" %}
+
+                                <h3 class="h4">Motif de l'orientation (facultatif)</h3>
+                                <p>Si besoin, détaillez ici le motif de l'orientation</p>
+                                {% bootstrap_field form.orientation_reason show_label=False %}
+
+                                <p class="small text-muted">
+                                    Merci de ne pas fournir des informations considérées comme sensibles (origine raciale
+                                    ou ethnique, opinions politiques, convictions religieuses ou philosophiques,
+                                    appartenance syndicale, données génétiques, données biométriques, etc.).
+                                </p>
+
+                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" secondary_url=wizard_steps.prev %}
+                            </form>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
