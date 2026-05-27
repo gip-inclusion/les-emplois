@@ -79,7 +79,7 @@ class StartViewForHire(HirePermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNeededMixin, TemplateView):
+class HireWizardMixin(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNeededMixin):
     def __init__(self):
         super().__init__()
         self.hire_session = None
@@ -160,7 +160,7 @@ class HireBaseView(HirePermissionMixin, common_views.IsIAEEligibilityDiagnosisNe
         }
 
 
-class CheckPreviousApplicationsForHireView(HireBaseView):
+class CheckPreviousApplicationsForHireView(HireWizardMixin, TemplateView):
     template_name = "apply/hire_step_check_prev_applications.html"
 
     def setup(self, request, *args, **kwargs):
@@ -200,7 +200,7 @@ class CheckPreviousApplicationsForHireView(HireBaseView):
 
 
 class IAEEligibilityForHireView(
-    common_views.JobSeekerAndContractInfosNeededMixin, HireBaseView, BaseIAEEligibilityViewForEmployer
+    common_views.JobSeekerAndContractInfosNeededMixin, HireWizardMixin, BaseIAEEligibilityViewForEmployer
 ):
     template_name = "apply/submit/eligibility_for_hire.html"
 
@@ -228,7 +228,7 @@ class IAEEligibilityForHireView(
 
 
 class GEIQEligibilityForHireView(
-    common_views.JobSeekerAndContractInfosNeededMixin, HireBaseView, common_views.BaseGEIQEligibilityView
+    common_views.JobSeekerAndContractInfosNeededMixin, HireWizardMixin, common_views.BaseGEIQEligibilityView
 ):
     template_name = "apply/submit/geiq_eligibility_for_hire.html"
 
@@ -260,11 +260,11 @@ class GEIQEligibilityForHireView(
         return context
 
 
-class GEIQEligiblityCriteriaForHireView(HireBaseView, common_views.BaseGEIQEligibilityCriteriaHtmxView):
+class GEIQEligiblityCriteriaForHireView(HireWizardMixin, common_views.BaseGEIQEligibilityCriteriaHtmxView):
     pass
 
 
-class FillJobSeekerInfosForHireView(HireBaseView, common_views.BaseFillJobSeekerInfosView):
+class FillJobSeekerInfosForHireView(HireWizardMixin, common_views.BaseFillJobSeekerInfosView):
     template_name = "apply/submit/hire_fill_job_seeker_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
@@ -290,7 +290,7 @@ class FillJobSeekerInfosForHireView(HireBaseView, common_views.BaseFillJobSeeker
         return context
 
 
-class ContractInfosForHireView(HireBaseView, common_views.BaseContractInfosView):
+class ContractInfosForHireView(HireWizardMixin, common_views.BaseContractInfosView):
     template_name = "apply/submit/hire_contract_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
@@ -329,7 +329,7 @@ class ContractInfosForHireView(HireBaseView, common_views.BaseContractInfosView)
         return context
 
 
-class ConfirmationForHireView(HireBaseView, common_views.BaseConfirmationView):
+class ConfirmationForHireView(HireWizardMixin, common_views.BaseConfirmationView):
     template_name = "apply/submit/hire_confirmation_step.html"
 
     def setup(self, request, *args, **kwargs):
