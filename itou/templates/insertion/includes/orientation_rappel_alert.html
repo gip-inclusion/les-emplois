@@ -1,0 +1,14 @@
+{% load components %}
+
+{% component_alert title=title content=content variant="warning" dismissible=True extra_classes="mb-3 mb-md-4" %}
+    {% fragment as title %}
+        Rappel
+    {% endfragment %}
+    {% fragment as content %}
+        <p class="mb-0">
+            Les orientations invalides ou à titre de test génèrent une alerte et nécessiteront une vérification
+            manuelle&nbsp;; vous recevrez un e-mail si c'est le cas. Pour plus d'informations, consultez
+            <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" class="has-external-link">notre documentation</a>.
+        </p>
+    {% endfragment %}
+{% endcomponent_alert %}

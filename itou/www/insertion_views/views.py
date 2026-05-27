@@ -1,3 +1,8 @@
+import enum
+import logging
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -8,11 +13,18 @@ from django.views.generic.base import TemplateView
 from itou.insertion import models as insertion_models
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import get_orientation_jwt
+from itou.users.enums import UserKind
+from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
+from itou.www.utils.wizard import WizardView
+
+
+logger = logging.getLogger(__name__)
 
 
 class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
@@ -75,3 +87,59 @@ class ServiceCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, DetailView)
         context["matomo_custom_title"] = "Fiche de la service d'insértion"
         context["orientation_jwt"] = get_orientation_jwt(self.request)
         return context
+
+
+class OrientationStep(enum.StrEnum):
+    CONFORMITY = "valider-conformite"
+    REFERENT = "completer-demande"
+    DOCUMENTS = "documents-justificatifs"
+    do_not_call_in_templates = enum.nonmember(True)
+
+
+@login_required
+def start_orientation(request, service_uid):
+    service = get_object_or_404(insertion_models.Service, uid=service_uid, is_orientable_with_form=True)
+    job_seeker = get_object_or_404(User, public_id=request.GET.get("job_seeker_public_id"), kind=UserKind.JOB_SEEKER)
+    logger.info(
+        "orientation wizard start user=%s service_uid=%s job_seeker=%s",
+        request.user.pk,
+        service.uid,
+        job_seeker.public_id,
+    )
+    return OrientationWizardView.initialize_session_and_start(
+        request,
+        reset_url=reverse("insertion_views:service_card", kwargs={"service_uid": service.uid}),
+        extra_session_data={
+            "service_uid": service.uid,
+            "job_seeker_public_id": str(job_seeker.public_id),
+        },
+    )
+
+
+class OrientationWizardView(LoginRequiredMixin, WizardView):
+    url_name = "insertion_views:orientation_steps"
+    expected_session_kind = "orientation"
+    template_name = "insertion/orientation_wizard.html"
+    steps_config = {}
+
+    def setup_wizard(self):
+        self.service = get_object_or_404(
+            insertion_models.Service.objects.select_related("kind", "structure"),
+            uid=self.wizard_session.get("service_uid"),
+        )
+        self.job_seeker = get_object_or_404(
+            User.objects.select_related("jobseeker_profile"),
+            public_id=self.wizard_session.get("job_seeker_public_id"),
+            kind=UserKind.JOB_SEEKER,
+        )
+
+    def done(self):
+        return self.reset_url
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "service": self.service,
+            "job_seeker": self.job_seeker,
+            "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
+            "OrientationStep": OrientationStep,
+        }

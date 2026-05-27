@@ -28,7 +28,7 @@
                       <div class="c-box c-box--action d-flex align-items-center justify-content-between">
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/di--test-service-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-prescriber" rel="noopener" target="_blank">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orienter/test-service-uid/start/">
                                       <span>
                                           Orienter le bénéficiaire
                                       </span>
@@ -187,7 +187,7 @@
   <div class="c-box c-box--action d-flex align-items-center justify-content-between">
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/di--test-orientable-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-prescriber" rel="noopener" target="_blank">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orienter/test-orientable-uid/start/">
                   <span>
                       Orienter le bénéficiaire
                   </span>
@@ -245,7 +245,7 @@
                       <div class="c-box c-box--action d-flex align-items-center justify-content-between">
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/test/orienter?mtm_campaign=lesemplois&mtm_kwd=service-prescriber" rel="noopener" target="_blank">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orienter/test-service-full-uid/start/">
                                       <span>
                                           Orienter le bénéficiaire
                                       </span>

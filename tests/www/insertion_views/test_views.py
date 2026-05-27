@@ -4,7 +4,6 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.insertion.models import GenericReferenceItemKind
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -151,31 +150,12 @@ def test_detail_without_source_link(client, user):
     assertNotContains(response, 'rel="canonical"')
 
 
-def test_detail_orientation_url_with_jwt_for_authorized_prescriber(client):
-    organization = PrescriberOrganizationFactory(authorized=True)
-    prescriber = PrescriberFactory(membership=True, membership__organization=organization)
+def test_detail_orientation_url_points_to_wizard_start(client, user):
     service = ServiceFactory(
-        uid="test-jwt-uid",
+        uid="test-wizard-uid",
         updated_on="2025-01-15",
         is_orientable_with_form=True,
-        structure__uid="test-structure-jwt-uid",
-        structure__updated_on="2025-01-15",
-    )
-    client.force_login(prescriber)
-
-    response = client.get(detail_url(service))
-
-    assert response.status_code == 200
-    # Authorized ProConnect prescribers get orientation URL wrapped in nexus auto_login with JWT
-    assertContains(response, reverse("nexus:auto_login"))
-
-
-def test_detail_orientation_url_without_jwt_for_regular_prescriber(client, user):
-    service = ServiceFactory(
-        uid="test-no-jwt-uid",
-        updated_on="2025-01-15",
-        is_orientable_with_form=True,
-        structure__uid="test-structure-no-jwt-uid",
+        structure__uid="test-structure-wizard-uid",
         structure__updated_on="2025-01-15",
     )
     client.force_login(user)
@@ -183,5 +163,5 @@ def test_detail_orientation_url_without_jwt_for_regular_prescriber(client, user)
     response = client.get(detail_url(service))
 
     assert response.status_code == 200
-    # Regular prescribers get direct DORA URL without nexus auto_login
+    assertContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
     assertNotContains(response, reverse("nexus:auto_login"))
