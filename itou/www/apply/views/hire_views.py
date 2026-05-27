@@ -188,11 +188,14 @@ class IAEEligibilityForHireView(
 ):
     template_name = "apply/submit/eligibility_for_hire.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        # If someone tries to access this page for a non-IAE company, let the base class serve a 404
-        if self.company.is_subject_to_iae_rules and not self.is_iae_eligibility_diagnosis_needed():
+    def steps_redirect(self):
+        redirect = super().steps_redirect()
+        if redirect is None and (
+            # If someone tries to access this page for a non-IAE company, let the base class serve a 404
+            self.company.is_subject_to_iae_rules and not self.is_iae_eligibility_diagnosis_needed()
+        ):
             return HttpResponseRedirect(self.get_success_url())
-        return super().dispatch(request, *args, **kwargs)
+        return redirect
 
     def get_success_url(self):
         return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name})

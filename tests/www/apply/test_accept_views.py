@@ -2644,6 +2644,9 @@ class TestIAEEligibility:
             sent_by_authorized_prescriber=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
+            job_seeker__with_ban_geoloc_address=True,
+            job_seeker__born_in_france=True,
         )
         ApprovalFactory(user=job_application.job_seeker)
         employer = job_application.to_company.members.first()
@@ -2656,6 +2659,16 @@ class TestIAEEligibility:
         response = client.get(url_accept)
         assert response.status_code == 302
         session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+
+        # Fill contract infos
+        response = client.post(
+            reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
+            data={
+                "hiring_start_at": timezone.localdate(),
+            },
+        )
+        assert response.status_code == 302
+
         url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
         response = client.get(url)
         assertRedirects(
@@ -2735,6 +2748,7 @@ class TestIAEEligibility:
             reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
             data={
                 "hiring_start_at": timezone.localdate(),
+                "answer": "",
             },
         )
         url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})

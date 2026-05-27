@@ -1646,7 +1646,12 @@ class TestEligibilityForHire:
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
-        hire_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        hire_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {"selected_jobs": [], "contract_form_data": {"hiring_start_at": timezone.localdate()}},
+        )
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": hire_session.name}))
         assertRedirects(
             response,
