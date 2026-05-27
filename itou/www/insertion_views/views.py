@@ -26,6 +26,7 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.insertion_views.forms import (
     OrientationConformityForm,
+    OrientationDocumentsForm,
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
 )
@@ -189,6 +190,7 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
     steps_config = {
         OrientationStep.CONFORMITY: OrientationConformityForm,
         OrientationStep.REFERENT: OrientationReferentForm,
+        OrientationStep.DOCUMENTS: OrientationDocumentsForm,
     }
 
     def setup_wizard(self):
@@ -200,6 +202,12 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
             User.objects.select_related("jobseeker_profile"),
             public_id=self.wizard_session.get("job_seeker_public_id"),
             kind=UserKind.JOB_SEEKER,
+        )
+
+    def get_form(self, step, data):
+        files = self.request.FILES if self.request.method == "POST" else None
+        return self.get_form_class(step)(
+            initial=self.get_form_initial(step), data=data, files=files, **self.get_form_kwargs(step)
         )
 
     def get_form_initial(self, step):
@@ -224,6 +232,9 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if self.step == OrientationStep.DOCUMENTS:
+            return self._post_documents_step(request, *args, **kwargs)
+
         if self.form.is_valid():
             logger.info(
                 "orientation wizard step_completed step=%s user=%s service_uid=%s job_seeker=%s",
@@ -234,13 +245,21 @@ class OrientationWizardView(LoginRequiredMixin, WizardView):
             )
         return super().post(request, *args, **kwargs)
 
-    def done(self):
-        return self.reset_url
+    def _post_documents_step(self, request, *args, **kwargs):
+        if invalid_step := self.find_step_with_invalid_data_until_step(self.step):
+            return HttpResponseRedirect(self.get_step_url(invalid_step))
+
+        if not self.form.is_valid():
+            return self.render_to_response(self.get_context_data(**kwargs))
+
+        self.wizard_session.delete()
+        return HttpResponseRedirect(self.reset_url)
 
     def get_context_data(self, **kwargs):
         matomo_titles = {
             OrientationStep.CONFORMITY: "Orientation service - valider conformité",
             OrientationStep.REFERENT: "Orientation service - compléter demande",
+            OrientationStep.DOCUMENTS: "Orientation service - documents justificatifs",
         }
         return super().get_context_data(**kwargs) | {
             "service": self.service,

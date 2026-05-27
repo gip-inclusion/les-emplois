@@ -2,10 +2,18 @@ from django import forms
 from django.forms import ValidationError
 from django_select2.forms import Select2Widget
 
+from itou.files.forms import ItouMultiFileField
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.constants import MB
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
+
+
+# FIXME(vperron): ensure those files match DORA's allowed file types
+ORIENTATION_FILE_EXTENSIONS = ["doc", "docx", "pdf", "png", "jpeg", "jpg", "odt", "xls", "xlsx", "ods"]
+ORIENTATION_FILE_CONTENT_TYPES = ".doc,.docx,.pdf,.png,.jpeg,.jpg,.odt,.xls,.xlsx,.ods"
+ORIENTATION_FILE_MAX_SIZE_MB = 5
 
 
 class OrientationSelectJobSeekerForm(forms.Form):
@@ -70,4 +78,28 @@ class OrientationReferentForm(forms.Form):
         required=False,
         label="Motif de l'orientation",
         widget=forms.Textarea(attrs={"placeholder": "Placeholder", "rows": 4}),
+    )
+
+
+class OrientationDocumentsForm(forms.Form):
+    credentials_documents_files = ItouMultiFileField(
+        required=False,
+        label="Documents à compléter",
+        content_type=ORIENTATION_FILE_CONTENT_TYPES,
+        max_upload_size=ORIENTATION_FILE_MAX_SIZE_MB * MB,
+        allowed_extensions=ORIENTATION_FILE_EXTENSIONS,
+    )
+    credentials_proof_files = ItouMultiFileField(
+        required=False,
+        label="Pré-requis et justificatifs",
+        content_type=ORIENTATION_FILE_CONTENT_TYPES,
+        max_upload_size=ORIENTATION_FILE_MAX_SIZE_MB * MB,
+        allowed_extensions=ORIENTATION_FILE_EXTENSIONS,
+    )
+    gdpr_consent = forms.BooleanField(
+        required=True,
+        label=(
+            "Je m'engage en tant qu'accompagnateur, à informer la personne concernée du traitement de ses "
+            "données personnelles dans le cadre de cette orientation"
+        ),
     )

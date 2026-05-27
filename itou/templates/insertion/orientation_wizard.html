@@ -118,6 +118,75 @@
                                 {% itou_buttons_form reset_url=reset_url primary_label="Suivant" secondary_url=wizard_steps.prev %}
                             </form>
                         </div>
+
+                    {% elif wizard_steps.current == OrientationStep.DOCUMENTS %}
+                        <div class="c-form mb-3 mb-md-4">
+                            <form method="post" enctype="multipart/form-data" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+
+                                <h2 class="h3">Documents et justificatifs requis</h2>
+
+                                {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
+                                    {% fragment as c_info__summary %}
+                                        <p class="mb-0">
+                                            Attention à ne télécharger que les pièces strictement nécessaires à la demande.
+                                            Pour des raisons de confidentialité, l'envoi de la carte vitale, des attestations
+                                            de droits santé/CPAM ou de tout autre document contenant le NIR (numéro de sécurité
+                                            sociale) n'est pas autorisé.
+                                        </p>
+                                    {% endfragment %}
+                                {% endcomponent_info %}
+
+                                {% if service.credentials_documents %}
+                                    <div class="mb-3 mb-md-4">
+                                        <h3 class="h4">Documents à compléter</h3>
+                                        <ul class="list-unstyled mb-3">
+                                            {% for document in service.credentials_documents %}
+                                                <li class="mb-2">
+                                                    <a href="{{ document }}" target="_blank" rel="noopener" class="has-external-link" download>
+                                                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                                                        {{ document }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% bootstrap_field form.credentials_documents_files show_label=False %}
+                                    </div>
+                                    <hr>
+                                {% endif %}
+
+                                {% if service.credentials_online_form %}
+                                    <div class="mb-3 mb-md-4">
+                                        <h3 class="h4">Liens</h3>
+                                        <p>Informations complémentaires ou formulaires à compléter</p>
+                                        <ul>
+                                            <li>
+                                                <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener" class="has-external-link">
+                                                    {{ service.credentials_online_form }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <hr>
+                                {% endif %}
+
+                                {% if service.credentials %}
+                                    <div class="mb-3 mb-md-4">
+                                        <h3 class="h4">Pré-requis et justificatifs</h3>
+                                        <p>(A récupérer auprès de l'usager)</p>
+                                        <ul>
+                                            {% for credential in service.credentials %}<li>{{ credential }}</li>{% endfor %}
+                                        </ul>
+                                        {% bootstrap_field form.credentials_proof_files show_label=False %}
+                                    </div>
+                                    <hr>
+                                {% endif %}
+
+                                {% bootstrap_field form.gdpr_consent %}
+                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" secondary_url=wizard_steps.prev %}
+                            </form>
+                        </div>
                     {% endif %}
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -115,6 +116,34 @@ def test_back_button_url_points_to_previous_step(client, db):
     client.post(_step_url(session_uuid, OrientationStep.CONFORMITY), {"confirms_conditions": "on"})
     response = client.get(_step_url(session_uuid, OrientationStep.REFERENT))
     assert response.context["wizard_steps"].prev == _step_url(session_uuid, OrientationStep.CONFORMITY)
+
+
+@pytest.mark.parametrize(
+    "current,next_step,post_data",
+    [
+        (OrientationStep.CONFORMITY, OrientationStep.REFERENT, {"confirms_conditions": "on"}),
+        (
+            OrientationStep.REFERENT,
+            OrientationStep.DOCUMENTS,
+            {
+                "referent_last_name": "Dupont",
+                "referent_first_name": "Jean",
+                "referent_phone": "0612345678",
+                "referent_email": "jean@example.com",
+            },
+        ),
+    ],
+)
+def test_valid_post_advances_to_next_step(client, db, current, next_step, post_data):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory()
+    service = ServiceFactory(is_orientable_with_form=True)
+
+    session_uuid = _start_wizard(client, prescriber, job_seeker, service)
+    if current == OrientationStep.REFERENT:
+        client.post(_step_url(session_uuid, OrientationStep.CONFORMITY), {"confirms_conditions": "on"})
+    response = client.post(_step_url(session_uuid, current), post_data)
+    assertRedirects(response, _step_url(session_uuid, next_step), fetch_redirect_response=False)
 
 
 def test_session_isolation_between_users(client, db):
