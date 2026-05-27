@@ -39,7 +39,7 @@ from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import ActionKind, IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
-from itou.utils import triggers
+from itou.utils import constants as global_constants, triggers
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
@@ -49,6 +49,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import (
     CompanyFactory,
+    CompanyMembershipFactory,
     JobDescriptionFactory,
     SiaeConventionFactory,
 )
@@ -97,6 +98,20 @@ def fake_session_initialization(client, company, job_seeker, data):
     session = initialize_hire_session(client, data)
     session.save()
     return session
+
+
+def test_start_hire_with_other_company(client):
+    employer = CompanyMembershipFactory().user
+    other_membership = CompanyMembershipFactory(user=employer)
+    client.force_login(employer)
+
+    response = client.get(reverse("apply:start_hire", kwargs={"company_pk": other_membership.company_id}))
+    assert response.status_code == 403
+    session = client.session
+    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_membership.company.organization_switch_key
+    session.save()
+    response = client.get(reverse("apply:start_hire", kwargs={"company_pk": other_membership.company_id}))
+    assert response.status_code == 302
 
 
 class TestHire:

@@ -56,7 +56,7 @@ def initialize_accept_session(request, data):
 @require_safe
 @check_request(lambda request: request.from_employer)
 def start_accept_wizard(request, job_application_id):
-    queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
+    queryset = JobApplication.objects.filter(to_company=request.current_organization).select_related(
         "job_seeker", "job_seeker__jobseeker_profile", "to_company"
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -84,6 +84,8 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
         self.geiq_eligibility_missing = False
 
     def setup(self, request, *args, session_uuid, **kwargs):
+        if not request.from_employer:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à accepter des candidatures.")
         super().setup(request, *args, **kwargs)
         try:
             self.accept_session = SessionNamespace(request.session, ACCEPT_SESSION_KIND, session_uuid)
@@ -96,6 +98,8 @@ class AcceptWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
         )
         self.job_application = get_object_or_404(queryset, id=job_application_id)
         self.company = self.job_application.to_company
+        if self.company != request.current_organization:
+            raise PermissionDenied("Vous ne pouvez accepter une candidature que dans la structure active.")
         self.job_seeker = self.job_application.job_seeker
         check_waiting_period(self.job_application)
         if self.company.kind == CompanyKind.GEIQ:

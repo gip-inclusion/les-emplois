@@ -931,7 +931,7 @@
 # ---
 # name: TestCheckPreviousApplicationsForHireView.test_num_queries[get_with_previous_application]
   dict({
-    'num_queries': 24,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -1901,26 +1901,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
-          'CheckPreviousApplicationsForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s))
-                 AND "users_user"."id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.get_active_suspension_dates[companies/models.py]',
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
           'CheckPreviousApplicationsForHireView.dispatch[www/apply/views/hire_views.py]',
@@ -2194,7 +2174,7 @@
 # ---
 # name: TestFillJobSeekerInfosForHire.test_no_missing_data_iae[view queries]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -3000,26 +2980,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s))
-                 AND "users_user"."id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
@@ -3135,7 +3095,7 @@
 # ---
 # name: TestHireConfirmation.test_as_geiq[view queries]
   dict({
-    'num_queries': 33,
+    'num_queries': 32,
     'queries': list([
       dict({
         'origin': list([
@@ -3964,26 +3924,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s))
-                 AND "users_user"."id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
@@ -4357,7 +4297,7 @@
 # ---
 # name: TestHireConfirmation.test_as_iae[view queries]
   dict({
-    'num_queries': 26,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -5158,26 +5098,6 @@
                  AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s))
-                 AND "users_user"."id" = %s)
           LIMIT 1
         ''',
       }),
@@ -5478,7 +5398,7 @@
 # ---
 # name: TestHireContract.test_as_company[view queries]
   dict({
-    'num_queries': 26,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -6279,26 +6199,6 @@
                  AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s))
-                 AND "users_user"."id" = %s)
           LIMIT 1
         ''',
       }),
