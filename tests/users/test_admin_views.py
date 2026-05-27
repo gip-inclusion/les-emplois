@@ -660,16 +660,14 @@ class TestDeactivateView:
             email="user@example.com",
         )
         EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
-        membership_factory = {
-            UserKind.EMPLOYER: CompanyMembershipFactory,
-            UserKind.PRESCRIBER: PrescriberMembershipFactory,
-            UserKind.LABOR_INSPECTOR: InstitutionMembershipFactory,
-            UserKind.JOB_SEEKER: None,
-        }[user.kind]
-        if membership_factory:
-            membership = membership_factory(user=user)
+        if user.is_professional:
+            memberships = [
+                CompanyMembershipFactory(user=user),
+                PrescriberMembershipFactory(user=user),
+                InstitutionMembershipFactory(user=user),
+            ]
         else:
-            membership = None
+            memberships = []
 
         response = admin_client.post(reverse("admin:deactivate_user", kwargs={"user_pk": user.pk}))
         assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
@@ -680,7 +678,7 @@ class TestDeactivateView:
         assert user.username == "old_0e8bee68-6c4b-48bb-850c-0dea09915d94"
         assert user.email == "user@example.com_old"
         assert not EmailAddress.objects.filter(user=user).exists()
-        if membership is not None:
+        for membership in memberships:
             membership.refresh_from_db()
             assert membership.is_active is False
             assert membership.updated_by == admin_user
