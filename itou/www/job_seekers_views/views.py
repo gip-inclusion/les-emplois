@@ -42,7 +42,7 @@ from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.utils.views import with_triggers_context
-from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireBaseView
+from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireWizardMixin
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
@@ -1431,7 +1431,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
         }
 
 
-class CheckJobSeekerInformationsForHire(HireBaseView):
+class CheckJobSeekerInformationsForHire(HireWizardMixin, TemplateView):
     """
     Ensure the job seeker has all required info.
     """
