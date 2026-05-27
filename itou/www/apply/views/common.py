@@ -96,11 +96,8 @@ class CommonUserInfoFormsMixin:
         return forms
 
 
-class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
+class BaseFillJobSeekerInfosView(CommonUserInfoFormsMixin, TemplateView):
     template_name = None
-
-    def test_func(self):
-        return self.request.from_employer
 
     def get_back_url(self):
         raise NotImplementedError
@@ -154,11 +151,8 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
         return HttpResponseRedirect(self.get_success_url())
 
 
-class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
+class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
     template_name = None
-
-    def test_func(self):
-        return self.request.from_employer
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -278,11 +272,8 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
 
 
 @method_decorator(with_triggers_context, name="dispatch")
-class BaseConfirmationView(UserPassesTestMixin, JobSeekerAndContractInfosNeededMixin, TemplateView):
+class BaseConfirmationView(JobSeekerAndContractInfosNeededMixin, TemplateView):
     template_name = None
-
-    def test_func(self):
-        return self.request.from_employer
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
