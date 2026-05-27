@@ -101,8 +101,9 @@ class HireWizardMixin(common_views.IsIAEEligibilityDiagnosisNeededMixin):
             )
 
     def dispatch(self, request, *args, **kwargs):
+        # If an IAE diagnosis is needed today, it will also be needed for a future hiring_start_at
         if (
-            self.is_iae_eligibility_diagnosis_needed()
+            self.is_iae_eligibility_diagnosis_needed(timezone.localdate())
             # For employer diagnosis, the sanction presence must be checked
             or (self.eligibility_diagnosis and self.eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER)
         ) and (suspension_explanation := self.company.get_active_suspension_text_with_dates()):
@@ -192,7 +193,8 @@ class IAEEligibilityForHireView(
         redirect = super().steps_redirect()
         if redirect is None and (
             # If someone tries to access this page for a non-IAE company, let the base class serve a 404
-            self.company.is_subject_to_iae_rules and not self.is_iae_eligibility_diagnosis_needed()
+            self.company.is_subject_to_iae_rules
+            and not self.is_iae_eligibility_diagnosis_needed(self.forms["accept"].cleaned_data["hiring_start_at"])
         ):
             return HttpResponseRedirect(self.get_success_url())
         return redirect
@@ -299,7 +301,7 @@ class ContractInfosForHireView(HireWizardMixin, common_views.BaseContractInfosVi
         )
 
     def get_success_url(self):
-        if self.is_iae_eligibility_diagnosis_needed():
+        if self.is_iae_eligibility_diagnosis_needed(self.forms["accept"].cleaned_data["hiring_start_at"]):
             return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
         if self.geiq_eligibility_missing:
             return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
@@ -353,7 +355,9 @@ class ConfirmationForHireView(HireWizardMixin, common_views.BaseConfirmationView
 
     def steps_redirect(self):
         redirect = super().steps_redirect()
-        if redirect is None and self.is_iae_eligibility_diagnosis_needed():  # GEIQ eligibility might be skipped
+        if redirect is None and self.is_iae_eligibility_diagnosis_needed(
+            self.forms["accept"].cleaned_data["hiring_start_at"]
+        ):  # GEIQ eligibility might be skipped
             # This should not happen
             messages.error(
                 self.request,
