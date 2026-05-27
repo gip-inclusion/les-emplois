@@ -348,8 +348,8 @@ class ConfirmationForHireView(HireWizardMixin, common_views.BaseConfirmationView
         context["matomo_custom_title"] = "Confirmation d'embauche"
         return context
 
-    def missing_steps_redirect(self):
-        redirect = super().missing_steps_redirect()
+    def steps_redirect(self):
+        redirect = super().steps_redirect()
         if redirect is None and self.is_iae_eligibility_diagnosis_needed():  # GEIQ eligibility might be skipped
             # This should not happen
             messages.error(

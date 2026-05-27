@@ -258,7 +258,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
 
         return forms
 
-    def missing_steps_redirect(self):
+    def steps_redirect(self):
         self.forms = self.get_forms()
         if not all([form.is_valid() for form in self.forms.values()]):
             messages.error(self.request, "Certaines informations sont manquantes ou invalides")
@@ -266,7 +266,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
         return None
 
     def dispatch(self, request, *args, **kwargs):
-        if redirect := self.missing_steps_redirect():
+        if redirect := self.steps_redirect():
             return redirect
         return super().dispatch(request, *args, **kwargs)
 
