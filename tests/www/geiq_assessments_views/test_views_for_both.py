@@ -146,7 +146,7 @@ class TestAssessmentContractsListAndToggle:
             name="assessments contracts list"
         )
 
-    def test_allowance_granted_previous_year(self, client, snapshot):
+    def test_allowance_granted_previous_year(self, client):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
