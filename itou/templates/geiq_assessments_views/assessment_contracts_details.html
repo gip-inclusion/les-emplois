@@ -131,6 +131,11 @@
                             </ul>
                         </div>
                     {% elif active_tab == AssessmentContractDetailsTab.CONTRACT %}
+                        {% if request.from_institution and contract.requires_justification and contract.allowance_request_justification_reason %}
+                            <div class="mb-3 mb-md-4">
+                                {% include "geiq_assessments_views/includes/allowance_request_justified_box.html" with MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE contract=contract request=request only %}
+                            </div>
+                        {% endif %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
                                 <li>
