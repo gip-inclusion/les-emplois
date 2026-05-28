@@ -58,9 +58,7 @@ def mock_oauth_dance(
     }
     for api in [
         pe_connect.ESD_COORDS_API,
-        pe_connect.ESD_STATUS_API,
         pe_connect.ESD_BIRTHDATE_API,
-        pe_connect.ESD_COMPENSATION_API,
     ]:
         respx.get(f"{settings.API_ESD['BASE_URL']}/{api}").mock(return_value=httpx.Response(200, json=fake_api_data))
 

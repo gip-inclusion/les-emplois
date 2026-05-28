@@ -13,15 +13,9 @@ from itou.utils import triggers
 
 
 # PE Connect API data retrieval tools
-ESD_USERINFO_API = "peconnect-individu/v1/userinfo"
 ESD_COORDS_API = "peconnect-coordonnees/v1/coordonnees"
-ESD_STATUS_API = "peconnect-statut/v1/statut"
 ESD_BIRTHDATE_API = "peconnect-datenaissance/v1/etat-civil"
 
-# FIXME: not registered yet
-ESD_COMPENSATION_API = "peconnect-indemnisations/v1/indemnisation"
-ESD_PT_TRAININGS_API = "peconnect-formations/v1/formations"
-ESD_PT_LICENSES_API = "peconnect-formations/v1/permits"
 
 # Internal
 logger = logging.getLogger(__name__)
@@ -55,20 +49,6 @@ def _fields_or_failed(result, keys):
     return {k: v for k, v in result.items() if k in keys}
 
 
-def _get_userinfo(token):
-    """
-    Get main info from user:
-        * first and family names
-        * gender
-        * email address
-
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-individu-v1.html
-    """  # noqa: E501
-    # Fields of interest
-    keys = ["given_name", "family_name", "gender", "email"]
-    return _fields_or_failed(_call_api(ESD_USERINFO_API, token), keys)
-
-
 def _get_birthdate(token):
     """
     Get birthdate of user (format `YYYY-MM-DDTHH:MM:SSZ`), converted as `datetime` object.
@@ -80,25 +60,6 @@ def _get_birthdate(token):
     result = _fields_or_failed(_call_api(ESD_BIRTHDATE_API, token), [key])
     if result:
         return {key: result.get(key)}
-
-    return None
-
-
-def _get_status(token):
-    """
-    Get current status of candidate.
-
-    Returns a dict with codeStatutIndividu field from API:
-        * 0: does not seek a job
-        * 1: active jobseeker
-
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-statut-v1.html
-    """  # noqa: E501
-    key = "codeStatutIndividu"
-    result = _fields_or_failed(_call_api(ESD_STATUS_API, token), [key])
-    if result:
-        code = result.get(key)
-        return {key: int(code)}
 
     return None
 
@@ -124,20 +85,6 @@ def _get_address(token):
     return _fields_or_failed(_call_api(ESD_COORDS_API, token), keys)
 
 
-def _get_compensations(token):
-    """
-    Get user "compensations" (social allowance):
-
-    Return a dict with fields:
-        * beneficiairePrestationSolidarite (has one or more of AER, AAH, ASS, RSA)
-        * beneficiaireAssuranceChomage (has ARE or ASP)
-
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-indemnisations-v1.html
-    """  # noqa: E501
-    keys = ["beneficiairePrestationSolidarite", "beneficiaireAssuranceChomage"]
-    return _fields_or_failed(_call_api(ESD_COMPENSATION_API, token), keys)
-
-
 def get_aggregated_user_data(token):
     """
     Aggregates all needed user data before formatting and storage.
@@ -145,11 +92,8 @@ def get_aggregated_user_data(token):
     """
     # Include API results "à volonté"
     results = [
-        _get_userinfo(token),
         _get_birthdate(token),
-        _get_status(token),
         _get_address(token),
-        _get_compensations(token),
     ]
 
     ok = all(results)

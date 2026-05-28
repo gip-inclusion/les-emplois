@@ -16,16 +16,6 @@ from tests.users.factories import JobSeekerFactory
 
 FOO_TOKEN = "kreacher_token"
 
-# CALL https://api.emploi-store.fr/partenaire/peconnect-individu/v1/userinfo:
-_RESP_USER_INFO = {
-    "giv/en_name": "Tom",
-    "family_name": "Riddle",
-    "gender": "male",
-    "idIdentiteExterne": "46533ae7-da92-4614-9d9b-12c47a5d14c9",
-    "email": "me@voldemort.com",
-    "sub": "46533ae7-da92-4614-9d9b-12c47a5d14c9",
-    "updated_at": 0,
-}
 
 # CALL https://api.emploi-store.fr/partenaire/peconnect-datenaissance/v1/etat-civil:
 _RESP_USER_BIRTHDATE = {
@@ -36,9 +26,6 @@ _RESP_USER_BIRTHDATE = {
     "prenom": None,
     "dateDeNaissance": "1970-01-01T00:00:00+01:00",
 }
-
-# CALL https://api.emploi-store.fr/partenaire/peconnect-statut/v1/statut:
-_RESP_USER_STATUS = {"codeStatutIndividu": "1", "libelleStatutIndividu": "Demandeur d’emploi"}
 
 # CALL https://api.emploi-store.fr/partenaire/peconnect-coordonnees/v1/coordonnees:
 _RESP_USER_COORDS = {
@@ -53,44 +40,28 @@ _RESP_USER_COORDS = {
     "libellePays": "FRANCE",
 }
 
-# CALL https://api.emploi-store.fr/partenaire/peconnect-indemnisations/v1/indemnisation:
-_RESP_COMPENSATION = {"beneficiairePrestationSolidarite": False, "beneficiaireAssuranceChomage": False}
-
 
 def _url_for_key(k):
     return f"{settings.API_ESD['BASE_URL']}/{k}"
 
 
 _API_KEYS = [
-    pec.ESD_COMPENSATION_API,
     pec.ESD_COORDS_API,
-    pec.ESD_STATUS_API,
     pec.ESD_BIRTHDATE_API,
-    pec.ESD_USERINFO_API,
 ]
 
 
 def _mock_status_ok():
-    respx.get(_url_for_key(pec.ESD_USERINFO_API)).mock(
-        httpx.Response(status_code=200, text=json.dumps(_RESP_USER_INFO))
-    )
     respx.get(_url_for_key(pec.ESD_BIRTHDATE_API)).mock(
         httpx.Response(status_code=200, text=json.dumps(_RESP_USER_BIRTHDATE))
     )
-    respx.get(_url_for_key(pec.ESD_STATUS_API)).mock(
-        httpx.Response(status_code=200, text=json.dumps(_RESP_USER_STATUS))
-    )
     respx.get(_url_for_key(pec.ESD_COORDS_API)).mock(
         httpx.Response(status_code=200, text=json.dumps(_RESP_USER_COORDS))
-    )
-    respx.get(_url_for_key(pec.ESD_COMPENSATION_API)).mock(
-        httpx.Response(status_code=200, text=json.dumps(_RESP_COMPENSATION))
     )
 
 
 def _mock_status_partial():
     _mock_status_ok()
-    respx.get(_url_for_key(pec.ESD_COMPENSATION_API)).mock(httpx.Response(text="", status_code=503))
     respx.get(_url_for_key(pec.ESD_BIRTHDATE_API)).mock(httpx.Response(text="", status_code=503))
 
 
