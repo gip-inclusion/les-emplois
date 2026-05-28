@@ -186,3 +186,30 @@ class TestJobSeekerExternalData:
         assert user.address_line_1 == "4, Privet Drive"
         assert user.address_line_2 == "The cupboard under the stairs"
         assert str(user.jobseeker_profile.birthdate) != "1970-01-01"
+
+    @respx.mock
+    def test_import_address_if_missing(self):
+        _mock_status_ok()
+
+        # Check override of birthdate / of a field
+        user = JobSeekerFactory(jobseeker_profile__birthdate=None, with_address=True)
+        assert user.address_line_2 == ""
+        old_address_one_line = user.address_on_one_line
+
+        with triggers.connection_wrapper():
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+        user.refresh_from_db()
+
+        assert user.address_on_one_line == old_address_one_line
+        assert user.address_line_2 == ""
+        assert str(user.jobseeker_profile.birthdate) == "1970-01-01"
+
+        # Just checking birthdate is not overridden
+        user = JobSeekerFactory()
+        birthdate = user.jobseeker_profile.birthdate
+
+        with triggers.connection_wrapper():
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+        user.refresh_from_db()
+
+        assert birthdate == user.jobseeker_profile.birthdate
