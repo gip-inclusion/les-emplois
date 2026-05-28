@@ -18,7 +18,7 @@ from itou.invitations.models import (
     PrescriberWithOrgInvitation,
 )
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.legal_terms import bypass_terms_acceptance
@@ -62,7 +62,6 @@ def handle_invited_user_registration_with_pro_connect(request, invitation, invit
     context = {
         "pro_connect_url": pro_connect_url,
         "invitation": invitation,
-        "matomo_account_type": MATOMO_ACCOUNT_TYPE[invitation_type],
     }
     return render(request, "invitations_views/new_pro_connect_user.html", context=context)
 

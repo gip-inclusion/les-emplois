@@ -29,12 +29,6 @@ class UserKind(models.TextChoices):
         ]
 
 
-MATOMO_ACCOUNT_TYPE = {
-    UserKind.PRESCRIBER: "prescripteur",
-    UserKind.EMPLOYER: "employeur inclusif",
-}
-
-
 class Title(models.TextChoices):
     M = "M", "Monsieur"
     MME = "MME", "Madame"

@@ -33,7 +33,7 @@ from itou.metabase.models import DatumKey
 from itou.nexus.utils import activate_pilotage
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
-from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.legal_terms import bypass_terms_acceptance
@@ -470,9 +470,5 @@ class AccountMigrationView(TemplateView):
         context = super().get_context_data(**kwargs)
         params = self._get_params()
         pro_connect_url = reverse("pro_connect:authorize", query=params) if settings.PRO_CONNECT_BASE_URL else None
-
-        extra_context = {
-            "pro_connect_url": pro_connect_url,
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE.get(self.request.user.kind),
-        }
-        return context | extra_context
+        context["pro_connect_url"] = pro_connect_url
+        return context

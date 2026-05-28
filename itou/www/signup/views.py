@@ -27,7 +27,7 @@ from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company, CompanyMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, MATOMO_ACCOUNT_TYPE, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, KIND_PROFESSIONAL, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.legal_terms import bypass_terms_acceptance
@@ -206,10 +206,7 @@ def professional_user(request, template_name="signup/professional_user.html"):
         f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
     )
 
-    context = {
-        "pro_connect_url": pro_connect_url,
-        "matomo_account_type": MATOMO_ACCOUNT_TYPE[KIND_PRESCRIBER],
-    }
+    context = {"pro_connect_url": pro_connect_url}
     return render(request, template_name, context)
 
 
@@ -374,7 +371,6 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
         return super().get_context_data(**kwargs) | {
             "pro_connect_url": pro_connect_url,
             "company": self.company,
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
         }
 
 
