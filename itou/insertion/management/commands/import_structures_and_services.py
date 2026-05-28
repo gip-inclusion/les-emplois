@@ -414,6 +414,8 @@ class Command(BaseCommand):
 
         service.access_conditions_di = data["conditions_acces"] or ""
 
+        service.eligibility_zones = data["zone_eligibilite"] or []
+
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""
         )  # service.mobilizations is a ManyToManyField
