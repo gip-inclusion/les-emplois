@@ -174,7 +174,7 @@ class OIDConnectUserData:
         """
         sso_data_dict = {k: v for k, v in dataclasses.asdict(self).items() if v}
         is_jobseeker = sso_data_dict["kind"] == UserKind.JOB_SEEKER
-        jobseeker_fields = {"birthdate"}
+        jobseeker_fields = {"birth_name", "birthdate"}
         jobseeker_data_dict = {}
         user_data_dict = {}
         for field, value in sso_data_dict.items():

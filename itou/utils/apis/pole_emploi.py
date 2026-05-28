@@ -219,7 +219,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         except httpx.RequestError as exc:
             raise PoleEmploiAPIException(API_CLIENT_HTTP_ERROR_CODE) from exc
 
-    def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
+    def recherche_individu_certifie(self, first_name, birth_name, birthdate, nir):
         """Example data:
         {
             "nirCertifie":"1800813800217",
@@ -240,7 +240,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
             {
                 "dateNaissance": birthdate.strftime(DATE_FORMAT) if birthdate else "",
                 "nirCertifie": nir[:MAX_NIR_CHARACTERS] if nir else "",
-                "nomNaissance": _pole_emploi_name(last_name),
+                "nomNaissance": _pole_emploi_name(birth_name),
                 "prenom": _pole_emploi_name(first_name, hyphenate=True, max_len=13),
             },
         )

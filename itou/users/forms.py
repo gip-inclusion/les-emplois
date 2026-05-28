@@ -97,8 +97,8 @@ class PoleEmploiFieldsMixin:
 
 
 class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
-    PROFILE_FIELDS = ["birthdate", "birth_place", "birth_country"]
-    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate"]
+    PROFILE_FIELDS = ["birth_name", "birthdate", "birth_place", "birth_country"]
+    REQUIRED_FIELDS = ["title", "first_name", "birth_name", "birthdate"]
 
     class Meta:
         model = User
@@ -112,6 +112,8 @@ class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMix
                 self.fields[fieldname].required = True
             except KeyError:
                 pass
+
+        self.fields["last_name"].label = "Nom d’usage"
 
         for fieldname, field in self.fields.items():
             if fieldname in self.readonly_pii_fields:

@@ -977,6 +977,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
                  (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1009,6 +1014,7 @@
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
@@ -1018,8 +1024,9 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41
-          ORDER BY "users_user"."last_name" ASC,
+                   40,
+                   42
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
@@ -1069,6 +1076,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
                  (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1101,6 +1113,7 @@
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
@@ -1110,7 +1123,8 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41
+                   40,
+                   42
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1178,7 +1192,12 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+            (SELECT CASE
+                        WHEN ("users_user"."kind" = %s
+                              AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                        ELSE "users_user"."last_name"
+                    END AS "last_name_for_display",
+                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                     COALESCE(
                                (SELECT COUNT(U0."id") AS "count"
                                 FROM "job_applications_jobapplication" U0
@@ -1208,6 +1227,7 @@
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "valid_eligibility_diagnosis"
              FROM "users_user"
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
              LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
                     AND "users_user"."id" IN (%s,
@@ -1217,7 +1237,8 @@
              GROUP BY "users_user"."id",
                       1,
                       2,
-                      4) subquery
+                      3,
+                      5) subquery
         ''',
       }),
       dict({
@@ -1264,6 +1285,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
                  (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1297,6 +1323,7 @@
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1344,8 +1371,8 @@
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -1354,9 +1381,10 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41,
+                   40,
+                   42,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 40 DESC,
+          ORDER BY 41 DESC,
                    "users_user"."id" DESC
           LIMIT 4
         ''',
@@ -2191,6 +2219,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
                  (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -2222,6 +2255,7 @@
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
@@ -2230,8 +2264,9 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41
-          ORDER BY "users_user"."last_name" ASC,
+                   40,
+                   42
+          ORDER BY 38 ASC,
                    "users_user"."first_name" ASC
         ''',
       }),
@@ -2281,6 +2316,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
                  (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -2312,6 +2352,7 @@
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
@@ -2320,7 +2361,8 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41
+                   40,
+                   42
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -2390,7 +2432,12 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+            (SELECT CASE
+                        WHEN ("users_user"."kind" = %s
+                              AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                        ELSE "users_user"."last_name"
+                    END AS "last_name_for_display",
+                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                     COALESCE(
                                (SELECT COUNT(U0."id") AS "count"
                                 FROM "job_applications_jobapplication" U0
@@ -2419,6 +2466,7 @@
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "valid_eligibility_diagnosis"
              FROM "users_user"
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
              LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
                     AND "users_user"."id" IN (%s,
@@ -2427,7 +2475,8 @@
              GROUP BY "users_user"."id",
                       1,
                       2,
-                      4) subquery
+                      3,
+                      5) subquery
         ''',
       }),
       dict({
@@ -2474,6 +2523,11 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
+                 CASE
+                     WHEN ("users_user"."kind" = %s
+                           AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                     ELSE "users_user"."last_name"
+                 END AS "last_name_for_display",
                  (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -2506,6 +2560,7 @@
                                                                                            WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
                  "users_jobseekerprofile"."fields_history",
                  "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birth_name",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -2553,8 +2608,8 @@
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore"
           FROM "users_user"
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -2562,9 +2617,10 @@
           GROUP BY "users_user"."id",
                    38,
                    39,
-                   41,
+                   40,
+                   42,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 40 DESC,
+          ORDER BY 41 DESC,
                    "users_user"."id" DESC
           LIMIT 3
         ''',

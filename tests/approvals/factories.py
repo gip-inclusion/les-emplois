@@ -1,4 +1,5 @@
 import datetime
+import random
 import string
 
 import factory.fuzzy
@@ -119,6 +120,7 @@ class CancelledApprovalFactory(factory.django.DjangoModelFactory):
 
     user_first_name = factory.Faker("first_name")
     user_last_name = factory.Faker("last_name")
+    user_birth_name = factory.LazyFunction(lambda: random.choice(["", fake.last_name()]))
     user_birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
 
     origin_siae_kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
