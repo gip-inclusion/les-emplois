@@ -323,7 +323,7 @@ def test_multiple(client, snapshot):
     assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_personal_information=False)
 
 
-@override_settings(PAGE_SIZE_SMALL=1)
+@override_settings(PAGE_SIZE_LARGE=1)
 def test_pagination(client):
     url = reverse("job_seekers_views:list")
     organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
