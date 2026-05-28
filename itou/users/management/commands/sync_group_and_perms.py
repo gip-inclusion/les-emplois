@@ -37,7 +37,6 @@ def get_permissions_dict():
     import itou.eligibility.models as eligibility_models
     import itou.emails.models as emails_models
     import itou.employee_record.models as employee_record_models
-    import itou.external_data.models as external_data_models
     import itou.files.models as files_models
     import itou.geiq_assessments.models as geiq_assessments_models
     import itou.geo.models as geo_models
@@ -85,7 +84,6 @@ def get_permissions_dict():
         employee_record_models.EmployeeRecord: PERMS_EDIT | PERMS_DELETE,
         employee_record_models.EmployeeRecordUpdateNotification: PERMS_READ,
         employee_record_models.EmployeeRecordTransitionLog: PERMS_READ,
-        external_data_models.ExternalDataImport: PERMS_DELETE,
         files_models.File: PERMS_READ,
         geo_models.QPV: PERMS_READ,
         geo_models.ZRR: PERMS_READ,
