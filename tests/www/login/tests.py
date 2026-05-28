@@ -241,13 +241,13 @@ class TestExistingUserLogin:
         return [
             (
                 "DJANGO",
-                random.choice([JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])(
+                random.choice([JobSeekerFactory, ItouStaffFactory])(
                     identity_provider=IdentityProvider.DJANGO, email="django@mailinator.com"
                 ),
             ),
             (
                 "DJANGO+PC",
-                random.choice([PrescriberFactory, EmployerFactory])(
+                random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory])(
                     identity_provider=IdentityProvider.DJANGO, email="django+pc@mailinator.com"
                 ),
             ),
@@ -311,25 +311,26 @@ class TestExistingUserLogin:
         PEAMU_AUTH_BASE_URL="http://localhost:8080",
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
-    def test_login(self, client, snapshot):
+    def test_login(self, client, snapshot, subtests):
         for name, user in self._get_login_form_cases():
-            session = client.session
-            session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
-            session.save()
-            url = reverse("login:existing_user")
-            response = client.get(url)
-            assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-            assert pretty_indented(
-                parse_response_to_soup(
-                    response,
-                    selector=".c-form",
-                    replace_in_attr=[
-                        ("data-matomo-category", "employeur inclusif", "[User kind]"),
-                        ("data-matomo-category", "prescripteur", "[User kind]"),
-                        ("href", user.kind, "[User kind]"),
-                    ],
-                )
-            ) == snapshot(name=name)
+            with subtests.test(name=name):
+                session = client.session
+                session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+                session.save()
+                url = reverse("login:existing_user")
+                response = client.get(url)
+                assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+                assert pretty_indented(
+                    parse_response_to_soup(
+                        response,
+                        selector=".c-form",
+                        replace_in_attr=[
+                            ("data-matomo-category", "employeur inclusif", "[User kind]"),
+                            ("data-matomo-category", "prescripteur", "[User kind]"),
+                            ("href", user.kind, "[User kind]"),
+                        ],
+                    )
+                ) == snapshot(name=name)
 
     @pytest.mark.parametrize(
         "user_factory",
@@ -382,14 +383,15 @@ class TestExistingUserLogin:
         PEAMU_AUTH_BASE_URL=None,
         PRO_CONNECT_BASE_URL=None,
     )
-    def test_login_disabled_provider(self, client, snapshot):
+    def test_login_disabled_provider(self, client, snapshot, subtests):
         for name, user in self._get_login_form_cases():
-            session = client.session
-            session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
-            session.save()
-            response = client.get(reverse("login:existing_user"))
-            assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-            assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(name=name)
+            with subtests.test(name=name):
+                session = client.session
+                session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+                session.save()
+                response = client.get(reverse("login:existing_user"))
+                assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+                assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(name=name)
 
     def test_login_no_session(self, client):
         response = client.get(reverse("login:existing_user"))
