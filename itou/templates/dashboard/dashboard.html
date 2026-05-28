@@ -131,23 +131,6 @@
             {% endfragment %}
         {% endcomponent_alert %}
     {% endif %}
-
-    {% if request.from_authorized_prescriber %}
-        {% component_alert title=title content=content call_to_action=call_to_action variant="info" dismissible=True extra_classes="mb-3" %}
-            {% fragment as title %}
-                Webinaire thématique
-            {% endfragment %}
-            {% fragment as content %}
-                <p class="mb-0">1 heure pour améliorer vos candidatures et faciliter leur traitement par les SIAE.</p>
-            {% endfragment %}
-            {% fragment as call_to_action %}
-                <a class="btn btn-sm btn-primary has-external-link"
-                   target="_blank"
-                   rel="noopener"
-                   href="https://tally.so/r/b55KY0?event_id=orientation-vers-l-iae-2026-07-06-1779450573403&titre_event=Orientation%20vers%20l%E2%80%99IAE&date_event=06%20juillet%202026%20-%2011h00">Je m'inscris</a>
-            {% endfragment %}
-        {% endcomponent_alert %}
-    {% endif %}
 {% endblock %}
 
 {% block title_extra %}
