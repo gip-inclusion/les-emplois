@@ -28,12 +28,11 @@ from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
     ProConnectAuthentication,
-    ProConnectEmployerData,
-    ProConnectPrescriberData,
     ProConnectState,
+    ProConnectUserData,
 )
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.readonly import http_methods
@@ -44,18 +43,12 @@ from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
 logger = logging.getLogger(__name__)
 
-USER_DATA_CLASSES = {
-    KIND_PRESCRIBER: ProConnectPrescriberData,
-    KIND_EMPLOYER: ProConnectEmployerData,
-}
-
 
 @dataclasses.dataclass
 class ProConnectStateData:
     previous_url: str = None
     next_url: str = None
     user_email: str = None
-    user_kind: str = None
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
     channel: str = None
@@ -129,16 +122,15 @@ def _generate_pro_params_from_session(pc_data):
     return data
 
 
-def _add_user_kind_error_message(request, existing_user, new_user_kind):
+def _add_user_kind_error_message(request, existing_user):
     messages.error(
         request,
         format_html(
             "Un compte {} existe déjà avec cette adresse e-mail. "
             "Vous devez créer un compte ProConnect avec une autre adresse e-mail pour "
-            "devenir {} sur la plateforme. Besoin d'aide ? "
+            "devenir professionnel sur la plateforme. Besoin d'aide ? "
             "<a href='{}' target='_blank'>Contactez-nous</a>.",
             existing_user.get_kind_display(),
-            UserKind(new_user_kind).label,
             get_zendesk_form_url(request),
         ),
     )
@@ -147,17 +139,12 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
 @login_not_required
 def pro_connect_authorize(request):
     # Start a new session.
-    user_kind = request.GET.get("user_kind")
     previous_url = get_safe_url(request, "previous_url", fallback_url=reverse("search:employers_home"))
     next_url = request.GET.get("next_url")
     if next_url and not url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS, request.is_secure()):
         return _redirect_to_login_page_on_error(error_msg="Forbidden external url")
-    if not user_kind:
-        return _redirect_to_login_page_on_error(error_msg="User kind missing.")
-    if user_kind not in USER_DATA_CLASSES:
-        return _redirect_to_login_page_on_error(error_msg="Wrong user kind.")
 
-    pc_data = ProConnectStateData(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
+    pc_data = ProConnectStateData(previous_url=previous_url, next_url=next_url)
 
     if channel := request.GET.get("channel"):
         pc_data.channel = channel
@@ -271,9 +258,8 @@ def pro_connect_callback(request):
         # 'sub' is the unique identifier from ProConnect, we need that to match a user later on.
         return _redirect_to_login_page_on_error(error_msg="Sub parameter error.", request=request)
 
-    user_kind = pro_connect_state.data["user_kind"]
     is_successful = True
-    pc_user_data = USER_DATA_CLASSES[user_kind].from_user_info(user_data)
+    pc_user_data = ProConnectUserData.from_user_info(user_data)
     pc_session_email = pro_connect_state.data.get("user_email")
 
     if pc_session_email and pc_session_email.lower() != pc_user_data.email.lower():
@@ -302,7 +288,7 @@ def pro_connect_callback(request):
         is_successful = False
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
-        _add_user_kind_error_message(request, existing_user, user_kind)
+        _add_user_kind_error_message(request, existing_user)
         is_successful = False
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(

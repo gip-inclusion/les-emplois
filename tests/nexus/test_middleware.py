@@ -16,12 +16,13 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    random_pro_user_factory,
 )
 
 
 class TestAutoLoginMiddleware:
     def test_middleware_for_authenticated_user(self, client, caplog):
-        user = EmployerFactory(membership=True)
+        user = random_pro_user_factory(membership=True)
         client.force_login(user)
         params = {"auto_login": generate_auto_login_token(user)}
         response = client.get(reverse("home:hp", query=params))
@@ -29,7 +30,7 @@ class TestAutoLoginMiddleware:
         assert caplog.messages == ["Nexus auto login: user is already logged in"]
 
     def test_middleware_for_wrong_authenticated_user(self, client, caplog):
-        user = EmployerFactory(membership=True)
+        user = random_pro_user_factory(membership=True)
         params = {"auto_login": generate_auto_login_token(user)}
         # Another user is logged in
         client.force_login(EmployerFactory(membership=True))
@@ -39,7 +40,7 @@ class TestAutoLoginMiddleware:
             response,
             reverse(
                 "pro_connect:authorize",
-                query={"user_kind": "employer", "next_url": "/", "user_email": user.email},
+                query={"next_url": "/", "user_email": user.email},
             ),
             fetch_redirect_response=False,
         )
@@ -59,7 +60,7 @@ class TestAutoLoginMiddleware:
         assert caplog.messages == [f"Nexus auto login: no user found for jwt={jwt}"]
 
     def test_middleware_for_unlogged_user(self, client, caplog):
-        user = EmployerFactory(membership=True)
+        user = random_pro_user_factory(membership=True)
         params = {"auto_login": generate_auto_login_token(user)}
 
         response = client.get(reverse("home:hp", query=params))
@@ -67,14 +68,14 @@ class TestAutoLoginMiddleware:
             response,
             reverse(
                 "pro_connect:authorize",
-                query={"user_kind": "employer", "next_url": "/", "user_email": user.email},
+                query={"next_url": "/", "user_email": user.email},
             ),
             fetch_redirect_response=False,
         )
         assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
 
         # It also works if it's not a ProConnect user
-        user.identity_provider = IdentityProvider.INCLUSION_CONNECT
+        user.identity_provider = IdentityProvider.DJANGO
         user.save()
         caplog.clear()
 
@@ -83,32 +84,11 @@ class TestAutoLoginMiddleware:
             response,
             reverse(
                 "pro_connect:authorize",
-                query={"user_kind": "employer", "next_url": "/", "user_email": user.email},
+                query={"next_url": "/", "user_email": user.email},
             ),
             fetch_redirect_response=False,
         )
         assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
-
-    def test_middleware_labor_inspector(self, client, caplog):
-        user = LaborInspectorFactory()
-        params = {"auto_login": generate_auto_login_token(user)}
-        response = client.get(reverse("home:hp", query=params))
-        expected_url = reverse(
-            "pro_connect:authorize",
-            query={"user_kind": "labor_inspector", "next_url": "/", "user_email": user.email},
-        )
-        assertRedirects(
-            response,
-            expected_url,
-            fetch_redirect_response=False,
-        )
-        assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
-
-        # But it won't work a the next step
-        caplog.clear()
-        response = client.get(expected_url)
-        assertRedirects(response, reverse("search:employers_home"))
-        assert caplog.messages == ["Wrong user kind.", "HTTP 302 Found", "HTTP 200 OK"]
 
 
 class TestDropDownMiddleware:

@@ -21,6 +21,20 @@ class ProConnectState(OIDConnectState):
 
 @dataclasses.dataclass
 class ProConnectUserData(OIDConnectUserData):
+    # We don't care anymore for the user kind : we will soon merge all users
+    kind: UserKind = UserKind.PRESCRIBER
+    identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
+    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (
+        IdentityProvider.DJANGO,
+        IdentityProvider.INCLUSION_CONNECT,
+    )
+    # Only ProConnect may update the sub based on the email.
+    # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
+    # and create a new one, changing the sub in the process and generating many support tickets.
+    # We are confident that the email is enough to identity prescribers and employers
+    # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
+    allow_sub_update = True
+
     @staticmethod
     def user_info_mapping_dict(user_info: dict):
         return {
@@ -40,38 +54,6 @@ class ProConnectUserData(OIDConnectUserData):
             raise
         if not organization.has_member(user):
             organization.add_or_activate_membership(user)
-
-
-@dataclasses.dataclass
-class ProConnectPrescriberData(ProConnectUserData):
-    kind: UserKind = UserKind.PRESCRIBER
-    identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
-    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (
-        IdentityProvider.DJANGO,
-        IdentityProvider.INCLUSION_CONNECT,
-    )
-    # Only ProConnect may update the sub based on the email.
-    # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
-    # and create a new one, changing the sub in the process and generating many support tickets.
-    # We are confident that the email is enough to identity prescribers and employers
-    # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
-    allow_sub_update = True
-
-
-@dataclasses.dataclass
-class ProConnectEmployerData(ProConnectUserData):
-    kind: UserKind = UserKind.EMPLOYER
-    identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
-    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (
-        IdentityProvider.DJANGO,
-        IdentityProvider.INCLUSION_CONNECT,
-    )
-    # Only ProConnect may update the sub based on the email.
-    # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
-    # and create a new one, changing the sub in the process and generating many support tickets.
-    # We are confident that the email is enough to identity prescribers and employers
-    # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
-    allow_sub_update = True
 
 
 class ProConnectAuthentication(models.Model):

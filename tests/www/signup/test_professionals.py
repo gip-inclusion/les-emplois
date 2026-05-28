@@ -24,7 +24,6 @@ class TestProfessionalSignup:
         # Check ProConnect will redirect to the correct url
         next_url = reverse("signup:choose_pro_membership_kind")
         params = {
-            "user_kind": KIND_PRESCRIBER,
             "previous_url": start_url,
             "next_url": next_url,
         }
@@ -33,7 +32,6 @@ class TestProfessionalSignup:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            KIND_PRESCRIBER,
             previous_url=start_url,
             next_url=next_url,
         )
@@ -50,7 +48,6 @@ class TestProfessionalSignup:
         # Check ProConnect will redirect to the correct url
         next_url = reverse("signup:choose_pro_membership_kind")
         params = {
-            "user_kind": KIND_PRESCRIBER,
             "previous_url": start_url,
             "next_url": next_url,
         }
@@ -60,7 +57,6 @@ class TestProfessionalSignup:
         # mock_oauth_dance check the response redirects to mock_oauth_dance
         pro_connect.mock_oauth_dance(
             client,
-            KIND_PRESCRIBER,
             previous_url=start_url,
             next_url=next_url,
         )

@@ -53,7 +53,7 @@ IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
     IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.INCLUSION_CONNECT: (),  # Not supported anymore
     IdentityProvider.PE_CONNECT: (UserKind.JOB_SEEKER,),
-    IdentityProvider.PRO_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
+    IdentityProvider.PRO_CONNECT: UserKind.professionals(),
 }
 
 

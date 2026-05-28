@@ -32,21 +32,26 @@ from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
     ProConnectAuthentication,
-    ProConnectEmployerData,
-    ProConnectPrescriberData,
     ProConnectState,
+    ProConnectUserData,
 )
 from itou.openid_connect.pro_connect.views import ProConnectSession
 from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import PrescriberFactory, UserFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    UserFactory,
+)
 from tests.utils.testing import accept_legal_terms, get_request
 
 
@@ -85,7 +90,7 @@ class TestProConnectModel:
         Similar to france_connect.tests.FranceConnectTest.test_create_django_user
         but with more tests.
         """
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         assert not User.objects.filter(username=pc_user_data.username).exists()
         assert not User.objects.filter(email=pc_user_data.email).exists()
 
@@ -120,7 +125,7 @@ class TestProConnectModel:
         If there already is an existing user with this ProConnect id, we do not create it again,
         we use it and we update it.
         """
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(
             username=pc_user_data.username,
             last_name="will_be_forgotten",
@@ -138,7 +143,7 @@ class TestProConnectModel:
         If there already is an existing user with this ProConnect id, but it comes from another SSO.
         The email is also different, so it will crash while trying to create a new user.
         """
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(
             username=pc_user_data.username,
             last_name="will_be_forgotten",
@@ -153,7 +158,7 @@ class TestProConnectModel:
         If there already is an existing user with this email but another ProConnect sub,
         allow login and update the sub.
         """
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(
             username="another_sub",
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
@@ -171,7 +176,7 @@ class TestProConnectModel:
         # New membership.
         organization = PrescriberOrganizationFactory(france_travail=True)
         assert organization.active_members.count() == 0
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         user, _ = pc_user_data.create_or_update_user()
         pc_user_data.join_org(user=user, safir=organization.code_safir_pole_emploi)
 
@@ -197,7 +202,7 @@ class TestProConnectModel:
         If there already is an existing django user with email ProConnect sent us, we do not create it again,
         We user it and we update it with the data form the identity_provider.
         """
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
         with triggers.connection_wrapper(), triggers.context():
             user, created = pc_user_data.create_or_update_user()
@@ -212,7 +217,7 @@ class TestProConnectModel:
         If there already is an existing IC user with email ProConnect sent us, we do not create it again,
         We user it and we update it with the data form the identity_provider.
         """
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
         with triggers.connection_wrapper(), triggers.context():
             user, created = pc_user_data.create_or_update_user()
@@ -223,12 +228,10 @@ class TestProConnectModel:
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
     def test_update_user_from_user_info(self, pro_connect):
-        user = PrescriberFactory(
-            **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
-        )
-        pc_user = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
+        pc_user = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
 
-        new_pc_user = ProConnectPrescriberData(
+        new_pc_user = ProConnectUserData(
             first_name="Jean", last_name="Gabin", username=pc_user.username, email="jean@lestontons.fr"
         )
         now = timezone.now()
@@ -257,30 +260,15 @@ class TestProConnectModel:
             expected, key=itemgetter("field_name")
         )
 
-    def test_create_or_update_prescriber_raise_too_many_kind_exception(self, pro_connect):
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+    def test_create_or_update_user_raise_too_many_kind_exception(self, pro_connect):
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
 
-        for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
-            user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=kind)
-
-            with pytest.raises(InvalidKindException):
-                pc_user_data.create_or_update_user()
-
-            user.delete()
-
-    def test_create_or_update_employer_raise_too_many_kind_exception(self, pro_connect):
-        pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
-
-        for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
-            user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=kind)
-
-            with pytest.raises(InvalidKindException):
-                pc_user_data.create_or_update_user()
-
-            user.delete()
+        JobSeekerFactory(username=pc_user_data.username, email=pc_user_data.email)
+        with pytest.raises(InvalidKindException):
+            pc_user_data.create_or_update_user()
 
     def test_login_only(self, pro_connect):
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         with pytest.raises(RegisterForbiddenException), triggers.connection_wrapper(), triggers.context():
             pc_user_data.create_or_update_user(login_only=True)
 
@@ -290,11 +278,7 @@ class TestProConnectModel:
 
 class TestProConnectAuthorizeView:
     def test_authorize_endpoint(self, client, pro_connect):
-        url = reverse("pro_connect:authorize")
-        response = client.get(url, follow=False)
-        assertRedirects(response, reverse("search:employers_home"))
-
-        url = f"{pro_connect.authorize_url}?user_kind={UserKind.PRESCRIBER}"
+        url = pro_connect.authorize_url
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
         pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
@@ -302,11 +286,7 @@ class TestProConnectAuthorizeView:
         assert f"nonce={pc_state.nonce}" in response.url
 
     def test_authorize_endpoint_for_registration(self, client, pro_connect):
-        url = reverse("pro_connect:authorize")
-        response = client.get(url, follow=False)
-        assertRedirects(response, reverse("search:employers_home"))
-
-        url = f"{pro_connect.authorize_url}?user_kind={UserKind.PRESCRIBER}&register=true"
+        url = f"{pro_connect.authorize_url}?register=true"
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
         pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
@@ -315,7 +295,7 @@ class TestProConnectAuthorizeView:
 
     def test_authorize_endpoint_with_params(self, client, pro_connect):
         email = "porthos@touspourun.com"
-        params = {"user_email": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
+        params = {"user_email": email, "channel": "invitation"}
         url = f"{pro_connect.authorize_url}?{urlencode(params)}"
         response = client.get(url, follow=False)
         assert f"login_hint={quote(email)}" in response.url
@@ -323,14 +303,6 @@ class TestProConnectAuthorizeView:
         assert pc_state.data["user_email"] == email
         assert pc_state.nonce is not None
         assert f"nonce={pc_state.nonce}" in response.url
-
-    def test_authorize_check_user_kind(self, client, pro_connect, subtests):
-        forbidden_user_kinds = [UserKind.ITOU_STAFF, UserKind.LABOR_INSPECTOR, UserKind.JOB_SEEKER]
-        for kind in forbidden_user_kinds:
-            with subtests.test(kind=kind.label):
-                url = f"{pro_connect.authorize_url}?user_kind={kind}"
-                response = client.get(url)
-                assertRedirects(response, reverse("search:employers_home"))
 
     def test_next_url(self, client, pro_connect, caplog):
         url = f"{pro_connect.authorize_url}?{urlencode({'next_url': 'https://external.url.com'})}"
@@ -363,30 +335,19 @@ class TestProConnectCallbackView:
         response = client.get(url)
         assert response.status_code == 302
 
-    def test_callback_prescriber_created(self, client, pro_connect):
+    def test_callback_professional_created(self, client, pro_connect):
         ### User does not exist.
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
         assert user.username == pro_connect.oidc_userinfo["sub"]
         assert user.has_sso_provider
-        assert user.kind == "prescriber"
-        assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
-
-    def test_callback_employer_created(self, client, pro_connect):
-        ### User does not exist.
-        pro_connect.mock_oauth_dance(client, UserKind.EMPLOYER)
-        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
-        assert user.first_name == pro_connect.oidc_userinfo["given_name"]
-        assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
-        assert user.username == pro_connect.oidc_userinfo["sub"]
-        assert user.has_sso_provider
-        assert user.kind == UserKind.EMPLOYER
+        assert user.kind == KIND_PRESCRIBER  # It will soon be PROFESSIONAL
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
     def test_callback_record_authentication(self, client, pro_connect):
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         record = ProConnectAuthentication.objects.get()
         assert record.user_public_id == user.public_id
@@ -403,7 +364,7 @@ class TestProConnectCallbackView:
             email=pro_connect.oidc_userinfo["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
@@ -411,26 +372,19 @@ class TestProConnectCallbackView:
         assert user.has_sso_provider
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
-    def test_callback_allows_employer_on_prescriber(self, client, pro_connect):
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
-        user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.EMPLOYER)
+    @pytest.mark.parametrize("user_factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory])
+    def test_callback_allows_professionals(self, client, pro_connect, user_factory):
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
+        user = user_factory(username=pc_user_data.username, email=pc_user_data.email)
+        kind = user.kind
 
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
         user.refresh_from_db()
-        assert user.kind == UserKind.EMPLOYER
-        assert get_user(client).is_authenticated is True
-
-    def test_callback_allows_prescriber_on_employer(self, client, pro_connect):
-        pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
-        user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.PRESCRIBER)
-
-        pro_connect.mock_oauth_dance(client, UserKind.EMPLOYER)
-        user.refresh_from_db()
-        assert user.kind == UserKind.PRESCRIBER
+        assert user.kind == kind  # kind didn't change
         assert get_user(client).is_authenticated is True
 
     def test_callback_refuses_job_seekers(self, client, pro_connect):
-        pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.JOB_SEEKER)
 
         expected_redirect_url = reverse(
@@ -441,59 +395,56 @@ class TestProConnectCallbackView:
             },
         )
 
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-        pro_connect.mock_oauth_dance(client, UserKind.EMPLOYER, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-        pro_connect.mock_oauth_dance(client, UserKind.EMPLOYER, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-    def test_callback_redirect_prescriber_on_too_many_kind_exception(self, client, pro_connect):
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+    def test_callback_redirect_professional_on_too_many_kind_exception(self, client, pro_connect):
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
 
-        for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
-            user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=kind)
-            response = pro_connect.mock_oauth_dance(
-                client,
-                UserKind.PRESCRIBER,
-                expected_redirect_url=reverse(
-                    "pro_connect:logout",
-                    query={
-                        "redirect_url": reverse("search:employers_home"),
-                        "token": ID_TOKEN_ENCODED,
-                    },
-                ),
-            )
-            response = client.get(reverse("search:employers_home"))
-            assertContains(response, "existe déjà avec cette adresse e-mail")
-            assertContains(response, "pour devenir prescripteur sur la plateforme")
-            user.delete()
+        user = JobSeekerFactory(username=pc_user_data.username, email=pc_user_data.email)
+        response = pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=reverse(
+                "pro_connect:logout",
+                query={
+                    "redirect_url": reverse("search:employers_home"),
+                    "token": ID_TOKEN_ENCODED,
+                },
+            ),
+        )
+        response = client.get(reverse("search:employers_home"))
+        assertContains(response, "existe déjà avec cette adresse e-mail")
+        assertContains(response, "pour devenir professionnel sur la plateforme")
+        user.delete()
 
     def test_callback_redirect_on_inactive_user_exception(self, client, pro_connect):
-        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
 
         user = UserFactory(
             username=pc_user_data.username,
             email=pc_user_data.email,
-            kind=random.choice([UserKind.PRESCRIBER, UserKind.EMPLOYER]),
+            kind=random.choice(UserKind.professionals()),
             is_active=False,
         )
         response = pro_connect.mock_oauth_dance(
             client,
-            user.kind,
             expected_redirect_url=reverse(
                 "pro_connect:logout",
                 query={
@@ -517,38 +468,13 @@ class TestProConnectCallbackView:
             ],
         )
 
-    def test_callback_redirect_employer_on_too_many_kind_exception(self, client, pro_connect):
-        pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
-
-        for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
-            user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=kind)
-            # Don't check redirection as the user isn't an siae member yet, so it won't work.
-            response = pro_connect.mock_oauth_dance(
-                client,
-                UserKind.EMPLOYER,
-                expected_redirect_url=reverse(
-                    "pro_connect:logout",
-                    query={
-                        "redirect_url": reverse("search:employers_home"),
-                        "token": ID_TOKEN_ENCODED,
-                    },
-                ),
-            )
-            response = client.get(reverse("search:employers_home"))
-            assertContains(response, "existe déjà avec cette adresse e-mail")
-            assertContains(response, "pour devenir employeur sur la plateforme")
-            user.delete()
-
     def test_callback_update_sub_on_sub_conflict(self, client, pro_connect):
-        oidc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        oidc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         user = PrescriberFactory(
             username="another_sub", email=oidc_user_data.email, identity_provider=IdentityProvider.PRO_CONNECT
         )
 
-        pro_connect.mock_oauth_dance(
-            client,
-            UserKind.PRESCRIBER,
-        )
+        pro_connect.mock_oauth_dance(client)
         user.refresh_from_db()
         assert user.username == pro_connect.oidc_userinfo["sub"]
 
@@ -567,7 +493,7 @@ class TestProConnectCallbackView:
             email="random@email.com",
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
         )
-        response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        response = pro_connect.mock_oauth_dance(client)
         response = client.get(response.url, follow=True)
         assertMessages(
             response,
@@ -584,15 +510,12 @@ class TestProConnectCallbackView:
         )
 
     def test_callback_update_FT_organization(self, client, pro_connect):
-        user = PrescriberFactory(
-            **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
-        )
+        user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         assert not org.members.exists()
 
         pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
         )
         assertQuerySetEqual(org.members.all(), [user])
@@ -602,7 +525,6 @@ class TestProConnectCallbackView:
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         pro_connect.mock_oauth_dance(
             client,
-            UserKind.EMPLOYER,
             oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
         )
         user = get_user(client)
@@ -610,13 +532,12 @@ class TestProConnectCallbackView:
         assertQuerySetEqual(org.members.all(), [user])
 
     def test_callback_ft_users_with_no_org(self, client, pro_connect):
-        PrescriberFactory(**dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)))
+        PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
 
         oidc_userinfo = pro_connect.oidc_userinfo.copy()
         oidc_userinfo["email"] = "prenom.nom@francetravail.fr"
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
         # fetch post login page to trigger perm middleware
@@ -628,12 +549,11 @@ class TestProConnectCallbackView:
         assert get_user(client).is_authenticated is False
 
     def test_callback_ft_users_unknown_safir(self, client, pro_connect):
-        PrescriberFactory(**dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)))
+        PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
 
         oidc_userinfo = pro_connect.oidc_userinfo_with_safir.copy()
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
         # fetch post login page to trigger perm middleware
@@ -659,9 +579,7 @@ class TestProConnectCallbackView:
         assert get_user(client).is_authenticated is False
 
     def test_callback_ft_users_unknown_safir_already_in_org(self, client, pro_connect):
-        user = PrescriberFactory(
-            **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
-        )
+        user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="00000")
         org.add_or_activate_membership(user)
 
@@ -669,7 +587,6 @@ class TestProConnectCallbackView:
         oidc_userinfo["email"] = "prenom.nom@francetravail.fr"
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
         assert get_user(client).is_authenticated is True
@@ -714,7 +631,7 @@ class TestProConnectLogin:
         He can log in again later.
         """
         # Create an account with ProConnect.
-        response = pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        response = pro_connect.mock_oauth_dance(client)
         # artificially add a membership
         user = User.objects.get()
         PrescriberMembershipFactory(user=user)
@@ -730,7 +647,6 @@ class TestProConnectLogin:
         pre_login_url = reverse("account_login")
         response = client.post(pre_login_url, {"email": user.email})
         params = {
-            "user_kind": user.kind,
             "previous_url": pre_login_url,
             "user_email": user.email,
         }
@@ -739,7 +655,8 @@ class TestProConnectLogin:
 
         before_auth = timezone.now()
         response = pro_connect.mock_oauth_dance(
-            client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index")
+            client,
+            expected_redirect_url=reverse("dashboard:index"),
         )
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
@@ -748,7 +665,7 @@ class TestProConnectLogin:
 
 class TestProConnectLogout:
     def test_simple_logout(self, client, pro_connect):
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
         logout_response = client.post(reverse("account_logout"))
         response = client.get(logout_response.url)
         post_logout_redirect_uri = get_absolute_url(reverse("pro_connect:logout_callback"))
@@ -771,7 +688,7 @@ class TestProConnectLogout:
         assertRedirects(response, reverse("search:employers_home"))
 
     def test_logout_with_redirection(self, client, pro_connect):
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
         expected_redirection = reverse("search:prescribers_home")
         logout_response = client.post(reverse("account_logout"), {"redirect_url": expected_redirection})
 
@@ -807,7 +724,6 @@ class TestProConnectLogout:
         )
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             expected_redirect_url=reverse("dashboard:index"),
         )
         assert auth.get_user(client).is_authenticated
@@ -835,7 +751,7 @@ class TestProConnectLogout:
     def test_logout_with_incomplete_state(self, client, pro_connect):
         # This happens while testing. It should never happen for real users, but it's still painful for us.
 
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
+        pro_connect.mock_oauth_dance(client)
 
         session = client.session
         session[constants.PRO_CONNECT_SESSION_KEY]["token"] = None
@@ -872,7 +788,6 @@ class TestProConnectMapChannel:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             next_url=url_from_map,
             expected_redirect_url=url_from_map,
             channel=ProConnectChannel.MAP_CONSEILLER,
@@ -906,7 +821,6 @@ class TestProConnectMapChannel:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             next_url=url_from_map,
             expected_redirect_url=url_from_map,
             channel=ProConnectChannel.MAP_CONSEILLER,
@@ -942,7 +856,6 @@ class TestProConnectMapChannel:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             next_url=url_from_map,
             channel=ProConnectChannel.MAP_CONSEILLER,
             oidc_userinfo=pro_connect.oidc_userinfo_with_safir.copy(),
@@ -978,7 +891,6 @@ class TestProConnectNexusChannel:
 
         pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             channel=ProConnectChannel.NEXUS.value,
         )
         assert get_user(client).is_authenticated is True
@@ -986,7 +898,6 @@ class TestProConnectNexusChannel:
     def test_callback_new_user(self, client, pro_connect):
         pro_connect.mock_oauth_dance(
             client,
-            UserKind.PRESCRIBER,
             channel=ProConnectChannel.NEXUS.value,
             expected_redirect_url=reverse("search:employers_home"),  # Default previous url
         )
