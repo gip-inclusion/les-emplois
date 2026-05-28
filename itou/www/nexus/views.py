@@ -209,7 +209,6 @@ def login(request, template_name="nexus/login.html"):
         template_name,
         context={
             "pro_connect_url": pro_connect_url,
-            "matomo_account_type": "non défini",
             "tally_url": TALLY_URL,
         },
     )

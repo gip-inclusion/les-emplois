@@ -11,7 +11,7 @@ from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOUNT_TYPE, IdentityProvider
+from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import get_safe_url, get_url_param_value
@@ -123,9 +123,6 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
         context = super().get_context_data(**kwargs)
         extra_context = {
             "back_url": get_safe_url(self.request, "back_url", reverse("account_login")),
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.user.kind]
-            if self.user.kind in MATOMO_ACCOUNT_TYPE
-            else self.user.kind,
             "login_provider": self.user.identity_provider,
             "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),

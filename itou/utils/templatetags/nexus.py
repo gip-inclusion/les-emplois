@@ -344,7 +344,6 @@ def nexus_dropdown(context):
             )
             template_context = {
                 "pro_connect_url": pro_connect_url,
-                "matomo_account_type": "non défini",
                 "SHOW_DEMO_ACCOUNTS_BANNER": settings.SHOW_DEMO_ACCOUNTS_BANNER,
             }
             return template.render(template_context)
