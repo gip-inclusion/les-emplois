@@ -202,6 +202,13 @@ class Service(GeolocatedAddressMixin, models.Model):
         blank=True,
     )
 
+    eligibility_zones = ArrayField(
+        verbose_name="zones d’éligibilité",
+        base_field=models.CharField(),
+        default=list,
+        blank=True,
+    )
+
     receptions = models.ManyToManyField(
         verbose_name="modes d'accueil",
         to=GenericReferenceItem,

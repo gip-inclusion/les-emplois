@@ -69,6 +69,7 @@
                  "insertion_service"."publics_details",
                  "insertion_service"."access_conditions_di",
                  "insertion_service"."access_conditions_dora",
+                 "insertion_service"."eligibility_zones",
                  "insertion_service"."mobilizations_details",
                  "insertion_service"."mobilization_modes_beneficiaries_external_form_link",
                  "insertion_service"."mobilization_modes_beneficiaries_external_form_link_text",

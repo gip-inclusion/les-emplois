@@ -91,6 +91,7 @@ class ServiceAdmin(InsertionAdmin):
                     "publics_details",
                     "access_conditions_di",
                     "access_conditions_dora",
+                    "eligibility_zones",
                     "receptions",
                     "fee",
                     "fee_details",
