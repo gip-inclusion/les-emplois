@@ -325,7 +325,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
     )
 
-    page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
+    page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
         job_seeker.show_more_actions = (
