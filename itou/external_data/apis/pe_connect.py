@@ -188,6 +188,7 @@ def _model_fields_changed(initial, final_instance):
 def set_pe_data_import_from_user_data(user, user_data):
     fields_fetched = [k for k, v in user_data.items() if v is not None]
 
+    user_has_address = user.address_on_one_line
     for k in fields_fetched:
         v = user_data.get(k)
 
@@ -195,14 +196,14 @@ def set_pe_data_import_from_user_data(user, user_data):
         if k == "dateDeNaissance":
             new_value = user.jobseeker_profile.birthdate or timezone.localdate(parse_datetime(v))
             user.jobseeker_profile.birthdate = new_value
-        elif k == "adresse4":
-            user.address_line_1 = user.address_line_1 or v
-        elif k == "adresse2":
-            user.address_line_2 = user.address_line_2 or v
-        elif k == "codePostal":
-            user.post_code = user.post_code or v
-        elif k == "libelleCommune":
-            user.city = user.city or v
+        elif k == "adresse4" and not user_has_address:
+            user.address_line_1 = v
+        elif k == "adresse2" and not user_has_address:
+            user.address_line_2 = v
+        elif k == "codePostal" and not user_has_address:
+            user.post_code = v
+        elif k == "libelleCommune" and not user_has_address:
+            user.city = v
 
     # Atomicity in outer call
     user.save()
