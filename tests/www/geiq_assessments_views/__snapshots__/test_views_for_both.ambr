@@ -271,6 +271,525 @@
     ]),
   })
 # ---
+# name: TestAssessmentContractsDetails.test_contract_details_access[SQL queries for tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION as GEIQ]
+  dict({
+    'num_queries': 14,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_siaeconvention" U0
+             WHERE (U0."deactivated_at" >= %s
+                    AND U0."id" = ("companies_company"."convention_id"))
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
+                 AND "companies_companymembership"."user_id" = %s
+                 AND "companies_company"."id" IN (%s)
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
+                      OR "companies_company"."source" = %s
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."id" = ("companies_company"."convention_id")
+                                AND U0."is_active")
+                         LIMIT 1)
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."deactivated_at" >= %s
+                                AND U0."id" = ("companies_company"."convention_id"))
+                         LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at",
+                 COALESCE(
+                            (SELECT U0."valid_since" AS "valid_since"
+                             FROM "nexus_nexusressourcesyncstatus" U0
+                             WHERE U0."service" = ("nexus_nexususer"."source")
+                             ORDER BY RANDOM() ASC
+                             LIMIT 1), %s) AS "_threshold"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
+                                                               (SELECT U0."valid_since" AS "valid_since"
+                                                                FROM "nexus_nexusressourcesyncstatus" U0
+                                                                WHERE U0."service" = ("nexus_nexususer"."source")
+                                                                ORDER BY RANDOM() ASC
+                                                                LIMIT 1), %s))
+                 AND "nexus_nexususer"."email" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_activatedservice"."id",
+                 "nexus_activatedservice"."user_id",
+                 "nexus_activatedservice"."service",
+                 "nexus_activatedservice"."created_at"
+          FROM "nexus_activatedservice"
+          WHERE "nexus_activatedservice"."user_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_employeecontract"."id",
+                 "geiq_assessments_employeecontract"."label_id",
+                 "geiq_assessments_employeecontract"."employee_id",
+                 "geiq_assessments_employeecontract"."start_at",
+                 "geiq_assessments_employeecontract"."planned_end_at",
+                 "geiq_assessments_employeecontract"."end_at",
+                 "geiq_assessments_employeecontract"."nb_days_in_campaign_year",
+                 "geiq_assessments_employeecontract"."allowance_requested",
+                 "geiq_assessments_employeecontract"."allowance_granted",
+                 "geiq_assessments_employeecontract"."allowance_request_justification_reason",
+                 "geiq_assessments_employeecontract"."allowance_request_justification_details",
+                 "geiq_assessments_employeecontract"."allowance_refusal_reason",
+                 "geiq_assessments_employeecontract"."allowance_refusal_details",
+                 "geiq_assessments_employeecontract"."other_data",
+                 "geiq_assessments_employee"."id",
+                 "geiq_assessments_employee"."assessment_id",
+                 "geiq_assessments_employee"."allowance_granted_previous_year",
+                 "geiq_assessments_employee"."label_id",
+                 "geiq_assessments_employee"."last_name",
+                 "geiq_assessments_employee"."first_name",
+                 "geiq_assessments_employee"."birthdate",
+                 "geiq_assessments_employee"."title",
+                 "geiq_assessments_employee"."allowance_amount",
+                 "geiq_assessments_employee"."other_data",
+                 "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."state",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."label_geiq_post_code",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."opening_date",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          INNER JOIN "geiq_assessments_assessment" ON ("geiq_assessments_employee"."assessment_id" = "geiq_assessments_assessment"."id")
+          INNER JOIN "geiq_assessments_assessment_companies" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessment_companies"."assessment_id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE ("geiq_assessments_assessment_companies"."company_id" = %s
+                 AND "geiq_assessments_employeecontract"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
+          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
+          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U0."is_admin"
+                           AND U1."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
 # name: TestAssessmentContractsDetails.test_contract_details_access[SQL queries for tab=AssessmentContractDetailsTab.CONTRACT as DDETS]
   dict({
     'num_queries': 8,
@@ -3651,6 +4170,229 @@
           <button class="btn btn-primary btn-block btn-lg" disabled="" name="action" type="submit" value="grant_allowance">
               <span>
                   Accorder l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract < 90 days][allowance request box with allowance not requested]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide non sollicitée pour ce contrat
+      </h3>
+      <p>
+          Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
+      </p>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary w-100" type="submit">
+              Solliciter l’aide
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract < 90 days][allowance request box with allowance requested, filled reason, common tab]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide sollicitée pour ce contrat
+      </h3>
+      <p>
+          La durée du contrat est inférieure à 90 jours sur l’année 2024.
+          <b>
+              Vous avez motivé cette demande d’aide
+          </b>
+          . Vous pouvez encore y apporter des corrections si besoin.
+      </p>
+      <p>
+          Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
+      </p>
+      <a class="btn btn-primary w-100 mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+          Modifier votre justification
+      </a>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+              <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
+              </i>
+              <span>
+                  Ne plus solliciter l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract < 90 days][allowance request box with allowance requested, missing reason, common tab]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide sollicitée pour ce contrat
+      </h3>
+      <p>
+          La durée du contrat est inférieure à 90 jours sur l’année 2024.
+                  
+                      Vous devez donc
+          <b>
+              obligatoirement justifier
+          </b>
+          votre demande.
+      </p>
+      <p>
+          Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
+      </p>
+      <a class="btn btn-primary w-100 mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+          Justifier la demande d’aide
+      </a>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+              <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
+              </i>
+              <span>
+                  Ne plus solliciter l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract >= 90 days][allowance request box with allowance not requested]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide non sollicitée pour ce contrat
+      </h3>
+      <p>
+          Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
+      </p>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary w-100" type="submit">
+              Solliciter l’aide
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract >= 90 days][allowance request box with allowance requested]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide sollicitée pour ce contrat
+      </h3>
+      <p>
+          Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.
+      </p>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+              <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
+              </i>
+              <span>
+                  Ne plus solliciter l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract < 90 days][allowance request box with allowance not requested after contract selection]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide non sollicitée pour ce contrat
+      </h3>
+      <p>
+          Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
+      </p>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary w-100" disabled="" type="submit">
+              Solliciter l’aide
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract < 90 days][allowance request box with allowance requested after contract selection]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide sollicitée pour ce contrat
+      </h3>
+      <p>
+          La durée du contrat est inférieure à 90 jours sur l’année 2024.
+          <b>
+              Vous avez motivé cette demande d’aide
+          </b>
+          . Vous pouvez encore y apporter des corrections si besoin.
+      </p>
+      <p>
+          Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
+      </p>
+      <a class="btn btn-primary w-100 mb-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+          Modifier votre justification
+      </a>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" type="submit">
+              <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
+              </i>
+              <span>
+                  Ne plus solliciter l’aide
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract >= 90 days][allowance request box with allowance not requested after contract selection]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide non sollicitée pour ce contrat
+      </h3>
+      <p>
+          Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
+      </p>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary w-100" disabled="" type="submit">
+              Solliciter l’aide
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract >= 90 days][allowance request box with allowance requested after contract selection]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+      <h3>
+          Aide sollicitée pour ce contrat
+      </h3>
+      <p>
+          Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.
+      </p>
+      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" type="submit">
+              <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
+              </i>
+              <span>
+                  Ne plus solliciter l’aide
               </span>
           </button>
       </form>

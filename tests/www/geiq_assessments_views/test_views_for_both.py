@@ -3,15 +3,21 @@ import random
 import uuid
 
 import pytest
+from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.geiq_assessments.enums import AllowanceRefusalReason, AssessmentContractDetailsTab, InstitutionAction
+from itou.geiq_assessments.enums import (
+    AllowanceJustificationReason,
+    AllowanceRefusalReason,
+    AssessmentContractDetailsTab,
+    InstitutionAction,
+)
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
@@ -712,6 +718,7 @@ class TestAssessmentContractsDetails:
             employee__first_name="Jean",
             employee__birthdate="1990-01-01",
             allowance_requested=True,
+            nb_days_in_campaign_year=90,
         )
 
         PREVIOUS_YEAR_WARNING = (
@@ -719,13 +726,12 @@ class TestAssessmentContractsDetails:
         )
 
         def check_user_access_to_tabs(
-            user, *, access, tabs=AssessmentContractDetailsTab, with_previous_year_warning=False
+            user, *, access, tabs=AssessmentContractDetailsTab.get_common_tabs(), with_previous_year_warning=False
         ):
             client.force_login(user)
-            user_label = "GEIQ" if user == geiq_membership.user else "DDETS"
             if user == geiq_membership.user:
                 user_label = "GEIQ"
-                viewable_tabs_for_user = AssessmentContractDetailsTab.get_common_tabs()
+                viewable_tabs_for_user = AssessmentContractDetailsTab.get_employer_tabs()
             else:
                 user_label = "DDETS"
                 viewable_tabs_for_user = AssessmentContractDetailsTab.get_institution_tabs()
@@ -761,6 +767,43 @@ class TestAssessmentContractsDetails:
         check_user_access_to_tabs(geiq_membership.user, access=True)
         check_user_access_to_tabs(ddets_membership.user, access=False)
 
+        # GEIQ only tabs
+        # --------------------------------------------------------------------
+        # Justification tab is not available for contracts >90 days with allowance_requested=True
+        contract.allowance_requested = True
+        contract.save()
+        assert not contract.requires_justification
+        check_user_access_to_tabs(
+            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], access=False
+        )
+        # Justification tab is available for contract <90 days with allowance_requested=True
+        contract.nb_days_in_campaign_year = 1
+        contract.save()
+        assert contract.requires_justification
+        check_user_access_to_tabs(
+            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], access=True
+        )
+        check_user_access_to_tabs(
+            ddets_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], access=False
+        )  # institution users still do not have access
+
+        # Institution only tabs
+        # --------------------------------------------------------------------
+        # Justification tab is available when allowance_granted=False
+        assert contract.allowance_granted is False
+        check_user_access_to_tabs(
+            ddets_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION], access=True
+        )
+        contract.allowance_granted = True
+        contract.save()
+        # Justification tab is not available when allowance_granted=True
+        check_user_access_to_tabs(
+            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION], access=False
+        )
+        check_user_access_to_tabs(
+            ddets_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION], access=False
+        )  # GEIQ users do not have access
+
         # Now for contract with previous year info
         contract.employee.allowance_granted_previous_year = True
         contract.employee.save()
@@ -769,19 +812,316 @@ class TestAssessmentContractsDetails:
         check_user_access_to_tabs(ddets_membership.user, access=True, with_previous_year_warning=True)
         check_user_access_to_tabs(geiq_membership.user, access=True, with_previous_year_warning=True)
 
-        # Now for contract with allowance_granted
-        contract.allowance_granted = True
-        contract.save()
-        check_user_access_to_tabs(
-            geiq_membership.user, access=False, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION]
+    @pytest.mark.parametrize("short_contract", [True, False], ids=["contract < 90 days", "contract >= 90 days"])
+    def test_contract_request_allowance_as_geiq(self, client, snapshot, short_contract):
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
         )
-        check_user_access_to_tabs(
-            ddets_membership.user, access=False, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION]
+        assessment = AssessmentFactory(
+            companies=[geiq_membership.company],
+            campaign__year=2024,
+            with_submission_requirements=True,
+            contracts_selection_validated_at=None,
+        )
+        contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            allowance_requested=False,
+            nb_days_in_campaign_year=89 if short_contract else 90,
+        )
+        details_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={
+                "contract_pk": str(contract.pk),
+                # all common tabs should behave the same
+                "tab": random.choice(AssessmentContractDetailsTab.get_common_tabs()).value,
+            },
+        )
+        details_contract_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={"contract_pk": str(contract.pk), "tab": AssessmentContractDetailsTab.CONTRACT},
+        )
+        details_justification_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={
+                "contract_pk": str(contract.pk),
+                "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.value,
+            },
+        )
+        JUSTIFICATION_TAB_LI = f"""
+        <li class="nav-item">
+            <a class="nav-link" href="{details_justification_url}">
+                <span>Justification</span>
+            </a>
+        </li>"""
+        JUSTIFICATION_TAB_WITH_ICON_LI = f"""
+        <li class="nav-item">
+            <a class="nav-link" href="{details_justification_url}">
+                <span>Justification</span>
+                <i class="ri-error-warning-line text-warning ms-2"></i>
+            </a>
+        </li>"""
+
+        client.force_login(geiq_membership.user)
+        response = client.get(details_url)
+        # Allowance is not requested, never display justification tab
+        assertNotContains(response, JUSTIFICATION_TAB_LI, html=True)
+        assertNotContains(response, JUSTIFICATION_TAB_WITH_ICON_LI, html=True)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                replace_in_attr=[("action", str(contract.pk), "[PK of EmployeeContract]")],
+            )
+        ) == snapshot(name="allowance request box with allowance not requested")
+
+        # User requests the allowance
+        response = client.post(
+            reverse(
+                "geiq_assessments_views:assessment_contracts_include",
+                kwargs={"contract_pk": str(contract.pk)},
+            ),
+        )
+        contract.refresh_from_db()
+        assert contract.allowance_requested is True
+
+        if not short_contract:
+            assertRedirects(response, details_contract_url)
+            response = client.get(details_url)
+            assert pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                    replace_in_attr=[("action", str(contract.pk), "[PK of EmployeeContract]")],
+                )
+            ) == snapshot(name="allowance request box with allowance requested")
+            assertNotContains(response, JUSTIFICATION_TAB_LI, html=True)
+            assertNotContains(response, JUSTIFICATION_TAB_WITH_ICON_LI, html=True)
+
+        else:
+            # contract is <90 days, requesting the allowance requires justification
+            assertRedirects(response, details_justification_url)
+
+            response = client.get(details_url)
+            assert pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                    replace_in_attr=[
+                        ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                    ],
+                )
+            ) == snapshot(name="allowance request box with allowance requested, missing reason, common tab")
+            assertNotContains(response, JUSTIFICATION_TAB_LI, html=True)
+            assertContains(response, JUSTIFICATION_TAB_WITH_ICON_LI, html=True)
+
+            # User fills the form with invalid values
+            response = client.post(
+                details_justification_url,
+                data={
+                    "allowance_request_reason": "inexistant",
+                },
+            )
+            assertContains(
+                response, "<li>Sélectionnez un choix valide. inexistant n’en fait pas partie.</li>", html=True, count=1
+            )
+            assertContains(response, "<li>Ce champ est obligatoire.</li>", html=True, count=1)
+            response = client.post(
+                details_justification_url,
+                data={"allowance_request_details": " "},
+            )
+            assertContains(
+                response, "<li>Ce champ est obligatoire.</li>", html=True, count=2
+            )  # both reason and details are empty
+
+            # User fills the form with valid values
+            response = client.post(
+                details_justification_url,
+                data={
+                    "allowance_request_reason": random.choice(AllowanceJustificationReason.choices)[0],
+                    "allowance_request_details": "C’est un cas particulier…",
+                },
+            )
+            assertRedirects(response, details_contract_url)
+            contract.refresh_from_db()
+            assert contract.allowance_requested is True
+            assert contract.allowance_request_justification_reason is not None
+            assert contract.allowance_request_justification_details == "C’est un cas particulier…"
+            response = client.get(details_url)
+            assert pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                    replace_in_attr=[
+                        ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                        ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                    ],
+                )
+            ) == snapshot(name="allowance request box with allowance requested, filled reason, common tab")
+            assertContains(response, JUSTIFICATION_TAB_LI, html=True)
+            assertNotContains(response, JUSTIFICATION_TAB_WITH_ICON_LI, html=True)
+
+        # User unrequests the allowance and gets redirected to contract tab
+        response = client.post(
+            reverse(
+                "geiq_assessments_views:assessment_contracts_exclude",
+                kwargs={"contract_pk": str(contract.pk)},
+            ),
+        )
+        contract.refresh_from_db()
+        assert contract.allowance_requested is False
+        assertRedirects(
+            response,
+            reverse(
+                "geiq_assessments_views:assessment_contracts_details",
+                kwargs={"contract_pk": contract.pk, "tab": AssessmentContractDetailsTab.CONTRACT},
+            ),
+        )
+        if short_contract:
+            # The reason and details are not deleted
+            assert contract.allowance_request_justification_reason is not None
+            assert contract.allowance_request_justification_details == "C’est un cas particulier…"
+
+    @pytest.mark.parametrize("short_contract", [True, False], ids=["contract < 90 days", "contract >= 90 days"])
+    def test_contract_request_allowance_as_geiq_after_contract_selection(self, client, snapshot, short_contract):
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+        )
+        assessment = AssessmentFactory(
+            companies=[geiq_membership.company],
+            campaign__year=2024,
+            with_submission_requirements=True,  # sets contracts_selection_validated_at
+        )
+        contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            allowance_requested=False,
+            nb_days_in_campaign_year=89 if short_contract else 90,
+        )
+        details_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={
+                "contract_pk": str(contract.pk),
+                # all common tabs should behave the same
+                "tab": random.choice(AssessmentContractDetailsTab.get_common_tabs()).value,
+            },
+        )
+        details_contract_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={"contract_pk": str(contract.pk), "tab": AssessmentContractDetailsTab.CONTRACT},
+        )
+        details_justification_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={
+                "contract_pk": str(contract.pk),
+                "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.value,
+            },
         )
 
-    def test_contract_request_for_allowance_as_geiq(self):
-        # FIXME: fill the test
-        pass
+        client.force_login(geiq_membership.user)
+        response = client.get(details_url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                replace_in_attr=[("action", str(contract.pk), "[PK of EmployeeContract]")],
+            )
+        ) == snapshot(name="allowance request box with allowance not requested after contract selection")
+
+        # User tries to request the allowance
+        response = client.post(
+            reverse(
+                "geiq_assessments_views:assessment_contracts_include",
+                kwargs={"contract_pk": str(contract.pk)},
+            ),
+        )
+        contract.refresh_from_db()
+        assert contract.allowance_requested is False
+        assertRedirects(response, details_contract_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "La sélection des contrats a déjà été validée : "
+                    "vous ne pouvez plus modifier le statut de sollicitation de l’aide pour ce contrat.",
+                )
+            ],
+        )
+        response = client.get(details_contract_url)
+        # Box has not changed
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                replace_in_attr=[
+                    ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                ],
+            )
+        ) == snapshot(name="allowance request box with allowance not requested after contract selection")
+
+        # User tries to deselect contract
+        contract.allowance_requested = True
+        if short_contract:
+            contract.allowance_request_justification_reason = AllowanceJustificationReason.OTHER_REFERENCE_PERIOD
+            contract.allowance_request_justification_details = "Détails."
+        contract.save()
+        response = client.post(
+            reverse(
+                "geiq_assessments_views:assessment_contracts_exclude",
+                kwargs={"contract_pk": str(contract.pk)},
+            ),
+        )
+        contract.refresh_from_db()
+        assert contract.allowance_requested is True
+        assertRedirects(response, details_contract_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "La sélection des contrats a déjà été validée : "
+                    "vous ne pouvez plus modifier le statut de sollicitation de l’aide pour ce contrat.",
+                )
+            ],
+        )
+        response = client.get(details_contract_url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                selector="div.s-section__row > div.s-section__col.order-1 > div.c-box",
+                replace_in_attr=[
+                    ("action", str(contract.pk), "[PK of EmployeeContract]"),
+                    ("href", str(contract.pk), "[PK of EmployeeContract]"),
+                ],
+            )
+        ) == snapshot(name="allowance request box with allowance requested after contract selection")
+
+        if short_contract:
+            # User tries to update justification reason
+            response = client.post(
+                details_justification_url,
+                data={
+                    "allowance_request_reason": AllowanceJustificationReason.OTHER.value,
+                    "allowance_request_details": "Nouveaux détails",
+                },
+            )
+            assertRedirects(response, details_contract_url)
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.ERROR,
+                        "La sélection des contrats a déjà été validée : "
+                        "vous ne pouvez plus modifier le motif de sollicitation de l’aide pour ce contrat.",
+                    )
+                ],
+            )
+            contract.refresh_from_db()
+            assert (
+                contract.allowance_request_justification_reason
+                == AllowanceJustificationReason.OTHER_REFERENCE_PERIOD.value
+            )
+            assert contract.allowance_request_justification_details == "Détails."
 
     def test_contract_grant_or_refuse_allowance_as_institution(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)

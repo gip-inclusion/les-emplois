@@ -32,9 +32,19 @@
     {% endif %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         {% for tab in AssessmentContractDetailsTab %}
-            {% if tab != AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
+            {% if tab != AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION and tab != AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
                 <li class="nav-item">
+                    {# FIXME(ewen): use span as below #}
                     <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}
+                    </a>
+                </li>
+            {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION and request.from_employer and contract.requires_justification %}
+                <li class="nav-item">
+                    <a class="nav-link{% if active_tab == tab %} active{% endif %}" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=tab.value %}">
+                        <span>{{ tab.label }}</span>
+                        {% if not contract.allowance_request_justification_reason %}
+                            <i class="ri-error-warning-line text-warning ms-2"></i>
+                        {% endif %}
                     </a>
                 </li>
             {% elif tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION and request.from_institution and not contract.allowance_granted %}
@@ -53,11 +63,13 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                {% if request.from_institution %}
-                    <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                    {% if request.from_employer %}
+                        {% include "geiq_assessments_views/includes/contracts_request_allowance_box_for_geiq.html" with contract=contract csrf_token=csrf_token active_tab=active_tab disabled=contract.employee.assessment.contracts_selection_validated_at MIN_DAYS_IN_YEAR_FOR_ALLOWANCE=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE only %}
+                    {% elif request.from_institution %}
                         {% include "geiq_assessments_views/includes/contracts_grant_allowance_box_for_institution.html" with contract=contract csrf_token=csrf_token active_tab=active_tab disabled=contract.employee.assessment.grants_selection_validated_at only %}
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>{{ active_tab.label }}</h2>
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
@@ -371,6 +383,8 @@
                                 </li>
                             </ul>
                         </div>
+                    {% elif request.from_employer and active_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}
+                        {% include "geiq_assessments_views/includes/allowance_request_justification_form.html" with contract=contract csrf_token=csrf_token form=allowance_request_justification_form disabled=contract.employee.assessment.contracts_selection_validated_at only %}
                     {% elif request.from_institution and active_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
                         {% include "geiq_assessments_views/includes/allowance_refusal_justification_form.html" with contract=contract csrf_token=csrf_token form=allowance_refusal_justification_form disabled=contract.employee.assessment.grants_selection_validated_at only %}
                     {% endif %}

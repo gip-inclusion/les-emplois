@@ -8,11 +8,16 @@ class AssessmentContractDetailsTab(models.TextChoices):
     CONTRACT = "contract", "Contrat"
     SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
     EXIT = "exit", "Sortie"
+    ALLOWANCE_REQUEST_JUSTIFICATION = "request-justification", "Justification"
     ALLOWANCE_REFUSAL_JUSTIFICATION = "refusal-justification", "Motif de refus"
 
     @classmethod
     def get_common_tabs(cls):
         return [cls.EMPLOYEE, cls.CONTRACT, cls.SUPPORT_AND_TRAINING, cls.EXIT]
+
+    @classmethod
+    def get_employer_tabs(cls):
+        return cls.get_common_tabs() + [cls.ALLOWANCE_REQUEST_JUSTIFICATION]
 
     @classmethod
     def get_institution_tabs(cls):
@@ -73,3 +78,14 @@ class AllowanceJustificationReason(models.TextChoices):
     OTHER_REFERENCE_PERIOD = "other_reference_period", "Autre période de référence"
     SUPPORT_CONSIDERATION = "support_consideration", "Prise en compte de l'accompagnement"
     OTHER = "other", "Autre motif"
+
+    @classmethod
+    def get_description(cls, reason):
+        details = {
+            cls.OTHER_REFERENCE_PERIOD: "La période de contrat / l’accompagnement s’étend sur un autre exercice.",
+            cls.SUPPORT_CONSIDERATION: (
+                "L'accompagnement a débuté avant et/ou s'est poursuivi après la fin du contrat."
+            ),
+            cls.OTHER: "Précisez le motif dans le champ de saisie ci-dessous.",
+        }
+        return details.get(reason)

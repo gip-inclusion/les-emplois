@@ -735,6 +735,10 @@ class EmployeeContract(models.Model):
         else:
             return "En période d’essai"
 
+    @property
+    def requires_justification(self):
+        return self.allowance_requested and self.nb_days_in_campaign_year < MIN_DAYS_IN_YEAR_FOR_ALLOWANCE
+
 
 class EmployeePrequalification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
