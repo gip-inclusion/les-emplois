@@ -1265,11 +1265,11 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         return salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.validate_constraints()
         if not self.asp_uid:
             self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        self.validate_constraints()
         if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None

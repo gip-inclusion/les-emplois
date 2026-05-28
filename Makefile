@@ -73,7 +73,7 @@ fix: fast_fix
 .PHONY: populate_db populate_db_with_reference_data
 
 # After migrate
-populate_db_with_reference_data:
+populate_db_with_reference_data: $(VIRTUAL_ENV)
 	cat \
 		itou/fixtures/postgres/cities_city.sql \
 		itou/fixtures/postgres/asp_commune.sql \
