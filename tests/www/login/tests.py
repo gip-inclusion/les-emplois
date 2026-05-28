@@ -327,6 +327,7 @@ class TestExistingUserLogin:
                         replace_in_attr=[
                             ("data-matomo-category", "employeur inclusif", "[User kind]"),
                             ("data-matomo-category", "prescripteur", "[User kind]"),
+                            ("data-matomo-category", "labor_inspector", "[User kind]"),
                             ("href", user.kind, "[User kind]"),
                         ],
                     )
