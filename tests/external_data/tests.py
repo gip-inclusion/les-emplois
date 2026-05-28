@@ -7,8 +7,6 @@ from django.conf import settings
 
 import itou.external_data.apis.pe_connect as pec
 from itou.external_data.apis.pe_connect import import_user_pe_data
-from itou.external_data.models import ExternalDataImport
-from itou.users.enums import IdentityProvider
 from itou.utils import triggers
 from tests.users.factories import JobSeekerFactory
 
@@ -113,51 +111,41 @@ class TestExternalDataImport:
     @respx.mock
     def test_status_ok(self):
         user = JobSeekerFactory()
+        old_birthdate = user.jobseeker_profile.birthdate
 
         # Mock all PE APIs
         _mock_status_ok()
 
         with triggers.connection_wrapper():
-            result = import_user_pe_data(user, FOO_TOKEN, triggers_context={})
-        assert result.status == ExternalDataImport.STATUS_OK
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
 
-        report = result.report
-
-        # Birthdate is already filled by factory:
-        assert f"User/{user.pk}/birthdate" not in report.get("fields_updated")
-
-        assert 6 + 1 == len(report.get("fields_updated"))  # all the fields + history
-        assert 12 == len(report.get("fields_fetched"))
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.birthdate == old_birthdate
 
     @respx.mock
     def test_status_partial(self):
         user = JobSeekerFactory()
+        old_birthdate = user.jobseeker_profile.birthdate
+
         _mock_status_partial()
 
         with triggers.connection_wrapper():
-            result = import_user_pe_data(user, FOO_TOKEN, triggers_context={})
-        assert result.status == ExternalDataImport.STATUS_PARTIAL
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
 
-        report = result.report
-        assert user.has_external_data
-        assert f"User/{user.pk}/birthdate" not in report.get("fields_updated")
-        assert f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker" in report.get("fields_updated")
-        assert 5 + 1 == len(report.get("fields_updated"))  # fields + history
-        assert 9 == len(report.get("fields_fetched"))
-        assert 2 == len(report.get("fields_failed"))
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.birthdate == old_birthdate
 
     @respx.mock
     def test_status_failed(self):
         user = JobSeekerFactory()
+        old_birthdate = user.jobseeker_profile.birthdate
+
         _mock_status_failed()
 
-        result = import_user_pe_data(user, FOO_TOKEN)
-        assert result.status == ExternalDataImport.STATUS_FAILED
+        import_user_pe_data(user, FOO_TOKEN)
 
-        report = result.report
-        assert 0 == len(report.get("fields_updated"))
-        assert 0 == len(report.get("fields_fetched"))
-        assert 0 == len(report.get("fields_failed"))
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.birthdate == old_birthdate
 
 
 class TestJobSeekerExternalData:
@@ -169,36 +157,22 @@ class TestJobSeekerExternalData:
         user = JobSeekerFactory(jobseeker_profile__birthdate=None)
 
         with triggers.connection_wrapper():
-            result = import_user_pe_data(user, FOO_TOKEN, triggers_context={})
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
-        assert user.has_external_data
-
-        data = user.jobseekerexternaldata
-
-        assert not data.has_minimal_social_allowance
-        assert data.is_pe_jobseeker
 
         assert user.address_line_1 == "4, Privet Drive"
         assert user.address_line_2 == "The cupboard under the stairs"
         assert str(user.jobseeker_profile.birthdate) == "1970-01-01"
-
-        report = result.report
-        assert f"JobSeekerProfile/{user.pk}/birthdate" in report.get("fields_updated")
-        assert 7 + 1 == len(report.get("fields_updated"))  # fields + history
-        assert 12 == len(report.get("fields_fetched"))
 
         # Just checking birthdate is not overridden
         user = JobSeekerFactory()
         birthdate = user.jobseeker_profile.birthdate
 
         with triggers.connection_wrapper():
-            report = import_user_pe_data(user, FOO_TOKEN, triggers_context={}).report
-
+            import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
 
-        assert f"JobSeekerProfile/{user.pk}/birthdate" not in report.get("fields_updated")
         assert birthdate == user.jobseeker_profile.birthdate
-        assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock
     def test_import_partial(self):
@@ -208,41 +182,7 @@ class TestJobSeekerExternalData:
         with triggers.connection_wrapper():
             import_user_pe_data(user, FOO_TOKEN, triggers_context={})
         user.refresh_from_db()
-        assert user.has_external_data
-
-        data = user.jobseekerexternaldata
-
-        assert data.has_minimal_social_allowance is None
-        assert data.is_pe_jobseeker
 
         assert user.address_line_1 == "4, Privet Drive"
         assert user.address_line_2 == "The cupboard under the stairs"
         assert str(user.jobseeker_profile.birthdate) != "1970-01-01"
-        assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
-
-    @respx.mock
-    def test_import_failed(self):
-        _mock_status_failed()
-
-        user = JobSeekerFactory()
-        import_user_pe_data(user, FOO_TOKEN)
-        user.refresh_from_db()
-        assert user.has_external_data
-
-        data = user.jobseekerexternaldata
-        assert data.is_pe_jobseeker is None
-        assert data.has_minimal_social_allowance is None
-
-    @respx.mock
-    def test_has_external_data(self):
-        _mock_status_ok()
-
-        user1 = JobSeekerFactory()
-        user2 = JobSeekerFactory()
-
-        with triggers.connection_wrapper():
-            import_user_pe_data(user1, FOO_TOKEN, triggers_context={})
-        user1.refresh_from_db()
-
-        assert user1.has_external_data
-        assert not user2.has_external_data

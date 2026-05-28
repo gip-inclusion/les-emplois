@@ -13,7 +13,6 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.external_data.apis import pe_connect
-from itou.external_data.models import ExternalDataImport
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
 from itou.openid_connect.pe_connect import constants
@@ -253,7 +252,6 @@ class TestPoleEmploiConnect:
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.jobseeker_profile.nir == ""
         assert user.jobseeker_profile.birthdate == datetime.date(2000, 1, 1)
-        assert user.externaldataimport_set.pe_sources().get().status == ExternalDataImport.STATUS_OK
 
         user.jobseeker_profile.birthdate = datetime.date(2001, 1, 1)
         with triggers.connection_wrapper(), triggers.context():
@@ -261,7 +259,6 @@ class TestPoleEmploiConnect:
 
         # Don't call import_user_pe_data on second login (and don't update user data)
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
-        assert user.externaldataimport_set.pe_sources().count() == 1
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == datetime.date(2001, 1, 1)
 
