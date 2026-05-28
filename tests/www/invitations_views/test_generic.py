@@ -17,7 +17,6 @@ from pytest_django.asserts import (
 
 from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -45,7 +44,6 @@ class PrescriberMixin:
     org_name = "organization"
     membership_factory = PrescriberMembershipFactory
     user_factory = PrescriberFactory
-    user_kind = UserKind.PRESCRIBER
     invitation_factory = PrescriberWithOrgInvitationFactory
     invitation_model = PrescriberWithOrgInvitation
     invitation_url = reverse_lazy("invitations_views:invite_prescriber_with_org")
@@ -57,7 +55,6 @@ class CompanyMixin:
     membership_factory = CompanyMembershipFactory
     org_name = "company"
     user_factory = EmployerFactory
-    user_kind = UserKind.EMPLOYER
     invitation_factory = EmployerInvitationFactory
     invitation_model = EmployerInvitation
     invitation_url = reverse_lazy("invitations_views:invite_employer")
@@ -69,7 +66,6 @@ class InstitutionMixin:
     membership_factory = InstitutionMembershipFactory
     org_name = "institution"
     user_factory = LaborInspectorFactory
-    user_kind = UserKind.LABOR_INSPECTOR
     invitation_factory = LaborInspectorInvitationFactory
     invitation_model = LaborInspectorInvitation
     invitation_url = reverse_lazy("invitations_views:invite_labor_inspector")
@@ -234,16 +230,7 @@ class BaseTestSendInvitation:
 
     def test_existing_user_has_bad_kind(self, client):
         self.setup_test(client)
-        user_factory_choices = {
-            JobSeekerFactory,
-            EmployerFactory,
-            PrescriberFactory,
-            LaborInspectorFactory,
-            ItouStaffFactory,
-        } - {self.user_factory}
-        if self.user_kind in UserKind.professionals():
-            user_factory_choices -= {EmployerFactory, PrescriberFactory, LaborInspectorFactory}
-        guest = random.choice(list(user_factory_choices))()
+        guest = random.choice([JobSeekerFactory, ItouStaffFactory])()
         post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -274,7 +261,7 @@ class BaseTestSendInvitation:
         }
         response = client.post(self.invitation_url, data=post_data)
         assert response.status_code == 200
-        if self.user_kind == UserKind.PRESCRIBER:
+        if self.org_name == "organization":
             self.assert_no_invitation(response, "Cette personne fait déjà partie de votre organisation.")
         else:
             self.assert_no_invitation(response, "Cette personne fait déjà partie de votre structure.")
@@ -359,9 +346,9 @@ class BaseTestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
         assertRedirects(response, reverse("dashboard:index"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
-        if self.user_kind == UserKind.PRESCRIBER:
+        if self.org_name == "organization":
             assert user.prescriberorganization_set.count() == 2
-        elif self.user_kind == UserKind.EMPLOYER:
+        elif self.org_name == "company":
             assert user.company_set.count() == 2
         else:
             assert user.institution_set.count() == 2
@@ -389,7 +376,7 @@ class BaseTestAcceptInvitation:
             follow=True,
         )
         assert response.context["user"].is_authenticated
-        if self.user_kind == UserKind.LABOR_INSPECTOR:
+        if self.org_name == "institution":
             assertRedirects(response, reverse("dashboard:index"))
         else:
             assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
@@ -413,23 +400,14 @@ class BaseTestAcceptInvitation:
             "password": DEFAULT_PASSWORD,
         }
         response = client.post(login_url, data=form_data, follow=True)
-        if self.user_kind == UserKind.LABOR_INSPECTOR:
+        if self.org_name == "institution":
             assertRedirects(response, reverse("dashboard:index"))
         else:
             assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     def test_existing_user_has_bad_kind(self, client):
-        user_factory_choices = {
-            JobSeekerFactory,
-            EmployerFactory,
-            PrescriberFactory,
-            LaborInspectorFactory,
-            ItouStaffFactory,
-        } - {self.user_factory}
-        if self.user_kind in UserKind.professionals():
-            user_factory_choices -= {EmployerFactory, PrescriberFactory, LaborInspectorFactory}
-        user = random.choice(list(user_factory_choices))()
+        user = random.choice([JobSeekerFactory, ItouStaffFactory])()
         invitation = self.invitation_factory(email=user.email)
 
         client.force_login(user)
