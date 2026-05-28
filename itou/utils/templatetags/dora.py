@@ -12,7 +12,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def dora_service_url(service, *, orientation_jwt, source):
+def dora_service_url(service, *, orientation_jwt, request):
     if service["source"] == "dora" and service["lien_source"]:
         service_url = service["lien_source"]
         # Rewrite URLs to not redirect to production when using review app,
@@ -23,6 +23,19 @@ def dora_service_url(service, *, orientation_jwt, source):
             service_url = urlunsplit(dora_url_parts[:2] + service_url_parts[2:])
     else:
         service_url = urljoin(settings.DORA_WWW_BASE_URL, f"/services/di--{service['id']}")
+
+    source = "accueil"
+    if request.user.is_authenticated:
+        if request.user.is_professional:
+            if request.from_prescriber:
+                source = "prescriber"
+            elif request.from_employer:
+                source = "employer"
+            elif request.from_institution:
+                source = "labor_inspector"
+        else:
+            source = request.user.kind
+
     params = {"mtm_campaign": "lesemplois", "mtm_kwd": "rechservice-" + source}
     if orientation_jwt:
         params["op"] = orientation_jwt
