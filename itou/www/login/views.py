@@ -11,7 +11,7 @@ from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
+from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOUNT_TYPE, IdentityProvider
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import get_safe_url, get_url_param_value
@@ -131,7 +131,7 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
             "redirect_field_value": self.next_url,
             "pro_connect_url": self._get_pro_connect_url(),
-            "uses_pro_connect": self.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER],
+            "uses_pro_connect": self.user.is_professional,
         }
         return context | extra_context
 
