@@ -18,7 +18,7 @@ Références du dossier :
 Vous trouverez ci-dessous le récapitulatif de la décision enregistrée par la {{ assessment.reviewed_by_institution.name }}.
 
 IMPORTANT : Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
-Seul le courrier officiel émis par la {{ assessment.reviewed_by_institution.name }} pourra confirmer de manière définitive le montant accordé.
+Seule la décision officielle émise par la {{ assessment.reviewed_by_institution.name }} pourra confirmer de manière définitive le montant accordé.
 
 Montant total accordé : {{ assessment.granted_amount|format_int_euros }}
 Montant du premier versement déjà réalisé : {{ assessment.advance_amount|format_int_euros }}
