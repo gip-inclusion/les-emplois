@@ -18,7 +18,6 @@ from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
 from itou.asp.models import Department
 from itou.companies.models import SiaeACIConvergencePHC
 from itou.emails.models import Email
-from itou.external_data.models import ExternalDataImport
 from itou.geiq_assessments.models import LabelInfos
 from itou.insertion import models as insertion_models
 from itou.job_applications.enums import JobApplicationState
@@ -90,7 +89,6 @@ def test_all_admin(admin_client, mocker, subtests):
     TOTPDevice.objects.create(user=admin_user, confirmed=False)
     EmailAddress.objects.create(user=admin_user, email="foobar@example.com", primary=False, verified=False)
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
-    ExternalDataImport.objects.create(user=admin_user)
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
     EvaluatedJobApplicationSanctionFactory(sanctions__evaluated_siae=evaluated_siae)
     InstitutionMembershipFactory(institution=evaluated_siae.evaluation_campaign.institution)
