@@ -168,21 +168,20 @@ def import_user_pe_data(
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
     """
 
-    if not pe_data_import:
-        try:
-            # External requests
-            status, user_data = get_aggregated_user_data(token)
-            with (
-                transaction.atomic(),
-                triggers.context(**triggers_context) if triggers_context is not None else contextlib.nullcontext(),
-            ):
-                set_pe_data_import_from_user_data(user, user_data)
+    try:
+        # External requests
+        status, user_data = get_aggregated_user_data(token)
+        with (
+            transaction.atomic(),
+            triggers.context(**triggers_context) if triggers_context is not None else contextlib.nullcontext(),
+        ):
+            set_pe_data_import_from_user_data(user, user_data)
 
-            if status == ExternalDataImport.STATUS_OK:
-                logger.info("Stored external data for user=%s", user.pk)
-            elif status == ExternalDataImport.STATUS_PARTIAL:
-                logger.warning("Could only fetch partial results for user=%s", user.pk)
-            else:
-                logger.warning("Could not fetch any data for user=%s: not data stored", user.pk)
-        except Exception as e:
-            logger.warning("Data import for user=%s failed: %s", user.pk, e)
+        if status == ExternalDataImport.STATUS_OK:
+            logger.info("Stored external data for user=%s", user.pk)
+        elif status == ExternalDataImport.STATUS_PARTIAL:
+            logger.warning("Could only fetch partial results for user=%s", user.pk)
+        else:
+            logger.warning("Could not fetch any data for user=%s: not data stored", user.pk)
+    except Exception as e:
+        logger.warning("Data import for user=%s failed: %s", user.pk, e)

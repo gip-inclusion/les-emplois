@@ -14,7 +14,6 @@ from django.utils.html import format_html
 from django.utils.http import urlencode
 from itoutils.urls import add_url_params
 
-from itou.external_data.models import ExternalDataImport
 from itou.external_data.tasks import huey_import_user_pe_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.models import (
@@ -191,13 +190,10 @@ def pe_connect_callback(request):
 
     init_user_nir_from_session(request, user)
 
-    # Fetch external data if never done
-    latest_pe_data_import = user.externaldataimport_set.pe_sources().first()
-    if latest_pe_data_import is None or latest_pe_data_import.status != ExternalDataImport.STATUS_OK:
-        # No data for user or the import failed last time
-        # Async via Huey
+    # Fetch external data if birthdate or address is missing
+    if not user.jobseeker_profile.birthdate or not user.address_on_one_line:
         triggers_context = triggers.get_current_context() or {}
-        huey_import_user_pe_data(user, access_token, latest_pe_data_import, triggers_context)
+        huey_import_user_pe_data(user, access_token, None, triggers_context)
 
     login(request, user)
     # Keep token_data["id_token"] to logout from PEAMU

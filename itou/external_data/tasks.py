@@ -5,7 +5,7 @@ from itou.utils import triggers
 
 
 @on_commit_task()
-def huey_import_user_pe_data(user, token, pe_data_import, triggers_context=None):
+def huey_import_user_pe_data(user, token, pe_data_import=None, triggers_context=None):
     # The triggers_context is provided by the view triggering this task
     with triggers.connection_wrapper():
         import_user_pe_data(user, token, pe_data_import, triggers_context)
