@@ -8,8 +8,7 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
-from itou.users import enums as users_enums
+from itou.external_data.models import ExternalDataImport
 from itou.utils import triggers
 
 
@@ -186,78 +185,28 @@ def _model_fields_changed(initial, final_instance):
 # * or store as key / value if needed
 
 
-def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
-    """
-    Store user data and produce a "report" containing a JSON object, with these fields:
-        - fields_fetched (array): successfully imported field names
-        - fields_failed (array): fields that could not be fetched (API error...)
-        - fields_updated (array): updated fields in the db each of form:
-            `class_name/pk/field_name` (f.i. `User/10/birthdate`)
-
-    Return a ExternalDataImport object containing outcome of the data import
-    """
+def set_pe_data_import_from_user_data(user, user_data):
     fields_fetched = [k for k, v in user_data.items() if v is not None]
-    fields_failed = [k for k, v in user_data.items() if v is None]
-
-    job_seeker_data, _ = JobSeekerExternalData.objects.get_or_create(user=user, data_import=pe_data_import)
-
-    # Record changes on model objects:
-    initial_job_seekeer_data = model_to_dict(job_seeker_data)
-    initial_job_seeker_profile = model_to_dict(user.jobseeker_profile)
-    initial_user = model_to_dict(user)
 
     for k in fields_fetched:
-        pe_connect_provider = users_enums.IdentityProvider.PE_CONNECT
         v = user_data.get(k)
 
         # User part:
         if k == "dateDeNaissance":
             new_value = user.jobseeker_profile.birthdate or timezone.localdate(parse_datetime(v))
             user.jobseeker_profile.birthdate = new_value
-            user.update_external_data_source_history_field(pe_connect_provider, "birthdate", new_value)
         elif k == "adresse4":
-            new_value = "" or user.address_line_1 or v
-            user.address_line_1 = new_value
-            user.update_external_data_source_history_field(pe_connect_provider, "address_line_1", new_value)
+            user.address_line_1 = user.address_line_1 or v
         elif k == "adresse2":
-            new_value = "" or user.address_line_2 or v
-            user.address_line_2 = new_value
-            user.update_external_data_source_history_field(pe_connect_provider, "address_line_2", new_value)
+            user.address_line_2 = user.address_line_2 or v
         elif k == "codePostal":
-            new_value = user.post_code or v
-            user.post_code = new_value
-            user.update_external_data_source_history_field(pe_connect_provider, "post_code", new_value)
+            user.post_code = user.post_code or v
         elif k == "libelleCommune":
-            new_value = user.city or v
-            user.city = new_value
-            user.update_external_data_source_history_field(pe_connect_provider, "city", new_value)
-
-        # JobSeekerExternalData part:
-        if k == "codeStatutIndividu":
-            new_value = v == 1
-            job_seeker_data.is_pe_jobseeker = new_value
-            user.update_external_data_source_history_field(pe_connect_provider, "is_pe_jobseeker", new_value)
-        elif k == "beneficiairePrestationSolidarite":
-            job_seeker_data.has_minimal_social_allowance = v
-            user.update_external_data_source_history_field(pe_connect_provider, "has_minimal_social_allowance", v)
-
-    # Check updated fields
-    # To be done before saving objects:
-    fields_updated = (
-        _model_fields_changed(initial_user, user)
-        + _model_fields_changed(initial_job_seekeer_data, job_seeker_data)
-        + _model_fields_changed(initial_job_seeker_profile, user.jobseeker_profile)
-    )
+            user.city = user.city or v
 
     # Atomicity in outer call
     user.save()
     user.jobseeker_profile.save(update_fields={"birthdate"})
-    job_seeker_data.save()
-
-    report = {"fields_fetched": fields_fetched, "fields_failed": fields_failed, "fields_updated": fields_updated}
-    pe_data_import.status = status
-    pe_data_import.report = report
-    return pe_data_import
 
 
 #  Public
@@ -275,10 +224,6 @@ def import_user_pe_data(
     """
 
     if not pe_data_import:
-        pe_data_import = ExternalDataImport.objects.create(
-            source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user, status=ExternalDataImport.STATUS_PENDING
-        )
-
         try:
             # External requests
             status, user_data = get_aggregated_user_data(token)
@@ -286,11 +231,7 @@ def import_user_pe_data(
                 transaction.atomic(),
                 triggers.context(**triggers_context) if triggers_context is not None else contextlib.nullcontext(),
             ):
-                # A refactoring would be helpful to split user/job seeker saving
-                # and to use the status before calling save()
-                # Save user and job seeker data
-                set_pe_data_import_from_user_data(pe_data_import, user, status, user_data)
-                pe_data_import.save()
+                set_pe_data_import_from_user_data(user, user_data)
 
             if status == ExternalDataImport.STATUS_OK:
                 logger.info("Stored external data for user=%s", user.pk)
@@ -300,7 +241,3 @@ def import_user_pe_data(
                 logger.warning("Could not fetch any data for user=%s: not data stored", user.pk)
         except Exception as e:
             logger.warning("Data import for user=%s failed: %s", user.pk, e)
-            pe_data_import.status = ExternalDataImport.STATUS_FAILED
-            pe_data_import.save()
-
-    return pe_data_import
