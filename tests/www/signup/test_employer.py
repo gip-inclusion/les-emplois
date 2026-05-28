@@ -14,7 +14,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
-from itou.users.enums import KIND_EMPLOYER, IdentityProvider
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
@@ -223,7 +223,6 @@ class TestCompanySignup:
         previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:company_join", args=(company.pk, token))
         params = {
-            "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -232,7 +231,6 @@ class TestCompanySignup:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )

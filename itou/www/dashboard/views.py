@@ -452,13 +452,12 @@ class AccountMigrationView(TemplateView):
     template_name = "account/activate_pro_connect_account.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in MATOMO_ACCOUNT_TYPE:
+        if not request.user.is_professional:
             return HttpResponseRedirect(reverse("dashboard:index"))
         return super().dispatch(request, *args, **kwargs)
 
     def _get_params(self):
         params = {
-            "user_kind": self.request.user.kind,
             "previous_url": self.request.get_full_path(),
             "user_email": self.request.user.email,
         }
@@ -474,6 +473,6 @@ class AccountMigrationView(TemplateView):
 
         extra_context = {
             "pro_connect_url": pro_connect_url,
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.request.user.kind],
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE.get(self.request.user.kind),
         }
         return context | extra_context

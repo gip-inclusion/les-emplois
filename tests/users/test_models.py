@@ -494,9 +494,6 @@ class TestModel:
     @pytest.mark.parametrize("kind", UserKind)
     @pytest.mark.no_django_db
     def test_can_be_reactivated(self, kind, is_active, username, has_sso_provider, upcoming_deletion_notified, email):
-        # Local override when some cases are not possible
-        has_sso_provider = has_sso_provider if kind != UserKind.LABOR_INSPECTOR else False  # No SSO available
-
         # Build the user
         factory_kwargs = {
             "is_active": is_active,
@@ -504,7 +501,10 @@ class TestModel:
             "email": email,
             "upcoming_deletion_notified_at": timezone.now() if upcoming_deletion_notified else None,
         }
-        factory_kwargs |= {"identity_provider": IdentityProvider.DJANGO} if not has_sso_provider else {}
+        if kind in UserKind.professionals():
+            factory_kwargs["identity_provider"] = (
+                IdentityProvider.PRO_CONNECT if has_sso_provider else IdentityProvider.DJANGO
+            )
         user = {
             UserKind.JOB_SEEKER: JobSeekerFactory,
             UserKind.PRESCRIBER: PrescriberFactory,

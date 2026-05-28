@@ -92,7 +92,6 @@ class TestPreLogin:
         form_data = {"email": user.email}
         response = client.post(url, data=form_data)
         params = {
-            "user_kind": user.kind,
             "previous_url": url,
             "user_email": user.email,
         }
@@ -110,7 +109,6 @@ class TestPreLogin:
         form_data = {"email": user.email}
         response = client.post(url, data=form_data)
         params = {
-            "user_kind": user.kind,
             "previous_url": url,
             "user_email": user.email,
             "next_url": next_url,
@@ -413,7 +411,6 @@ class TestExistingUserLogin:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
         params = {
-            "user_kind": user.kind,
             "previous_url": url,
             "user_email": user.email,
         }
@@ -423,7 +420,6 @@ class TestExistingUserLogin:
         url_with_next = reverse("login:existing_user", query={"next": "/next_url"})
         response = client.get(url_with_next)
         params = {
-            "user_kind": user.kind,
             "previous_url": url_with_next,
             "user_email": user.email,
             "next_url": "/next_url",
@@ -441,7 +437,6 @@ def test_pro_connect_activation_view(client, pro_connect, factory):
     response = client.get(url)
     # Check the href link
     params = {
-        "user_kind": user.kind,
         "previous_url": url,
         "user_email": user.email,
     }

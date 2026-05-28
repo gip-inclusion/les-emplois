@@ -17,7 +17,6 @@ from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService
 from itou.nexus.utils import get_service_users
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.users.enums import UserKind
 from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.url_add_query import autologin_proconnect
 from itou.utils.urls import get_absolute_url
@@ -200,8 +199,6 @@ def login(request, template_name="nexus/login.html"):
         return HttpResponseRedirect(reverse("nexus:homepage"))
 
     params = {
-        # we don't care which kind is chosen since we only allow login and both kinds are commutable
-        "user_kind": UserKind.PRESCRIBER,
         "previous_url": request.get_full_path(),
         "channel": ProConnectChannel.NEXUS,
         "next_url": reverse("nexus:homepage"),

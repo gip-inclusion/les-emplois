@@ -56,7 +56,6 @@ ID_TOKEN_ENCODED = jwt.encode(
 # Make sure to use respx_mock fixture or @respx.mock decorator on tests using this helper.
 def mock_oauth_dance(
     client,
-    user_kind,
     previous_url=None,
     next_url=None,
     expected_redirect_url=None,
@@ -65,10 +64,8 @@ def mock_oauth_dance(
     channel=None,
     oidc_userinfo=None,
 ):
-    assert user_kind, "Letting this filed empty is not allowed"
     # Authorize params depend on user kind.
     authorize_params = {
-        "user_kind": user_kind,
         "previous_url": previous_url,
         "next_url": next_url,
         "user_email": user_email,

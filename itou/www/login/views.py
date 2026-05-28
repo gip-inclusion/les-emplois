@@ -34,7 +34,6 @@ class UserKindLoginMixin:
             return None
 
         params = {
-            "user_kind": self.user.kind,
             "previous_url": self.request.get_full_path(),
             "user_email": self.user.email,
         }
@@ -59,7 +58,6 @@ class PreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
         if self.next_url:
             if get_url_param_value(self.next_url, "channel") == ProConnectChannel.MAP_CONSEILLER:
                 query = {
-                    "user_kind": UserKind.PRESCRIBER,
                     "next_url": self.next_url,
                     "channel": ProConnectChannel.MAP_CONSEILLER.value,
                 }

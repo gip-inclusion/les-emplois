@@ -3,7 +3,6 @@ from allauth.account.models import EmailConfirmationHMAC
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
@@ -63,7 +62,7 @@ class TestWelcomingTour:
         session = client.session
         session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
-        response = pro_connect.mock_oauth_dance(client, KIND_PRESCRIBER)
+        response = pro_connect.mock_oauth_dance(client)
         response = client.get(response.url, follow=True)
         response = accept_legal_terms(client, response)
 
@@ -78,7 +77,6 @@ class TestWelcomingTour:
         next_url = reverse("signup:company_join", args=(company.pk, token))
         response = pro_connect.mock_oauth_dance(
             client,
-            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )

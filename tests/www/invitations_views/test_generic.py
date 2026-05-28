@@ -310,7 +310,7 @@ class BaseTestAcceptInvitation:
             messages_response = response
         user.refresh_from_db()
         invitation.refresh_from_db()
-        assert user.kind == self.user_kind
+        assert user.is_professional
 
         assert invitation.accepted_at
         organization = getattr(invitation, self.org_name)
@@ -512,7 +512,6 @@ class ProConnectSignupTestAcceptInvitation:
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = invitation.acceptance_url_for_existing_user
         params = {
-            "user_kind": self.user_kind,
             "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -523,7 +522,6 @@ class ProConnectSignupTestAcceptInvitation:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            self.user_kind,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
@@ -544,7 +542,6 @@ class ProConnectSignupTestAcceptInvitation:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            self.user_kind,
             user_email=invitation.email,
         )
         assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
@@ -575,7 +572,6 @@ class ProConnectSignupTestAcceptInvitation:
 
         next_url = invitation.acceptance_url_for_existing_user
         params = {
-            "user_kind": self.user_kind,
             "previous_url": login_url,
             "user_email": user.email,
             "next_url": next_url,
@@ -585,7 +581,6 @@ class ProConnectSignupTestAcceptInvitation:
 
         response = pro_connect.mock_oauth_dance(
             client,
-            self.user_kind,
             user_email=user.email,
             channel="invitation",
             previous_url=login_url,
@@ -606,7 +601,6 @@ class ProConnectSignupTestAcceptInvitation:
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = invitation.acceptance_url_for_existing_user
         params = {
-            "user_kind": self.user_kind,
             "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -618,7 +612,6 @@ class ProConnectSignupTestAcceptInvitation:
         url = reverse("dashboard:index")
         response = pro_connect.mock_oauth_dance(
             client,
-            self.user_kind,
             # the login hint is different from the email used to create the SSO account
             user_email=invitation.email,
             channel="invitation",

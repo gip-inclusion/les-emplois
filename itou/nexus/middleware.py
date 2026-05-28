@@ -13,7 +13,7 @@ class AutoLoginMiddleware(BaseAutoLoginMiddleware):
     def get_proconnect_authorize_url(self, user, next_url):
         return reverse(
             "pro_connect:authorize",
-            query={"user_kind": user.kind, "next_url": next_url, "user_email": user.email},
+            query={"next_url": next_url, "user_email": user.email},
         )
 
     def get_no_user_url(self, email, next_url):

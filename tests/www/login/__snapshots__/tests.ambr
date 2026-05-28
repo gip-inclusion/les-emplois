@@ -3,7 +3,7 @@
   '''
   <div class="c-form mb-5">
       <div class="text-center">
-          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion [User kind]" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=[User kind]&previous_url=%2Flogin%2Fexisting&user_email=django%2Bpc%40mailinator.com">
+          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion [User kind]" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?previous_url=%2Flogin%2Fexisting&user_email=django%2Bpc%40mailinator.com">
           </a>
           <br/>
           <a class="btn btn-link has-external-link" href="https://proconnect.gouv.fr/" target="_blank">
@@ -186,7 +186,7 @@
   '''
   <div class="c-form mb-5">
       <div class="text-center">
-          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion [User kind]" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=[User kind]&previous_url=%2Flogin%2Fexisting&user_email=ic%40mailinator.com">
+          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion [User kind]" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?previous_url=%2Flogin%2Fexisting&user_email=ic%40mailinator.com">
           </a>
           <br/>
           <a class="btn btn-link has-external-link" href="https://proconnect.gouv.fr/" target="_blank">
@@ -271,7 +271,7 @@
   '''
   <div class="c-form mb-5">
       <div class="text-center">
-          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion [User kind]" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=[User kind]&previous_url=%2Flogin%2Fexisting&user_email=pc%40mailinator.com">
+          <a aria-label="Se connecter avec ProConnect" class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion [User kind]" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?previous_url=%2Flogin%2Fexisting&user_email=pc%40mailinator.com">
           </a>
           <br/>
           <a class="btn btn-link has-external-link" href="https://proconnect.gouv.fr/" target="_blank">

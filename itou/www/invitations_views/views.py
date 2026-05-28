@@ -53,7 +53,6 @@ def handle_invited_user_registration_with_django(request, invitation, invitation
 
 def handle_invited_user_registration_with_pro_connect(request, invitation, invitation_type):
     query = {
-        "user_kind": invitation_type,
         "user_email": invitation.email,
         "channel": ProConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),

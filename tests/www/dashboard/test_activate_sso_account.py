@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -28,7 +28,6 @@ def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect
     activate_pro_connect_account_url = reverse("dashboard:activate_pro_connect_account")
     assertRedirects(response, activate_pro_connect_account_url)
     params = {
-        "user_kind": UserKind.PRESCRIBER,
         "previous_url": activate_pro_connect_account_url,
         "user_email": user.email,
     }
@@ -36,7 +35,6 @@ def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect
     assertContains(response, url + '"')
     response = pro_connect.mock_oauth_dance(
         client,
-        UserKind.PRESCRIBER,
         previous_url=activate_pro_connect_account_url,
     )
     user.refresh_from_db()
@@ -53,7 +51,6 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     activate_pro_connect_account_url = reverse("dashboard:activate_pro_connect_account")
     assertRedirects(response, activate_pro_connect_account_url)
     params = {
-        "user_kind": UserKind.EMPLOYER,
         "previous_url": activate_pro_connect_account_url,
         "user_email": user.email,
     }
@@ -61,7 +58,6 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     assertContains(response, url + '"')
     response = pro_connect.mock_oauth_dance(
         client,
-        UserKind.EMPLOYER,
         previous_url=activate_pro_connect_account_url,
     )
     user.refresh_from_db()
@@ -75,8 +71,9 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
         (JobSeekerFactory, True),
         (partial(PrescriberFactory, membership=True), False),
         (partial(EmployerFactory, membership=True), False),
-        (partial(LaborInspectorFactory, membership=True), True),
+        (partial(LaborInspectorFactory, membership=True), False),
     ],
+    ids=["staff", "jobseeker", "prescriber", "employer", "labor_inspector"],
 )
 def test_activate_pro_connect_account_permissions(client, user_factory, is_redirected):
     client.force_login(user_factory())

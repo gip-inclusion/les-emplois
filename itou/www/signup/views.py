@@ -197,9 +197,7 @@ def professional_user(request, template_name="signup/professional_user.html"):
     OAuth callback.
     """
 
-    # FIXME: We use KIND_PRESCRIBER for all new professionals until we merge all 3 pro kind
     params = {
-        "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),
         "next_url": reverse("signup:choose_pro_membership_kind"),
     }
@@ -367,7 +365,6 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
 
     def get_context_data(self, **kwargs):
         params = {
-            "user_kind": KIND_EMPLOYER,
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:company_join", args=(self.company.pk, self.token)),
         }

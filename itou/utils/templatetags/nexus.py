@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from itou.nexus.enums import Service
-from itou.users.enums import UserKind
 from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.matomo import matomo_event
 from itou.utils.templatetags.url_add_query import autologin_proconnect
@@ -337,8 +336,6 @@ def nexus_dropdown(context):
         if dropdown_status["proconnect"] is False:
             template = get_template("nexus/components/dropdown_no_proconnect.html")
             proconnect_params = {
-                # we don't care which kind is chosen since the user already exists so the kind won't be updated
-                "user_kind": UserKind.PRESCRIBER,
                 "previous_url": context["request"].get_full_path(),
                 "next_url": reverse("nexus:homepage"),
             }
