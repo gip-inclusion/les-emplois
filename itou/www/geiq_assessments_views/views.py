@@ -51,6 +51,7 @@ from itou.www.geiq_assessments_views.export import (
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
     AllowanceRefusalJustificationForm,
+    AllowanceRequestJustificationForm,
     AskForFixCommentForm,
     ContractFilterForm,
     CreateForm,
@@ -667,7 +668,7 @@ def assessment_contracts_details(
     except ValueError:
         raise Http404
     if request.from_employer:
-        if tab not in AssessmentContractDetailsTab.get_common_tabs():
+        if tab not in AssessmentContractDetailsTab.get_employer_tabs():
             raise Http404
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.from_institution:
@@ -690,6 +691,50 @@ def assessment_contracts_details(
     if request.from_employer:
         if not contract.employee.assessment.submitted_at:
             editable = not contract.employee.assessment.contracts_selection_validated_at
+        if details_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION:
+            if not contract.requires_justification:
+                raise Http404  # Tab is displayed and accessible only if the contract requires justification.
+            allowance_request_justification_form = AllowanceRequestJustificationForm(
+                data=request.POST or None,
+                initial={
+                    "allowance_request_reason": contract.allowance_request_justification_reason,
+                    "allowance_request_details": contract.allowance_request_justification_details,
+                },
+            )
+            if contract.employee.assessment.contracts_selection_validated_at:
+                for fieldname in allowance_request_justification_form.fields:
+                    allowance_request_justification_form.fields[fieldname].disabled = True
+            context |= {"allowance_request_justification_form": allowance_request_justification_form}
+            if request.method == "POST":
+                if allowance_request_justification_form.is_valid():
+                    if contract.employee.assessment.contracts_selection_validated_at:
+                        messages.error(
+                            request,
+                            "La sélection des contrats a déjà été validée : "
+                            "vous ne pouvez plus modifier le motif de sollicitation de l’aide pour ce contrat.",
+                        )
+                    else:
+                        contract.allowance_request_justification_reason = (
+                            allowance_request_justification_form.cleaned_data["allowance_request_reason"]
+                        )
+                        contract.allowance_request_justification_details = (
+                            allowance_request_justification_form.cleaned_data["allowance_request_details"]
+                        )
+                        contract.save(
+                            update_fields=(
+                                "allowance_request_justification_reason",
+                                "allowance_request_justification_details",
+                            )
+                        )
+                    return HttpResponseRedirect(
+                        reverse(
+                            "geiq_assessments_views:assessment_contracts_details",
+                            kwargs={
+                                "contract_pk": str(contract.pk),
+                                "tab": AssessmentContractDetailsTab.CONTRACT.value,
+                            },
+                        )
+                    )
     elif request.from_institution:
         if not contract.employee.assessment.reviewed_at:
             editable = not contract.employee.assessment.grants_selection_validated_at
@@ -777,6 +822,7 @@ def assessment_contracts_details(
         "contract": contract,
         "matomo_custom_title": f"Bilan d’exécution - page de detail d’un contrat - {tab}",
         "active_tab": details_tab,
+        "MIN_DAYS_IN_YEAR_FOR_ALLOWANCE": MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     }
     return render(request, template_name, context)
 
@@ -825,6 +871,25 @@ def assessment_contracts_toggle(
             updated_fields += ["allowance_refusal_reason", "allowance_refusal_details"]
         contract.save(update_fields=updated_fields)
     from_list = bool(request.GET.get("from_list"))
+
+    # For the buttons not relying on HTMX (i.e. cards/boxes inside contract details tabs).
+    if not request.htmx:
+        tab = AssessmentContractDetailsTab.CONTRACT
+        if contract.requires_justification and not contract.allowance_request_justification_reason:
+            tab = AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION
+        if contract.employee.assessment.contracts_selection_validated_at:
+            messages.error(
+                request,
+                "La sélection des contrats a déjà été validée : "
+                "vous ne pouvez plus modifier le statut de sollicitation de l’aide pour ce contrat.",
+            )
+        return HttpResponseRedirect(
+            reverse(
+                "geiq_assessments_views:assessment_contracts_details",
+                kwargs={"contract_pk": contract.pk, "tab": tab.value},
+            )
+        )
+
     stats = None
     if from_list:
         if request.from_employer:

@@ -1,0 +1,31 @@
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+<div class="c-form mb-3 mb-md-4">
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form_errors form type="all" %}
+        <h2 class="h3">{{ form.allowance_request_reason.label }} *</h2>
+        {% for choice in form.allowance_request_reason %}
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="radio"
+                           name="{{ choice.data.name }}"
+                           value="{{ choice.data.value }}"
+                           id="{{ choice.id_for_label }}"
+                           required
+                           {% if form.allowance_request_reason.field.disabled %}disabled{% endif %}
+                           aria-required="true"
+                           {% if choice.data.selected %}checked{% endif %}>
+                    <label class="form-check-label" for="{{ choice.id_for_label }}">
+                        <strong>{{ choice.data.label }}</strong>
+                        <br>
+                        <span class="text-muted">{{ choice.description }}</span>
+                    </label>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="form-group">{% bootstrap_field form.allowance_request_details %}</div>
+        {% itou_buttons_form primary_label="Enregistrer" primary_disabled=disabled reset_url=None %}
+    </form>
+</div>
