@@ -242,13 +242,9 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
 
 
 def get_user_kind_display(user):
-    if user.kind == UserKind.EMPLOYER:
-        return "employeur"
-    elif user.kind == UserKind.PRESCRIBER:
-        if user.is_prescriber_with_authorized_org_memberships:
-            return "prescripteur habilité"
-        return "orienteur"
-    elif user.kind == UserKind.JOB_SEEKER:
+    if user.is_professional:
+        return "professionnel"
+    elif user.is_job_seeker:
         return "candidat"
     raise ValueError("Invalid user kind: %s", user.kind)
 
