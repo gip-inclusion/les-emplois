@@ -43,7 +43,7 @@
                         {% endif %}
                     </ul>
                     <div class="mt-md-1">
-                        <a href="{% dora_service_url service orientation_jwt=orientation.jwt source=request.user.kind|default:"accueil" %}"
+                        <a href="{% dora_service_url service orientation_jwt=orientation.jwt request=request %}"
                            class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link"
                            target="_blank"
                            rel="noopener"
