@@ -1341,6 +1341,76 @@ class TestAssessmentContractsDetails:
         assert contract.allowance_refusal_reason == AllowanceRefusalReason.UNCONFIRMED_ELIGIBILITY
         assert contract.allowance_refusal_details == "Incorrect."
 
+    @pytest.mark.parametrize(
+        "short_contract, allowance_request_justification_reason, assertion",
+        [
+            (True, AllowanceJustificationReason.OTHER_REFERENCE_PERIOD, assertContains),
+            (False, AllowanceJustificationReason.OTHER_REFERENCE_PERIOD, assertNotContains),
+            (False, "", assertNotContains),
+        ],
+    )
+    def test_display_allowance_request_justification_to_institution(
+        self, client, short_contract, allowance_request_justification_reason, assertion
+    ):
+        JUSTIFICATION_TITLE = "<h3>Demande d’aide motivée</h3>"
+        JUSTIFICATION_LABEL = (
+            f"<span>{AllowanceJustificationReason(allowance_request_justification_reason).label}</span>"
+            if allowance_request_justification_reason
+            else ""
+        )
+        JUSTIFICATION_DETAILS = '<div class="fst-italic">Détails saisissants.</div>'
+
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+        )
+        assessment = AssessmentFactory(
+            companies=[geiq_membership.company],
+            campaign__year=2024,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(seconds=1),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(seconds=2),
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+        contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            allowance_requested=True,
+            nb_days_in_campaign_year=89 if short_contract else 90,
+            allowance_request_justification_reason=allowance_request_justification_reason,
+            allowance_request_justification_details="Détails saisissants."
+            if allowance_request_justification_reason
+            else "",
+        )
+        common_tabs_except_contract = AssessmentContractDetailsTab.get_common_tabs()
+        common_tabs_except_contract.remove(AssessmentContractDetailsTab.CONTRACT)
+        details_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={"contract_pk": str(contract.pk), "tab": random.choice(common_tabs_except_contract)},
+        )
+        details_contract_url = reverse(
+            "geiq_assessments_views:assessment_contracts_details",
+            kwargs={"contract_pk": str(contract.pk), "tab": AssessmentContractDetailsTab.CONTRACT.value},
+        )
+        client.force_login(ddets_membership.user)
+
+        # Never display justification on tabs other than CONTRACT
+        response = client.get(details_url)
+        assertNotContains(response, JUSTIFICATION_TITLE, html=True)
+        if allowance_request_justification_reason:
+            assertNotContains(response, JUSTIFICATION_LABEL, html=True)
+            assertNotContains(response, JUSTIFICATION_DETAILS, html=True)
+
+        response = client.get(details_contract_url)
+        assertion(response, JUSTIFICATION_TITLE, html=True)
+        if allowance_request_justification_reason:
+            assertion(response, JUSTIFICATION_LABEL, html=True)
+            assertion(response, JUSTIFICATION_DETAILS, html=True)
+
 
 class TestEmployeeContractToggleView:
     def test_contract_toggle_as_geiq_noop_after_selection_validated_at(self, client):
