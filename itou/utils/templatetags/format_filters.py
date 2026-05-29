@@ -8,7 +8,7 @@ from textwrap import wrap
 
 from django import template
 from django.template.defaultfilters import floatformat, stringfilter
-from django.utils.html import conditional_escape
+from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 
 
@@ -130,3 +130,14 @@ def label_object_format(data):
         other_data_str = ", ".join(f"{k}: {v}" for k, v in other_data.items())
         return f"{data['nom']} - [{other_data_str}]"
     return str(data)
+
+
+@register.filter
+def strong_or_disabled_non_filled(value, non_filled_text="Non renseigné"):
+    # Handle "" or None as missing value but not the number 0
+    if value == "":
+        value = None
+    if value is not None:
+        return format_html("<strong>{}</strong>", value)
+    else:
+        return format_html('<i class="text-disabled">{}</i>', non_filled_text)

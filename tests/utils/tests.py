@@ -932,6 +932,22 @@ class TestUtilsTemplateFilters:
             with subtests.test(number):
                 assert format_filters.format_approval_number(number) == expected
 
+    @pytest.mark.parametrize(
+        "value,non_filled_text,expected",
+        [
+            (42, None, "<strong>42</strong>"),
+            ("Martine", None, "<strong>Martine</strong>"),
+            ("", None, '<i class="text-disabled">Non renseigné</i>'),
+            (None, None, '<i class="text-disabled">Non renseigné</i>'),
+            (0, None, "<strong>0</strong>"),
+            ("", "Non disponible", '<i class="text-disabled">Non disponible</i>'),
+            (None, "Non disponible", '<i class="text-disabled">Non disponible</i>'),
+        ],
+    )
+    def test_strong_or_disabled_non_filled(self, value, non_filled_text, expected):
+        kwargs = {"non_filled_text": non_filled_text} if non_filled_text is not None else {}
+        assert format_filters.strong_or_disabled_non_filled(value, **kwargs) == expected
+
 
 class TestUtilsUrls:
     def test_get_safe_url(self):
