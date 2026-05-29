@@ -326,9 +326,11 @@ class TestAssessmentContractsListAndToggle:
             employee__first_name="Pean-Jierre",
             employee__allowance_amount=1_400,
             start_at=datetime.date(2024, 6, 1),
-            end_at=datetime.date(2024, 9, 30),
+            end_at=datetime.date(2024, 6, 30),  # so that duration <90 days and an icon is displayed
             planned_end_at=datetime.date(2024, 10, 30),
             allowance_requested=True,
+            allowance_request_justification_reason=AllowanceJustificationReason.OTHER_REFERENCE_PERIOD,
+            allowance_request_justification_details="Détails.",
             allowance_granted=False,
             allowance_refusal_reason="",
             allowance_refusal_details="",
