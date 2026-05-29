@@ -385,7 +385,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
             assert headers[key] == value
 
     @respx.mock
-    def test_rechercher_usager_by_birthdate_and_nir(self):
+    def test_rechercher_usager_by_jobseeker_profile_birthdate_and_nir(self):
         respx.post(f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}").respond(
             200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.CERTIFIED]
         )
@@ -393,13 +393,33 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         assert jeton_usager == "a_long_token"
 
     @respx.mock
-    def test_rechercher_usager_by_pole_emploi_id(self):
+    def test_rechercher_usager_by_jobseeker_profile_pole_emploi_id(self):
         respx.post(f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}").respond(
             200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL][ResponseKind.CERTIFIED]
         )
         jobseeker_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678901")
         jeton_usager = self.api_client.rechercher_usager(jobseeker_profile=jobseeker_profile)
         assert jeton_usager == "a_long_token"
+
+    @respx.mock
+    def test_rechercher_usager_by_france_travail_id(self):
+        respx.post(f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}").respond(
+            200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL][ResponseKind.CERTIFIED]
+        )
+        jeton_usager = self.api_client.rechercher_usager(france_travail_id="12345678901")
+        assert jeton_usager == "a_long_token"
+
+    @respx.mock
+    def test_rechercher_usager_call_arguments(self):
+        respx.post(f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}").respond(
+            200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL][ResponseKind.CERTIFIED]
+        )
+        with pytest.raises(AssertionError):
+            self.api_client.rechercher_usager()
+        with pytest.raises(AssertionError):
+            self.api_client.rechercher_usager(
+                jobseeker_profile=JobSeekerProfileFactory(), france_travail_id="12345678901"
+            )
 
     @pytest.mark.parametrize(
         "json_response,exception_raised,exception_pattern",
