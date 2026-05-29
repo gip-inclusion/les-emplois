@@ -66,6 +66,13 @@ urlpatterns = [
         "<uuid:pk>/export",
         views.assessment_contracts_export,
         name="assessment_contracts_export",
+        kwargs={"include_unselected_by_geiq": False},
+    ),
+    path(
+        "<uuid:pk>/export-all",
+        views.assessment_contracts_export,
+        name="assessment_contracts_export_all",
+        kwargs={"include_unselected_by_geiq": True},
     ),
     path(
         "contracts/<uuid:contract_pk>/include",

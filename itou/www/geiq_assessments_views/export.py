@@ -189,27 +189,46 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     "Situation post-contrat": with_format(
         Format.TEXT, lambda contract: get_libelle(contract.other_data.get("emploi_sorti", {}))
     ),
-    "Motif de dérogation": with_format(
-        Format.TEXT,
-        lambda contract: get_choice_label(
-            contract.allowance_request_justification_reason, AllowanceJustificationReason
-        ),
-    ),
 }
 
 
-def get_export_format(request):
+def get_export_format(request, include_unselected_by_geiq):
     user_fields = {}
     if request.from_employer:
         user_fields["Demande d’aide"] = with_format(
             Format.TEXT, lambda contract: oui_non(contract.allowance_requested)
         )
+        user_fields["Motif de dérogation"] = with_format(
+            Format.TEXT,
+            lambda contract: (
+                get_choice_label(contract.allowance_request_justification_reason, AllowanceJustificationReason)
+                if contract.allowance_requested
+                else ""
+            ),
+        )
     elif request.from_institution:
+        if include_unselected_by_geiq:
+            user_fields["Aide demandée par le GEIQ"] = with_format(
+                Format.TEXT, lambda contract: oui_non(contract.allowance_requested)
+            )
+        user_fields["Motif de dérogation"] = with_format(
+            Format.TEXT,
+            lambda contract: (
+                get_choice_label(contract.allowance_request_justification_reason, AllowanceJustificationReason)
+                if contract.allowance_requested
+                else ""
+            ),
+        )
         user_fields["Éligible à l’aide"] = with_format(
             Format.TEXT, lambda contract: oui_non(contract.allowance_granted)
         )
         user_fields["Motif de refus"] = with_format(
-            Format.TEXT, lambda contract: get_choice_label(contract.allowance_refusal_reason, AllowanceRefusalReason)
+            Format.TEXT,
+            lambda contract: (
+                get_choice_label(contract.allowance_refusal_reason, AllowanceRefusalReason)
+                if contract.allowance_requested
+                else ""
+            ),
         )
     return {**EMPLOYEE_CONTRACT_XLSX_FORMAT, **user_fields}
 
