@@ -251,7 +251,8 @@ class OIDConnectUserData:
             )
 
         for key, value in user_data_dict.items():
-            user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
+            if key != "kind":  # We never allow kind update so no need to track it
+                user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
 
         user.allow_next_sso_sub_update = False  # Always disable this at login, even if the sub wasn't changed
         user.save()
