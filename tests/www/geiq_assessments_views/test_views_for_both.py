@@ -779,39 +779,9 @@ class TestAssessmentContractsDetails:
             ddets_membership.user, access=False, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION]
         )
 
-    def test_contract_toggle_as_geiq(self, client):
-        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
-        assessment = AssessmentFactory(
-            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
-            campaign__year=2024,
-            companies=[geiq_membership.company],
-            with_submission_requirements=True,
-            contracts_selection_validated_at=None,
-        )
-        contract = EmployeeContractFactory(
-            employee__assessment=assessment,
-            allowance_requested=random.choice([True, False]),
-        )
-        client.force_login(geiq_membership.user)
-        for tab in AssessmentContractDetailsTab.get_common_tabs():
-            current_value = contract.allowance_requested
-            tab_url = reverse(
-                "geiq_assessments_views:assessment_contracts_details",
-                kwargs={"contract_pk": str(contract.pk), "tab": tab.value},
-            )
-            response = client.get(tab_url)
-            simulated_page = parse_response_to_soup(response, selector="#main")
-            view_name = "assessment_contracts_include" if not current_value else "assessment_contracts_exclude"
-            response = client.post(
-                reverse(f"geiq_assessments_views:{view_name}", kwargs={"contract_pk": str(contract.pk)}),
-                headers={"HX-Request": "true"},
-            )
-            contract.refresh_from_db()
-            assert contract.allowance_requested != current_value
-            update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract.pk} > form", response)
-            response = client.get(tab_url)
-            fresh_page = parse_response_to_soup(response, selector="#main")
-            assertSoupEqual(simulated_page, fresh_page)
+    def test_contract_request_for_allowance_as_geiq(self):
+        # FIXME: fill the test
+        pass
 
     def test_contract_grant_or_refuse_allowance_as_institution(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)

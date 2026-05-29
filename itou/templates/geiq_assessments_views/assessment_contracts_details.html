@@ -14,14 +14,9 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+    {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>Détail du contrat : {{ contract.employee.get_full_name }}</h1>
-        {% endfragment %}
-        {% fragment as c_title__cta %}
-            {% if request.from_employer %}
-                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=False editable=editable request=request only %}
-            {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
