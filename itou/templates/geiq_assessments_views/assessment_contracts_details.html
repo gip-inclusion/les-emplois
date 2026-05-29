@@ -98,11 +98,11 @@
                             <ul class="list-data">
                                 <li>
                                     <small>Prescripteur</small>
-                                    <strong>{{ contract.employee.other_data.prescripteur.libelle|default:"-" }}</strong>
+                                    {{ contract.employee.other_data.prescripteur.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Autre prescripteur</small>
-                                    <strong>{{ contract.employee.other_data.autre_prescripteur|default:"-" }}</strong>
+                                    {{ contract.employee.other_data.autre_prescripteur|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Aide potentielle</small>
@@ -127,7 +127,7 @@
                                 </li>
                                 <li>
                                     <small>Précisions critères public prioritaire</small>
-                                    <strong>{{ contract.employee.other_data.precision_status_prio|default:"-" }}</strong>
+                                    {{ contract.employee.other_data.precision_status_prio|default:""|strong_or_disabled_non_filled }}
                                 </li>
                             </ul>
                         </div>
@@ -153,7 +153,7 @@
                                 </li>
                                 <li>
                                     <small>Type de contrat</small>
-                                    <strong>{{ contract.other_data.nature_contrat.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.nature_contrat.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Temps plein</small>
@@ -169,7 +169,7 @@
                                 </li>
                                 <li>
                                     <small>Date de fin effective</small>
-                                    <strong>{{ contract.end_at|date:"d/m/Y"|default:"-" }}</strong>
+                                    {{ contract.end_at|date:"d/m/Y"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Durée prévisionnelle du contrat</small>
@@ -205,35 +205,35 @@
                             <ul class="list-data">
                                 <li>
                                     <small>Poste occupé</small>
-                                    <strong>{{ contract.other_data.metier_prepare|default:"-" }}</strong>
+                                    {{ contract.other_data.metier_prepare|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Secteur d’activité</small>
-                                    <strong>{{ contract.other_data.secteur_activite.nom|default:"-" }}</strong>
+                                    {{ contract.other_data.secteur_activite.nom|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Durée hebdomadaire du contrat</small>
-                                    <strong>{{ contract.other_data.nb_heure_hebdo|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                    {{ contract.other_data.nb_heure_hebdo|formatfloat_with_unit:"h"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Précision sur la nature du contrat</small>
-                                    <strong>{{ contract.other_data.nature_contrat_autre_precision|default:"-" }}</strong>
+                                    {{ contract.other_data.nature_contrat_autre_precision|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Détail sur la nature du contrat</small>
-                                    <strong>{{ contract.other_data.nature_contrat_precision|default:"-" }}</strong>
+                                    {{ contract.other_data.nature_contrat_precision|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Contrat professionnel expérimental</small>
-                                    <strong>{{ contract.other_data.is_contrat_pro_experimental|yesno:"Oui,Non,-" }}</strong>
+                                    {{ contract.other_data.is_contrat_pro_experimental|yesno:"Oui,Non,"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Contrat signé dans le cadre d’une clause d’insertion</small>
-                                    <strong>{{ contract.other_data.signer_cadre_clause_insertion|yesno:"Oui,Non,-" }}</strong>
+                                    {{ contract.other_data.signer_cadre_clause_insertion|yesno:"Oui,Non,"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Raison d’une signature d’un contrat hors alternance</small>
-                                    <strong>{{ contract.other_data.hors_alternance_precision|default:"-" }}</strong>
+                                    {{ contract.other_data.hors_alternance_precision|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Multi mises à disposition</small>
@@ -241,11 +241,11 @@
                                 </li>
                                 <li>
                                     <small>Rémunération supérieure aux minima réglementaires</small>
-                                    <strong>{{ contract.other_data.is_remuneration_superieur_minima|yesno:"Oui,Non,-" }}</strong>
+                                    {{ contract.other_data.is_remuneration_superieur_minima|yesno:"Oui,Non,"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Nombre d’entreprises</small>
-                                    <strong>{{ contract.other_data.mad_nb_entreprises|default:"-" }}</strong>
+                                    {{ contract.other_data.mad_nb_entreprises|default:""|strong_or_disabled_non_filled }}
                                 </li>
                             </ul>
                         </div>
@@ -258,15 +258,15 @@
                                 </li>
                                 <li>
                                     <small>Mise en situation professionnelle</small>
-                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle_bool|yesno:"Oui,Non,-" }}</strong>
+                                    {{ contract.other_data.mise_en_situation_professionnelle_bool|yesno:"Oui,Non,"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Détail sur la mise en situation professionnelle</small>
-                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle_precision|default:"-" }}</strong>
+                                    {{ contract.other_data.mise_en_situation_professionnelle_precision|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Type de mise en situation professionnelle</small>
-                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.mise_en_situation_professionnelle.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>
@@ -294,7 +294,7 @@
                             <ul class="list-data">
                                 <li>
                                     <small>Niveau de qualification</small>
-                                    <strong>{{ contract.employee.other_data.qualification.libelle|default:"-" }}</strong>
+                                    {{ contract.employee.other_data.qualification.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Titulaire d’un bac général</small>
@@ -302,47 +302,47 @@
                                 </li>
                                 <li>
                                     <small>Qualification visée</small>
-                                    <strong>{{ contract.other_data.qualification_visee.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.qualification_visee.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Type de qualification visée</small>
-                                    <strong>{{ contract.other_data.type_qualification_visee.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.type_qualification_visee.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Qualification obtenue</small>
-                                    <strong>{{ contract.other_data.is_qualification_obtenue|yesno:"Oui,Non,-" }}</strong>
+                                    {{ contract.other_data.is_qualification_obtenue|yesno:"Oui,Non,"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Niveau de qualification obtenue</small>
-                                    <strong>{{ contract.other_data.qualification_obtenu.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.qualification_obtenu.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Type de qualification obtenue</small>
-                                    <strong>{{ contract.other_data.type_qualification_obtenu.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.type_qualification_obtenu.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Formation complémentaire</small>
-                                    <strong>{{ contract.other_data.formation_complementaire|default:"-" }}</strong>
+                                    {{ contract.other_data.formation_complementaire|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Formation complémentaire prévue</small>
-                                    <strong>{{ contract.other_data.formation_complementaire_prevue|default:"-" }}</strong>
+                                    {{ contract.other_data.formation_complementaire_prevue|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Heures de formation prévues</small>
-                                    <strong>{{ contract.other_data.heures_formation_prevue|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                    {{ contract.other_data.heures_formation_prevue|formatfloat_with_unit:"h"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Heures de formation réalisées</small>
-                                    <strong>{{ contract.other_data.heures_formation_realisee|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                    {{ contract.other_data.heures_formation_realisee|formatfloat_with_unit:"h"|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Nom de l’organisme de formation</small>
-                                    <strong>{{ contract.other_data.organisme_formation|default:"-" }}</strong>
+                                    {{ contract.other_data.organisme_formation|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Modalité de formation</small>
-                                    <strong>{{ contract.other_data.modalite_formation.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.modalite_formation.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                             </ul>
                         </div>
@@ -351,19 +351,19 @@
                             <ul class="list-data">
                                 <li>
                                     <small>Emploi de sortie</small>
-                                    <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.emploi_sorti.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Détail sur l’emploi de sortie</small>
-                                    <strong>{{ contract.other_data.emploi_sorti_precision_text|default:"-" }}</strong>
+                                    {{ contract.other_data.emploi_sorti_precision_text|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Précision sur l’emploi de sortie</small>
-                                    <strong>{{ contract.other_data.emploi_sorti_precision.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.emploi_sorti_precision.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Métier correspondant</small>
-                                    <strong>{{ contract.other_data.metier_correspondant|default:"-" }}</strong>
+                                    {{ contract.other_data.metier_correspondant|default:""|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>CDD/CDI refusé</small>
@@ -381,11 +381,11 @@
                                 </li>
                                 <li>
                                     <small>Type de rupture anticipée</small>
-                                    <strong>{{ contract.rupture_kind_display|default:"-" }}</strong>
+                                    {{ contract.rupture_kind_display|strong_or_disabled_non_filled }}
                                 </li>
                                 <li>
                                     <small>Situation post-contrat</small>
-                                    <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
+                                    {{ contract.other_data.emploi_sorti.libelle|default:""|strong_or_disabled_non_filled }}
                                 </li>
                             </ul>
                         </div>
