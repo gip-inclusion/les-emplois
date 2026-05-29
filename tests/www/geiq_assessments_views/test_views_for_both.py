@@ -38,6 +38,11 @@ from tests.utils.testing import (
 
 
 class TestAssessmentContractsListAndToggle:
+    EXPORT_BUTTON_LABELS_FOR_INSTITUTION = [
+        "Exporter tous les contrats soumis par le GEIQ",
+        "Exporter tous les contrats",
+    ]
+
     def test_anonymous_access(self, client):
         assessment = AssessmentFactory()
         url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
@@ -86,6 +91,8 @@ class TestAssessmentContractsListAndToggle:
         contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
         client.force_login(geiq_membership.user)
         response = client.get(contracts_list_url)
+        for label in self.EXPORT_BUTTON_LABELS_FOR_INSTITUTION:
+            assertNotContains(response, label)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments empty contracts list"
         )
@@ -285,6 +292,8 @@ class TestAssessmentContractsListAndToggle:
         contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
         client.force_login(ddets_membership.user)
         response = client.get(contracts_list_url)
+        for label in self.EXPORT_BUTTON_LABELS_FOR_INSTITUTION:
+            assertContains(response, label)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments empty contracts list"
         )
