@@ -3,6 +3,7 @@
 {% load django_bootstrap5 %}
 {% load enums %}
 {% load format_filters %}
+{% load static %}
 {% load str_filters %}
 
 {% block title %}
@@ -397,4 +398,9 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
 {% endblock %}
