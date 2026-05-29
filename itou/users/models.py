@@ -640,7 +640,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
         """
         now = timezone.now()
-        has_performed_update = False
 
         if not self.external_data_source_history:
             self.external_data_source_history = []
@@ -655,17 +654,22 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             current_value = field_history[-1]["value"]
         except IndexError:
             current_value = None
-        if current_value != value:
-            self.external_data_source_history.append(
-                {
-                    "field_name": field,
-                    "source": provider.value,
-                    "created_at": now,
-                    "value": value,
-                }
-            )
-            has_performed_update = True
-        return has_performed_update
+        if current_value == value:
+            return False
+
+        if field in ["last_name", "first_name"]:
+            if current_value and current_value.lower() == value.lower():
+                return False
+
+        self.external_data_source_history.append(
+            {
+                "field_name": field,
+                "source": provider.value,
+                "created_at": now,
+                "value": value,
+            }
+        )
+        return True
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, acting_organization=None, gps=False, **fields):

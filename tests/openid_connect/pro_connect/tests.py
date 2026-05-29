@@ -115,6 +115,7 @@ class TestProConnectModel:
                 "created_at": now_str,
             }
             for field in dataclasses.fields(pc_user_data)
+            if field.name != "kind"
         ]
         assert sorted(user.external_data_source_history, key=itemgetter("field_name")) == sorted(
             expected, key=itemgetter("field_name")
@@ -255,6 +256,7 @@ class TestProConnectModel:
                 "created_at": now_str,
             }
             for field in dataclasses.fields(pc_user)
+            if field.name != "kind"
         ]
         assert sorted(user.external_data_source_history, key=itemgetter("field_name")) == sorted(
             expected, key=itemgetter("field_name")
