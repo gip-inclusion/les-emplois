@@ -67,3 +67,9 @@ class InstitutionAction(enum.StrEnum):
     # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
     # - https://github.com/django/django/pull/12304
     do_not_call_in_templates = enum.nonmember(True)
+
+
+class AllowanceJustificationReason(models.TextChoices):
+    OTHER_REFERENCE_PERIOD = "other_reference_period", "Autre période de référence"
+    SUPPORT_CONSIDERATION = "support_consideration", "Prise en compte de l'accompagnement"
+    OTHER = "other", "Autre motif"
