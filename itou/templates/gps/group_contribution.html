@@ -1,4 +1,5 @@
 {% extends "gps/group_details_base.html" %}
+{% load format_filters %}
 
 {% block content %}
     <section class="s-section">
@@ -28,11 +29,7 @@
                             </li>
                             <li>
                                 <small>Date de fin</small>
-                                {% if membership.ended_at %}
-                                    <strong>{{ membership.ended_at|date:"F Y" }}</strong>
-                                {% else %}
-                                    <i class="text-disabled">(accompagnement en cours)</i>
-                                {% endif %}
+                                {{ membership.ended_at|date:"F Y"|strong_or_disabled_non_filled:"(accompagnement en cours)" }}
                             </li>
                         </ul>
                     </div>
@@ -41,11 +38,7 @@
                         <ul class="list-data">
                             <li>
                                 <small>Motif</small>
-                                {% if membership.reason %}
-                                    <strong>{{ membership.reason }}</strong>
-                                {% else %}
-                                    <i class="text-disabled">Non renseigné</i>
-                                {% endif %}
+                                {{ membership.reason|strong_or_disabled_non_filled }}
                             </li>
                         </ul>
                     </div>

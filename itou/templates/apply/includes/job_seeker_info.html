@@ -64,11 +64,7 @@
         </li>
         <li>
             <small>Date de naissance</small>
-            {% if job_seeker.jobseeker_profile.birthdate %}
-                <strong>{{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>
-            {% else %}
-                <i class="text-disabled">Non renseignée</i>
-            {% endif %}
+            {{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y"|strong_or_disabled_non_filled:"Non renseignée" }}
         </li>
         <li>
             <small>Adresse</small>

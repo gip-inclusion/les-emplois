@@ -43,11 +43,7 @@
             {% if display_ntt %}
                 <li>
                     <small>Numéro technique temporaire</small>
-                    {% if employee_record.ntt %}
-                        <strong>{{ employee_record.ntt }}</strong>
-                    {% else %}
-                        <i class="text-disabled">Non renseigné</i>
-                    {% endif %}
+                    {{ employee_record.ntt|strong_or_disabled_non_filled }}
                 </li>
             {% endif %}
         </ul>

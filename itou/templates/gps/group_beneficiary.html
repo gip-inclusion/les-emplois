@@ -34,11 +34,7 @@
                                 {% if can_view_personal_information %}
                                     <li>
                                         <small>Date de naissance</small>
-                                        {% if group.beneficiary.jobseeker_profile.birthdate %}
-                                            <strong>{{ group.beneficiary.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>
-                                        {% else %}
-                                            <i class="text-disabled">Non renseignée</i>
-                                        {% endif %}
+                                        {{ group.beneficiary.jobseeker_profile.birthdate|date:"d/m/Y"|strong_or_disabled_non_filled }}
                                     </li>
                                 {% endif %}
                             </ul>
@@ -87,11 +83,7 @@
                                 <ul class="list-data">
                                     <li>
                                         <small>Niveau de formation</small>
-                                        {% if group.beneficiary.jobseeker_profile.get_education_level_display %}
-                                            <strong>{{ group.beneficiary.jobseeker_profile.get_education_level_display }}</strong>
-                                        {% else %}
-                                            <i class="text-disabled">Non renseigné</i>
-                                        {% endif %}
+                                        {{ group.beneficiary.jobseeker_profile.get_education_level_display|strong_or_disabled_non_filled }}
                                     </li>
                                     {% if group.beneficiary.jobseeker_profile.pole_emploi_since %}
                                         <li>

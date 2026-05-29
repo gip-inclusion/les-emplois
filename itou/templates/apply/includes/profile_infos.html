@@ -105,11 +105,7 @@
     <ul class="list-data mb-4">
         <li>
             <small>Inscrit à France Travail depuis</small>
-            {% if profile.pole_emploi_since %}
-                <strong>{{ profile.get_pole_emploi_since_display|lower }}</strong>
-            {% else %}
-                <i class="text-disabled">Non renseigné</i>
-            {% endif %}
+            {{ profile.get_pole_emploi_since_display|lower|strong_or_disabled_non_filled }}
         </li>
         <li>
             <small>Identifiant France Travail</small>
@@ -122,11 +118,7 @@
         </li>
         <li>
             <small>Niveau de formation</small>
-            {% if profile.education_level %}
-                <strong>{{ profile.get_education_level_display }}</strong>
-            {% else %}
-                <i class="text-disabled">Non renseigné</i>
-            {% endif %}
+            {{ profile.get_education_level_display|strong_or_disabled_non_filled }}
         </li>
         <li>
             <small>Autres</small>
