@@ -119,7 +119,7 @@ jobs:
 
     - name: 🏷 Set review app name
       run:
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63 | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=app_7b06c35f-1626-4187-93e7-682e92fa3408" >> $GITHUB_ENV
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
@@ -140,4 +140,4 @@ jobs:
 
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
-      run: scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
+      run: scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-id "$REVIEW_APP_NAME"
