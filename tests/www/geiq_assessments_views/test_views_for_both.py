@@ -1530,15 +1530,29 @@ class TestEmployeeContractToggleView:
 
 
 class TestAssessmentContractsExportView:
-    def test_anonymous_access(self, client):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            "geiq_assessments_views:assessment_contracts_export",
+            "geiq_assessments_views:assessment_contracts_export_all",
+        ],
+    )
+    def test_anonymous_access(self, client, url_name):
         assessment = AssessmentFactory()
-        url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
+        url = reverse(url_name, kwargs={"pk": assessment.pk})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_unauthorized_access(self, client):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            "geiq_assessments_views:assessment_contracts_export",
+            "geiq_assessments_views:assessment_contracts_export_all",
+        ],
+    )
+    def test_unauthorized_access(self, client, url_name):
         assessment = AssessmentFactory()
-        url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
+        url = reverse(url_name, kwargs={"pk": assessment.pk})
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(membership=True), 403),
@@ -1629,7 +1643,30 @@ class TestAssessmentContractsExportView:
             allowance_requested=True,
             allowance_granted=True,
         )
+        # Justifications might have been filled, before the GEIQ corrected the assessment and unselected the contract.
+        # Do not display the reasons in such cases.
+        EmployeeContractFactory(
+            id=uuid.UUID("44444444-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__title=Title.MME,
+            employee__last_name="Nicolas",
+            employee__first_name="Violette",
+            employee__birthdate="1993-04-04",
+            employee__allowance_amount=1_400,
+            start_at=datetime.date(2024, 6, 1),
+            end_at=datetime.date(2024, 6, 30),
+            planned_end_at=datetime.date(2024, 9, 30),
+            allowance_requested=False,
+            allowance_request_justification_reason=allowance_justification_reason[0],
+            allowance_request_justification_details="Détails de la dérogation.",
+            allowance_granted=False,
+            allowance_refusal_reason=allowance_refusal_reason[0],
+            allowance_refusal_details="Détails de la justification",
+        )
         url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
+        all_contracts_url = reverse(
+            "geiq_assessments_views:assessment_contracts_export_all", kwargs={"pk": assessment.pk}
+        )
         client.force_login(geiq_membership.user)
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(url)
@@ -1638,7 +1675,7 @@ class TestAssessmentContractsExportView:
         assert response.status_code == 200
         assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         assert response["Content-Disposition"] == 'attachment; filename="Contrats - Un Joli GEIQ - 2025-06-01.xlsx"'
-        assert len(excel_export) == 4  # 3 contracts + header
+        assert len(excel_export) == 5  # 4 contracts + header
         assert excel_export[0] == snapshot(name="excel export headers for the employer")
         rupture_anticipee_idx = excel_export[0].index("Date de rupture anticipée")
         allowance_requested_idx = excel_export[0].index("Demande d’aide")
@@ -1669,6 +1706,18 @@ class TestAssessmentContractsExportView:
         assert excel_export[3][allowance_justification_reason_idx] == allowance_justification_reason[1]
         assert excel_export[3][rupture_anticipee_idx] == datetime.datetime(2024, 3, 30)
         assert excel_export[3][allowance_requested_idx] == "Oui"
+        assert excel_export[4][:4] == [
+            "Nicolas",
+            "Violette",
+            "F",
+            datetime.datetime(1993, 4, 4, 0, 0),
+        ]
+        assert excel_export[4][allowance_justification_reason_idx] == ""
+        assert excel_export[4][rupture_anticipee_idx] == datetime.datetime(2024, 6, 30)
+        assert excel_export[4][allowance_requested_idx] == "Non"
+
+        response = client.get(all_contracts_url)
+        assert response.status_code == 404
 
         client.force_login(ddets_membership.user)
         response = client.get(url)
@@ -1699,3 +1748,51 @@ class TestAssessmentContractsExportView:
         assert excel_export[2][allowance_justification_reason_idx] == allowance_justification_reason[1]
         assert excel_export[2][allowance_granted_idx] == "Non"
         assert excel_export[2][-1] == allowance_refusal_reason[1]  # allowance refusal reason
+
+        response = client.get(all_contracts_url)
+        excel_export = get_rows_from_streaming_response(response)
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        assert response["Content-Disposition"] == 'attachment; filename="Contrats - Un Joli GEIQ - 2025-06-01.xlsx"'
+        assert len(excel_export) == 5  # 4 contracts + header
+        assert excel_export[0] == snapshot(name="excel export headers for the DDETS - all contracts version")
+        allowance_justification_reason_idx = excel_export[0].index("Motif de dérogation")
+        allowance_requested_idx = excel_export[0].index("Aide demandée par le GEIQ")
+        allowance_granted_idx = excel_export[0].index("Éligible à l’aide")
+        assert excel_export[1][:4] == [
+            "Dupond",
+            "Jean-Pierre",
+            "H",
+            datetime.datetime(1993, 3, 3, 0, 0),
+        ]
+        assert excel_export[1][allowance_justification_reason_idx] == ""
+        assert excel_export[1][allowance_granted_idx] == "Oui"
+        assert excel_export[1][-1] == ""  # allowance refusal reason
+        assert excel_export[2][:4] == [
+            "Dupont",
+            "Jean",
+            "H",
+            datetime.datetime(1990, 1, 1, 0, 0),
+        ]
+        assert excel_export[2][allowance_requested_idx] == "Non"
+        assert excel_export[2][allowance_justification_reason_idx] == ""
+        assert excel_export[2][-1] == ""  # allowance refusal reason
+        assert excel_export[3][:4] == [
+            "Martin",
+            "Cécile",
+            "F",
+            datetime.datetime(1992, 2, 2, 0, 0),
+        ]
+        assert excel_export[3][allowance_justification_reason_idx] == allowance_justification_reason[1]
+        assert excel_export[3][allowance_granted_idx] == "Non"
+        assert excel_export[3][-1] == allowance_refusal_reason[1]  # allowance refusal reason
+        assert excel_export[4][:4] == [
+            "Nicolas",
+            "Violette",
+            "F",
+            datetime.datetime(1993, 4, 4, 0, 0),
+        ]
+        assert excel_export[4][allowance_justification_reason_idx] == ""
+        assert excel_export[4][allowance_requested_idx] == "Non"
+        assert excel_export[4][-1] == ""  # allowance refusal reason

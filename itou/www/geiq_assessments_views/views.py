@@ -627,13 +627,16 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
 @require_safe
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
-def assessment_contracts_export(request, pk):
+def assessment_contracts_export(request, pk, include_unselected_by_geiq):
+    contract_filter_kwargs = {}
     if request.from_employer:
+        if include_unselected_by_geiq:
+            raise Http404
         filter_kwargs = {"companies": request.current_organization}
-        contract_filter_kwargs = {}
     elif request.from_institution:
         filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
-        contract_filter_kwargs = {"allowance_requested": True}
+        if not include_unselected_by_geiq:
+            contract_filter_kwargs = {"allowance_requested": True}
     else:
         raise Http404  # This should never happen thanks to check_user
     assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
@@ -643,7 +646,7 @@ def assessment_contracts_export(request, pk):
         .prefetch_related("employee__prequalifications")
         .order_by("employee__last_name", "employee__first_name", "start_at", "pk")
     )
-    export_format = get_export_format(request)
+    export_format = get_export_format(request, include_unselected_by_geiq)
 
     header_map = {
         "Nombre de jours réalisés en N-2": f"Nombre de jours réalisés en {assessment.campaign.year - 1}",
