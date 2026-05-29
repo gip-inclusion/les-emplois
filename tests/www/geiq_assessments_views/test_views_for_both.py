@@ -443,6 +443,7 @@ class TestAssessmentContractsListAndToggle:
         client.force_login(geiq_membership.user)
         response = client.get(url)
         simulated_page = parse_response_to_soup(response, ".s-section")
+        # Unselect contract
         response = client.post(
             reverse(
                 "geiq_assessments_views:assessment_contracts_exclude",
@@ -457,6 +458,7 @@ class TestAssessmentContractsListAndToggle:
         assert contract_1.allowance_requested is False
         response = client.get(url)
         assertSoupEqual(simulated_page, parse_response_to_soup(response, ".s-section"))
+        # Select contract that will need justification
         response = client.post(
             reverse(
                 "geiq_assessments_views:assessment_contracts_include",
@@ -469,6 +471,8 @@ class TestAssessmentContractsListAndToggle:
         assert response.status_code == 200
         contract_2.refresh_from_db()
         assert contract_2.allowance_requested is True
+        response = client.get(url)
+        assertSoupEqual(simulated_page, parse_response_to_soup(response, ".s-section"))
 
     def test_htmx_toggle_as_institution(self, client):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
