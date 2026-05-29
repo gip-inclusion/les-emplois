@@ -46,10 +46,33 @@
                     </form>
                 {% endif %}
             {% endif %}
-            <a class="btn btn-lg btn-ico btn-secondary" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
-                <i class="ri-download-line fw-medium" aria-hidden="true"></i>
-                <span>Exporter</span>
-            </a>
+            {% if request.from_employer %}
+                <a class="btn btn-lg btn-ico btn-secondary" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
+                    <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                    <span>Exporter</span>
+                </a>
+            {% elif request.from_institution %}
+                <div class="dropdown">
+                    <button class="btn  btn-secondary btn-ico dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ri-download-line ri-sm fw-medium" aria-hidden="true"></i>
+                        <span>Exporter</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
+                                <i class="ri-download-line ri-sm fw-medium" aria-hidden="true"></i>
+                                <span>Exporter tous les contrats soumis par le GEIQ</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url "geiq_assessments_views:assessment_contracts_export_all" pk=assessment.pk %}">
+                                <i class="ri-download-line ri-sm fw-medium" aria-hidden="true"></i>
+                                <span>Exporter tous les contrats</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
