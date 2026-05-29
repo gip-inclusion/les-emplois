@@ -25,19 +25,11 @@
             </li>
             <li>
                 <small>Début</small>
-                {% if job_application.hiring_start_at %}
-                    <strong>{{ job_application.hiring_start_at|date:"d F Y" }}</strong>
-                {% else %}
-                    <i class="text-disabled">Non renseigné</i>
-                {% endif %}
+                {{ job_application.hiring_start_at|date:"d F Y"|strong_or_disabled_non_filled }}
             </li>
             <li>
                 <small>Fin</small>
-                {% if job_application.hiring_end_at %}
-                    <strong>{{ job_application.hiring_end_at|date:"d F Y" }}</strong>
-                {% else %}
-                    <i class="text-disabled">Non renseigné</i>
-                {% endif %}
+                {{ job_application.hiring_end_at|date:"d F Y"|strong_or_disabled_non_filled }}
             </li>
         </ul>
 

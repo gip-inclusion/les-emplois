@@ -1,6 +1,7 @@
 {% load buttons_form %}
 {% load components %}
 {% load enums %}
+{% load format_filters %}
 {% load str_filters %}
 
 {% enums "companies" "ContractType" as ContractType %}
@@ -62,11 +63,7 @@
         </li>
         <li>
             <small>Date prévisionnelle de fin du contrat</small>
-            {% if form_accept.cleaned_data.hiring_end_at %}
-                <strong>{{ form_accept.cleaned_data.hiring_end_at|date:"d/m/Y" }}</strong>
-            {% else %}
-                <i class="text-disabled">Non renseigné</i>
-            {% endif %}
+            {{ form_accept.cleaned_data.hiring_end_at|date:"d/m/Y"|strong_or_disabled_non_filled }}
         </li>
         <li>
             <small>Accompagnateur au sein de la structure</small>

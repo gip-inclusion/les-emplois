@@ -1,4 +1,5 @@
 {% load components %}
+{% load format_filters %}
 {% load matomo %}
 {% load str_filters %}
 
@@ -52,11 +53,7 @@
                     </li>
                     <li>
                         <small>Motif de l’accompagnement</small>
-                        {% if membership.reason %}
-                            <strong>{{ membership.reason }}</strong>
-                        {% else %}
-                            <i class="text-disabled">Non renseigné</i>
-                        {% endif %}
+                        {{ membership.reason|strong_or_disabled_non_filled }}
                     </li>
                     <li>
                         <small>Téléphone</small>
