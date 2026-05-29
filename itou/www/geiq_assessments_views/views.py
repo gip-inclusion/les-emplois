@@ -94,25 +94,24 @@ def get_allowance_stats_for_geiq(assessment, *, for_assessment_details=False):
             "allowance_of_0_selected_nb": Count(
                 "pk", filter=Q(allowance_requested=True, employee__allowance_amount=0)
             ),
+            "contracts_awaiting_justification_nb": Count(
+                "pk",
+                filter=Q(
+                    allowance_requested=True,
+                    nb_days_in_campaign_year__lt=MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
+                    allowance_request_justification_reason="",
+                ),
+            ),
         }
         if not for_assessment_details
         else {}
     )
-    return (
-        EmployeeContract.objects.filter(employee__assessment=assessment).aggregate(
-            allowance_of_814_selected_nb=Count(
-                "pk", filter=Q(allowance_requested=True, employee__allowance_amount=814)
-            ),
-            allowance_of_1400_selected_nb=Count(
-                "pk", filter=Q(allowance_requested=True, employee__allowance_amount=1400)
-            ),
-            potential_allowance_amount=Sum("employee__allowance_amount", filter=Q(allowance_requested=True)),
-            with_allowance_granted_previous_year_nb=Count(
-                "pk", filter=Q(employee__allowance_granted_previous_year=True)
-            ),
-            **extra_stats,
-        )
-        | {"contracts_awaiting_justification_nb": None}  # FIXME(ewen/lgavalda): fill this variable with an aggregate)
+    return EmployeeContract.objects.filter(employee__assessment=assessment).aggregate(
+        allowance_of_814_selected_nb=Count("pk", filter=Q(allowance_requested=True, employee__allowance_amount=814)),
+        allowance_of_1400_selected_nb=Count("pk", filter=Q(allowance_requested=True, employee__allowance_amount=1400)),
+        potential_allowance_amount=Sum("employee__allowance_amount", filter=Q(allowance_requested=True)),
+        with_allowance_granted_previous_year_nb=Count("pk", filter=Q(employee__allowance_granted_previous_year=True)),
+        **extra_stats,
     )
 
 
@@ -541,7 +540,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         except ValueError:
             raise Http404
         if action == ContractsAction.VALIDATE:
-            if not can_validate or stats.get("contracts_awaiting_justification_nb", 0):
+            if not can_validate or stats["contracts_awaiting_justification_nb"]:
                 raise PermissionDenied
             if request.from_employer:
                 assessment.contracts_selection_validated_at = timezone.now()

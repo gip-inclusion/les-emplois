@@ -101,7 +101,7 @@ class TestAssessmentContractsListAndToggle:
             planned_end_at=datetime.date(2024, 5, 31),
             allowance_requested=True,
         )
-        EmployeeContractFactory(
+        short_contract = EmployeeContractFactory(
             id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
             employee__id=uuid.UUID("22222222-eeee-4444-8888-222222222222"),
             employee__assessment=assessment,
@@ -111,7 +111,7 @@ class TestAssessmentContractsListAndToggle:
             start_at=datetime.date(2024, 2, 1),
             end_at=datetime.date(2024, 3, 30),
             planned_end_at=datetime.date(2024, 6, 30),
-            allowance_requested=False,
+            allowance_requested=True,
         )
         EmployeeContractFactory(
             id=uuid.UUID("33333333-4444-4444-4444-444444444444"),
@@ -129,8 +129,18 @@ class TestAssessmentContractsListAndToggle:
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(contracts_list_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessments contracts list"
+            name="assessments contracts list with request to justify"
         )
+        # One contract is to justify, user cannot validate
+        response = client.post(contracts_list_url, data={"action": "validate"})
+        assert response.status_code == 403
+        assessment.refresh_from_db()
+        assert assessment.contracts_selection_validated_at is None
+
+        # Fill request justification and try again
+        short_contract.allowance_request_justification_reason = AllowanceJustificationReason.SUPPORT_CONSIDERATION
+        short_contract.allowance_request_justification_details = "Détails."
+        short_contract.save()
         response = client.post(contracts_list_url, data={"action": "validate"})
         assertRedirects(
             response,
@@ -139,6 +149,7 @@ class TestAssessmentContractsListAndToggle:
         )
         assessment.refresh_from_db()
         assert assessment.contracts_selection_validated_at is not None
+
         response = client.get(contracts_list_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments contracts list readonly"
@@ -149,7 +160,7 @@ class TestAssessmentContractsListAndToggle:
         assert assessment.contracts_selection_validated_at is None
         response = client.get(contracts_list_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessments contracts list"
+            name="assessments contracts list with justified request"
         )
 
     def test_allowance_granted_previous_year(self, client):
