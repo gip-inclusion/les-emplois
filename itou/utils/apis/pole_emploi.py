@@ -19,6 +19,10 @@ API_CLIENT_HTTP_ERROR_CODE = "http_error"
 REFRESH_TOKEN_MARGIN_SECONDS = 10  # arbitrary value, in order not to be *right* on the expiry time.
 
 
+class Apps(enum.Enum):
+    EMPLOIS = "emplois"
+
+
 class Endpoints(enum.StrEnum):
     RECHERCHER_USAGER_DATE_NAISSANCE_NIR = "/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
     RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL = "/rechercher-usager/v2/usagers/par-numero-francetravail"
@@ -36,6 +40,18 @@ class TopIdentiteCertifiee(enum.StrEnum):
 OFFERS_MIN_INDEX = 0
 OFFERS_MAX_INDEX = 3149
 OFFERS_MAX_RANGE = 150
+
+
+def get_credentials(app):
+    # We use a match/case instead of {...}[app] so that we don't need all keys to be there
+    # It will make overriding the settings easier in tests
+    match app:
+        case Apps.EMPLOIS:
+            return {
+                "key": settings.API_ESD["KEY"],
+                "secret": settings.API_ESD["SECRET"],
+            }
+    raise ValueError(f"Unknown app: {app}")
 
 
 class PoleEmploiAPIException(Exception):
@@ -463,19 +479,17 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         }
 
 
-def pole_emploi_partenaire_api_client():
+def pole_emploi_partenaire_api_client(app=Apps.EMPLOIS):
     return PoleEmploiRoyaumePartenaireApiClient(
         settings.API_ESD["BASE_URL"],
         settings.API_ESD["AUTH_BASE_URL_PARTENAIRE"],
-        settings.API_ESD["KEY"],
-        settings.API_ESD["SECRET"],
+        **get_credentials(app),
     )
 
 
-def pole_emploi_agent_api_client():
+def pole_emploi_agent_api_client(app=Apps.EMPLOIS):
     return PoleEmploiRoyaumeAgentAPIClient(
         settings.API_ESD["BASE_URL"],
         settings.API_ESD["AUTH_BASE_URL_AGENT"],
-        settings.API_ESD["KEY"],
-        settings.API_ESD["SECRET"],
+        **get_credentials(app),
     )
