@@ -9,7 +9,12 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import File
-from itou.geiq_assessments.enums import AllowanceRefusalReason, AssessmentState, AssessmentTransition
+from itou.geiq_assessments.enums import (
+    AllowanceJustificationReason,
+    AllowanceRefusalReason,
+    AssessmentState,
+    AssessmentTransition,
+)
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.users.enums import Title
@@ -629,6 +634,16 @@ class EmployeeContract(models.Model):
 
     allowance_requested = models.BooleanField(verbose_name="aide demandée par le GEIQ")
     allowance_granted = models.BooleanField(verbose_name="aide acceptée par l'institution")
+    allowance_request_justification_reason = models.CharField(
+        verbose_name="motif de la demande d'aide (GEIQ)",
+        max_length=30,
+        choices=AllowanceJustificationReason,
+        blank=True,
+    )
+    allowance_request_justification_details = models.TextField(
+        verbose_name="commentaire associé à la demande d'aide (GEIQ)",
+        blank=True,
+    )
 
     allowance_refusal_reason = models.CharField(
         verbose_name="motif du refus de l’aide (institution)",
@@ -650,6 +665,22 @@ class EmployeeContract(models.Model):
                 name="geiq_allowance_requested_or_not_granted",
                 violation_error_message="Impossible d'accorder une aide non-sollicitée",
                 condition=~models.Q(allowance_requested=False, allowance_granted=True),
+            ),
+            models.CheckConstraint(
+                name="geiq_allowance_request_justification_set",
+                violation_error_message="Le motif et le commentaire de justification doivent être renseignés ensemble",
+                condition=(
+                    models.Q(
+                        allowance_request_justification_reason="",
+                        allowance_request_justification_details="",
+                    )
+                    | ~(
+                        models.Q(
+                            allowance_request_justification_reason="",
+                        )
+                        | models.Q(allowance_request_justification_details="")
+                    )
+                ),
             ),
             models.CheckConstraint(
                 name="geiq_allowance_refusal_set",
