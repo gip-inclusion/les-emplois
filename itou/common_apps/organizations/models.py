@@ -218,6 +218,17 @@ class OrganizationAbstract(models.Model):
 
         return get_email_message(to, context, subject, body)
 
+    def auto_admin_attribution_email(self, user):
+        """
+        Tell a member he has been automatically assigned the admin role
+        because the organization had no active administrator.
+        """
+        to = [user.email]
+        context = {"structure": self, "user": user, "documentation_link": self.get_documentation_link()}
+        subject = "common/emails/auto_admin_attribution_email_subject.txt"
+        body = "common/emails/auto_admin_attribution_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
     def remove_admin_email(self, user):
         """
         Tell a member he is no longer an administrator.
