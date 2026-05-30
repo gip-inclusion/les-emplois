@@ -1413,3 +1413,168 @@ def test_delete_old_nir_modification_requests(is_after_cutoff, caplog):
     call_command("delete_old_nir_modification_requests", wet_run=True)
     assert caplog.messages[4] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1 - del_count
+
+
+class TestAutoAttributeCompanyAdmins:
+    def test_no_member(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        CompanyFactory(auth_email="")
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+        assert "Processing 0 companies" in caplog.messages
+        assert mailoutbox == []
+
+    def test_already_has_admin(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        CompanyMembershipFactory(company__auth_email="", is_admin=True)
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+        assert "Processing 0 companies" in caplog.messages
+        assert mailoutbox == []
+
+    def test_skips_company_with_auth_email(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        CompanyMembershipFactory(company__auth_email="contact@example.com", is_admin=False)
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+        assert "Processing 0 companies" in caplog.messages
+        assert mailoutbox == []
+
+    def test_skips_inactive_company(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        membership = CompanyMembershipFactory(
+            company__auth_email="",
+            company__subject_to_iae_rules=True,
+            company__convention__after_grace_period=True,
+            is_admin=False,
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+
+        membership.refresh_from_db()
+        assert not membership.is_admin
+        assert mailoutbox == []
+
+    def test_promotes_single_member(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        membership = CompanyMembershipFactory(
+            company__auth_email="",
+            is_admin=False,
+            user__last_login=timezone.now(),
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+
+        membership.refresh_from_db()
+        assert membership.is_admin
+        assert len(mailoutbox) == 1
+        assert membership.user.email in mailoutbox[0].to
+        assert membership.company.name in mailoutbox[0].subject
+
+    def test_promotes_two_most_recently_logged_in(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        company = CompanyFactory(auth_email="")
+        now = timezone.now()
+
+        oldest = CompanyMembershipFactory(
+            company=company,
+            is_admin=False,
+            user__last_login=now - datetime.timedelta(days=30),
+        )
+        recent = CompanyMembershipFactory(
+            company=company,
+            is_admin=False,
+            user__last_login=now - datetime.timedelta(days=1),
+        )
+        most_recent = CompanyMembershipFactory(
+            company=company,
+            is_admin=False,
+            user__last_login=now,
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+
+        oldest.refresh_from_db()
+        recent.refresh_from_db()
+        most_recent.refresh_from_db()
+
+        assert not oldest.is_admin
+        assert recent.is_admin
+        assert most_recent.is_admin
+        assert len(mailoutbox) == 2
+        promoted_emails = {m.to[0] for m in mailoutbox}
+        assert recent.user.email in promoted_emails
+        assert most_recent.user.email in promoted_emails
+
+    def test_idempotent(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        CompanyMembershipFactory(
+            company__auth_email="",
+            is_admin=False,
+            user__last_login=timezone.now(),
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+        assert len(mailoutbox) == 1
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+        assert len(mailoutbox) == 1
+
+    def test_null_last_login_members_are_excluded(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        company = CompanyFactory(auth_email="")
+        now = timezone.now()
+
+        no_login = CompanyMembershipFactory(
+            company=company,
+            is_admin=False,
+            user__last_login=None,
+        )
+        recent = CompanyMembershipFactory(
+            company=company,
+            is_admin=False,
+            user__last_login=now - datetime.timedelta(days=1),
+        )
+        most_recent = CompanyMembershipFactory(
+            company=company,
+            is_admin=False,
+            user__last_login=now,
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+
+        no_login.refresh_from_db()
+        recent.refresh_from_db()
+        most_recent.refresh_from_db()
+
+        assert not no_login.is_admin
+        assert recent.is_admin
+        assert most_recent.is_admin
+        assert len(mailoutbox) == 2
+        assert mailoutbox[0].to == [most_recent.user.email]
+        assert mailoutbox[1].to == [recent.user.email]
+
+    def test_skips_members_without_last_login(self, django_capture_on_commit_callbacks, mailoutbox, caplog):
+        membership = CompanyMembershipFactory(
+            company__auth_email="",
+            is_admin=False,
+            user__last_login=None,
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+
+        membership.refresh_from_db()
+        assert not membership.is_admin
+        assert "Processing 0 companies" in caplog.messages
+        assert mailoutbox == []
+
+    def test_email_content(self, django_capture_on_commit_callbacks, mailoutbox, snapshot):
+        CompanyMembershipFactory(
+            company__for_snapshot=True,
+            company__auth_email="",
+            user__for_snapshot=True,
+            user__last_login=timezone.now(),
+            is_admin=False,
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("auto_attribute_company_admins")
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+        assert email.subject == snapshot(name="auto_admin_attribution email subject")
+        assert email.body == snapshot(name="auto_admin_attribution email body")
