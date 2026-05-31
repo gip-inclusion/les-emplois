@@ -169,7 +169,7 @@ class TestListAssessmentsView:
             assessment=reviewed_assessment, institution=membership.institution, with_convention=True
         )
         final_reviewed_assessment = AssessmentFactory(
-            id=uuid.UUID("33333333-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            id=uuid.UUID("44444444-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
             created_by__first_name="Marie",
             created_by__last_name="Curie",
@@ -193,6 +193,31 @@ class TestListAssessmentsView:
         AssessmentInstitutionLink.objects.create(
             assessment=final_reviewed_assessment, institution=membership.institution, with_convention=True
         )
+        later_final_reviewed_assessment = AssessmentFactory(
+            id=uuid.UUID("33333333-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            created_by__first_name="Marie",
+            created_by__last_name="Curie",
+            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=timezone.now() + datetime.timedelta(hours=6),
+            reviewed_by=membership.user,
+            reviewed_by_institution=membership.institution,
+            review_comment="Bravo !",
+            final_reviewed_at=timezone.now() + datetime.timedelta(hours=8),
+            final_reviewed_by=membership.user,
+            final_reviewed_by_institution=membership.institution,
+            convention_amount=100_000,
+            advance_amount=60_000,
+            granted_amount=90_000,
+        )  # Assessment has been finally reviewed (i.e. updated) later than previous one: it must appear before.
+        AssessmentInstitutionLink.objects.create(
+            assessment=later_final_reviewed_assessment, institution=membership.institution, with_convention=True
+        )
         AssessmentFactory(campaign=campaign)  # Another assessment not linked to the institution
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
@@ -202,7 +227,13 @@ class TestListAssessmentsView:
         )
         assertQuerySetEqual(
             response.context["assessments"],
-            [submitted_assessment, reviewed_assessment, final_reviewed_assessment, new_assessment],
+            [
+                reviewed_assessment,
+                submitted_assessment,
+                new_assessment,
+                later_final_reviewed_assessment,
+                final_reviewed_assessment,
+            ],
         )
 
 
