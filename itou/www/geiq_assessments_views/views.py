@@ -9,7 +9,8 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.db import models
-from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
+from django.db.models import Case, Count, F, IntegerField, Prefetch, Q, Sum, Value, When
+from django.db.models.functions import Greatest
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -27,6 +28,7 @@ from itou.geiq_assessments.models import (
     Assessment,
     AssessmentCampaign,
     AssessmentInstitutionLink,
+    AssessmentState,
     EmployeeContract,
     LabelInfos,
 )
@@ -812,8 +814,23 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
         .prefetch_related("institution_links__institution")
         .annotate(
             contracts_nb=Count("employees__contracts", filter=Q(employees__contracts__allowance_requested=True)),
+            state_order=Case(
+                When(state=AssessmentState.REVIEWED, then=Value(0)),
+                When(state=AssessmentState.SUBMITTED, then=Value(1)),
+                When(state=AssessmentState.NEW, then=Value(2)),
+                When(state=AssessmentState.FINAL_REVIEWED, then=Value(3)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+            last_updated_at=Greatest(
+                "created_at",
+                "decision_validated_at",
+                "grants_selection_validated_at",
+                "reviewed_at",
+                "final_reviewed_at",
+            ),
         )
-        .order_by("submitted_at", "created_at")
+        .order_by("state_order", "-last_updated_at")
     )
     context = {
         "assessments": assessments,

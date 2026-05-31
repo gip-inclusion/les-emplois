@@ -2815,6 +2815,14 @@
                  "geiq_assessments_assessment"."final_reviewed_by_institution_id",
                  COUNT("geiq_assessments_employeecontract"."id") FILTER (
                                                                          WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_nb",
+                 CASE
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     ELSE %s
+                 END AS "state_order",
+                 GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
                  "geiq_assessments_assessmentcampaign"."id",
                  "geiq_assessments_assessmentcampaign"."year",
                  "geiq_assessments_assessmentcampaign"."opening_date",
@@ -2827,9 +2835,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
+                   34,
+                   35,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY "geiq_assessments_assessment"."submitted_at" ASC,
-                   "geiq_assessments_assessment"."created_at" ASC
+          ORDER BY 34 ASC,
+                   35 DESC
         ''',
       }),
       dict({
@@ -2847,6 +2857,7 @@
                  "geiq_assessments_assessmentinstitutionlink"."with_convention"
           FROM "geiq_assessments_assessmentinstitutionlink"
           WHERE "geiq_assessments_assessmentinstitutionlink"."assessment_id" IN (%s,
+                                                                                 %s,
                                                                                  %s,
                                                                                  %s,
                                                                                  %s)
@@ -2926,7 +2937,7 @@
           <div class="row">
               <div class="col-12">
                   <p>
-                      4 résultats
+                      5 résultats
                   </p>
                   <div class="table-responsive mt-3 mt-md-4">
                       <table class="table table-hover">
@@ -2967,43 +2978,6 @@
                           <tbody>
                               <tr>
                                   <td>
-                                      <a class="btn-link" href="/geiq-assessments/institution/11111111-0d2c-4f29-ba5b-a27ffb8ecc84">
-                                          Un Beau GEIQ
-                                      </a>
-                                  </td>
-                                  <td>
-                                      <ul class="mb-0">
-                                          <li>
-                                              Siège (23)
-                                          </li>
-                                      </ul>
-                                  </td>
-                                  <td>
-                                      2024
-                                  </td>
-                                  <td>
-                                      Un DREETS GEIQ
-                                  </td>
-                                  <td>
-                                      <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary">
-                                          À contrôler
-                                      </span>
-                                  </td>
-                                  <td>
-                                      0
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                                  <td>
-                                      -
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
                                       <a class="btn-link" href="/geiq-assessments/institution/22222222-0d2c-4f29-ba5b-a27ffb8ecc84">
                                       </a>
                                   </td>
@@ -3042,13 +3016,14 @@
                               </tr>
                               <tr>
                                   <td>
-                                      <a class="btn-link" href="/geiq-assessments/institution/33333333-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                      <a class="btn-link" href="/geiq-assessments/institution/11111111-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Un Beau GEIQ
                                       </a>
                                   </td>
                                   <td>
                                       <ul class="mb-0">
                                           <li>
-                                              Un Superbe GEIQ (12)
+                                              Siège (23)
                                           </li>
                                       </ul>
                                   </td>
@@ -3059,23 +3034,21 @@
                                       Un DREETS GEIQ
                                   </td>
                                   <td>
-                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success">
-                                          Validé
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary">
+                                          À contrôler
                                       </span>
                                   </td>
                                   <td>
                                       0
                                   </td>
                                   <td>
-                                      80 000 €
+                                      -
                                   </td>
                                   <td>
-                                      100 000 €
+                                      -
                                   </td>
                                   <td>
-                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
-                                          80 %
-                                      </span>
+                                      -
                                   </td>
                               </tr>
                               <tr>
@@ -3116,6 +3089,82 @@
                                   </td>
                                   <td>
                                       -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/33333333-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Un Superbe GEIQ (12)
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                      Un DREETS GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success">
+                                          Validé
+                                      </span>
+                                  </td>
+                                  <td>
+                                      0
+                                  </td>
+                                  <td>
+                                      90 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
+                                          90 %
+                                      </span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/44444444-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Un Superbe GEIQ (12)
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                      Un DREETS GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success">
+                                          Validé
+                                      </span>
+                                  </td>
+                                  <td>
+                                      0
+                                  </td>
+                                  <td>
+                                      80 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
+                                          80 %
+                                      </span>
                                   </td>
                               </tr>
                           </tbody>
