@@ -19,7 +19,7 @@ from itou.job_applications.enums import JobApplicationState, Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.types import InclusiveDateRange
-from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
+from itou.www.apply.views.list_views import JobApplicationsListKind
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -61,7 +61,6 @@ def test_job_application_multiple_jobs():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(EmployerFactory()),
             }
         )
@@ -95,7 +94,6 @@ def test_job_application_auto_prescription_badge_in_list():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(EmployerFactory(membership=True)),
             }
         )
@@ -115,7 +113,6 @@ def test_job_application_imported_from_pe_in_list():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(EmployerFactory(membership=True)),
             }
         )
@@ -135,7 +132,6 @@ def test_job_application_job_seeker_in_list():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(EmployerFactory()),
             }
         )

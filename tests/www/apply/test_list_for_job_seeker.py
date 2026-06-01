@@ -6,12 +6,12 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
+from itou.www.apply.views.list_views import JobApplicationOrder
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -36,12 +36,8 @@ def test_list_for_job_seeker_queries(client, snapshot):
     JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker)
     client.force_login(job_seeker)
 
-    with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
-        response = client.get(reverse("apply:list_for_job_seeker"), {"display": JobApplicationsDisplayKind.LIST})
-    assert len(response.context["job_applications_page"].object_list) == 3
-
-    with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
-        response = client.get(reverse("apply:list_for_job_seeker"), {"display": JobApplicationsDisplayKind.TABLE})
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(reverse("apply:list_for_job_seeker"))
     assert len(response.context["job_applications_page"].object_list) == 3
 
 
@@ -102,29 +98,6 @@ def test_list_for_job_seeker_filtered_by_dates(client):
     assert applications[0].created_at <= end_date
 
 
-def test_list_display_kind(client):
-    job_seeker = JobSeekerFactory()
-    JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
-    client.force_login(job_seeker)
-    url = reverse("apply:list_for_job_seeker")
-
-    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures'
-    LIST_VIEW_MARKER = '<div class="c-box--results__header">'
-
-    for display_param, expected_marker in [
-        ({}, TABLE_VIEW_MARKER),
-        ({"display": "invalid"}, TABLE_VIEW_MARKER),
-        ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
-        ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
-    ]:
-        response = client.get(url, display_param)
-        for marker in (LIST_VIEW_MARKER, TABLE_VIEW_MARKER):
-            if marker == expected_marker:
-                assertContains(response, marker)
-            else:
-                assertNotContains(response, marker)
-
-
 def test_list_for_job_seeker_htmx_filters(client):
     job_seeker = JobSeekerFactory()
     JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
@@ -160,14 +133,9 @@ def test_list_snapshot(client, snapshot):
     client.force_login(job_seeker)
     url = reverse("apply:list_for_job_seeker")
 
-    for display_param in [
-        {},
-        {"display": JobApplicationsDisplayKind.LIST},
-        {"display": JobApplicationsDisplayKind.TABLE},
-    ]:
-        response = client.get(url, display_param)
-        page = parse_response_to_soup(response, selector="#job-applications-section")
-        assert pretty_indented(page) == snapshot(name="empty")
+    response = client.get(url)
+    page = parse_response_to_soup(response, selector="#job-applications-section")
+    assert pretty_indented(page) == snapshot(name="empty")
 
     company = CompanyFactory(for_snapshot=True, with_membership=True)
     common_kwargs = {"job_seeker": job_seeker, "to_company": company}
@@ -196,8 +164,7 @@ def test_list_snapshot(client, snapshot):
         ),
     ]
 
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
+    response = client.get(url)
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -219,32 +186,7 @@ def test_list_snapshot(client, snapshot):
             )
         ),
     )
-    assert pretty_indented(page) == snapshot(name="applications list")
-
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/jobseeker/details",
-                        "/apply/[PK of JobApplication]/jobseeker/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications table")
+    assert pretty_indented(page) == snapshot(name="applications")
 
 
 def test_reset_filter_button_snapshot(client, snapshot):
@@ -261,7 +203,6 @@ def test_reset_filter_button_snapshot(client, snapshot):
         name="off-canvas buttons in list view"
     )
 
-    filter_params["display"] = JobApplicationsDisplayKind.TABLE
     filter_params["order"] = JobApplicationOrder.CREATED_AT_ASC
     response = client.get(reverse("apply:list_for_job_seeker"), filter_params)
 
@@ -284,7 +225,6 @@ def test_order(client, subtests):
 
     client.force_login(job_seeker)
     url = reverse("apply:list_for_job_seeker")
-    query_params = {"display": JobApplicationsDisplayKind.TABLE}
 
     expected_order = {
         "created_at": [first_application, second_application],
@@ -292,19 +232,19 @@ def test_order(client, subtests):
     }
 
     with subtests.test(order="<missing_value>"):
-        response = client.get(url, query_params)
+        response = client.get(url)
         assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
 
     with subtests.test(order="<invalid_value>"):
-        response = client.get(url, query_params | {"order": "invalid_value"})
+        response = client.get(url, {"order": "invalid_value"})
         assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
 
     for order, applications in expected_order.items():
         with subtests.test(order=order):
-            response = client.get(url, query_params | {"order": order})
+            response = client.get(url, {"order": order})
             assert response.context["job_applications_page"].object_list == applications
 
-            response = client.get(url, query_params | {"order": f"-{order}"})
+            response = client.get(url, {"order": f"-{order}"})
             assert response.context["job_applications_page"].object_list == list(reversed(applications))
 
 
@@ -315,8 +255,7 @@ def test_htmx_order(client):
     JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker)
 
     client.force_login(job_seeker)
-    query_params = {"display": JobApplicationsDisplayKind.TABLE}
-    response = client.get(url, query_params)
+    response = client.get(url)
 
     assertContains(response, "2 résultats")
     simulated_page = parse_response_to_soup(response)
@@ -330,9 +269,9 @@ def test_htmx_order(client):
     [order_input] = simulated_page.find_all(id=ORDER_ID)
     # Simulate click on button
     order_input["value"] = CREATED_AT_ASC
-    response = client.get(url, query_params | {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
+    response = client.get(url, {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
     update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
-    response = client.get(url, query_params | {"order": CREATED_AT_ASC})
+    response = client.get(url, {"order": CREATED_AT_ASC})
     assertContains(response, "2 résultats")
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)

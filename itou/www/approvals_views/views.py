@@ -1,4 +1,3 @@
-import enum
 import logging
 import urllib.parse
 from datetime import timedelta
@@ -96,24 +95,6 @@ def _add_contract_data(queryset, siae):
     )
 
 
-class ApprovalDisplayKind(enum.StrEnum):
-    LIST = "list"
-    TABLE = "table"
-
-    # Make the Enum work in Django's templates
-    # See :
-    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
-    # - https://github.com/django/django/pull/12304
-    do_not_call_in_templates = enum.nonmember(True)
-
-    # Ease the use in templates by avoiding the need to have access to JobApplicationsDisplayKind
-    def is_list(self):
-        return self is self.LIST
-
-    def is_table(self):
-        return self is self.TABLE
-
-
 class ApprovalBaseViewMixin:
     model = Approval
 
@@ -147,11 +128,6 @@ class ApprovalListView(ReadonlyViewMixin, ApprovalBaseViewMixin, ListView):
         if self.siae:
             self.form = ApprovalForm(self.siae.pk, self.request.GET)
 
-        try:
-            self.display_kind = ApprovalDisplayKind(request.GET.get("display"))
-        except ValueError:
-            self.display_kind = ApprovalDisplayKind.TABLE
-
     def get_template_names(self):
         return ["approvals/includes/list_results.html" if self.request.htmx else "approvals/list.html"]
 
@@ -179,7 +155,6 @@ class ApprovalListView(ReadonlyViewMixin, ApprovalBaseViewMixin, ListView):
             EmployeeRecord.objects.for_company(self.siae).filter(status=Status.REJECTED).count()
         )
         context["mon_recap_banner_departments"] = settings.MON_RECAP_BANNER_DEPARTMENTS
-        context["display_kind"] = self.display_kind
         return context
 
 
