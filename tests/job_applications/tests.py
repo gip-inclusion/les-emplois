@@ -44,7 +44,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.files.factories import FileFactory
@@ -1159,6 +1159,59 @@ class TestJobApplicationQuerySet:
         assert qs.exists() == expected
         if expected:
             assert set(qs) == {old_job_application}
+
+    def test_for_company(self):
+        ALL_BUT_ACCEPTED_STATES = list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})
+        TWO_YEARS_AGO = timezone.now() - datetime.timedelta(days=365 * 2)
+        LESS_THAN_TWO_YEARS_AGO = TWO_YEARS_AGO + datetime.timedelta(days=1)
+
+        company_membership = CompanyMembershipFactory()
+        company = company_membership.company
+
+        JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=random.choice(ALL_BUT_ACCEPTED_STATES),
+            created_at=TWO_YEARS_AGO,
+        )  # Too old
+        old_but_accepted = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=JobApplicationState.ACCEPTED,
+            created_at=TWO_YEARS_AGO,
+        )
+        JobApplicationFactory(
+            sent_by_employer=True,
+            to_company=company,
+            sender_company=company,
+            state=random.choice(ALL_BUT_ACCEPTED_STATES),
+            created_at=TWO_YEARS_AGO,
+        )  # Autoprescription too old
+        old_autoprescription_but_accepted = JobApplicationFactory(
+            sent_by_employer=True,
+            to_company=company,
+            sender_company=company,
+            state=JobApplicationState.ACCEPTED,
+            created_at=TWO_YEARS_AGO,
+        )
+        recent_received = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=random.choice(JobApplicationState.values),
+            created_at=LESS_THAN_TWO_YEARS_AGO,
+        )
+        recent_sent = JobApplicationFactory(
+            sent_by_employer=True,
+            sender_company=company,
+            state=random.choice(JobApplicationState.values),
+            created_at=LESS_THAN_TWO_YEARS_AGO,
+        )
+
+        assertQuerySetEqual(
+            JobApplication.objects.all().for_company(company),
+            [old_but_accepted, old_autoprescription_but_accepted, recent_received, recent_sent],
+            ordered=False,
+        )
 
 
 class TestJobApplicationNotifications:
