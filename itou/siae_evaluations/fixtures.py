@@ -91,7 +91,7 @@ def load_data():
             )
             job_seeker.jobseeker_profile.nir = nir
             job_seeker.jobseeker_profile.pole_emploi_id = pe_id
-            with triggers.connection_wrapper(), triggers.context():
+            with triggers.fake_context():
                 job_seeker.jobseeker_profile.save(update_fields=["nir", "pole_emploi_id"])
             level = str((i % 2) + 1)
             # See AdministrativeCriteriaForm
