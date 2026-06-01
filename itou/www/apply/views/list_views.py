@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Exists, F, OuterRef, Value
+from django.db.models import F, Value
 from django.db.models.functions import Coalesce, Concat, Lower, NullIf
 from django.http import Http404, JsonResponse
 from django.http.response import HttpResponse
@@ -18,7 +18,6 @@ from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis, GEIQSelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.rdv_insertion.models import InvitationRequest
 from itou.utils.auth import check_request, check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
@@ -62,24 +61,6 @@ def _get_job_applications_qs(request, *, list_kind):
             return request.user.job_applications
         case _:
             raise ValueError(f"Unexpected list_kind: {list_kind}")
-
-
-class JobApplicationsDisplayKind(enum.StrEnum):
-    LIST = "list"
-    TABLE = "table"
-
-    # Make the Enum work in Django's templates
-    # See :
-    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
-    # - https://github.com/django/django/pull/12304
-    do_not_call_in_templates = enum.nonmember(True)
-
-    # Ease the use in templates by avoiding the need to have access to JobApplicationsDisplayKind
-    def is_list(self):
-        return self is self.LIST
-
-    def is_table(self):
-        return self is self.TABLE
 
 
 class JobApplicationOrder(OrderEnum):
@@ -177,20 +158,6 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     job_applications = job_applications.with_list_related_data()
 
-    try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.TABLE
-
-    if display_kind == JobApplicationsDisplayKind.LIST:
-        job_applications = (
-            job_applications.with_next_appointment_start_at()
-            .with_upcoming_participations_count()
-            .annotate(
-                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
-            )
-        )
-
     filters_counter = 0
     if filters_form.is_valid():
         job_applications = filters_form.filter(job_applications)
@@ -213,7 +180,6 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
     context = {
         "job_applications_page": job_applications_page,
-        "display_kind": display_kind,
         "order": order,
         "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
@@ -266,11 +232,6 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
     try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.TABLE
-
-    try:
         order = JobApplicationOrder(request.GET.get("order"))
     except ValueError:
         order = JobApplicationOrder.CREATED_AT_DESC
@@ -278,15 +239,6 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     job_applications = job_applications.annotate(
         job_seeker_full_name=Concat(Lower("job_seeker__last_name"), Value(" "), Lower("job_seeker__first_name"))
     ).order_by(*order.order_by)
-
-    if display_kind == JobApplicationsDisplayKind.LIST:
-        job_applications = (
-            job_applications.with_next_appointment_start_at()
-            .with_upcoming_participations_count()
-            .annotate(
-                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
-            )
-        )
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     _add_pending_for_weeks(job_applications_page)
@@ -301,7 +253,6 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     context = {
         "title": title,
         "job_applications_page": job_applications_page,
-        "display_kind": display_kind,
         "order": order,
         "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
@@ -385,27 +336,6 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
     try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.TABLE
-
-    if display_kind == JobApplicationsDisplayKind.LIST:
-        job_applications = (
-            job_applications.with_next_appointment_start_at()
-            .with_upcoming_participations_count()
-            .annotate(
-                has_pending_rdv_insertion_invitation_request=Exists(
-                    InvitationRequest.objects.filter(
-                        job_seeker=OuterRef("job_seeker"),
-                        company=OuterRef("to_company"),
-                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
-                    )
-                ),
-                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
-            )
-        )
-
-    try:
         order = JobApplicationOrder(request.GET.get("order"))
     except ValueError:
         order = JobApplicationOrder.CREATED_AT_DESC
@@ -428,7 +358,6 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "title": title,
         "siae": company,
         "job_applications_page": job_applications_page,
-        "display_kind": display_kind,
         "order": order,
         "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
