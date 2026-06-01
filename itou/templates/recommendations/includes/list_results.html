@@ -1,0 +1,82 @@
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+{% partialdef list-counter %}
+    <p class="mb-0" id="recommendations-portfolio-list-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+        {% with paginator.count as counter %}{{ counter }} {{ counter|pluralizefr:"résultat,résultats" }}{% endwith %}
+    </p>
+{% endpartialdef %}
+
+{% if request.htmx %}
+    {% partial list-counter %}
+    {% include "recommendations/includes/list_reset_filters.html" with filters_counter=filters_counter request=request only %}
+{% endif %}
+
+<section aria-labelledby="recommendations-portfolio-list-count" id="recommendations-portfolio-section">
+    {% if not beneficiaries_page %}
+        <div class="text-center my-3 my-md-4">
+            <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+            <p class="mt-3">
+                <strong>
+                    {% if request.GET %}
+                        Aucun résultat avec les filtres actuels.
+                    {% else %}
+                        Aucun demandeur d'emploi pour le moment
+                    {% endif %}
+                </strong>
+            </p>
+            {% if request.GET %}
+                <a href="{{ request.path }}" class="btn btn-outline-primary w-100 w-md-auto justify-content-center">Effacer les filtres</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="table-responsive mt-3 mt-md-4">
+            <table class="table table-hover table-sortable">
+                <caption class="visually-hidden">Liste des demandeurs d'emploi accompagnés</caption>
+                <thead>
+                    <tr>
+                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=BeneficiaryOrder.FULL_NAME_ASC name="Nom Prénom" only %}
+                        {% comment %}
+                        TODO llalba: ajouter une colonne selon les données disponibles ?
+                        <th scope="col">Profil</th>
+                        {% endcomment %}
+                        <th scope="col" class="text-end w-50px">
+                            <span class="visually-hidden">Actions possibles sur les demandeurs d'emploi accompagnés</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for beneficiary in beneficiaries_page %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'recommendations:beneficiary_profile' public_id=beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                   class="btn-link"
+                                   {% matomo_event "recommendations" "clic" "consulter_le_profil" %}>{{ beneficiary.get_inverted_full_name }}</a>
+                            </td>
+                            {% comment %}
+                            <td>
+                                {% for flag in beneficiary.flags|slice:":3" %}
+                                    <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">
+                                        <i class="ri-map-pin-line" aria-hidden="true"></i> {{ flag }}
+                                    </span>
+                                {% endfor %}
+                            </td>
+                            {% endcomment %}
+                            <td class="text-end w-50px align-middle">
+                                <a href="{% url 'recommendations:beneficiary_profile' public_id=beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                   class="btn btn-sm btn-link btn-ico-only"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Voir la fiche de {{ beneficiary.get_inverted_full_name }}">
+                                    <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir la fiche de {{ beneficiary.get_inverted_full_name }}"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include "includes/pagination.html" with page=beneficiaries_page boost=True boost_target="#recommendations-portfolio-section" boost_indicator="#recommendations-portfolio-section" request=request only %}
+    {% endif %}
+</section>

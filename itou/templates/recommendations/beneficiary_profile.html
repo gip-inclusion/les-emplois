@@ -1,0 +1,122 @@
+{% extends "recommendations/beneficiary_base.html" %}
+
+{% load format_filters %}
+
+{% block tab_content %}
+    <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="s-section__row row">
+            <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                <h2>Informations générales</h2>
+                <div class="c-box mb-3 mb-md-4">
+                    <h3>Critères de recommandation</h3>
+                    {% if criteria_labels %}
+                        <div class="badge-group">
+                            {% for label in criteria_labels %}
+                                <span class="badge badge-sm rounded-pill bg-primary text-white fw-normal">{{ label }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <i class="text-disabled">Non renseigné</i>
+                    {% endif %}
+                    <hr class="my-4">
+                    <h3>Diagnostic complet</h3>
+                    {% for section in diagnostic %}
+                        <h4>{{ section.section }}</h4>
+                        {% for item in section.items %}
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <strong>{{ item.title }}</strong>
+                                    {% for badge in item.badges %}
+                                        <span class="badge badge-sm rounded-pill {{ badge.css }}">{{ badge.label }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% if item.bullets %}
+                                    <ul class="mb-2">
+                                        {% for bullet in item.bullets %}<li>{{ bullet }}</li>{% endfor %}
+                                    </ul>
+                                {% endif %}
+                                <p class="mb-0 text-muted fs-sm">{{ item.footer }}</p>
+                            </div>
+                        {% empty %}
+                            <i class="text-disabled">Non renseigné</i>
+                        {% endfor %}
+                        {% if not forloop.last %}<hr class="my-4">{% endif %}
+                    {% empty %}
+                        <i class="text-disabled">Non renseigné</i>
+                    {% endfor %}
+                </div>
+
+                <div class="c-box mb-3 mb-md-4">
+                    <h3>Accompagnement</h3>
+                    <ul class="list-data mb-0">
+                        <li>
+                            <small>Structure référente</small>
+                            {{ referring_structure|strong_or_disabled_non_filled:"Non renseignée" }}
+                        </li>
+                        <li>
+                            <small>Accompagnateur·rice</small>
+                            {{ referring_advisor|strong_or_disabled_non_filled }}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="c-box mb-3 mb-md-4">
+                    <h3>Informations personnelles</h3>
+                    <ul class="list-data mb-0">
+                        <li>
+                            <small>Prénom</small>
+                            <strong>{{ beneficiary.first_name|title }}</strong>
+                        </li>
+                        <li>
+                            <small>Nom</small>
+                            <strong>{{ beneficiary.last_name|upper }}</strong>
+                        </li>
+                        <li>
+                            <small>Identifiant France Travail</small>
+                            <strong>{{ beneficiary.france_travail_id }}</strong>
+                        </li>
+                        <li>
+                            <small>Code Safir agence</small>
+                            <strong>{{ beneficiary.organization_safir }}</strong>
+                        </li>
+                        {% comment %}
+                        TODO llalba: téléphone, email, date de naissance, adresse
+                        <li>
+                            <small>Téléphone</small>
+                            {% if beneficiary.phone %}
+                                <strong>{{ beneficiary.phone|format_phone }}</strong>
+                                {% matomo_event "recommendations" "clic" "copied_beneficiary_phone" as matomo_event_attrs %}
+                                {% include 'includes/copy_to_clipboard.html' with content=beneficiary.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                            {% else %}
+                                <i class="text-disabled">Non renseigné</i>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <small>Adresse e-mail</small>
+                            {% if beneficiary.email %}
+                                <strong>{{ beneficiary.email }}</strong>
+                                {% matomo_event "recommendations" "clic" "copied_beneficiary_email" as matomo_event_attrs %}
+                                {% include 'includes/copy_to_clipboard.html' with content=beneficiary.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                            {% else %}
+                                <i class="text-disabled">Non renseignée</i>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <small>Date de naissance</small>
+                            {{ beneficiary.birthdate|date:"d/m/Y"|strong_or_disabled_non_filled:"Non renseignée" }}
+                        </li>
+                        <li>
+                            <small>Adresse</small>
+                            {% if beneficiary.address_on_one_line %}
+                                <address>{{ beneficiary.address_on_one_line }}</address>
+                            {% else %}
+                                <i class="text-disabled">Non renseignée</i>
+                            {% endif %}
+                        </li>
+                        {% endcomment %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock tab_content %}

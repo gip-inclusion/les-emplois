@@ -315,10 +315,12 @@ NAV_ENTRIES = {
         target=reverse("recommendations:beneficiary_list"),
         active_view_names=[
             "recommendations:beneficiary_list",
+            "recommendations:beneficiary_profile",
+            "recommendations:beneficiary_actions",
         ],
-        matomo_event_category="sps",
+        matomo_event_category="recommendations",
         matomo_event_name="clic",
-        matomo_event_option="sps-list-demandeurs-d-emploi",
+        matomo_event_option="recommendations-list-jobseekers",
         is_beta=True,
     ),
 }

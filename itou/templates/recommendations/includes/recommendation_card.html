@@ -1,0 +1,115 @@
+{% comment %}
+Arguments :
+- recommendation : dict(kind_short, name, subtitle, distance_km, address, description, show_map, jobs, pk)
+- beneficiary
+- csrf_token
+- reco_index
+{% endcomment %}
+
+{% partialdef job-row %}
+    <li class="list-group-item list-group-item-action">
+        <div>
+            <span class="fw-bold">{{ job.label }}</span>
+            {% if job.candidates_badge %}
+                <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+                    <i class="ri-user-line me-1" aria-hidden="true"></i>
+                    <span class="ms-1">{{ job.candidates_badge }}</span>
+                </span>
+            {% endif %}
+            <p class="fs-sm mb-0 mt-1">
+                <i class="ri-map-pin-2-line ri-sm" aria-hidden="true"></i>
+                {{ job.city }}
+            </p>
+        </div>
+    </li>
+{% endpartialdef %}
+
+<div class="c-box c-box--results has-links-inside{% if not reco_is_last %} mb-3 mb-md-4{% endif %}">
+    <div class="c-box--results__header">
+        <div class="c-box--results__summary">
+            <i class="ri-community-line" aria-hidden="true"></i>
+            <div>
+                <span>
+                    {{ recommendation.kind_short }}
+                    {% if recommendation.subtitle %}<small>&nbsp;{{ recommendation.subtitle }}</small>{% endif %}
+                </span>
+                <h4>{{ recommendation.name }}</h4>
+            </div>
+        </div>
+        <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+            <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                <li>
+                    <i class="ri-navigation-line fw-normal me-1" aria-hidden="true"></i>
+                    à <strong class="text-info mx-1">{{ recommendation.distance_km }}&nbsp;km</strong> de votre lieu de recherche
+                </li>
+                <li>
+                    <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
+                    <address class="m-0">{{ recommendation.address }}</address>
+                </li>
+            </ul>
+            <div>
+                <form>
+                    {% csrf_token %}
+                    <button type="button"
+                            class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap"
+                            hx-post="{% url 'recommendations:mobilise' public_id=beneficiary.public_id %}"
+                            hx-target="this"
+                            hx-swap="outerHTML"
+                            name="recommendation"
+                            value="{{ recommendation.pk }}">Mobiliser</button>
+                    {% partialdef mobilise-success %}
+                        <span class="badge rounded-pill bg-success-lighter text-success">
+                            <i class="ri-check-line" aria-hidden="true"></i> Recommandation enregistrée
+                        </span>
+                    {% endpartialdef %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if recommendation.description %}
+        <hr class="m-0">
+        <div class="c-box--results__body">
+            <p class="mb-0 text-muted fs-sm">{{ recommendation.description }}</p>
+        </div>
+    {% endif %}
+
+    {% if recommendation.jobs %}
+        <hr class="m-0">
+        {% with collapse_id="collapseMoreJobs_"|add:recommendation.pk other_jobs=recommendation.jobs|slice:"3:" %}
+            <div class="c-box--results__body">
+                <ul class="list-group list-group-flush list-group-link">
+                    {% for job in recommendation.jobs|slice:":3" %}
+                        {% partial job-row %}
+                    {% endfor %}
+                </ul>
+                {% if other_jobs %}
+                    <ul class="list-group list-group-flush list-group-link collapse" id="{{ collapse_id }}">
+                        {% for job in other_jobs %}
+                            {% partial job-row %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            {% if other_jobs %}
+                <div class="c-box--results__footer">
+                    <button class="btn btn-link has-collapse-caret btn-block"
+                            type="button"
+                            data-it-collapse-text-show="Voir"
+                            data-it-collapse-text-hide="Masquer"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#{{ collapse_id }}"
+                            aria-expanded="false"
+                            aria-controls="{{ collapse_id }}"
+                            aria-label="Voir ou masquer les autres postes">
+                        {% if other_jobs|length > 1 %}
+                            les {{ other_jobs|length }} autres postes
+                        {% else %}
+                            1 autre poste
+                        {% endif %}
+                    </button>
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</div>

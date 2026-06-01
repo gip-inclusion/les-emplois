@@ -1,0 +1,11 @@
+{% load django_bootstrap5 %}
+
+<div class="s-section__row row">
+    <div class="col-12">
+        <div>{% bootstrap_form_errors filters_form %}</div>
+        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.profile_kinds label="Type de profil" %}
+            {% include "recommendations/includes/list_reset_filters.html" with filters_counter=filters_counter request=request only %}
+        </div>
+    </div>
+</div>

@@ -64,6 +64,7 @@ from itou.utils.validators import (
     validate_af_number,
     validate_birthdate,
     validate_code_safir,
+    validate_france_travail_id_new_format,
     validate_html,
     validate_naf,
     validate_nir,
@@ -581,6 +582,20 @@ class TestUtilsValidators:
             validate_pole_emploi_id("1234567È")
         validate_pole_emploi_id("12345678")
         validate_pole_emploi_id("1234567E")
+
+    def test_validate_france_travail_id_new_format(self):
+        message = "L'identifiant France Travail doit être composé de 11 chiffres."
+        # Only the 11-digit "national" format is accepted, the 8-char legacy
+        # format used by `validate_pole_emploi_id` is rejected on purpose
+        validate_france_travail_id_new_format("12345678901")
+        with pytest.raises(ValidationError, match=message):
+            validate_france_travail_id_new_format("1234567890")  # too short
+        with pytest.raises(ValidationError, match=message):
+            validate_france_travail_id_new_format("123456789012")  # too long
+        with pytest.raises(ValidationError, match=message):
+            validate_france_travail_id_new_format("1234567890A")  # contains a letter
+        with pytest.raises(ValidationError, match=message):
+            validate_france_travail_id_new_format("1234567E")  # legacy 8-char format is no longer valid here
 
     def test_validate_birthdate(self):
         # Min.

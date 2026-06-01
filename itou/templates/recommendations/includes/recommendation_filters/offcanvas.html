@@ -1,0 +1,31 @@
+{% load django_bootstrap5 %}
+{% load str_filters %}
+
+<div class="c-offcanvas-filters offcanvas offcanvas-end" tabindex="-1" aria-labelledby="offcanvasApplyFiltersLabel" id="offcanvasApplyFilters">
+    <div class="offcanvas-header">
+        <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+            <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
+            <span>Filtrer</span>
+        </h4>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="form-errors-container">{% bootstrap_form_errors filters_form %}</div>
+        {% include "recommendations/includes/recommendation_filters/field_collapse_checkbox.html" with field=filters_form.criteria only %}
+        <hr>
+        {% include "recommendations/includes/recommendation_filters/field_collapse_checkbox.html" with field=filters_form.education_level only %}
+    </div>
+    <div class="offcanvas-footer gap-3">
+        <button type="button" data-bs-dismiss="offcanvas" class="btn btn-block btn-primary">Voir</button>
+        {% partialdef offcanvas-reset inline %}
+            <a href="{{ request.path }}"
+               class="{% if filters_counter == 0 %}d-none {% endif %}btn btn-ico btn-block btn-outline-primary"
+               aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}"
+               id="offcanvas-reset"
+               {% if request.htmx %}hx-swap-oob="outerHTML"{% endif %}>
+                <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+                <span>Effacer tout</span>
+            </a>
+        {% endpartialdef %}
+    </div>
+</div>

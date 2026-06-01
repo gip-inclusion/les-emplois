@@ -1,0 +1,20 @@
+{% load matomo %}
+
+<ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+    <li class="nav-item">
+        <a class="nav-link{% if active_tab == 'profile' %} active{% endif %}"
+           href="{% url 'recommendations:beneficiary_profile' public_id=beneficiary.public_id %}?back_url={{ back_url|urlencode }}"
+           {% if active_tab == 'profile' %}aria-current="page"{% endif %}
+           {% matomo_event "recommendations" "clic-onglet" "profil" %}
+           id="profile-tab"
+           role="tab">Informations générales</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active_tab == 'actions' %} active{% endif %}"
+           href="{% url 'recommendations:beneficiary_actions' public_id=beneficiary.public_id %}?back_url={{ back_url|urlencode }}"
+           {% if active_tab == 'actions' %}aria-current="page"{% endif %}
+           {% matomo_event "recommendations" "clic-onglet" "actions recommandées" %}
+           id="recommendations-tab"
+           role="tab">Actions recommandées</a>
+    </li>
+</ul>

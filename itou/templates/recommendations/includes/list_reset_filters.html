@@ -1,0 +1,10 @@
+{% load str_filters %}
+
+<div class="ms-md-auto" id="top-filters-reset"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% if filters_counter > 0 %}
+        <a href="{{ request.path }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser {{ filters_counter|pluralizefr:'le filtre actif,les filtres actifs' }}">
+            <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+            <span>Effacer tout</span>
+        </a>
+    {% endif %}
+</div>
