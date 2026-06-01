@@ -21,7 +21,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransitionLog
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.admin import get_admin_view_link
 from itou.utils.auth import check_user
@@ -435,8 +434,6 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 def merge_users_confirm(
     request, user_1_public_id, user_2_public_id, template_name="itou_staff_views/merge_users_confirm.html"
 ):
-    ALLOWED_USER_KINDS = UserKind.professionals()
-
     user_1 = get_object_or_404(User, public_id=user_1_public_id)
     user_2 = get_object_or_404(User, public_id=user_2_public_id)
 
@@ -449,13 +446,11 @@ def merge_users_confirm(
     merge_allowed = False
 
     # checks
-    if to_user.kind != from_user.kind:
-        to_user_error = from_user_error = "Les utilisateurs doivent être du même type"
     if to_user == from_user:
         to_user_error = from_user_error = "Les utilisateurs doivent être différents"
-    if to_user.kind not in ALLOWED_USER_KINDS:
+    if not to_user.is_professional:
         to_user_error = "L’utilisateur doit être un professionel"
-    if from_user.kind not in ALLOWED_USER_KINDS:
+    if not from_user.is_professional:
         from_user_error = "L’utilisateur doit être un professionel"
 
     form = MergeUserConfirmForm(data=request.POST or None)
