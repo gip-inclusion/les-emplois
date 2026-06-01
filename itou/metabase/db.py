@@ -89,7 +89,7 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
         cursor.execute(create_table_query)
 
 
-def populate_table(table, batch_size, querysets=None, extra_object=None):
+def populate_table(table, batch_size, querysets=None):
     """
     About commits: a single final commit freezes the itou-metabase-db temporarily, making
     our GUI unable to connect to the db during this commit.
@@ -162,9 +162,6 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                 column_comment=sql.Literal(column_comment),
             )
             cur.execute(comment_query)
-
-        if extra_object:
-            inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
 
         written_rows = 0
         for queryset in querysets:

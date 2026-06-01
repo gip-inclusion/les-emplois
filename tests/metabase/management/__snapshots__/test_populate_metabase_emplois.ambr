@@ -6742,7 +6742,7 @@
 # ---
 # name: test_populate_organizations
   dict({
-    'num_queries': 40,
+    'num_queries': 36,
     'queries': list([
       dict({
         'origin': list([
@@ -7098,160 +7098,6 @@
       }),
       dict({
         'origin': list([
-          'get_post_code_to_insee_cities_map[metabase/tables/utils.py]',
-          'get_code_commune[metabase/tables/utils.py]',
-          '<lambda>[metabase/tables/utils.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee"
-          FROM "cities_city"
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_org_members_count[metabase/tables/organizations.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "users_user"
-          LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
-          WHERE ("users_user"."kind" = %s
-                 AND "prescribers_prescribermembership"."id" IS NULL)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_org_job_applications_count[metabase/tables/organizations.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "job_applications_jobapplication"
-          WHERE ("job_applications_jobapplication"."sender_kind" = %s
-                 AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL
-                 AND "job_applications_jobapplication"."to_company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
-                                OR EXISTS
-                                  (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
-                                   LIMIT 1))))
-                 AND NOT ("job_applications_jobapplication"."origin" = %s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_org_accepted_job_applications_count[metabase/tables/organizations.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "job_applications_jobapplication"
-          WHERE ("job_applications_jobapplication"."sender_kind" = %s
-                 AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL
-                 AND "job_applications_jobapplication"."to_company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
-                                OR EXISTS
-                                  (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
-                                   LIMIT 1))))
-                 AND NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."state" = %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          COPY "z_new_organisations_v0" ("id",
-                                         "siret",
-                                         "nom",
-                                         "type",
-                                         "type_complet",
-                                         "habilitée",
-                                         "adresse_ligne_1",
-                                         "adresse_ligne_2",
-                                         "code_postal",
-                                         "code_commune",
-                                         "ville",
-                                         "longitude",
-                                         "latitude",
-                                         "département",
-                                         "nom_département",
-                                         "région",
-                                         "date_inscription",
-                                         "code_safir",
-                                         "total_membres",
-                                         "total_candidatures",
-                                         "total_embauches",
-                                         "date_dernière_candidature",
-                                         "date_dernière_connexion",
-                                         "active",
-                                         "brsa",
-                                         "date_mise_à_jour_metabase")
-          FROM STDIN WITH (FORMAT BINARY)
-        ''',
-      }),
-      dict({
-        'origin': list([
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7361,6 +7207,28 @@
           LEFT OUTER JOIN "cities_city" ON ("prescribers_prescriberorganization"."insee_city_id" = "cities_city"."id")
           GROUP BY "prescribers_prescriberorganization"."id",
                    "cities_city"."id"
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_post_code_to_insee_cities_map[metabase/tables/utils.py]',
+          'get_code_commune[metabase/tables/utils.py]',
+          '<lambda>[metabase/tables/utils.py]',
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee"
+          FROM "cities_city"
           ORDER BY RANDOM() ASC
         ''',
       }),
