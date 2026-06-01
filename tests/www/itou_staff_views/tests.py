@@ -1,5 +1,6 @@
 import datetime
 import io
+import random
 
 import openpyxl
 import pytest
@@ -28,7 +29,7 @@ from itou.nexus.enums import Service
 from itou.nexus.models import ActivatedService
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import ActionKind, UserKind
+from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
@@ -54,6 +55,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    random_pro_user_factory,
 )
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -462,24 +464,14 @@ class TestMergeUsers:
         response = client.post(url)
         assert merge_users_mock.call_count == 0
 
-        # if kind is different
-        url = reverse("itou_staff_views:merge_users_confirm", args=(employer.public_id, prescriber.public_id))
-        response = client.get(url)
-        assertContains(response, "Les utilisateurs doivent être du même type", count=2)
-        assertNotContains(response, BUTTON_TXT)
-        assertNotContains(response, DATA_TITLE)
-        response = client.post(url)
-        assert merge_users_mock.call_count == 0
-
         # everything is OK
-        other_employer = EmployerFactory()
-        url = reverse("itou_staff_views:merge_users_confirm", args=(employer.public_id, other_employer.public_id))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(employer.public_id, prescriber.public_id))
         response = client.get(url)
         assertContains(response, BUTTON_TXT)
         assertContains(response, DATA_TITLE)
         response = client.post(url, data={"user_to_keep": "from_user"}, follow=True)
         assert merge_users_mock.call_count == 1
-        assertContains(response, f"Fusion {employer.email} & {other_employer.email} effectuée")
+        assertContains(response, f"Fusion {prescriber.email} & {employer.email} effectuée")
         assertRedirects(response, reverse("itou_staff_views:merge_users"))
 
     def test_merge_order(self, client, snapshot):
@@ -916,20 +908,14 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
-    @pytest.mark.parametrize("kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
-    def test_merge_updated_by_membership(self, kind, admin_client, caplog):
-        if kind == UserKind.EMPLOYER:
-            user_factory = EmployerFactory
-            membership_factory = CompanyMembershipFactory
-        elif kind == UserKind.PRESCRIBER:
-            user_factory = PrescriberFactory
-            membership_factory = PrescriberMembershipFactory
-        else:
-            raise ValueError("Invalid kind")
+    def test_merge_updated_by_membership(self, admin_client, caplog):
+        membership_factory = random.choice(
+            [PrescriberMembershipFactory, CompanyMembershipFactory, InstitutionMembershipFactory]
+        )
         membership_model = membership_factory._meta.model
 
-        user_1 = user_factory()
-        user_2 = user_factory()
+        user_1 = random_pro_user_factory()
+        user_2 = random_pro_user_factory()
         # Inactive membership that would not be found by membership_model.objects default manager
         membership = membership_factory(user=user_1, is_active=False, updated_by=user_2)
 

@@ -271,7 +271,7 @@ def migrate_field(model, field_name, from_user, to_user):
 @transaction.atomic
 def merge_users(to_user, from_user, update_personal_data):
     assert to_user.is_professional
-    assert to_user.kind == from_user.kind
+    assert from_user.is_professional
     support_remark = f"{timezone.localdate()}: Fusion des utilisateurs {to_user.email} et {from_user.email}"
     for model, field_name in get_users_relations():
         migrate_field(model, field_name, from_user, to_user)
