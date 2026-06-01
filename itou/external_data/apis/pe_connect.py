@@ -8,7 +8,7 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from itou.external_data.models import ExternalDataImport
+from itou.external_data.enums import RetrievalStatus
 from itou.utils import triggers
 
 
@@ -101,11 +101,11 @@ def get_aggregated_user_data(token):
     cleaned_results = [part for part in results if part]
 
     if ok:
-        status = ExternalDataImport.STATUS_OK
+        status = RetrievalStatus.OK
     elif partial:
-        status = ExternalDataImport.STATUS_PARTIAL
+        status = RetrievalStatus.PARTIAL
     else:
-        status = ExternalDataImport.STATUS_FAILED
+        status = RetrievalStatus.FAILED
 
     user_data = {}
     for result in cleaned_results:
@@ -177,9 +177,9 @@ def import_user_pe_data(
         ):
             set_pe_data_import_from_user_data(user, user_data)
 
-        if status == ExternalDataImport.STATUS_OK:
+        if status == RetrievalStatus.OK:
             logger.info("Stored external data for user=%s", user.pk)
-        elif status == ExternalDataImport.STATUS_PARTIAL:
+        elif status == RetrievalStatus.PARTIAL:
             logger.warning("Could only fetch partial results for user=%s", user.pk)
         else:
             logger.warning("Could not fetch any data for user=%s: not data stored", user.pk)
