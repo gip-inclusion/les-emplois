@@ -253,7 +253,8 @@ class TestProConnectModel:
             pc_user_data.create_or_update_user(login_only=True)
 
         ProfessionalFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
-        pc_user_data.create_or_update_user(login_only=True)
+        with triggers.fake_context():
+            pc_user_data.create_or_update_user(login_only=True)
 
 
 class TestProConnectAuthorizeView:
