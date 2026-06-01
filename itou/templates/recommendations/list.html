@@ -21,25 +21,21 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                        <p class="mb-0 flex-grow-1" id="results">
-                            {% with memberships_page.paginator.count as counter %}
-                                {{ counter }} {{ counter|pluralizefr:"résultat,résultats" }}
-                            {% endwith %}
-                        </p>
-                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <caption class="visually-hidden">Liste des personnes accompagnées</caption>
                             <thead>
                                 <tr>
-                                    <th scope="col" class="w-40px"></th>
-                                    <th scope="col">Informations générales</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Structure référente &amp; modalité</th>
-                                    <th scope="col" class="text-end w-50px"></th>
+                                    <th scope="col">NOM Prénom</th>
                                 </tr>
                             </thead>
+                            <tbody>
+                                {% for beneficiary in beneficiaries %}
+                                    <tr>
+                                        <td>{{ beneficiary.get_inverted_full_name }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
                     </div>
                 </div>

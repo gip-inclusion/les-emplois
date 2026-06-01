@@ -42,3 +42,10 @@ class Beneficiary(models.Model):
                 name="france_travail_id_format", condition=models.Q(france_travail_id__regex=r"\A[0-9]{11}\Z")
             ),
         ]
+
+    def get_inverted_full_name(self):
+        """
+        Return the last_name plus the first_name, with a space in between.
+        """
+        full_name = f"{self.last_name.upper()} {self.first_name.strip().title()}"
+        return full_name.strip()
