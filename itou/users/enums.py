@@ -18,6 +18,7 @@ class UserKind(models.TextChoices):
     PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
     EMPLOYER = KIND_EMPLOYER, "employeur"
     LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
+    PROFESSIONAL = KIND_PROFESSIONAL, "professionnel"
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 
     @classmethod

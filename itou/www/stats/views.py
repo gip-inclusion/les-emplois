@@ -33,6 +33,7 @@ from itou.institutions.models import Institution
 from itou.nexus.utils import activate_pilotage
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.auth import check_request
@@ -132,13 +133,16 @@ def render_stats(
 
     if request.user.is_authenticated and metabase_dashboard:
         extra_data = {}
+        user_kind = request.user.kind
         if request.from_employer:
             extra_data["current_company_id"] = request.current_organization.pk
+            user_kind = KIND_EMPLOYER
         elif request.from_prescriber and request.current_organization:
             extra_data["current_prescriber_organization_id"] = request.current_organization.pk
+            user_kind = KIND_PRESCRIBER
         elif request.from_institution:
             extra_data["current_institution_id"] = request.current_organization.pk
-        user_kind = request.user.kind
+            user_kind = KIND_LABOR_INSPECTOR
         department = base_context.get("department")
         region = DEPARTMENT_TO_REGION[department] if department else base_context.get("region")
         dashboard_id = metabase_dashboard.get("dashboard_id")

@@ -363,6 +363,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     | models.Q(kind=UserKind.PRESCRIBER)
                     | models.Q(kind=UserKind.EMPLOYER)
                     | models.Q(kind=UserKind.LABOR_INSPECTOR)
+                    | models.Q(kind=UserKind.PROFESSIONAL)
                 ),
             ),
             models.CheckConstraint(
