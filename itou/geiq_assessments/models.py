@@ -351,11 +351,6 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
                 condition=(models.Q(final_reviewed_at=None) & ~models.Q(state=AssessmentState.FINAL_REVIEWED))
                 | (models.Q(final_reviewed_at__isnull=False, state=AssessmentState.FINAL_REVIEWED)),
             ),
-            models.UniqueConstraint(
-                fields=["campaign", "label_geiq_id"],
-                name="geiq_assessment_unique_label_geiq_id_with_main_geiq",
-                condition=models.Q(with_main_geiq=True),
-            ),
         ]
 
     def action_financial_assessment_filename(self):
