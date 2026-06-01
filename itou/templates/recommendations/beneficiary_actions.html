@@ -1,0 +1,97 @@
+{% extends "recommendations/beneficiary_base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}Actions recommandées {{ block.super }}{% endblock %}
+
+{% block tab_content %}
+    <div class="tab-pane fade show active" id="recommendations-tab-pane" role="tabpanel" aria-labelledby="recommendations-tab">
+        <div class="s-section__row row">
+            <div class="s-section__col col-12">
+                <h2 class="mb-md-4">Actions recommandées</h2>
+                <div class="d-block w-100">
+                    <form hx-get="{{ request.path }}" hx-trigger="change delay:.5s" hx-target="#actions-section" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#actions-section" hx-include="#offcanvasApplyFilters">
+                        <div>{% bootstrap_form_errors filters_form %}</div>
+                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.age label="Âge" %}
+                            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.address label="Adresse" %}
+                            <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
+                                <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
+                                <span>Tous les filtres</span>
+                            </button>
+                            {% include "recommendations/includes/list_reset_filters.html" with filters_counter=filters_counter request=request only %}
+                        </div>
+                        {% include "recommendations/includes/recommendation_filters/offcanvas.html" %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="s-section__row row">
+            <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                {% partialdef actions-results inline %}
+                    {% if request.htmx %}
+                        {% include "recommendations/includes/recommendation_filters/offcanvas.html#offcanvas-reset" %}
+                        {% include "recommendations/includes/list_reset_filters.html" with filters_counter=filters_counter request=request only %}
+                    {% endif %}
+
+                    <div id="actions-section">
+                        {# FIXME llalba: nombre de résultats et recherche par mot clé ? #}
+                        {% comment %}
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                            <div class="flex-md-grow-1" id="recommendations-count">
+                                <p class="mb-0">{{ recommendations_count }} résultat{{ recommendations_count|pluralizefr }}</p>
+                            </div>
+                            <div class="flex-column flex-md-row mt-3 mt-md-0">
+                                {% bootstrap_field filters_form.search wrapper_class="w-lg-400px" show_label=False %}
+                            </div>
+                        </div>
+                        {% endcomment %}
+                        <section aria-labelledby="recommendations-count" id="recommendations-section">
+                            {% if recommendations %}
+                                {% for reco in recommendations %}
+                                    <div class="c-box mb-3 mb-md-4">
+                                        <h3>{{ reco.kind_label }}</h3>
+                                        {% component_alert content=content variant="info" extra_classes="mt-2 mb-3 mb-md-4" %}
+                                            {% fragment as content %}
+                                                <p class="mb-0">
+                                                    Cette action est recommandée car le profil du bénéficiaire correspond aux critères d’admission suivants&nbsp;:
+                                                    <br>
+                                                    <strong>{{ reco.rationale }}</strong>.
+                                                </p>
+                                            {% endfragment %}
+                                        {% endcomponent_alert %}
+                                        {% for result in reco.providers %}
+                                            {% include "recommendations/includes/recommendation_card.html" with recommendation=result beneficiary=beneficiary csrf_token=csrf_token reco_index=forloop.counter reco_is_last=forloop.last only %}
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center my-3 my-md-4">
+                                    <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+                                    <p class="mb-1 mt-3">
+                                        <strong>
+                                            {% if filters_counter %}
+                                                Aucune action recommandée avec ces filtres.
+                                            {% else %}
+                                                Aucune action recommandée.
+                                            {% endif %}
+                                        </strong>
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </section>
+                    </div>
+                {% endpartialdef %}
+            </div>
+            <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                {# FIXME llalba: pas de leaflet pour le moment, juste un placeholder statique #}
+                <div class="c-box mb-3 mb-md-4">
+                    <h3>Carte des solutions</h3>
+                    <p class="mb-0">Bientôt disponible.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

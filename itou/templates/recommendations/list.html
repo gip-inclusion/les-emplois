@@ -1,40 +1,43 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load django_bootstrap5 %}
 {% load static %}
 
-{% block title %}Actions recommandées - Mon portefeuille {{ block.super }}{% endblock %}
+{% block title %}Actions recommandées {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Mon portefeuille</h1>
+            <h1>Actions recommandées pour mon portefeuille</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
 
-
 {% block content %}
-    <section class="s-section" id="gps-my-groups">
+    {% comment %} TODO llalba: off-canvas filter menu ? {% endcomment %}
+    <section class="s-section">
         <div class="s-section__container container">
+            <form hx-get="{{ request.path }}"
+                  hx-trigger="change delay:.5s, change from:#id_beneficiary delay:.5s"
+                  hx-indicator="#recommendations-portfolio-section"
+                  hx-target="#recommendations-portfolio-section"
+                  hx-swap="outerHTML"
+                  hx-push-url="true"
+                  hx-include="#id_beneficiary,#id_order">
+                {% include "recommendations/includes/top_filters.html" with filters_form=filters_form filters_counter=filters_counter request=request only %}
+                <input id="id_order" type="hidden" name="order" value="{{ order }}">
+            </form>
             <div class="s-section__row row">
                 <div class="col-12">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <caption class="visually-hidden">Liste des personnes accompagnées</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">NOM Prénom</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for beneficiary in beneficiaries %}
-                                    <tr>
-                                        <td>{{ beneficiary.get_inverted_full_name }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        <div class="flex-md-grow-1">
+                            {% include "recommendations/includes/list_results.html#list-counter" with paginator=paginator request=request only %}
+                        </div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">
+                            {% bootstrap_field filters_form.beneficiary wrapper_class="w-lg-400px" show_label=False %}
+                        </div>
                     </div>
+                    {% include "recommendations/includes/list_results.html" with beneficiaries_page=beneficiaries_page paginator=paginator order=order filters_counter=filters_counter BeneficiaryOrder=BeneficiaryOrder request=request only %}
                 </div>
             </div>
         </div>

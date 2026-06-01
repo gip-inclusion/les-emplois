@@ -1,0 +1,49 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load matomo %}
+{% load static %}
+
+{% block title %}Profil de {{ beneficiary.get_inverted_full_name }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {{ beneficiary.get_inverted_full_name }}
+                <span class="badge rounded-pill text-nowrap badge-base {{ modality_classes }}">{{ modality_label }} · {{ modality_duration }}</span>
+            </h1>
+            <p id="copy_ft_id">
+                {% matomo_event "recommendations" "clic" "copied_ft_id" as matomo_event_attrs %}
+                Copier l'ID France Travail
+                {% include "includes/copy_to_clipboard.html" with content=france_travail_id matomo_event_attrs=matomo_event_attrs css_classes="btn-link" only_icon=True %}
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "recommendations/includes/nav_tabs.html" %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="tab-content">
+                        {% block tab_content %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock %}

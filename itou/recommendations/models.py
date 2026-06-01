@@ -1,3 +1,5 @@
+import uuid
+
 from citext import CIEmailField
 from django.db import models
 
@@ -10,6 +12,13 @@ class Beneficiary(models.Model):
     This a distinct class from User with `kind=job_seekers` because we are creating a beta feature.
     It will be easier to work within this app and merge in User model when everything is stable.
     """
+
+    public_id = models.UUIDField(
+        verbose_name="identifiant public",
+        help_text="identifiant opaque, pour les URLs publiques",
+        default=uuid.uuid4,
+        unique=True,
+    )
 
     # for display in the list view
     first_name = models.CharField(verbose_name="prénom", max_length=150, blank=True)

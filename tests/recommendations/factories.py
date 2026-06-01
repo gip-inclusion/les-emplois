@@ -1,6 +1,7 @@
 import string
 
 import factory
+import factory.fuzzy
 
 from itou.recommendations import models
 
@@ -16,3 +17,12 @@ class BeneficiaryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Beneficiary
         skip_postgeneration_save = True
+
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="Alice",
+            last_name="Martin",
+            france_travail_id="12345678901",
+            referent_email="ref@example.com",
+            organization_safir="12345",
+        )
