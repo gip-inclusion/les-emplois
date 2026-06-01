@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 2026-06-01
+
+### Ajouté
+
+- [Insertion : Ajout d'une page de visualisation d'une structure d'insertion](https://github.com/gip-inclusion/les-emplois/pull/7838)
+- [GEIQ : Permettre de justifier la demande d'aide pour un contrat](https://github.com/gip-inclusion/les-emplois/pull/7971)
+- [GEIQ : Permettre de justifier le refus d’aide pour un contrat (DDETS/DREETS)](https://github.com/gip-inclusion/les-emplois/pull/8020)
+
+### Modifié
+
+- [Admin : Ajout de validation d'entrée pour les uid ASP](https://github.com/gip-inclusion/les-emplois/pull/8065)
+- [Connexion : Autoriser les institutionnels à se connecter avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/8106)
+- [Connexion : Permettre de modifier l'adresse email après un retour arrière](https://github.com/gip-inclusion/les-emplois/pull/8114)
+- [Fiches salarié : Mise en place d'une alerte à destination des employeurs en cas d'erreur 3437](https://github.com/gip-inclusion/les-emplois/pull/8093)
+- [GEIQ : Indiquer que des salariés étaient déjà présents lors du précédent bilan](https://github.com/gip-inclusion/les-emplois/pull/8083)
+- [GEIQ : Ouverture du module des bilans d'exécution à toute la France](https://github.com/gip-inclusion/les-emplois/pull/8127)
+- [Interface : Augmenter le nombre d'usagers affichés par page dans les accompagnements à 50](https://github.com/gip-inclusion/les-emplois/pull/8133)
+- [Interface : Harmoniser les vues lorsqu'on postule 2 fois pour une même entreprise en moins de 24h](https://github.com/gip-inclusion/les-emplois/pull/8113)
+- [Notifications : Désactivation de la campagne AFPA](https://github.com/gip-inclusion/les-emplois/pull/8087)
+
 ## 2026-05-25
 
 ### Ajouté
