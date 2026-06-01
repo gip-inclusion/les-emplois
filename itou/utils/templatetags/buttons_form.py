@@ -95,8 +95,11 @@ def itou_buttons_form(
     if secondary_name and secondary_url:
         raise ValueError("secondary_url cannot be used with secondary_name/value")
 
+    ask_confirmation_before_reset = reset_url and (secondary_name and secondary_value or secondary_url)
+
     return {
         "show_mandatory_fields_mention": show_mandatory_fields_mention,
+        "ask_confirmation_before_reset": ask_confirmation_before_reset,
         "primary_aria_label": primary_aria_label,
         "primary_disabled": primary_disabled,
         "primary_label": primary_label,

@@ -6,7 +6,7 @@
         {% if show_mandatory_fields_mention %}<small class="d-inline-block mb-3">* champs obligatoires</small>{% endif %}
         <div class="form-row align-items-center justify-content-end gx-3">
             <div class="form-group col-12 col-lg order-3 order-lg-1">
-                {% if secondary_name and secondary_value or secondary_url %}
+                {% if ask_confirmation_before_reset %}
                     {# If there is a previous step - which is what most secondaries link to - we want a confirmation before resetting everything #}
                     <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
                         <i class="ri-close-line ri-lg" aria-hidden="true"></i>
@@ -58,7 +58,7 @@
     </div>
 </div>
 
-{% if secondary_name and secondary_value or secondary_url %}
+{% if ask_confirmation_before_reset %}
     <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -72,9 +72,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                    {% if reset_url is not None %}
-                        <a href="{{ reset_url }}" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
-                    {% endif %}
+                    <a href="{{ reset_url }}" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
                 </div>
             </div>
         </div>
