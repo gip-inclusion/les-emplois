@@ -92,6 +92,7 @@ def get_permissions_dict():
         geiq_assessments_models.Employee: PERMS_READ,
         geiq_assessments_models.EmployeeContract: PERMS_READ,
         geiq_assessments_models.EmployeePrequalification: PERMS_READ,
+        geiq_assessments_models.LabelInfos: PERMS_READ,
         gps_models.FollowUpGroup: PERMS_DELETE,
         gps_models.FollowUpGroupMembership: PERMS_DELETE,
         institution_models.Institution: PERMS_ADD,
