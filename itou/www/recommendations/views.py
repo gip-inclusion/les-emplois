@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.shortcuts import render
 
+from itou.recommendations.models import Beneficiary
 from itou.utils.auth import check_request
 
 
@@ -11,5 +12,9 @@ from itou.utils.auth import check_request
     )
 )
 def list_users(request, template_name="recommendations/list.html"):
+    # For now we only display Beneficiaries from the current user and organization
+    beneficiaries = Beneficiary.objects.filter(
+        referent_email=request.user.email, organization_safir=request.current_organization.code_safir_pole_emploi
+    )
 
-    return render(request, template_name, {})
+    return render(request, template_name, {"beneficiaries": beneficiaries})
