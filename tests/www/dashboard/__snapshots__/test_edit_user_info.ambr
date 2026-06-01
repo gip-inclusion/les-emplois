@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditUserInfoView.test_edit_with_nir
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -152,26 +152,6 @@
           FROM "users_identitycertification"
           WHERE "users_identitycertification"."jobseeker_profile_id" = %s
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ExternalDataImportQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'edit_user_info[www/dashboard/views.py]',
-          'wrapper[utils/views.py]',
-        ]),
-        'sql': '''
-          SELECT "external_data_externaldataimport"."id",
-                 "external_data_externaldataimport"."status",
-                 "external_data_externaldataimport"."created_at",
-                 "external_data_externaldataimport"."source",
-                 "external_data_externaldataimport"."user_id",
-                 "external_data_externaldataimport"."report"
-          FROM "external_data_externaldataimport"
-          WHERE ("external_data_externaldataimport"."user_id" = %s
-                 AND "external_data_externaldataimport"."source" = %s)
-          ORDER BY "external_data_externaldataimport"."id" ASC
-          LIMIT 1
         ''',
       }),
       dict({

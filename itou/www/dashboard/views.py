@@ -326,7 +326,6 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
             instance=request.user,
             data=request.POST or None,
         )
-    extra_data = request.user.externaldataimport_set.pe_sources().first()
 
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -335,7 +334,6 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         return HttpResponseRedirect(success_url)
 
     context = {
-        "extra_data": extra_data,
         "form": form,
         "prev_url": prev_url,
     }
