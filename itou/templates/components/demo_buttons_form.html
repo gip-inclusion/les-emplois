@@ -1,0 +1,32 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load support %}
+{% load theme_inclusion %}
+
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+
+                <h1>
+                    itou_buttons_form
+                    {% if reset_url %}
+                        avec
+                    {% else %}
+                        sans
+                    {% endif %}
+                    reset_url
+                </h1>
+                <div>gna gna gna un autre formulaire ici</div>
+                {% itou_buttons_form primary_label="Terminer" secondary_label="Revenir à l’étape précédente" secondary_url="/secondary" reset_url=reset_url|default:None %}
+
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}
