@@ -219,6 +219,15 @@
                       </a>
                   </li>
                   <li class="nav-item">
+                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="accompagnements-siae" href="/job-seekers/list-organization">
+                          <i aria-hidden="true" class="ri-user-line fw-medium">
+                          </i>
+                          <span>
+                              Accompagnements
+                          </span>
+                      </a>
+                  </li>
+                  <li class="nav-item">
                       <button aria-controls="collapse-nav-salaries" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-salaries" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>

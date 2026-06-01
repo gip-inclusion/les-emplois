@@ -199,6 +199,15 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="candidatures-envoyees",
     ),
+    "employer-assignments": NavItem(
+        label="Accompagnements",
+        icon="ri-user-line",
+        target=reverse("job_seekers_views:list_organization"),
+        active_view_names=["job_seekers_views:list_organization"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="accompagnements-siae",
+    ),
     "employer-approvals": NavItem(
         label="Salariés et PASS IAE",
         target=reverse("approvals:list"),
@@ -367,6 +376,7 @@ def nav(request):
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
             if request.current_organization.is_subject_to_iae_rules:
+                menu_items.append(NAV_ENTRIES["employer-assignments"])
                 employee_group_items = [NAV_ENTRIES["employer-approvals"]]
                 if request.current_organization.can_use_employee_record:
                     employee_group_items.append(NAV_ENTRIES["employer-employee-records"])

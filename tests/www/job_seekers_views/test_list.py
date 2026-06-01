@@ -13,11 +13,13 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune
+from itou.companies.models import Company
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -101,11 +103,14 @@ def test_anonymous_user(client, url):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_refused_access(client, url):
-    for user in [
+    forbidden_users = [
         JobSeekerFactory(),
         LaborInspectorFactory(membership=True),
-        CompanyFactory(with_membership=True).members.first(),
-    ]:
+        CompanyFactory(with_membership=True, not_subject_to_iae_rules=True).members.first(),
+    ]
+    if url == reverse("job_seekers_views:list"):
+        forbidden_users.append(CompanyFactory(with_membership=True, subject_to_iae_rules=True).members.first())
+    for user in forbidden_users:
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 403
@@ -152,14 +157,20 @@ def test_displayed_tabs(client, user_factory, assertion):
 
 
 @pytest.mark.parametrize(
-    "url, assertion",
+    "factory, url, assertion",
     [
-        (reverse("job_seekers_views:list"), assertNotContains),
-        (reverse("job_seekers_views:list_organization"), assertContains),
+        (PrescriberMembershipFactory, reverse("job_seekers_views:list"), assertNotContains),
+        (
+            partial(CompanyMembershipFactory, company__subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+            assertContains,
+        ),
+        (PrescriberMembershipFactory, reverse("job_seekers_views:list_organization"), assertContains),
     ],
+    ids=["prescriber_assignments_list", "siae_assignments_list", "prescriber_organization_assignments_list"],
 )
-def test_displayed_filters(client, url, assertion):
-    user = PrescriberOrganizationWith2MembershipFactory().members.first()
+def test_displayed_filters(client, factory, url, assertion):
+    user = factory().user
     client.force_login(user)
     response = client.get(url)
 
@@ -680,23 +691,39 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     assert_update_eligibility(response, can_update=False)
 
 
-@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
-def test_htmx_job_seeker_filter(client, url):
-    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
-    prescriber = organization.members.first()
-    job_app = JobApplicationFactory(
-        sent_by_prescriber=True,
-        sender=prescriber,
-        sender_prescriber_organization=organization,
+@pytest.mark.parametrize(
+    "factory, url",
+    [
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
+        (
+            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+        ),
+    ],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+)
+def test_htmx_job_seeker_filter(client, factory, url):
+    organization = factory()
+    user = organization.members.first()
+    is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+    is_company = isinstance(organization, Company)
+    job_app_factory = partial(
+        JobApplicationFactory,
+        sent_by_prescriber=is_prescriber_organization,
+        sender_prescriber_organization=(is_prescriber_organization and organization or None),
+        sent_by_employer=is_company,
+        sender_company=(is_company and organization or None),
+    )
+    job_app = job_app_factory(
+        sender=user,
         with_job_seeker_assignment=True,
     )
-    other_app = JobApplicationFactory(
-        sent_by_prescriber=True,
-        sender=prescriber,
-        sender_prescriber_organization=organization,
+    other_app = job_app_factory(
+        sender=user,
         with_job_seeker_assignment=True,
     )
-    client.force_login(prescriber)
+    client.force_login(user)
     response = client.get(url)
 
     assertContains(response, "2 résultats")
@@ -850,16 +877,33 @@ def test_filtered_by_eligibility_state(client, url):
     ]
 
 
-@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
-def test_filtered_by_approval_state(client, url):
-    organization = PrescriberOrganizationWith2MembershipFactory()
-    prescriber = organization.members.first()
-    client.force_login(prescriber)
+@pytest.mark.parametrize(
+    "factory, url",
+    [
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
+        (
+            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+        ),
+    ],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+)
+def test_filtered_by_approval_state(client, factory, url):
+    organization = factory()
+    user = organization.members.first()
+    is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+    is_company = isinstance(organization, Company)
+    prescriber_organization = is_prescriber_organization and organization or None
+    company = is_company and organization or None
+    client.force_login(user)
 
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        author=prescriber,
-        author_prescriber_organization=organization,
+        from_prescriber=is_prescriber_organization,
+        from_employer=is_company,
+        author=user,
+        author_prescriber_organization=prescriber_organization,
+        author_siae=company,
         expired=True,
         # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
         created_at=timezone.now() - datetime.timedelta(days=2),
@@ -870,9 +914,11 @@ def test_filtered_by_approval_state(client, url):
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
 
     job_seeker_expired_eligibility_expired_approval = IAEEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        author=prescriber,
-        author_prescriber_organization=organization,
+        from_prescriber=is_prescriber_organization,
+        from_employer=is_company,
+        author=user,
+        author_prescriber_organization=prescriber_organization,
+        author_siae=company,
         expired=True,
         # assignment.updated_at is set to diagnosis created_at, which is non-deterministic when expired=True
         created_at=timezone.now() - datetime.timedelta(days=1),
@@ -883,9 +929,11 @@ def test_filtered_by_approval_state(client, url):
     ApprovalFactory(user=job_seeker_expired_eligibility_expired_approval, expired=True)
 
     job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        author=prescriber,
-        author_prescriber_organization=organization,
+        from_prescriber=is_prescriber_organization,
+        from_employer=is_company,
+        author=user,
+        author_prescriber_organization=prescriber_organization,
+        author_siae=company,
         job_seeker__first_name="valid eligibility, no approval",
         job_seeker__last_name="Zorro",
         with_job_seeker_assignment=True,
@@ -993,14 +1041,29 @@ def test_filtered_by_organization_members(client):
     assert response.context["page_obj"].object_list == [job_seeker_assigned_to_old_member]
 
 
-@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
-def test_htmx_filters(client, url):
-    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
-    client.force_login(prescriber)
+@pytest.mark.parametrize(
+    "factory, url",
+    [
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
+        (
+            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+        ),
+    ],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+)
+def test_htmx_filters(client, factory, url):
+    organization = factory()
+    is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+    is_company = isinstance(organization, Company)
+    user = organization.members.first()
+    client.force_login(user)
 
     IAEEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        job_seeker__created_by=prescriber,
+        from_prescriber=is_prescriber_organization,
+        from_employer=is_company,
+        job_seeker__created_by=user,
         with_job_seeker_assignment=True,
     )
     response = client.get(url)
@@ -1019,39 +1082,75 @@ def test_htmx_filters(client, url):
     assertSoupEqual(page, fresh_page)
 
 
-@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
-def test_job_seekers_order(client, url, subtests):
-    organization = PrescriberOrganizationWith2MembershipFactory()
-    prescriber = organization.members.first()
+@pytest.mark.parametrize(
+    "factory, url",
+    [
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
+        (
+            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+        ),
+    ],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+)
+def test_job_seekers_order(client, factory, url, subtests):
+    organization = factory()
+    user = organization.members.first()
+    is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+    is_company = isinstance(organization, Company)
+    prescriber_organization = is_prescriber_organization and organization or None
+    company = is_company and organization or None
     c_d_job_seeker = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
-        sender=prescriber,
-        job_seeker__created_by=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        sent_by_prescriber_alone=is_prescriber_organization,
+        sent_by_employer=is_company,
+        sender=user,
+        sender_company=company,
+        job_seeker__created_by=user,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         job_seeker__first_name="Charles",
         job_seeker__last_name="Deux candidatures",
     ).job_seeker
     JobApplicationFactory(
-        sent_by_prescriber_alone=True, sender=prescriber, job_seeker=c_d_job_seeker, with_job_seeker_assignment=True
+        sent_by_prescriber_alone=is_prescriber_organization,
+        sent_by_employer=is_company,
+        sender=user,
+        sender_company=company,
+        job_seeker=c_d_job_seeker,
+        with_job_seeker_assignment=True,
     )
     created_job_seeker = JobSeekerFactory(
-        created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
+        created_by=user,
+        jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         first_name="Zorro",
         last_name="Martin",
         with_job_seeker_assignment=True,
     )
+    if is_company:
+        JobSeekerAssignmentFactory(
+            job_seeker=created_job_seeker,
+            professional=user,
+            company=company,
+        )
     second_created_job_seeker = JobSeekerFactory(
-        created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
+        created_by=user,
+        jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         first_name="Zorro",
         last_name="Martin",
         with_job_seeker_assignment=True,
     )
+    if is_company:
+        JobSeekerAssignmentFactory(
+            job_seeker=second_created_job_seeker,
+            professional=user,
+            company=company,
+        )
     a_b_job_seeker = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
-        sender=prescriber,
-        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        sent_by_prescriber_alone=is_prescriber_organization,
+        sent_by_employer=is_company,
+        sender_company=company,
+        sender=user,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=prescriber_organization,
         job_seeker__first_name="Alice",
         job_seeker__last_name="Berger",
         with_job_seeker_assignment=True,
@@ -1059,12 +1158,12 @@ def test_job_seekers_order(client, url, subtests):
     # Simulate IAE eligibility diagnosis done by prescriber
     JobSeekerAssignment.objects.upsert_assignment(
         job_seeker=second_created_job_seeker,
-        professional=prescriber,
+        professional=user,
         organization=organization,
         last_action_kind=ActionKind.IAE_ELIGIBILITY,
     )
 
-    client.force_login(prescriber)
+    client.force_login(user)
 
     expected_order = {
         "-last_updated_at": [second_created_job_seeker, a_b_job_seeker, created_job_seeker, c_d_job_seeker],
@@ -1090,23 +1189,39 @@ def test_job_seekers_order(client, url, subtests):
             assert response.context["page_obj"].object_list == list(reversed(job_seekers))
 
 
-@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
-def test_htmx_order(client, url):
-    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
-    prescriber = organization.members.first()
-    job_app = JobApplicationFactory(
-        sent_by_prescriber=True,
-        sender=prescriber,
-        sender_prescriber_organization=organization,
+@pytest.mark.parametrize(
+    "factory, url",
+    [
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list")),
+        (PrescriberOrganizationWith2MembershipFactory, reverse("job_seekers_views:list_organization")),
+        (
+            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            reverse("job_seekers_views:list_organization"),
+        ),
+    ],
+    ids=["prescriber_assignments_list", "prescriber_organization_assignments_list", "siae_assignments_list"],
+)
+def test_htmx_order(client, factory, url):
+    organization = factory()
+    user = organization.members.first()
+    is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+    is_company = isinstance(organization, Company)
+    job_app_factory = partial(
+        JobApplicationFactory,
+        sent_by_prescriber=is_prescriber_organization,
+        sender_prescriber_organization=(is_prescriber_organization and organization or None),
+        sent_by_employer=is_company,
+        sender_company=(is_company and organization or None),
+    )
+    job_app = job_app_factory(
+        sender=user,
         with_job_seeker_assignment=True,
     )
-    other_app = JobApplicationFactory(
-        sent_by_prescriber=True,
-        sender=prescriber,
-        sender_prescriber_organization=organization,
+    other_app = job_app_factory(
+        sender=user,
         with_job_seeker_assignment=True,
     )
-    client.force_login(prescriber)
+    client.force_login(user)
     response = client.get(url)
 
     assertContains(response, "2 résultats")
