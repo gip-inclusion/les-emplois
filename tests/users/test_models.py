@@ -510,12 +510,13 @@ class TestModel:
             UserKind.PRESCRIBER: PrescriberFactory,
             UserKind.EMPLOYER: EmployerFactory,
             UserKind.LABOR_INSPECTOR: LaborInspectorFactory,
+            UserKind.PROFESSIONAL: random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory]),
             UserKind.ITOU_STAFF: ItouStaffFactory,
         }[kind].build(**factory_kwargs)
 
         assert user.can_be_reactivated() is all(
             [
-                kind in UserKind.professionals(),
+                kind in UserKind.professionals() or kind == UserKind.PROFESSIONAL,
                 not is_active,
                 username,
                 has_sso_provider,

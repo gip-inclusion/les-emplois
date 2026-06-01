@@ -5,7 +5,7 @@ from django.forms import ValidationError
 from django.utils import timezone
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.users.enums import UserKind
+from itou.users import enums as users_enums
 
 
 class DatumCode(models.TextChoices):
@@ -83,6 +83,16 @@ PERCENTAGE_DATUM = [
 ]
 
 
+class StatsUserKind(models.TextChoices):
+    """UserKind for dashboard display stats"""
+
+    JOB_SEEKER = users_enums.KIND_JOB_SEEKER, "candidat"
+    PRESCRIBER = users_enums.KIND_PRESCRIBER, "prescripteur"
+    EMPLOYER = users_enums.KIND_EMPLOYER, "employeur"
+    LABOR_INSPECTOR = users_enums.KIND_LABOR_INSPECTOR, "inspecteur du travail"
+    ITOU_STAFF = users_enums.KIND_ITOU_STAFF, "administrateur"
+
+
 class Datum(models.Model):
     """Store an aggregated `value` of the `code` data point for the specified `bucket`."""
 
@@ -127,7 +137,7 @@ class StatsDashboardVisit(models.Model):
         verbose_name="ID organisation prescriptrice courante", null=True
     )
     current_institution_id = models.IntegerField(verbose_name="ID institution courante", null=True)
-    user_kind = models.TextField(verbose_name="type d'utilisateur", choices=UserKind.choices)
+    user_kind = models.TextField(verbose_name="type d'utilisateur", choices=StatsUserKind.choices)
     user_id = models.IntegerField(verbose_name="ID utilisateur")
 
     measured_at = models.DateTimeField(default=timezone.now)  # Not using auto_now_add=True to allow overrides
