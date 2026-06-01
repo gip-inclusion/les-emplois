@@ -72,19 +72,20 @@ def test_context_stacking_with_same_data():
 
 def test_context_consecutively_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
-    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(4), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(3), connection.cursor() as cursor:
         with triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
         with triggers.context(**expected):
-            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
+            cursor.execute("SELECT current_setting('itou.context')")  # 1 query: current_setting
         assert cursor.fetchone() == (json.dumps(expected),)
 
 
-@pytest.mark.xfail
 def test_context_cleanup():
     with triggers.connection_wrapper(), transaction.atomic(), connection.cursor() as cursor:
+        cursor.execute("SELECT current_setting('itou.context')")
+        assert cursor.fetchone() == ("",)
         with triggers.context(foo="bar"):
             cursor.execute("SELECT current_setting('itou.context')")
             assert cursor.fetchone() == (json.dumps({"foo": "bar"}),)
@@ -95,13 +96,13 @@ def test_context_cleanup():
 @pytest.mark.django_db(transaction=True)
 def test_context_savepoint_rollback():
     expected = {"uuid": str(uuid.uuid4())}
-    with transaction.atomic(), triggers.connection_wrapper(), assertNumQueries(7), connection.cursor() as cursor:
+    with triggers.connection_wrapper(), transaction.atomic(), assertNumQueries(8), connection.cursor() as cursor:
         savepoint_id = transaction.savepoint()  # 1 query: SAVEPOINT
         with triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
 
-        transaction.savepoint_rollback(savepoint_id)  # 1 query: ROLLBACK TO SAVEPOINT
+        transaction.savepoint_rollback(savepoint_id)  # 2 queries: set_config + ROLLBACK TO SAVEPOINT
         cursor.execute("SELECT current_setting('itou.context')")  # 1 query: current_setting
         assert cursor.fetchone() == ("",)
 
@@ -121,8 +122,8 @@ def test_context_laziness():
 @pytest.mark.django_db(transaction=True)
 def test_context_on_error():
     with (
-        transaction.atomic(),
         triggers.connection_wrapper(),
+        transaction.atomic(),
         connection.cursor() as cursor,
         pytest.raises(RuntimeError),
         triggers.context(),
@@ -132,7 +133,7 @@ def test_context_on_error():
         raise RuntimeError("test")
     # Here itou.utils.triggers._context must have been reset
     # So that triggers.context() can be used again with the same context
-    with transaction.atomic(), triggers.connection_wrapper(), connection.cursor() as cursor, triggers.context():
+    with triggers.connection_wrapper(), transaction.atomic(), connection.cursor() as cursor, triggers.context():
         cursor.execute("SELECT current_setting('itou.context')")
         assert cursor.fetchone() == ("{}",)
 
@@ -143,7 +144,6 @@ def test_without_connection_wrapper_set():
             pass
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db(transaction=True)
 def test_missing_context_in_succeeding_calls_in_same_test():
     # In a "classic" Django test, all calls happen in the same transaction
