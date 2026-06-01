@@ -13,3 +13,9 @@ def show_components(request):
         },
     }
     return render(request, "components/index.html", context)
+
+
+@login_not_required
+def demo_buttons_form(request):
+    context = {"reset_url": request.GET.get("reset_url")}
+    return render(request, "components/demo_buttons_form.html", context)
