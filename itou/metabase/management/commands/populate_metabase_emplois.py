@@ -286,9 +286,7 @@ class Command(BaseCommand):
 
     def populate_organizations(self):
         """
-        Populate prescriber organizations,
-        and add a special "ORG_OF_PRESCRIBERS_WITHOUT_ORG" to gather stats
-        of prescriber users *without* any organization.
+        Populate prescriber organizations
         """
         active_user_created_job_applications_filter = Q(
             ~Q(jobapplication__origin=Origin.PE_APPROVAL)
@@ -364,7 +362,6 @@ class Command(BaseCommand):
             organizations.TABLE,
             batch_size=10_000,
             querysets=[queryset],
-            extra_object=organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
 
     def populate_job_seekers(self):
