@@ -250,30 +250,39 @@ def switch_stalled_status(request, public_id):
     return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
-@readonly_view
-@check_request(lambda request: request.from_prescriber)
-def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
-    if list_organization:
-        if not request.current_organization:
-            raise Http404
-        job_seekers_ids = list(
-            User.objects.assigned_job_seeker_ids(request.user, request.current_organization, from_all_coworkers=True)
-        )
-    else:
-        job_seekers_ids = list(User.objects.assigned_job_seeker_ids(request.user, request.current_organization))
+def has_access_to_assignments(request):
+    return request.from_prescriber or (request.from_employer and request.current_organization.is_subject_to_iae_rules)
 
-    user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
-        job_seeker=OuterRef("pk")
-    )
+
+@readonly_view
+@check_request(has_access_to_assignments)
+def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
+    if request.from_employer:
+        if not list_organization:
+            raise PermissionDenied()
+
+        assignments_qs = JobSeekerAssignment.objects.filter(company=request.current_organization)
+        user_applications = JobApplication.objects.for_company(request.current_organization).filter(
+            job_seeker=OuterRef("pk"),
+        )
+    else:  # from prescriber
+        assignments_qs = JobSeekerAssignment.objects.assigned_to(
+            request.user,
+            organization=request.current_organization,
+            from_all_coworkers=list_organization,
+        )
+        user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
+            job_seeker=OuterRef("pk")
+        )
+
+    job_seekers_ids = assignments_qs.values_list("job_seeker_id", flat=True).distinct()
+
     subquery_count = Subquery(
         user_applications.values("job_seeker").annotate(count=Count("pk")).values("count"),
         output_field=IntegerField(),
     )
     subquery_last_action_at = Subquery(
-        JobSeekerAssignment.objects.assigned_to(
-            request.user, organization=request.current_organization, from_all_coworkers=list_organization
-        )
-        .filter(job_seeker=OuterRef("pk"))
+        assignments_qs.filter(job_seeker=OuterRef("pk"))
         .values("job_seeker")
         .annotate(last_action_at=Max("updated_at"))
         .values("last_action_at")[:1],

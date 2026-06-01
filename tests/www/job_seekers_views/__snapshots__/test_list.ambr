@@ -619,7 +619,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 21,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -910,29 +910,6 @@
       }),
       dict({
         'origin': list([
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id" AS "pk"
-          FROM "users_user"
-          WHERE EXISTS
-              (SELECT %s AS "a"
-               FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s
-                           AND U0."professional_id" = %s))
-                      AND U0."job_seeker_id" = ("users_user"."id"))
-               LIMIT 1)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
@@ -1010,10 +987,15 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s,
-                                           %s))
+                 AND "users_user"."id" IN
+                   (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s
+                               AND U0."professional_id" = %s))))
           GROUP BY "users_user"."id",
                    38,
                    39,
@@ -1209,10 +1191,15 @@
                     FROM "users_user" V0
                     LEFT OUTER JOIN "users_jobseekerassignment" V1 ON (V0."id" = V1."job_seeker_id")
                     WHERE (V0."kind" = %s
-                           AND V0."id" IN (%s,
-                                           %s,
-                                           %s,
-                                           %s))
+                           AND V0."id" IN
+                             (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                              FROM "users_jobseekerassignment" U0
+                              WHERE ((U0."company_id" IS NULL
+                                      AND U0."prescriber_organization_id" IS NULL
+                                      AND U0."professional_id" = %s)
+                                     OR (U0."company_id" IS NULL
+                                         AND U0."prescriber_organization_id" = %s
+                                         AND U0."professional_id" = %s))))
                     GROUP BY V0."id",
                              1))
           ORDER BY RANDOM() ASC
@@ -1261,10 +1248,15 @@
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
-                    AND "users_user"."id" IN (%s,
-                                              %s,
-                                              %s,
-                                              %s))
+                    AND "users_user"."id" IN
+                      (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE ((U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" IS NULL
+                               AND U0."professional_id" = %s)
+                              OR (U0."company_id" IS NULL
+                                  AND U0."prescriber_organization_id" = %s
+                                  AND U0."professional_id" = %s))))
              GROUP BY "users_user"."id",
                       1,
                       2,
@@ -1397,10 +1389,15 @@
           LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s,
-                                           %s))
+                 AND "users_user"."id" IN
+                   (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s
+                               AND U0."professional_id" = %s))))
           GROUP BY "users_user"."id",
                    38,
                    39,
@@ -1884,7 +1881,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -2175,28 +2172,6 @@
       }),
       dict({
         'origin': list([
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id" AS "pk"
-          FROM "users_user"
-          WHERE EXISTS
-              (SELECT %s AS "a"
-               FROM "users_jobseekerassignment" U0
-               WHERE (((U0."company_id" IS NULL
-                        AND U0."prescriber_organization_id" IS NULL
-                        AND U0."professional_id" = %s)
-                       OR (U0."company_id" IS NULL
-                           AND U0."prescriber_organization_id" = %s))
-                      AND U0."job_seeker_id" = ("users_user"."id"))
-               LIMIT 1)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
@@ -2273,9 +2248,14 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s))
+                 AND "users_user"."id" IN
+                   (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s))))
           GROUP BY "users_user"."id",
                    38,
                    39,
@@ -2470,9 +2450,14 @@
                     FROM "users_user" V0
                     LEFT OUTER JOIN "users_jobseekerassignment" V1 ON (V0."id" = V1."job_seeker_id")
                     WHERE (V0."kind" = %s
-                           AND V0."id" IN (%s,
-                                           %s,
-                                           %s))
+                           AND V0."id" IN
+                             (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                              FROM "users_jobseekerassignment" U0
+                              WHERE ((U0."company_id" IS NULL
+                                      AND U0."prescriber_organization_id" IS NULL
+                                      AND U0."professional_id" = %s)
+                                     OR (U0."company_id" IS NULL
+                                         AND U0."prescriber_organization_id" = %s))))
                     GROUP BY V0."id",
                              1))
           ORDER BY RANDOM() ASC
@@ -2520,9 +2505,14 @@
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
-                    AND "users_user"."id" IN (%s,
-                                              %s,
-                                              %s))
+                    AND "users_user"."id" IN
+                      (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                       FROM "users_jobseekerassignment" U0
+                       WHERE ((U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" IS NULL
+                               AND U0."professional_id" = %s)
+                              OR (U0."company_id" IS NULL
+                                  AND U0."prescriber_organization_id" = %s))))
              GROUP BY "users_user"."id",
                       1,
                       2,
@@ -2654,9 +2644,14 @@
           LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s))
+                 AND "users_user"."id" IN
+                   (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
+                    FROM "users_jobseekerassignment" U0
+                    WHERE ((U0."company_id" IS NULL
+                            AND U0."prescriber_organization_id" IS NULL
+                            AND U0."professional_id" = %s)
+                           OR (U0."company_id" IS NULL
+                               AND U0."prescriber_organization_id" = %s))))
           GROUP BY "users_user"."id",
                    38,
                    39,
