@@ -2,8 +2,8 @@ import random
 
 import freezegun
 import pytest
-from django.core import management
 from django.core.cache import caches
+from django.core.management import call_command
 from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual
 
@@ -13,10 +13,9 @@ from itou.users.models import User
 from tests.users.factories import JobSeekerFactory
 
 
-@pytest.fixture(name="command")
-def command_fixture(mocker, settings):
+@pytest.fixture()
+def command_setup(mocker, settings):
     settings.METABASE_API_KEY = "metabase-api-key"
-    command = metabase_data.Command()
 
     def card_results(card, *args, **kwargs):
         if card == 272:
@@ -42,22 +41,27 @@ def command_fixture(mocker, settings):
 
     mocker.patch("itou.utils.apis.metabase.Client.fetch_card_results", side_effect=card_results)
 
-    return command
-
 
 @pytest.mark.parametrize("wet_run", [True, False])
-def test_fetch_kpi(caplog, capsys, snapshot, django_capture_on_commit_callbacks, command, wet_run):
+@pytest.mark.usefixtures("command_setup")
+def test_fetch_kpi(caplog, capsys, snapshot, django_capture_on_commit_callbacks, wet_run):
     with django_capture_on_commit_callbacks(execute=True), freezegun.freeze_time("2024-11-20"):
-        command.handle(data="kpi", action="fetch", wet_run=wet_run)
-    assert caches[command.CACHE_NAME].get_many(DatumKey) == snapshot(name="cache")
+        call_command("metabase_data", "kpi", "fetch", wet_run=wet_run)
+    assert caches[metabase_data.Command.CACHE_NAME].get_many(DatumKey) == snapshot(name="cache")
     assert capsys.readouterr() == snapshot(name="stdout and stderr")
-    assert caplog.record_tuples == snapshot(name="logs")
+    duration_position = -2 if wet_run else -1
+    record_tuples = caplog.record_tuples
+    _logger, _level, msg = record_tuples[duration_position]
+    assert msg.startswith("Management command itou.metabase.management.commands.metabase_data succeeded in ")
+    del record_tuples[duration_position]
+    assert record_tuples == snapshot(name="logs")
 
 
-def test_show_kpi(capsys, snapshot, command):
-    caches[command.CACHE_NAME].set_many({key: f"The value of '{key.value}'" for key in DatumKey})
+@pytest.mark.usefixtures("command_setup")
+def test_show_kpi(capsys, snapshot):
+    caches[metabase_data.Command.CACHE_NAME].set_many({key: f"The value of '{key.value}'" for key in DatumKey})
 
-    command.handle(data="kpi", action="show", wet_run=random.choice([True, False]))
+    call_command("metabase_data", "kpi", "show", wet_run=random.choice([True, False]))
     assert capsys.readouterr() == snapshot(name="stdout and stderr")
 
 
@@ -90,7 +94,7 @@ def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
         ],
     )
 
-    management.call_command("metabase_data", "stalled-job-seekers", wet_run=wet_run)
+    call_command("metabase_data", "stalled-job-seekers", wet_run=wet_run)
     if wet_run:
         assertQuerySetEqual(
             User.objects.filter(jobseeker_profile__is_stalled=True),

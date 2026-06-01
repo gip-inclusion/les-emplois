@@ -4,20 +4,15 @@ import itertools
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.enums import ProlongationRequestStatus
-from itou.approvals.management.commands import prolongation_requests_chores
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
-
-
-@pytest.fixture(name="command")
-def command_fixture():
-    return prolongation_requests_chores.Command()
 
 
 def test_unique_approval_for_pending_constraint():
@@ -107,7 +102,7 @@ def test_deny(django_capture_on_commit_callbacks, mailoutbox, postcode, containe
     ],
 )
 def test_chores_send_reminder_to_prescriber_organization_other_members(
-    snapshot, mailoutbox, caplog, command, django_capture_on_commit_callbacks, wet_run, expected
+    snapshot, mailoutbox, caplog, django_capture_on_commit_callbacks, wet_run, expected
 ):
     parameters = itertools.product(
         ProlongationRequestStatus,
@@ -123,14 +118,17 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
 
     with freeze_time():
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle(command="email_reminder", wet_run=wet_run)
+            call_command("prolongation_requests_chores", "email_reminder", wet_run=wet_run)
         assert len(mailoutbox) == expected
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
-    assert caplog.messages == snapshot()
+    assert caplog.messages[:-1] == snapshot()
+    assert caplog.messages[-1].startswith(
+        "Management command itou.approvals.management.commands.prolongation_requests_chores succeeded in "
+    )
 
 
 def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten_days_for_thirty_days(
-    mailoutbox, django_capture_on_commit_callbacks, command
+    mailoutbox, django_capture_on_commit_callbacks
 ):
     prolongation_request = ProlongationRequestFactory()
 
@@ -150,12 +148,12 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten
     for days_ago, expected in specs:
         with freeze_time(prolongation_request.created_at + relativedelta(days=days_ago)):
             with django_capture_on_commit_callbacks(execute=True):
-                command.handle(command="email_reminder", wet_run=True)
+                call_command("prolongation_requests_chores", "email_reminder", wet_run=True)
         assert len(mailoutbox) == expected
 
 
 def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit(
-    mailoutbox, snapshot, django_capture_on_commit_callbacks, command
+    mailoutbox, snapshot, django_capture_on_commit_callbacks
 ):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
     admin_prescribers = PrescriberFactory.create_batch(
@@ -167,7 +165,7 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
 
     with freeze_time(prolongation_request.created_at + relativedelta(days=30)):
         with django_capture_on_commit_callbacks(execute=True):
-            command.handle(command="email_reminder", wet_run=True)
+            call_command("prolongation_requests_chores", "email_reminder", wet_run=True)
 
     assert len(mailoutbox) == 11  # prolongation_request.assigned_to and 10 coworkers
 
