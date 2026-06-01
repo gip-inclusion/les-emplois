@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
@@ -18,7 +17,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
-from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
+from itou.www.apply.views.list_views import JobApplicationOrder
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -51,37 +50,27 @@ def test_get(client):
     job_application = JobApplicationFactory(sent_by_authorized_prescriber=True)
     organization = job_application.sender_prescriber_organization
     client.force_login(job_application.sender)
-    for display in JobApplicationsDisplayKind:
-        response = client.get(reverse("apply:list_prescriptions", query={"display": display}))
-        # Has link to export with back_url set
-        exports_link = unquote(
-            reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
+    response = client.get(reverse("apply:list_prescriptions"))
+    # Has link to export with back_url set
+    exports_link = unquote(
+        reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
+    )
+    assertContains(response, exports_link)
+
+    # Has job application link with back_url set
+    job_application_link = unquote(
+        reverse(
+            "apply:details_for_prescriber",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": reverse("apply:list_prescriptions")},
         )
-        assertContains(response, exports_link)
+    )
+    assertContains(response, job_application_link)
 
-        # Has job application link with back_url set
-        job_application_link = unquote(
-            reverse(
-                "apply:details_for_prescriber",
-                kwargs={"job_application_id": job_application.pk},
-                query={"back_url": reverse("apply:list_prescriptions")},
-            )
-        )
-        assertContains(response, job_application_link)
+    # Count job applications used by the template
+    assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
-        if display == JobApplicationsDisplayKind.LIST:
-            # Has link to company with back_url set
-            company_link = unquote(
-                add_url_params(
-                    job_application.to_company.get_card_url(), {"back_url": reverse("apply:list_prescriptions")}
-                )
-            )
-            assertContains(response, company_link)
-
-        # Count job applications used by the template
-        assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
-
-        assertContains(response, job_application.job_seeker.get_inverted_full_name())
+    assertContains(response, job_application.job_seeker.get_inverted_full_name())
 
 
 def test_suspended_approval_info_tooltip(client):
@@ -119,12 +108,8 @@ def test_queries(client, snapshot):
     )
     client.force_login(prescriber)
 
-    with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
-        response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.LIST})
-    assert len(response.context["job_applications_page"].object_list) == 3
-
-    with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
-        response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.TABLE})
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(reverse("apply:list_prescriptions"))
     assert len(response.context["job_applications_page"].object_list) == 3
 
 
@@ -152,13 +137,11 @@ def test_as_unauthorized_prescriber(client, snapshot):
 
     list_url = reverse("apply:list_prescriptions")
     with assertSnapshotQueries(snapshot(name="SQL queries for prescriptions list")):
-        response = client.get(list_url, data={"display": JobApplicationsDisplayKind.LIST})
+        response = client.get(list_url)
 
-    assertContains(response, "<h3>U… S…</h3>", html=True)
     assertNotContains(response, "Supersecretname")
-    assertContains(response, "<h3>IBLE Liz</h3>", html=True)
 
-    response = client.get(list_url, data={"display": JobApplicationsDisplayKind.TABLE})
+    response = client.get(list_url)
     assertContains(response, "U… S…")
     assertNotContains(response, "Supersecretname")
     assertContains(response, "IBLE Liz")
@@ -303,28 +286,6 @@ def test_filtered_by_eligibility_state_prescriber(client):
     assert applications == [eligibility_pending_jobapp]
 
 
-def test_list_display_kind(client):
-    prescriber_jobapp = JobApplicationFactory(sent_by_prescriber=True)
-    client.force_login(prescriber_jobapp.sender)
-    url = reverse("apply:list_prescriptions")
-
-    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures'
-    LIST_VIEW_MARKER = '<div class="c-box--results__header">'
-
-    for display_param, expected_marker in [
-        ({}, TABLE_VIEW_MARKER),
-        ({"display": "invalid"}, TABLE_VIEW_MARKER),
-        ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
-        ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
-    ]:
-        response = client.get(url, display_param)
-        for marker in (LIST_VIEW_MARKER, TABLE_VIEW_MARKER):
-            if marker == expected_marker:
-                assertContains(response, marker)
-            else:
-                assertNotContains(response, marker)
-
-
 def test_filters(client, snapshot):
     client.force_login(PrescriberFactory(membership=True))
 
@@ -339,7 +300,7 @@ def test_archived(client):
     active = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
     archived = JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber, archived_at=timezone.now())
     archived_badge_html = """\
-    <span class="badge rounded-pill badge-sm mb-1 bg-light text-primary"
+    <span class="badge rounded-pill badge-sm bg-light text-primary"
           aria-label="candidature archivée"
           data-bs-toggle="tooltip"
           data-bs-placement="top"
@@ -349,24 +310,23 @@ def test_archived(client):
     """
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")
-    list_display_param = {"display": JobApplicationsDisplayKind.LIST}
-    response = client.get(url, data=list_display_param)
+    response = client.get(url)
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": "", **list_display_param})
+    response = client.get(url, data={"archived": ""})
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": "archived", **list_display_param})
+    response = client.get(url, data={"archived": "archived"})
     assertNotContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "all", **list_display_param})
+    response = client.get(url, data={"archived": "all"})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "invalid", **list_display_param})
+    response = client.get(url, data={"archived": "invalid"})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
@@ -411,41 +371,16 @@ def test_htmx_filters(client):
     )
     update_page_with_htmx(page, f"form[hx-get='{url}']", response)
 
-    response = client.get(url, {"states": ["refused"]})
-    fresh_page = parse_response_to_soup(response, selector="#main")
-    assertSoupEqual(page, fresh_page)
-
-    # Switch display kind
-    [display_input] = page.find_all(id="display-kind")
-    display_input["value"] = JobApplicationsDisplayKind.TABLE.value
-
-    response = client.get(
-        url,
-        {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE},
-        headers={"HX-Request": "true"},
-    )
-    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
-
-    response = client.get(url, {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE})
-    fresh_page = parse_response_to_soup(response, selector="#main")
-    assertSoupEqual(page, fresh_page)
-
 
 @freeze_time("2024-11-27", tick=True)
-def test_list_and_table_empty_snapshot(client, snapshot):
+def test_empty_snapshot(client, snapshot):
     prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")
-
-    for display_param in [
-        {},
-        {"display": JobApplicationsDisplayKind.LIST},
-        {"display": JobApplicationsDisplayKind.TABLE},
-    ]:
-        response = client.get(url, display_param)
-        page = parse_response_to_soup(response, selector="#job-applications-section")
-        assert pretty_indented(page) == snapshot(name="empty")
+    response = client.get(url)
+    page = parse_response_to_soup(response, selector="#job-applications-section")
+    assert pretty_indented(page) == snapshot(name="empty")
 
 
 def test_exports_as_prescriber(client):
@@ -564,15 +499,14 @@ def test_reset_filter_button_snapshot(client, snapshot):
         name="off-canvas buttons in list view"
     )
 
-    filter_params["display"] = JobApplicationsDisplayKind.TABLE
     filter_params["order"] = JobApplicationOrder.CREATED_AT_ASC
     response = client.get(reverse("apply:list_prescriptions"), filter_params)
 
     assert pretty_indented(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
-        name="reset-filter button in table view & created_at ascending order"
+        name="reset-filter button & created_at ascending order"
     )
     assert pretty_indented(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
-        name="off-canvas buttons in table view & created_at ascending order"
+        name="off-canvas buttons & created_at ascending order"
     )
 
 
@@ -600,7 +534,6 @@ def test_order(client, subtests):
 
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")
-    query_params = {"display": JobApplicationsDisplayKind.TABLE}
 
     expected_order = {
         "created_at": [zorro_application, alice_first_application, alice_second_application],
@@ -608,19 +541,19 @@ def test_order(client, subtests):
     }
 
     with subtests.test(order="<missing_value>"):
-        response = client.get(url, query_params)
+        response = client.get(url)
         assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
 
     with subtests.test(order="<invalid_value>"):
-        response = client.get(url, query_params | {"order": "invalid_value"})
+        response = client.get(url, {"order": "invalid_value"})
         assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
 
     for order, applications in expected_order.items():
         with subtests.test(order=order):
-            response = client.get(url, query_params | {"order": order})
+            response = client.get(url, {"order": order})
             assert response.context["job_applications_page"].object_list == applications
 
-            response = client.get(url, query_params | {"order": f"-{order}"})
+            response = client.get(url, {"order": f"-{order}"})
             assert response.context["job_applications_page"].object_list == list(reversed(applications))
 
 
@@ -631,8 +564,7 @@ def test_htmx_order(client):
     prescriber = job_app.sender
     JobApplicationFactory(sent_by_prescriber_alone=True, sender=prescriber)
     client.force_login(prescriber)
-    query_params = {"display": JobApplicationsDisplayKind.TABLE}
-    response = client.get(url, query_params)
+    response = client.get(url)
 
     assertContains(response, "2 résultats")
     simulated_page = parse_response_to_soup(response)
@@ -646,9 +578,9 @@ def test_htmx_order(client):
     [order_input] = simulated_page.find_all(id=ORDER_ID)
     # Simulate click on button
     order_input["value"] = CREATED_AT_ASC
-    response = client.get(url, query_params | {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
+    response = client.get(url, {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
     update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
-    response = client.get(url, query_params | {"order": CREATED_AT_ASC})
+    response = client.get(url, {"order": CREATED_AT_ASC})
     assertContains(response, "2 résultats")
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)
@@ -862,7 +794,7 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
     ]
 
     # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE, "order": "created_at"})
+    response = client.get(url, {"order": "created_at"})
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -884,33 +816,7 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
             )
         ),
     )
-    assert pretty_indented(page) == snapshot(name="applications table")
-
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST, "order": "created_at"})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/prescriber/details",
-                        "/apply/[PK of JobApplication]/prescriber/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
+    assert pretty_indented(page) == snapshot(name="applications")
 
 
 @freeze_time("2024-11-27", tick=True)
@@ -1072,8 +978,7 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         ),
     ]
 
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE, "order": "created_at"})
+    response = client.get(url, {"order": "created_at"})
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -1095,33 +1000,7 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
             )
         ),
     )
-    assert pretty_indented(page) == snapshot(name="applications table")
-
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST, "order": "created_at"})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/prescriber/details",
-                        "/apply/[PK of JobApplication]/prescriber/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
+    assert pretty_indented(page) == snapshot(name="applications")
 
 
 class TestAutocomplete:

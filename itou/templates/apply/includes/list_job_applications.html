@@ -52,25 +52,19 @@
             {% endif %}
         </div>
     {% else %}
-        {% if display_kind.is_table %}
-            <div class="table-responsive mt-3 mt-md-4">
-                {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
-                    <form hx-get="{% url 'apply:list_for_siae_actions' %}?list_url={{ request.get_full_path|urlencode }}"
-                          hx-trigger="change delay:.5"
-                          hx-swap="none"
-                          hx-indicator=".selection-indicator"
-                          data-emplois-elements-visibility-on-selection-controller="selected-application">
-                        {% include "apply/includes/list_table.html" %}
-                    </form>
-                {% else %}
+        <div class="table-responsive mt-3 mt-md-4">
+            {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+                <form hx-get="{% url 'apply:list_for_siae_actions' %}?list_url={{ request.get_full_path|urlencode }}"
+                      hx-trigger="change delay:.5"
+                      hx-swap="none"
+                      hx-indicator=".selection-indicator"
+                      data-emplois-elements-visibility-on-selection-controller="selected-application">
                     {% include "apply/includes/list_table.html" %}
-                {% endif %}
-            </div>
-        {% elif display_kind.is_list %}
-            {% for job_application in job_applications_page %}
-                {% include "apply/includes/list_card_body.html" with csrf_token=csrf_token job_application=job_application job_applications_list_kind=job_applications_list_kind request=request JobApplicationsListKind=JobApplicationsListKind only %}
-            {% endfor %}
-        {% endif %}
+                </form>
+            {% else %}
+                {% include "apply/includes/list_table.html" %}
+            {% endif %}
+        </div>
         {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" extra_attributes='data-emplois-elements-visibility-on-selection="hidden"' request=request only %}
         {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
             <p>
@@ -84,9 +78,8 @@
     {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED or job_applications_list_kind is JobApplicationsListKind.SENT %}
         {% include "apply/includes/list_job_applications_title.html" with title=title request=request only %}
     {% endif %}
-    {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True display_kind=display_kind filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
+    {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
     {% include "apply/includes/list_counter.html" with job_applications_page=job_applications_page request=request only %}
     {% include "apply/includes/job_applications_export_button.html" with list_exports_url=list_exports_url request=request only %}
-    {% include "apply/includes/job_applications_filters/offcanvas_footer.html" with display_kind=display_kind filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
-    {% include "common/list_view_switcher.html" with display_kind=display_kind request=request only %}
+    {% include "apply/includes/job_applications_filters/offcanvas_footer.html" with filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
 {% endif %}
