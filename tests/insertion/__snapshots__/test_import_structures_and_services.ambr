@@ -328,7 +328,7 @@
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 53,
+    'num_queries': 51,
     'queries': list([
       dict({
         'origin': list([
@@ -341,23 +341,15 @@
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'CollectionDiffer.__iter__[utils/diff.py]',
+          'Command.import_data_inclusion_reference_data[insertion/management/commands/import_structures_and_services.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
           'wrapper[itoutils/django/commands.py]',
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1552,16 +1544,6 @@
                                                                             "genericreferenceitem_id")
           VALUES (%s, %s) ON CONFLICT DO NOTHING
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

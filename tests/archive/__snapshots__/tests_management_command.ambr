@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 87,
+    'num_queries': 85,
     'queries': list([
       dict({
         'origin': list([
@@ -955,23 +955,14 @@
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[itoutils/django/commands.py]',
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -3520,16 +3511,6 @@
                                       %s,
                                       %s)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
