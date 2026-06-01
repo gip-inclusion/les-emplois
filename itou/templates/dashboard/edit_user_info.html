@@ -14,19 +14,6 @@
     {% endcomponent_title %}
 {% endblock %}
 
-{% block title_messages %}
-    {{ block.super }}
-    {% if extra_data %}
-        {% component_alert content=content variant="info" icon=False %}
-            {% fragment as content %}
-                <p class="mb-0">
-                    Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte France Travail (récupérés lors de votre connexion du {{ extra_data.created_at|date:"d F Y" }}).
-                </p>
-            {% endfragment %}
-        {% endcomponent_alert %}
-    {% endif %}
-{% endblock %}
-
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
