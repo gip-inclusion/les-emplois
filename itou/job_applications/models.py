@@ -546,6 +546,14 @@ class JobApplicationQuerySet(models.QuerySet):
             updated_at__lte=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY,
         )
 
+    def for_company(self, company):
+        """
+        Returns job applications sent by a company or received by a company and still visible.
+        """
+        sent_to_company = Exists(self.filter(pk=OuterRef("pk"), to_company=company).visible_by_employers())
+        sent_by_company = Q(sender_company=company) & ~Q(to_company=company)
+        return self.filter(sent_to_company | sent_by_company)
+
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """
