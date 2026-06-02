@@ -213,21 +213,6 @@ class TestProConnectModel:
         assert user.username == pro_connect.oidc_userinfo["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
-    def test_get_existing_user_with_same_email_IC(self, pro_connect):
-        """
-        If there already is an existing IC user with email ProConnect sent us, we do not create it again,
-        We user it and we update it with the data form the identity_provider.
-        """
-        pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
-        PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
-        with triggers.fake_context():
-            user, created = pc_user_data.create_or_update_user()
-        assert not created
-        assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
-        assert user.first_name == pro_connect.oidc_userinfo["given_name"]
-        assert user.username == pro_connect.oidc_userinfo["sub"]
-        assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
-
     def test_update_user_from_user_info(self, pro_connect):
         user = PrescriberFactory(**dataclasses.asdict(ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)))
         pc_user = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
@@ -715,7 +700,7 @@ class TestProConnectLogout:
 
     def test_django_account_logout_from_pro(self, client, pro_connect):
         """
-        When ac ProConnect user wants to log out from his local account,
+        When a ProConnect user wants to log out from his local account,
         he should be logged out too from ProConnect.
         """
         PrescriberFactory(

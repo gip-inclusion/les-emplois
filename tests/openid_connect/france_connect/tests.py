@@ -544,8 +544,8 @@ class TestFranceConnect:
     @respx.mock
     def test_django_account_logout_from_fc(self, client):
         """
-        When ac IC user wants to log out from his local account,
-        he should be logged out too from IC.
+        When a France Connect user wants to log out from his local account,
+        he should be logged out too from France Connect.
         """
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
         response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")

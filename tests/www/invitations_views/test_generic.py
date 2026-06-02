@@ -605,7 +605,7 @@ class ProConnectSignupTestAcceptInvitation:
         )
         # After logout, the SSO redirects to previous_url (see redirect_url param in expected_redirect_url)
         response = client.get(previous_url, follow=True)
-        # Signup should have failed : as the email used in IC isn't the one from the invitation
+        # Signup should have failed : as the email used in ProConnect isn't the one from the invitation
         assertMessages(
             response,
             [

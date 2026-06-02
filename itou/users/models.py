@@ -373,7 +373,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     | models.Q(identity_provider=IdentityProvider.FRANCE_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.PE_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind__in=UserKind.professionals())
-                    | models.Q(identity_provider=IdentityProvider.INCLUSION_CONNECT, kind__in=UserKind.professionals())
                 ),
             ),
         ]

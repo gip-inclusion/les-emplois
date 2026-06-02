@@ -37,7 +37,6 @@ class Title(models.TextChoices):
 class IdentityProvider(models.TextChoices):
     DJANGO = "DJANGO", "Django"
     FRANCE_CONNECT = "FC", "FranceConnect"
-    INCLUSION_CONNECT = "IC", "Inclusion Connect"
     PRO_CONNECT = "PC", "ProConnect"
     PE_CONNECT = "PEC", "Pôle emploi Connect"
 
@@ -45,7 +44,6 @@ class IdentityProvider(models.TextChoices):
 IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
     IdentityProvider.DJANGO: tuple(UserKind.values),
     IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
-    IdentityProvider.INCLUSION_CONNECT: (),  # Not supported anymore
     IdentityProvider.PE_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.PRO_CONNECT: UserKind.professionals(),
 }

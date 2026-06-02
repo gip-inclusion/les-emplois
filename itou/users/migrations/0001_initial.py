@@ -291,7 +291,6 @@ class Migration(migrations.Migration):
                         choices=[
                             ("DJANGO", "Django"),
                             ("FC", "FranceConnect"),
-                            ("IC", "Inclusion Connect"),
                             ("PC", "ProConnect"),
                             ("PEC", "Pôle emploi Connect"),
                         ],

@@ -167,7 +167,7 @@ class ItouCurrentOrganizationMiddleware:
             and (request.from_employer or request.from_prescriber)
             and not request.path.startswith(
                 "/dashboard/activate-pro-connect-account"
-            )  # Allow to access ic activation view
+            )  # Allow to access ProConnect activation view
             and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
             and settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
         ):

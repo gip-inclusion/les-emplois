@@ -439,7 +439,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
 def random_user_kind_factory(**kwargs):
     factory = None
     if identity_provider := kwargs.get("identity_provider"):
-        if identity_provider in [IdentityProvider.PRO_CONNECT, IdentityProvider.INCLUSION_CONNECT]:
+        if identity_provider == IdentityProvider.PRO_CONNECT:
             factory = random.choice(
                 [
                     functools.partial(PrescriberFactory, membership=True),
