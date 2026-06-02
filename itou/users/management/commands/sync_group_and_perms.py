@@ -180,6 +180,7 @@ def get_permissions_dict():
         },
         "geiq-assessments": {
             geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
+            geiq_assessments_models.Assessment: PERMS_DELETE,
         },
     }
 

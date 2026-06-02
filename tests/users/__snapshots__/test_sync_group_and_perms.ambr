@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_command[geiq-assessments]
   list([
+    'delete_assessment',
+    'view_assessment',
     'add_assessmentcampaign',
     'change_assessmentcampaign',
     'view_assessmentcampaign',
@@ -300,6 +302,8 @@
     'group name=geiq-assessments created',
     'group name=geiq-assessments, permission add_assessmentcampaign added',
     'group name=geiq-assessments, permission change_assessmentcampaign added',
+    'group name=geiq-assessments, permission delete_assessment added',
+    'group name=geiq-assessments, permission view_assessment added',
     'group name=geiq-assessments, permission view_assessmentcampaign added',
     'group name=gps-admin created',
     'group name=gps-admin, permission add_followupgroup added',
