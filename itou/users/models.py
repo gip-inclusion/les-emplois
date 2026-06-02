@@ -1286,6 +1286,11 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
 
         self.set_old_values()
 
+    def validate_constraints(self, exclude=None):
+        if not self.asp_uid:
+            exclude = set(exclude or []) | {"asp_uid"}
+        super().validate_constraints(exclude=exclude)
+
     @staticmethod
     def clean_pole_emploi_fields(cleaned_data):
         """

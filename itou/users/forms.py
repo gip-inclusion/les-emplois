@@ -69,8 +69,7 @@ class JobSeekerProfileFieldsMixin:
         except ValidationError as e:
             self._update_errors(e)
         try:
-            exclude = ["asp_uid"] if not jobseeker_profile.asp_uid else []
-            jobseeker_profile.validate_constraints(exclude=exclude)
+            jobseeker_profile.validate_constraints()
         except ValidationError as e:
             self._update_errors(e)
 
