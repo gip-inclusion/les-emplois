@@ -335,10 +335,12 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             ]
         ):
             self.pe_log_err(
-                "had an invalid user_first_name={} user_last_name={} nir={}",
-                self.user_first_name,
-                self.user_last_name,
-                self.user_nir,
+                "approval is missing information in fields: %s",
+                [
+                    f
+                    for f in ("user_first_name", "user_last_name", "user_nir", "user_birthdate")
+                    if not getattr(self, f)
+                ],
             )
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
