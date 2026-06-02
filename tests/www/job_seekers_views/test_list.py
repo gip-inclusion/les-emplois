@@ -28,6 +28,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
 )
 from tests.users.factories import (
+    EmployerFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
@@ -989,50 +990,67 @@ def test_filtered_by_is_stalled(client):
     assert response.context["page_obj"].object_list == [stalled.job_seeker]
 
 
-def test_filtered_by_organization_members(client):
-    organization = PrescriberOrganizationWith2MembershipFactory(
-        authorized=True, membership1__user__first_name="Alice", membership2__user__first_name="Billy"
-    )
-    prescriber = organization.members.first()
+@pytest.mark.parametrize(
+    "org_factory,membership_factory",
+    [
+        (
+            PrescriberOrganizationWith2MembershipFactory,
+            lambda org: partial(PrescriberMembershipFactory, organization=org),
+        ),
+        (
+            partial(CompanyWith2MembershipsFactory, subject_to_iae_rules=True),
+            lambda org: partial(CompanyMembershipFactory, company=org),
+        ),
+    ],
+    ids=["filtered_by_prescribers", "filtered_by_employers"],
+)
+def test_filtered_by_organization_members(client, org_factory, membership_factory):
+    organization = org_factory(membership1__user__first_name="Alice", membership2__user__first_name="Billy")
+    is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+    is_company = isinstance(organization, Company)
+    professional = organization.members.first()
     member = organization.members.last()
-    old_member = PrescriberMembershipFactory(
-        organization=organization, user__is_active=False, user__first_name="Charlie"
-    ).user
-    other_prescriber_not_in_orga = PrescriberFactory(first_name="Deborah")
+    old_member = membership_factory(organization)(user__is_active=False, user__first_name="Charlie").user
+    other_pro_not_in_orga = PrescriberFactory(first_name="Deborah")
+    prescriber_organization = is_prescriber_organization and organization or None
+    company = is_company and organization or None
 
-    job_seeker_assigned_to_prescriber = JobSeekerAssignmentFactory(
-        professional=prescriber,
-        prescriber_organization=organization,
+    job_seeker_assigned_to_professional = JobSeekerAssignmentFactory(
+        professional=professional,
+        prescriber_organization=prescriber_organization,
+        company=company,
     ).job_seeker
 
     job_seeker_assigned_to_member = JobSeekerAssignmentFactory(
         professional=member,
-        prescriber_organization=organization,
+        prescriber_organization=prescriber_organization,
+        company=company,
     ).job_seeker
 
     job_seeker_assigned_to_old_member = JobSeekerAssignmentFactory(
         professional=old_member,
-        prescriber_organization=organization,
+        prescriber_organization=prescriber_organization,
+        company=company,
     ).job_seeker
 
     JobSeekerAssignmentFactory(
-        job_seeker=job_seeker_assigned_to_prescriber,
-        professional=other_prescriber_not_in_orga,
+        job_seeker=job_seeker_assigned_to_professional,
+        professional=other_pro_not_in_orga,
     )
 
-    client.force_login(prescriber)
-    url = reverse("job_seekers_views:list_organization")
+    client.force_login(professional)
 
+    url = reverse("job_seekers_views:list_organization")
     response = client.get(url)
     assert response.context["page_obj"].object_list == [
         job_seeker_assigned_to_old_member,
         job_seeker_assigned_to_member,
-        job_seeker_assigned_to_prescriber,
+        job_seeker_assigned_to_professional,
     ]
 
-    for organization_member in [prescriber, member, old_member]:
+    for organization_member in [professional, member, old_member]:
         assertContains(response, organization_member.get_full_name())
-    assertNotContains(response, other_prescriber_not_in_orga.get_full_name())
+    assertNotContains(response, other_pro_not_in_orga.get_full_name())
 
     response = client.get(url, {"organization_members": member.pk})
     assert response.context["page_obj"].object_list == [job_seeker_assigned_to_member]
