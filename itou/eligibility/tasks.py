@@ -117,7 +117,8 @@ def certify_criterion_with_api_france_travail(criterion):
     with pole_emploi_agent_api_client() as pe_client:
         user_found = False
         try:
-            data = pe_client.rqth(jobseeker_profile=profile)
+            token = pe_client.rechercher_usager(jobseeker_profile=profile)
+            data = pe_client.rqth(token)
         except (UserDoesNotExist, MultipleUsersReturned) as e:
             logger.info("Could not certify criterion %r: json=%s", criterion, e.response_data)
             criterion.data_returned_by_api = e.response_data

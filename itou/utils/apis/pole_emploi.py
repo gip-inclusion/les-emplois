@@ -426,7 +426,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     def rechercher_usager(self, jobseeker_profile):
         """Find a user by pivot data (birthdate and nir or pole_emploi_id)
         and return a crypted token (`jeton usager`).
-        `profile`: users.models.JobSeekerProfile (not included as a type hint because of a circular import issue).
+        `jobseeker_profile`: users.models.JobSeekerProfile (not included as a type hint because of circular imports).
         return: "a_long_jeton_usager"
         """
         birthdate, nir, pole_emploi_id = (
@@ -456,8 +456,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
         return data["jetonUsager"]
 
-    def rqth(self, jobseeker_profile):
-        jeton_usager = self.rechercher_usager(jobseeker_profile=jobseeker_profile)
+    def rqth(self, jeton_usager):
         data = self._request(
             f"{self.base_url}{Endpoints.RQTH}",
             method="GET",
