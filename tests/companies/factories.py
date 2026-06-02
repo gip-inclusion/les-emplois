@@ -158,7 +158,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             ),
             email="contact@acmeinc.com",
             phone="0612345678",
-            siret="012345678910",
+            siret="01234567891001",
         )
 
     # Don't start a SIRET with 0.

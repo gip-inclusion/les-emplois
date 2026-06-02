@@ -257,7 +257,7 @@
 # name: TestExportCTA.test_export[streaming content]
   '''
   Utilisateur - type,Structure - type,Structure - nom,Structure - SIRET,Structure - adresse ligne 1,Structure - adresse ligne 2,Structure - code postal,Structure - ville,Structure - département,Structure - région,Utilisateur - prénom,Utilisateur - nom,Utilisateur - e-mail,Administrateur ?,Utilisateur - date d'inscription,Utilisateur - date de dernière connexion
-  Employeur,EI,ACME Inc.,012345678910,112 rue de la Croix-Nivert,,75015,Paris,75,Île-de-France,John,Doe,john.doe@test.local,Oui,17-05-2024,
+  Employeur,EI,ACME Inc.,01234567891001,112 rue de la Croix-Nivert,,75015,Paris,75,Île-de-France,John,Doe,john.doe@test.local,Oui,17-05-2024,
   Orienteur,FT,Pres. Org.,012345678910,39 rue d'Artois,,75008,Paris,75,Île-de-France,Pierre,Dupont,pierre.dupont@test.local,Oui,17-05-2024,17-05-2024
   
   '''
@@ -495,7 +495,7 @@
 # name: TestExportFS3437.test_export[streaming content]
   '''
   idItou,nomUsage,prenom,dateNaissance,numeroIDE,NIR,NTT,passIae,siret,mesure,horodatage
-  a08dbdb523633cfc59dfdb297307a1,Doe,Jane,01/01/1990,,290010101010125,,999999999999,012345678910,EI_DC,
+  a08dbdb523633cfc59dfdb297307a1,Doe,Jane,01/01/1990,,290010101010125,,999999999999,01234567891001,EI_DC,
   
   '''
 # ---
