@@ -1027,7 +1027,7 @@ class MockedCompanySignupTokenGenerator(CompanySignupTokenGenerator):
 
 class TestCompanySignupTokenGenerator:
     def test_make_token(self):
-        company = Company.objects.create()
+        company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
         assert p0.check_token(company, tk1) is True
@@ -1037,7 +1037,7 @@ class TestCompanySignupTokenGenerator:
         The token generated for a siae created in the same request
         will work correctly.
         """
-        company = Company.objects.create(email="itou@example.com")
+        company = CompanyFactory(email="itou@example.com")
         siae_reload = Company.objects.get(email="itou@example.com")
         p0 = MockedCompanySignupTokenGenerator(datetime.datetime.now())
         tk1 = p0.make_token(company)
@@ -1048,7 +1048,7 @@ class TestCompanySignupTokenGenerator:
         """The token is valid after n seconds, but no greater."""
         # Uses a mocked version of CompanySignupTokenGenerator so we can change
         # the value of 'now'.
-        company = Company.objects.create()
+        company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
         p1 = MockedCompanySignupTokenGenerator(
@@ -1061,7 +1061,7 @@ class TestCompanySignupTokenGenerator:
         assert p2.check_token(company, tk1) is False
 
     def test_check_token_with_nonexistent_token_and_user(self):
-        company = Company.objects.create()
+        company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
         assert p0.check_token(None, tk1) is False
@@ -1073,7 +1073,7 @@ class TestCompanySignupTokenGenerator:
         Tokens are based on siae.members.count() so that
         any new signup invalidates past tokens.
         """
-        company = Company.objects.create()
+        company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
         assert p0.check_token(company, tk1) is True
