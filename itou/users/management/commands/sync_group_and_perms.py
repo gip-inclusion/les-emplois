@@ -87,7 +87,7 @@ def get_permissions_dict():
         files_models.File: PERMS_READ,
         geo_models.QPV: PERMS_READ,
         geo_models.ZRR: PERMS_READ,
-        geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
+        geiq_assessments_models.AssessmentCampaign: PERMS_READ,
         geiq_assessments_models.Assessment: PERMS_READ,
         geiq_assessments_models.Employee: PERMS_READ,
         geiq_assessments_models.EmployeeContract: PERMS_READ,
@@ -177,6 +177,9 @@ def get_permissions_dict():
             siae_evaluations_models.EvaluatedJobApplicationSanction: PERMS_ALL,
             siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_ALL,
             siae_evaluations_models.Sanctions: PERMS_ALL,
+        },
+        "geiq-assessments": {
+            geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
         },
     }
 
