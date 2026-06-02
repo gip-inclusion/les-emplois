@@ -773,7 +773,7 @@ class TestAssessmentContractsDetails:
         )
 
         def check_user_access_to_tabs(
-            user, *, access, tabs=AssessmentContractDetailsTab.get_common_tabs(), with_previous_year_warning=False
+            user, *, status_code, tabs=AssessmentContractDetailsTab.get_common_tabs(), with_previous_year_warning=False
         ):
             client.force_login(user)
             if user == geiq_membership.user:
@@ -784,7 +784,7 @@ class TestAssessmentContractsDetails:
                 viewable_tabs_for_user = AssessmentContractDetailsTab.get_institution_tabs()
             for tab in tabs:
                 tab_url = self.get_tab_url(tab, contract.pk)
-                if access and tab in viewable_tabs_for_user:
+                if status_code == 200 and tab in viewable_tabs_for_user:
                     with assertSnapshotQueries(snapshot(name=f"SQL queries for {tab=} as {user_label}")):
                         response = client.get(tab_url)
                     assertContains(response, "DUPONT Jean")
@@ -794,22 +794,32 @@ class TestAssessmentContractsDetails:
                         assertNotContains(response, PREVIOUS_YEAR_WARNING)
                 else:
                     response = client.get(tab_url)
-                    assert response.status_code == 404
+                    assert response.status_code == status_code
 
-        check_user_access_to_tabs(geiq_membership.user, access=True)
+        check_user_access_to_tabs(geiq_membership.user, status_code=200)
 
         # DDETS user should not access the contract details before submission
-        check_user_access_to_tabs(ddets_membership.user, access=False)
+        check_user_access_to_tabs(ddets_membership.user, status_code=404)
 
         # Submit the assessment
         assessment.submit(user=geiq_membership.user)
-        check_user_access_to_tabs(ddets_membership.user, access=True)
+        check_user_access_to_tabs(ddets_membership.user, status_code=200)
 
         # Now for contract without allowance requested
         contract.allowance_requested = False
         contract.save()
-        check_user_access_to_tabs(geiq_membership.user, access=True)
-        check_user_access_to_tabs(ddets_membership.user, access=False)
+        check_user_access_to_tabs(geiq_membership.user, status_code=200)
+        check_user_access_to_tabs(ddets_membership.user, status_code=404)
+
+        # Now for contract with previous year info
+        contract.employee.allowance_granted_previous_year = True
+        contract.employee.save()
+        contract.allowance_requested = True
+        contract.save()
+        check_user_access_to_tabs(ddets_membership.user, status_code=200, with_previous_year_warning=True)
+        check_user_access_to_tabs(geiq_membership.user, status_code=200, with_previous_year_warning=True)
+        contract.employee.allowance_granted_previous_year = False
+        contract.employee.save()
 
         # GEIQ only tabs
         # --------------------------------------------------------------------
@@ -818,17 +828,21 @@ class TestAssessmentContractsDetails:
         contract.save()
         assert not contract.requires_justification
         check_user_access_to_tabs(
-            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], access=False
+            geiq_membership.user,
+            tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION],
+            status_code=404,
         )
         # Justification tab is available for contract <90 days with allowance_requested=True
         contract.nb_days_in_campaign_year = 1
         contract.save()
         assert contract.requires_justification
         check_user_access_to_tabs(
-            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], access=True
+            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], status_code=200
         )
         check_user_access_to_tabs(
-            ddets_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION], access=False
+            ddets_membership.user,
+            tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION],
+            status_code=404,
         )  # institution users still do not have access
 
         # Institution only tabs
@@ -836,25 +850,23 @@ class TestAssessmentContractsDetails:
         # Justification tab is available when allowance_granted=False
         assert contract.allowance_granted is False
         check_user_access_to_tabs(
-            ddets_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION], access=True
+            ddets_membership.user,
+            tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION],
+            status_code=200,
         )
         contract.allowance_granted = True
         contract.save()
         # Justification tab is not available when allowance_granted=True
         check_user_access_to_tabs(
-            geiq_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION], access=False
+            geiq_membership.user,
+            tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION],
+            status_code=404,
         )
         check_user_access_to_tabs(
-            ddets_membership.user, tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION], access=False
+            ddets_membership.user,
+            tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION],
+            status_code=404,
         )  # GEIQ users do not have access
-
-        # Now for contract with previous year info
-        contract.employee.allowance_granted_previous_year = True
-        contract.employee.save()
-        contract.allowance_requested = True
-        contract.save()
-        check_user_access_to_tabs(ddets_membership.user, access=True, with_previous_year_warning=True)
-        check_user_access_to_tabs(geiq_membership.user, access=True, with_previous_year_warning=True)
 
     @pytest.mark.parametrize("short_contract", [True, False], ids=["contract < 90 days", "contract >= 90 days"])
     def test_contract_request_allowance_as_geiq(self, client, snapshot, short_contract):
