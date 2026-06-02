@@ -116,7 +116,7 @@ class TransitionLogInline(ReadonlyMixin, ItouTabularInline):
 
 
 @admin.register(models.Assessment)
-class AssessmentAdmin(ReadonlyMixin, ItouModelAdmin):
+class AssessmentAdmin(ItouModelAdmin):
     list_display = [
         "label_geiq_name",
         "campaign",
@@ -193,6 +193,29 @@ class AssessmentAdmin(ReadonlyMixin, ItouModelAdmin):
             },
         ),
     )
+
+    def has_add_permission(self, *args, **kwargs):
+        return False
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        # One can only delete "new" assessments (with the matching permission)
+        if obj and obj.submitted_at:
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def get_deleted_objects(self, objs, request):
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+        # Don't block Assessment deletion for those objects
+        for model in [
+            models.Employee,
+            models.EmployeeContract,
+            models.EmployeePrequalification,
+        ]:
+            perms_needed.discard(model._meta.verbose_name)
+        return to_delete, model_count, perms_needed, protected
 
 
 class EmployeeContractInline(ReadonlyMixin, ItouTabularInline):

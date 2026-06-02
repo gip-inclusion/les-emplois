@@ -5,10 +5,16 @@ from django.urls import reverse
 from pytest_django.asserts import assertMessages
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments.models import Assessment
 from itou.utils.apis import geiq_label
 from tests.companies.factories import CompanyFactory
 from tests.geiq.factories import GeiqLabelDataFactory
-from tests.geiq_assessments.factories import AssessmentCampaignFactory
+from tests.geiq_assessments.factories import (
+    AssessmentCampaignFactory,
+    AssessmentFactory,
+    EmployeeContractFactory,
+    EmployeePrequalificationFactory,
+)
 
 
 def test_sync_assessments_without_conf(admin_client, settings):
@@ -88,3 +94,28 @@ def test_sync_assessments_all_good(admin_client, label_settings, mocker):
     assert campaign.label_infos
     assert len(campaign.label_infos.data) == 1
     assert campaign.label_infos.data[0]["siret"] == geiq.siret
+
+
+@pytest.mark.parametrize("submitted", [True, False])
+def test_delete_assessment(admin_client, submitted):
+    assessment = AssessmentFactory(with_submission_requirements=True)
+    if submitted:
+        assessment.submit(user=assessment.created_by)
+        # Since a submitted assessment cannot be deleted, don't bother with extra objects
+    else:
+        EmployeeContractFactory(employee__assessment=assessment)
+        EmployeePrequalificationFactory(employee__assessment=assessment)
+    response = admin_client.post(
+        reverse("admin:geiq_assessments_assessment_changelist"),
+        {
+            "action": "delete_selected",
+            "post": "yes",
+            "_selected_action": str(assessment.pk),
+        },
+    )
+    if submitted:
+        assert response.status_code == 403
+        assert Assessment.objects.filter(pk=assessment.pk).exists()
+    else:
+        assert response.status_code == 302
+        assert not Assessment.objects.filter(pk=assessment.pk).exists()
