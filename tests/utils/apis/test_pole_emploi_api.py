@@ -508,17 +508,10 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
     )
     @respx.mock
     def test_rqth(self, json_response, expected_data):
-        respx.post(settings.API_ESD["BASE_URL"] + Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR).respond(
-            200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.CERTIFIED]
-        )
-
         respx.get(settings.API_ESD["BASE_URL"] + Endpoints.RQTH).respond(200, json=json_response)
 
-        # The RQTH certification calls two endpoints: rechercher_usager and donnees_rqth.
-        # Use a context manager to reuse the same HTTP client.
-        # See BasePoleEmploiApiClient._httpx_client
         with self.api_client as client:
-            data = client.rqth(jobseeker_profile=JobSeekerProfileFactory())
+            data = client.rqth("a_long_token")
         for key, value in expected_data.items():
             assert data[key] == value
         assert data["raw_response"] == json_response
