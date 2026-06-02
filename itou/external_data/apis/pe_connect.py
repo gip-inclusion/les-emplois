@@ -160,7 +160,6 @@ def set_pe_data_import_from_user_data(user, user_data):
 def import_user_pe_data(
     user,
     token,
-    pe_data_import=None,
     triggers_context=None,
 ):
     """

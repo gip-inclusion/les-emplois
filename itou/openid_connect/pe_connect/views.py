@@ -193,7 +193,7 @@ def pe_connect_callback(request):
     # Fetch external data if birthdate or address is missing
     if not user.jobseeker_profile.birthdate or not user.address_on_one_line:
         triggers_context = triggers.get_current_context() or {}
-        huey_import_user_pe_data(user, access_token, None, triggers_context)
+        huey_import_user_pe_data(user, access_token, triggers_context=triggers_context)
 
     login(request, user)
     # Keep token_data["id_token"] to logout from PEAMU
