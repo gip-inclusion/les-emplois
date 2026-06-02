@@ -1,0 +1,17 @@
+{% load matomo %}
+
+{% matomo_event "candidat" "clic" matomo_event_label as matomo_event_attrs %}
+{% for job_application in job_applications %}
+    {% if job_application.to_company == request.current_organization %}
+        {% url 'apply:details_for_company' job_application_id=job_application.id as detail_url %}
+    {% else %}
+        {% url 'apply:details_for_prescriber' job_application_id=job_application.id as detail_url %}
+    {% endif %}
+    {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application detail_url=detail_url can_view_personal_information=can_view_personal_information matomo_event_attrs=matomo_event_attrs request=request only %}
+{% empty %}
+    <div class="c-box c-box--results my-3 my-md-4">
+        <div class="c-box--results__body">
+            <p class="mb-0">{{ no_application_text }}</p>
+        </div>
+    </div>
+{% endfor %}

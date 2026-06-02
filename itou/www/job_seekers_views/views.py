@@ -159,6 +159,16 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
 
         can_see_external = can_see_external_job_applications(self.object, self.request)
         job_applications = self.get_job_applications(can_see_external)
+        received_job_applications, sent_job_applications = None, job_applications
+
+        if self.request.from_employer:
+            received_job_applications, sent_job_applications = [], []
+            for job_app in job_applications:
+                if job_app.to_company.id == self.request.current_organization.pk:
+                    received_job_applications.append(job_app)
+                elif job_app.sender_company.id == self.request.current_organization.pk:
+                    sent_job_applications.append(job_app)
+
         has_external_applications = any(not a.user_can_see_details for a in job_applications)
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -168,7 +178,8 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             "approval": approval,
             "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
             "contracts": self.get_contracts(self.request, approval),
-            "job_applications": job_applications,
+            "received_job_applications": received_job_applications,
+            "sent_job_applications": sent_job_applications,
             "can_see_external_job_applications": can_see_external,
             "has_external_applications": has_external_applications,
             # already checked in test_func because the user name is displayed in the title
@@ -180,16 +191,23 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
         }
 
     def get_job_applications(self, can_see_external):
-        own_applications_qs = self.object.job_applications.prescriptions_of(
-            self.request.user,
-            self.request.current_organization,
-        )
+        if self.request.from_employer:
+            # Retrieve the applications of the job seeker sent by the company or to the company
+            applications_qs = JobApplication.objects.for_company(self.request.current_organization).filter(
+                job_seeker=self.object
+            )
+        else:
+            # Retrieve the applications of the job seeker sent by the prescriber or their organization
+            applications_qs = self.object.job_applications.prescriptions_of(
+                self.request.user,
+                self.request.current_organization,
+            )
         if can_see_external:
             applications = self.object.job_applications.annotate(
-                user_can_see_details=Exists(own_applications_qs.filter(pk=OuterRef("pk"))),
+                user_can_see_details=Exists(applications_qs.filter(pk=OuterRef("pk"))),
             ).all()
         else:
-            applications = own_applications_qs.annotate(user_can_see_details=Value(True)).all()
+            applications = applications_qs.annotate(user_can_see_details=Value(True)).all()
         return applications.select_related("to_company", "sender").prefetch_related("selected_jobs")
 
     def get_contracts(self, request, approval):

@@ -28,7 +28,6 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
 )
 from tests.users.factories import (
-    EmployerFactory,
     JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,

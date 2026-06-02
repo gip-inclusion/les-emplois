@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
 {% load components %}
-{% load matomo %}
 {% load static %}
 {% load str_filters %}
 
@@ -60,18 +59,12 @@
                                 {% endif %}
                             {% endif %}
 
-                            {% matomo_event "candidat" "clic" "detail-candidature" as matomo_event_attrs %}
-                            {% for job_application in job_applications %}
-                                {% url 'apply:details_for_prescriber' job_application_id=job_application.id as detail_url %}
-                                {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
-                            {% empty %}
-                                <div class="c-box c-box--results my-3 my-md-4">
-                                    <div class="c-box--results__body">
-                                        <p class="mb-0">Aucune candidature envoyée.</p>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                            {% include "job_seekers_views/includes/list_job_applications.html" with request=request job_applications=sent_job_applications can_view_personal_information=can_view_personal_information matomo_event_label=request.from_prescriber|yesno:"detail-candidature-prescripteur,detail-candidature-envoyee-employeur" no_application_text="Aucune candidature envoyée." only %}
                         </div>
+                        {% if request.from_employer %}
+                            <h2>Candidatures reçues</h2>
+                            {% include "job_seekers_views/includes/list_job_applications.html" with request=request job_applications=received_job_applications can_view_personal_information=can_view_personal_information matomo_event_label="detail-candidature-recue-employeur" no_application_text="Aucune candidature reçue." only %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
