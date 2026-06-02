@@ -95,6 +95,14 @@ class TestButtonsForm:
         template = Template('{% load buttons_form %}{% itou_buttons_form secondary_name="name" secondary_value="1" %}')
         assert pretty_indented(template.render(Context({}))) == snapshot(name="with_secondary_name_and_value")
 
+    def test_itou_buttons_with_secondary_name_and_value_without_reset_url(self, snapshot):
+        template = Template(
+            '{% load buttons_form %}{% itou_buttons_form secondary_name="name" secondary_value="1" reset_url=None %}'
+        )
+        assert pretty_indented(template.render(Context({}))) == snapshot(
+            name="with_secondary_name_and_value_without_reset_url"
+        )
+
     def test_itou_buttons_matomo_event(self, snapshot):
         template = Template(
             "{% load buttons_form %}"
