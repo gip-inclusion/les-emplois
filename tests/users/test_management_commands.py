@@ -8,7 +8,6 @@ from allauth.account import models as allauth_models
 from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.sessions.models import Session
 from django.core.management import call_command
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
@@ -20,6 +19,7 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.sessions.models import ItouSession
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
 from itou.users.models import NirModificationRequest, User
@@ -217,21 +217,21 @@ class TestDeduplicateJobSeekersManagementCommands:
 
 @freeze_time("2023-03-06 11:40:01")
 def test_shorten_active_sessions():
-    expired_session = Session.objects.create(
+    expired_session = ItouSession.objects.create(
         session_key="expired",
         expire_date=datetime.datetime(2023, 3, 6, tzinfo=datetime.UTC),
     )
-    almost_expired_session = Session.objects.create(
+    almost_expired_session = ItouSession.objects.create(
         session_key="almost_expired",
         expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=datetime.UTC),
     )
-    Session.objects.create(
+    ItouSession.objects.create(
         session_key="active",
         expire_date=datetime.datetime(2023, 3, 7, tzinfo=datetime.UTC),
     )
 
     call_command("shorten_active_sessions")
-    assert list(Session.objects.all().order_by("expire_date").values_list("session_key", "expire_date")) == [
+    assert list(ItouSession.objects.all().order_by("expire_date").values_list("session_key", "expire_date")) == [
         ("expired", expired_session.expire_date),
         ("almost_expired", almost_expired_session.expire_date),
         ("active", timezone.now() + relativedelta(hours=1)),
