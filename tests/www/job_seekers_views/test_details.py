@@ -12,6 +12,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.job_applications.enums import JobApplicationState
 from itou.users.models import JobSeekerAssignment
 from itou.www.job_seekers_views.views import can_see_external_job_applications
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
@@ -405,6 +406,71 @@ def test_job_application_tab(client, snapshot):
         ],
     )
     assert pretty_indented(soup) == snapshot
+
+
+@freeze_time("2026-06-02")
+def test_job_application_tab_as_siae(client, snapshot):
+    employer_membership = CompanyMembershipFactory(
+        user__for_snapshot=True, company__for_snapshot=True, company__subject_to_iae_rules=True
+    )
+    job_application_1 = JobApplicationFactory(
+        for_snapshot=True,
+        sent_by_prescriber_alone=True,
+        to_company=employer_membership.company,
+        created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+    )
+    JobSeekerAssignmentFactory(
+        job_seeker=job_application_1.job_seeker,
+        professional=employer_membership.user,
+        company=employer_membership.company,
+    )
+
+    # Job applications that have not been accepted and are older than 2 years should not be displayed
+    created_at = timezone.now() - datetime.timedelta(days=3 * 365)
+    job_application_2 = JobApplicationFactory(
+        sent_by_employer=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
+        job_seeker=job_application_1.job_seeker,
+        to_company__name="Autre Entreprise",
+        sender=employer_membership.user,
+        sender_company=employer_membership.company,
+        created_at=created_at,
+        state=JobApplicationState.ACCEPTED,
+    )
+
+    prescriber_membership = PrescriberMembershipFactory(
+        organization__authorized=True,
+        organization__name="L'Autre Organisation",
+    )
+    JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        pk=uuid.UUID("11111111-1111-1111-1111-333333333333"),
+        job_seeker=job_application_1.job_seeker,
+        to_company=employer_membership.company,
+        sender=prescriber_membership.user,
+        sender_prescriber_organization=prescriber_membership.organization,
+        created_at=timezone.now() - datetime.timedelta(days=2 * 365 + 2),
+    )
+
+    client.force_login(employer_membership.user)
+    url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application_1.job_seeker.public_id})
+
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(url)
+
+    assert response.context["received_job_applications"] == [job_application_1]
+    assert response.context["sent_job_applications"] == [job_application_2]
+    assertContains(response, "Candidatures envoyées")
+    assertContains(response, "Candidatures reçues")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            ("href", f"/company/{job_application_1.to_company.pk}/card", "/company/[PK of Company]/card"),
+            ("href", f"/company/{job_application_2.to_company.pk}/card", "/company/[PK of Company]/card"),
+        ],
+    )
+    assert pretty_indented(soup) == snapshot(name="HTML")
 
 
 @freeze_time("2024-08-14")
