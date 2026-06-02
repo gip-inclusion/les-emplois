@@ -368,6 +368,10 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
                 name="unique_convention_per_company_from_asp",
                 condition=Q(source=CompanySource.ASP),
             ),
+            models.CheckConstraint(
+                condition=Q(siret__regex=r"\A[0-9]{14}\Z"),
+                name="company_siret_regex",
+            ),
         ]
         permissions = [
             ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
