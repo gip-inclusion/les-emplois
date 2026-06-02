@@ -47,7 +47,7 @@ def command_fixture(mocker, settings):
 
 @pytest.mark.parametrize("wet_run", [True, False])
 def test_fetch_kpi(caplog, capsys, snapshot, django_capture_on_commit_callbacks, command, wet_run):
-    with django_capture_on_commit_callbacks(execute=True), freezegun.freeze_time("2024-11-20"):
+    with django_capture_on_commit_callbacks(execute=wet_run), freezegun.freeze_time("2024-11-20"):
         command.handle(data="kpi", action="fetch", wet_run=wet_run)
     assert caches[command.CACHE_NAME].get_many(DatumKey) == snapshot(name="cache")
     assert capsys.readouterr() == snapshot(name="stdout and stderr")

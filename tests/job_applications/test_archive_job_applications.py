@@ -1,6 +1,7 @@
 import datetime
 
 from django.core.management import call_command
+from django.db import transaction
 from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual
 
@@ -39,7 +40,8 @@ def test_archive(caplog):
     expected_log = f"Archived {len(ARCHIVABLE_JOB_APPLICATION_STATES)} job applications"
 
     # Dry run
-    call_command("archive_job_applications")
+    with transaction.atomic():
+        call_command("archive_job_applications")
     assert caplog.messages[:-1] == [
         "Command launched with wet_run=False",
         expected_log,
@@ -52,7 +54,8 @@ def test_archive(caplog):
 
     # Wet run
     caplog.clear()
-    call_command("archive_job_applications", wet_run=True)
+    with transaction.atomic():
+        call_command("archive_job_applications", wet_run=True)
     assert JobApplication.objects.exclude(archived_at=None).count() == already_archived_count + len(
         ARCHIVABLE_JOB_APPLICATION_STATES
     )

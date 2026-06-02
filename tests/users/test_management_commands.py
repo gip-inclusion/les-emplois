@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.management import call_command
+from django.db import transaction
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
 from freezegun import freeze_time
@@ -824,7 +825,8 @@ def test_update_job_seeker_coords(settings, caplog, capsys, respx_mock):
 
     for wet_run in [False, True]:
         caplog.clear()
-        call_command("update_job_seeker_coords", wet_run=wet_run, verbosity=2)
+        with transaction.atomic():
+            call_command("update_job_seeker_coords", wet_run=wet_run, verbosity=2)
         stdout, stderr = capsys.readouterr()
         assert stderr == ""
         assert stdout.splitlines() == [

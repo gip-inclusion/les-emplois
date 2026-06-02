@@ -4,6 +4,7 @@ import itertools
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from freezegun import freeze_time
@@ -122,8 +123,9 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
         ProlongationRequestFactory(status=status, created_at=created_at, reminder_sent_at=reminder_sent_at)
 
     with freeze_time():
-        with django_capture_on_commit_callbacks(execute=True):
-            command.handle(command="email_reminder", wet_run=wet_run)
+        with django_capture_on_commit_callbacks(execute=wet_run):
+            with transaction.atomic():
+                command.handle(command="email_reminder", wet_run=wet_run)
         assert len(mailoutbox) == expected
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
     assert caplog.messages == snapshot()
