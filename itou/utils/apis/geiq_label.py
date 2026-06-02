@@ -1,9 +1,14 @@
 import enum
+import hashlib
 import json
+import logging
 
 import httpx
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+
+
+logger = logging.getLogger(__name__)
 
 
 API_TIMEOUT_SECONDS = 5.0
@@ -87,6 +92,10 @@ class LabelApiClient:
             raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
         if response_data.headers["content-type"] != "application/pdf":
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
+        logger.info(
+            "Successfully retrieved DownloadCompte - sha256=%s",
+            hashlib.sha256(response_data.content).digest(),
+        )
         return response_data.content
 
     def get_synthese_pdf(self, *, geiq_id):
@@ -100,6 +109,7 @@ class LabelApiClient:
             raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
         if response_data.headers["content-type"] != "application/pdf":
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
+        logger.info("Successfully retrieved SynthesePDF - sha256=%s", hashlib.sha256(response_data.content).digest())
         return response_data.content
 
     def get_all_contracts(self, geiq_id, *, page_size=100, date_fin=None):
@@ -114,6 +124,9 @@ class LabelApiClient:
         if date_fin:
             where.append(f"salariecontrat.date_fin,>,{date_fin}")
         expected_nb = self._command(LabelCommand.SalarieContrat, join=join, where=where, count=True)
+        if not expected_nb:
+            logger.info("No contract to retrieve")
+            return data
         while new_values := self._command(
             LabelCommand.SalarieContrat,
             join=join,
@@ -127,6 +140,7 @@ class LabelApiClient:
                 break
             p += 1
         assert len(data) == expected_nb
+        logger.info("Retrieved nb=%s contracts", expected_nb)
         return data
 
     def get_all_prequalifications(self, geiq_id, *, page_size=100):
@@ -138,6 +152,9 @@ class LabelApiClient:
             where=f"s.geiq,=,{geiq_id}",
             count=True,
         )
+        if not expected_nb:
+            logger.info("No prequalification to retrieve")
+            return data
         while new_values := self._command(
             LabelCommand.SalariePreQualification,
             join="salarieprequalification.salarie,s",
@@ -151,6 +168,7 @@ class LabelApiClient:
                 break
             p += 1
         assert len(data) == expected_nb
+        logger.info("Retrieved nb=%s prequalifications", expected_nb)
         return data
 
 

@@ -137,6 +137,8 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
     assert assessment.employee_nb == 3
 
     assert caplog.messages == [
+        "Filtered contracts - start_date_filter=0 end_date_filter=0 antenna_filter=1",
+        "Filtered prequalifications - start_date_filter=0 end_date_filter=0 employee_filter=1",
         "Label sync will create nb=3 type=employé",
         "Label sync will update nb=0 type=employé",
         "Label sync will delete nb=0 type=employé",

@@ -152,6 +152,7 @@ def sync_employee_and_contracts(assessment):
     limit_end_date = datetime.date(assessment.campaign.year - 1, 10, 1)
     label_rates = client.get_taux_geiq(geiq_id=geiq_id)[0]
     # TODO: rajouter filtre sur antennes ?
+    start_date_filter, end_date_filter, antenna_filter = 0, 0, 0
     for contract_info in client.get_all_contracts(geiq_id, date_fin=limit_end_date - datetime.timedelta(days=1)):
         contract_info["date_debut"] = convert_iso_datetime_to_date(contract_info["date_debut"])
         contract_info["date_fin"] = convert_iso_datetime_to_date(contract_info["date_fin"])
@@ -162,6 +163,7 @@ def sync_employee_and_contracts(assessment):
         )
         if contract_info["date_debut"].year > assessment.campaign.year:
             # Ignoring contract starting after assessment year
+            start_date_filter += 1
             continue
         # Use the real enddate or the planned one
         # If a contract was planned to end in 2023 but ended in 2022,
@@ -169,9 +171,11 @@ def sync_employee_and_contracts(assessment):
         end_date = contract_info["date_fin_contrat"] or contract_info["date_fin"]
         if end_date < limit_end_date:
             # Ignoring contract ending before assessment year
+            end_date_filter += 1
             continue
         if contract_info["antenne"]["id"] not in assessment_antenna_ids:
             # Contract on other antenna
+            antenna_filter += 1
             continue
 
         employee_info = contract_info["salarie"]
@@ -190,8 +194,16 @@ def sync_employee_and_contracts(assessment):
         contract_infos.append(contract_info)
         employee_support_periods.setdefault(employee_info["id"], []).append((contract_info["date_debut"], end_date))
 
+    logger.info(
+        "Filtered contracts - start_date_filter=%d end_date_filter=%d antenna_filter=%d",
+        start_date_filter,
+        end_date_filter,
+        antenna_filter,
+    )
+
     prequalif_limit_end_date = datetime.date(assessment.campaign.year - 2, 1, 1)
 
+    employee_filter, start_date_filter, end_date_filter = 0, 0, 0
     for prequalification_info in client.get_all_prequalifications(geiq_id):
         employee_info = prequalification_info["salarie"]
         _cleanup_employee_info(employee_info)
@@ -202,20 +214,29 @@ def sync_employee_and_contracts(assessment):
             )
         else:
             # Ignore prequalifications for employees without active contract in assessment year
+            employee_filter += 1
             continue
         prequalification_info["salarie"] = employee_info["id"]
         prequalification_info["date_debut"] = convert_iso_datetime_to_date(prequalification_info["date_debut"])
         prequalification_info["date_fin"] = convert_iso_datetime_to_date(prequalification_info["date_fin"])
         if prequalification_info["date_debut"].year > assessment.campaign.year:
             # Ignoring prequalifications starting after assessment year
+            start_date_filter += 1
             continue
         if prequalification_info["date_fin"] < prequalif_limit_end_date:
             # Ignoring prequalifications ending before the year preceding the assessment
+            end_date_filter += 1
             continue
         prequalification_infos.append(prequalification_info)
         employee_support_periods.setdefault(employee_info["id"], []).append(
             (prequalification_info["date_debut"], prequalification_info["date_fin"])
         )
+    logger.info(
+        "Filtered prequalifications - start_date_filter=%d end_date_filter=%d employee_filter=%d",
+        start_date_filter,
+        end_date_filter,
+        employee_filter,
+    )
 
     # Sync data to DB
     def employee_data_to_django(data, *, mapping, model):
