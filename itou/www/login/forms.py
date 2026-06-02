@@ -83,7 +83,6 @@ class ItouLoginForm(LoginForm):
         if (
             user
             and user.has_sso_provider
-            and user.identity_provider != IdentityProvider.INCLUSION_CONNECT
             # Bypass sso login error if we show the test account banner and the form received the hidden field value
             and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_DEMO_ACCOUNTS_BANNER)
         ):

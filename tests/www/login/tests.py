@@ -160,7 +160,7 @@ class TestItouLoginForm:
         }
         request = get_request(AnonymousUser())
         form = ItouLoginForm(data=form_data, request=request)
-        if identity_provider in [IdentityProvider.DJANGO, IdentityProvider.INCLUSION_CONNECT]:
+        if identity_provider == IdentityProvider.DJANGO:
             assert form.is_valid()
         else:
             assert not form.is_valid()
@@ -252,12 +252,6 @@ class TestExistingUserLogin:
                 ),
             ),
             (
-                "IC",
-                random_user_kind_factory(
-                    identity_provider=IdentityProvider.INCLUSION_CONNECT, email="ic@mailinator.com"
-                ),
-            ),
-            (
                 "PC",
                 random_user_kind_factory(identity_provider=IdentityProvider.PRO_CONNECT, email="pc@mailinator.com"),
             ),
@@ -345,26 +339,6 @@ class TestExistingUserLogin:
     )
     def test_login_django(self, client, user_factory):
         user = user_factory(identity_provider=IdentityProvider.DJANGO)
-        session = client.session
-        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
-        session.save()
-        url = reverse("login:existing_user")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
-
-    def test_login_inclusion_connect(self, client):
-        # IC old users have the Django login form
-        user = random_user_kind_factory(
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
-            password=HASHED_DEFAULT_PASSWORD,
-        )
         session = client.session
         session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
         session.save()

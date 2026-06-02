@@ -247,7 +247,7 @@ class TestCommandSendUsersToBrevo:
     def test_wet_run_siae(self, caplog, respx_mock, snapshot):
         for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
-        # Missing verified email and not using IC
+        # Missing verified email and not using ProConnect
         CompanyMembershipFactory(company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO)
         not_primary = CompanyMembershipFactory(
             company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO
@@ -257,7 +257,7 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user__with_verified_email=True, company__kind=CompanyKind.EI, is_active=False)
         # Inactive users are ignored.
         CompanyMembershipFactory(user__with_verified_email=True, user__is_active=False, company__kind=CompanyKind.EI)
-        # New email not verified is ignored when not using IC
+        # New email not verified is ignored when not using ProConnect
         changed_email = CompanyMembershipFactory(
             user__with_verified_email=True,
             company__kind=CompanyKind.EI,
@@ -393,7 +393,7 @@ class TestCommandSendUsersToBrevo:
             PrescriberMembershipFactory(
                 user__is_active=False, user__with_verified_email=True, organization=organization
             )
-            # New email not verified is ignored when not using IC
+            # New email not verified is ignored when not using ProConnect
             changed_email = PrescriberMembershipFactory(
                 user__with_verified_email=True,
                 organization=organization,
@@ -468,7 +468,7 @@ class TestCommandSendUsersToBrevo:
             is_active=False,
             date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
         )
-        # Ignored, email is not the primary email when not using IC
+        # Ignored, email is not the primary email when not using ProConnect
         not_primary = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
         # New email not verified is ignored.

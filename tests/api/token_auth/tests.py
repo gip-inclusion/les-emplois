@@ -10,10 +10,9 @@ from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
     "identity_provider,expects_creation",
     [
         (IdentityProvider.DJANGO, True),
-        (IdentityProvider.INCLUSION_CONNECT, True),
         (IdentityProvider.PRO_CONNECT, False),
     ],
-    ids=["django", "inclusion_connect", "pro_connect"],
+    ids=["django", "pro_connect"],
 )
 def test_token_auth_with_login_password(client, identity_provider, expects_creation):
     user = EmployerFactory(with_password=True, identity_provider=identity_provider)

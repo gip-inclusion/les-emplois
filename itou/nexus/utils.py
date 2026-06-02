@@ -104,7 +104,6 @@ def serialize_user(user):
         "last_login": user.last_login,
         "auth": {
             IdentityProvider.DJANGO: Auth.DJANGO,
-            IdentityProvider.INCLUSION_CONNECT: Auth.INCLUSION_CONNECT,
             IdentityProvider.PRO_CONNECT: Auth.PRO_CONNECT,
         }[user.identity_provider],
     }

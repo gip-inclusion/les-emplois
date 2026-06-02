@@ -7,7 +7,6 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
-from itou.users.enums import IdentityProvider
 from itou.utils.auth import LoginNotRequiredMixin
 
 
@@ -21,7 +20,7 @@ class ItouAuthTokenSerializer(AuthTokenSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         user = attrs["user"]
-        if user.has_sso_provider and user.identity_provider != IdentityProvider.INCLUSION_CONNECT:
+        if user.has_sso_provider:
             msg = "Ce compte ne peut pas se connecter avec un username et mot de passe."
             raise serializers.ValidationError(msg, code="authorization")
         return attrs

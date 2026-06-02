@@ -443,8 +443,8 @@ class TestPoleEmploiConnect:
     @respx.mock
     def test_django_account_logout_from_peamu(self, client):
         """
-        When ac IC user wants to log out from his local account,
-        he should be logged out too from IC.
+        When a FranceTravail Connect user wants to log out from his local account,
+        he should be logged out too from FranceTravail Connect.
         """
         # New created job seeker has no title and is redirected to complete its infos
         response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")

@@ -164,7 +164,7 @@ class OIDConnectUserData:
     def create_or_update_user(self, *, login_only=False):
         """
         A user is being created or updated from information provided by an identity provider.
-        A user is globally unique with the combination of SSO provider + sub (e.g. InclusionConnect:username).
+        A user is globally unique with the combination of SSO provider + sub.
 
         If we cannot find the user via provider + username:
          - If the email isn't in use, we'll create a new account.
