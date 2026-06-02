@@ -1038,6 +1038,12 @@ class SiaeConvention(models.Model):
             # It is the only exception. Both structures are active.
             # ("siret_signature", "kind"),
         )
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(siret_signature__regex=r"\A[0-9]{14}\Z"),
+                name="convention_siret_signature_regex",
+            ),
+        ]
 
     @property
     def siren_signature(self):
