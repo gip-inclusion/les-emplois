@@ -4160,9 +4160,9 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" type="submit">
+          <button class="btn btn-primary w-100" name="action" type="submit" value="request_allowance">
               Solliciter l’aide
           </button>
       </form>
@@ -4189,9 +4189,9 @@
       <a class="btn btn-primary w-100 mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
           Modifier votre justification
       </a>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" name="action" type="submit" value="unrequest_allowance">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4224,9 +4224,9 @@
       <a class="btn btn-primary w-100 mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
           Justifier la demande d’aide
       </a>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" name="action" type="submit" value="unrequest_allowance">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4247,9 +4247,9 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" type="submit">
+          <button class="btn btn-primary w-100" name="action" type="submit" value="request_allowance">
               Solliciter l’aide
           </button>
       </form>
@@ -4266,9 +4266,9 @@
       <p>
           Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" name="action" type="submit" value="unrequest_allowance">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4289,9 +4289,9 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" disabled="" type="submit">
+          <button class="btn btn-primary w-100" disabled="" name="action" type="submit" value="request_allowance">
               Solliciter l’aide
           </button>
       </form>
@@ -4318,9 +4318,9 @@
       <a class="btn btn-primary w-100 mb-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
           Modifier votre justification
       </a>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" name="action" type="submit" value="unrequest_allowance">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4341,9 +4341,9 @@
       <p>
           Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" disabled="" type="submit">
+          <button class="btn btn-primary w-100" disabled="" name="action" type="submit" value="request_allowance">
               Solliciter l’aide
           </button>
       </form>
@@ -4360,9 +4360,9 @@
       <p>
           Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.
       </p>
-      <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
+      <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" name="action" type="submit" value="unrequest_allowance">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>

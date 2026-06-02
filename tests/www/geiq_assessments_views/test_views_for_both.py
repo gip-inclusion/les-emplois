@@ -16,6 +16,7 @@ from itou.geiq_assessments.enums import (
     AllowanceJustificationReason,
     AllowanceRefusalReason,
     AssessmentContractDetailsTab,
+    EmployerAction,
     InstitutionAction,
 )
 from itou.geiq_assessments.models import AssessmentInstitutionLink
@@ -953,12 +954,7 @@ class TestAssessmentContractsDetails:
         ) == snapshot(name="allowance request box with allowance not requested")
 
         # User requests the allowance
-        response = client.post(
-            reverse(
-                "geiq_assessments_views:assessment_contracts_include",
-                kwargs={"contract_pk": str(contract.pk)},
-            ),
-        )
+        response = client.post(details_url, data={"action": EmployerAction.REQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is True
 
@@ -1040,12 +1036,7 @@ class TestAssessmentContractsDetails:
             assertNotContains(response, JUSTIFICATION_TAB_WITH_ICON_LI, html=True)
 
         # User unrequests the allowance and gets redirected to contract tab
-        response = client.post(
-            reverse(
-                "geiq_assessments_views:assessment_contracts_exclude",
-                kwargs={"contract_pk": str(contract.pk)},
-            ),
-        )
+        response = client.post(details_url, data={"action": EmployerAction.UNREQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is False
         assertRedirects(
@@ -1091,12 +1082,7 @@ class TestAssessmentContractsDetails:
         ) == snapshot(name="allowance request box with allowance not requested after contract selection")
 
         # User tries to request the allowance
-        response = client.post(
-            reverse(
-                "geiq_assessments_views:assessment_contracts_include",
-                kwargs={"contract_pk": str(contract.pk)},
-            ),
-        )
+        response = client.post(details_url, data={"action": EmployerAction.REQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is False
         assertRedirects(response, details_contract_url)
@@ -1128,12 +1114,7 @@ class TestAssessmentContractsDetails:
             contract.allowance_request_justification_reason = AllowanceJustificationReason.OTHER_REFERENCE_PERIOD
             contract.allowance_request_justification_details = "Détails."
         contract.save()
-        response = client.post(
-            reverse(
-                "geiq_assessments_views:assessment_contracts_exclude",
-                kwargs={"contract_pk": str(contract.pk)},
-            ),
-        )
+        response = client.post(details_url, data={"action": EmployerAction.UNREQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is True
         assertRedirects(response, details_contract_url)

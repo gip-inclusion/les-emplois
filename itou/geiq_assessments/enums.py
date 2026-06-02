@@ -59,6 +59,17 @@ class AllowanceRefusalReason(models.TextChoices):
         return details.get(reason)
 
 
+class EmployerAction(enum.StrEnum):
+    REQUEST_ALLOWANCE = "request_allowance"
+    UNREQUEST_ALLOWANCE = "unrequest_allowance"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
+
+
 class InstitutionAction(enum.StrEnum):
     REVIEW = "review"
     ASK_FOR_INSTITUTION_FIX = "ask_for_institution_fix"

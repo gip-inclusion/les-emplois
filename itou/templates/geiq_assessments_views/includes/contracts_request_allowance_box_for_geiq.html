@@ -1,4 +1,5 @@
 {% load enums %}
+{% enums "geiq_assessments" "EmployerAction" as EmployerAction %}
 <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
     {% if contract.allowance_requested %}
         <h3>Aide sollicitée pour ce contrat</h3>
@@ -23,9 +24,9 @@
         {% else %}
             <p>Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.</p>
         {% endif %}
-        <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_exclude' contract_pk=contract.pk %}">
+        <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100"{% if disabled %} disabled{% endif %}>
+            <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100" name="action" value="{{ EmployerAction.UNREQUEST_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
                 <i class="ri-close-large-line font-weight-medium" aria-hidden="true"></i>
                 <span>Ne plus solliciter l’aide</span>
             </button>
@@ -33,9 +34,11 @@
     {% else %}
         <h3>Aide non sollicitée pour ce contrat</h3>
         <p>Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.</p>
-        <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_include' contract_pk=contract.pk %}">
+        <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100"{% if disabled %} disabled{% endif %}>Solliciter l’aide</button>
+            <button type="submit" class="btn btn-primary w-100" name="action" value="{{ EmployerAction.REQUEST_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
+                Solliciter l’aide
+            </button>
         </form>
     {% endif %}
 </div>

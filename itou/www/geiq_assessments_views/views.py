@@ -25,7 +25,12 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
 from itou.geiq_assessments import sync
-from itou.geiq_assessments.enums import AssessmentContractDetailsTab, AssessmentTransition, InstitutionAction
+from itou.geiq_assessments.enums import (
+    AssessmentContractDetailsTab,
+    AssessmentTransition,
+    EmployerAction,
+    InstitutionAction,
+)
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -702,6 +707,35 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
         return qs
 
     def post_action(self, action):
+        if self.request.from_employer:
+            if action in [EmployerAction.REQUEST_ALLOWANCE, EmployerAction.UNREQUEST_ALLOWANCE]:
+                if self.object.employee.assessment.contracts_selection_validated_at:
+                    messages.error(
+                        self.request,
+                        "La sélection des contrats a déjà été validée : "
+                        "vous ne pouvez plus modifier le statut de sollicitation de l’aide pour ce contrat.",
+                    )
+                elif action is EmployerAction.REQUEST_ALLOWANCE:
+                    self.object.allowance_requested = True
+                elif action is EmployerAction.UNREQUEST_ALLOWANCE:
+                    self.object.allowance_requested = False
+                self.object.save(update_fields=("allowance_requested",))
+
+                if self.object.requires_justification and not self.object.allowance_request_justification_reason:
+                    redirect_to_view = reverse(
+                        "geiq_assessments_views:assessment_contracts_details",
+                        kwargs={
+                            "contract_pk": self.object.pk,
+                            "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION,
+                        },
+                    )
+                else:
+                    redirect_to_view = reverse(
+                        "geiq_assessments_views:assessment_contracts_details_contract",
+                        kwargs={"contract_pk": self.object.pk},
+                    )
+                return HttpResponseRedirect(redirect_to_view)
+
         if self.request.from_institution:
             if action in [InstitutionAction.REFUSE_ALLOWANCE, InstitutionAction.GRANT_ALLOWANCE]:
                 redirect_to_view = None
@@ -740,7 +774,10 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         try:
-            action = InstitutionAction(request.POST.get("action"))
+            if request.from_employer:
+                action = EmployerAction(request.POST.get("action"))
+            elif request.from_institution:
+                action = InstitutionAction(request.POST.get("action"))
         except ValueError:
             raise Http404
 
@@ -1081,24 +1118,6 @@ def assessment_contracts_toggle(
             updated_fields += ["allowance_refusal_reason", "allowance_refusal_details"]
         contract.save(update_fields=updated_fields)
     from_list = bool(request.GET.get("from_list"))
-
-    # For the buttons not relying on HTMX (i.e. cards/boxes inside contract details tabs).
-    if not request.htmx:
-        tab = AssessmentContractDetailsTab.CONTRACT
-        if contract.requires_justification and not contract.allowance_request_justification_reason:
-            tab = AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION
-        if contract.employee.assessment.contracts_selection_validated_at:
-            messages.error(
-                request,
-                "La sélection des contrats a déjà été validée : "
-                "vous ne pouvez plus modifier le statut de sollicitation de l’aide pour ce contrat.",
-            )
-        return HttpResponseRedirect(
-            reverse(
-                "geiq_assessments_views:assessment_contracts_details",
-                kwargs={"contract_pk": contract.pk, "tab": tab.value},
-            )
-        )
 
     stats = None
     if from_list:
