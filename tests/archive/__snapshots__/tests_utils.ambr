@@ -246,16 +246,6 @@
       'model': 'eligibility.GEIQEligibilityDiagnosis',
     }),
     dict({
-      'field': 'user',
-      'hidden': False,
-      'model': 'external_data.ExternalDataImport',
-    }),
-    dict({
-      'field': 'user',
-      'hidden': False,
-      'model': 'external_data.JobSeekerExternalData',
-    }),
-    dict({
       'field': 'beneficiary',
       'hidden': False,
       'model': 'gps.FollowUpGroup',
