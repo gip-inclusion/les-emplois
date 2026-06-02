@@ -923,7 +923,6 @@ class TestAssessmentContractsDetails:
             random.choice(AssessmentContractDetailsTab.get_common_tabs()),
             contract.pk,
         )
-        details_contract_url = self.get_tab_url(AssessmentContractDetailsTab.CONTRACT, contract.pk)
         details_justification_url = self.get_tab_url(
             AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION, contract.pk
         )
@@ -960,7 +959,7 @@ class TestAssessmentContractsDetails:
         assert contract.allowance_requested is True
 
         if not short_contract:
-            assertRedirects(response, details_contract_url)
+            assert response.status_code == 200
             response = client.get(details_url)
             assert pretty_indented(
                 parse_response_to_soup(
@@ -1021,7 +1020,7 @@ class TestAssessmentContractsDetails:
                     "allowance_request_details": "C’est un cas particulier…",
                 },
             )
-            assertRedirects(response, details_contract_url)
+            assert response.status_code == 200
             contract.refresh_from_db()
             assert contract.allowance_requested is True
             assert contract.allowance_request_justification_reason is not None
@@ -1044,12 +1043,7 @@ class TestAssessmentContractsDetails:
         response = client.post(details_url, data={"action": EmployerAction.UNREQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is False
-        assertRedirects(
-            response,
-            reverse(
-                "geiq_assessments_views:assessment_contracts_details_contract", kwargs={"contract_pk": contract.pk}
-            ),
-        )
+        assert response.status_code == 200
         if short_contract:
             # The reason and details are not deleted
             assert contract.allowance_request_justification_reason is not None
@@ -1090,7 +1084,7 @@ class TestAssessmentContractsDetails:
         response = client.post(details_url, data={"action": EmployerAction.REQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is False
-        assertRedirects(response, details_contract_url)
+        assert response.status_code == 200
         assertMessages(
             response,
             [
@@ -1122,7 +1116,7 @@ class TestAssessmentContractsDetails:
         response = client.post(details_url, data={"action": EmployerAction.UNREQUEST_ALLOWANCE})
         contract.refresh_from_db()
         assert contract.allowance_requested is True
-        assertRedirects(response, details_contract_url)
+        assert response.status_code == 200
         assertMessages(
             response,
             [
@@ -1155,7 +1149,7 @@ class TestAssessmentContractsDetails:
                     "allowance_request_details": "Nouveaux détails",
                 },
             )
-            assertRedirects(response, details_contract_url)
+            assert response.status_code == 200
             assertMessages(
                 response,
                 [

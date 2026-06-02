@@ -709,6 +709,7 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
     def post_action(self, action):
         if self.request.from_employer:
             if action in [EmployerAction.REQUEST_ALLOWANCE, EmployerAction.UNREQUEST_ALLOWANCE]:
+                redirect_to_view = None
                 if self.object.employee.assessment.contracts_selection_validated_at:
                     messages.error(
                         self.request,
@@ -717,21 +718,21 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
                     )
                 elif action is EmployerAction.REQUEST_ALLOWANCE:
                     self.object.allowance_requested = True
+                    if self.object.requires_justification and not self.object.allowance_request_justification_reason:
+                        redirect_to_view = reverse(
+                            "geiq_assessments_views:assessment_contracts_details_request_justification",
+                            kwargs={"contract_pk": self.object.pk},
+                        )
                 elif action is EmployerAction.UNREQUEST_ALLOWANCE:
                     self.object.allowance_requested = False
+                    if self.tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION:
+                        redirect_to_view = reverse(
+                            "geiq_assessments_views:assessment_contracts_details_contract",
+                            kwargs={"contract_pk": self.object.pk},
+                        )
                 self.object.save(update_fields=("allowance_requested",))
-
-                if self.object.requires_justification and not self.object.allowance_request_justification_reason:
-                    redirect_to_view = reverse(
-                        "geiq_assessments_views:assessment_contracts_details_request_justification",
-                        kwargs={"contract_pk": self.object.pk},
-                    )
-                else:
-                    redirect_to_view = reverse(
-                        "geiq_assessments_views:assessment_contracts_details_contract",
-                        kwargs={"contract_pk": self.object.pk},
-                    )
-                return HttpResponseRedirect(redirect_to_view)
+                if redirect_to_view:
+                    return HttpResponseRedirect(redirect_to_view)
 
         if self.request.from_institution:
             if action in [InstitutionAction.REFUSE_ALLOWANCE, InstitutionAction.GRANT_ALLOWANCE]:
@@ -899,12 +900,6 @@ class AssessmentContractDetailsRequestJustificationView(AssessmentContractDetail
                             "allowance_request_justification_details",
                         )
                     )
-                return HttpResponseRedirect(
-                    reverse(
-                        "geiq_assessments_views:assessment_contracts_details_contract",
-                        kwargs={"contract_pk": str(self.object.pk)},
-                    )
-                )
             return self.render_to_response(self.get_context_data(object=self.object))
 
         return super().post_action(action)
