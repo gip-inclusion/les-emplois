@@ -1,4 +1,11 @@
 # serializer version: 1
+# name: test_command[geiq-assessments]
+  list([
+    'add_assessmentcampaign',
+    'change_assessmentcampaign',
+    'view_assessmentcampaign',
+  ])
+# ---
 # name: test_command[gps-admin-readonly]
   list([
     'view_company',
@@ -181,8 +188,6 @@
     'view_employeerecordupdatenotification',
     'view_file',
     'view_assessment',
-    'add_assessmentcampaign',
-    'change_assessmentcampaign',
     'view_assessmentcampaign',
     'view_employee',
     'view_employeecontract',
@@ -292,6 +297,10 @@
 # ---
 # name: test_command[logs]
   list([
+    'group name=geiq-assessments created',
+    'group name=geiq-assessments, permission add_assessmentcampaign added',
+    'group name=geiq-assessments, permission change_assessmentcampaign added',
+    'group name=geiq-assessments, permission view_assessmentcampaign added',
     'group name=gps-admin created',
     'group name=gps-admin, permission add_followupgroup added',
     'group name=gps-admin, permission add_followupgroupmembership added',
@@ -327,7 +336,6 @@
     'group name=itou-admin created',
     'group name=itou-admin, permission add_announcementcampaign added',
     'group name=itou-admin, permission add_announcementitem added',
-    'group name=itou-admin, permission add_assessmentcampaign added',
     'group name=itou-admin, permission add_company added',
     'group name=itou-admin, permission add_companymembership added',
     'group name=itou-admin, permission add_eligibilitydiagnosis added',
@@ -349,7 +357,6 @@
     'group name=itou-admin, permission change_announcementcampaign added',
     'group name=itou-admin, permission change_announcementitem added',
     'group name=itou-admin, permission change_approval added',
-    'group name=itou-admin, permission change_assessmentcampaign added',
     'group name=itou-admin, permission change_company added',
     'group name=itou-admin, permission change_companymembership added',
     'group name=itou-admin, permission change_eligibilitydiagnosis added',
