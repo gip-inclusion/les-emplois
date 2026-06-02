@@ -112,7 +112,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "final_reviewed_assessments",  # Assessment.final_reviewed_by
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
-        "externaldataimport",  # ExternalDataImport.user: this seems largely unused
         "follow_up_group",  # gps.FollowUpGroup: do I have a GPS follow group as a jobseeker
         "follow_up_groups",  # gps.FollowUpGroupMembership.member: followup groups membership
         "follow_up_groups_member",  # gps.FollowUpGroup.member: followup groups
@@ -127,7 +126,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "jobapplicationcomment",  # JobApplicationComment.created_by
         "jobapplicationtransitionlog",  # JobApplicationTransitionLog.user
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
-        "jobseekerexternaldata",  # JobSeekerExternalData.user: this seems largely unused
         "logentry",  # django.contrib.admin.models.LogEntry.user
         "prescriber_org_invitations",  # PrescriberWithOrgInvitation.sender
         "prescribermembership",  # PrescriberMembership.user

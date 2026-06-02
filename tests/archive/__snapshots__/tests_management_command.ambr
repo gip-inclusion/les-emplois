@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 89,
+    'num_queries': 87,
     'queries': list([
       dict({
         'origin': list([
@@ -2816,31 +2816,6 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          SELECT "external_data_externaldataimport"."id"
-          FROM "external_data_externaldataimport"
-          WHERE "external_data_externaldataimport"."user_id" IN (%s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'anonymize_and_delete_professionals[archive/anonymize.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
           SELECT "employee_record_employeerecordtransitionlog"."id",
                  "employee_record_employeerecordtransitionlog"."transition",
                  "employee_record_employeerecordtransitionlog"."from_state",
@@ -3400,30 +3375,6 @@
                                                                        %s,
                                                                        %s,
                                                                        %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'anonymize_and_delete_professionals[archive/anonymize.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[itoutils/django/commands.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          DELETE
-          FROM "external_data_jobseekerexternaldata"
-          WHERE "external_data_jobseekerexternaldata"."user_id" IN (%s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s,
-                                                                    %s)
         ''',
       }),
       dict({
