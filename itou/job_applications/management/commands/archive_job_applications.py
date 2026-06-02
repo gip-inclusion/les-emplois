@@ -10,7 +10,7 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
-    ATOMIC_HANDLE = False
+    ATOMIC_HANDLE = True
     AUTO_TRIGGER_CONTEXT = False
 
     def add_arguments(self, parser):
