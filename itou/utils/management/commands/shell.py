@@ -1,6 +1,13 @@
+import os
+
 from django.core.management.commands import shell
 
+from itou.utils import triggers
 from itou.utils.command import TriggerContextMixin
+
+
+def shell_context():
+    return triggers.context(user=os.getenv("CC_USER_ID"))
 
 
 class Command(TriggerContextMixin, shell.Command):
@@ -11,4 +18,6 @@ class Command(TriggerContextMixin, shell.Command):
             "django.conf.settings",
             "django.utils.timezone",
             "datetime",
+            "django.db.transaction",
+            "itou.utils.management.commands.shell.shell_context",
         ]
