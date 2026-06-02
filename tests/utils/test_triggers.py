@@ -82,6 +82,16 @@ def test_context_consecutively_with_same_data():
         assert cursor.fetchone() == (json.dumps(expected),)
 
 
+@pytest.mark.xfail
+def test_context_cleanup():
+    with triggers.connection_wrapper(), transaction.atomic(), connection.cursor() as cursor:
+        with triggers.context(foo="bar"):
+            cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps({"foo": "bar"}),)
+        cursor.execute("SELECT current_setting('itou.context')")
+        assert cursor.fetchone() == ("",)
+
+
 @pytest.mark.django_db(transaction=True)
 def test_context_savepoint_rollback():
     expected = {"uuid": str(uuid.uuid4())}
@@ -131,3 +141,40 @@ def test_without_connection_wrapper_set():
     with pytest.raises(RuntimeError, match=r".*without _set_context_connection_wrapper.*"):
         with transaction.atomic(), triggers.context():
             pass
+
+
+@pytest.mark.xfail
+@pytest.mark.django_db(transaction=True)
+def test_missing_context_in_succeeding_calls_in_same_test():
+    # In a "classic" Django test, all calls happen in the same transaction
+    with transaction.atomic():
+        # This simulates a view performing changes and setting a context
+        with triggers.connection_wrapper(), connection.cursor() as cursor:
+            with triggers.context(foo="bar"):
+                cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
+                assert cursor.fetchone() == ('{"foo": "bar"}',)
+
+        # Now a second view without wrapping context is called: its context should be empty
+        with triggers.connection_wrapper(), connection.cursor() as cursor:
+            cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == ("",)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_successive_atomic_with_context():
+    expected = {"uuid": str(uuid.uuid4())}
+    with triggers.connection_wrapper(), assertNumQueries(8):
+        with (
+            transaction.atomic(),  # 2 queries: BEGIN + COMMIT
+            triggers.context(**expected),
+            connection.cursor() as cursor,
+        ):
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
+            assert cursor.fetchone() == (json.dumps(expected),)
+        with (
+            transaction.atomic(),  # 2 queries: BEGIN + COMMIT
+            triggers.context(**expected),
+            connection.cursor() as cursor,
+        ):
+            cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
+            assert cursor.fetchone() == (json.dumps(expected),)
