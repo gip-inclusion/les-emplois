@@ -63,7 +63,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
             city="Paris",
             email="contact@Presorg.fr",
             phone="0612345678",
-            siret="012345678910",
+            siret="01234567891010",
         )
 
     name = factory.Faker("name", locale="fr_FR")
