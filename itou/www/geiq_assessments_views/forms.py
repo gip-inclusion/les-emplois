@@ -10,7 +10,7 @@ from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, 
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
-from itou.utils.templatetags.format_filters import format_int_euros
+from itou.utils.templatetags.format_filters import format_int_euros, format_siret
 from itou.utils.types import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -54,7 +54,17 @@ class CreateForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, *args, geiq_name, antenna_names, existing_main_geiq, existing_antenna_ids, **kwargs):
+    def __init__(
+        self,
+        *args,
+        geiq_name,
+        geiq_siret=None,
+        antenna_names,
+        antenna_sirets=None,
+        existing_main_geiq,
+        existing_antenna_ids,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.antenna_names = antenna_names
         self.fields["ddets"].form_group_class = "form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"
@@ -68,15 +78,20 @@ class CreateForm(forms.Form):
             self.fields["convention_with_dreets"].widget.attrs["aria-expanded"] = "true"
             self.fields["dreets"].form_group_class += " show"
 
-        self.fields["main_geiq"].label = geiq_name
+        self.fields["main_geiq"].label = (
+            f"{geiq_name} (SIRET : {format_siret(geiq_siret)})" if geiq_siret else geiq_name
+        )
         self.fields["main_geiq"].disabled = existing_main_geiq
 
         antenna_fields = []
+        antenna_sirets = antenna_sirets or {}
         for antenna_id, antenna_name in antenna_names.items():
             if antenna_id:  # Ignore main geiq with id 0
                 field_name = self.get_antenna_field(antenna_id)
+                antenna_siret = antenna_sirets.get(antenna_id)
+                label = f"{antenna_name} (SIRET : {format_siret(antenna_siret)})" if antenna_siret else antenna_name
                 self.fields[field_name] = forms.BooleanField(
-                    label=antenna_name, required=False, disabled=antenna_id in existing_antenna_ids
+                    label=label, required=False, disabled=antenna_id in existing_antenna_ids
                 )
                 antenna_fields.append(field_name)
         self.antenna_fields = antenna_fields
