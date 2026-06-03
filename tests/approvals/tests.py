@@ -23,6 +23,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.utils.apis import enums as api_enums
 from tests.approvals.factories import (
     ApprovalFactory,
+    CancelledApprovalFactory,
     ProlongationFactory,
     ProlongationRequestFactory,
     SuspensionFactory,
@@ -721,6 +722,22 @@ class TestApprovalModel:
 
         with pytest.raises(IntegrityError):
             ApprovalFactory(public_id=approval.public_id)
+
+    def test_origin_siae_siret_constraint(self):
+        approval = ApprovalFactory(with_origin_values=True)
+        assert approval.origin_siae_siret
+        approval.origin_siae_siret = approval.origin_siae_siret[:-1]
+        with pytest.raises(IntegrityError, match=".*origin_siae_siret_regex.*"):
+            approval.save()
+
+
+class TestCancelledApprovalModel:
+    def test_origin_siae_siret_constraint(self):
+        approval = CancelledApprovalFactory()
+        assert approval.origin_siae_siret
+        approval.origin_siae_siret = approval.origin_siae_siret[:-1]
+        with pytest.raises(IntegrityError, match=".*origin_siae_siret_regex.*"):
+            approval.save()
 
 
 class TestSuspensionQuerySet:

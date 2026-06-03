@@ -77,6 +77,10 @@ class CommonApprovalMixin(models.Model):
                 name="%(app_label)s_%(class)s_start_before_end",
                 condition=models.Q(start_at__lt=models.F("end_at")),
             ),
+            models.CheckConstraint(
+                condition=Q(origin_siae_siret__regex=r"\A[0-9]{14}\Z"),
+                name="%(class)s_origin_siae_siret_regex",
+            ),
         ]
 
     @classmethod
