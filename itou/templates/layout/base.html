@@ -94,6 +94,10 @@
                             {% block title_navinfo %}{% endblock %}
                             {% block title_content %}{% endblock %}
                             {% block title_messages %}
+                                {% if concurrent_session %}
+                                    {# TODO: find a concise and clear message to display #}
+                                    {% bootstrap_alert "Une autre session est actuellement active sur votre compte." alert_type="warning" %}
+                                {% endif %}
                                 {% bootstrap_messages %}
                             {% endblock %}
                             {% block title_extra %}{% endblock %}
