@@ -619,7 +619,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 21,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -1529,6 +1529,25 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'IfNode[job_seekers_views/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
@@ -1836,7 +1855,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -2733,6 +2752,25 @@
                                                                 %s,
                                                                 %s)
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

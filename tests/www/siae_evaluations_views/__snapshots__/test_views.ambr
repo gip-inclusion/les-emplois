@@ -142,7 +142,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_queries[queries]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -572,6 +572,25 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'VariableNode[siae_evaluations/evaluated_siae_sanction.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
@@ -978,7 +997,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_view_as_institution[non_significant_sanction][queries]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -1396,6 +1415,25 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1629,7 +1667,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_view_as_institution[significant_sanction][queries]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -2047,6 +2085,25 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

@@ -1288,7 +1288,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 31,
+    'num_queries': 32,
     'queries': list([
       dict({
         'origin': list([
@@ -2479,6 +2479,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -2847,7 +2865,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 32,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -4058,6 +4076,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -4484,7 +4520,7 @@
 # ---
 # name: TestProcessViews.test_details_for_job_seeker
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -5358,6 +5394,23 @@
                  AND "gps_followupgroup"."beneficiary_id" = %s)
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'details_for_jobseeker[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

@@ -931,7 +931,7 @@
 # ---
 # name: TestCheckPreviousApplicationsForHireView.test_num_queries[get_with_previous_application]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -1921,6 +1921,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -3099,7 +3115,7 @@
 # ---
 # name: TestHireConfirmation.test_as_geiq[view queries]
   dict({
-    'num_queries': 32,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -4225,6 +4241,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -4303,7 +4335,7 @@
 # ---
 # name: TestHireConfirmation.test_as_iae[view queries]
   dict({
-    'num_queries': 25,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -5325,6 +5357,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -5406,7 +5454,7 @@
 # ---
 # name: TestHireContract.test_as_company[view queries]
   dict({
-    'num_queries': 25,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -6416,6 +6464,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -6879,7 +6943,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -7313,6 +7377,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -7362,7 +7442,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -7728,12 +7808,28 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -8147,6 +8243,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
     ]),
   })
@@ -8621,7 +8733,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -9141,6 +9253,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -9238,7 +9366,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -9692,6 +9820,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -9743,7 +9887,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -10243,6 +10387,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -10679,7 +10839,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -11113,6 +11273,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -11162,7 +11338,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -11528,12 +11704,28 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -11947,6 +12139,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
     ]),
   })
@@ -12421,7 +12629,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -12941,6 +13149,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -13038,7 +13262,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -13492,6 +13716,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -13543,7 +13783,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -14043,6 +14283,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([

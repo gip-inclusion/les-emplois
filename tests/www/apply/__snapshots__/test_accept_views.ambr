@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAcceptConfirmation.test_as_geiq[view queries]
   dict({
-    'num_queries': 30,
+    'num_queries': 31,
     'queries': list([
       dict({
         'origin': list([
@@ -1034,6 +1034,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -1114,7 +1130,7 @@
 # ---
 # name: TestAcceptConfirmation.test_as_iae[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -2198,6 +2214,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -3188,7 +3220,7 @@
 # ---
 # name: TestProcessAcceptViewsInWizard.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 27,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -4310,6 +4342,22 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([

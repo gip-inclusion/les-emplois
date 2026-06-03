@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalSuspendActionChoiceView.test_context[view queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -570,6 +570,24 @@
           ORDER BY 45 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_action_choice[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -654,7 +672,7 @@
 # ---
 # name: TestApprovalSuspendUpdateEndDateView.test_context[view queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1223,6 +1241,24 @@
           ORDER BY 45 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_update_enddate[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1408,7 +1444,7 @@
 # ---
 # name: TestApprovalSuspendView.test_delete_suspension[view queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -1984,6 +2020,23 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_delete[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -2068,7 +2121,7 @@
 # ---
 # name: TestApprovalSuspendView.test_update_suspension[view queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -2751,6 +2804,24 @@
                  AND NOT ("approvals_suspension"."id" = %s))
           ORDER BY "approvals_suspension"."start_at" DESC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_update[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

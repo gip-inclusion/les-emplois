@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestJobDescriptionCard.test_job_seeker_card_actions
   dict({
-    'num_queries': 7,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -161,6 +161,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'IfNode[companies/job_description_card.html]',
           'IfNode[companies/job_description_card.html]',
           'BlockNode[layout/base.html]',
@@ -289,7 +305,7 @@
 # ---
 # name: TestJobDescriptionCard.test_prescriber_card_actions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -675,6 +691,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'IfNode[companies/job_description_card.html]',
           'IfNode[companies/job_description_card.html]',
           'BlockNode[layout/base.html]',
@@ -803,7 +835,7 @@
 # ---
 # name: TestJobDescriptionListView.test_response_content[job descriptions list]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -1217,6 +1249,24 @@
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'job_description_list[www/companies_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

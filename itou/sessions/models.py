@@ -13,6 +13,9 @@ class ItouSession(AbstractBaseSession):
     def get_session_store_class(cls):
         return SessionStore
 
+    def is_hijacked(self):
+        return bool(self.get_session_store_class()(self.session_key).decode(self.session_data).get("hijack_history"))
+
 
 class SessionStore(DBStore):
     @classmethod

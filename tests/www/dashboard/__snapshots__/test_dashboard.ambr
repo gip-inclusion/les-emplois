@@ -50,7 +50,7 @@
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -516,6 +516,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -750,7 +768,7 @@
 # ---
 # name: TestDashboardView.test_jobseeker_approval_card[job seeker with approval queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1197,6 +1215,24 @@
           WHERE "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" = %s
           ORDER BY "eligibility_geiqeligibilitydiagnosis"."created_at" DESC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'dashboard[www/dashboard/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

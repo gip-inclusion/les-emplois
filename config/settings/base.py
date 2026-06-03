@@ -190,6 +190,7 @@ TEMPLATES = [
                 "itou.utils.settings_context_processors.expose_settings",
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
+                "itou.utils.context_processors.concurrent_session_exists",
             ],
             "builtins": ["slippers.templatetags.slippers"],
         },
