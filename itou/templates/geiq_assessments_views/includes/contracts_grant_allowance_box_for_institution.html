@@ -33,7 +33,7 @@
 
         {% if active_tab != active_tab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
             <a class="btn btn-outline-primary btn-block btn-lg mb-2{% if disabled %} disabled{% endif %}"
-               href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=active_tab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}">
+               href="{% url "geiq_assessments_views:assessment_contracts_details_refusal_justification" contract_pk=contract.pk %}">
                 <span>{{ contract.allowance_refusal_reason|yesno:"Modifier le motif de refus,Justifier le refus" }}</span>
             </a>
         {% endif %}

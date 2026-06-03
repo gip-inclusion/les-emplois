@@ -265,6 +265,7 @@ NAV_ENTRIES = {
             "geiq_assessments_views:assessment_contracts_details_contract",
             "geiq_assessments_views:assessment_contracts_details_support_and_training",
             "geiq_assessments_views:assessment_contracts_details_exit",
+            "geiq_assessments_views:assessment_contracts_details_request_justification",
         ],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",

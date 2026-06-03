@@ -715,11 +715,8 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
                     self.object.allowance_granted = False
                     self.object.save(update_fields=("allowance_granted",))
                     redirect_to_view = reverse(
-                        "geiq_assessments_views:assessment_contracts_details",
-                        kwargs={
-                            "contract_pk": str(self.object.pk),
-                            "tab": AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value,
-                        },
+                        "geiq_assessments_views:assessment_contracts_details_refusal_justification",
+                        kwargs={"contract_pk": str(self.object.pk)},
                     )
                 elif action is InstitutionAction.GRANT_ALLOWANCE:
                     self.object.allowance_granted = True
@@ -732,6 +729,11 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
                             "allowance_refusal_details",
                         )
                     )
+                    if self.tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
+                        redirect_to_view = reverse(
+                            "geiq_assessments_views:assessment_contracts_details_employee",
+                            kwargs={"contract_pk": self.object.pk},
+                        )
                 if redirect_to_view:
                     return HttpResponseRedirect(redirect_to_view)
         return self.render_to_response(self.get_context_data(object=self.object))
@@ -807,7 +809,66 @@ class AssessmentContractDetailsExitView(AssessmentContractDetailsBaseView):
         self.tab = AssessmentContractDetailsTab.EXIT
 
 
-# View only used for ALLOWANCE_REQUEST_JUSTIFICATION and ALLOWANCE_REFUSAL_JUSTIFICATION, temporarily
+class AssessmentContractDetailsRefusalJustificationView(AssessmentContractDetailsBaseView):
+    def test_func(self):
+        return self.request.from_institution
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.tab = AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.allowance_granted:
+            raise Http404
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def get_form(self):
+        form = AllowanceRefusalJustificationForm(
+            data=self.request.POST
+            if self.request.POST.get("action") == InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION
+            else None,
+            initial={
+                "allowance_refusal_reason": self.object.allowance_refusal_reason,
+                "allowance_refusal_details": self.object.allowance_refusal_details,
+            },
+        )
+        if self.object.employee.assessment.grants_selection_validated_at:
+            for fieldname in form.fields:
+                form.fields[fieldname].disabled = True
+        return form
+
+    def post_action(self, action):
+        if self.object.allowance_granted:
+            raise Http404
+
+        self.allowance_refusal_justification_form = self.get_form()
+        if action is InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION:
+            if self.allowance_refusal_justification_form.is_valid():
+                if self.object.employee.assessment.grants_selection_validated_at:
+                    messages.error(
+                        self.request,
+                        "La sélection des contrats a déjà été validée : "
+                        "vous ne pouvez plus modifier le motif de refus.",
+                    )
+                else:
+                    self.object.allowance_refusal_reason = self.allowance_refusal_justification_form.cleaned_data[
+                        "allowance_refusal_reason"
+                    ]
+                    self.object.allowance_refusal_details = self.allowance_refusal_justification_form.cleaned_data[
+                        "allowance_refusal_details"
+                    ]
+                    self.object.save(update_fields=("allowance_refusal_reason", "allowance_refusal_details"))
+            return self.render_to_response(self.get_context_data(object=self.object))
+
+        return super().post_action(action)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"allowance_refusal_justification_form": self.get_form()}
+
+
+# View only used for ALLOWANCE_REQUEST_JUSTIFICATION temporarily
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_contracts_details(
     request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"

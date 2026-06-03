@@ -706,8 +706,13 @@ class TestAssessmentContractsDetails:
                 return reverse(
                     "geiq_assessments_views:assessment_contracts_details_exit", kwargs={"contract_pk": contract_pk}
                 )
+            case AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
+                return reverse(
+                    "geiq_assessments_views:assessment_contracts_details_refusal_justification",
+                    kwargs={"contract_pk": contract_pk},
+                )
             case _:
-                # FIXME: deprecated URL for ALLOWANCE_REQUEST_JUSTIFICATION and ALLOWANCE_REFUSAL_JUSTIFICATION
+                # FIXME: deprecated URL for ALLOWANCE_REQUEST_JUSTIFICATION
                 return reverse(
                     "geiq_assessments_views:assessment_contracts_details",
                     kwargs={"contract_pk": contract_pk, "tab": tab.value},
@@ -720,8 +725,8 @@ class TestAssessmentContractsDetails:
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    @pytest.mark.parametrize("tab", AssessmentContractDetailsTab)
-    def test_unauthorized_access(self, client, tab):
+    @pytest.mark.parametrize("tab", AssessmentContractDetailsTab.get_common_tabs())
+    def test_unauthorized_access_common_tabs(self, client, tab):
         contract = EmployeeContractFactory()
         url = self.get_tab_url(tab, contract.pk)
         for user, expected_status in [
@@ -729,6 +734,34 @@ class TestAssessmentContractsDetails:
             (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
             (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(membership=True), 404),
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == expected_status
+
+    def test_unauthorized_access_employer_tabs(self, client):
+        contract = EmployeeContractFactory()
+        url = self.get_tab_url(AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION, contract.pk)
+        for user, expected_status in [
+            (JobSeekerFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
+            (LaborInspectorFactory(membership=True), 404),
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == expected_status
+
+    def test_unauthorized_access_institution_tabs(self, client):
+        contract = EmployeeContractFactory()
+        url = self.get_tab_url(AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION, contract.pk)
+        for user, expected_status in [
+            (JobSeekerFactory(), 403),
+            (PrescriberFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
+            (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -824,7 +857,6 @@ class TestAssessmentContractsDetails:
         # GEIQ only tabs
         # --------------------------------------------------------------------
         # Justification tab is not available for contracts >90 days with allowance_requested=True
-        contract.allowance_requested = True
         contract.save()
         assert not contract.requires_justification
         check_user_access_to_tabs(
@@ -858,14 +890,14 @@ class TestAssessmentContractsDetails:
         contract.save()
         # Justification tab is not available when allowance_granted=True
         check_user_access_to_tabs(
-            geiq_membership.user,
+            ddets_membership.user,
             tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION],
             status_code=404,
         )
         check_user_access_to_tabs(
-            ddets_membership.user,
+            geiq_membership.user,
             tabs=[AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION],
-            status_code=404,
+            status_code=403,
         )  # GEIQ users do not have access
 
     @pytest.mark.parametrize("short_contract", [True, False], ids=["contract < 90 days", "contract >= 90 days"])

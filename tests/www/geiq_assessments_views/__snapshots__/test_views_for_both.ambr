@@ -185,8 +185,8 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsRefusalJustificationView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'AssessmentContractDetailsRefusalJustificationView.get[www/geiq_assessments_views/views.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
