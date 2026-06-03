@@ -6,6 +6,7 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.db import models
@@ -17,6 +18,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST, require_safe
+from django.views.generic import DetailView
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
@@ -663,6 +665,149 @@ def assessment_contracts_export(request, pk, include_unselected_by_geiq):
     )
 
 
+class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
+    model = EmployeeContract
+    template_name = "geiq_assessments_views/assessment_contracts_details.html"
+    context_object_name = "contract"
+    slug_field = "pk"
+    slug_url_kwarg = "contract_pk"
+
+    def test_func(self):
+        raise NotImplementedError
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.editable = False
+        self.tab = None
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if self.request.from_employer:
+            filter_kwargs = {"employee__assessment__companies": self.request.current_organization}
+        elif self.request.from_institution:
+            filter_kwargs = {
+                "employee__assessment__institutions": self.request.current_organization,
+                "employee__assessment__submitted_at__isnull": False,
+                "allowance_requested": True,
+            }
+        else:
+            raise Http404  # This should never happen thanks to UserPassesTestMixin
+
+        qs = qs.filter(**filter_kwargs).select_related("employee__assessment__campaign")
+
+        if self.tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
+            qs = qs.prefetch_related("employee__prequalifications")
+
+        return qs
+
+    def post_action(self, action):
+        if self.request.from_institution:
+            if action in [InstitutionAction.REFUSE_ALLOWANCE, InstitutionAction.GRANT_ALLOWANCE]:
+                redirect_to_view = None
+                if self.object.employee.assessment.grants_selection_validated_at:
+                    messages.error(
+                        self.request,
+                        "La sélection des contrats a déjà été validée : "
+                        "vous ne pouvez plus accorder ou refuser l’aide pour ce contrat.",
+                    )
+                elif action is InstitutionAction.REFUSE_ALLOWANCE:
+                    self.object.allowance_granted = False
+                    self.object.save(update_fields=("allowance_granted",))
+                    redirect_to_view = reverse(
+                        "geiq_assessments_views:assessment_contracts_details",
+                        kwargs={
+                            "contract_pk": str(self.object.pk),
+                            "tab": AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value,
+                        },
+                    )
+                elif action is InstitutionAction.GRANT_ALLOWANCE:
+                    self.object.allowance_granted = True
+                    self.object.allowance_refusal_reason = ""
+                    self.object.allowance_refusal_details = ""
+                    self.object.save(
+                        update_fields=(
+                            "allowance_granted",
+                            "allowance_refusal_reason",
+                            "allowance_refusal_details",
+                        )
+                    )
+                if redirect_to_view:
+                    return HttpResponseRedirect(redirect_to_view)
+        return self.render_to_response(self.get_context_data(object=self.object))
+
+    def post(self, request, *args, **kwargs):
+        try:
+            action = InstitutionAction(request.POST.get("action"))
+        except ValueError:
+            raise Http404
+
+        self.object = self.get_object()
+
+        return self.post_action(action)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.from_employer:
+            if not self.object.employee.assessment.submitted_at:
+                self.editable = not self.object.employee.assessment.contracts_selection_validated_at
+        elif self.request.from_institution:
+            if not self.object.employee.assessment.reviewed_at:
+                self.editable = not self.object.employee.assessment.grants_selection_validated_at
+
+        back_url = reverse(
+            "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": self.object.employee.assessment.pk}
+        )
+
+        context |= {
+            "back_url": back_url,
+            "assessment": self.object.employee.assessment,
+            "editable": self.editable,
+            "MIN_DAYS_IN_YEAR_FOR_ALLOWANCE": MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
+            "matomo_custom_title": f"Bilan d’exécution - page de detail d’un contrat - {self.tab}",
+            "active_tab": self.tab,
+        }
+        return context
+
+
+class AssessmentContractDetailsEmployeeView(AssessmentContractDetailsBaseView):
+    def test_func(self):
+        return employer_has_access_to_assessments(self.request) or self.request.from_institution
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.tab = AssessmentContractDetailsTab.EMPLOYEE
+
+
+class AssessmentContractDetailsContractView(AssessmentContractDetailsBaseView):
+    def test_func(self):
+        return employer_has_access_to_assessments(self.request) or self.request.from_institution
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.tab = AssessmentContractDetailsTab.CONTRACT
+
+
+class AssessmentContractDetailsSupportAndTrainingView(AssessmentContractDetailsBaseView):
+    def test_func(self):
+        return employer_has_access_to_assessments(self.request) or self.request.from_institution
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.tab = AssessmentContractDetailsTab.SUPPORT_AND_TRAINING
+
+
+class AssessmentContractDetailsExitView(AssessmentContractDetailsBaseView):
+    def test_func(self):
+        return employer_has_access_to_assessments(self.request) or self.request.from_institution
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.tab = AssessmentContractDetailsTab.EXIT
+
+
+# View only used for ALLOWANCE_REQUEST_JUSTIFICATION and ALLOWANCE_REFUSAL_JUSTIFICATION, temporarily
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_contracts_details(
     request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"

@@ -976,8 +976,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsContractView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -1447,8 +1446,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsContractView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -1524,12 +1522,16 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1552,8 +1554,6 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1571,12 +1571,6 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
@@ -1767,8 +1761,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsEmployeeView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -2238,8 +2231,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsEmployeeView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -2315,12 +2307,16 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2343,8 +2339,6 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2362,12 +2356,6 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -2584,8 +2572,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsExitView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -3055,8 +3042,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsExitView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -3132,12 +3118,16 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3160,8 +3150,6 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3179,12 +3167,6 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
@@ -3375,8 +3357,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsSupportAndTrainingView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -3454,8 +3435,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsSupportAndTrainingView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeeprequalification"."id",
@@ -3863,8 +3843,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsSupportAndTrainingView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -3940,8 +3919,7 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsSupportAndTrainingView.get_object[<site-packages>/django/views/generic/detail.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeeprequalification"."id",
@@ -3957,12 +3935,16 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3985,8 +3967,6 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -4004,12 +3984,6 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
