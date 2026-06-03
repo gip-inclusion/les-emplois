@@ -242,6 +242,10 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
                     '"Pas d\'habilitation nécessaire".'
                 ),
             ),
+            models.CheckConstraint(
+                condition=models.Q(siret__regex=r"\A[0-9]{14}\Z"),
+                name="prescriber_organization_siret_regex",
+            ),
         ]
 
     def save(self, *args, **kwargs):

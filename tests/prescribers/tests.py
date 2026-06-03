@@ -910,6 +910,20 @@ def test_prevent_validated_authorization_if_other_constraint():
         )
 
 
+def test_siret_constraint():
+    organization = PrescriberOrganizationFactory()
+    assert organization.siret
+    valid_siret = organization.siret
+
+    # Check that None value is still authorized
+    organization.siret = None
+    organization.save()
+
+    organization.siret = valid_siret[:-1]
+    with pytest.raises(IntegrityError, match=r".*prescriber_organization_siret_regex.*"):
+        organization.save()
+
+
 def test_prevent_not_required_authorization_unless_other_constraint():
     organization = PrescriberOrganizationFactory(
         kind=PrescriberOrganizationKind.OTHER, authorization_status=PrescriberAuthorizationStatus.NOT_REQUIRED
