@@ -46,10 +46,7 @@ from itou.utils.apis import geiq_label
 from itou.utils.auth import check_request
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
-from itou.www.geiq_assessments_views.export import (
-    get_export_format,
-    serialize_employee_contract,
-)
+from itou.www.geiq_assessments_views.export import get_export_format, serialize_employee_contract
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
     AllowanceRefusalJustificationForm,
@@ -1006,6 +1003,10 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
                 "grants_selection_validated_at",
                 "reviewed_at",
                 "final_reviewed_at",
+            ),
+            potential_allowance_amount=Sum(
+                "employees__contracts__employee__allowance_amount",
+                filter=Q(employees__contracts__allowance_granted=True),
             ),
             **annotate_kwargs,
         )

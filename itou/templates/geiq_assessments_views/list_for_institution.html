@@ -32,8 +32,9 @@
                                         <th scope="col">Structures</th>
                                         <th scope="col">Campagne</th>
                                         <th scope="col">Référent</th>
-                                        <th scope="col">Statut du bilan</th>
+                                        <th scope="col" aria-label="Statut du bilan">Statut</th>
                                         <th scope="col">Nombre de contrats</th>
+                                        <th scope="col">Montant potentiel</th>
                                         <th scope="col">Montant accordé</th>
                                         <th scope="col">Montant conventionné</th>
                                         <th scope="col">Taux de réalisation</th>
@@ -67,6 +68,13 @@
                                             <td>
                                                 {% if assessment.submitted_at %}
                                                     {{ assessment.contracts_nb }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if assessment.can_view_amounts %}
+                                                    {{ assessment.potential_allowance_amount|format_int_euros }}
                                                 {% else %}
                                                     -
                                                 {% endif %}

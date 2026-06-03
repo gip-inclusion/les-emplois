@@ -2983,6 +2983,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
+                 SUM(T6."allowance_amount") FILTER (
+                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -2993,6 +2995,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
+          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -3119,11 +3122,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -3164,6 +3170,9 @@
                                       0
                                   </td>
                                   <td>
+                                      -
+                                  </td>
+                                  <td>
                                       100 000 €
                                   </td>
                                   <td>
@@ -3201,6 +3210,9 @@
                                   </td>
                                   <td>
                                       0
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       -
@@ -3251,6 +3263,9 @@
                                   <td>
                                       -
                                   </td>
+                                  <td>
+                                      -
+                                  </td>
                               </tr>
                               <tr>
                                   <td>
@@ -3277,6 +3292,9 @@
                                   </td>
                                   <td>
                                       0
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       90 000 €
@@ -3315,6 +3333,9 @@
                                   </td>
                                   <td>
                                       0
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       80 000 €
@@ -3366,11 +3387,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -3414,6 +3438,9 @@
                                   <td>
                                       -
                                   </td>
+                                  <td>
+                                      -
+                                  </td>
                               </tr>
                               <tr>
                                   <td>
@@ -3435,6 +3462,9 @@
                                   </td>
                                   <td>
                                       2
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       -
@@ -3479,6 +3509,9 @@
                                   <td>
                                       -
                                   </td>
+                                  <td>
+                                      -
+                                  </td>
                               </tr>
                               <tr>
                                   <td>
@@ -3500,6 +3533,9 @@
                                   </td>
                                   <td>
                                       4
+                                  </td>
+                                  <td>
+                                      3 256 €
                                   </td>
                                   <td>
                                       80 000 €
@@ -3551,11 +3587,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -3593,6 +3632,9 @@
                                       3
                                   </td>
                                   <td>
+                                      2 442 €
+                                  </td>
+                                  <td>
                                       100 000 €
                                   </td>
                                   <td>
@@ -3626,6 +3668,9 @@
                                   </td>
                                   <td>
                                       2
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       -
@@ -3672,6 +3717,9 @@
                                   <td>
                                       -
                                   </td>
+                                  <td>
+                                      -
+                                  </td>
                               </tr>
                               <tr>
                                   <td>
@@ -3695,6 +3743,9 @@
                                   </td>
                                   <td>
                                       4
+                                  </td>
+                                  <td>
+                                      3 256 €
                                   </td>
                                   <td>
                                       80 000 €
@@ -3766,11 +3817,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -3810,6 +3864,9 @@
                                       <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
                                           En attente
                                       </span>
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       -
@@ -3862,11 +3919,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -3919,6 +3979,9 @@
                                   <td>
                                       -
                                   </td>
+                                  <td>
+                                      -
+                                  </td>
                               </tr>
                           </tbody>
                       </table>
@@ -3958,11 +4021,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -3999,6 +4065,9 @@
                                       <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
                                           En attente
                                       </span>
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       -
@@ -4051,11 +4120,14 @@
                                   <th scope="col">
                                       Référent
                                   </th>
-                                  <th scope="col">
-                                      Statut du bilan
+                                  <th aria-label="Statut du bilan" scope="col">
+                                      Statut
                                   </th>
                                   <th scope="col">
                                       Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant potentiel
                                   </th>
                                   <th scope="col">
                                       Montant accordé
@@ -4092,6 +4164,9 @@
                                       <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
                                           En attente
                                       </span>
+                                  </td>
+                                  <td>
+                                      -
                                   </td>
                                   <td>
                                       -

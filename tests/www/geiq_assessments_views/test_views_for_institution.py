@@ -16,6 +16,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
+    get_allowance_stats_for_institution,
 )
 from tests.companies.factories import CompanyMembershipFactory
 from tests.geiq_assessments.factories import (
@@ -333,6 +334,75 @@ class TestListAssessmentsView:
                 final_reviewed_assessment,
             ],
         )
+
+    @freeze_time("2025-05-21 12:00", tick=True)
+    def test_potential_allowance_amount_coherence(self, client):
+        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        client.force_login(membership.user)
+        campaign = AssessmentCampaignFactory()
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        assessment = AssessmentFactory(
+            id=uuid.UUID("11111111-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            created_by__first_name="Marie",
+            created_by__last_name="Curie",
+            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=timezone.now() + datetime.timedelta(hours=6),
+            reviewed_by=ddets_membership.user,
+            reviewed_by_institution=ddets_membership.institution,
+            review_comment="Bravo !",
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=100_000,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment, institution=membership.institution, with_convention=True
+        )
+        # Contracts taken into account for potential_allowance_amount
+        contract = EmployeeContractFactory(
+            allowance_requested=True,
+            allowance_granted=True,
+            employee__assessment=assessment,
+            employee__allowance_amount=1400,
+        )
+        EmployeeContractFactory(allowance_requested=True, allowance_granted=True, employee=contract.employee)
+        EmployeeContractFactory(
+            allowance_requested=True,
+            allowance_granted=True,
+            employee__assessment=assessment,
+            employee__allowance_amount=814,
+        )
+        # Contracts not taken into account for potential_allowance_amount
+        EmployeeContractFactory(allowance_requested=False, allowance_granted=False, employee=contract.employee)
+        EmployeeContractFactory(
+            allowance_requested=False,
+            allowance_granted=False,
+            employee__assessment=assessment,
+            employee__allowance_amount=814,
+        )
+        EmployeeContractFactory(
+            allowance_requested=True,
+            allowance_granted=False,
+            employee__assessment=assessment,
+            employee__allowance_amount=1400,
+        )
+
+        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        context_potential_amout = response.context["assessments"].get().potential_allowance_amount
+        expected_potential_amout = get_allowance_stats_for_institution(assessment, for_assessment_details=False)[
+            "potential_allowance_amount"
+        ]
+        assert context_potential_amout == 3614
+        assert context_potential_amout == expected_potential_amout
 
 
 class TestAssessmentDetailsForInstitutionView:
