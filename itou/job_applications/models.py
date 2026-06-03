@@ -933,7 +933,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if self.inverted_vae_contract is not None:
                 raise ValidationError("Un contrat associé à une VAE inversée n'est possible que pour les GEIQ")
 
-        if self.sender and self.sender_kind != self.sender.kind:
+        if self.sender and not any(
+            [
+                self.sender.is_job_seeker and self.sender_kind == SenderKind.JOB_SEEKER,
+                self.sender.is_professional and self.sender_kind != SenderKind.JOB_SEEKER,
+            ]
+        ):
             raise ValidationError(
                 "Le type de l'émetteur de la candidature ne correspond pas au type de l'utilisateur émetteur"
             )

@@ -39,7 +39,7 @@ from itou.job_applications.enums import (
 from itou.job_applications.export import JOB_APPLICATION_XSLX_FORMAT, _resolve_title, stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Appellation
-from itou.users.enums import LackOfPoleEmploiId, Title, UserKind
+from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
@@ -344,6 +344,7 @@ def test_sender_constraints(factory, constraint_name):
         partial(JobApplicationFactory, sent_by_prescriber=True),
         partial(JobApplicationFactory, sent_by_job_seeker=True),
     ],
+    ids=["employer", "prescriber", "job_seeker"],
 )
 def test_sender_kind_of_job_application(job_application_factory):
     # sender_kind is equal to the sender's kind
@@ -351,7 +352,10 @@ def test_sender_kind_of_job_application(job_application_factory):
     job_application.clean()
 
     # sender_kind is different from the sender's kind
-    job_application.sender_kind = random.choice([kind for kind in UserKind if kind != job_application.sender.kind])
+    if job_application.sender.is_professional:
+        job_application.sender_kind = SenderKind.JOB_SEEKER
+    else:
+        job_application.sender_kind = random.choice([SenderKind.EMPLOYER, SenderKind.PRESCRIBER])
     with pytest.raises(ValidationError):
         job_application.clean()
 
