@@ -2736,7 +2736,7 @@
                       
                       
                   <ul class="mb-0">
-                      <li>Un Joli GEIQ</li><li>Une autre antenne</li>
+                      <li>Un Joli GEIQ (SIRET : 123 456 789 01234)</li><li>Une autre antenne</li>
                   </ul>
               
                   </div>
@@ -2783,7 +2783,7 @@
                                           <div class="form-group">
                                               <div class="form-check">
                                                   <input class="form-check-input" disabled="" id="id_main_geiq" name="main_geiq" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label>
+                                                  <label class="form-check-label" for="id_main_geiq">Un Joli GEIQ (SIRET : 123 456 789 01234)</label>
                                                   <i aria-label="Cette structure est déjà présente dans un autre bilan d’exécution." class="ri-error-warning-line text-info" data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution." data-bs-toggle="tooltip"></i>
                                               </div>
                                           </div>
@@ -2794,7 +2794,7 @@
                                               <div class="form-group">
                                                   <div class="form-check">
                                                       <input class="form-check-input" disabled="" id="id_antenna_2345" name="antenna_2345" type="checkbox"/>
-                                                      <label class="form-check-label" for="id_antenna_2345">Une antenne</label>
+                                                      <label class="form-check-label" for="id_antenna_2345">Une antenne (SIRET : 123 456 789 02345)</label>
                                                       <i aria-label="Cette structure est déjà présente dans un autre bilan d’exécution." class="ri-error-warning-line text-info" data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution." data-bs-toggle="tooltip"></i>
                                                   </div>
                                               </div>
@@ -2804,14 +2804,14 @@
                                               <div class="form-group">
                                                   <div class="form-check">
                                                       <input class="form-check-input" disabled="" id="id_antenna_3456" name="antenna_3456" type="checkbox"/>
-                                                      <label class="form-check-label" for="id_antenna_3456">Une autre antenne</label>
+                                                      <label class="form-check-label" for="id_antenna_3456">Une autre antenne (SIRET : 123 456 789 03456)</label>
                                                       <i aria-label="Cette structure est déjà présente dans un autre bilan d’exécution." class="ri-error-warning-line text-info" data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution." data-bs-toggle="tooltip"></i>
                                                   </div>
                                               </div>
                                           
                                       
                                           
-                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_4567" name="antenna_4567" type="checkbox"/><label class="form-check-label" for="id_antenna_4567">Une dernière antenne</label></div></div>
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_4567" name="antenna_4567" type="checkbox"/><label class="form-check-label" for="id_antenna_4567">Une dernière antenne (SIRET : 123 456 789 04567)</label></div></div>
                                           
                                       
                                   </fieldset>
@@ -2898,20 +2898,20 @@
                                       <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
                                       <strong class="d-block">GEIQ principal:</strong>
                                       
-                                          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label></div></div>
+                                          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ (SIRET : 123 456 789 01234)</label></div></div>
                                       
                                       <strong class="d-block">Antennes:</strong>
                                       
                                           
-                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_2345" name="antenna_2345" type="checkbox"/><label class="form-check-label" for="id_antenna_2345">Une antenne</label></div></div>
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_2345" name="antenna_2345" type="checkbox"/><label class="form-check-label" for="id_antenna_2345">Une antenne (SIRET : 123 456 789 02345)</label></div></div>
                                           
                                       
                                           
-                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_3456" name="antenna_3456" type="checkbox"/><label class="form-check-label" for="id_antenna_3456">Une autre antenne</label></div></div>
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_3456" name="antenna_3456" type="checkbox"/><label class="form-check-label" for="id_antenna_3456">Une autre antenne (SIRET : 123 456 789 03456)</label></div></div>
                                           
                                       
                                           
-                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_4567" name="antenna_4567" type="checkbox"/><label class="form-check-label" for="id_antenna_4567">Une dernière antenne</label></div></div>
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_4567" name="antenna_4567" type="checkbox"/><label class="form-check-label" for="id_antenna_4567">Une dernière antenne (SIRET : 123 456 789 04567)</label></div></div>
                                           
                                       
                                   </fieldset>
@@ -2993,7 +2993,7 @@
                       
                       
                   <ul class="mb-0">
-                      <li>Un Joli GEIQ</li>
+                      <li>Un Joli GEIQ (SIRET : 123 456 789 01234)</li>
                   </ul>
               
                   </div>
@@ -3037,7 +3037,7 @@
                                       <legend class="h3">Quelles sont les structures concernées par cette convention ?</legend>
                                       <strong class="d-block">GEIQ principal:</strong>
                                       
-                                          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label></div></div>
+                                          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ (SIRET : 123 456 789 01234)</label></div></div>
                                       
                                       <strong class="d-block">Antennes:</strong>
                                       
