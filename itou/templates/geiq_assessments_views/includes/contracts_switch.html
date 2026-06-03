@@ -30,14 +30,14 @@
 
     {% if request.from_employer and contract.requires_justification %}
         {% if contract.allowance_request_justification_reason %}
-            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
+            <a href="{% url 'geiq_assessments_views:assessment_contracts_details_request_justification' contract_pk=contract.pk %}"
                class="text-success text-decoration-none lh-1"
                data-bs-toggle="tooltip"
                data-bs-title="Vous avez motivé la demande d’aide de ce contrat">
                 <i class="ri-check-line" aria-label="Vous avez motivé la demande d’aide de ce contrat" role="button" tabindex="0"></i>
             </a>
         {% else %}
-            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
+            <a href="{% url 'geiq_assessments_views:assessment_contracts_details_request_justification' contract_pk=contract.pk %}"
                class="text-warning text-decoration-none lh-1"
                data-bs-toggle="tooltip"
                data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat">

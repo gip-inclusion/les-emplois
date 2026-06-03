@@ -656,8 +656,8 @@
       }),
       dict({
         'origin': list([
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
+          'AssessmentContractDetailsRequestJustificationView.get_object[<site-packages>/django/views/generic/detail.py]',
+          'AssessmentContractDetailsRequestJustificationView.get[www/geiq_assessments_views/views.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -733,12 +733,16 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -761,8 +765,6 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_details.html]',
-          'assessment_contracts_details[www/geiq_assessments_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -780,12 +782,6 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
@@ -4315,7 +4311,7 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary w-100 mb-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+      <a class="btn btn-primary w-100 mb-3 disabled" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
           Modifier votre justification
       </a>
       <form method="post">

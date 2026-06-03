@@ -62,6 +62,7 @@ class AllowanceRefusalReason(models.TextChoices):
 class EmployerAction(enum.StrEnum):
     REQUEST_ALLOWANCE = "request_allowance"
     UNREQUEST_ALLOWANCE = "unrequest_allowance"
+    ALLOWANCE_REQUEST_JUSTIFICATION = "allowance_request_justification"
 
     # Make the Enum work in Django's templates
     # See :

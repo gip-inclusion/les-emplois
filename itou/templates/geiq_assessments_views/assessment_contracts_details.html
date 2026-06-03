@@ -56,7 +56,7 @@
         {% if request.from_employer and contract.requires_justification %}
             <li class="nav-item">
                 <a class="nav-link{% if active_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %} active{% endif %}"
-                   href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}">
+                   href="{% url "geiq_assessments_views:assessment_contracts_details_request_justification" contract_pk=contract.pk %}">
                     <span>{{ AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION.label }}</span>
                     {% if not contract.allowance_request_justification_reason %}
                         <i class="ri-error-warning-line text-warning ms-2"></i>

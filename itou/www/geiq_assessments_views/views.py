@@ -723,11 +723,8 @@ class AssessmentContractDetailsBaseView(UserPassesTestMixin, DetailView):
 
                 if self.object.requires_justification and not self.object.allowance_request_justification_reason:
                     redirect_to_view = reverse(
-                        "geiq_assessments_views:assessment_contracts_details",
-                        kwargs={
-                            "contract_pk": self.object.pk,
-                            "tab": AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION,
-                        },
+                        "geiq_assessments_views:assessment_contracts_details_request_justification",
+                        kwargs={"contract_pk": self.object.pk},
                     )
                 else:
                     redirect_to_view = reverse(
@@ -846,6 +843,76 @@ class AssessmentContractDetailsExitView(AssessmentContractDetailsBaseView):
         self.tab = AssessmentContractDetailsTab.EXIT
 
 
+class AssessmentContractDetailsRequestJustificationView(AssessmentContractDetailsBaseView):
+    def test_func(self):
+        return employer_has_access_to_assessments(self.request)
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.tab = AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.requires_justification:
+            raise Http404
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def get_form(self):
+        form = AllowanceRequestJustificationForm(
+            data=self.request.POST
+            if self.request.POST.get("action") == EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION
+            else None,
+            initial={
+                "allowance_request_reason": self.object.allowance_request_justification_reason,
+                "allowance_request_details": self.object.allowance_request_justification_details,
+            },
+        )
+        if self.object.employee.assessment.contracts_selection_validated_at:
+            for fieldname in form.fields:
+                form.fields[fieldname].disabled = True
+        return form
+
+    def post_action(self, action):
+        if not self.object.requires_justification:
+            raise Http404
+
+        self.allowance_request_justification_form = self.get_form()
+        if action is EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION:
+            if self.allowance_request_justification_form.is_valid():
+                if self.object.employee.assessment.contracts_selection_validated_at:
+                    messages.error(
+                        self.request,
+                        "La sélection des contrats a déjà été validée : "
+                        "vous ne pouvez plus modifier le motif de sollicitation de l’aide pour ce contrat.",
+                    )
+                else:
+                    self.object.allowance_request_justification_reason = (
+                        self.allowance_request_justification_form.cleaned_data["allowance_request_reason"]
+                    )
+                    self.object.allowance_request_justification_details = (
+                        self.allowance_request_justification_form.cleaned_data["allowance_request_details"]
+                    )
+                    self.object.save(
+                        update_fields=(
+                            "allowance_request_justification_reason",
+                            "allowance_request_justification_details",
+                        )
+                    )
+                return HttpResponseRedirect(
+                    reverse(
+                        "geiq_assessments_views:assessment_contracts_details_contract",
+                        kwargs={"contract_pk": str(self.object.pk)},
+                    )
+                )
+            return self.render_to_response(self.get_context_data(object=self.object))
+
+        return super().post_action(action)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"allowance_request_justification_form": self.get_form()}
+
+
 class AssessmentContractDetailsRefusalJustificationView(AssessmentContractDetailsBaseView):
     def test_func(self):
         return self.request.from_institution
@@ -903,175 +970,6 @@ class AssessmentContractDetailsRefusalJustificationView(AssessmentContractDetail
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"allowance_refusal_justification_form": self.get_form()}
-
-
-# View only used for ALLOWANCE_REQUEST_JUSTIFICATION temporarily
-@check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
-def assessment_contracts_details(
-    request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
-):
-    try:
-        details_tab = AssessmentContractDetailsTab(tab)
-    except ValueError:
-        raise Http404
-    if request.from_employer:
-        if tab not in AssessmentContractDetailsTab.get_employer_tabs():
-            raise Http404
-        filter_kwargs = {"employee__assessment__companies": request.current_organization}
-    elif request.from_institution:
-        if tab not in AssessmentContractDetailsTab.get_institution_tabs():
-            raise Http404
-        filter_kwargs = {
-            "employee__assessment__institutions": request.current_organization,
-            "employee__assessment__submitted_at__isnull": False,
-            "allowance_requested": True,
-        }
-    else:
-        raise Http404  # This should never happen thanks to check_request
-    contract_qs = EmployeeContract.objects.filter(**filter_kwargs).select_related("employee__assessment__campaign")
-    if details_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
-        contract_qs = contract_qs.prefetch_related("employee__prequalifications")
-    contract = get_object_or_404(contract_qs, pk=contract_pk)
-
-    editable = False
-    context = {}
-    if request.from_employer:
-        if not contract.employee.assessment.submitted_at:
-            editable = not contract.employee.assessment.contracts_selection_validated_at
-        if details_tab == AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION:
-            if not contract.requires_justification:
-                raise Http404  # Tab is displayed and accessible only if the contract requires justification.
-            allowance_request_justification_form = AllowanceRequestJustificationForm(
-                data=request.POST or None,
-                initial={
-                    "allowance_request_reason": contract.allowance_request_justification_reason,
-                    "allowance_request_details": contract.allowance_request_justification_details,
-                },
-            )
-            if contract.employee.assessment.contracts_selection_validated_at:
-                for fieldname in allowance_request_justification_form.fields:
-                    allowance_request_justification_form.fields[fieldname].disabled = True
-            context |= {"allowance_request_justification_form": allowance_request_justification_form}
-            if request.method == "POST":
-                if allowance_request_justification_form.is_valid():
-                    if contract.employee.assessment.contracts_selection_validated_at:
-                        messages.error(
-                            request,
-                            "La sélection des contrats a déjà été validée : "
-                            "vous ne pouvez plus modifier le motif de sollicitation de l’aide pour ce contrat.",
-                        )
-                    else:
-                        contract.allowance_request_justification_reason = (
-                            allowance_request_justification_form.cleaned_data["allowance_request_reason"]
-                        )
-                        contract.allowance_request_justification_details = (
-                            allowance_request_justification_form.cleaned_data["allowance_request_details"]
-                        )
-                        contract.save(
-                            update_fields=(
-                                "allowance_request_justification_reason",
-                                "allowance_request_justification_details",
-                            )
-                        )
-                    return HttpResponseRedirect(
-                        reverse(
-                            "geiq_assessments_views:assessment_contracts_details",
-                            kwargs={
-                                "contract_pk": str(contract.pk),
-                                "tab": AssessmentContractDetailsTab.CONTRACT.value,
-                            },
-                        )
-                    )
-    elif request.from_institution:
-        if not contract.employee.assessment.reviewed_at:
-            editable = not contract.employee.assessment.grants_selection_validated_at
-        if details_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
-            if contract.allowance_granted:
-                raise Http404
-            allowance_refusal_justification_form = AllowanceRefusalJustificationForm(
-                data=request.POST
-                if request.POST.get("action") == InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION
-                else None,
-                initial={
-                    "allowance_refusal_reason": contract.allowance_refusal_reason,
-                    "allowance_refusal_details": contract.allowance_refusal_details,
-                },
-            )
-            if contract.employee.assessment.grants_selection_validated_at:
-                for fieldname in allowance_refusal_justification_form.fields:
-                    allowance_refusal_justification_form.fields[fieldname].disabled = True
-            context |= {"allowance_refusal_justification_form": allowance_refusal_justification_form}
-
-        if request.method == "POST":
-            try:
-                action = InstitutionAction(request.POST.get("action"))
-            except ValueError:
-                raise Http404
-
-            if action in [InstitutionAction.REFUSE_ALLOWANCE, InstitutionAction.GRANT_ALLOWANCE]:
-                redirect_to_tab = None
-                if contract.employee.assessment.grants_selection_validated_at:
-                    messages.error(
-                        request,
-                        "La sélection des contrats a déjà été validée : "
-                        "vous ne pouvez plus accorder ou refuser l’aide pour ce contrat.",
-                    )
-                elif action is InstitutionAction.REFUSE_ALLOWANCE:
-                    contract.allowance_granted = False
-                    contract.save(update_fields=("allowance_granted",))
-                    redirect_to_tab = AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value
-                elif action is InstitutionAction.GRANT_ALLOWANCE:
-                    contract.allowance_granted = True
-                    contract.allowance_refusal_reason = ""
-                    contract.allowance_refusal_details = ""
-                    contract.save(
-                        update_fields=(
-                            "allowance_granted",
-                            "allowance_refusal_reason",
-                            "allowance_refusal_details",
-                        )
-                    )
-                    if details_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
-                        redirect_to_tab = AssessmentContractDetailsTab.EMPLOYEE.value
-                if redirect_to_tab:
-                    return HttpResponseRedirect(
-                        reverse(
-                            "geiq_assessments_views:assessment_contracts_details",
-                            kwargs={"contract_pk": str(contract.pk), "tab": redirect_to_tab},
-                        )
-                    )
-
-            elif action is InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION:
-                if details_tab != AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
-                    raise Http404
-                if allowance_refusal_justification_form.is_valid():
-                    if contract.employee.assessment.grants_selection_validated_at:
-                        messages.error(
-                            request,
-                            "La sélection des contrats a déjà été validée : "
-                            "vous ne pouvez plus modifier le motif de refus.",
-                        )
-                    else:
-                        contract.allowance_refusal_reason = allowance_refusal_justification_form.cleaned_data[
-                            "allowance_refusal_reason"
-                        ]
-                        contract.allowance_refusal_details = allowance_refusal_justification_form.cleaned_data[
-                            "allowance_refusal_details"
-                        ]
-                        contract.save(update_fields=("allowance_refusal_reason", "allowance_refusal_details"))
-
-    context |= {
-        "back_url": reverse(
-            "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
-        ),
-        "assessment": contract.employee.assessment,
-        "editable": editable,
-        "contract": contract,
-        "matomo_custom_title": f"Bilan d’exécution - page de detail d’un contrat - {tab}",
-        "active_tab": details_tab,
-        "MIN_DAYS_IN_YEAR_FOR_ALLOWANCE": MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
-    }
-    return render(request, template_name, context)
 
 
 @require_POST

@@ -260,12 +260,12 @@ NAV_ENTRIES = {
             "geiq_assessments_views:upload_action_financial_assessment",
             "geiq_assessments_views:assessment_comment",
             "geiq_assessments_views:assessment_contracts_list",
-            "geiq_assessments_views:assessment_contracts_details",  # deprecated
             "geiq_assessments_views:assessment_contracts_details_employee",
             "geiq_assessments_views:assessment_contracts_details_contract",
             "geiq_assessments_views:assessment_contracts_details_support_and_training",
             "geiq_assessments_views:assessment_contracts_details_exit",
             "geiq_assessments_views:assessment_contracts_details_request_justification",
+            "geiq_assessments_views:assessment_contracts_details_refusal_justification",
         ],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",

@@ -707,17 +707,18 @@ class TestAssessmentContractsDetails:
                 return reverse(
                     "geiq_assessments_views:assessment_contracts_details_exit", kwargs={"contract_pk": contract_pk}
                 )
+            case AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION:
+                return reverse(
+                    "geiq_assessments_views:assessment_contracts_details_request_justification",
+                    kwargs={"contract_pk": contract_pk},
+                )
             case AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
                 return reverse(
                     "geiq_assessments_views:assessment_contracts_details_refusal_justification",
                     kwargs={"contract_pk": contract_pk},
                 )
             case _:
-                # FIXME: deprecated URL for ALLOWANCE_REQUEST_JUSTIFICATION
-                return reverse(
-                    "geiq_assessments_views:assessment_contracts_details",
-                    kwargs={"contract_pk": contract_pk, "tab": tab.value},
-                )
+                raise ValueError(f"Tab {tab} not found")
 
     @pytest.mark.parametrize("tab", AssessmentContractDetailsTab)
     def test_anonymous_access(self, client, tab):
@@ -749,7 +750,7 @@ class TestAssessmentContractsDetails:
             (PrescriberFactory(membership=True), 403),
             (EmployerFactory(membership=True, membership__company__not_geiq_kind=True), 403),
             (EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ), 404),
-            (LaborInspectorFactory(membership=True), 404),
+            (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
@@ -875,7 +876,7 @@ class TestAssessmentContractsDetails:
         check_user_access_to_tabs(
             ddets_membership.user,
             tabs=[AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION],
-            status_code=404,
+            status_code=403,
         )  # institution users still do not have access
 
         # Institution only tabs
@@ -990,9 +991,12 @@ class TestAssessmentContractsDetails:
             assertContains(response, JUSTIFICATION_TAB_WITH_ICON_LI, html=True)
 
             # User fills the form with invalid values
+            response = client.post(details_justification_url, data={"allowance_request_reason": ""})
+            assert response.status_code == 404  # no action given leads to 404
             response = client.post(
                 details_justification_url,
                 data={
+                    "action": EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION,
                     "allowance_request_reason": "inexistant",
                 },
             )
@@ -1002,7 +1006,7 @@ class TestAssessmentContractsDetails:
             assertContains(response, "<li>Ce champ est obligatoire.</li>", html=True, count=1)
             response = client.post(
                 details_justification_url,
-                data={"allowance_request_details": " "},
+                data={"action": EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION, "allowance_request_details": " "},
             )
             assertContains(
                 response, "<li>Ce champ est obligatoire.</li>", html=True, count=2
@@ -1012,6 +1016,7 @@ class TestAssessmentContractsDetails:
             response = client.post(
                 details_justification_url,
                 data={
+                    "action": EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION,
                     "allowance_request_reason": random.choice(AllowanceJustificationReason.choices)[0],
                     "allowance_request_details": "C’est un cas particulier…",
                 },
@@ -1145,6 +1150,7 @@ class TestAssessmentContractsDetails:
             response = client.post(
                 details_justification_url,
                 data={
+                    "action": EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION,
                     "allowance_request_reason": AllowanceJustificationReason.OTHER.value,
                     "allowance_request_details": "Nouveaux détails",
                 },

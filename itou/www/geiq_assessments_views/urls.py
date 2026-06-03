@@ -107,15 +107,15 @@ urlpatterns = [
         name="assessment_contracts_details_exit",
     ),
     path(
+        "contracts/<uuid:contract_pk>/request-justification",
+        views.AssessmentContractDetailsRequestJustificationView.as_view(),
+        name="assessment_contracts_details_request_justification",
+    ),
+    path(
         "contracts/<uuid:contract_pk>/refusal-justification",
         views.AssessmentContractDetailsRefusalJustificationView.as_view(),
         name="assessment_contracts_details_refusal_justification",
     ),
-    path(
-        "contracts/<uuid:contract_pk>/<str:tab>",
-        views.assessment_contracts_details,
-        name="assessment_contracts_details",
-    ),  # ALLOWANCE_REQUEST_JUSTIFICATION
     # institution urls
     path("institution/list", views.list_for_institution, name="list_for_institution"),
     path("institution/<uuid:pk>", views.assessment_details_for_institution, name="details_for_institution"),

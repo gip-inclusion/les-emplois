@@ -15,9 +15,8 @@
             <p>Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».</p>
             {% if active_tab is not active_tab.ALLOWANCE_REQUEST_JUSTIFICATION %}
                 <a type="button"
-                   class="btn btn-primary w-100 mb-3"
-                   {% if disabled %}disabled{% endif %}
-                   href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=active_tab.ALLOWANCE_REQUEST_JUSTIFICATION.value %}">
+                   class="btn btn-primary w-100 mb-3{% if disabled %} disabled{% endif %}"
+                   href="{% url "geiq_assessments_views:assessment_contracts_details_request_justification" contract_pk=contract.pk %}">
                     {{ contract.allowance_request_justification_reason|yesno:"Modifier votre justification,Justifier la demande d’aide" }}
                 </a>
             {% endif %}

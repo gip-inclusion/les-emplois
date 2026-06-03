@@ -208,7 +208,7 @@
                                                         {% else %}
                                                             Non
                                                             {% if request.from_institution and contract.allowance_request_justification_reason %}
-                                                                <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.CONTRACT %}"
+                                                                <a href="{% url 'geiq_assessments_views:assessment_contracts_details_contract' contract_pk=contract.pk %}"
                                                                    class="text-info text-decoration-none lh-1"
                                                                    data-bs-toggle="tooltip"
                                                                    data-bs-title="Le GEIQ a motivé cette demande d’aide">
