@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -20,6 +21,7 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
     JobDescriptionFactory,
+    SiaeConventionFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -393,6 +395,17 @@ class TestCompanyModel:
         JobDescriptionFactory(company=company, created_at=OLD_DATE, last_employer_update_at=OLD_DATE)
         assert company.has_job_descriptions_not_updated_recently() is False
 
+    def test_siret_constraint(self):
+        company = CompanyFactory()
+        assert company.siret
+        company.siret = company.siret[:-1]
+        with (
+            triggers.fake_context(),
+            transaction.atomic(),
+            pytest.raises(IntegrityError, match=r".*company_siret_regex.*"),
+        ):
+            company.save()
+
 
 class TestCompanyQuerySet:
     def test_with_count_recent_received_job_applications(self):
@@ -694,3 +707,22 @@ def test_company_siret_field_history():
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
         datetime.now().timestamp()
     )
+
+
+class TestSiaeConventionModel:
+    def test_siret_constraint(self):
+        convention = SiaeConventionFactory()
+        assert convention.siret_signature
+        convention.siret_signature = convention.siret_signature[:-1]
+        with pytest.raises(IntegrityError, match=r".*convention_siret_signature_regex.*"):
+            convention.save()
+
+
+class TestSiaeACIConvergencePHCModel:
+    def test_siret_constraint(self):
+
+        instance = SiaeACIConvergencePHC.objects.create(siret=CompanyFactory.build().siret)
+        assert instance.siret
+        instance.siret = instance.siret[:-1]
+        with pytest.raises(IntegrityError, match=r".*aci_cvg_phc_siret.*"):
+            instance.save()
