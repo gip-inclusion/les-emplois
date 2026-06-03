@@ -61,7 +61,7 @@
       'nir_sex': 8,
       'nir_year': 55,
       'title': 'MME',
-      'user_signup_kind': 'prescriber',
+      'user_signup_kind': 'professional',
     }),
     dict({
       'birth_year': 1970,
@@ -781,7 +781,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 0,
       'number_of_memberships': 1,
@@ -794,7 +794,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
-      'kind': 'employer',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -827,7 +827,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 0,
       'number_of_memberships': 1,
@@ -840,7 +840,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': True,
       'identity_provider': 'PC',
-      'kind': 'prescriber',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -853,7 +853,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
-      'kind': 'prescriber',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -866,7 +866,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
-      'kind': 'prescriber',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 0,
       'number_of_memberships': 1,
@@ -879,7 +879,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
-      'kind': 'employer',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -892,7 +892,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
-      'kind': 'employer',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -905,7 +905,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
-      'kind': 'employer',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 0,
       'number_of_memberships': 1,
@@ -918,7 +918,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -931,7 +931,7 @@
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
+      'kind': 'professional',
       'last_login': None,
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
@@ -976,9 +976,7 @@
         'sql': '''
           UPDATE "users_user"
           SET "upcoming_deletion_notified_at" = NULL
-          WHERE ("users_user"."kind" IN (%s,
-                                         %s,
-                                         %s)
+          WHERE ("users_user"."kind" = %s
                  AND "users_user"."last_login" >= ("users_user"."upcoming_deletion_notified_at")
                  AND "users_user"."upcoming_deletion_notified_at" IS NOT NULL)
         ''',
@@ -1033,9 +1031,7 @@
                  "users_user"."allow_next_sso_sub_update",
                  "users_user"."email"::text IS NULL AS "is_deactivated"
           FROM "users_user"
-          WHERE ("users_user"."kind" IN (%s,
-                                         %s,
-                                         %s)
+          WHERE ("users_user"."kind" = %s
                  AND "users_user"."upcoming_deletion_notified_at" <= %s)
           ORDER BY 38 ASC,
                    "users_user"."upcoming_deletion_notified_at" ASC

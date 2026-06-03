@@ -123,9 +123,7 @@ class Command(BaseCommand):
     AUTO_TRIGGER_CONTEXT = False
 
     def populate_users(self):
-        queryset = User.objects.filter(
-            is_active=True, kind__in=UserKind.professionals(), email__isnull=False
-        ).annotate(
+        queryset = User.objects.filter(is_active=True, kind=UserKind.PROFESSIONAL, email__isnull=False).annotate(
             has_authorized_prescriber_orgnization_membership=Exists(
                 PrescriberMembership.objects.filter(
                     user=OuterRef("pk"), organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED

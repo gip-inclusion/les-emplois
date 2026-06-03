@@ -1587,7 +1587,7 @@ class JobApplicationComment(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name="posté par",
         on_delete=models.RESTRICT,
-        limit_choices_to={"kind__in": UserKind.professionals()},
+        limit_choices_to={"kind": UserKind.PROFESSIONAL},
     )
     message = models.TextField(verbose_name="commentaire", validators=[MaxLengthValidator(MAX_LENGTH)])
 

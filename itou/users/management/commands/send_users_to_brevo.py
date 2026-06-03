@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
     def import_professionals(self, client, *, wet_run):
         professional_qs = (
-            User.objects.filter(kind__in=UserKind.professionals())
+            User.objects.filter(kind=UserKind.PROFESSIONAL)
             .filter(
                 Exists(
                     EmailAddress.objects.filter(

@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
         users = list(
             User.objects.filter(
-                kind__in=UserKind.professionals(),
+                kind=UserKind.PROFESSIONAL,
                 upcoming_deletion_notified_at__isnull=True,
                 last_login__lt=inactive_since,
             )[: self.batch_size]

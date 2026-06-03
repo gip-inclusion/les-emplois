@@ -818,7 +818,7 @@ def test_populate_users(snapshot):
             (
                 pro_user.id,
                 pro_user.email,
-                "employer",
+                "professional",
                 pro_user.first_name,
                 pro_user.last_name,
                 pro_user.last_login,

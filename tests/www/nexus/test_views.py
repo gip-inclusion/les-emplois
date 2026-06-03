@@ -18,7 +18,7 @@ from pytest_django.asserts import (
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.nexus.factories import NexusUserFactory
@@ -99,16 +99,12 @@ class TestLayout:
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="facility_manager")
 
-        # Only use GUIDE layout if there are only GUIDE kinds
-        user.kind = UserKind.PRESCRIBER
-        user.save()
-        response = client.get(reverse("nexus:homepage"))
-        assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="guide")
-
         # Ignore NexusUser with empty kind
         NexusUserFactory(email=user.email, kind="", source=Service.MARCHE, auth=Auth.PRO_CONNECT)
         response = client.get(reverse("nexus:homepage"))
-        assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="guide")
+        assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="facility_manager")
+
+        # FIXME (alaurent): Check the User memberships to display the "guide" variant whithout company mmeberships
 
     def test_header_activated_badge(self, client, snapshot):
         user = EmployerFactory(for_snapshot=True)
@@ -157,10 +153,7 @@ class TestHomePageView:
         assertContains(response, self.ACTIVATE_SERVICES_H2)
         assertContains(response, self.NEW_SERVICES_H2)
 
-        user.kind = UserKind.PRESCRIBER
-        user.save()
-        response = client.get(self.url)
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="guide")
+        # FIXME (alaurent): Check the User memberships to display the "guide" variant whithout company mmeberships
 
     def test_all_activated_services(self, client, snapshot):
         user = pro_user_factory()
@@ -239,12 +232,6 @@ class TestDoraView:
 
 class TestEmploisViews:
     url = reverse("nexus:emplois")
-
-    def test_wrong_user_kind(self, client):
-        user = PrescriberFactory()
-        client.force_login(user)
-        response = client.get(self.url)
-        assert response.status_code == 403
 
     def test_no_company(self, client, snapshot):
         user = pro_user_factory()

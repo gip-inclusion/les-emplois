@@ -55,6 +55,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
     UserFactory,
+    random_pro_user_factory,
 )
 from tests.utils.testing import normalize_fields_history
 
@@ -501,22 +502,19 @@ class TestModel:
             "email": email,
             "upcoming_deletion_notified_at": timezone.now() if upcoming_deletion_notified else None,
         }
-        if kind in UserKind.professionals():
+        if kind == UserKind.PROFESSIONAL:
             factory_kwargs["identity_provider"] = (
                 IdentityProvider.PRO_CONNECT if has_sso_provider else IdentityProvider.DJANGO
             )
         user = {
             UserKind.JOB_SEEKER: JobSeekerFactory,
-            UserKind.PRESCRIBER: PrescriberFactory,
-            UserKind.EMPLOYER: EmployerFactory,
-            UserKind.LABOR_INSPECTOR: LaborInspectorFactory,
             UserKind.PROFESSIONAL: random.choice([PrescriberFactory, EmployerFactory, LaborInspectorFactory]),
             UserKind.ITOU_STAFF: ItouStaffFactory,
         }[kind].build(**factory_kwargs)
 
         assert user.can_be_reactivated() is all(
             [
-                kind in UserKind.professionals() or kind == UserKind.PROFESSIONAL,
+                kind == UserKind.PROFESSIONAL,
                 not is_active,
                 username,
                 has_sso_provider,
@@ -551,12 +549,7 @@ class TestModel:
         assert user.has_verified_email
 
     def test_user_kind(self):
-        non_staff_kinds = [
-            UserKind.JOB_SEEKER,
-            UserKind.PRESCRIBER,
-            UserKind.EMPLOYER,
-            UserKind.LABOR_INSPECTOR,
-        ]
+        non_staff_kinds = [UserKind.JOB_SEEKER, UserKind.PROFESSIONAL]
 
         for kind in non_staff_kinds:
             user = UserFactory(kind=kind, is_staff=True)
@@ -568,14 +561,8 @@ class TestModel:
         job_seeker = JobSeekerFactory()
         assert "candidat" == job_seeker.get_kind_display()
 
-        prescriber = PrescriberFactory()
-        assert "prescripteur" == prescriber.get_kind_display()
-
-        employer = EmployerFactory()
-        assert "employeur" == employer.get_kind_display()
-
-        labor_inspector = LaborInspectorFactory()
-        assert "inspecteur du travail" == labor_inspector.get_kind_display()
+        professional = random_pro_user_factory()
+        assert "professionnel" == professional.get_kind_display()
 
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
         no_nir_profile = JobSeekerProfileFactory(nir="")
@@ -1207,12 +1194,7 @@ def test_user_invalid_kind():
 
 @pytest.mark.parametrize(
     "user_kind,profile_expected",
-    [
-        (UserKind.JOB_SEEKER, True),
-        (UserKind.PRESCRIBER, False),
-        (UserKind.EMPLOYER, False),
-        (UserKind.LABOR_INSPECTOR, False),
-    ],
+    [(UserKind.JOB_SEEKER, True), (UserKind.PROFESSIONAL, False)],
 )
 def test_save_creates_a_job_seeker_profile(user_kind, profile_expected):
     user = User(kind=user_kind)

@@ -23,9 +23,7 @@ def collect_archive_data():
     counts = User.objects.aggregate(
         anonymized_professionals_not_deleted=Count(
             "pk",
-            filter=Q(
-                kind__in=UserKind.professionals(), upcoming_deletion_notified_at__isnull=False, email__isnull=True
-            ),
+            filter=Q(kind=UserKind.PROFESSIONAL, upcoming_deletion_notified_at__isnull=False, email__isnull=True),
         ),
         notified_job_seekers=Count(
             "pk",
@@ -34,7 +32,7 @@ def collect_archive_data():
         notified_professionals=Count(
             "pk",
             filter=Q(
-                kind__in=UserKind.professionals(),
+                kind=UserKind.PROFESSIONAL,
                 upcoming_deletion_notified_at__isnull=False,
                 email__isnull=False,
             ),
@@ -42,7 +40,7 @@ def collect_archive_data():
         notifiable_professionals=Count(
             "pk",
             filter=Q(
-                kind__in=UserKind.professionals(),
+                kind=UserKind.PROFESSIONAL,
                 upcoming_deletion_notified_at__isnull=True,
                 last_login__lt=inactive_since,
             ),

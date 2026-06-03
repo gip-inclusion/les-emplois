@@ -55,8 +55,8 @@ def test_can_be_transferred():
         sent_by_prescriber_alone=True, to_company=origin_company, state=JobApplicationState.ACCEPTED
     )
 
-    assert origin_user.kind in UserKind.professionals()
-    assert target_user.kind in UserKind.professionals()
+    assert origin_user.kind == UserKind.PROFESSIONAL
+    assert target_user.kind == UserKind.PROFESSIONAL
     assert not job_application.can_be_transferred(target_user, job_application.to_company)
     assert not job_application.can_be_transferred(lambda_user, target_company)
     assert not job_application.can_be_transferred(target_user, target_company)

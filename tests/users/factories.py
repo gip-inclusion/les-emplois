@@ -111,7 +111,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def terms_accepted_at(self):
-        if self.kind in UserKind.professionals():
+        if self.kind == UserKind.PROFESSIONAL:
             return timezone.now()
         return None
 
@@ -121,7 +121,7 @@ class ItouStaffFactory(UserFactory):
 
 
 class PrescriberFactory(UserFactory):
-    kind = UserKind.PRESCRIBER
+    kind = UserKind.PROFESSIONAL
     identity_provider = IdentityProvider.PRO_CONNECT
 
     class Params:
@@ -154,7 +154,7 @@ class PrescriberFactory(UserFactory):
 
 
 class EmployerFactory(UserFactory):
-    kind = UserKind.EMPLOYER
+    kind = UserKind.PROFESSIONAL
     identity_provider = IdentityProvider.PRO_CONNECT
 
     @factory.post_generation
@@ -175,7 +175,7 @@ class EmployerFactory(UserFactory):
 
 
 class LaborInspectorFactory(UserFactory):
-    kind = UserKind.LABOR_INSPECTOR
+    kind = UserKind.PROFESSIONAL
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):

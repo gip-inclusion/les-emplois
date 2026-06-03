@@ -370,7 +370,7 @@ def test_nir_modification_request_changelist(admin_client):
 def test_nir_modification_request_display_requested_by_kind(admin_client):
     job_seeker = JobSeekerFactory()
     (requested_by, display_kind) = random.choice(
-        [(job_seeker, "candidat"), (EmployerFactory(), "employeur"), (PrescriberFactory(), "prescripteur")]
+        [(job_seeker, "candidat"), (EmployerFactory(), "professionnel"), (PrescriberFactory(), "professionnel")]
     )
     nir_modification_request = NirModificationRequest.objects.create(
         jobseeker_profile=job_seeker.jobseeker_profile, requested_by=requested_by

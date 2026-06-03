@@ -173,8 +173,8 @@ class TestDemoAccount:
     @pytest.mark.parametrize(
         "user_kind,template_tag",
         [
-            (UserKind.EMPLOYER, employers_accounts_tag),
-            (UserKind.PRESCRIBER, prescribers_accounts_tag),
+            (UserKind.PROFESSIONAL, employers_accounts_tag),
+            (UserKind.PROFESSIONAL, prescribers_accounts_tag),
             (UserKind.JOB_SEEKER, job_seekers_accounts_tag),
         ],
     )
