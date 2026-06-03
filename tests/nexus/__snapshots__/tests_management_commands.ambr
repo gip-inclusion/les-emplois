@@ -63,9 +63,7 @@
           FROM "users_user"
           WHERE ("users_user"."email"::text IS NOT NULL
                  AND "users_user"."is_active"
-                 AND "users_user"."kind" IN (%s,
-                                             %s,
-                                             %s))
+                 AND "users_user"."kind" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),

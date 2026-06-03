@@ -1077,7 +1077,7 @@ class TestCompanySignupTokenGenerator:
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
         assert p0.check_token(company, tk1) is True
-        user = User(kind=UserKind.EMPLOYER)
+        user = User(kind=UserKind.PROFESSIONAL)
         user.save()
         membership = CompanyMembership()
         membership.user = user

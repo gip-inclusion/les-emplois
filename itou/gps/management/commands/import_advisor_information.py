@@ -129,9 +129,9 @@ class Command(BaseCommand):
         job_seekers_pks = list(
             User.objects.filter(pk__in=df["job_seeker_pk"], kind=UserKind.JOB_SEEKER).values_list("pk", flat=True)
         )
-        non_prescriber_account_emails = list(
+        non_professional_account_emails = list(
             User.objects.filter(email__in=df["email"])
-            .exclude(kind=UserKind.PRESCRIBER)
+            .exclude(kind=UserKind.PROFESSIONAL)
             .values_list("email", flat=True)
         )
         pk_to_contact = {}
@@ -140,7 +140,7 @@ class Command(BaseCommand):
             if row.job_seeker_pk not in job_seekers_pks:
                 invalid_pks.append(row.job_seeker_pk)
                 continue
-            if row.email in non_prescriber_account_emails:
+            if row.email in non_professional_account_emails:
                 continue
             pk_to_contact[row.job_seeker_pk] = AdvisorDetails(
                 first_name=row.first_name,
@@ -151,9 +151,9 @@ class Command(BaseCommand):
 
         if invalid_pks:
             self.logger.warning(f"Some job seekers ids where not found: {invalid_pks}.")
-        if non_prescriber_account_emails:
+        if non_professional_account_emails:
             self.logger.warning(
-                f"Some advisor email are attached to non prescriber accounts: {non_prescriber_account_emails}."
+                f"Some advisor email are attached to non professional accounts: {non_professional_account_emails}."
             )
 
         return job_seeker_details, pk_to_contact
@@ -219,7 +219,7 @@ class Command(BaseCommand):
                 prescribers_dict = {
                     user.email.lower(): user
                     for user in User.objects.filter(
-                        kind=UserKind.PRESCRIBER,
+                        kind=UserKind.PROFESSIONAL,
                         email__in=[o.email for o in batch.values()],
                     )
                 }
@@ -231,7 +231,7 @@ class Command(BaseCommand):
                             email=advisor_details.email.lower(),
                             first_name=advisor_details.first_name,
                             last_name=advisor_details.last_name,
-                            kind=UserKind.PRESCRIBER,
+                            kind=UserKind.PROFESSIONAL,
                         )
                         if advisor_details.code_safir_agence:
                             if organization := PrescriberOrganization.objects.filter(

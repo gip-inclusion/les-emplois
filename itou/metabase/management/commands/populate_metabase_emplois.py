@@ -592,7 +592,7 @@ class Command(BaseCommand):
         metabase_db.populate_table(evaluated_criteria.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_users(self):
-        queryset = User.objects.filter(kind__in=UserKind.professionals(), is_active=True)
+        queryset = User.objects.filter(kind=UserKind.PROFESSIONAL, is_active=True)
         metabase_db.populate_table(users.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_memberships(self):

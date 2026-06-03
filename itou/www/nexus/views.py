@@ -51,6 +51,7 @@ class NexusMixin:
         if Auth.PRO_CONNECT not in {user.auth for user in service_users}:
             raise PermissionDenied("Seul un utilisateur ayant un compte ProConnect peut accéder à cette page.")
 
+        # FIXME (alaurent): Check the User memberships to know his kind
         if {user.kind for user in service_users if user.kind} == {NexusUserKind.GUIDE}:
             self.user_kind = NexusUserKind.GUIDE
         else:
@@ -138,6 +139,7 @@ class EmploisView(NexusMixin, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        # FIXME: This cannot happen today (see fixme in NexusMixin.setup())
         if self.user_kind != NexusUserKind.FACILITY_MANAGER:
             raise PermissionDenied("Votre type de compte ne permet pas d'afficher cette page.")
         self.has_company_memberships = any(isinstance(org, Company) for org in self.request.organizations)

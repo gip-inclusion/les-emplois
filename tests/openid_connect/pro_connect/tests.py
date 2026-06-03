@@ -1,6 +1,5 @@
 import dataclasses
 import json
-import random
 from operator import itemgetter
 from unittest import mock
 from urllib.parse import quote, urlencode
@@ -38,7 +37,7 @@ from itou.openid_connect.pro_connect.models import (
 from itou.openid_connect.pro_connect.views import ProConnectSession
 from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
-from itou.users.enums import KIND_PRESCRIBER, IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
 from itou.utils.urls import get_absolute_url
@@ -329,7 +328,7 @@ class TestProConnectCallbackView:
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
         assert user.username == pro_connect.oidc_userinfo["sub"]
         assert user.has_sso_provider
-        assert user.kind == KIND_PRESCRIBER  # It will soon be PROFESSIONAL
+        assert user.kind == UserKind.PROFESSIONAL
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
     def test_callback_record_authentication(self, client, pro_connect):
@@ -426,7 +425,7 @@ class TestProConnectCallbackView:
         user = UserFactory(
             username=pc_user_data.username,
             email=pc_user_data.email,
-            kind=random.choice(UserKind.professionals()),
+            kind=UserKind.PROFESSIONAL,
             is_active=False,
         )
         response = pro_connect.mock_oauth_dance(

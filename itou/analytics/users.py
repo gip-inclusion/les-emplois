@@ -19,7 +19,7 @@ def collect_analytics_data(before):
         .values("kind", "is_employer", "is_prescriber", "is_labor_inspector")
         .annotate(count=Count("pk"))
         # Exclude pro without memberships, they are similar to inactive users
-        .exclude(kind__in=UserKind.professionals(), is_employer=False, is_prescriber=False, is_labor_inspector=False)
+        .exclude(kind=UserKind.PROFESSIONAL, is_employer=False, is_prescriber=False, is_labor_inspector=False)
         .values("kind", "count", "is_employer", "is_prescriber", "is_labor_inspector")
     )
 
@@ -27,13 +27,13 @@ def collect_analytics_data(before):
         models.DatumCode.USER_COUNT: sum([c["count"] for c in counts]),
         models.DatumCode.USER_JOB_SEEKER_COUNT: sum([c["count"] for c in counts if c["kind"] == UserKind.JOB_SEEKER]),
         models.DatumCode.USER_PRESCRIBER_COUNT: sum(
-            [c["count"] for c in counts if c["kind"] in UserKind.professionals() and c["is_prescriber"]]
+            [c["count"] for c in counts if c["kind"] == UserKind.PROFESSIONAL and c["is_prescriber"]]
         ),
         models.DatumCode.USER_EMPLOYER_COUNT: sum(
-            [c["count"] for c in counts if c["kind"] in UserKind.professionals() and c["is_employer"]]
+            [c["count"] for c in counts if c["kind"] == UserKind.PROFESSIONAL and c["is_employer"]]
         ),
         models.DatumCode.USER_LABOR_INSPECTOR_COUNT: sum(
-            [c["count"] for c in counts if c["kind"] in UserKind.professionals() and c["is_labor_inspector"]]
+            [c["count"] for c in counts if c["kind"] == UserKind.PROFESSIONAL and c["is_labor_inspector"]]
         ),
         models.DatumCode.USER_ITOU_STAFF_COUNT: sum([c["count"] for c in counts if c["kind"] == UserKind.ITOU_STAFF]),
     }

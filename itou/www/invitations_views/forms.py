@@ -243,5 +243,5 @@ class NewLaborInspectorInvitationForm(SignupForm):
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
         get_adapter().stash_verified_email(request, self.email)
-        self.user_kind = UserKind.LABOR_INSPECTOR
+        self.user_kind = UserKind.PROFESSIONAL  # user.kind is set in allauth UserAdapter override
         return super().save(request)

@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 
 from itou.invitations.notifications import InvitationAcceptedNotification
-from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -88,7 +88,7 @@ class InvitationAbstract(models.Model):
         Link present in the invitation email.
         """
         return get_absolute_url(
-            reverse("invitations_views:new_user", kwargs={"invitation_type": self.USER_KIND, "invitation_id": self.pk})
+            reverse("invitations_views:new_user", kwargs={"invitation_type": self.KIND, "invitation_id": self.pk})
         )
 
     @property
@@ -96,7 +96,7 @@ class InvitationAbstract(models.Model):
         """
         URL usable by an existing user to accept the invitation.
         """
-        return reverse("invitations_views:join", kwargs={"invitation_type": self.USER_KIND, "invitation_id": self.pk})
+        return reverse("invitations_views:join", kwargs={"invitation_type": self.KIND, "invitation_id": self.pk})
 
     @property
     def expiration_date(self):
@@ -171,7 +171,7 @@ class InvitationAbstract(models.Model):
 
 
 class PrescriberWithOrgInvitation(InvitationAbstract):
-    USER_KIND = UserKind.PRESCRIBER
+    KIND = KIND_PRESCRIBER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
@@ -192,7 +192,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
 
 class EmployerInvitation(InvitationAbstract):
-    USER_KIND = UserKind.EMPLOYER
+    KIND = KIND_EMPLOYER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
@@ -215,7 +215,7 @@ class EmployerInvitation(InvitationAbstract):
 
 
 class LaborInspectorInvitation(InvitationAbstract):
-    USER_KIND = UserKind.LABOR_INSPECTOR
+    KIND = KIND_LABOR_INSPECTOR
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",

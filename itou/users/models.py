@@ -360,9 +360,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                 condition=(
                     models.Q(kind=UserKind.ITOU_STAFF)
                     | models.Q(kind=UserKind.JOB_SEEKER)
-                    | models.Q(kind=UserKind.PRESCRIBER)
-                    | models.Q(kind=UserKind.EMPLOYER)
-                    | models.Q(kind=UserKind.LABOR_INSPECTOR)
                     | models.Q(kind=UserKind.PROFESSIONAL)
                 ),
             ),
@@ -373,7 +370,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     models.Q(identity_provider=IdentityProvider.DJANGO)
                     | models.Q(identity_provider=IdentityProvider.FRANCE_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.PE_CONNECT, kind=UserKind.JOB_SEEKER)
-                    | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind__in=UserKind.professionals())
+                    | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind=UserKind.PROFESSIONAL)
                 ),
             ),
         ]
@@ -489,7 +486,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
     @property
     def is_professional(self):
-        return self.kind in UserKind.professionals()
+        return self.kind == UserKind.PROFESSIONAL
 
     @property
     def is_itou_staff(self):

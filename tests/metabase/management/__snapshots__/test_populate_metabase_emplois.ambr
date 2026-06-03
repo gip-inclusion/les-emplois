@@ -8235,9 +8235,7 @@
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
           WHERE ("users_user"."is_active"
-                 AND "users_user"."kind" IN (%s,
-                                             %s,
-                                             %s))
+                 AND "users_user"."kind" = %s)
         ''',
       }),
       dict({
@@ -8404,9 +8402,7 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."is_active"
-                 AND "users_user"."kind" IN (%s,
-                                             %s,
-                                             %s))
+                 AND "users_user"."kind" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),

@@ -326,19 +326,17 @@ class MembershipAbstract(models.Model):
     objects = ActiveMembershipManager()
     include_inactive = MembershipQuerySet.as_manager()
 
-    user_kinds = UserKind.professionals()
-
     class Meta:
         abstract = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.user.field.remote_field.limit_choices_to = {"kind__in": cls.user_kinds}
+        cls.user.field.remote_field.limit_choices_to = {"kind": UserKind.PROFESSIONAL}
 
     def clean(self, *args, **kwargs):
         super().clean()
-        if getattr(self, "user", None) and self.user.kind not in self.user_kinds:
-            raise ValidationError(f"L'utilisateur d'un {self.__class__.__name__} doit être dans {self.user_kinds}")
+        if getattr(self, "user", None) and not self.user.is_professional:
+            raise ValidationError(f"L'utilisateur d'un {self.__class__.__name__} doit être un professionnel")
 
     def save(self, *args, **kwargs):
         self.clean()

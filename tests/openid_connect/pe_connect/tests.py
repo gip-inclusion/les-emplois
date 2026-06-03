@@ -188,13 +188,12 @@ class TestPoleEmploiConnect:
     def test_create_or_update_user_raise_invalid_kind_exception(self):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        for kind in UserKind.professionals():
-            user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
+        user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=UserKind.PROFESSIONAL)
 
-            with pytest.raises(InvalidKindException):
-                peamu_user_data.create_or_update_user()
+        with pytest.raises(InvalidKindException):
+            peamu_user_data.create_or_update_user()
 
-            user.delete()
+        user.delete()
 
     def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
@@ -339,10 +338,9 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        for kind in UserKind.professionals():
-            user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
-            mock_oauth_dance(client, expected_route="account_login")
-            user.delete()
+        user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=UserKind.PROFESSIONAL)
+        mock_oauth_dance(client, expected_route="account_login")
+        user.delete()
 
     @respx.mock
     def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):

@@ -43,7 +43,7 @@ class Command(BaseCommand):
         self.logger.info("Reseting inactive professionals with recent activity")
 
         reset_users_count = User.objects.filter(
-            kind__in=UserKind.professionals(),
+            kind=UserKind.PROFESSIONAL,
             upcoming_deletion_notified_at__isnull=False,
             last_login__gte=F("upcoming_deletion_notified_at"),
         ).update(upcoming_deletion_notified_at=None)
@@ -82,9 +82,7 @@ class Command(BaseCommand):
 
     def get_users(self, grace_period_since):
         return list(
-            User.objects.filter(
-                kind__in=UserKind.professionals(), upcoming_deletion_notified_at__lte=grace_period_since
-            )
+            User.objects.filter(kind=UserKind.PROFESSIONAL, upcoming_deletion_notified_at__lte=grace_period_since)
             .annotate(is_deactivated=Q(email__isnull=True))
             .order_by("is_deactivated", "upcoming_deletion_notified_at")
             .select_for_update(of=("self",), skip_locked=True)[: self.batch_size]

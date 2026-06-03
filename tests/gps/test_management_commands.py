@@ -15,7 +15,6 @@ from itou.www.gps.enums import EndReason
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
-    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     PrescriberFactory,
@@ -28,7 +27,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     settings.GPS_GROUPS_CREATED_BY_EMAIL = batch_group_creator.email
 
     job_seeker_with_no_correct_data = JobSeekerFactory()
-    employer = EmployerFactory()
+    non_professional = ItouStaffFactory()
 
     unknown_safir = "22222"
     known_safir = "11111"
@@ -140,7 +139,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "",
                 "kn_4",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
-            # mail_conseiller is used by an employer
+            # mail_conseiller is used by an non professional
             [
                 job_seeker_with_no_correct_data.pk,
                 job_seeker_with_no_correct_data.last_name,
@@ -151,7 +150,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Test",
                 "Test",
                 "Test",
-                employer.email,
+                non_professional.email,
                 "kn_5",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
             # Not a job seeker
@@ -298,7 +297,7 @@ def test_import_advisor_information(settings, caplog, mocker):
         "Some job seekers were found multiple times, their ft_gps_id won't be saved: 1 jobseekers",
         "Found 6 rows from GPS export.",  # 10 minus the 4 with missing data
         f"Some job seekers ids where not found: [{prescriber_1.pk}].",
-        f"Some advisor email are attached to non prescriber accounts: ['{employer.email}'].",
+        f"Some advisor email are attached to non professional accounts: ['{non_professional.email}'].",
         "Updated 2 ft_gps_id values the database",
         "Matched 4 users in the database",
         "100.00%",

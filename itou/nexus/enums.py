@@ -131,9 +131,7 @@ class NexusStructureKind(models.TextChoices):
 
 
 emplois_kind_mapping = {
-    UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
-    UserKind.PRESCRIBER: NexusUserKind.GUIDE,
-    UserKind.LABOR_INSPECTOR: "",
+    UserKind.PROFESSIONAL: NexusUserKind.FACILITY_MANAGER,
 }
 USER_KIND_MAPPING = {
     Service.EMPLOIS: emplois_kind_mapping,
@@ -147,9 +145,7 @@ USER_KIND_MAPPING = {
     Service.PILOTAGE: emplois_kind_mapping,
     Service.MON_RECAP: {
         # this service does not have a user kind
-        UserKind.EMPLOYER: "",
-        UserKind.PRESCRIBER: "",
-        UserKind.LABOR_INSPECTOR: "",
+        UserKind.PROFESSIONAL: "",
     },
     Service.MARCHE: {
         "SIAE": NexusUserKind.FACILITY_MANAGER,

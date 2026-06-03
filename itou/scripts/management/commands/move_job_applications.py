@@ -41,7 +41,7 @@ class Command(BaseCommand):
             on_behalf_of,
         )
         prescriber = User.objects.get(
-            pk=prescriber, kind=UserKind.PRESCRIBER
+            pk=prescriber, kind=UserKind.PROFESSIONAL
         )  # Limit to prescriber because of the non-polymorphic model fields
         staff = User.objects.get(pk=on_behalf_of, kind=UserKind.ITOU_STAFF)
 

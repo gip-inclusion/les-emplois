@@ -15,19 +15,8 @@ KIND_ITOU_STAFF = "itou_staff"
 
 class UserKind(models.TextChoices):
     JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
-    PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
-    EMPLOYER = KIND_EMPLOYER, "employeur"
-    LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
     PROFESSIONAL = KIND_PROFESSIONAL, "professionnel"
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
-
-    @classmethod
-    def professionals(cls):
-        return [
-            cls.PRESCRIBER,
-            cls.EMPLOYER,
-            cls.LABOR_INSPECTOR,
-        ]
 
 
 class Title(models.TextChoices):
@@ -46,7 +35,7 @@ IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
     IdentityProvider.DJANGO: tuple(UserKind.values),
     IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.PE_CONNECT: (UserKind.JOB_SEEKER,),
-    IdentityProvider.PRO_CONNECT: UserKind.professionals(),
+    IdentityProvider.PRO_CONNECT: (UserKind.PROFESSIONAL,),
 }
 
 

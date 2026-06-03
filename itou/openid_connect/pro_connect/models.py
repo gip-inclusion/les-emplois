@@ -21,8 +21,7 @@ class ProConnectState(OIDConnectState):
 
 @dataclasses.dataclass
 class ProConnectUserData(OIDConnectUserData):
-    # We don't care anymore for the user kind : we will soon merge all users
-    kind: UserKind = UserKind.PRESCRIBER
+    kind: UserKind = UserKind.PROFESSIONAL
     identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
     # Only ProConnect may update the sub based on the email.
