@@ -125,7 +125,7 @@ def test_nexus_dropdown(snapshot, client, case, pro_connect):
     PrescriberMembershipFactory(
         user=user,
         organization__name="On vous aide",
-        organization__siret="012345678910",
+        organization__siret="01234567891010",
         organization__post_code="31"
         if case in ["enabled_no_proconnect", "enabled", "enabled_all_activated"]
         else "32",
