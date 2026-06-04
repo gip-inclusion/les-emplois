@@ -106,7 +106,23 @@
             </td>
             <td>
                 {% if job_application.to_company.is_subject_to_iae_rules %}
-                    {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_application.job_seeker eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                    <div class="d-flex align-items-center">
+                        {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_application.job_seeker eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                        {% if job_application.job_seeker.has_valid_approval and job_application.job_seeker.latest_approval.state == "SUSPENDED" %}
+                            {% partialdef suspended-pass-info %}
+                                <i class="ms-1 ri-information-line text-info" aria-label="{{ suspended_tooltip }}" data-bs-toggle="tooltip" data-bs-title="{{ suspended_tooltip }}" role="button" tabindex="0"></i>
+                            {% endpartialdef %}
+                            {% if request.from_employer %}
+                                {% with suspended_tooltip="Vous pouvez embaucher ce candidat. Le PASS IAE se réactivera automatiquement à la déclaration d'une nouvelle embauche." %}
+                                    {% partial suspended-pass-info %}
+                                {% endwith %}
+                            {% else %}
+                                {% with suspended_tooltip="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter ce candidat sans restriction." %}
+                                    {% partial suspended-pass-info %}
+                                {% endwith %}
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     {% if job_application.job_seeker.has_valid_approval %}
                         {% if job_application.job_seeker.latest_approval.eligibility_diagnosis %}
                             {% if job_application.job_seeker.latest_approval.eligibility_diagnosis.is_from_employer %}

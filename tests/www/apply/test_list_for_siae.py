@@ -38,6 +38,32 @@ from tests.utils.testing import (
 
 INVALID_VALUE_MESSAGE = "Sélectionnez un choix valide."
 
+_SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP = (
+    "Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter ce candidat sans restriction."
+)
+_SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP = (
+    "Vous pouvez embaucher ce candidat. "
+    "Le PASS IAE se réactivera automatiquement à la déclaration d'une nouvelle embauche."
+)
+
+
+SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP_MARKUP = f"""
+    <i class="ms-1 ri-information-line text-info"
+       aria-label="{_SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP}"
+       data-bs-toggle="tooltip"
+       data-bs-title="{_SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP}"
+       role="button"
+       tabindex="0"></i>"""
+
+
+SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP_MARKUP = f"""
+    <i class="ms-1 ri-information-line text-info"
+       aria-label="{_SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP}"
+       data-bs-toggle="tooltip"
+       data-bs-title="{_SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP}"
+       role="button"
+       tabindex="0"></i>"""
+
 
 class TestProcessListSiae:
     SELECTED_JOBS = "selected_jobs"
@@ -190,6 +216,24 @@ class TestProcessListSiae:
 
         # No selected jobs, the filter should not appear.
         assertNotContains(response, self.SELECTED_JOBS)
+
+    def test_list_for_siae_suspended_approval_info_tooltip(self, client):
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        employer = company.members.first()
+
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            with_approval=True,
+            state=JobApplicationState.ACCEPTED,
+            to_company=company,
+        )
+        SuspensionFactory(approval=job_application.approval)
+
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"))
+
+        assertContains(response, SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP_MARKUP, html=True)
+        assertNotContains(response, SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP_MARKUP, html=True)
 
     def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self, client, subtests):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)

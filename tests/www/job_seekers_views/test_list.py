@@ -18,7 +18,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -35,6 +35,7 @@ from tests.users.factories import (
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
+from tests.www.apply.test_list_for_siae import SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP_MARKUP
 from tests.www.apply.test_submit import fake_session_initialization
 
 
@@ -960,6 +961,24 @@ def test_filtered_by_approval_state(client, factory, url):
         job_seeker_expired_eligibility_expired_approval,
         job_seeker_expired_eligibility_valid_approval,
     ]
+
+
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_suspended_approval_info_tooltip(client, url):
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+
+    job_seeker = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        author=prescriber,
+        author_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    approval = ApprovalFactory(user=job_seeker)
+    SuspensionFactory(approval=approval)
+
+    assertContains(client.get(url), SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP_MARKUP, html=True)
 
 
 def test_filtered_by_is_stalled(client):

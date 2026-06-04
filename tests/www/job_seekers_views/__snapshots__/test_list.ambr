@@ -1630,11 +1630,13 @@
                   </a>
               </td>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                      <i aria-hidden="true" class="ri-check-line">
-                      </i>
-                      Éligible à l’IAE
-                  </span>
+                  <div class="d-flex align-items-center">
+                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                          <i aria-hidden="true" class="ri-check-line">
+                          </i>
+                          Éligible à l’IAE
+                      </span>
+                  </div>
               </td>
               <td>
                   DERAY Odile (Pres. Org.)
@@ -1675,11 +1677,13 @@
                   </span>
               </td>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-                      <i aria-hidden="true" class="ri-error-warning-line">
-                      </i>
-                      Éligibilité IAE à valider
-                  </span>
+                  <div class="d-flex align-items-center">
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                          <i aria-hidden="true" class="ri-error-warning-line">
+                          </i>
+                          Éligibilité IAE à valider
+                      </span>
+                  </div>
               </td>
               <td>
                   DERAY Odile (Pres. Org.)
@@ -1723,11 +1727,13 @@
                   </a>
               </td>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                      <i aria-hidden="true" class="ri-pass-valid-line">
-                      </i>
-                      PASS IAE valide
-                  </span>
+                  <div class="d-flex align-items-center">
+                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                          <i aria-hidden="true" class="ri-pass-valid-line">
+                          </i>
+                          PASS IAE valide
+                      </span>
+                  </div>
               </td>
               <td>
                   Non précisé (ACME Inc.)
@@ -1772,11 +1778,13 @@
                   </span>
               </td>
               <td>
-                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                      <i aria-hidden="true" class="ri-check-line">
-                      </i>
-                      Éligible à l’IAE
-                  </span>
+                  <div class="d-flex align-items-center">
+                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                          <i aria-hidden="true" class="ri-check-line">
+                          </i>
+                          Éligible à l’IAE
+                      </span>
+                  </div>
               </td>
               <td>
                   BIALÈS Patrick (Pres. Org.)
@@ -2760,11 +2768,13 @@
               </a>
           </td>
           <td>
-              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-                  <i aria-hidden="true" class="ri-error-warning-line">
-                  </i>
-                  Éligibilité IAE à valider
-              </span>
+              <div class="d-flex align-items-center">
+                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                      <i aria-hidden="true" class="ri-error-warning-line">
+                      </i>
+                      Éligibilité IAE à valider
+                  </span>
+              </div>
           </td>
           <td>
               Non précisé (Pres. Org.)
@@ -2801,11 +2811,13 @@
               </a>
           </td>
           <td>
-              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                  <i aria-hidden="true" class="ri-check-line">
-                  </i>
-                  Éligible à l’IAE
-              </span>
+              <div class="d-flex align-items-center">
+                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                      <i aria-hidden="true" class="ri-check-line">
+                      </i>
+                      Éligible à l’IAE
+                  </span>
+              </div>
           </td>
           <td>
               GRAVIER Emile (Pres. Org.)
@@ -2842,11 +2854,13 @@
               </a>
           </td>
           <td>
-              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-                  <i aria-hidden="true" class="ri-error-warning-line">
-                  </i>
-                  Éligibilité IAE à valider
-              </span>
+              <div class="d-flex align-items-center">
+                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                      <i aria-hidden="true" class="ri-error-warning-line">
+                      </i>
+                      Éligibilité IAE à valider
+                  </span>
+              </div>
           </td>
           <td>
               Non précisé (ACME Inc.)

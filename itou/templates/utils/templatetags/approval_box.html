@@ -69,6 +69,9 @@ Arguments:
         {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
+        {% if approval.state == "SUSPENDED" %}
+            {% include "approvals/includes/suspended_pass_info_alert.html" %}
+        {% endif %}
     {% else %}
         {% if approval.state == "VALID" %}
             {% with approval.pending_prolongation_request as pending_prolongation_request %}
@@ -90,7 +93,7 @@ Arguments:
                     <hr class="my-3 my-md-4">
                     <ul class="list-data">
                         <li>
-                            <small>Suspension en cours</small>
+                            <small>En pause</small>
                             <strong class="text-info">du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</strong>
                         </li>
                     </ul>
@@ -121,6 +124,9 @@ Arguments:
             {% endif %}
         {% endif %}
         {% if with_details_link %}
+            {% if approval.state == "SUSPENDED" %}
+                {% include "approvals/includes/suspended_pass_info_alert.html" %}
+            {% endif %}
             <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
