@@ -1,0 +1,59 @@
+{% load components %}
+{% load enums %}
+{% comment %}
+  Options:
+    user: User(kind=JOB_SEEKER) the job seeker being modified
+    viewing_self: bool whether the job seeker is editing their own profile
+{% endcomment %}
+{% if user.is_job_seeker %}
+    {% enums "users" "IdentityProvider" as IdentityProvider %}
+    {% if user.identity_provider == IdentityProvider.PE_CONNECT %}
+        {% component_alert variant="info" title=title content=content %}
+            {% fragment as title %}
+                {{ viewing_self|yesno:"Vos informations d’identité,Les informations d’identité de ce candidat" }}
+                viennent de {{ IdentityProvider.PE_CONNECT.label }}
+            {% endfragment %}
+            {% fragment as content %}
+                {% if viewing_self %}
+                    Pour les modifier, rendez-vous directement sur
+                    <a href="https://candidat.francetravail.fr/espacepersonnel/" class="has-external-link">France Travail</a>.
+                    Les changements seront automatiquement répercutés ici lors de votre prochaine connexion.
+                {% else %}
+                    Invitez-le à effectuer les modifications directement sur
+                    <a href="https://candidat.francetravail.fr/espacepersonnel/" class="has-external-link">France Travail</a>.
+                    Les changements seront automatiquement répercutés ici lors de sa prochaine connexion.
+                {% endif %}
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% elif user.identity_provider == IdentityProvider.FRANCE_CONNECT %}
+        {% component_alert variant="info" title=title content=content %}
+            {% fragment as title %}
+                {{ viewing_self|yesno:"Vos informations d’identité,Les informations d’identité de ce candidat" }}
+                viennent de {{ IdentityProvider.FRANCE_CONNECT.label }}
+            {% endfragment %}
+            {% fragment as content %}
+                {% if viewing_self %}
+                    Votre état civil est certifié par le service partenaire avec lequel vous vous êtes connecté
+                    (impots.gouv.fr, Améli, La Poste, …). Effectuez les modifications directement sur le service
+                    partenaire, elles seront automatiquement répercutées ici lors de votre prochaine connexion.
+                {% else %}
+                    Ces informations proviennent du service partenaire avec lequel il s’est connecté (impots.gouv.fr,
+                    Améli, La Poste, …). Invitez-le à effectuer les modifications directement sur le service
+                    partenaire, elles seront automatiquement répercutées ici lors de sa prochaine connexion.
+                {% endif %}
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% elif user.identity_provider == IdentityProvider.PRO_CONNECT %}
+        {% component_alert variant="info" title=title content=content %}
+            {% fragment as title %}
+                Vos informations d’identité viennent de {{ IdentityProvider.PRO_CONNECT.label }}
+            {% endfragment %}
+            {% fragment as content %}
+                Pour les modifier, rendez-vous directement sur
+                <a href="https://candidat.francetravail.fr/espacepersonnel/" class="has-external-link">France Travail</a>.
+                Les changements seront automatiquement répercutés ici lors de
+                votre prochaine connexion.
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+{% endif %}
