@@ -24,8 +24,9 @@ from tests.geiq_assessments.factories import (
     AssessmentFactory,
     EmployeeContractFactory,
 )
-from tests.institutions.factories import InstitutionMembershipFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -202,9 +203,15 @@ class TestListAssessmentsView:
 
         client.force_login(membership.user)
         response = client.get(self.URL)
-        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessment list with links to details"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".s-section",
+                replace_in_attr=[
+                    ("value", f"{membership.institution.pk}", "[PK of Institution]"),
+                ],
+            )
+        ) == snapshot(name="assessment list with links to details")
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_complex_list(self, client, snapshot):
@@ -321,9 +328,15 @@ class TestListAssessmentsView:
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(self.URL)
-        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessments complex list"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".s-section",
+                replace_in_attr=[
+                    ("value", f"{membership.institution.pk}", "[PK of Institution]"),
+                ],
+            )
+        ) == snapshot(name="assessments complex list")
         assertQuerySetEqual(
             response.context["assessments"],
             [
@@ -403,6 +416,100 @@ class TestListAssessmentsView:
         ]
         assert context_potential_amout == 3614
         assert context_potential_amout == expected_potential_amout
+
+    @freeze_time("2025-05-21 12:00", tick=True)
+    def test_institutions_filter(self, client, snapshot):
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        ddets = InstitutionFactory(kind=InstitutionKind.DDETS_GEIQ, name="Une DDETS GEIQ")
+        campaign = AssessmentCampaignFactory()
+        assessment_dreets_ddets = AssessmentFactory(campaign=campaign)
+        # User selected both institutions in the creation form
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_dreets_ddets, institution=membership.institution, with_convention=True
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_dreets_ddets, institution=ddets, with_convention=True
+        )
+
+        assessment_ddets = AssessmentFactory(campaign=campaign)
+        # User selected only the DDETS in the creation form
+        AssessmentInstitutionLink.objects.create(assessment=assessment_ddets, institution=membership.institution)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_ddets, institution=ddets, with_convention=True)
+
+        # Another unlinked assessment that should not be seen anywhere
+        AssessmentFactory(campaign=campaign)
+
+        client.force_login(membership.user)
+        # No filter
+        response = client.get(self.URL)
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
+        )
+
+        # Filter on the DDETS
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(self.URL, {"institutions": ddets.pk})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
+        )
+
+        # Filter on the DREETS
+        response = client.get(self.URL, {"institutions": membership.institution.pk})
+        assertQuerySetEqual(response.context["assessments"], [assessment_dreets_ddets])
+        # Filter on both the DDETS and the DREETS
+        response = client.get(self.URL, {"institutions": [membership.institution.pk, ddets.pk]})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
+        )
+
+        # Invalid data: do nothing, ie. do not filter
+        response = client.get(self.URL, {"institutions": "invalid"})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
+        )
+
+    @freeze_time("2025-05-21 12:00", tick=True)
+    def test_filters_htmx(self, client):
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        ddets = InstitutionFactory(kind=InstitutionKind.DDETS_GEIQ, name="Une DDETS GEIQ")
+        campaign = AssessmentCampaignFactory()
+        assessment_dreets_ddets = AssessmentFactory(campaign=campaign)
+        # User selected both institutions in the creation form
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_dreets_ddets, institution=membership.institution, with_convention=True
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_dreets_ddets, institution=ddets, with_convention=True
+        )
+
+        assessment_ddets = AssessmentFactory(campaign=campaign)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_ddets, institution=membership.institution)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_ddets, institution=ddets, with_convention=True)
+
+        client.force_login(membership.user)
+        # No filter
+        response = client.get(self.URL)
+        page = parse_response_to_soup(response, selector="#main")
+
+        # institutions filter
+        ddets_checkbox = page.find("input", attrs={"type": "checkbox", "name": "institutions", "value": str(ddets.pk)})
+        ddets_checkbox["checked"] = ""  # simulate select checkbox
+        response = client.get(self.URL, {"institutions": ddets.pk}, headers={"HX-Request": "true"})
+        update_page_with_htmx(page, f"form[hx-get='{self.URL}']", response)
+        response = client.get(self.URL, {"institutions": ddets.pk})
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
+        ddets_checkbox["checked"] = ""  # simulate unselect checkbox
+        response = client.get(self.URL, headers={"HX-Request": "true"})
+        update_page_with_htmx(page, f"form[hx-get='{self.URL}']", response)
+        response = client.get(self.URL)
+        fresh_page = parse_response_to_soup(response, selector="#main")
 
 
 class TestAssessmentDetailsForInstitutionView:

@@ -52,6 +52,7 @@ from itou.www.geiq_assessments_views.forms import (
     AllowanceRefusalJustificationForm,
     AllowanceRequestJustificationForm,
     AskForFixCommentForm,
+    AssessmentsFilterForInstitutionForm,
     ContractFilterForm,
     CreateForm,
     GeiqCommentForm,
@@ -1012,11 +1013,24 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
         )
         .order_by("state_order", "-last_updated_at")
     )
+
+    filters_form = AssessmentsFilterForInstitutionForm(assessments, request.GET)
+
+    if filters_form.is_valid():
+        assessments = filters_form.filter(assessments)
+
     context = {
         "assessments": assessments,
         "can_access_details": organization_kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
+        "filters_form": filters_form,
     }
-    return render(request, template_name, context)
+    return render(
+        request,
+        "geiq_assessments_views/includes/assessments_list_results_for_institutions.html"
+        if request.htmx
+        else template_name,
+        context,
+    )
 
 
 @check_request(lambda request: request.from_institution)
