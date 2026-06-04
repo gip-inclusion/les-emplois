@@ -1,0 +1,19 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Bonjour,
+
+{{ requesting_user.get_full_name }} identifié avec l'adresse email {{ requesting_user.email }} souhaite devenir administrateur de la structure {{ structure.name }} ({{ structure.kind }}).
+
+{% if documentation_link %}
+Ce statut permet d'avoir accès à certaines fonctionnalités, la liste complète est disponible ici : {{ documentation_link }}.
+
+{% endif %}
+Pour des raisons de sécurité nous vous invitons à vérifier que cette demande émane bien de {{ requesting_user.get_full_name }}.
+
+Cliquez sur le lien suivant pour attribuer le statut d'administrateur à {{ requesting_user.get_full_name }} - {{ requesting_user.email }} :
+{{ confirm_url }}
+
+Si vous ne souhaitez pas donner suite à cette demande, merci de ne pas prendre en compte ce message.
+
+{% endblock body %}

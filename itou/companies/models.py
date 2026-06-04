@@ -34,7 +34,7 @@ from itou.companies.enums import (
 )
 from itou.utils.emails import get_email_message
 from itou.utils.models import AbstractFieldsHistoryModel
-from itou.utils.tokens import company_signup_token_generator
+from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
@@ -486,6 +486,28 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
         subject = "companies/email/new_signup_activation_email_to_official_contact_subject.txt"
         body = "companies/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
+
+    def admin_request_email(self, requesting_user, confirm_url):
+        """
+        Send an email to auth_email asking to confirm the admin role request
+        made by requesting_user.
+        """
+        to = [self.auth_email]
+        context = {
+            "structure": self,
+            "requesting_user": requesting_user,
+            "confirm_url": confirm_url,
+            "documentation_link": self.get_documentation_link(),
+        }
+        subject = "companies/email/admin_request_email_subject.txt"
+        body = "companies/email/admin_request_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_admin_request_token(self, user):
+        return admin_request_token_generator.make_token(self, user)
+
+    def check_admin_request_token(self, user, token):
+        return admin_request_token_generator.check_token(token, company=self, user=user)
 
     def activate_your_account_email(self):
         if self.has_members or not self.auth_email:
