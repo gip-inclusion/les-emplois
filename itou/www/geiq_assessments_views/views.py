@@ -374,7 +374,7 @@ def assessment_get_file(request, pk, *, file_field):
     elif request.from_institution:
         filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
     else:
-        raise Http404  # This should never happen thanks to check_user
+        raise Http404  # This should never happen thanks to check_request
     assessments = Assessment.objects.filter(**filter_kwargs).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
     match file_field:
@@ -519,7 +519,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
         contract_filter_kwargs = {"allowance_requested": True}
     else:
-        raise Http404  # This should never happen thanks to check_user
+        raise Http404  # This should never happen thanks to check_request
     assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
 
     back_url, can_validate, can_invalidate, stats = None, False, False, None  # defined to please the linters
@@ -638,7 +638,7 @@ def assessment_contracts_export(request, pk, include_unselected_by_geiq):
         if not include_unselected_by_geiq:
             contract_filter_kwargs = {"allowance_requested": True}
     else:
-        raise Http404  # This should never happen thanks to check_user
+        raise Http404  # This should never happen thanks to check_request
     assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
     contracts_qs = (
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
@@ -684,7 +684,7 @@ def assessment_contracts_details(
             "allowance_requested": True,
         }
     else:
-        raise Http404  # This should never happen thanks to check_user
+        raise Http404  # This should never happen thanks to check_request
     contract_qs = EmployeeContract.objects.filter(**filter_kwargs).select_related("employee__assessment__campaign")
     if details_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
         contract_qs = contract_qs.prefetch_related("employee__prequalifications")
@@ -847,7 +847,7 @@ def assessment_contracts_toggle(
             "allowance_requested": True,
         }
     else:
-        raise Http404  # This should never happen thanks to check_user
+        raise Http404  # This should never happen thanks to check_request
     contract = get_object_or_404(
         EmployeeContract.objects.filter(**filter_kwargs)
         .select_related("employee__assessment")
