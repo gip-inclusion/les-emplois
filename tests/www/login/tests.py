@@ -19,6 +19,8 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.pe_connect import constants as pe_constants
+from itou.otp.models import ItouStaticDevice
+from itou.otp.utils import create_otp_backup_code
 from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
@@ -433,7 +435,8 @@ def test_pro_connect_activation_view(client, pro_connect, factory):
 
 
 class TestItouStaffLogin:
-    def test_login(self, client, settings):
+    def test_login_with_totp(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
         pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
@@ -443,7 +446,6 @@ class TestItouStaffLogin:
         )
         verify_otp_url = reverse("login:verify_otp")
         setup_otp_url = reverse("otp_views:enrollment_step_0_intro")
-        settings.REQUIRE_OTP_FOR_STAFF = True
 
         response = client.get(admin_url)
         assertRedirects(response, pre_login_url)
@@ -514,6 +516,73 @@ class TestItouStaffLogin:
         device.save()
         response = client.post(next_url, data=post_data)
         assertRedirects(response, admin_url)
+
+    def test_login_with_backup_code(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        TOTPDevice.objects.create(user=user, confirmed=False)
+        backup_code = create_otp_backup_code(user)
+
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user"),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
+        verify_otp_url = add_url_params(reverse("login:verify_otp"), {"next": admin_url})
+        login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
+
+        response = client.get(admin_url)
+        assertRedirects(response, pre_login_url)
+
+        response = client.post(pre_login_url, {"email": user.email})
+        assertRedirects(response, login_url)
+
+        # When user inputs their credentials, they are redirected to a
+        # form where they can input the TOTP.
+        credentials = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(login_url, data=credentials, follow=True)
+        assertRedirects(response, verify_otp_url)
+
+        # User has lost their device, they click the link to input
+        # their backup code.
+        response = client.get(login_with_backup_code_url, data=credentials)
+        assertContains(response, "Entrez le code de récupération")
+
+        # Send a bogus backup code.
+        wrong_code_data = {"code": backup_code[::-1]}
+        response = client.post(login_with_backup_code_url, data=wrong_code_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"code": ["Le code de récupération n’est pas correct."]}
+
+        # Test throttling.
+        correct_code_data = {"code": backup_code}
+        response = client.post(login_with_backup_code_url, data=correct_code_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"code": ["Le code de récupération n’est pas correct."]}
+
+        # Reset throttling, user can log in.
+        static_device = ItouStaticDevice.objects.get(user=user)
+        static_device.throttling_failure_timestamp = None
+        static_device.throttling_failure_count = 0
+        static_device.save()
+        correct_code_data = {"code": backup_code}
+        response = client.post(login_with_backup_code_url, data=correct_code_data)
+        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    "Vous avez été identifié grâce à votre code de récupération. "
+                    "Vos appareils précedemment enregistrés ont été supprimés. "
+                    "Vous devez à nouveau enregistrer un appareil.",
+                )
+            ],
+        )
 
     def test_login_otp_not_required(self, client):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)

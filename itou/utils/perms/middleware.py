@@ -200,8 +200,9 @@ class ItouCurrentOrganizationMiddleware:
             and not user.is_verified()
         ):
             login_verify_otp_url = reverse("login:verify_otp")
+            login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
             if user_has_device(user):
-                if request.path != login_verify_otp_url:
+                if request.path not in (login_verify_otp_url, login_with_backup_code_url):
                     return HttpResponseRedirect(
                         add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
                     )

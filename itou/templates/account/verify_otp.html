@@ -38,13 +38,10 @@
                                         </li>
                                     {% endfor %}
                                 </ol>
-                                {% comment %}
-                                FIXME (dbaty): add link to recovery form once it is implemented
                                 <p class="mb-0">
                                     <strong>Vous n’avez plus accès à votre appareil ?</strong>
-                                    <a href="..." class="btn-link">Cliquez ici pour entrer votre code de récupération</a>
+                                    <a href="{% url "otp_views:login_with_backup_code" %}" class="btn-link">Cliquez ici pour entrer votre code de récupération</a>
                                 </p>
-                                {% endcomment %}
                             {% endfragment %}
                         {% endcomponent_alert %}
 

@@ -1,5 +1,6 @@
 import base64
 import binascii
+import logging
 
 import segno
 from django.contrib import messages
@@ -9,13 +10,15 @@ from django.urls import reverse
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import TOTPDevice, default_key as generate_otp_key
 
+from itou.otp.models import ItouStaticDevice
 from itou.otp.utils import create_otp_backup_code, get_user_devices
 from itou.utils.auth import check_user
 from itou.utils.readonly import http_methods
 from itou.www.otp_views.enums import DeviceType
-from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
+from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeForm
 
 
+logger = logging.getLogger(__name__)
 check_user_for_otp = check_user(lambda user: user.is_staff)
 
 
@@ -103,4 +106,59 @@ def enrollment_step_2_and_3_confirm_device(
         "backup_code": backup_code,
         "post_save_url": post_save_url,
     }
+    return render(request, template_name, context)
+
+
+@check_user_for_otp
+def login_with_backup_code(request, template_name="otp_views/login_with_backup_code.html"):
+    static_device = ItouStaticDevice.objects.filter(user=request.user).first()
+    if not static_device:
+        if not get_user_devices(request.user):
+            # Direct access to this route without any enrolled device.
+            # Reject by redirecting to dashboard, user will be
+            # redirected if an OTP is required.
+            return HttpResponseRedirect(reverse("dashboard:index"))
+        # This should not happen: if user enrolled a device, they must
+        # have a static device (backup code).
+        logger.error("User %s has a TOTP device but no backup code", request.user.id)
+        context = {"form": LoginWithBackupCodeForm(static_device=None)}
+        messages.warning(
+            request,
+            "Il semble que vous n’ayiez pas de code de récupération. Veuillez contacter le support.",
+        )
+        return render(request, template_name, context)
+
+    form = LoginWithBackupCodeForm(
+        data=request.POST or None,
+        static_device=static_device,
+    )
+    if request.method == "POST" and form.is_valid():
+        logger.info("User %s authenticated with 2FA backup code", request.user.id)
+        messages.success(
+            request,
+            "Vous avez été identifié grâce à votre code de récupération. "
+            "Vos appareils précedemment enregistrés ont été supprimés. "
+            "Vous devez à nouveau enregistrer un appareil.",
+        )
+
+        # No need to delete the ItouStaticToken, it's already been
+        # done by `ItouStaticDevice.verify_token` (called by the
+        # form). However, we need to delete all other TOTP devices,
+        # since the user seems to have lost them.
+
+        # FIXME (dbaty): when we define our own ItouTOTPDevice class,
+        # we could add an `enabled` field, so that we can keep it for
+        # auditing purposes.
+        TOTPDevice.objects.filter(user=request.user).delete()
+        ItouStaticDevice.objects.filter(user=request.user).delete()
+
+        # FIXME (dbaty): send mail to user (when wording is ready)
+        # FIXME (dbaty): shall we also logout the user so that they
+        # have to input their password again?
+
+        # Now that the user does not have any usable device anymore,
+        # they must enroll again.
+        return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
+
+    context = {"form": form}
     return render(request, template_name, context)
