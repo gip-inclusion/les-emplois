@@ -1,11 +1,12 @@
 from django import forms
-from django.forms import widgets
+from django.db.models import Exists, OuterRef, Q
+from django.forms import CheckboxSelectMultiple, widgets
 from django.utils import timezone
 from django_select2.forms import Select2Widget
 
 from itou.files.forms import ItouFileField
 from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason
-from itou.geiq_assessments.models import Assessment, Employee
+from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, Employee
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
@@ -227,6 +228,37 @@ class ReviewForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.decision_validated_at = timezone.now()
         return super().save(commit=commit)
+
+
+class AssessmentsFilterForInstitutionForm(forms.Form):
+    institutions = forms.MultipleChoiceField(required=False, label="Référent", widget=CheckboxSelectMultiple)
+
+    def __init__(self, assessments_qs, data, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
+        self.fields["institutions"].choices = self._get_choices_for_institutions(assessments_qs)
+
+    def _get_choices_for_institutions(self, assessments_qs):
+        institutions_qs = Institution.objects.filter(
+            Exists(
+                AssessmentInstitutionLink.objects.filter(
+                    assessment__pk__in=assessments_qs.values_list("pk", flat=True),
+                    institution=OuterRef("pk"),
+                    with_convention=True,
+                )
+            )
+        ).order_by("name")
+        return [(institution.pk, institution.name) for institution in institutions_qs]
+
+    def filter(self, queryset):
+        filters = []
+
+        if institutions := self.cleaned_data.get("institutions"):
+            institutions_filter = Q(
+                institution_links__institution__in=institutions, institution_links__with_convention=True
+            )
+            filters.append(institutions_filter)
+
+        return queryset.filter(*filters)
 
 
 class ContractFilterForm(forms.Form):

@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}Bilans d’exécution GEIQ {{ block.super }}{% endblock %}
 
@@ -15,9 +16,18 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
+            <form hx-get="{{ request.path }}" hx-trigger="change delay:.5s" hx-indicator="#assessments-results" hx-target="#assessments-results" hx-swap="outerHTML" hx-push-url="true">
+                {% include "geiq_assessments_views/includes/assessments_list_filters_for_institutions.html" with filters_form=filters_form only %}
+            </form>
             <div class="s-section__row row">
                 {% include "geiq_assessments_views/includes/assessments_list_results_for_institutions.html" with request=request assessments=assessments can_access_details=can_access_details only %}
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}
