@@ -51,7 +51,7 @@ from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.templatetags import badges, dict_filters, format_filters, job_seekers
 from itou.utils.templatetags.datetime_filters import duration, naturaldate
-from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
+from itou.utils.tokens import CompanySignupTokenGenerator
 from itou.utils.urls import (
     get_absolute_url,
     get_external_link_markup,
@@ -1052,7 +1052,7 @@ class TestCompanySignupTokenGenerator:
         company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
-        assert p0.check_token(company, tk1) is True
+        assert p0.check_token(tk1, company=company) is True
 
     def test_10265(self):
         """
@@ -1074,21 +1074,21 @@ class TestCompanySignupTokenGenerator:
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
         p1 = MockedCompanySignupTokenGenerator(
-            datetime.datetime.now() + datetime.timedelta(seconds=(COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
+            datetime.datetime.now() + datetime.timedelta(seconds=(CompanySignupTokenGenerator.timeout - 1))
         )
-        assert p1.check_token(company, tk1) is True
+        assert p1.check_token(tk1, company=company) is True
         p2 = MockedCompanySignupTokenGenerator(
-            datetime.datetime.now() + datetime.timedelta(seconds=(COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
+            datetime.datetime.now() + datetime.timedelta(seconds=(CompanySignupTokenGenerator.timeout + 1))
         )
-        assert p2.check_token(company, tk1) is False
+        assert p2.check_token(tk1, company=company) is False
 
     def test_check_token_with_nonexistent_token_and_user(self):
         company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
-        assert p0.check_token(None, tk1) is False
-        assert p0.check_token(company, None) is False
-        assert p0.check_token(company, tk1) is True
+        assert p0.check_token(tk1, company=None) is False
+        assert p0.check_token(None, company=company) is False
+        assert p0.check_token(tk1, company=company) is True
 
     def test_any_new_signup_invalidates_past_token(self):
         """
@@ -1098,14 +1098,14 @@ class TestCompanySignupTokenGenerator:
         company = CompanyFactory()
         p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(company)
-        assert p0.check_token(company, tk1) is True
+        assert p0.check_token(tk1, company=company) is True
         user = User(kind=UserKind.PROFESSIONAL)
         user.save()
         membership = CompanyMembership()
         membership.user = user
         membership.company = company
         membership.save()
-        assert p0.check_token(company, tk1) is False
+        assert p0.check_token(tk1, company=company) is False
 
 
 class TestCnilCompositionPasswordValidator:
