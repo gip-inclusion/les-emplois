@@ -21,7 +21,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Calendar, EvaluationCampaign, create_campaigns_and_calendar
 from itou.users.models import User
@@ -118,6 +118,10 @@ def load_data():
                 end_at=Approval.get_default_end_date(datetime_within_period_range.date()),
                 eligibility_diagnosis=eligibility_diagnosis,
                 created_at=datetime_within_period_range,
+                origin_sender_kind=SenderKind.EMPLOYER,
+                origin_siae_kind=controlled_siae.kind,
+                origin_siae_siret=controlled_siae.siret,
+                origin_prescriber_organization_kind="",
             )
             created_job_applications_pks += [
                 JobApplication.objects.create(
