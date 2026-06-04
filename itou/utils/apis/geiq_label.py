@@ -95,6 +95,9 @@ class LabelApiClient:
             raise LabelAPIError(f"Error requesting Label API {command}: {exc.__class__.__name__}") from exc
         if response_data.headers["content-type"] != "application/pdf":
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
+        if x_geiq_id := response_data.headers.get("x-geiq-id"):
+            if x_geiq_id != str(geiq_id):
+                raise LabelAPIError(f"Unexpected x-geiq-id: {x_geiq_id}")
         logger.info(f"Successfully retrieved {command} - sha256=%s", hashlib.sha256(response_data.content).digest())
         return response_data.content
 
