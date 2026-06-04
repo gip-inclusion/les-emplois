@@ -1,5 +1,5 @@
 from dateutil.relativedelta import relativedelta
-from django.db.models import F, Prefetch, Subquery
+from django.db.models import F, OuterRef, Prefetch, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
@@ -100,7 +100,9 @@ class JobApplicationSearchView(
         JobApplication.objects.annotate(
             last_modification_at=Coalesce(
                 Subquery(
-                    JobApplicationTransitionLog.objects.all().order_by("-timestamp").values("timestamp")[:1],
+                    JobApplicationTransitionLog.objects.filter(job_application_id=OuterRef("pk"))
+                    .order_by("-timestamp")
+                    .values("timestamp")[:1],
                 ),
                 F("updated_at"),
             ),

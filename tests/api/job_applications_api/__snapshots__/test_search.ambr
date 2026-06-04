@@ -22,6 +22,7 @@
                  AND COALESCE(
                                 (SELECT U0."timestamp" AS "timestamp"
                                  FROM "job_applications_jobapplicationtransitionlog" U0
+                                 WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
                                  ORDER BY 1 DESC
                                  LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
         ''',
@@ -80,6 +81,7 @@
                  COALESCE(
                             (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
+                             WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
                              ORDER BY 1 DESC
                              LIMIT 1), "job_applications_jobapplication"."updated_at") AS "last_modification_at",
                  "users_user"."id",
@@ -326,6 +328,7 @@
                  AND COALESCE(
                                 (SELECT U0."timestamp" AS "timestamp"
                                  FROM "job_applications_jobapplicationtransitionlog" U0
+                                 WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
                                  ORDER BY 1 DESC
                                  LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
           ORDER BY 45 DESC
