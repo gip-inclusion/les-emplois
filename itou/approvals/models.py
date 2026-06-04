@@ -556,22 +556,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        sender_kind = self.origin_sender_kind
-        prescriber_organization_kind = self.origin_prescriber_organization_kind
-        siae_siret = self.origin_siae_siret
-        siae_kind = self.origin_siae_kind
-        if not all((sender_kind, siae_siret, siae_kind)):
-            job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
-            if not job_application:
-                # This should only happen for historical approvals and we'll have to find the root cause and fix it
-                raise ValueError("Cannot delete an approval without an accepted job application.")
-            if prescriber_org := job_application.sender_prescriber_organization:
-                prescriber_organization_kind = prescriber_org.kind
-            else:
-                prescriber_organization_kind = ""
-            siae_siret = job_application.to_company.siret
-            siae_kind = job_application.to_company.kind
-            sender_kind = job_application.sender_kind
         CancelledApproval(
             start_at=self.start_at,
             end_at=self.end_at,
@@ -581,10 +565,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             user_nir=self.user.jobseeker_profile.nir,
             user_birthdate=self.user.jobseeker_profile.birthdate,
             user_id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            origin_siae_siret=siae_siret,
-            origin_siae_kind=siae_kind,
-            origin_sender_kind=sender_kind,
-            origin_prescriber_organization_kind=prescriber_organization_kind,
+            origin_siae_siret=self.origin_siae_siret,
+            origin_siae_kind=self.origin_siae_kind,
+            origin_sender_kind=self.origin_sender_kind,
+            origin_prescriber_organization_kind=self.origin_prescriber_organization_kind,
         ).save()
         self.jobapplication_set.update(approval=None)
         super().delete()

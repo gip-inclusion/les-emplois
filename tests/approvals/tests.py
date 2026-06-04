@@ -634,41 +634,6 @@ class TestApprovalModel:
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.approval is None
 
-    def test_deleting_an_approval_prefer_origin_values(self):
-        job_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True,
-            state=JobApplicationState.PROCESSING,
-            to_company__kind=CompanyKind.EI,
-            to_company__subject_to_iae_rules=True,
-        )
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
-        job_application.accept(user=job_application.to_company.members.first())
-
-        approval = job_application.approval
-
-        assert approval.origin_siae_siret == job_application.to_company.siret
-
-        other_application = JobApplicationFactory(
-            sent_by_prescriber_alone=True,
-            state=JobApplicationState.PROCESSING,
-            to_company__kind=CompanyKind.ETTI,
-            to_company__subject_to_iae_rules=True,
-            job_seeker_id=job_application.job_seeker_id,  # Use pk to avoid cached_property invalidations
-        )
-        other_application.accept(user=other_application.to_company.members.first())
-
-        job_application.cancel(user=job_application.to_company.members.first())
-        job_application.delete()
-
-        origin_siae = job_application.to_company
-        approval.delete()
-        # Approval was successfully deleted
-        assert Approval.objects.first() is None
-        # And the cancelled approval kept the original values (from the first application)
-        cancelled_approval = CancelledApproval.objects.get()
-        assert cancelled_approval.origin_siae_kind == CompanyKind.EI
-        assert cancelled_approval.origin_siae_siret == origin_siae.siret
-
     def test_deleting_an_approval_without_application_linked(self):
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
