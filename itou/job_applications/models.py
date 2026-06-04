@@ -692,6 +692,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="partage du motif de refus avec le candidat", default=False
     )
 
+    # Set on accepted job applications, except when they were imported from
+    # external systems, such as Origin.PE_APPROVAL.
     hiring_start_at = models.DateField(verbose_name="date de début du contrat", blank=True, null=True)
     hiring_end_at = models.DateField(verbose_name="date prévisionnelle de fin du contrat", blank=True, null=True)
 
