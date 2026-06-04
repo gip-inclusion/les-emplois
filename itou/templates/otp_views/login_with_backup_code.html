@@ -1,0 +1,54 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load support %}
+
+{% block title %}Configuration 2FA {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Se connecter</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="section__col col-12">
+                    <h2>Accès sans appareil</h2>
+                    <div class="c-box">
+                        <h3>Utiliser votre code de récupération</h3>
+                        <p>
+                            Lors de la configuration de la double authentification, un code de récupération à usage unique vous a été remis. Saisissez-le ci-dessous pour accéder à votre compte.
+                        </p>
+
+                        {% component_alert title=title content=content variant="info" call_to_action=call_to_action %}
+                            {% fragment as title %}
+                                Vous n’avez pas non plus votre code de récupération ?
+                            {% endfragment %}
+                            {% fragment as content %}
+                                Sans code de récupération, il n’est pas possible d'accéder à votre compte de manière autonome. Veuillez contactez notre support.
+                            {% endfragment %}
+                            {% fragment as call_to_action %}
+                                <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="btn btn-block btn-primary has-external-link">Contacter le support</a>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            <fieldset>
+                                {% bootstrap_form_errors form type="all" %}
+                                {% bootstrap_field form.code wrapper_class="form-group form-group-input-w-lg-33" %}
+                            </fieldset>
+                            {% itou_buttons_form primary_label="Valider" reset_url=None %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

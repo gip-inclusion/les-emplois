@@ -454,6 +454,14 @@
                                                   01 juin 2026 à 12h00
                       </li>
                   </ol>
+                  <p class="mb-0">
+                      <strong>
+                          Vous n’avez plus accès à votre appareil ?
+                      </strong>
+                      <a class="btn-link" href="/otp/login_with_backup_code">
+                          Cliquez ici pour entrer votre code de récupération
+                      </a>
+                  </p>
               </div>
           </div>
       </div>

@@ -38,3 +38,20 @@ class ConfirmTOTPDeviceForm(forms.Form):
             self.add_error("otp_token", "Le code unique de validation (OTP) n’est pas correct.")
 
         return cleaned_data
+
+
+class LoginWithBackupCodeForm(forms.Form):
+    code = forms.CharField(label="Entrez le code de récupération")
+
+    def __init__(self, *args, static_device, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.static_device = static_device
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        code = cleaned_data["code"]
+        if not self.static_device.verify_token(code):
+            self.add_error("code", "Le code de récupération n’est pas correct.")
+
+        return cleaned_data

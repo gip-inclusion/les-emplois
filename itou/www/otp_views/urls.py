@@ -22,4 +22,9 @@ urlpatterns = [
         views.enrollment_step_2_and_3_confirm_device,
         name="enrollment_step_2_and_3_confirm_device",
     ),
+    path(
+        "login_with_backup_code",
+        views.login_with_backup_code,
+        name="login_with_backup_code",
+    ),
 ]
