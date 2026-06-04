@@ -5,10 +5,53 @@ from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
 
-COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT = 2 * 7 * 24 * 3600
+class TokenGenerator:
+    """
+    Base mixin for time-limited HMAC token generators.
+
+    Subclasses must define:
+    - key_salt (str)
+    - timeout (int, seconds)
+    - _make_hash_value(self, timestamp, **kwargs) -> str
+    """
+
+    secret = settings.SECRET_KEY
+
+    def make_token(self, **kwargs):
+        return self._make_token_with_timestamp(self._num_seconds(self._now()), **kwargs)
+
+    def check_token(self, token, **kwargs):
+        if not (token and all(kwargs.values())):
+            return False
+        try:
+            timestamp_b36, _ = token.split("-")
+        except ValueError:
+            return False
+        try:
+            timestamp = base36_to_int(timestamp_b36)
+        except ValueError:
+            return False
+        if not constant_time_compare(self._make_token_with_timestamp(timestamp, **kwargs), token):
+            return False
+        if (self._num_seconds(self._now()) - timestamp) > self.timeout:
+            return False
+        return True
+
+    def _make_token_with_timestamp(self, timestamp, **kwargs):
+        timestamp_b36 = int_to_base36(timestamp)
+        hash_string = salted_hmac(
+            self.key_salt, self._make_hash_value(timestamp, **kwargs), secret=self.secret
+        ).hexdigest()[::2]
+        return f"{timestamp_b36}-{hash_string}"
+
+    def _num_seconds(self, dt):
+        return int((dt - datetime(2001, 1, 1)).total_seconds())
+
+    def _now(self):
+        return datetime.now()
 
 
-class CompanySignupTokenGenerator:
+class CompanySignupTokenGenerator(TokenGenerator):
     """
     Strategy object used to generate and check tokens for the secure
     company signup mechanism.
@@ -17,52 +60,12 @@ class CompanySignupTokenGenerator:
     """
 
     key_salt = "itou.utils.tokens.SiaeSignupTokenGenerator"
-    secret = settings.SECRET_KEY
+    timeout = 2 * 7 * 24 * 3600
 
     def make_token(self, company):
-        """
-        Return a token that can be used once to do a signup
-        for the given company and is valid only for a limited time.
-        """
-        return self._make_token_with_timestamp(company, self._num_seconds(self._now()))
+        return super().make_token(company=company)
 
-    def check_token(self, company, token):
-        """
-        Check that a company signup token is correct for a given company.
-        """
-        if not (company and token):
-            return False
-        # Parse the token
-        try:
-            timestamp_b36, _ = token.split("-")
-        except ValueError:
-            return False
-
-        try:
-            timestamp = base36_to_int(timestamp_b36)
-        except ValueError:
-            return False
-
-        # Check that the timestamp/uid has not been tampered with
-        if not constant_time_compare(self._make_token_with_timestamp(company, timestamp), token):
-            return False
-
-        # Check the timestamp is within limit.
-        if (self._num_seconds(self._now()) - timestamp) > COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT:
-            return False
-
-        return True
-
-    def _make_token_with_timestamp(self, company, timestamp):
-        # timestamp is number of seconds since 2001-1-1. Converted to base 36,
-        # this gives us a 6 digit string until about 2069.
-        timestamp_b36 = int_to_base36(timestamp)
-        hash_string = salted_hmac(
-            self.key_salt, self._make_hash_value(company, timestamp), secret=self.secret
-        ).hexdigest()[::2]  # Limit to 20 characters to shorten the URL.
-        return f"{timestamp_b36}-{hash_string}"
-
-    def _make_hash_value(self, company, timestamp):
+    def _make_hash_value(self, timestamp, company):
         """
         Hash the company's primary key and some company state (its number of members)
         that's sure to change after a signup to produce a token that is invalidated
@@ -72,12 +75,31 @@ class CompanySignupTokenGenerator:
         """
         return str(company.pk) + str(company.members.count()) + str(timestamp)
 
-    def _num_seconds(self, dt):
-        return int((dt - datetime(2001, 1, 1)).total_seconds())
-
-    def _now(self):
-        # Used for mocking in tests
-        return datetime.now()
-
 
 company_signup_token_generator = CompanySignupTokenGenerator()
+
+
+class AdminRequestTokenGenerator(TokenGenerator):
+    """
+    Token generator for the admin role request mechanism.
+
+    A member of a company with an auth_email can request the admin role.
+    A token is generated and sent to auth_email. When the link is clicked,
+    the token is validated and the member is promoted to admin.
+
+    The token includes membership.is_admin in its hash so it is automatically
+    invalidated once the promotion has been applied.
+    """
+
+    key_salt = "itou.utils.tokens.AdminRequestTokenGenerator"
+    timeout = 2 * 7 * 24 * 3600
+
+    def make_token(self, company, user):
+        return super().make_token(company=company, user=user)
+
+    def _make_hash_value(self, timestamp, company, user):
+        membership = company.memberships.get(user=user)
+        return f"{company.pk}{user.pk}{membership.is_admin}{timestamp}"
+
+
+admin_request_token_generator = AdminRequestTokenGenerator()

@@ -666,6 +666,9 @@ class MemberList(BaseMemberList):
         context = super().get_context_data(**kwargs)
         context["can_show_financial_annexes"] = self.organization.convention_can_be_accessed_by(self.request.user)
         context["base_url"] = "companies_views"
+        context["show_admin_request_banner"] = bool(
+            self.organization.auth_email and not self.organization.active_admin_members.exists()
+        )
         return context
 
 
@@ -692,3 +695,70 @@ def update_admin_role(request, action, public_id, template_name="companies/updat
         success_url=reverse("companies_views:members"),
         template_name=template_name,
     )
+
+
+@check_request(lambda request: request.from_employer)
+@require_POST
+def request_admin_role(request):
+    """
+    A member of a company with an auth_email (and no active admin) can submit
+    this view to trigger an email to auth_email asking to confirm their promotion.
+    """
+    company = request.current_organization
+    if not company.auth_email:
+        raise PermissionDenied
+    if company.active_admin_members.exists():
+        raise PermissionDenied
+
+    token = company.get_admin_request_token(request.user)
+    confirm_url = get_absolute_url(
+        reverse(
+            "companies_views:confirm_admin_role",
+            kwargs={"company_pk": company.pk, "token": token},
+        )
+    )
+    company.admin_request_email(request.user, confirm_url).send()
+    messages.success(
+        request,
+        f"Nous venons d'envoyer un e-mail à l'adresse {company.auth_email} afin de vérifier votre demande "
+        "d'attribution du statut d'administrateur. Nous vous invitons à consulter votre boîte de réception.",
+    )
+    return HttpResponseRedirect(reverse("companies_views:members"))
+
+
+def confirm_admin_role(request, company_pk, token):
+    """
+    Linked from the email sent to auth_email.
+    Validates the token and promotes the requesting user to admin.
+    The requesting user must be logged in since the token is tied to their account.
+    """
+    company = get_object_or_404(Company.objects.active(), pk=company_pk)
+
+    if not company.check_admin_request_token(request.user, token):
+        messages.error(
+            request,
+            "Ce lien est invalide ou a expiré. Veuillez demander un nouveau lien depuis la page collaborateurs.",
+        )
+        return HttpResponseRedirect(reverse("dashboard:index"))
+
+    existing_admins = company.active_admin_members.exclude(pk=request.user.pk)
+    if existing_admins.exists():
+        admin_names = ", ".join(u.get_full_name() for u in existing_admins)
+        messages.error(
+            request,
+            f"Votre demande ne peut plus être traitée car {company.name} dispose déjà d'un ou plusieurs "
+            f"administrateurs ({admin_names}). Veuillez les contacter directement.",
+        )
+        return HttpResponseRedirect(reverse("dashboard:index"))
+
+    membership = get_object_or_404(company.memberships, user=request.user, is_active=True)
+    membership.is_admin = True
+    membership.updated_by = request.user
+    membership.save(update_fields=["is_admin", "updated_by", "updated_at"])
+    company.add_admin_email(request.user).send()
+
+    messages.success(
+        request,
+        f"{request.user.get_full_name()} est désormais administrateur de {company.name}.",
+    )
+    return HttpResponseRedirect(reverse("dashboard:index"))

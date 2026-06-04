@@ -39,6 +39,28 @@
 {% endblock %}
 
 {% block content %}
+    {% if show_admin_request_banner %}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        {% component_alert content=content variant="warning" title="Votre organisation ne compte actuellement aucun administrateur" %}
+                            {% fragment as content %}
+                                <p>
+                                    Si vous estimez devoir assumer ce rôle, veuillez en faire la demande en cliquant sur ce lien :
+                                    un e-mail sera envoyé à l'adresse d'authentification de l'entreprise.
+                                </p>
+                                <form method="post" action="{% url 'companies_views:request_admin_role' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning btn-sm">Demander le statut d'administrateur</button>
+                                </form>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
     {% include "includes/members_list.html" %}
 {% endblock %}
 
