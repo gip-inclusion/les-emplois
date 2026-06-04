@@ -1,0 +1,99 @@
+{% load format_filters %}
+{% load geiq_assessments_badges %}
+{% load str_filters %}
+
+<div class="col-12">
+    {% if assessments %}
+        <p>{{ assessments|length }} résultat{{ assessments|pluralizefr }}</p>
+        <section>
+            <div class="table-responsive mt-3 mt-md-4">
+                <table class="table table-hover">
+                    <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">GEIQ</th>
+                            <th scope="col">Structures</th>
+                            <th scope="col">Campagne</th>
+                            <th scope="col">Référent</th>
+                            <th scope="col" aria-label="Statut du bilan">Statut</th>
+                            <th scope="col">Nombre de contrats</th>
+                            <th scope="col">Montant potentiel</th>
+                            <th scope="col">Montant accordé</th>
+                            <th scope="col">Montant conventionné</th>
+                            <th scope="col">Taux de réalisation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assessment in assessments %}
+                            <tr>
+                                <td>
+                                    {% if can_access_details %}
+                                        <a class="btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">
+                                            {{ assessment.label_geiq_name }}
+                                        </a>
+                                    {% else %}
+                                        {{ assessment.label_geiq_name }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <ul class="mb-0">
+                                        {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
+                                    </ul>
+                                </td>
+                                <td>{{ assessment.campaign.year }}</td>
+                                <td>
+                                    {% for institution in assessment.conventionned_institutions %}
+                                        {{ institution.name }}
+                                        {% if not forloop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{% state_for_institution assessment %}</td>
+                                <td>
+                                    {% if assessment.submitted_at %}
+                                        {{ assessment.contracts_nb }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assessment.can_view_amounts %}
+                                        {{ assessment.potential_allowance_amount|format_int_euros }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assessment.can_view_amounts %}
+                                        {{ assessment.granted_amount|format_int_euros }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assessment.can_view_amounts %}
+                                        {{ assessment.convention_amount|format_int_euros }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assessment.can_view_amounts %}
+                                        {% grant_percentage_badge assessment %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% else %}
+        <div class="text-center my-3 my-md-4">
+            <p class="mb-1 mt-3">
+                <strong>Aucun bilan pour le moment</strong>
+            </p>
+        </div>
+    {% endif %}
+</div>
