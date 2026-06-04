@@ -88,7 +88,8 @@ def test_get_all_contracts_empty(respx_mock, label_settings):
 def test_get_all_contracts(respx_mock, label_settings):
     base = label_settings.API_GEIQ_LABEL_BASE_URL
     expected_data = [
-        {"id": nb, "antenne": {}, "salarie": {"id": nb * 11, "nom": f"Salarie du contrat {nb}"}} for nb in range(1, 91)
+        {"id": nb, "antenne": {}, "salarie": {"id": nb * 11, "geiq_id": 123, "nom": f"Salarie du contrat {nb}"}}
+        for nb in range(1, 91)
     ]
     respx_mock.get(
         f"{base}/rest/SalarieContrat"
@@ -122,7 +123,7 @@ def test_get_all_prequalifications(respx_mock, label_settings):
     expected_data = [
         {
             "id": nb,
-            "salarie": {"id": nb * 11, "nom": f"Salarie de la prequalification {nb}"},
+            "salarie": {"id": nb * 11, "geiq_id": 123, "nom": f"Salarie de la prequalification {nb}"},
             "action_pre_qualification": {"id": 3, "libelle": "POE", "libelle_abr": "POE"},
         }
         for nb in range(1, 10)
@@ -140,16 +141,14 @@ def test_get_all_prequalifications(respx_mock, label_settings):
 
 def test_get_taux_geiq_single(respx_mock, label_settings):
     expected_data = [
-        [
-            {
-                "geiq_id": 123,
-                "taux_rupture_periode_essai": "",
-                "taux_rupture_hors_periode_essai": "",
-                "taux_sortie_emploi_durable": "50.0",
-                "taux_sortie_emploi": "50.0",
-                "taux_obtention_qualification": "75.0",
-            }
-        ]
+        {
+            "geiq_id": 123,
+            "taux_rupture_periode_essai": "",
+            "taux_rupture_hors_periode_essai": "",
+            "taux_sortie_emploi_durable": "50.0",
+            "taux_sortie_emploi": "50.0",
+            "taux_obtention_qualification": "75.0",
+        }
     ]
     respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/TauxGeiq?where=geiq,=,123").respond(
         200, json={"status": "Success", "result": expected_data}
@@ -157,6 +156,26 @@ def test_get_taux_geiq_single(respx_mock, label_settings):
 
     client = geiq_label.get_client()
     assert client.get_taux_geiq(geiq_id=123) == expected_data
+
+
+def test_get_taux_geiq_single_invalid_geiq(respx_mock, label_settings):
+    expected_data = [
+        {
+            "geiq_id": 321,
+            "taux_rupture_periode_essai": "",
+            "taux_rupture_hors_periode_essai": "",
+            "taux_sortie_emploi_durable": "50.0",
+            "taux_sortie_emploi": "50.0",
+            "taux_obtention_qualification": "75.0",
+        }
+    ]
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/TauxGeiq?where=geiq,=,123").respond(
+        200, json={"status": "Success", "result": expected_data}
+    )
+
+    client = geiq_label.get_client()
+    with pytest.raises(geiq_label.LabelAPIError, match=r"Data returned incorrect geiq_id=321 \(expected 123\)"):
+        client.get_taux_geiq(geiq_id=123)
 
 
 def test_get_taux_geiq_batch(respx_mock, label_settings):
