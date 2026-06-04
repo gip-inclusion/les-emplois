@@ -59,23 +59,6 @@ class TestApprovalNotifyPoleEmploiIntegration:
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code == "MISSING_USER_DATA"
 
-    def test_invalid_job_application(self):
-        approval = ApprovalFactory()
-        JobApplicationFactory(
-            sent_by_authorized_prescriber=True,
-            job_seeker=approval.user,
-            state=JobApplicationState.CANCELLED,
-            approval=None,
-        )
-        with freeze_time() as frozen_now:
-            return_status = approval.notify_pole_emploi()
-        assert return_status == api_enums.PEApiNotificationStatus.PENDING
-        approval.refresh_from_db()
-        assert approval.pe_notification_status == "notification_pending"
-        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
-        assert approval.pe_notification_endpoint is None
-        assert approval.pe_notification_exit_code == "NO_JOB_APPLICATION"
-
     @respx.mock
     @freeze_time("2021-06-21")
     def test_notification_accepted_nominal(self):
@@ -84,9 +67,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
-            with_jobapplication=True,
-            with_jobapplication__to_company__kind=CompanyKind.ACI,
-            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
+            origin_sender_kind=SenderKind.PRESCRIBER,
+            origin_siae_kind=CompanyKind.ACI,
+            origin_prescriber_organization_kind=PrescriberOrganizationKind.FT,
         )
         return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
@@ -97,7 +80,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
+            "numSIRETsiae": approval.origin_siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -122,9 +105,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     def test_notification_accepted_with_id_national(self):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
-            with_jobapplication=True,
-            with_jobapplication__to_company__kind=CompanyKind.ACI,
-            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
+            origin_sender_kind=SenderKind.PRESCRIBER,
+            origin_siae_kind=CompanyKind.ACI,
+            origin_prescriber_organization_kind=PrescriberOrganizationKind.FT,
         )
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()
@@ -142,7 +125,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
+            "numSIRETsiae": approval.origin_siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -160,10 +143,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
-            with_jobapplication=True,
-            with_jobapplication__to_company__kind=CompanyKind.ACI,
-            with_jobapplication__sent_by_authorized_prescriber=True,
-            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
+            origin_sender_kind=SenderKind.PRESCRIBER,
+            origin_siae_kind=CompanyKind.ACI,
+            origin_prescriber_organization_kind=PrescriberOrganizationKind.CAF,
         )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -175,7 +157,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
+            "numSIRETsiae": approval.origin_siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -193,10 +175,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
-            with_jobapplication=True,
-            with_jobapplication__to_company__kind=CompanyKind.ACI,
-            with_jobapplication__sent_by_authorized_prescriber=True,
-            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
+            origin_sender_kind=SenderKind.PRESCRIBER,
+            origin_siae_kind=CompanyKind.ACI,
+            origin_prescriber_organization_kind=PrescriberOrganizationKind.SPIP,
         )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -208,7 +189,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
+            "numSIRETsiae": approval.origin_siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -298,10 +279,10 @@ class TestApprovalNotifyPoleEmploiIntegration:
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         job_seeker = JobSeekerFactory()
-        company = CompanyFactory(kind="FOO")  # unknown kind
-        approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(
-            sent_by_prescriber_alone=True, to_company=company, approval=approval, state=JobApplicationState.ACCEPTED
+        approval = ApprovalFactory(
+            user=job_seeker,
+            origin_siae_kind="FOO",  # unknown kind
+            origin_sender_kind=SenderKind.PRESCRIBER,
         )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -313,25 +294,6 @@ class TestApprovalNotifyPoleEmploiIntegration:
         assert approval.pe_notification_exit_code == "INVALID_SIAE_KIND"
 
     @respx.mock
-    def test_notification_goes_to_pending_if_job_application_is_not_accepted(self):
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESPONSE_KNOWN
-        )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
-        job_seeker = JobSeekerFactory()
-        company = CompanyFactory(kind="FOO")  # unknown kind
-        approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.POSTPONED)
-        with freeze_time() as frozen_now:
-            return_status = approval.notify_pole_emploi()
-        assert return_status == api_enums.PEApiNotificationStatus.PENDING
-        approval.refresh_from_db()
-        assert approval.pe_notification_status == "notification_pending"
-        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
-        assert approval.pe_notification_endpoint is None
-        assert approval.pe_notification_exit_code == "NO_JOB_APPLICATION"
-
-    @respx.mock
     @freeze_time("2021-06-21")
     def test_notification_use_origin_values(self):
         now = timezone.now()
@@ -341,7 +303,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         job_seeker = JobSeekerFactory()
         siae = CompanyFactory(kind="FOO")  # unknown kind
-        approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
+        approval = ApprovalFactory(user=job_seeker, origin_siae_kind=CompanyKind.ETTI)
         JobApplicationFactory(
             sent_by_prescriber_alone=True, to_company=siae, approval=approval, state=JobApplicationState.ACCEPTED
         )

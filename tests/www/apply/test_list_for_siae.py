@@ -547,10 +547,7 @@ class TestProcessListSiae:
         assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
         # With a valid approval
-        approval = ApprovalFactory(
-            user=job_app.job_seeker,
-            with_origin_values=True,  # origin_values needed to delete it
-        )
+        approval = ApprovalFactory(user=job_app.job_seeker)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == [job_app]
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})

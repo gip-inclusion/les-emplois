@@ -724,7 +724,7 @@ class TestApprovalModel:
             ApprovalFactory(public_id=approval.public_id)
 
     def test_origin_siae_siret_constraint(self):
-        approval = ApprovalFactory(with_origin_values=True)
+        approval = ApprovalFactory()
         assert approval.origin_siae_siret
         approval.origin_siae_siret = approval.origin_siae_siret[:-1]
         with pytest.raises(IntegrityError, match=".*origin_siae_siret_regex.*"):

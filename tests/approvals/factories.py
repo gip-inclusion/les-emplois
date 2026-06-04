@@ -53,12 +53,6 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
             end_at=datetime.date(3000, 1, 1),
             origin_pe_approval=True,
         )
-        with_origin_values = factory.Trait(
-            origin_siae_kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
-            origin_siae_siret=factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1"),
-            origin_sender_kind=SenderKind.EMPLOYER,
-            origin_prescriber_organization_kind="",
-        )
         with_diagnosis_from_employer = factory.Trait(
             eligibility_diagnosis=factory.SubFactory(
                 IAEEligibilityDiagnosisFactory, from_employer=True, job_seeker=factory.SelfAttribute("..user")
@@ -72,6 +66,10 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     eligibility_diagnosis = factory.SubFactory(
         IAEEligibilityDiagnosisFactory, from_prescriber=True, job_seeker=factory.SelfAttribute("..user")
     )
+    origin_siae_kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
+    origin_siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
+    origin_sender_kind = SenderKind.EMPLOYER
+    origin_prescriber_organization_kind = ""
 
     @factory.post_generation
     def with_jobapplication(self, create, extracted, **kwargs):
