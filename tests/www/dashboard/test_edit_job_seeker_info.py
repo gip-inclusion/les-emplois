@@ -834,13 +834,7 @@ class TestEditJobSeekerInfo:
         for attr in ["birthdate", "birth_place", "birth_country"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
-    @pytest.mark.parametrize(
-        "identity_provider",
-        [
-            IdentityProvider.FRANCE_CONNECT,
-            # TODO: IdentityProvider.PE_CONNECT
-        ],
-    )
+    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT])
     def test_sso_fields_readonly(self, client, identity_provider, mocker):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",

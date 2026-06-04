@@ -484,9 +484,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         if not request.user.is_superuser:
             readonly_fields.extend(["is_staff", "is_superuser", "groups", "user_permissions"])
         if obj and obj.has_sso_provider:
-            readonly_fields.append("username")
-            if obj.identity_provider != IdentityProvider.PE_CONNECT:
-                readonly_fields.extend(["first_name", "last_name", "email"])
+            readonly_fields.extend(["username", "first_name", "last_name", "email"])
         if obj:
             readonly_fields.append("kind")  # kind is never editable, but still addable
         return readonly_fields
