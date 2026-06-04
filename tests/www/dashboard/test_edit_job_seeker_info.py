@@ -902,3 +902,32 @@ class TestEditJobSeekerInfo:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
         for attr in profile_fields:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
+
+    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT])
+    def test_edit_job_seeker_sso_alert(self, client, identity_provider):
+        ALERT_COMPONENT = {
+            IdentityProvider.FRANCE_CONNECT: (
+                "Ces informations proviennent du service partenaire avec lequel il s’est connecté (impots.gouv.fr, "
+                "Améli, La Poste, …). Invitez-le à effectuer les modifications directement sur le service "
+                "partenaire, elles seront automatiquement répercutées ici lors de sa prochaine connexion."
+            ),
+            IdentityProvider.PE_CONNECT: (
+                "Invitez-le à effectuer les modifications directement sur "
+                '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
+                'class="has-external-link">France Travail</a>. '
+                "Les changements seront automatiquement répercutés ici lors de sa prochaine connexion."
+            ),
+        }
+
+        prescriber = prescribers_factories.PrescriberMembershipFactory(organization__authorized=True).user
+        job_seeker = JobSeekerFactory(identity_provider=identity_provider)
+
+        client.force_login(prescriber)
+        url = reverse(
+            "dashboard:edit_job_seeker_info",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+        )
+        response = client.get(url)
+
+        assertContains(response, f"Les informations d’identité de cet usager viennent de {identity_provider.label}")
+        assertContains(response, ALERT_COMPONENT[identity_provider])

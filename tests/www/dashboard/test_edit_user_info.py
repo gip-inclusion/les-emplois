@@ -1,5 +1,6 @@
 import math
 from datetime import UTC, date, datetime
+from functools import partial
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -815,3 +816,46 @@ class TestEditUserInfoView:
         assert updated_user.first_name == original_user.first_name
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
+
+    @pytest.mark.parametrize(
+        "user_factory,identity_provider",
+        [
+            (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT),
+            (JobSeekerFactory, IdentityProvider.PE_CONNECT),
+            (partial(PrescriberFactory, membership=True), IdentityProvider.PRO_CONNECT),
+        ],
+        ids=[
+            "job_seeker_with_france_connect",
+            "job_seeker_with_ft_connect",
+            "professional_with_pro_connect",
+        ],
+    )
+    def test_edit_user_sso_alert(self, client, user_factory, identity_provider):
+        ALERT_COMPONENT = {
+            IdentityProvider.FRANCE_CONNECT: (
+                "Votre état civil est certifié par le service partenaire avec lequel vous vous êtes connecté "
+                "(impots.gouv.fr, Améli, La Poste, …). Effectuez les modifications directement sur le service "
+                "partenaire, elles seront automatiquement répercutées ici lors de votre prochaine connexion."
+            ),
+            IdentityProvider.PE_CONNECT: (
+                "Pour les modifier, rendez-vous directement sur "
+                '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
+                'class="has-external-link">France Travail</a>. '
+                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
+            ),
+            IdentityProvider.PRO_CONNECT: (
+                "Pour les modifier, rendez-vous directement sur "
+                '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
+                'class="has-external-link">France Travail</a>. '
+                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
+            ),
+        }
+
+        user = user_factory(identity_provider=identity_provider)
+
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = client.get(url)
+
+        assertContains(response, f"Vos informations d’identité viennent de {identity_provider.label}")
+        assertContains(response, ALERT_COMPONENT[identity_provider])
