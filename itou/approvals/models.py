@@ -445,14 +445,13 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     # performance improvements, nor huge readability boons. https://github.com/betagouv/itou/pull/2746
 
     # Origin fields stored to enable
-    origin_siae_siret = models.CharField(verbose_name="siret siae à l'origine du PASS IAE", max_length=14, null=True)
+    origin_siae_siret = models.CharField(verbose_name="siret siae à l'origine du PASS IAE", max_length=14)
     origin_siae_kind = models.CharField(
-        verbose_name="type siae à l'origine du PASS IAE", choices=companies_enums.CompanyKind.choices, null=True
+        verbose_name="type siae à l'origine du PASS IAE", choices=companies_enums.CompanyKind.choices
     )
     origin_sender_kind = models.CharField(
         verbose_name="origine de la candidature à l'origine du PASS IAE",
         choices=job_application_enums.SenderKind.choices,
-        null=True,
     )
     origin_prescriber_organization_kind = models.CharField(
         verbose_name="typologie prescripteur à l'origine du PASS IAE",
@@ -939,28 +938,11 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 reason=api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
             )
 
-        sender_kind = self.origin_sender_kind
-        prescriber_organization_kind = self.origin_prescriber_organization_kind
-        siae_siret = self.origin_siae_siret
-        siae_kind = self.origin_siae_kind
-        if not all((sender_kind, siae_siret, siae_kind)):
-            job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
-            if not job_application:
-                self.pe_log_err("had no accepted job application")
-                return self.pe_save_pending(
-                    now,
-                    reason=api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
-                )
-
-            siae_siret = job_application.to_company.siret
-            siae_kind = job_application.to_company.kind
-            sender_kind = job_application.sender_kind
-            if prescriber_org := job_application.sender_prescriber_organization:
-                prescriber_organization_kind = prescriber_org.kind
-
-        type_siae = companies_enums.siae_kind_to_ft_type_siae(siae_kind)
+        type_siae = companies_enums.siae_kind_to_ft_type_siae(self.origin_siae_kind)
         if not type_siae:
-            self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", siae_siret, siae_kind)
+            self.pe_log_err(
+                "could not find PE type for siae_siret={} siae_kind={}", self.origin_siae_siret, self.origin_siae_kind
+            )
             return self.pe_save_error(
                 now,
                 endpoint=None,
@@ -1015,10 +997,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         return self.pe_maj_pass(
             id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            siae_siret=siae_siret,
-            siae_kind=siae_kind,
-            sender_kind=sender_kind,
-            prescriber_kind=prescriber_organization_kind,
+            siae_siret=self.origin_siae_siret,
+            siae_kind=self.origin_siae_kind,
+            sender_kind=self.origin_sender_kind,
+            prescriber_kind=self.origin_prescriber_organization_kind,
             at=now,
             client=pe_client,
         )

@@ -964,7 +964,7 @@ class TestAnonymizeJobseekersManagementCommand:
         approval_with_few_datas = ApprovalFactory(
             origin_sender_kind=SenderKind.PRESCRIBER,
             origin_prescriber_organization_kind=PrescriberOrganizationKind.CCAS,
-            origin_siae_kind=None,
+            origin_siae_kind=CompanyKind.EI,
             eligibility_diagnosis__expires_at=datetime.date(2023, 1, 17),
             **kwargs,
             user__email="test2@example.com",

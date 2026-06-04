@@ -488,7 +488,7 @@
       'number_of_prolongations': 1,
       'number_of_suspensions': 1,
       'origin': 'default',
-      'origin_company_kind': None,
+      'origin_company_kind': 'EI',
       'origin_prescriber_organization_kind': 'CCAS',
       'origin_sender_kind': 'prescriber',
       'start_at': datetime.date(2020, 1, 1),
