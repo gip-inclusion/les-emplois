@@ -29,6 +29,12 @@ class LabelCommand(enum.StrEnum):
     TauxGeiq = "TauxGeiq"
 
 
+def check_data_salarie_geiq_id(data, geiq_id):
+    for item in data:
+        if item["salarie"]["geiq_id"] != geiq_id:
+            raise LabelAPIError(f"Data returned incorrect geiq_id={item['geiq_id']} (expected {geiq_id})")
+
+
 class LabelApiClient:
     def __init__(self, base_url: str, token: str):
         self.client = httpx.Client(
@@ -73,6 +79,9 @@ class LabelApiClient:
         data = []
         if geiq_id:
             data.extend(self._command(LabelCommand.TauxGeiq, where=f"geiq,=,{geiq_id}"))
+            for item in data:
+                if item["geiq_id"] != geiq_id:
+                    raise LabelAPIError(f"Data returned incorrect geiq_id={item['geiq_id']} (expected {geiq_id})")
         else:
             p = 1
             while new_values := self._command(LabelCommand.TauxGeiq, sort="geiq.id", n=page_size, p=p):
@@ -135,6 +144,7 @@ class LabelApiClient:
                 break
             p += 1
         assert len(data) == expected_nb
+        check_data_salarie_geiq_id(data, geiq_id)
         logger.info("Retrieved nb=%s contracts", expected_nb)
         return data
 
@@ -163,6 +173,7 @@ class LabelApiClient:
                 break
             p += 1
         assert len(data) == expected_nb
+        check_data_salarie_geiq_id(data, geiq_id)
         logger.info("Retrieved nb=%s prequalifications", expected_nb)
         return data
 
