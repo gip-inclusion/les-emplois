@@ -8333,11 +8333,13 @@
                           </i>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
-                              <i aria-hidden="true" class="ri-error-warning-line">
-                              </i>
-                              Éligibilité IAE à valider
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+                                  <i aria-hidden="true" class="ri-error-warning-line">
+                                  </i>
+                                  Éligibilité IAE à valider
+                              </span>
+                          </div>
                           <span class="d-block">
                               Un diagnostic doit être réalisé
                           </span>
@@ -8385,11 +8387,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              Éligible à l’IAE
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -8437,11 +8441,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              Éligible à l’IAE
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -8489,11 +8495,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              Éligible à l’IAE
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -8534,11 +8542,13 @@
                           </i>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-pass-valid-line">
-                              </i>
-                              PASS IAE valide
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un employeur
                           </span>
@@ -8584,11 +8594,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-pass-valid-line">
-                              </i>
-                              PASS IAE valide
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un employeur
                           </span>
@@ -8627,11 +8639,13 @@
                           Le prescripteur habilité n'a pas renseigné de critères.
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-pass-valid-line">
-                              </i>
-                              PASS IAE valide
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -9961,11 +9975,13 @@
                           </i>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
-                              <i aria-hidden="true" class="ri-error-warning-line">
-                              </i>
-                              Éligibilité IAE à valider
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+                                  <i aria-hidden="true" class="ri-error-warning-line">
+                                  </i>
+                                  Éligibilité IAE à valider
+                              </span>
+                          </div>
                           <span class="d-block">
                               Un diagnostic doit être réalisé
                           </span>
@@ -10013,11 +10029,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              Éligible à l’IAE
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -10065,11 +10083,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              Éligible à l’IAE
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -10117,11 +10137,13 @@
                           </ul>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
-                              </i>
-                              Éligible à l’IAE
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>
@@ -10162,11 +10184,13 @@
                           </i>
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-pass-valid-line">
-                              </i>
-                              PASS IAE valide
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un employeur
                           </span>
@@ -10205,11 +10229,13 @@
                           Le prescripteur habilité n'a pas renseigné de critères.
                       </td>
                       <td>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-pass-valid-line">
-                              </i>
-                              PASS IAE valide
-                          </span>
+                          <div class="d-flex align-items-center">
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
                           <span class="d-block">
                               Éligibilité validée par un prescripteur habilité
                           </span>

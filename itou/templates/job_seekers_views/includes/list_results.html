@@ -39,7 +39,17 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
+                                <div class="d-flex align-items-center">
+                                    {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
+                                    {% if job_seeker.has_valid_approval and job_seeker.latest_approval.state == "SUSPENDED" %}
+                                        <i class="ms-1 ri-information-line text-info"
+                                           aria-label="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter ce candidat sans restriction."
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Le PASS IAE est valide, en pause entre deux contrats. Vous pouvez orienter ce candidat sans restriction."
+                                           role="button"
+                                           tabindex="0"></i>
+                                    {% endif %}
+                                </div>
                             </td>
                             <td>
                                 {{ job_seeker.last_advisor_with_org.0.get_inverted_full_name|default:"Non précisé" }} ({{ job_seeker.last_advisor_with_org.1.name|default:"Non précisé" }})

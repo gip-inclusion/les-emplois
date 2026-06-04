@@ -78,7 +78,8 @@ def test_valid_approval_with_pending_prolongation_request(snapshot):
 
 
 @freeze_time("2024-08-06")
-def test_suspended_approval(snapshot):
+@pytest.mark.parametrize("version", ["box", "details_view"])
+def test_suspended_approval(snapshot, version):
     approval = ApprovalFactory(
         start_at=datetime.date(2024, 1, 1),
         number=approval_number,
@@ -92,9 +93,10 @@ def test_suspended_approval(snapshot):
     )
     request = get_request(approval.eligibility_diagnosis.author)  # an authorized prescriber linked to the job seeker
     template = Template(
-        "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
+        "{% load approvals %}{% approval_details_box approval=approval version=version request=request %}"
     )
-    assert pretty_indented(template.render(Context({"approval": approval, "request": request}))) == snapshot
+    context = Context({"approval": approval, "request": request, "version": version})
+    assert pretty_indented(template.render(context)) == snapshot
 
 
 @freeze_time("2024-08-06")

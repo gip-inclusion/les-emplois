@@ -237,6 +237,19 @@
       <p class="fs-sm fst-italic mt-3">
           Ce PASS IAE a été importé depuis un agrément Pôle emploi.
       </p>
+      <div class="alert alert-info mt-3" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-0">
+                      Le PASS est mis en pause entre deux contrats pour préserver sa durée restante. Il se réactive automatiquement à l'embauche.
+                  </p>
+              </div>
+          </div>
+      </div>
   </div>
   
   '''

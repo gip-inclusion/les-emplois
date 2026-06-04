@@ -1,0 +1,8 @@
+{% load components %}
+{% component_alert content=content variant="info" extra_classes="mt-3" %}
+    {% fragment as content %}
+        <p class="mb-0">
+            Le PASS est mis en pause entre deux contrats pour préserver sa durée restante. Il se réactive automatiquement à l'embauche.
+        </p>
+    {% endfragment %}
+{% endcomponent_alert %}

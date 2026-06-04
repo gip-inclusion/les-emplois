@@ -19,7 +19,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -36,6 +36,10 @@ from tests.utils.testing import (
     get_rows_from_streaming_response,
     parse_response_to_soup,
     pretty_indented,
+)
+from tests.www.apply.test_list_for_siae import (
+    SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP_MARKUP,
+    SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP_MARKUP,
 )
 
 
@@ -78,6 +82,20 @@ def test_get(client):
         assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
         assertContains(response, job_application.job_seeker.get_inverted_full_name())
+
+
+def test_suspended_approval_info_tooltip(client):
+    job_application = JobApplicationFactory(
+        sent_by_authorized_prescriber=True,
+        with_approval=True,
+        state=JobApplicationState.ACCEPTED,
+    )
+    SuspensionFactory(approval=job_application.approval)
+    client.force_login(job_application.sender)
+
+    response = client.get(reverse("apply:list_prescriptions"))
+    assertContains(response, SUSPENDED_APPROVAL_PRESCRIBER_TOOLTIP_MARKUP, html=True)
+    assertNotContains(response, SUSPENDED_APPROVAL_EMPLOYER_TOOLTIP_MARKUP, html=True)
 
 
 @override_settings(PAGE_SIZE_DEFAULT=1)
