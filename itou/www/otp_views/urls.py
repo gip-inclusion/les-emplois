@@ -18,8 +18,8 @@ urlpatterns = [
         name="enrollment_step_1_choose_device_type",
     ),
     path(
-        "enrollment_step_2",
-        views.enrollment_step_2_confirm_device,
-        name="enrollment_step_2_confirm_device",
+        "enrollment_step_2_and_3",
+        views.enrollment_step_2_and_3_confirm_device,
+        name="enrollment_step_2_and_3_confirm_device",
     ),
 ]

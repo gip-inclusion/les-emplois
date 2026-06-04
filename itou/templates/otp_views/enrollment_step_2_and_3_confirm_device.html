@@ -1,0 +1,185 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+
+{% block title %}Sécurisez votre accès {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Sécurisez votre accès</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    {% if backup_code %}
+        {% component_alert title=title content=content variant="warning" %}
+            {% fragment as title %}
+                Ne passez pas cette page sans avoir noté votre code de récupération.
+            {% endfragment %}
+            {% fragment as content %}
+                <p>Il est généré une seule fois et ne sera plus accessible ensuite.</p>
+                <ul class="mb-0">
+                    <li>Sans lui, vous ne pourrez plus accéder à votre compte si vous perdez ou changez votre appareil.</li>
+                    <li>
+                        Conservez-le dans un endroit sécurisé : gestionnaire de mots de passe, document imprimé, coffre-fort numérique…
+                    </li>
+                    <li>
+                        Si vous utilisez l’application mobile pour l’authentification forte, évitez de stocker ce code sur ce même téléphone, vous risqueriez de tout perdre en même temps.
+                    </li>
+                </ul>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    {% if not backup_code %}
+        {# step 2 #}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="c-stepper mb-3 mb-md-4">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-66" role="progressbar" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
+                                </div>
+                            </div>
+                            <p id="currentProgressState">
+                                <strong>Étape 2</strong>/3 : Associez votre compte
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="c-form">
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {{ form.key }}
+                                {{ form.device_type }}
+
+                                <fieldset>
+                                    <h2 class="h3">Configurez l’authentification à deux facteurs</h2>
+
+                                    {% bootstrap_form_errors form type="all" %}
+                                    <ol class="list-ordered">
+                                        <li>{% bootstrap_field form.name wrapper_class="form-group form-group-input-w-lg-33" %}</li>
+                                        {% if form.device_type.value == 'smartphone' %}
+                                            <li>
+                                                <div>
+                                                    <p class="mb-0">
+                                                        <strong>Dans votre application, cliquez sur « + » ou sur « ajouter » puis scannez ce QR code depuis l’application.</strong>
+                                                    </p>
+                                                    <p>
+                                                        <img src="{{ qrcode }}" width="250" alt="QR code pour la configuration de l’authentification à deux facteurs">
+                                                    </p>
+                                                    <p class="mb-1">
+                                                        <strong>Ou copiez la clé de configuration suivante dans l’application (valable une seule fois pour configurer votre appareil) :</strong>
+                                                    </p>
+                                                    <p>
+                                                        <span>{{ otp_secret }}</span>
+                                                        {% include "includes/copy_to_clipboard.html" with content=otp_secret css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        {% else %}
+                                            <li>
+                                                <div>
+                                                    <p class="mb-1">
+                                                        <strong>Copiez ce code dans votre gestionnaire de mot de passe en cliquant sur « + » ou sur « ajouter » :</strong>
+                                                    </p>
+                                                    <p>
+                                                        <span>{{ otp_secret }}</span>
+                                                        {% include "includes/copy_to_clipboard.html" with content=otp_secret css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        <li>{% bootstrap_field form.otp_token wrapper_class="form-group form-group-input-w-lg-33" %}</li>
+                                    </ol>
+                                </fieldset>
+                                {% itou_buttons_form primary_label="Poursuivre et obtenir le code de récupération" secondary_label="Revenir à l’étape précédente" secondary_url=previous_step_url reset_url=None %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    {% else %}
+        {# step 3 #}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="c-stepper mb-3 mb-md-4">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-labelledby="currentProgressState">
+                                </div>
+                            </div>
+                            <p id="currentProgressState">
+                                <strong>Étape 3</strong>/3 : Sauvegardez le code de récupération
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="s-section__row row">
+                    <div class="section__col col-12">
+                        <div class="c-form mb-3 mb-md-4">
+                            <h2 class="h3">Votre code de récupération à conserver</h2>
+                            <p class="mb-1">
+                                <strong>Code de récupération</strong>
+                            </p>
+                            <p>
+                                <span>{{ backup_code }}</span>
+                                {% include "includes/copy_to_clipboard.html" with content=backup_code css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
+                            </p>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="confirmation-checkbox" class="form-check-input" required>
+                                    <label class="form-check-label" for="confirmation-checkbox">
+                                        Je confirme avoir noté mon code de récupération et j’ai compris que je n’aurai plus l’occasion de le retrouver sur la plateforme.
+                                        <br class="d-none d-xl-inline">
+                                        Il me sera nécessaire si je perds accès à mon application ou à mon appareil. *
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <hr class="mb-3">
+                                    <small class="d-inline-block mb-3">* champs obligatoires</small>
+                                    <div class="form-row align-items-center justify-content-end gx-3">
+                                        <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                            <a href="" id="end-button" class="btn btn-block btn-primary disabled">
+                                                <span>Terminer</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    {% if backup_code %}
+        <script nonce="{{ csp_nonce }}">
+            console.log("machin");
+            document.getElementById("confirmation-checkbox").addEventListener("change", (event) => {
+                const button = document.getElementById("end-button");
+                button.classList.toggle("disabled", !event.target.checked);
+                button.href = event.target.checked ? "{{ post_save_url }}" : "";
+            })
+        </script>
+    {% endif %}
+{% endblock %}
