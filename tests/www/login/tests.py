@@ -483,7 +483,7 @@ class TestItouStaffLogin:
         response = client.get(setup_otp_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
         TOTPDevice.objects.create(user=user, confirmed=False)
-        setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_2_confirm_device")
+        setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
         response = client.get(setup_otp_confirm_device_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
 

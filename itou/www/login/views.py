@@ -8,9 +8,10 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic.edit import FormView
-from django_otp import devices_for_user, login as otp_login
+from django_otp import login as otp_login
 
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
+from itou.otp.utils import get_user_devices
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
@@ -142,9 +143,7 @@ class VerifyOTPView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # FIXME (dbaty): use `itoui.otp.utils.get_user_devices()` once
-        # we have a unique constraint on `Device.name`.
-        devices = sorted(devices_for_user(self.request.user), key=lambda d: (d.name, d.pk))
+        devices = get_user_devices(self.request.user)
         return context | {"devices": devices}
 
     def get_form_kwargs(self):

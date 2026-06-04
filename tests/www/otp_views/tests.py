@@ -1,4 +1,5 @@
 from functools import partial
+from unittest import mock
 
 import pytest
 from django.contrib import messages
@@ -16,6 +17,7 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
+from itou.otp.models import ItouStaticToken
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -155,10 +157,10 @@ def test_enrollment_step_1_choose_device_type(client):
     client.force_login(user)
     url = reverse("otp_views:enrollment_step_1_choose_device_type")
     response = client.get(url)
-    assertContains(response, "<strong>Étape 1</strong>/2 : Choisissez votre méthode")
+    assertContains(response, "<strong>Étape 1</strong>/3 : Choisissez votre méthode")
 
 
-class TestEnrollmentStep2ConfirmDevice:
+class TestEnrollmentSteps2And3ConfirmDevice:
     @pytest.mark.parametrize(
         "device_type,should_show_qr_code",
         (
@@ -169,11 +171,11 @@ class TestEnrollmentStep2ConfirmDevice:
     def test_get_known_device_type(self, client, device_type, should_show_qr_code):
         user = ItouStaffFactory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_confirm_device")
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
 
         response = client.get(url, query_params={"device_type": device_type})
 
-        assertContains(response, "<strong>Étape 2</strong>/2 : Associez votre compte")
+        assertContains(response, "<strong>Étape 2</strong>/3 : Associez votre compte")
         qr_code_text = "scannez ce QR code"
         if should_show_qr_code:
             assertContains(response, qr_code_text)
@@ -183,7 +185,7 @@ class TestEnrollmentStep2ConfirmDevice:
     def test_get_unknown_device_type(self, client):
         user = ItouStaffFactory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_confirm_device")
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
 
         response = client.get(url, query_params={"device_type": "unknown"})
         assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
@@ -191,7 +193,7 @@ class TestEnrollmentStep2ConfirmDevice:
     def test_post_valid_totp(self, client):
         user = ItouStaffFactory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_confirm_device")
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
         fake_device = TOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
         data = {
@@ -200,20 +202,27 @@ class TestEnrollmentStep2ConfirmDevice:
             "key": "R7QKTGB4PXO3JLFQCRWFKB2VGNY6T4QR",
             "otp_token": TOTP(fake_device.bin_key).token(),
         }
-        response = client.post(url, data)
+        with mock.patch(
+            "itou.otp.models.ItouStaticToken.generate_random_token",
+            lambda: "secret-backup-code",
+        ):
+            response = client.post(url, data)
 
-        assertRedirects(response, reverse("otp_views:otp_devices"))
         assertMessages(
             response, [messages.Message(messages.SUCCESS, "Votre nouvel appareil est confirmé", extra_tags="toast")]
         )
+        assertContains(response, "Votre code de récupération à conserver")
+        assertContains(response, "secret-backup-code")
         device = user.totpdevice_set.get()
         assert device.key == fake_device.key
         assert client.session[DEVICE_ID_SESSION_KEY] == device.persistent_id
+        backup_token = ItouStaticToken.objects.get()
+        assert backup_token.check_token("secret-backup-code")
 
     def test_post_invalid_totp(self, client):
         user = ItouStaffFactory()
         client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_confirm_device")
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
         fake_device = TOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
         expired_token = TOTP(fake_device.bin_key, drift=100).token()
