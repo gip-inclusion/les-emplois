@@ -2,7 +2,9 @@ import json
 from datetime import date
 
 import pytest
-from django.urls import reverse_lazy
+from dateutil.relativedelta import relativedelta
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 
@@ -223,7 +225,7 @@ class TestJobApplicationSearchApi:
         # No transition logs
         # Must fallback on job application last update
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
-        first_application = response.json()["results"][-1]  # Reversed sorting
+        first_application = response.json()["results"][-1]  # Oldest application.
         assert not self.job_application.logs.exists()
         assert first_application["dernier_changement_le"] == _str_with_tz(self.job_application.updated_at)
 
@@ -235,7 +237,7 @@ class TestJobApplicationSearchApi:
             to_state=JobApplicationState.PROCESSING,
         )
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
-        first_application = response.json()["results"][-1]  # Reversed sorting
+        first_application = response.json()["results"][0]  # Just updated, sorted first.
         assert first_application["dernier_changement_le"] == _str_with_tz(employer_log.timestamp)
 
         # 'ACCEPT' transition performed by staff user
@@ -245,5 +247,53 @@ class TestJobApplicationSearchApi:
             to_state=JobApplicationState.ACCEPTED,
         )
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
-        first_application = response.json()["results"][-1]  # Reversed sorting
+        first_application = response.json()["results"][0]  # Just updated, sorted first.
         assert first_application["dernier_changement_le"] == _str_with_tz(staff_user_log.timestamp)
+
+
+def test_search_older_than_3_months(api_client):
+    """
+    Security issue where the subquery finding the latest
+    JobApplicationTransitionLog did NOT restrict the
+    JobApplicationTransitionLog QuerySet to the outer query job_application.
+    """
+    job_seeker_1 = JobSeekerFactory(
+        jobseeker_profile__nir="269054958815780",
+        jobseeker_profile__birthdate=date(1969, 5, 12),
+        last_name="Durand",
+        first_name="Nathalie",
+        born_in_france=True,
+        with_address=True,
+    )
+    job_app_1 = JobApplicationFactory(
+        job_seeker=job_seeker_1,
+        sent_by_authorized_prescriber=True,
+        with_approval=True,
+        was_hired=True,
+    )
+    job_seeker_2 = JobSeekerFactory(
+        jobseeker_profile__nir="199127524528683",
+        jobseeker_profile__birthdate=date(1999, 12, 3),
+        last_name="Dupont-Maréchal",
+        first_name="Léopold",
+        born_outside_france=True,
+        with_address=True,
+    )
+    job_app_2 = JobApplicationFactory(sent_by_authorized_prescriber=True, job_seeker=job_seeker_2)
+    staff = ItouStaffFactory()
+    JobApplicationTransitionLog.objects.create(
+        user=staff,
+        job_application=job_app_1,
+        to_state=JobApplicationState.ACCEPTED,
+    )
+    token = DepartmentToken.objects.create(department="01", label="Token tests département 01")
+
+    api_client.force_authenticate(ServiceAccount(), token)
+    with freeze_time(timezone.now() + relativedelta(months=3, days=1)):
+        JobApplicationTransitionLog.objects.create(
+            user=staff,
+            job_application=job_app_2,
+            to_state=JobApplicationState.PROCESSING,
+        )
+        response = api_client.post(reverse("v1:job-applications-search"), VALID_SEARCH_DATA, format="json")
+    assert response.json()["results"] == []
