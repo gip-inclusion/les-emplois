@@ -11,7 +11,6 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
-from itou.users.enums import IdentityProvider
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.urls import get_zendesk_form_url
@@ -20,9 +19,8 @@ from itou.utils.urls import get_zendesk_form_url
 class SSOReadonlyMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.has_sso_provider and self.instance.identity_provider != IdentityProvider.PE_CONNECT:
-            # When a user has logged in with a SSO other than PEAMU
-            # it should see the field but most should be disabled
+        if self.instance.has_sso_provider:
+            # When users log in with a SSO, the fields should be disabled
             # (that’s a requirement on FranceConnect’s side).
             disabled_fields = ["first_name", "last_name", "email", "birthdate", "title"]
             for name in self.fields.keys():
@@ -77,8 +75,8 @@ class EditJobSeekerInfoForm(
         assert self.instance.is_job_seeker, self.instance
 
         # Noboby can edit its own email.
-        if self.instance.identity_provider == IdentityProvider.FRANCE_CONNECT:
-            # If the job seeker uses FranceConnect, point them to the modification process
+        if self.instance.has_sso_provider:
+            # Point them to the modification process
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
                 f"<a href='{get_zendesk_form_url()}' target='_blank'>"

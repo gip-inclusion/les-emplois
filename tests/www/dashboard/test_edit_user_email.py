@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import pytest
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from django.contrib import messages
 from django.urls import reverse
@@ -77,10 +78,11 @@ class TestChangeEmailView:
             assert new_address.email == new_email
             assert new_address.verified
 
-    def test_update_email_forbidden(self, client):
+    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT])
+    def test_update_email_forbidden(self, client, identity_provider):
         url = reverse("dashboard:edit_user_email")
 
-        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        job_seeker = JobSeekerFactory(identity_provider=identity_provider)
         client.force_login(job_seeker)
         response = client.get(url)
         assert response.status_code == 403
