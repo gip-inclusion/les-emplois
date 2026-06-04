@@ -30,6 +30,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    {% include "dashboard/includes/edit_job_seeker_sso_alert.html" with user=job_seeker viewing_self=False only %}
                     <div class="c-form">
                         <h2 class="h3">Informations personnelles</h2>
                         {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Mettre à jour" %}
