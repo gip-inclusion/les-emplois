@@ -82,35 +82,27 @@ class LabelApiClient:
                 p += 1
         return data
 
-    def get_compte_pdf(self, *, geiq_id):
+    def _get_pdf(self, *, command, geiq_id):
+        if command not in (LabelCommand.DownloadCompte, LabelCommand.SynthesePDF):
+            raise ValueError(f"{command} does not return a PDF")
         try:
             response_data = self.client.get(
-                f"rest/{LabelCommand.DownloadCompte}",
-                params={"id": geiq_id},
-            ).raise_for_status()
-        except httpx.HTTPError as exc:
-            raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
-        if response_data.headers["content-type"] != "application/pdf":
-            raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
-        logger.info(
-            "Successfully retrieved DownloadCompte - sha256=%s",
-            hashlib.sha256(response_data.content).digest(),
-        )
-        return response_data.content
-
-    def get_synthese_pdf(self, *, geiq_id):
-        try:
-            response_data = self.client.get(
-                f"rest/{LabelCommand.SynthesePDF}",
+                f"rest/{command}",
                 params={"id": geiq_id},
                 timeout=httpx.Timeout(API_TIMEOUT_SECONDS, read=10),  # this endpoint can be slow to generate the PDF
             ).raise_for_status()
         except httpx.HTTPError as exc:
-            raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
+            raise LabelAPIError(f"Error requesting Label API {command}: {exc.__class__.__name__}") from exc
         if response_data.headers["content-type"] != "application/pdf":
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
-        logger.info("Successfully retrieved SynthesePDF - sha256=%s", hashlib.sha256(response_data.content).digest())
+        logger.info(f"Successfully retrieved {command} - sha256=%s", hashlib.sha256(response_data.content).digest())
         return response_data.content
+
+    def get_compte_pdf(self, *, geiq_id):
+        return self._get_pdf(command=LabelCommand.DownloadCompte, geiq_id=geiq_id)
+
+    def get_synthese_pdf(self, *, geiq_id):
+        return self._get_pdf(command=LabelCommand.SynthesePDF, geiq_id=geiq_id)
 
     def get_all_contracts(self, geiq_id, *, page_size=100, date_fin=None):
         data = []
