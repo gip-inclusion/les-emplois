@@ -86,7 +86,7 @@ def test_all_admin(admin_client, mocker, subtests):
     Scan.objects.create(file=FileFactory(), clamav_signature="toto")
     Department.objects.create(code="33", name="Gironde", start_date=timezone.localdate())
     Token.objects.create(user=admin_user)
-    ItouTOTPDeviceFactory(user=admin_user, confirmed=False)
+    ItouTOTPDeviceFactory(user=admin_user)
     EmailAddress.objects.create(user=admin_user, email="foobar@example.com", primary=False, verified=False)
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae

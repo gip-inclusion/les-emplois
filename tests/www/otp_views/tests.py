@@ -64,7 +64,7 @@ def test_permissions(client, factory, expected_status):
 @freeze_time("2025-03-11 05:18:56")
 def test_device_list(client, snapshot):
     user = ItouStaffFactory()
-    device = ItouTOTPDeviceFactory(user=user, name="Mon appareil", confirmed=True)
+    device = ItouTOTPDeviceFactory(user=user, name="Mon appareil")
 
     client.force_login(user)
     attach_device_to_user_session(client, device)
@@ -92,13 +92,9 @@ def test_delete_devices(client, snapshot, settings):
     url = reverse("otp_views:otp_devices")
 
     with freeze_time("2025-03-11 05:18:56") as frozen_time:
-        device_1 = ItouTOTPDeviceFactory(
-            user=staff_user,
-            confirmed=True,
-            name="authenticator",
-        )
+        device_1 = ItouTOTPDeviceFactory(user=staff_user, name="authenticator")
         frozen_time.tick(60)
-        device_2 = ItouTOTPDeviceFactory(user=staff_user, confirmed=True, name="bitwarden")
+        device_2 = ItouTOTPDeviceFactory(user=staff_user, name="bitwarden")
         frozen_time.tick(60)
 
         client.force_login(staff_user)
@@ -305,17 +301,7 @@ class TestItouStaffLogin:
         session = client.session
         session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
         session.save()
-        device = ItouTOTPDeviceFactory(name="1", user=user, confirmed=False)
-        response = client.post(login_url, data=form_data, follow=True)
-        assertRedirects(response, setup_otp_url)
-
-        # With a confirmed device the user is redirected to the OTP code form
-        device.confirmed = True
-        device.save()
-        client.logout()
-        session = client.session
-        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
-        session.save()
+        device = ItouTOTPDeviceFactory(name="1", user=user)
         response = client.post(login_url, data=form_data, follow=True)
         next_url = add_url_params(verify_otp_url, {"next": admin_url})
         assertRedirects(response, next_url)
@@ -323,7 +309,6 @@ class TestItouStaffLogin:
         # The user should not be able to access the setup otp pages
         response = client.get(setup_otp_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
-        ItouTOTPDeviceFactory(name="2", user=user, confirmed=False)
         setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
         response = client.get(setup_otp_confirm_device_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
@@ -359,7 +344,7 @@ class TestItouStaffLogin:
     def test_login_with_backup_code(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
-        device = ItouTOTPDeviceFactory(user=user, confirmed=False)
+        device = ItouTOTPDeviceFactory(user=user)
         backup_code = create_otp_backup_code(user)
 
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
