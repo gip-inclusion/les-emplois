@@ -30,13 +30,13 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestListAssessmentsView:
+    URL = reverse("geiq_assessments_views:list_for_institution")
+
     def test_anonymous_access(self, client):
-        url = reverse("geiq_assessments_views:list_for_institution")
-        response = client.get(url)
-        assertRedirects(response, reverse("account_login") + f"?next={url}")
+        response = client.get(self.URL)
+        assertRedirects(response, reverse("account_login") + f"?next={self.URL}")
 
     def test_unauthorized_access(self, client):
-        url = reverse("geiq_assessments_views:list_for_institution")
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(membership=True), 403),
@@ -44,13 +44,13 @@ class TestListAssessmentsView:
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
-            response = client.get(url)
+            response = client.get(self.URL)
             assert response.status_code == expected_status
 
     def test_empty_list(self, client, snapshot):
         membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
         client.force_login(membership.user)
-        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments empty list"
         )
@@ -72,7 +72,7 @@ class TestListAssessmentsView:
         )
 
         client.force_login(user)
-        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessment list without links to details"
         )
@@ -170,7 +170,7 @@ class TestListAssessmentsView:
                 )
 
         client.force_login(membership.user)
-        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessment list with amounts"
         )
@@ -201,7 +201,7 @@ class TestListAssessmentsView:
         _unrelated_assessment = AssessmentFactory()
 
         client.force_login(membership.user)
-        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessment list with links to details"
         )
@@ -320,7 +320,7 @@ class TestListAssessmentsView:
         AssessmentFactory(campaign=campaign)  # Another assessment not linked to the institution
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
-            response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+            response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments complex list"
         )
@@ -396,7 +396,7 @@ class TestListAssessmentsView:
             employee__allowance_amount=1400,
         )
 
-        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        response = client.get(self.URL)
         context_potential_amout = response.context["assessments"].get().potential_allowance_amount
         expected_potential_amout = get_allowance_stats_for_institution(assessment, for_assessment_details=False)[
             "potential_allowance_amount"
