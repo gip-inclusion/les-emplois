@@ -72,21 +72,21 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {% if assessment.decision_validated_at %}
+                                                {% if assessment.can_view_amounts %}
                                                     {{ assessment.granted_amount|format_int_euros }}
                                                 {% else %}
                                                     -
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {% if assessment.decision_validated_at %}
+                                                {% if assessment.can_view_amounts %}
                                                     {{ assessment.convention_amount|format_int_euros }}
                                                 {% else %}
                                                     -
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {% if assessment.decision_validated_at and assessment.convention_amount %}
+                                                {% if assessment.can_view_amounts %}
                                                     {% grant_percentage_badge assessment %}
                                                 {% else %}
                                                     -

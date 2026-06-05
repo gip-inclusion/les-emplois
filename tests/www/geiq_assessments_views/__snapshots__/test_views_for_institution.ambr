@@ -2983,11 +2983,12 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 "geiq_assessments_assessmentcampaign"."id",
-                 "geiq_assessments_assessmentcampaign"."year",
-                 "geiq_assessments_assessmentcampaign"."opening_date",
-                 "geiq_assessments_assessmentcampaign"."submission_deadline",
-                 "geiq_assessments_assessmentcampaign"."review_deadline"
+                 "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
+                                                                            "geiq_assessments_assessmentcampaign"."id",
+                                                                            "geiq_assessments_assessmentcampaign"."year",
+                                                                            "geiq_assessments_assessmentcampaign"."opening_date",
+                                                                            "geiq_assessments_assessmentcampaign"."submission_deadline",
+                                                                            "geiq_assessments_assessmentcampaign"."review_deadline"
           FROM "geiq_assessments_assessment"
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
@@ -3314,6 +3315,386 @@
                                   </td>
                                   <td>
                                       0
+                                  </td>
+                                  <td>
+                                      80 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
+                                          80 %
+                                      </span>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestListAssessmentsView.test_display_amounts[limited access][assessment list with amounts]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <p>
+                      4 résultats
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      GEIQ
+                                  </th>
+                                  <th scope="col">
+                                      Structures
+                                  </th>
+                                  <th scope="col">
+                                      Campagne
+                                  </th>
+                                  <th scope="col">
+                                      Référent
+                                  </th>
+                                  <th scope="col">
+                                      Statut du bilan
+                                  </th>
+                                  <th scope="col">
+                                      Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant accordé
+                                  </th>
+                                  <th scope="col">
+                                      Montant conventionné
+                                  </th>
+                                  <th scope="col">
+                                      Taux de réalisation
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      Bilan à valider
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-info">
+                                          À valider
+                                      </span>
+                                  </td>
+                                  <td>
+                                      3
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      Bilan envoyé
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary">
+                                          À contrôler
+                                      </span>
+                                  </td>
+                                  <td>
+                                      2
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      Nouveau bilan
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Siège (département non disponible)
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
+                                          En attente
+                                      </span>
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      Bilan validé
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success">
+                                          Validé
+                                      </span>
+                                  </td>
+                                  <td>
+                                      4
+                                  </td>
+                                  <td>
+                                      80 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
+                                          80 %
+                                      </span>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestListAssessmentsView.test_display_amounts[unlimited access][assessment list with amounts]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <p>
+                      4 résultats
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      GEIQ
+                                  </th>
+                                  <th scope="col">
+                                      Structures
+                                  </th>
+                                  <th scope="col">
+                                      Campagne
+                                  </th>
+                                  <th scope="col">
+                                      Référent
+                                  </th>
+                                  <th scope="col">
+                                      Statut du bilan
+                                  </th>
+                                  <th scope="col">
+                                      Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant accordé
+                                  </th>
+                                  <th scope="col">
+                                      Montant conventionné
+                                  </th>
+                                  <th scope="col">
+                                      Taux de réalisation
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/22222222-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Bilan à valider
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-info">
+                                          À valider
+                                      </span>
+                                  </td>
+                                  <td>
+                                      3
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
+                                          100 %
+                                      </span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/11111111-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Bilan envoyé
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary">
+                                          À contrôler
+                                      </span>
+                                  </td>
+                                  <td>
+                                      2
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/00000000-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Nouveau bilan
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Siège (département non disponible)
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
+                                          En attente
+                                      </span>
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/33333333-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Bilan validé
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success">
+                                          Validé
+                                      </span>
+                                  </td>
+                                  <td>
+                                      4
                                   </td>
                                   <td>
                                       80 000 €
