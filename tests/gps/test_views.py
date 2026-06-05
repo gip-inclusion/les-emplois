@@ -838,7 +838,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert pretty_indented(html_details) == snapshot(name="with_diagnostic")
+        assert pretty_indented(html_details) == snapshot(name="with_diagnostic_can_edit")
 
         # When the organization is gps autorized instead
         PrescriberOrganization.objects.update(
@@ -865,7 +865,6 @@ class TestGroupDetailsBeneficiaryTab:
             selector="#main",
             replace_in_attr=[
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
-                ("href", beneficiary.public_id, "[PublicID of Beneficiary]"),
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )

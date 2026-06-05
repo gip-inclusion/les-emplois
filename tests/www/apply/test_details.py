@@ -9,7 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.job_applications.enums import JobApplicationState
 from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import EmployerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 
 def test_missing_job_seeker_info(client):
@@ -101,3 +101,51 @@ def test_hide_old_applications_to_employers(client, subtests):
     for job_app in [hidden_application] + visible_applications:
         response = client.get(reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_app.pk}))
         assertContains(response, company.display_name)
+
+
+def edit_jobseeker_info_button(url, job_application):
+    edit_job_seeker_info_url = (
+        reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
+        + f"?back_url={url}&from_application={job_application.pk}"
+    )
+    job_seeker_name = job_application.job_seeker.get_inverted_full_name()
+
+    return f"""
+            <a href="{edit_job_seeker_info_url}"
+               class="btn btn-ico btn-outline-primary"
+               aria-label="Modifier les informations personnelles de {job_seeker_name}">
+                <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                <span>Modifier</span>
+            </a>
+        """
+
+
+@pytest.mark.parametrize(
+    "factory,assertion",
+    [
+        (partial(JobApplicationFactory, sent_by_authorized_prescriber=True), assertContains),
+        (partial(JobApplicationFactory, sent_by_prescriber=True), assertNotContains),
+        (partial(JobApplicationFactory, sent_by_another_employer=True), assertContains),
+    ],
+)
+def test_display_edit_jobseeker_info_button(client, factory, assertion):
+    job_application = factory()
+    client.force_login(job_application.sender)
+    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+
+    assertion(response, edit_jobseeker_info_button(url, job_application), html=True)
+
+
+@pytest.mark.parametrize("created_by_prescriber,assertion", [(True, assertContains), (False, assertNotContains)])
+def test_display_edit_jobseeker_info_button_as_unauthorized_prescriber(client, created_by_prescriber, assertion):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory(created_by=prescriber if created_by_prescriber else None)
+    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, job_seeker=job_seeker, sender=prescriber)
+    client.force_login(prescriber)
+    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+
+    assertion(response, edit_jobseeker_info_button(url, job_application), html=True)

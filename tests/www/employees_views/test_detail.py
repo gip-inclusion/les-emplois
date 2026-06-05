@@ -205,8 +205,9 @@ class TestEmployeeDetailView:
         user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"
 
         response = client.get(url)
-        assertNotContains(response, user_info_edit_url)
-        assertContains(response, user_info_not_allowed)
+        # employers can update job seekers infos even if they are not handled by a proxy
+        assertContains(response, user_info_edit_url)
+        assertNotContains(response, user_info_not_allowed)
 
         job_application.job_seeker.created_by = PrescriberFactory()
         job_application.job_seeker.save()

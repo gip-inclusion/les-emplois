@@ -6485,7 +6485,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - start]
+# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_job_seeker[queries - start]
   dict({
     'num_queries': 14,
     'queries': list([
@@ -6865,7 +6865,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
+# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_job_seeker[queries - step 1]
   dict({
     'num_queries': 17,
     'queries': list([
@@ -7345,7 +7345,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
+# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_job_seeker[queries - step 2]
   dict({
     'num_queries': 12,
     'queries': list([
@@ -7714,7 +7714,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
+# name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_job_seeker[queries - step 3]
   dict({
     'num_queries': 12,
     'queries': list([
@@ -8132,7 +8132,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - start]
+# name: TestUpdateJobSeekerForHire.test_as_company_with_job_seeker[queries - start]
   dict({
     'num_queries': 15,
     'queries': list([
@@ -8598,7 +8598,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 1]
+# name: TestUpdateJobSeekerForHire.test_as_company_with_job_seeker[queries - step 1]
   dict({
     'num_queries': 20,
     'queries': list([
@@ -9212,7 +9212,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 2]
+# name: TestUpdateJobSeekerForHire.test_as_company_with_job_seeker[queries - step 2]
   dict({
     'num_queries': 15,
     'queries': list([
@@ -9715,7 +9715,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 3]
+# name: TestUpdateJobSeekerForHire.test_as_company_with_job_seeker[queries - step 3]
   dict({
     'num_queries': 15,
     'queries': list([
@@ -10267,7 +10267,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - start]
+# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_job_seeker[queries - start]
   dict({
     'num_queries': 14,
     'queries': list([
@@ -10647,7 +10647,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
+# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_job_seeker[queries - step 1]
   dict({
     'num_queries': 17,
     'queries': list([
@@ -11127,7 +11127,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
+# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_job_seeker[queries - step 2]
   dict({
     'num_queries': 12,
     'queries': list([
@@ -11496,7 +11496,7 @@
     ]),
   })
 # ---
-# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
+# name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_job_seeker[queries - step 3]
   dict({
     'num_queries': 12,
     'queries': list([
