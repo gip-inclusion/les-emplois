@@ -1,10 +1,57 @@
 import secrets
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import make_password
 from django.db import models
 from django_otp.models import Device, ThrottlingMixin, TimestampMixin
+from django_otp.plugins.otp_totp.models import (
+    TOTPDevice as BaseTOTPDevice,
+    default_key as generate_totp_key,
+    key_validator,
+)
+from encrypted_fields import EncryptedCharField
+
+from itou.utils.models import CopyModelFieldsMeta
+
+
+# `django_otp.TOTPDevice` needs a few adjustments, but it's not an
+# abstract model, so we cannot easily subclass it. Let's copy its
+# fields and methods instead, and make a few additions and
+# overrides.
+class ItouTOTPDevice(
+    TimestampMixin,
+    ThrottlingMixin,
+    Device,
+    metaclass=CopyModelFieldsMeta,
+    source_model=BaseTOTPDevice,
+    copy_contents=True,
+):
+    # Override `id` to make it a UUID (non-enumerable).
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Override `key`, the base model stores it in clear text.
+    key = EncryptedCharField(
+        max_length=100,
+        validators=[key_validator],
+        default=generate_totp_key,
+    )
+    # Override `user` to get a proper "related_name".
+    user = models.ForeignKey(
+        getattr(settings, "AUTH_USER_MODEL", "auth.User"),
+        help_text="L’utilisateur à qui appartient ce matériel.",
+        related_name="itou_totp_devices",
+        on_delete=models.CASCADE,
+    )
+    disabled_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "name"],
+                name="unique_name_per_user",
+            )
+        ]
 
 
 # A variant of django_otp's StaticDevice. We don't subclass it because
