@@ -27,4 +27,5 @@ urlpatterns = [
         views.login_with_backup_code,
         name="login_with_backup_code",
     ),
+    path("verify", views.VerifyOTPView.as_view(), name="verify_otp"),
 ]

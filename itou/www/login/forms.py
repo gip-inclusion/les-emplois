@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django_otp import match_token
 
 from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider
@@ -102,36 +101,3 @@ class ItouLoginForm(LoginForm):
             accept_all_pending_invitations(request)
 
         return ret
-
-
-class VerifyOTPForm(forms.Form):
-    otp_token = forms.CharField(
-        required=True,
-        label="Entrez le code de validation unique (OTP)",
-        help_text=(
-            "Code à 6 chiffres généré par votre application mobile "
-            "ou votre gestionnaire de mot de passe sur votre ordinateur"
-        ),
-    )
-
-    otp_token.widget.attrs.update(
-        {
-            "max_length": 6,
-            "autocomplete": "one-time-code",
-            "autofocus": True,
-        }
-    )
-
-    def __init__(self, *args, user, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user = user
-
-    def clean_otp_token(self):
-        otp_token = self.cleaned_data.get("otp_token")
-
-        device = match_token(self.user, otp_token)
-        if device is None:
-            raise ValidationError("Le code de validation unique (OTP) n’est pas correct.")
-        self.user.otp_device = device
-
-        return otp_token

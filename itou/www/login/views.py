@@ -8,16 +8,14 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic.edit import FormView
-from django_otp import login as otp_login
 
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.otp.utils import get_user_devices
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import get_safe_url, get_url_param_value
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
-from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm, VerifyOTPForm
+from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm
 
 
 class UserKindLoginMixin:
@@ -135,26 +133,6 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
 
     def get_success_url(self):
         return self.next_url or super().get_success_url()
-
-
-class VerifyOTPView(FormView):
-    template_name = "account/verify_otp.html"
-    form_class = VerifyOTPForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        devices = get_user_devices(self.request.user)
-        return context | {"devices": devices}
-
-    def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"user": self.request.user}
-
-    def form_valid(self, form):
-        otp_login(self.request, self.request.user.otp_device)
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return get_safe_url(self.request, REDIRECT_FIELD_NAME, reverse("dashboard:index"))
 
 
 @require_POST
