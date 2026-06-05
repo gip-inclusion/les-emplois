@@ -2166,8 +2166,7 @@ class TestApplyAsPrescriber:
             ),
         )
 
-    @pytest.mark.parametrize("handled_by_proxy", [True, False])
-    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_birthdate(self, client, handled_by_proxy):
+    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_birthdate(self, client):
         company = CompanyFactory(with_membership=True)
         prescriber = PrescriberFactory(membership=True)
         client.force_login(prescriber)
@@ -2175,21 +2174,13 @@ class TestApplyAsPrescriber:
             jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
             jobseeker_profile__pole_emploi_id="",  # Make sure the view is accessible
             created_by=prescriber,
-            last_login=timezone.now() if not handled_by_proxy else None,
         )
         apply_session = fake_session_initialization(client, company, job_seeker, {})
 
         next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session.name})
         response = client.get(next_url)
-        if handled_by_proxy:
-            assertNotContains(response, job_seeker.jobseeker_profile.birthdate.isoformat())
-            assert "birthdate" not in response.context["form"].fields
-        else:
-            assertRedirects(
-                response,
-                reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
-                fetch_redirect_response=False,
-            )
+        assertNotContains(response, job_seeker.jobseeker_profile.birthdate.isoformat())
+        assert "birthdate" not in response.context["form"].fields
 
         post_data = {
             "phone": "",
@@ -2200,26 +2191,15 @@ class TestApplyAsPrescriber:
         job_seeker.jobseeker_profile.refresh_from_db()
         # birthdate is unchanged
         assert job_seeker.jobseeker_profile.birthdate == datetime.date(1990, 12, 1)
-        if handled_by_proxy:
-            # but pole_emploi_id is updated
-            assert job_seeker.jobseeker_profile.pole_emploi_id == "3454471C"
-            assertRedirects(
-                response,
-                reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
-                fetch_redirect_response=False,
-            )
-        else:
-            # and pole_emploi_id is unchanged
-            assert job_seeker.jobseeker_profile.pole_emploi_id == ""
-            assertContains(
-                response,
-                "Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat",
-                status_code=403,
-                html=True,
-            )
+        # but pole_emploi_id is updated
+        assert job_seeker.jobseeker_profile.pole_emploi_id == "3454471C"
+        assertRedirects(
+            response,
+            reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
+            fetch_redirect_response=False,
+        )
 
-    @pytest.mark.parametrize("handled_by_proxy", [True, False])
-    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_pole_emploi_id(self, client, handled_by_proxy):
+    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_pole_emploi_id(self, client):
         company = CompanyFactory(with_membership=True)
         prescriber = PrescriberFactory(membership=True)
         client.force_login(prescriber)
@@ -2228,21 +2208,13 @@ class TestApplyAsPrescriber:
             jobseeker_profile__pole_emploi_id="1234567C",
             jobseeker_profile__nir="",  # Make sure birthdate change is not blocked by NIR consistency check
             created_by=prescriber,
-            last_login=timezone.now() if not handled_by_proxy else None,
         )
         apply_session = fake_session_initialization(client, company, job_seeker, {})
 
         next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session.name})
         response = client.get(next_url)
-        if handled_by_proxy:
-            assertNotContains(response, job_seeker.jobseeker_profile.pole_emploi_id)
-            assert "pole_emploi_id" not in response.context["form"].fields
-        else:
-            assertRedirects(
-                response,
-                reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
-                fetch_redirect_response=False,
-            )
+        assertNotContains(response, job_seeker.jobseeker_profile.pole_emploi_id)
+        assert "pole_emploi_id" not in response.context["form"].fields
 
         post_data = {
             "birthdate": datetime.date(1978, 11, 20),
@@ -2252,23 +2224,13 @@ class TestApplyAsPrescriber:
         job_seeker.jobseeker_profile.refresh_from_db()
         # pole_emploi_id is unchanged
         assert job_seeker.jobseeker_profile.pole_emploi_id == "1234567C"
-        if handled_by_proxy:
-            # birthdate is updated
-            assert job_seeker.jobseeker_profile.birthdate == datetime.date(1978, 11, 20)
-            assertRedirects(
-                response,
-                reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
-                fetch_redirect_response=False,
-            )
-        else:
-            # birthdate is unchanged
-            assert job_seeker.jobseeker_profile.birthdate is None
-            assertContains(
-                response,
-                "Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat",
-                status_code=403,
-                html=True,
-            )
+        # birthdate is updated
+        assert job_seeker.jobseeker_profile.birthdate == datetime.date(1978, 11, 20)
+        assertRedirects(
+            response,
+            reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
+            fetch_redirect_response=False,
+        )
 
     @pytest.mark.parametrize("is_authorized", [True, False])
     @pytest.mark.parametrize("with_phone", [True, False])
@@ -3981,7 +3943,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self._check_nothing_permitted(client, prescriber)
 
-    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client, snapshot):
+    def test_as_unauthorized_prescriber_that_created_job_seeker(self, client, snapshot):
         prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self.job_seeker.created_by = prescriber
         self.job_seeker.last_login = None
@@ -4000,15 +3962,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             },
         )
 
-    def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self, client):
-        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
-        self.job_seeker.created_by = prescriber
-        # Make sure the job seeker does manage its own account
-        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-        self._check_nothing_permitted(client, prescriber)
-
-    def test_as_authorized_prescriber_with_proxied_job_seeker(self, client, snapshot):
+    def test_as_authorized_prescriber_with_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
@@ -4028,14 +3982,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             },
         )
 
-    def test_as_authorized_prescriber_with_non_proxied_job_seeker(self, client):
-        # Make sure the job seeker does manage its own account
-        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
-        self.job_seeker.save(update_fields=["last_login"])
-        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
-        self._check_only_administrative_allowed(client, authorized_prescriber)
-
-    def test_as_company_with_proxied_job_seeker(self, client, snapshot):
+    def test_as_company_with_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
@@ -4053,32 +4000,6 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
                 "birth_country": Country.FRANCE_ID,
             },
         )
-
-    def test_as_company_with_non_proxied_job_seeker(self, client):
-        # Make sure the job seeker does manage its own account
-        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
-        self.job_seeker.save(update_fields=["last_login"])
-        self._check_only_administrative_allowed(client, self.company.members.first())
-
-    def test_as_company_with_non_proxied_job_seeker_with_place_infos(self, client):
-        # Make sure the job seeker does manage its own account
-        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
-        self.job_seeker.save(update_fields=["last_login"])
-
-        # Set birth place infos
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-        geispolsheim_commune = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
-
-        self.job_seeker.jobseeker_profile.birth_place = geispolsheim_commune
-        self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
-        with triggers.fake_context():
-            self.job_seeker.jobseeker_profile.save(update_fields=["birth_place", "birth_country"])
-        self._check_only_administrative_allowed(client, self.company.members.first())
-
-        # Check that birth place infos are still there
-        assert self.job_seeker.jobseeker_profile.birth_place == geispolsheim_commune
-        assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
 
     def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())

@@ -743,8 +743,8 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
         sender=prescriber,
         job_seeker__created_by=prescriber,
         job_seeker__last_login=timezone.now(),
-        job_seeker__first_name="C_something",
-        job_seeker__last_name="D_something",
+        job_seeker__first_name="Catherine",
+        job_seeker__last_name="Dupont",
         with_job_seeker_assignment=True,
     ).job_seeker
     client.force_login(prescriber)
@@ -761,7 +761,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     filters_form = response.context["filters_form"]
     assert filters_form.fields["job_seeker"].choices == [
         (a_b_job_seeker.pk, "B… A…"),
-        (c_d_job_seeker.pk, "D… C…"),
+        (c_d_job_seeker.pk, "DUPONT Catherine"),
         (created_job_seeker.pk, "MARTIN Zorro"),
     ]
 

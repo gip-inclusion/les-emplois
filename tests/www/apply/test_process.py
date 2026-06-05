@@ -185,7 +185,6 @@ class TestProcessViews:
         approval_url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
         with assertSnapshotQueries(snapshot(name="job application detail for company")):
             response = client.get(url)
-        assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
         assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
@@ -273,7 +272,6 @@ class TestProcessViews:
         )
         with assertSnapshotQueries(snapshot(name="job application detail for company")):
             response = client.get(url)
-        assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
         assertContains(response, job_application.job_seeker.phone.replace(" ", ""))

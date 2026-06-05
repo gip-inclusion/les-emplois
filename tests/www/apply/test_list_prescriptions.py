@@ -239,6 +239,8 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     assert applications[0].pk == application.pk
     assertContains(response, full_name)
 
+    # Unauthorized prescribers can still edit and view job seekers they created
+    # even if they took control of their account
     created_job_seeker.last_login = timezone.now()
     created_job_seeker.save(update_fields=["last_login"])
 
@@ -246,8 +248,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 1
     assert applications[0].pk == application.pk
-    assertNotContains(response, full_name)
-    assertContains(response, "M… Z…")
+    assertContains(response, full_name)
 
 
 def test_filtered_by_company(client):
@@ -1247,12 +1248,18 @@ class TestAutocomplete:
                 {"id": third_application.job_seeker.pk, "text": "COOPER Ethan"},
             ]
         }
-        # User takes control of its account and prescriber cannot know anymore if it contains an 'r'
+
+        # Unauthorized prescribers can still view and edit job seekers they created
+        # even if they took control of their account
         job_seeker.last_login = timezone.now()
         job_seeker.save(update_fields=["last_login"])
 
         response = client.get(autocomplete_url, {"term": "e"})
-        assert response.json() == {"results": []}
+        assert response.json() == {
+            "results": [
+                {"id": third_application.job_seeker.pk, "text": "COOPER Ethan"},
+            ]
+        }
 
         # sender field
         autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})

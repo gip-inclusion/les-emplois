@@ -633,7 +633,7 @@
                           <h2 class="mb-0">
                               Informations
                           </h2>
-                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/[PublicID of Beneficiary]?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
+                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
                               <i aria-hidden="true" class="ri-pencil-line fw-medium">
                               </i>
                               <span>
