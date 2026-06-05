@@ -14,6 +14,7 @@ from config.settings.base import *  # noqa: E402,F403
 
 
 SECRET_KEY = "foobar"
+SALT_KEY = "verymuchsecret"
 ALLOWED_HOSTS = []
 
 # We *want* to do the same `collectstatic` on the CI than on PROD to catch errors early,

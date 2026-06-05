@@ -1,6 +1,7 @@
 import secrets
 import uuid
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import make_password
@@ -52,6 +53,24 @@ class ItouTOTPDevice(
                 name="unique_name_per_user",
             )
         ]
+
+    # Override `Device._filter_persistent_id()` for our UUID primary key.
+    # https://github.com/django-otp/django-otp/pull/29
+    @classmethod
+    def _filter_persistent_id(cls, persistent_id, for_verify=False):
+        model_label, device_id = persistent_id.rsplit("/", 1)
+        app_label, model_name = model_label.split(".")
+
+        device_cls = apps.get_model(app_label, model_name)
+        if issubclass(device_cls, Device):
+            # -- patch starts here
+            # device_set = device_cls.objects.filter(id=int(device_id))
+            device_set = device_cls.objects.filter(pk=device_id)
+            # -- end of patch
+            if for_verify:
+                device_set = device_set.select_for_update()
+            return device_set
+        return None
 
 
 # A variant of django_otp's StaticDevice. We don't subclass it because

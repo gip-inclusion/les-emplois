@@ -10,7 +10,6 @@ from django.contrib.admin.sites import site as admin_site
 from django.contrib.auth import get_user, models as auth_models
 from django.urls import reverse
 from django.utils import timezone
-from django_otp.plugins.otp_totp.models import TOTPDevice
 from rest_framework.authtoken.models import Token
 
 from itou.antivirus.models import Scan
@@ -40,6 +39,7 @@ from tests.invitations.factories import LaborInspectorInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.nexus.factories import NexusRessourceSyncStatusFactory
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -86,7 +86,7 @@ def test_all_admin(admin_client, mocker, subtests):
     Scan.objects.create(file=FileFactory(), clamav_signature="toto")
     Department.objects.create(code="33", name="Gironde", start_date=timezone.localdate())
     Token.objects.create(user=admin_user)
-    TOTPDevice.objects.create(user=admin_user, confirmed=False)
+    ItouTOTPDeviceFactory(user=admin_user, confirmed=False)
     EmailAddress.objects.create(user=admin_user, email="foobar@example.com", primary=False, verified=False)
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
