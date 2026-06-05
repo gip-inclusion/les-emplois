@@ -359,7 +359,7 @@ class TestItouStaffLogin:
     def test_login_with_backup_code(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
-        ItouTOTPDeviceFactory(user=user, confirmed=False)
+        device = ItouTOTPDeviceFactory(user=user, confirmed=False)
         backup_code = create_otp_backup_code(user)
 
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
@@ -422,6 +422,8 @@ class TestItouStaffLogin:
                 )
             ],
         )
+        device.refresh_from_db()
+        assert device.disabled_at is not None
 
     def test_login_otp_not_required(self, client):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
