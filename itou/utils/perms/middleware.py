@@ -2,11 +2,11 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django_otp import user_has_device
 from itoutils.urls import add_url_params
 
 from itou.companies.models import Company, CompanyMembership
 from itou.institutions.models import Institution, InstitutionMembership
+from itou.otp.utils import get_user_devices
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import IdentityProvider, UserKind
@@ -201,7 +201,7 @@ class ItouCurrentOrganizationMiddleware:
         ):
             login_verify_otp_url = reverse("otp_views:verify_otp")
             login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
-            if user_has_device(user):
+            if get_user_devices(user):
                 if request.path not in (login_verify_otp_url, login_with_backup_code_url):
                     return HttpResponseRedirect(
                         add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})

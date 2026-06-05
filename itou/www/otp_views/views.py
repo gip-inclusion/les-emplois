@@ -8,6 +8,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
@@ -168,11 +169,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         # done by `ItouStaticDevice.verify_token` (called by the
         # form). However, we need to delete all other TOTP devices,
         # since the user seems to have lost them.
-
-        # FIXME (dbaty): when we define our own ItouTOTPDevice class,
-        # we could add an `enabled` field, so that we can keep it for
-        # auditing purposes.
-        ItouTOTPDevice.objects.filter(user=request.user).delete()
+        ItouTOTPDevice.objects.filter(user=request.user).update(disabled_at=timezone.now())
         ItouStaticDevice.objects.filter(user=request.user).delete()
 
         # FIXME (dbaty): send mail to user (when wording is ready)
