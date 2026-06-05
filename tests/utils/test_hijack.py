@@ -106,7 +106,7 @@ class TestUserHijack:
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 
-        device = ItouTOTPDeviceFactory(user=hijacker, confirmed=True, name="my device")
+        device = ItouTOTPDeviceFactory(user=hijacker, name="my device")
         post_data = {
             "name": "Mon appareil",
             "otp_token": TOTP(device.bin_key).token(),
