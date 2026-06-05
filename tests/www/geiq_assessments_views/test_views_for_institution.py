@@ -76,6 +76,104 @@ class TestListAssessmentsView:
             name="assessment list without links to details"
         )
 
+    @pytest.mark.parametrize("with_limited_access", [True, False], ids=["limited access", "unlimited access"])
+    def test_display_amounts(self, client, with_limited_access, snapshot):
+        if with_limited_access:
+            kind = random.choice(
+                list(
+                    set(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST).difference(
+                        INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS
+                    )
+                )
+            )
+        else:
+            kind = random.choice(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS)
+
+        membership = InstitutionMembershipFactory(institution__kind=kind)
+        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        ddets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DDETS_GEIQ, institution__name="Une DDETS"
+        )
+
+        campaign = AssessmentCampaignFactory(year=2024)
+        new = AssessmentFactory(
+            id=uuid.UUID("00000000-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            with_main_geiq=True,
+            label_geiq_name="Nouveau bilan",
+        )
+        submitted = AssessmentFactory(
+            id=uuid.UUID("11111111-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            label_geiq_name="Bilan envoyé",
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            convention_amount=100_001,
+            advance_amount=50_001,
+            granted_amount=100_001,
+        )
+        reviewed = AssessmentFactory(
+            id=uuid.UUID("22222222-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            label_geiq_name="Bilan à valider",
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=timezone.now() + datetime.timedelta(hours=6),
+            reviewed_by=ddets_membership.user,
+            reviewed_by_institution=ddets_membership.institution,
+            review_comment="Bravo !",
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=100_000,
+        )
+        final_reviewed = AssessmentFactory(
+            id=uuid.UUID("33333333-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            label_geiq_name="Bilan validé",
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=timezone.now() + datetime.timedelta(hours=6),
+            reviewed_by=membership.user,
+            reviewed_by_institution=membership.institution,
+            review_comment="Bravo !",
+            final_reviewed_at=timezone.now() + datetime.timedelta(hours=6),
+            final_reviewed_by=membership.user,
+            final_reviewed_by_institution=membership.institution,
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=80_000,
+        )
+
+        for idx, assessment in enumerate([new, submitted, reviewed, final_reviewed]):
+            EmployeeContractFactory.create_batch(
+                idx + 1,
+                employee__assessment=assessment,
+                allowance_requested=True,
+                allowance_granted=True,
+                employee__allowance_amount=814,
+            )
+            if not with_limited_access:
+                # DDETS or DREETS need to have an institution link to see an assessment
+                AssessmentInstitutionLink.objects.create(
+                    assessment=assessment,
+                    institution=membership.institution,
+                )
+
+        client.force_login(membership.user)
+        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="assessment list with amounts"
+        )
+
     @pytest.mark.parametrize(
         "institution_kind",
         set(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST).intersection(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS),

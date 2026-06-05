@@ -982,8 +982,10 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
         raise Http404
     if organization_kind in (InstitutionKind.DGEFP_GEIQ, InstitutionKind.FFGEIQ):
         filters = {}  # can list all assessments
+        annotate_kwargs = {"can_view_amounts": Q(final_reviewed_at__isnull=False)}
     else:
         filters = {"institutions": request.current_organization}
+        annotate_kwargs = {"can_view_amounts": Q(reviewed_at__isnull=False)}
     assessments = (
         Assessment.objects.filter(**filters)
         .select_related("campaign")
@@ -1005,6 +1007,7 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
                 "reviewed_at",
                 "final_reviewed_at",
             ),
+            **annotate_kwargs,
         )
         .order_by("state_order", "-last_updated_at")
     )
