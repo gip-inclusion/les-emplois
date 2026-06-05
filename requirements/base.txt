@@ -429,6 +429,7 @@ cryptography==48.0.0 \
     --hash=sha256:fdfef35d751d510fcef5252703621574364fec16418c4a1e5e1055248401054b \
     --hash=sha256:fdfef35d751d510fcef5252703621574364fec16418c4a1e5e1055248401054b
     # via
+    #   django-fernet-encrypted-fields
     #   jwcrypto
     #   paramiko
 data-inclusion-schema==1.0.8 \
@@ -446,6 +447,7 @@ django==6.0.6 \
     #   django-bootstrap5
     #   django-citext
     #   django-datadog-logger
+    #   django-fernet-encrypted-fields
     #   django-filter
     #   django-formtools
     #   django-hijack
@@ -487,6 +489,10 @@ django-datadog-logger==0.9.0 \
     # via
     #   -r base.in
     #   itoutils
+django-fernet-encrypted-fields==0.4.0 \
+    --hash=sha256:836c927a260a834a35c4caecf82a97a5e411408cbecb44e25caddd02d8cdd86e \
+    --hash=sha256:b3e4049882b8c7216d868b7aa7533e466a48c1307b5d4b1b8dc4cb5946d87eec
+    # via -r base.in
 django-filter==25.2 \
     --hash=sha256:760e984a931f4468d096f5541787efb8998c61217b73006163bf2f9523fe8f23 \
     --hash=sha256:9c0f8609057309bba611062fe1b720b4a873652541192d232dd28970383633e3

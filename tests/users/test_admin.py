@@ -124,6 +124,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "institution_invitations",  # LaborInspectorInvitation.sender
         "institutionmembership",  # InstitutionMembership.user
         "itoustaticdevice",  # ItouStaticDevice.user
+        "itou_totp_devices",  # ItouTOTPDevice.user
         "job_applications_sent",  # JobApplication.sender, but might be replaced when transferring application
         # sent by the job seeker
         "jobapplication",  # JobApplication.transferred_by

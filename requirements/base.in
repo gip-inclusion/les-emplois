@@ -54,6 +54,9 @@ django-redis  # https://github.com/jazzband/django-redis
 # django-markdownify (to render only a set of HTML tags)
 django-markdownify  # https://github.com/erwinmatijsen/django-markdownify
 
+# Provide encrypted model fields
+django-fernet-encrypted-fields  # https://github.com/jazzband/django-fernet-encrypted-fields
+
 # Our utils library for Django
 itoutils[django]
 

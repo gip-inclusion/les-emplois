@@ -29,6 +29,7 @@ APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 FIXTURE_DIRS = [os.path.abspath(os.path.join(ROOT_DIR, "itou/fixtures/django"))]
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SALT_KEY = os.getenv("DFEC_SALT_KEY")  # used by django-fernet-encrypted-fields (DFEC)
 
 DEBUG = False
 

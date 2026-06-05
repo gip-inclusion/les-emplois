@@ -1,3 +1,5 @@
+import inspect
+from copy import deepcopy
 from datetime import timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -6,6 +8,7 @@ from django.contrib.postgres.fields import ArrayField, DateRangeField, ranges
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import F, Func, Q, Transform
+from django.db.models.base import ModelBase
 
 from itou.utils.triggers import FieldsHistory
 from itou.utils.types import InclusiveDateRange
@@ -157,3 +160,56 @@ class AbstractFieldsHistoryModel(models.Model):
             forced_update,
             returning_fields,
         )
+
+
+class CopyModelFieldsMeta(ModelBase):
+    """Helper to copy all fields of another model, when it's not
+    possible to subclass the model (for example if it's not abstract).
+
+    Usage:
+
+        class BaseModel(models.Model):
+            a = CharField(...)
+            b = IntegerField(...)
+            c = IntegerField(...)
+
+        class MyBetterModel(
+            metaclass=CopyModelFieldsMeta,
+            source_model=BaseTOTPDevice,
+            exclude_fields={"b"},
+        ):
+            # get `a` from `BaseModel`
+            c = PositiveIntegerField(...)  # override
+            d = IntegerField()  # new field
+
+    With `copy_contents`, one can also copy methods and properties.
+    """
+
+    def __new__(
+        cls,
+        name,
+        bases,
+        attrs,
+        source_model,
+        exclude_fields=None,
+        copy_contents=False,
+    ):
+        exclude_fields = exclude_fields or set()
+        for field in source_model._meta.local_fields:
+            if field.name not in attrs and field.name not in exclude_fields:
+                attrs[field.name] = deepcopy(field)
+
+        if copy_contents:
+            for _, member in inspect.getmembers(
+                source_model,
+                lambda member: (
+                    # `ismethod()` returns True on bound methods. We
+                    # are actually looking for unbound _functions_.
+                    (inspect.isfunction(member) or isinstance(member, property))
+                    # Discard inherited members.
+                    and member.__name__ in source_model.__dict__
+                ),
+            ):
+                attrs[member.__name__] = member
+
+        return super().__new__(cls, name, bases, attrs)

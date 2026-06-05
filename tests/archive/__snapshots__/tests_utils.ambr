@@ -288,6 +288,11 @@
     dict({
       'field': 'user',
       'hidden': False,
+      'model': 'otp.ItouTOTPDevice',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
       'model': 'otp_totp.TOTPDevice',
     }),
     dict({
