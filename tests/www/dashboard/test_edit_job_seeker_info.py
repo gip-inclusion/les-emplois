@@ -8,7 +8,7 @@ from django.urls import reverse
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import User
@@ -19,6 +19,7 @@ from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -116,12 +117,134 @@ class TestEditJobSeekerInfo:
         assert form.is_valid()
         assert form.has_changed()
 
+    @pytest.mark.parametrize("born_in_france", [True, False])
+    def test_display_modal_when_form_changed(self, client, mocker, snapshot, born_in_france):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+        birthdate = datetime.date(1990, 1, 1)
+        job_seeker = JobSeekerFactory(
+            public_id="7614fc4b-aef9-4694-ab17-12324300180a",
+            title="MME",
+            first_name="Jane",
+            last_name="Doe",
+            email="jane.doe@test.local",
+            phone="0612345678",
+            address_line_1="12 rue Georges Bizet",
+            post_code="35000",
+            city="Rennes",
+            department="35",
+            ban_api_resolved_address="12 rue Georges Bizet, 35000 Rennes",
+            born_in_france=born_in_france,
+            born_outside_france=(not born_in_france),
+            jobseeker_profile__birthdate=birthdate,
+            jobseeker_profile__nir="290010101010125",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+        )
+
+        job_application = JobApplicationFactory(
+            for_snapshot=True,
+            sent_by_prescriber_alone=True,
+            job_seeker=job_seeker,
+        )
+        user = job_application.to_company.members.first()
+
+        previous_last_checked_at = job_seeker.last_checked_at
+
+        client.force_login(user)
+
+        back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id})
+        url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
+
+        # send identical data to make sure no confirmation modal is displayed
+        post_data = {
+            "email": job_seeker.email,
+            "title": job_seeker.title,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "phone": job_seeker.phone,
+            "ban_api_resolved_address": job_seeker.ban_api_resolved_address,
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+        }
+
+        if born_in_france:
+            post_data |= {"birth_place": job_seeker.jobseeker_profile.birth_place_id}
+        else:
+            post_data |= {"birth_country": job_seeker.jobseeker_profile.birth_country_id}
+
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert response.status_code == 302
+        assert response.url == back_url
+        spy_form = mocker.spy(EditJobSeekerInfoForm, "save")
+        spy_form.assert_not_called()
+
+        birthdate = datetime.date(1990, 1, 10)
+        post_data = {
+            "email": job_seeker.email,
+            "title": job_seeker.title,
+            "first_name": "Odile",
+            "last_name": "Deray",
+            "phone": "0700000070",
+            "ban_api_resolved_address": "23 avenue de Nantes, 86000 Poitiers",
+            "address_line_1": "23 avenue de Nantes",
+            "post_code": "86000",
+            "city": "Poitiers",
+            "birthdate": birthdate.isoformat(),
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+        }
+
+        # change birth country
+        if born_in_france:
+            post_data |= {
+                "birth_country": Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk,
+            }
+        else:
+            post_data |= {
+                "birth_place": Commune.objects.order_by("?")
+                .filter(start_date__lte=birthdate, end_date__gte=birthdate)
+                .first()
+                .pk,
+            }
+
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
+        )
+        _response = client.post(url, data=post_data | {"confirm": 1})
+        spy_form.assert_called_once()
+
+        job_seeker = User.objects.get(id=job_seeker.id)
+        assert job_seeker.first_name == post_data["first_name"]
+        assert job_seeker.last_name == post_data["last_name"]
+        assert job_seeker.phone == post_data["phone"]
+        assert job_seeker.ban_api_resolved_address == post_data["ban_api_resolved_address"]
+        assert job_seeker.address_line_1 == post_data["address_line_1"]
+        assert job_seeker.post_code == post_data["post_code"]
+        assert job_seeker.city == post_data["city"]
+        assert job_seeker.jobseeker_profile.birthdate == birthdate
+        assert job_seeker.jobseeker_profile.birth_place_id == post_data.get("birth_place")
+        assert (
+            job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+            if not post_data.get("birth_country")
+            else post_data["birth_country"]
+        )
+
+        # last_checked_at should have been updated
+        assert job_seeker.last_checked_at > previous_last_checked_at
+
     def test_edit_by_company_with_nir(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
         job_application = JobApplicationFactory(
+            for_snapshot=True,
             sent_by_prescriber_alone=True,
             job_seeker__jobseeker_profile__nir="178122978200508",
         )
@@ -169,8 +292,12 @@ class TestEditJobSeekerInfo:
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
+        )
 
+        response = client.post(url, data=post_data | {"confirm": 1})
         assert response.status_code == 302
         assert response.url == back_url
 
@@ -185,7 +312,7 @@ class TestEditJobSeekerInfo:
             "phone": "0610203050",
             "address_line_2": "Sous l'escalier",
         }
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"confirm": 1})
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
@@ -194,12 +321,13 @@ class TestEditJobSeekerInfo:
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_company_with_lack_of_nir_reason(self, client, mocker):
+    def test_edit_by_company_with_lack_of_nir_reason(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
         job_application = JobApplicationFactory(
+            for_snapshot=True,
             sent_by_prescriber_alone=True,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
@@ -241,8 +369,12 @@ class TestEditJobSeekerInfo:
             "nir": NEW_NIR,
         } | self.address_form_fields
 
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
+        )
 
+        response = client.post(url, data=post_data | {"confirm": 1})
         assert response.status_code == 302
         assert response.url == back_url
 
@@ -253,12 +385,13 @@ class TestEditJobSeekerInfo:
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_company_without_nir_information(self, client, mocker):
+    def test_edit_by_company_without_nir_information(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
         job_application = JobApplicationFactory(
+            for_snapshot=True,
             sent_by_prescriber_alone=True,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason="",
@@ -310,7 +443,13 @@ class TestEditJobSeekerInfo:
                 "lack_of_nir_reason": LackOfNIRReason.NO_NIR.value,
             }
         )
-        response = client.post(url, data=post_data)
+
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
+        )
+
+        response = client.post(url, data=post_data | {"confirm": 1})
         assertRedirects(response, expected_url=back_url)
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         assert job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
@@ -335,7 +474,7 @@ class TestEditJobSeekerInfo:
 
         NEW_NIR = "1 781 22978200508"
         post_data["nir"] = NEW_NIR
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"confirm": 1})
         assertRedirects(response, expected_url=back_url)
 
         job_seeker.refresh_from_db()
@@ -464,7 +603,7 @@ class TestEditJobSeekerInfo:
             count=1,
         )
 
-    def test_edit_email_when_unconfirmed(self, client, mocker):
+    def test_edit_email_when_unconfirmed(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -476,6 +615,7 @@ class TestEditJobSeekerInfo:
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
+            for_snapshot=True,
             sent_by_prescriber_alone=True,
             to_company=company,
             job_seeker__created_by=user,
@@ -505,8 +645,12 @@ class TestEditJobSeekerInfo:
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
+        )
 
+        response = client.post(url, data=post_data | {"confirm": 1})
         assert response.status_code == 302
         assert response.url == back_url
 
@@ -518,19 +662,20 @@ class TestEditJobSeekerInfo:
             "phone": "0610203050",
             "address_line_2": "Sous l'escalier",
         }
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"confirm": 1})
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
-    def test_edit_email_when_confirmed(self, client, mocker):
+    def test_edit_email_when_confirmed(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
         new_email = "bidou@yopmail.com"
         job_application = JobApplicationFactory(
+            for_snapshot=True,
             sent_by_prescriber_alone=True,
             job_seeker__jobseeker_profile__nir="178122978200508",
             job_seeker__with_verified_email=True,
@@ -565,8 +710,12 @@ class TestEditJobSeekerInfo:
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"preview": 1})
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
+        )
 
+        response = client.post(url, data=post_data | {"confirm": 1})
         assert response.status_code == 302
         assert response.url == back_url
 
@@ -583,7 +732,7 @@ class TestEditJobSeekerInfo:
             "phone": "0610203050",
             "address_line_2": "Sous l'escalier",
         }
-        response = client.post(url, data=post_data)
+        response = client.post(url, data=post_data | {"confirm": 1})
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
@@ -614,7 +763,7 @@ class TestEditJobSeekerInfo:
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
 
-    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, mocker):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -633,25 +782,31 @@ class TestEditJobSeekerInfo:
 
         client.force_login(selected_criteria.eligibility_diagnosis.author)
         new_birthdate = datetime.date(1978, 12, 20)
-        response = client.post(
-            reverse(
-                "dashboard:edit_job_seeker_info",
-                kwargs={"job_seeker_public_id": job_seeker.public_id},
+        post_data = {
+            "title": "M",
+            "first_name": "Manuel",
+            "last_name": "Calavera",
+            "email": job_seeker.email,
+            "birthdate": new_birthdate.isoformat(),
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "birth_place": (
+                Commune.objects.filter(start_date__lte=new_birthdate, end_date__gte=new_birthdate).first().pk
             ),
-            {
-                "title": "M",
-                "first_name": "Manuel",
-                "last_name": "Calavera",
-                "email": job_seeker.email,
-                "birthdate": new_birthdate.isoformat(),
-                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
-                "birth_place": (
-                    Commune.objects.filter(start_date__lte=new_birthdate, end_date__gte=new_birthdate).first().pk
-                ),
-                **self.address_form_fields,
-            },
+            **self.address_form_fields,
+        }
+
+        response = client.post(
+            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id}),
+            data=post_data | {"preview": 1},
+        )
+        assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
+            name="modal"
         )
 
+        response = client.post(
+            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id}),
+            data=post_data | {"confirm": 1},
+        )
         assertRedirects(response, reverse("dashboard:index"))
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
