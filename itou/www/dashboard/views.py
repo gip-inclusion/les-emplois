@@ -337,6 +337,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     context = {
         "form": form,
         "prev_url": prev_url,
+        "preview_mode": False,
     }
 
     return render(request, template_name, context)
@@ -360,17 +361,26 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         data=request.POST or None,
         back_url=request.get_full_path(),
     )
+    preview_mode = False
 
     if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Les informations du candidat ont bien été mises à jour.", extra_tags="toast")
-        return HttpResponseRedirect(back_url)
+        # We only display the preview/confirmation modal if the form has been changed
+        preview_mode = form.data.get("preview") and form.has_changed()
+
+        if preview_mode is False:
+            return HttpResponseRedirect(back_url)
+
+        if form.data.get("confirm"):
+            form.save()
+            messages.success(request, "Les informations du candidat ont bien été mises à jour.", extra_tags="toast")
+            return HttpResponseRedirect(back_url)
 
     context = {
         "form": form,
         "job_seeker": job_seeker,
         "prev_url": back_url,
         "matomo_custom_title": "Informations personnelles du candidat",
+        "preview_mode": preview_mode,
     }
 
     return render(request, template_name, context)

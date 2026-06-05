@@ -46,4 +46,13 @@
     {{ block.super }}
     {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
     {{ form.media.js }}
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ csp_nonce }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const askForConfirmationModal = new bootstrap.Modal("#ask_for_confirmation_modal");
+            askForConfirmationModal.show();
+        </script>
+    {% endif %}
 {% endblock %}

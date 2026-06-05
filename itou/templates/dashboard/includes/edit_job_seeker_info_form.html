@@ -41,6 +41,29 @@
     {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
-    {% itou_buttons_form primary_label=submit_label reset_url=prev_url matomo_category="salaries" matomo_action="submit" matomo_name="edit_jobseeker_infos_submit" %}
+    {% itou_buttons_form primary_label=submit_label primary_name="preview" primary_value="1" reset_url=prev_url matomo_category="salaries" matomo_action="submit" matomo_name="edit_jobseeker_infos_submit" %}
 
+    {% if preview_mode %}
+        <div class="modal" id="ask_for_confirmation_modal" tabindex="-1" role="dialog" aria-labelledby="ask_for_confirmation_label" aria-modal="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="ask_for_confirmation_label">Confirmer les modifications ?</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Vous êtes sur le point de mettre à jour les données personnelles de ce candidat.
+                            <br>
+                            En cliquant sur confirmer, un e-mail de notification lui sera automatiquement envoyé pour l'informer de la mise à jour de ses données.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        {% bootstrap_button "Annuler" button_type="link" href=prev_url button_class="btn btn-outline-primary" %}
+                        {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" name="confirm" value="1" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </form>
