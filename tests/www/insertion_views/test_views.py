@@ -72,6 +72,31 @@ class TestStructures:
         modal = parse_response_to_soup(response, selector="#structure-contact-modal")
         assert pretty_indented(modal) == snapshot
 
+    def test_card_view_renders_bootstrap_tabs_with_full_payload(self, client, snapshot):
+        structure = StructureFactory(name="Structure test", description="Description of test structure")
+
+        services = []
+        for i in range(3):
+            service = ServiceFactory(structure=structure, name=f"Test service {i}", uid=f"service-uid-{i}")
+            services.append(service)
+
+        with patch(
+            "itou.www.insertion_views.views.get_division_label",
+            side_effect=["Perimeter 1", "Perimeter 2", "Perimeter 3"],
+        ):
+            response = client.get(self.get_structure_url(structure))
+
+        assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
+
+    def test_card_view_services_link_to_service_detail(self, client):
+        structure = StructureFactory()
+        service = ServiceFactory(structure=structure)
+
+        response = client.get(self.get_structure_url(structure))
+
+        expected_href = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+        assertContains(response, f'href="{expected_href}"')
+
 
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")

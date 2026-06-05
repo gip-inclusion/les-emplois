@@ -2,9 +2,8 @@
 
 {% load components %}
 {% load format_filters %}
-{% load markdownify %}
 {% load matomo %}
-
+{% load static %}
 
 {% block title %}{{ structure.name }} {{ block.super }}{% endblock %}
 
@@ -27,32 +26,47 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true" aria-labelledby="structure-tabs-title">
+        <li class="nav-item" role="presentation">
+            <a id="structure-description-tab"
+               class="nav-link active"
+               role="tab"
+               href="#structure-description"
+               data-bs-toggle="tab"
+               aria-selected="true"
+               aria-controls="structure-description"
+               {% matomo_event "fiche-structure" "clic" "onglet-structure" %}>Description de la structure</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a id="structure-services-tab"
+               class="nav-link"
+               role="tab"
+               href="#structure-services"
+               data-bs-toggle="tab"
+               aria-selected="false"
+               aria-controls="structure-services"
+               {% matomo_event "fiche-structure" "clic" "onglet-services" %}>
+                <span>Services</span>
+                <span class="badge badge-sm rounded-pill ms-2">{{ services|length }}</span>
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
+
 {% block content %}
-    <section class="s-section">
+    <section id="structure-content-tabs" class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
-                    <div class="c-box">
-                        <article>
-                            <h3>Présentation de la structure</h3>
-                            {{ structure.description|markdownify }}
-                        </article>
-                    </div>
-                </div>
-                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    <div class="c-box mb-3 mb-md-4">
-                        <h3>Informations pratiques</h3>
-                        <button class="btn btn-secondary btn-block" type="button" data-bs-toggle="modal" data-bs-target="#structure-contact-modal" {% matomo_event "fiche-structure" "clic" "voir-coordonnees-structure" %}>
-                            Voir les coordonnées de la structure
-                        </button>
-                    </div>
-                </div>
+                <div class="s-section__col col-12">{% include "insertion/includes/structure_card_tabs.html" %}</div>
             </div>
         </div>
     </section>
 {% endblock %}
 
 {% block modals %}
+    {{ block.super }}
     <div class="modal fade" id="structure-contact-modal" tabindex="-1" aria-labelledby="structure-contact-modal-label" aria-modal="true" role="dialog">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -95,9 +109,7 @@
                                    target="_blank"
                                    class="btn-link fw-medium has-external-link"
                                    aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)"
-                                   {% matomo_event "fiche-structure" "clic" "lien-site-web" %}>
-                                    {{ structure.website }}
-                                </a>
+                                   {% matomo_event "fiche-structure" "clic" "lien-site-web" %}>{{ structure.website }}</a>
                             </div>
                         {% endif %}
                     {% endif %}
@@ -108,4 +120,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/sliding_tabs.js" %}'></script>
 {% endblock %}
