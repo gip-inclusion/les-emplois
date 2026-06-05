@@ -1,3 +1,4 @@
+import datetime
 from functools import partial
 from unittest import mock
 
@@ -9,6 +10,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.oath import TOTP
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -17,8 +19,11 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
-from itou.otp.models import ItouStaticToken
+from itou.otp.models import ItouStaticDevice, ItouStaticToken
+from itou.otp.utils import create_otp_backup_code
+from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.users.factories import (
+    DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
@@ -237,3 +242,213 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         assertContains(response, "Le code unique de validation (OTP) n’est pas correct.")
         assertContains(response, data["key"])
         assert user.totpdevice_set.count() == 0
+
+
+class TestItouStaffLogin:
+    def test_login_with_totp(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user"),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
+        verify_otp_url = reverse("otp_views:verify_otp")
+        setup_otp_url = reverse("otp_views:enrollment_step_0_intro")
+
+        response = client.get(admin_url)
+        assertRedirects(response, pre_login_url)
+
+        response = client.post(pre_login_url, {"email": user.email})
+        assertRedirects(response, login_url)
+
+        # Without a device, the user is redirected to the otp setup page
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(login_url, data=form_data, follow=True)
+        assertRedirects(response, setup_otp_url)
+
+        # Same with an unconfirmed device
+        client.logout()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        device = TOTPDevice.objects.create(user=user, confirmed=False)
+        response = client.post(login_url, data=form_data, follow=True)
+        assertRedirects(response, setup_otp_url)
+
+        # With a confirmed device the user is redirected to the OTP code form
+        device.confirmed = True
+        device.save()
+        client.logout()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        response = client.post(login_url, data=form_data, follow=True)
+        next_url = add_url_params(verify_otp_url, {"next": admin_url})
+        assertRedirects(response, next_url)
+
+        # The user should not be able to access the setup otp pages
+        response = client.get(setup_otp_url)
+        assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
+        TOTPDevice.objects.create(user=user, confirmed=False)
+        setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        response = client.get(setup_otp_confirm_device_url)
+        assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
+
+        # Give a bad token
+        totp = TOTP(device.bin_key, drift=100)
+        post_data = {
+            "name": "Mon appareil",
+            "otp_token": totp.token(),  # a token from a long time ago
+        }
+        response = client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "otp_token": ["Le code de validation unique (OTP) n’est pas correct."]
+        }
+
+        # there's throttling
+        totp = TOTP(device.bin_key)
+        post_data["otp_token"] = totp.token()
+        response = client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "otp_token": ["Le code de validation unique (OTP) n’est pas correct."]
+        }
+
+        # When resetting the failure count it works
+        device.throttling_failure_timestamp = None
+        device.throttling_failure_count = 0
+        device.save()
+        response = client.post(next_url, data=post_data)
+        assertRedirects(response, admin_url)
+
+    def test_login_with_backup_code(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        TOTPDevice.objects.create(user=user, confirmed=False)
+        backup_code = create_otp_backup_code(user)
+
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user"),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
+        verify_otp_url = add_url_params(reverse("otp_views:verify_otp"), {"next": admin_url})
+        login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
+
+        response = client.get(admin_url)
+        assertRedirects(response, pre_login_url)
+
+        response = client.post(pre_login_url, {"email": user.email})
+        assertRedirects(response, login_url)
+
+        # When user inputs their credentials, they are redirected to a
+        # form where they can input the TOTP.
+        credentials = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(login_url, data=credentials, follow=True)
+        assertRedirects(response, verify_otp_url)
+
+        # User has lost their device, they click the link to input
+        # their backup code.
+        response = client.get(login_with_backup_code_url, data=credentials)
+        assertContains(response, "Entrez le code de récupération")
+
+        # Send a bogus backup code.
+        wrong_code_data = {"code": backup_code[::-1]}
+        response = client.post(login_with_backup_code_url, data=wrong_code_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"code": ["Le code de récupération n’est pas correct."]}
+
+        # Test throttling.
+        correct_code_data = {"code": backup_code}
+        response = client.post(login_with_backup_code_url, data=correct_code_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"code": ["Le code de récupération n’est pas correct."]}
+
+        # Reset throttling, user can log in.
+        static_device = ItouStaticDevice.objects.get(user=user)
+        static_device.throttling_failure_timestamp = None
+        static_device.throttling_failure_count = 0
+        static_device.save()
+        correct_code_data = {"code": backup_code}
+        response = client.post(login_with_backup_code_url, data=correct_code_data)
+        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    "Vous avez été identifié grâce à votre code de récupération. "
+                    "Vos appareils précedemment enregistrés ont été supprimés. "
+                    "Vous devez à nouveau enregistrer un appareil.",
+                )
+            ],
+        )
+
+    def test_login_otp_not_required(self, client):
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user"),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
+
+        response = client.get(admin_url)
+        assertRedirects(response, pre_login_url)
+
+        response = client.post(pre_login_url, {"email": user.email})
+        assertRedirects(response, login_url)
+
+        # Without a device, the user is logged and redirected to the next_url
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(login_url, data=form_data, follow=True)
+        assertRedirects(response, admin_url)
+
+        # Same with an device
+        client.logout()
+        session = client.session
+        session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        TOTPDevice.objects.create(user=user)
+        response = client.post(login_url, data=form_data, follow=True)
+        assertRedirects(response, admin_url)
+
+    def test_login_shows_list_of_devices(self, client, snapshot, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        TOTPDevice.objects.create(
+            name="Mon appareil",
+            user=user,
+            last_used_at=timezone.make_aware(datetime.datetime(2026, 6, 1, 12, 0)),
+        )
+
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        pre_login_url = add_url_params(reverse("account_login"), {"next": admin_url})
+        login_url = add_url_params(
+            reverse("login:existing_user"),
+            {"back_url": pre_login_url, "next": admin_url},
+        )
+        client.post(pre_login_url, {"email": user.email})
+        login_url = reverse("login:existing_user")
+        data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(login_url, data=data, follow=True)
+
+        response = client.get(reverse("otp_views:verify_otp"))
+
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot()

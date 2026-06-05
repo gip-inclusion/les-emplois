@@ -4,9 +4,11 @@ import logging
 
 import segno
 from django.contrib import messages
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import TOTPDevice, default_key as generate_otp_key
 
@@ -14,8 +16,9 @@ from itou.otp.models import ItouStaticDevice
 from itou.otp.utils import create_otp_backup_code, get_user_devices
 from itou.utils.auth import check_user
 from itou.utils.readonly import http_methods
+from itou.utils.urls import get_safe_url
 from itou.www.otp_views.enums import DeviceType
-from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeForm
+from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeForm, VerifyOTPForm
 
 
 logger = logging.getLogger(__name__)
@@ -107,6 +110,26 @@ def enrollment_step_2_and_3_confirm_device(
         "post_save_url": post_save_url,
     }
     return render(request, template_name, context)
+
+
+class VerifyOTPView(FormView):
+    template_name = "otp_views/verify_otp.html"
+    form_class = VerifyOTPForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        devices = get_user_devices(self.request.user)
+        return context | {"devices": devices}
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"user": self.request.user}
+
+    def form_valid(self, form):
+        otp_login(self.request, self.request.user.otp_device)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return get_safe_url(self.request, REDIRECT_FIELD_NAME, reverse("dashboard:index"))
 
 
 @check_user_for_otp

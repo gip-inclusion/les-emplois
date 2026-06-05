@@ -111,7 +111,7 @@ class TestUserHijack:
             "name": "Mon appareil",
             "otp_token": TOTP(device.bin_key).token(),
         }
-        client.post(reverse("login:verify_otp"), data=post_data)
+        client.post(reverse("otp_views:verify_otp"), data=post_data)
 
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
