@@ -60,7 +60,7 @@
                                   </tr>
                               </tbody>
                           </table>
-                          <a class="btn btn-block btn-primary" href="/otp/enrollment_step_1">
+                          <a class="btn btn-block btn-primary" href="/otp/enrollment-step-1">
                               Configurer un
                                   nouvel
                                   appareil
@@ -180,7 +180,7 @@
                                   </tr>
                               </tbody>
                           </table>
-                          <a class="btn btn-block btn-primary" href="/otp/enrollment_step_1">
+                          <a class="btn btn-block btn-primary" href="/otp/enrollment-step-1">
                               Configurer un
                                   nouvel
                                   appareil
@@ -279,7 +279,7 @@
                       <strong>
                           Vous n’avez plus accès à votre appareil ?
                       </strong>
-                      <a class="btn-link" href="/otp/login_with_backup_code">
+                      <a class="btn-link" href="/otp/login-with-backup-code">
                           Cliquez ici pour entrer votre code de récupération
                       </a>
                   </p>
