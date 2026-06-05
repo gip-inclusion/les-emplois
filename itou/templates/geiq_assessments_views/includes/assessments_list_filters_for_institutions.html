@@ -1,6 +1,7 @@
 <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
     <div class="col-12">
         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.campaigns only %}
             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.institutions only %}
         </div>
     </div>
