@@ -247,10 +247,16 @@ class ReviewForm(forms.ModelForm):
 
 class AssessmentsFilterForInstitutionForm(forms.Form):
     institutions = forms.MultipleChoiceField(required=False, label="Référent", widget=CheckboxSelectMultiple)
+    campaigns = forms.MultipleChoiceField(required=False, label="Campagne", widget=CheckboxSelectMultiple)
 
     def __init__(self, assessments_qs, data, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
+        self.fields["campaigns"].choices = self._get_choices_for_campaigns(assessments_qs)
         self.fields["institutions"].choices = self._get_choices_for_institutions(assessments_qs)
+
+    def _get_choices_for_campaigns(self, assessments_qs):
+        campaigns = assessments_qs.order_by("-campaign__year").distinct().values_list("campaign__pk", "campaign__year")
+        return campaigns
 
     def _get_choices_for_institutions(self, assessments_qs):
         institutions_qs = Institution.objects.filter(
@@ -267,6 +273,9 @@ class AssessmentsFilterForInstitutionForm(forms.Form):
     def filter(self, queryset):
         filters = []
 
+        if campaigns := self.cleaned_data.get("campaigns"):
+            campaigns_filter = Q(campaign__in=campaigns)
+            filters.append(campaigns_filter)
         if institutions := self.cleaned_data.get("institutions"):
             institutions_filter = Q(
                 institution_links__institution__in=institutions, institution_links__with_convention=True

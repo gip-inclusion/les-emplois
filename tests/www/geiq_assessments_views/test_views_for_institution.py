@@ -70,9 +70,15 @@ class TestListAssessmentsView:
 
         client.force_login(user)
         response = client.get(self.URL)
-        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessment list without links to details"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".s-section",
+                replace_in_attr=[
+                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
+                ],
+            )
+        ) == snapshot(name="assessment list without links to details")
 
     @pytest.mark.parametrize("with_limited_access", [True, False], ids=["limited access", "unlimited access"])
     def test_display_amounts(self, client, with_limited_access, snapshot):
@@ -168,9 +174,15 @@ class TestListAssessmentsView:
 
         client.force_login(membership.user)
         response = client.get(self.URL)
-        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
-            name="assessment list with amounts"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".s-section",
+                replace_in_attr=[
+                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
+                ],
+            )
+        ) == snapshot(name="assessment list with amounts")
 
     @pytest.mark.parametrize(
         "institution_kind",
@@ -204,6 +216,7 @@ class TestListAssessmentsView:
                 response,
                 ".s-section",
                 replace_in_attr=[
+                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
                     ("value", f"{membership.institution.pk}", "[PK of Institution]"),
                 ],
             )
@@ -329,6 +342,7 @@ class TestListAssessmentsView:
                 response,
                 ".s-section",
                 replace_in_attr=[
+                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
                     ("value", f"{membership.institution.pk}", "[PK of Institution]"),
                 ],
             )
@@ -414,6 +428,57 @@ class TestListAssessmentsView:
         assert context_potential_amout == expected_potential_amout
 
     @freeze_time("2025-05-21 12:00", tick=True)
+    def test_campaigns_filter(self, client, snapshot):
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        campaign_2023 = AssessmentCampaignFactory(year=2023)
+        campaign_2024 = AssessmentCampaignFactory(year=2024)
+
+        assessment_2023 = AssessmentFactory(campaign=campaign_2023)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_2023, institution=membership.institution)
+
+        assessment_2024 = AssessmentFactory(campaign=campaign_2024)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_2024, institution=membership.institution)
+
+        another_assessment_2024 = AssessmentFactory(campaign=campaign_2024)
+        AssessmentInstitutionLink.objects.create(
+            assessment=another_assessment_2024, institution=membership.institution
+        )
+
+        # Another unlinked assessment that should not be seen anywhere
+        AssessmentFactory(campaign=campaign_2024)
+
+        client.force_login(membership.user)
+        # No filter
+        response = client.get(self.URL)
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_2023, assessment_2024, another_assessment_2024], ordered=False
+        )
+
+        # Filter on 2024
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(self.URL, {"campaigns": campaign_2024.pk})
+        assertQuerySetEqual(response.context["assessments"], [assessment_2024, another_assessment_2024], ordered=False)
+
+        # Filter on 2023
+        response = client.get(self.URL, {"campaigns": campaign_2023.pk})
+        assertQuerySetEqual(response.context["assessments"], [assessment_2023])
+
+        # Filter on both 2023 and 2024
+        response = client.get(self.URL, {"campaigns": [campaign_2023.pk, campaign_2024.pk]})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_2023, assessment_2024, another_assessment_2024], ordered=False
+        )
+
+        # Invalid data: do nothing, ie. do not filter
+        response = client.get(self.URL, {"campaigns": "invalid"})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_2023, assessment_2024, another_assessment_2024], ordered=False
+        )
+
+    @freeze_time("2025-05-21 12:00", tick=True)
     def test_institutions_filter(self, client, snapshot):
         membership = InstitutionMembershipFactory(
             institution__kind=InstitutionKind.DREETS_GEIQ,
@@ -465,6 +530,42 @@ class TestListAssessmentsView:
         response = client.get(self.URL, {"institutions": "invalid"})
         assertQuerySetEqual(
             response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
+        )
+
+    def test_mishmash(self, client, snapshot):
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        ddets = InstitutionFactory(kind=InstitutionKind.DDETS_GEIQ, name="Une DDETS GEIQ")
+        campaign_2023 = AssessmentCampaignFactory(year=2023)
+        campaign_2024 = AssessmentCampaignFactory(year=2024)
+
+        assessment_2023_ddets = AssessmentFactory(campaign=campaign_2023)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_2023_ddets, institution=membership.institution)
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_2023_ddets, institution=ddets, with_convention=True
+        )
+
+        assessment_2024_ddets_dreets = AssessmentFactory(campaign=campaign_2024)
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_2024_ddets_dreets, institution=membership.institution, with_convention=True
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_2024_ddets_dreets, institution=ddets, with_convention=True
+        )
+
+        client.force_login(membership.user)
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            # Select the DDETS only, and the 2023 campaign
+            response = client.get(self.URL, {"institutions": ddets.pk, "campaigns": campaign_2023.pk})
+        assertQuerySetEqual(response.context["assessments"], [assessment_2023_ddets], ordered=False)
+
+        # One invalid data: all the filters are sadly ignored
+        response = client.get(self.URL, {"institutions": ddets.pk, "campaigns": "invalid"})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_2023_ddets, assessment_2024_ddets_dreets], ordered=False
         )
 
     @freeze_time("2025-05-21 12:00", tick=True)
