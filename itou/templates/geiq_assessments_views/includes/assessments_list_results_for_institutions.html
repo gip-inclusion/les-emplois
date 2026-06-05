@@ -1,11 +1,19 @@
 {% load format_filters %}
 {% load geiq_assessments_badges %}
+{% load static %}
 {% load str_filters %}
 
 <div class="col-12">
-    {% if assessments %}
-        <p>{{ assessments|length }} résultat{{ assessments|pluralizefr }}</p>
-        <section>
+    <p>{{ assessments|length }} résultat{{ assessments|pluralizefr }}</p>
+    <section>
+        {% if not assessments %}
+            <div class="text-center my-3 my-md-4">
+                <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+                <p class="mb-1 mt-3">
+                    <strong>Aucun bilan pour le moment</strong>
+                </p>
+            </div>
+        {% else %}
             <div class="table-responsive mt-3 mt-md-4">
                 <table class="table table-hover">
                     <caption class="visually-hidden">Liste des bilans d’exécution</caption>
@@ -88,12 +96,6 @@
                     </tbody>
                 </table>
             </div>
-        </section>
-    {% else %}
-        <div class="text-center my-3 my-md-4">
-            <p class="mb-1 mt-3">
-                <strong>Aucun bilan pour le moment</strong>
-            </p>
-        </div>
-    {% endif %}
+        {% endif %}
+    </section>
 </div>
