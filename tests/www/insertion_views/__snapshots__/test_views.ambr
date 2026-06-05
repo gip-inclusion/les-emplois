@@ -816,3 +816,151 @@
   
   '''
 # ---
+# name: TestStructures.test_card_view_renders_bootstrap_tabs_with_full_payload
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-navinfo">
+                          <div class="c-navinfo__prevstep">
+                              <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                                  <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                                  </i>
+                                  <span>
+                                      Retour
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Structure test
+                              </h1>
+                          </div>
+                      </div>
+                      <ul aria-labelledby="structure-tabs-title" class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+                          <li class="nav-item" role="presentation">
+                              <a aria-controls="structure-description" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="onglet-structure" href="#structure-description" id="structure-description-tab" role="tab">
+                                  Description de la structure
+                              </a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                              <a aria-controls="structure-services" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="onglet-services" href="#structure-services" id="structure-services-tab" role="tab">
+                                  <span>
+                                      Services
+                                  </span>
+                                  <span class="badge badge-sm rounded-pill ms-2">
+                                      3
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section" id="structure-content-tabs">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div id="structure-tabs">
+                          <div class="tab-content">
+                              <div aria-labelledby="structure-description-tab" class="tab-pane active show" id="structure-description" role="tabpanel">
+                                  <h2>
+                                      Description de la structure
+                                  </h2>
+                                  <div class="row">
+                                      <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                                          <div class="c-box">
+                                              <article>
+                                                  <h3>
+                                                      Présentation de la structure
+                                                  </h3>
+                                                  <p>
+                                                      Description of test structure
+                                                  </p>
+                                              </article>
+                                          </div>
+                                      </div>
+                                      <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                                          <div class="c-box mb-3 mb-md-4">
+                                              <h3>
+                                                  Informations pratiques
+                                              </h3>
+                                              <button class="btn btn-secondary btn-block" data-bs-target="#structure-contact-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-coordonnees-structure" type="button">
+                                                  Voir les coordonnées de la structure
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div aria-labelledby="structure-services-tab" class="tab-pane" id="structure-services" role="tabpanel">
+                                  <h2>
+                                      Services
+                                  </h2>
+                                  <ul class="list-group list-group-flush list-group-link">
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center">
+                                              <div>
+                                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-0/" rel="noopener" target="_blank">
+                                                          Test service 0
+                                                      </a>
+                                                  </div>
+                                                  <span class="fs-sm mt-1 d-flex align-items-center">
+                                                      <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                                                      </i>
+                                                      Périmètre : Perimeter 1
+                                                  </span>
+                                              </div>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center">
+                                              <div>
+                                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-1/" rel="noopener" target="_blank">
+                                                          Test service 1
+                                                      </a>
+                                                  </div>
+                                                  <span class="fs-sm mt-1 d-flex align-items-center">
+                                                      <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                                                      </i>
+                                                      Périmètre : Perimeter 2
+                                                  </span>
+                                              </div>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center">
+                                              <div>
+                                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-2/" rel="noopener" target="_blank">
+                                                          Test service 2
+                                                      </a>
+                                                  </div>
+                                                  <span class="fs-sm mt-1 d-flex align-items-center">
+                                                      <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                                                      </i>
+                                                      Périmètre : Perimeter 3
+                                                  </span>
+                                              </div>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---

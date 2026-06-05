@@ -1,0 +1,28 @@
+{% load matomo %}
+
+{% if services %}
+    <h2>Services</h2>
+    <ul class="list-group list-group-flush list-group-link">
+        {% for service in services %}
+            <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <a href="{% url 'insertion_views:service_detail' service_uid=service.uid %}"
+                               target="_blank"
+                               rel="noopener"
+                               class="fw-bold text-decoration-none stretched-link order-2 order-md-1"
+                               {% matomo_event "fiche-structure" "clic" "voir-service" %}>{{ service.name }}</a>
+                        </div>
+                        <span class="fs-sm mt-1 d-flex align-items-center">
+                            <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>
+                            Périmètre : {{ service.perimeter }}
+                        </span>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="mb-0">Cette structure ne comporte pas de service.</p>
+{% endif %}

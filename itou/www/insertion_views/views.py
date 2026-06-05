@@ -56,10 +56,14 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
         )
 
     def get_context_data(self, **kwargs):
+        services = list(self.structure.services.all())
+        for service in services:
+            service.perimeter = get_division_label(service.eligibility_zones) or "France entière"
         return super().get_context_data(**kwargs) | {
             "structure": self.structure,
             "matomo_custom_title": "Fiche structure d’insertion",
             "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("home:hp")),
+            "services": services,
         }
 
 
