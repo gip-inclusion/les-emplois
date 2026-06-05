@@ -1,8 +1,8 @@
 from base64 import b32encode
 
 from django import forms
-from django_otp import match_token
 
+from itou.otp.utils import get_user_devices
 from itou.www.otp_views.enums import DeviceType
 
 
@@ -87,7 +87,10 @@ class VerifyOTPForm(forms.Form):
     def clean_otp_token(self):
         otp_token = self.cleaned_data.get("otp_token")
 
-        device = match_token(self.user, otp_token)
+        device = next(
+            (d for d in get_user_devices(self.user) if d.verify_token(otp_token)),
+            None,
+        )
         if device is None:
             raise forms.ValidationError("Le code de validation unique (OTP) n’est pas correct.")
         self.user.otp_device = device
