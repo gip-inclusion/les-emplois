@@ -2,10 +2,10 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django_otp.oath import TOTP
-from django_otp.plugins.otp_totp.models import TOTPDevice
 from pytest_django.asserts import assertRedirects
 
 from itou.users.enums import IdentityProvider
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
@@ -106,7 +106,7 @@ class TestUserHijack:
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 
-        device = TOTPDevice.objects.create(user=hijacker, confirmed=True, name="my device")
+        device = ItouTOTPDeviceFactory(user=hijacker, confirmed=True, name="my device")
         post_data = {
             "name": "Mon appareil",
             "otp_token": TOTP(device.bin_key).token(),

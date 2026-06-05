@@ -10,9 +10,9 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic.edit import FormView
 from django_otp import login as otp_login
-from django_otp.plugins.otp_totp.models import TOTPDevice, default_key as generate_otp_key
+from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 
-from itou.otp.models import ItouStaticDevice
+from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
 from itou.otp.utils import create_otp_backup_code, get_user_devices
 from itou.utils.auth import check_user
 from itou.utils.readonly import http_methods
@@ -31,7 +31,7 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
     devices = get_user_devices(request.user)
     if request.method == "POST":
         if device_id := request.POST.get("delete-device"):
-            device = get_object_or_404(TOTPDevice.objects.filter(user=request.user), pk=device_id)
+            device = get_object_or_404(ItouTOTPDevice.objects.filter(user=request.user), pk=device_id)
             if device != request.user.otp_device:
                 messages.success(request, "L’appareil a été supprimé.")
                 device.delete()
@@ -66,7 +66,7 @@ def enrollment_step_2_and_3_confirm_device(
         # should not happen, unless user manipulates the request
         return HttpResponseRedirect(previous_step_url)
 
-    unsaved_device = TOTPDevice(
+    unsaved_device = ItouTOTPDevice(
         user=request.user,
         key=binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
         if request.POST
@@ -172,7 +172,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         # FIXME (dbaty): when we define our own ItouTOTPDevice class,
         # we could add an `enabled` field, so that we can keep it for
         # auditing purposes.
-        TOTPDevice.objects.filter(user=request.user).delete()
+        ItouTOTPDevice.objects.filter(user=request.user).delete()
         ItouStaticDevice.objects.filter(user=request.user).delete()
 
         # FIXME (dbaty): send mail to user (when wording is ready)

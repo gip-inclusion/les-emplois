@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.oath import TOTP
-from django_otp.plugins.otp_totp.models import TOTPDevice
 from freezegun import freeze_time
 from itoutils.urls import add_url_params
 from pytest_django.asserts import (
@@ -19,9 +18,10 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
-from itou.otp.models import ItouStaticDevice, ItouStaticToken
+from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.otp.utils import create_otp_backup_code
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -64,11 +64,7 @@ def test_permissions(client, factory, expected_status):
 @freeze_time("2025-03-11 05:18:56")
 def test_device_list(client, snapshot):
     user = ItouStaffFactory()
-    device = TOTPDevice.objects.create(
-        user=user,
-        name="Mon appareil",
-        confirmed=True,
-    )
+    device = ItouTOTPDeviceFactory(user=user, name="Mon appareil", confirmed=True)
 
     client.force_login(user)
     attach_device_to_user_session(client, device)
@@ -96,13 +92,13 @@ def test_delete_devices(client, snapshot, settings):
     url = reverse("otp_views:otp_devices")
 
     with freeze_time("2025-03-11 05:18:56") as frozen_time:
-        device_1 = TOTPDevice.objects.create(
+        device_1 = ItouTOTPDeviceFactory(
             user=staff_user,
             confirmed=True,
             name="authenticator",
         )
         frozen_time.tick(60)
-        device_2 = TOTPDevice.objects.create(user=staff_user, confirmed=True, name="bitwarden")
+        device_2 = ItouTOTPDeviceFactory(user=staff_user, confirmed=True, name="bitwarden")
         frozen_time.tick(60)
 
         client.force_login(staff_user)
@@ -129,7 +125,7 @@ def test_delete_devices(client, snapshot, settings):
 
         # We cannot remove the used device
         response = client.post(url, data={"delete-device": str(device_1.pk)}, follow=True)
-        assertQuerySetEqual(TOTPDevice.objects.all(), [device_1, device_2], ordered=False)
+        assertQuerySetEqual(ItouTOTPDevice.objects.all(), [device_1, device_2], ordered=False)
         assertMessages(
             response,
             [
@@ -141,7 +137,7 @@ def test_delete_devices(client, snapshot, settings):
 
         # The user removes his other device
         response = client.post(url, data={"delete-device": str(device_2.pk)})
-        assertQuerySetEqual(TOTPDevice.objects.all(), [device_1])
+        assertQuerySetEqual(ItouTOTPDevice.objects.all(), [device_1])
         assertContains(response, device_1.name)
         assertNotContains(response, device_2.name)
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
@@ -199,7 +195,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         user = ItouStaffFactory()
         client.force_login(user)
         url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
-        fake_device = TOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
+        fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
         data = {
             "name": "My Apploogle IPixel 34",
@@ -218,7 +214,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         )
         assertContains(response, "Votre code de récupération à conserver")
         assertContains(response, "secret-backup-code")
-        device = user.totpdevice_set.get()
+        device = user.itou_totp_devices.get()
         assert device.key == fake_device.key
         assert client.session[DEVICE_ID_SESSION_KEY] == device.persistent_id
         backup_token = ItouStaticToken.objects.get()
@@ -228,7 +224,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         user = ItouStaffFactory()
         client.force_login(user)
         url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
-        fake_device = TOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
+        fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
         expired_token = TOTP(fake_device.bin_key, drift=100).token()
         data = {
@@ -241,7 +237,7 @@ class TestEnrollmentSteps2And3ConfirmDevice:
 
         assertContains(response, "Le code unique de validation (OTP) n’est pas correct.")
         assertContains(response, data["key"])
-        assert user.totpdevice_set.count() == 0
+        assert user.itou_totp_devices.count() == 0
 
 
 class TestItouStaffLogin:
@@ -276,7 +272,7 @@ class TestItouStaffLogin:
         session = client.session
         session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
         session.save()
-        device = TOTPDevice.objects.create(user=user, confirmed=False)
+        device = ItouTOTPDeviceFactory(name="1", user=user, confirmed=False)
         response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, setup_otp_url)
 
@@ -294,7 +290,7 @@ class TestItouStaffLogin:
         # The user should not be able to access the setup otp pages
         response = client.get(setup_otp_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
-        TOTPDevice.objects.create(user=user, confirmed=False)
+        ItouTOTPDeviceFactory(name="2", user=user, confirmed=False)
         setup_otp_confirm_device_url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
         response = client.get(setup_otp_confirm_device_url)
         assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
@@ -330,7 +326,7 @@ class TestItouStaffLogin:
     def test_login_with_backup_code(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
-        TOTPDevice.objects.create(user=user, confirmed=False)
+        ItouTOTPDeviceFactory(user=user, confirmed=False)
         backup_code = create_otp_backup_code(user)
 
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
@@ -422,14 +418,14 @@ class TestItouStaffLogin:
         session = client.session
         session[ITOU_SESSION_LOGIN_EMAIL_KEY] = user.email
         session.save()
-        TOTPDevice.objects.create(user=user)
+        ItouTOTPDeviceFactory(user=user)
         response = client.post(login_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
 
     def test_login_shows_list_of_devices(self, client, snapshot, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
-        TOTPDevice.objects.create(
+        ItouTOTPDeviceFactory(
             name="Mon appareil",
             user=user,
             last_used_at=timezone.make_aware(datetime.datetime(2026, 6, 1, 12, 0)),

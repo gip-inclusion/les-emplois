@@ -1,6 +1,4 @@
-from django_otp.plugins.otp_totp.models import TOTPDevice
-
-from itou.otp.models import ItouStaticDevice, ItouStaticToken
+from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 
 
 STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
@@ -8,7 +6,7 @@ STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
 
 def get_user_devices(user):
     return sorted(
-        TOTPDevice.objects.filter(user=user),
+        ItouTOTPDevice.objects.filter(user=user),
         key=lambda device: device.name,
     )
 
