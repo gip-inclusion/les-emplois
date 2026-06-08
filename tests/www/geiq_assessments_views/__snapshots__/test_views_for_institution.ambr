@@ -2750,7 +2750,7 @@
 # ---
 # name: TestListAssessmentsView.test_complex_list[SQL queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2759,7 +2759,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -2934,6 +2935,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'IfNode[geiq_assessments_views/list_for_institution.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
@@ -3074,13 +3093,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),

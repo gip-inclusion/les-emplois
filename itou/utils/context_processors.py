@@ -1,6 +1,9 @@
 from urllib.parse import urlencode
 
+from django.utils import timezone
+
 from itou.communications.cache import get_cached_active_announcement
+from itou.sessions.models import ItouSession
 
 
 def matomo(request):
@@ -28,3 +31,17 @@ def active_announcement_campaign(request):
             }
 
     return {"display_campaign_announce": False}
+
+
+def concurrent_session_exists(request):
+    concurrent_session = False
+    if request.user and request.user.is_authenticated and request.session:
+        concurrent_sessions = list(
+            ItouSession.objects.filter(account_id=request.user.pk, expire_date__gt=timezone.now()).exclude(
+                session_key=request.session._session_key
+            )
+        )
+        # Filter out hijacked sessions
+        if any(not session.is_hijacked() for session in concurrent_sessions):
+            concurrent_session = True
+    return {"concurrent_session": concurrent_session}

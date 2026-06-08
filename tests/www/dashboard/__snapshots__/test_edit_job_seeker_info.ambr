@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -10,7 +10,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -519,6 +520,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -601,13 +620,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -623,7 +643,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -632,7 +652,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -1101,6 +1122,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+          'wrapper[utils/views.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
           'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
           'IncludeNode[dashboard/edit_job_seeker_info.html]',
@@ -1159,13 +1198,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),

@@ -10,7 +10,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -491,7 +492,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -972,7 +974,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -1452,7 +1455,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -1832,7 +1836,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -2228,7 +2233,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -2624,7 +2630,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -3019,7 +3026,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -3304,7 +3312,7 @@
 # ---
 # name: test_as_unauthorized_prescriber[SQL queries for prescriptions list]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -3313,7 +3321,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -4314,6 +4323,25 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -4321,13 +4349,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -4381,7 +4410,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -4670,13 +4700,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -5880,7 +5911,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -5889,7 +5920,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -7012,6 +7044,25 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -7019,13 +7070,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -7041,7 +7093,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -7050,7 +7102,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -8108,6 +8161,25 @@
           FROM "eligibility_geiqeligibilitydiagnosis"
           INNER JOIN "users_user" ON ("eligibility_geiqeligibilitydiagnosis"."author_id" = "users_user"."id")
           WHERE "eligibility_geiqeligibilitydiagnosis"."id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
           ORDER BY RANDOM() ASC
         ''',
       }),

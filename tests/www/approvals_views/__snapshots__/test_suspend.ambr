@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalSuspendActionChoiceView.test_context[view queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -10,7 +10,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -573,6 +574,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_action_choice[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -630,13 +649,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -652,7 +672,7 @@
 # ---
 # name: TestApprovalSuspendUpdateEndDateView.test_context[view queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -661,7 +681,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -1224,6 +1245,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_update_enddate[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -1281,13 +1320,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -1404,7 +1444,7 @@
 # ---
 # name: TestApprovalSuspendView.test_delete_suspension[view queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -1413,7 +1453,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -1979,6 +2020,23 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_delete[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -2040,13 +2098,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),
@@ -2062,7 +2121,7 @@
 # ---
 # name: TestApprovalSuspendView.test_update_suspension[view queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -2071,7 +2130,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -2748,6 +2808,24 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+          'suspension_update[www/approvals_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -2805,13 +2883,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),

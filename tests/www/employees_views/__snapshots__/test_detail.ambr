@@ -16,7 +16,7 @@
 # ---
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 33,
+    'num_queries': 34,
     'queries': list([
       dict({
         'origin': list([
@@ -25,7 +25,8 @@
         'sql': '''
           SELECT "django_session"."session_key",
                  "django_session"."session_data",
-                 "django_session"."expire_date"
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
           FROM "django_session"
           WHERE ("django_session"."expire_date" > %s
                  AND "django_session"."session_key" = %s)
@@ -1162,6 +1163,22 @@
       }),
       dict({
         'origin': list([
+          'concurrent_session_exists[utils/context_processors.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date",
+                 "django_session"."account_id"
+          FROM "django_session"
+          WHERE ("django_session"."account_id" = %s
+                 AND "django_session"."expire_date" > %s
+                 AND NOT ("django_session"."session_key" = %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -1871,13 +1888,14 @@
       }),
       dict({
         'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
+          'ItouSession.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
           UPDATE "django_session"
           SET "session_data" = %s,
-              "expire_date" = %s
+              "expire_date" = %s,
+              "account_id" = %s
           WHERE "django_session"."session_key" = %s
         ''',
       }),

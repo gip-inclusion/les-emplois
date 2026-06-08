@@ -165,10 +165,12 @@ def test_check_verbose_name_lower():
             exclude_predicates = [
                 field.is_relation and field.auto_created,  # Reverse side of the relation
                 field.is_relation and field.related_model is None,  # GenericForeignKey
+                model._meta.db_table == "django_session" and field.name == "session_key",  # uppercase in French
             ]
             if any(exclude_predicates):
                 continue
             if bad_name(field.verbose_name):
+                breakpoint()
                 errors.append(f"Field “{field}” verbose_name should be lower cased.")
 
     assert errors == []

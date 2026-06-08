@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
@@ -100,6 +99,7 @@ INSTALLED_APPS = [
     "itou.geiq_assessments",
     "itou.geo",
     "itou.search",
+    "itou.sessions",
     "itou.www.apply",
     "itou.www.approvals_views",
     "itou.www.autocomplete",
@@ -190,6 +190,7 @@ TEMPLATES = [
                 "itou.utils.settings_context_processors.expose_settings",
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
+                "itou.utils.context_processors.concurrent_session_exists",
             ],
             "builtins": ["slippers.templatetags.slippers"],
         },
@@ -287,6 +288,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+SESSION_ENGINE = "itou.sessions.models"
 
 SESSION_COOKIE_HTTPONLY = True
 
