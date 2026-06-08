@@ -10,42 +10,29 @@ register = template.Library()
 
 @register.simple_tag
 def state_for_institution(assessment, *, extra_classes="badge-sm"):
-    match assessment.state:
-        case AssessmentState.NEW:
-            text = "En attente"
-            state_classes = "bg-warning"
-        case AssessmentState.SUBMITTED:
-            text = "À contrôler"
-            state_classes = "bg-accent-03 text-primary"
-        case AssessmentState.REVIEWED:
-            text = "À valider"
-            state_classes = "bg-info"
-        case AssessmentState.FINAL_REVIEWED:
-            text = "Validé"
-            state_classes = "bg-success"
-        case _:
-            raise ValueError(f"Wrong state {assessment.state}")
+    state_classes = {
+        AssessmentState.NEW: "bg-warning",
+        AssessmentState.SUBMITTED: "bg-accent-03 text-primary",
+        AssessmentState.REVIEWED: "bg-info",
+        AssessmentState.FINAL_REVIEWED: "bg-success",
+    }
 
-    class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes}"
+    text = AssessmentState(assessment.state).get_label_for_institution()
+    class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes[assessment.state]}"
     return format_html('<span class="{}">{}</span>', class_attr, text)
 
 
 @register.simple_tag
 def state_for_geiq(assessment, *, extra_classes="badge-sm"):
-    match assessment.state:
-        case AssessmentState.NEW:
-            text = "À compléter"
-            state_classes = "bg-info"
-        case AssessmentState.SUBMITTED | AssessmentState.REVIEWED:
-            text = "Envoyé"
-            state_classes = "text-info bg-info-lightest"
-        case AssessmentState.FINAL_REVIEWED:
-            text = "Traité"
-            state_classes = "text-success bg-success-lightest"
-        case _:
-            raise ValueError("Wrong state {assessment.state}")
+    state_classes = {
+        AssessmentState.NEW: "bg-info",
+        AssessmentState.SUBMITTED: "text-info bg-info-lightest",
+        AssessmentState.REVIEWED: "text-info bg-info-lightest",
+        AssessmentState.FINAL_REVIEWED: "text-success bg-success-lightest",
+    }
 
-    class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes}"
+    text = AssessmentState(assessment.state).get_label_for_geiq()
+    class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes[assessment.state]}"
     return format_html('<span class="{}">{}</span>', class_attr, text)
 
 

@@ -30,6 +30,24 @@ class AssessmentState(models.TextChoices):
     REVIEWED = "reviewed", "Contrôlé"
     FINAL_REVIEWED = "final_reviewed", "Contrôlé (DREETS)"
 
+    def get_label_for_geiq(self):
+        labels = {
+            self.NEW: "À compléter",
+            self.SUBMITTED: "Envoyé",
+            self.REVIEWED: "Envoyé",
+            self.FINAL_REVIEWED: "Traité",
+        }
+        return labels[self]
+
+    def get_label_for_institution(self):
+        labels = {
+            self.NEW: "En attente",
+            self.SUBMITTED: "À contrôler",
+            self.REVIEWED: "À valider",
+            self.FINAL_REVIEWED: "Validé",
+        }
+        return labels[self]
+
 
 class AssessmentTransition(enum.StrEnum):
     SUBMIT = "submit"
