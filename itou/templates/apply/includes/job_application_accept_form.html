@@ -9,7 +9,7 @@
 
 <div class="c-form">
     <form method="post" class="js-format-nir">
-        {% if has_form_error %}
+        {% if form_accept.has_non_modal_form_error %}
             {% component_alert content=content variant="danger" form_error=True icon=False %}
                 {% fragment as content %}
                     <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>

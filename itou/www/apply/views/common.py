@@ -15,6 +15,7 @@ from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBi
 from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.job_applications.enums import SenderKind
@@ -36,12 +37,19 @@ def previous_applications_queryset(job_seeker, company):
 
 
 class IsIAEEligibilityDiagnosisNeededMixin:
-    def is_iae_eligibility_diagnosis_needed(self):
-        return (
-            self.company.is_subject_to_iae_rules
-            and self.eligibility_diagnosis is None
-            and not self.job_seeker.has_valid_approval
-        )
+    def is_iae_eligibility_diagnosis_needed(self, hiring_start_at):
+        if not self.company.is_subject_to_iae_rules or self.job_seeker.has_valid_approval:
+            # TODO: check approval dates vs hiring_start_at
+            return False
+        if self.eligibility_diagnosis is None:
+            return True
+        if self.eligibility_diagnosis.author_kind == AuthorKind.PRESCRIBER:
+            # TODO: check diagnosis dates vs hiring_start_at
+            return False
+        if self.eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER:
+            if self.eligibility_diagnosis.expires_at > hiring_start_at:
+                return False
+        return True
 
 
 class CommonUserInfoFormsMixin:
@@ -178,6 +186,7 @@ class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
             instance=self.job_application,
             company=self.company,
             job_seeker=self.job_seeker,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
             current_user=self.request.user,
             data=self.request.POST or None,
             initial=contract_form_data,
@@ -195,7 +204,6 @@ class BaseContractInfosView(CommonUserInfoFormsMixin, TemplateView):
         form_accept = self.forms["accept"]
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
-        context["has_form_error"] = bool(form_accept.errors)
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["hide_value"] = ContractType.OTHER.value
         context["matomo_custom_title"] = "Candidature acceptée"
@@ -253,6 +261,7 @@ class JobSeekerAndContractInfosNeededMixin(CommonUserInfoFormsMixin):
             instance=getattr(self, "job_application", None),
             company=self.company,
             job_seeker=self.job_seeker,
+            iae_eligibility_diagnosis=self.eligibility_diagnosis,
             data=contract_form_data,
         )
 
