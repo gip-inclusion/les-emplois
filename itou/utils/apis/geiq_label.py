@@ -62,7 +62,7 @@ class LabelApiClient:
         except (httpx.HTTPError, json.JSONDecodeError) as exc:
             raise LabelAPIError(f"Error requesting Label API: {exc.__class__.__name__}") from exc
         if response_data.get("status") != "Success":
-            raise LabelAPIError(f"Received response with status={response_data.get('Status')}")
+            raise LabelAPIError(f"Received response with status={response_data.get('status')}")
         return response_data["result"]
 
     def get_all_geiq(self, *, page_size=100):

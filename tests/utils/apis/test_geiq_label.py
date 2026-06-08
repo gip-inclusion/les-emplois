@@ -28,20 +28,20 @@ def test_error_response(respx_mock, label_settings):
         client.get_all_geiq()
 
     respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(400)
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match="Error requesting Label API: HTTPStatusError"):
         client.get_all_geiq()
 
     respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(
         200, json={"status": "Error"}
     )
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match=r"Received response with status=Error"):
         client.get_all_geiq()
 
     respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(
         200,
         content="These aren't the droids you're looking for",
     )
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match="Error requesting Label API: JSONDecodeError"):
         client.get_all_geiq()
 
 
@@ -235,7 +235,7 @@ def test_get_compte_pdf_invalid_content_type(respx_mock, label_settings):
             "x-geiq-id": "123",
         },
     )
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match=r"Unexpected content-type.*"):
         assert client.get_compte_pdf(geiq_id=123)
 
 
@@ -248,11 +248,11 @@ def test_get_compte_pdf_invalid_x_geiq_id(respx_mock, label_settings):
         headers={
             "content-length": "0",
             "content-transfer-encoding": "binary",
-            "content-type": "text/html",
+            "content-type": "application/pdf",
             "x-geiq-id": "321",
         },
     )
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match=r".*x-geiq-id.*"):
         assert client.get_compte_pdf(geiq_id=123)
 
 
@@ -288,7 +288,7 @@ def test_get_synthese_pdf_invalid_content_type(respx_mock, label_settings):
             "x-geiq-id": "123",
         },
     )
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match=r"Unexpected content-type.*"):
         assert client.get_synthese_pdf(geiq_id=123)
 
 
@@ -301,9 +301,9 @@ def test_get_synthese_pdf_invalid_x_geiq_id(respx_mock, label_settings):
         headers={
             "content-length": "0",
             "content-transfer-encoding": "binary",
-            "content-type": "text/html",
+            "content-type": "application/pdf",
             "x-geiq-id": "321",
         },
     )
-    with pytest.raises(geiq_label.LabelAPIError):
+    with pytest.raises(geiq_label.LabelAPIError, match=r".*x-geiq-id.*"):
         assert client.get_synthese_pdf(geiq_id=123)
