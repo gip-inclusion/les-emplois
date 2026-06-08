@@ -66,3 +66,17 @@ class DisablePasswordAuthNotification(EmailNotification):
         context = super().get_context()
         context["password_reset_url"] = get_absolute_url(reverse("account_reset_password"))
         return context
+
+
+@notifications_registry.register
+class EditJobSeekerInfoNotification(EmailNotification):
+    name = "Modification des informations personnelles d'un candidat"
+    category = NotificationCategory.ACCOUNT_MANAGEMENT
+    subject_template = "account/email/email_jobseeker_personal_info_edited_subject.txt"
+    body_template = "account/email/email_jobseeker_personal_info_edited_body.txt"
+    can_be_disabled = False
+
+    def get_context(self):
+        context = super().get_context()
+        context["edit_user_info_url"] = get_absolute_url(reverse("dashboard:edit_user_info"))
+        return context

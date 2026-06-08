@@ -35,6 +35,7 @@ from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.users.notifications import EditJobSeekerInfoNotification
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_request
 from itou.utils.legal_terms import bypass_terms_acceptance
@@ -373,6 +374,7 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         if form.data.get("confirm"):
             form.save()
             messages.success(request, "Les informations du candidat ont bien été mises à jour.", extra_tags="toast")
+            EditJobSeekerInfoNotification(job_seeker, organization=request.current_organization).send()
             return HttpResponseRedirect(back_url)
 
     context = {
