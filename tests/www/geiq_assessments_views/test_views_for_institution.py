@@ -536,7 +536,108 @@ class TestListAssessmentsView:
             response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
         )
 
+    @freeze_time("2025-05-21 12:00", tick=True)
+    def test_states_filter(self, client, snapshot):
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        campaign = AssessmentCampaignFactory()
+
+        assessment_new = AssessmentFactory(campaign=campaign)
+        AssessmentInstitutionLink.objects.create(assessment=assessment_new, institution=membership.institution)
+
+        assessment_submitted = AssessmentFactory(
+            campaign=campaign,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=80_000,
+        )
+        AssessmentInstitutionLink.objects.create(assessment=assessment_submitted, institution=membership.institution)
+
+        assessment_reviewed = AssessmentFactory(
+            campaign=campaign,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=80_000,
+            review_comment="Bravo !",
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_by=membership.user,
+            reviewed_by_institution=membership.institution,
+        )
+        AssessmentInstitutionLink.objects.create(assessment=assessment_reviewed, institution=membership.institution)
+
+        assessment_final_reviewed = AssessmentFactory(
+            campaign=campaign,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=80_000,
+            review_comment="Bravo !",
+            decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_at=timezone.now() + datetime.timedelta(hours=5),
+            reviewed_by=membership.user,
+            reviewed_by_institution=membership.institution,
+            final_reviewed_at=timezone.now() + datetime.timedelta(hours=6),
+            final_reviewed_by=membership.user,
+            final_reviewed_by_institution=membership.institution,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_final_reviewed, institution=membership.institution
+        )
+
+        # Another unlinked assessment that should not be seen anywhere
+        AssessmentFactory(campaign=campaign)
+
+        client.force_login(membership.user)
+        # No filter
+        response = client.get(self.URL)
+        assertQuerySetEqual(
+            response.context["assessments"],
+            [assessment_new, assessment_submitted, assessment_reviewed, assessment_final_reviewed],
+            ordered=False,
+        )
+
+        # Filter on NEW
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(self.URL, {"states": AssessmentState.NEW.value})
+        assertQuerySetEqual(response.context["assessments"], [assessment_new], ordered=False)
+
+        # Filter on SUBMITTED
+        response = client.get(self.URL, {"states": AssessmentState.SUBMITTED.value})
+        assertQuerySetEqual(response.context["assessments"], [assessment_submitted], ordered=False)
+
+        # Filter on both REVIEWED and FINAL_REVIEWED
+        response = client.get(
+            self.URL, {"states": [AssessmentState.REVIEWED.value, AssessmentState.FINAL_REVIEWED.value]}
+        )
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_reviewed, assessment_final_reviewed], ordered=False
+        )
+
+        # Invalid data: do nothing, ie. do not filter
+        response = client.get(self.URL, {"states": "invalid"})
+        assertQuerySetEqual(
+            response.context["assessments"],
+            [assessment_new, assessment_submitted, assessment_reviewed, assessment_final_reviewed],
+            ordered=False,
+        )
+
     def test_mishmash(self, client, snapshot):
+        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         membership = InstitutionMembershipFactory(
             institution__kind=InstitutionKind.DREETS_GEIQ,
             institution__name="Un DREETS GEIQ",
@@ -545,13 +646,28 @@ class TestListAssessmentsView:
         campaign_2023 = AssessmentCampaignFactory(year=2023)
         campaign_2024 = AssessmentCampaignFactory(year=2024)
 
-        assessment_2023_ddets = AssessmentFactory(campaign=campaign_2023)
+        assessment_2023_ddets = AssessmentFactory(
+            campaign=campaign_2023,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+        )
         AssessmentInstitutionLink.objects.create(assessment=assessment_2023_ddets, institution=membership.institution)
         AssessmentInstitutionLink.objects.create(
             assessment=assessment_2023_ddets, institution=ddets, with_convention=True
         )
 
-        assessment_2024_ddets_dreets = AssessmentFactory(campaign=campaign_2024)
+        assessment_2024_ddets_dreets = AssessmentFactory(
+            campaign=campaign_2024,
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+            review_comment="Bravo !",
+            convention_amount=100_000,
+            advance_amount=50_000,
+            granted_amount=100_000,
+            grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
+        )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment_2024_ddets_dreets, institution=membership.institution, with_convention=True
         )
@@ -562,12 +678,17 @@ class TestListAssessmentsView:
         client.force_login(membership.user)
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
-            # Select the DDETS only, and the 2023 campaign
-            response = client.get(self.URL, {"institutions": ddets.pk, "campaigns": campaign_2023.pk})
+            # Select the DDETS only, the 2023 campaign and the SUBMITTED state
+            response = client.get(
+                self.URL,
+                {"institutions": ddets.pk, "campaigns": campaign_2023.pk, "states": AssessmentState.SUBMITTED.value},
+            )
         assertQuerySetEqual(response.context["assessments"], [assessment_2023_ddets], ordered=False)
 
         # One invalid data: all the filters are sadly ignored
-        response = client.get(self.URL, {"institutions": ddets.pk, "campaigns": "invalid"})
+        response = client.get(
+            self.URL, {"institutions": ddets.pk, "campaigns": "invalid", "states": AssessmentState.SUBMITTED.value}
+        )
         assertQuerySetEqual(
             response.context["assessments"], [assessment_2023_ddets, assessment_2024_ddets_dreets], ordered=False
         )

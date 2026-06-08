@@ -3588,6 +3588,45 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -3885,6 +3924,45 @@
                               <ul class="dropdown-menu">
                               </ul>
                           </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -4115,6 +4193,45 @@
                                   Référent
                               </button>
                               <ul class="dropdown-menu">
+                              </ul>
+                          </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
+                                          </label>
+                                      </div>
+                                  </li>
                               </ul>
                           </div>
                       </div>
@@ -4351,6 +4468,45 @@
                               <ul class="dropdown-menu">
                               </ul>
                           </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -4410,6 +4566,45 @@
                                           <input class="form-check-input" id="id_institutions_0" name="institutions" type="checkbox" value="[PK of Institution]"/>
                                           <label class="form-check-label" for="id_institutions_0">
                                               Une institution GEIQ
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
                                           </label>
                                       </div>
                                   </li>
@@ -4552,6 +4747,45 @@
                                           <input class="form-check-input" id="id_institutions_0" name="institutions" type="checkbox" value="[PK of Institution]"/>
                                           <label class="form-check-label" for="id_institutions_0">
                                               Une institution GEIQ
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
                                           </label>
                                       </div>
                                   </li>
@@ -5080,6 +5314,45 @@
                               <ul class="dropdown-menu">
                               </ul>
                           </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -5209,6 +5482,45 @@
                                   Référent
                               </button>
                               <ul class="dropdown-menu">
+                              </ul>
+                          </div>
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                                          <label class="form-check-label" for="id_states_0">
+                                              En attente
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="submitted"/>
+                                          <label class="form-check-label" for="id_states_1">
+                                              À contrôler
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="reviewed"/>
+                                          <label class="form-check-label" for="id_states_2">
+                                              À valider
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="final_reviewed"/>
+                                          <label class="form-check-label" for="id_states_3">
+                                              Validé
+                                          </label>
+                                      </div>
+                                  </li>
                               </ul>
                           </div>
                       </div>
@@ -5632,7 +5944,8 @@
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."campaign_id" IN (%s)
                  AND T8."institution_id" IN (%s)
-                 AND T8."with_convention")
+                 AND T8."with_convention"
+                 AND "geiq_assessments_assessment"."state" IN (%s))
           GROUP BY "geiq_assessments_assessment"."id",
                    34,
                    35,
@@ -5721,6 +6034,392 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestListAssessmentsView.test_states_filter[SQL queries]
+  dict({
+    'num_queries': 12,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_company_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_prescriber_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_active_institution_memberships[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT "geiq_assessments_assessment"."campaign_id" AS "campaign__pk",
+                          "geiq_assessments_assessmentcampaign"."year" AS "campaign__year"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
+          LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
+          LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
+          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
+          GROUP BY "geiq_assessments_assessment"."id",
+                   2
+          ORDER BY 2 DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'AssessmentsFilterForInstitutionForm._get_choices_for_institutions[www/geiq_assessments_views/forms.py]',
+          'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institution"
+          WHERE EXISTS
+              (SELECT %s AS "a"
+               FROM "geiq_assessments_assessmentinstitutionlink" V0
+               WHERE (V0."assessment_id" IN
+                        (SELECT U0."id" AS "pk"
+                         FROM "geiq_assessments_assessment" U0
+                         INNER JOIN "geiq_assessments_assessmentinstitutionlink" U1 ON (U0."id" = U1."assessment_id")
+                         LEFT OUTER JOIN "geiq_assessments_employee" U3 ON (U0."id" = U3."assessment_id")
+                         LEFT OUTER JOIN "geiq_assessments_employeecontract" U4 ON (U3."id" = U4."employee_id")
+                         LEFT OUTER JOIN "geiq_assessments_employee" U5 ON (U4."employee_id" = U5."id")
+                         WHERE U1."institution_id" = %s
+                         GROUP BY 1)
+                      AND V0."institution_id" = ("institutions_institution"."id")
+                      AND V0."with_convention")
+               LIMIT 1)
+          ORDER BY "institutions_institution"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'VariableNode[geiq_assessments_views/includes/assessments_list_results_for_institutions.html]',
+          'IncludeNode[geiq_assessments_views/list_for_institution.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."state",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."label_geiq_post_code",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_nb",
+                 CASE
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     WHEN "geiq_assessments_assessment"."state" = %s THEN %s
+                     ELSE %s
+                 END AS "state_order",
+                 GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
+                 SUM(T6."allowance_amount") FILTER (
+                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
+                                                                            "geiq_assessments_assessmentcampaign"."id",
+                                                                            "geiq_assessments_assessmentcampaign"."year",
+                                                                            "geiq_assessments_assessmentcampaign"."opening_date",
+                                                                            "geiq_assessments_assessmentcampaign"."submission_deadline",
+                                                                            "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
+          LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
+          LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
+          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
+                 AND "geiq_assessments_assessment"."state" IN (%s))
+          GROUP BY "geiq_assessments_assessment"."id",
+                   34,
+                   35,
+                   "geiq_assessments_assessmentcampaign"."id"
+          ORDER BY 34 ASC,
+                   35 DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'VariableNode[geiq_assessments_views/includes/assessments_list_results_for_institutions.html]',
+          'IncludeNode[geiq_assessments_views/list_for_institution.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessmentinstitutionlink"."id",
+                 "geiq_assessments_assessmentinstitutionlink"."assessment_id",
+                 "geiq_assessments_assessmentinstitutionlink"."institution_id",
+                 "geiq_assessments_assessmentinstitutionlink"."with_convention"
+          FROM "geiq_assessments_assessmentinstitutionlink"
+          WHERE "geiq_assessments_assessmentinstitutionlink"."assessment_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'VariableNode[geiq_assessments_views/includes/assessments_list_results_for_institutions.html]',
+          'IncludeNode[geiq_assessments_views/list_for_institution.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institution"
+          WHERE ("institutions_institution"."id") IN ((%s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
