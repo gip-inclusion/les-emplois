@@ -10,7 +10,7 @@ from pytest_django.asserts import assertContains, assertFormError, assertNotCont
 
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title
+from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.users.notifications import EditJobSeekerInfoNotification
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
@@ -832,4 +832,56 @@ class TestEditJobSeekerInfo:
         for attr in ["title", "first_name", "last_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
         for attr in ["birthdate", "birth_place", "birth_country"]:
+            assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
+
+    @pytest.mark.parametrize(
+        "identity_provider",
+        [
+            IdentityProvider.FRANCE_CONNECT,
+            # TODO: IdentityProvider.PE_CONNECT
+        ],
+    )
+    def test_sso_fields_readonly(self, client, identity_provider, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+        org = prescribers_factories.PrescriberOrganizationFactory()
+        member = prescribers_factories.PrescriberMembershipFactory(organization=org).user
+        job_seeker = JobSeekerFactory(identity_provider=identity_provider, created_by=member)
+        user_fields = {"email", "title", "first_name", "last_name"}
+        profile_fields = {"birthdate"}
+        readonly_fields = user_fields | profile_fields
+
+        client.force_login(member)
+        url = reverse(
+            "dashboard:edit_job_seeker_info",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+        )
+        response = client.get(url)
+        soup = parse_response_to_soup(response)
+        assert readonly_fields <= {field["name"] for field in soup.find_all(attrs={"disabled": ""})}
+
+        new_birthdate = datetime.date(1978, 12, 20)
+        response = client.post(
+            url,
+            {
+                "title": "M",
+                "first_name": "Manuel",
+                "last_name": "Calavera",
+                "email": job_seeker.email,
+                "birthdate": new_birthdate.isoformat(),
+                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+                "birth_place": (
+                    Commune.objects.filter(start_date__lte=new_birthdate, end_date__gte=new_birthdate).first().pk
+                ),
+                "confirm": True,
+                **self.address_form_fields,
+            },
+        )
+        assertRedirects(response, reverse("dashboard:index"))
+        refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
+        for attr in user_fields:
+            assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
+        for attr in profile_fields:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
