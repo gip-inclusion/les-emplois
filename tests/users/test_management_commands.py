@@ -216,25 +216,21 @@ class TestDeduplicateJobSeekersManagementCommands:
 
 
 @freeze_time("2023-03-06 11:40:01")
-def test_shorten_active_sessions():
+def test_expire_active_sessions():
     expired_session = Session.objects.create(
         session_key="expired",
         expire_date=datetime.datetime(2023, 3, 6, tzinfo=datetime.UTC),
-    )
-    almost_expired_session = Session.objects.create(
-        session_key="almost_expired",
-        expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=datetime.UTC),
     )
     Session.objects.create(
         session_key="active",
         expire_date=datetime.datetime(2023, 3, 7, tzinfo=datetime.UTC),
     )
 
-    call_command("shorten_active_sessions")
+    call_command("expire_active_sessions")
+
     assert list(Session.objects.all().order_by("expire_date").values_list("session_key", "expire_date")) == [
         ("expired", expired_session.expire_date),
-        ("almost_expired", almost_expired_session.expire_date),
-        ("active", timezone.now() + relativedelta(hours=1)),
+        ("active", timezone.now()),
     ]
 
 

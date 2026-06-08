@@ -299,7 +299,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # work as we want. This is why we ask Django to expire sessions in DB after 1 week
 # of inactivity.
 # -> https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_the_lifetime_of_a_cookie
-# In addition, the command shorten_active_sessions is run every week to force user to connect at least once per week
+# In addition, the command expire_active_sessions is run every week to force user to connect at least once per week
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 
 SESSION_SERIALIZER = "itou.utils.session.JSONSerializer"

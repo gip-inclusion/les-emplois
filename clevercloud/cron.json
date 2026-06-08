@@ -50,7 +50,7 @@
   "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
-  "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
+  "0 1 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh expire_active_sessions",
   "0 1 * * MON $ROOT/clevercloud/run_management_command.sh delete_unused_files",
   "0 2 * * MON $ROOT/clevercloud/run_management_command.sh populate_metabase_matomo --wet-run",
 
