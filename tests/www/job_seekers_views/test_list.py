@@ -952,75 +952,34 @@ def test_filtered_by_organization_members(client):
     ).user
     other_prescriber_not_in_orga = PrescriberFactory(first_name="Deborah")
 
-    job_seeker_created_by_user = JobSeekerFactory(
-        created_by=prescriber,
-        jobseeker_profile__created_by_prescriber_organization=organization,
-        first_name="created_by_user",
-        last_name="Zorro",
-        with_job_seeker_assignment=True,
-    )
-    job_seeker_created_by_member = JobSeekerFactory(
-        created_by=member,
-        jobseeker_profile__created_by_prescriber_organization=organization,
-        first_name="created_by_member",
-        last_name="Zorro",
-        with_job_seeker_assignment=True,
-    )
-    job_seeker_created_by_old_member = JobSeekerFactory(
-        created_by=old_member,
-        jobseeker_profile__created_by_prescriber_organization=organization,
-        first_name="created_by_old_member",
-        last_name="Zorro",
-        with_job_seeker_assignment=True,
-    )
+    job_seeker_assigned_to_prescriber = JobSeekerAssignmentFactory(
+        professional=prescriber,
+        prescriber_organization=organization,
+    ).job_seeker
 
-    job_seeker_applied_by_user = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
-        sender=prescriber,
-        sender_prescriber_organization=organization,
-        job_seeker__first_name="applied_by_user",
-        job_seeker__last_name="Zorro",
-        with_job_seeker_assignment=True,
+    job_seeker_assigned_to_member = JobSeekerAssignmentFactory(
+        professional=member,
+        prescriber_organization=organization,
     ).job_seeker
-    job_seeker_applied_by_member = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
-        sender=member,
-        sender_prescriber_organization=organization,
-        job_seeker__first_name="applied_by_member",
-        job_seeker__last_name="Zorro",
-        updated_at=timezone.now() - datetime.timedelta(days=1),
-        with_job_seeker_assignment=True,
+
+    job_seeker_assigned_to_old_member = JobSeekerAssignmentFactory(
+        professional=old_member,
+        prescriber_organization=organization,
     ).job_seeker
-    job_seeker_applied_by_old_member = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
-        sender=old_member,
-        sender_prescriber_organization=organization,
-        job_seeker__first_name="applied_by_old_member",
-        job_seeker__last_name="Zorro",
-        with_job_seeker_assignment=True,
-    ).job_seeker
-    job_seeker_applied_by_user_created_by_user_not_in_orga = JobApplicationFactory(
-        sent_by_prescriber_alone=True,
-        sender=prescriber,
-        sender_prescriber_organization=organization,
-        job_seeker__first_name="applied_by_user_created_by_other_user_not_in_orga",
-        job_seeker__last_name="Zorro",
-        job_seeker__created_by=other_prescriber_not_in_orga,
-        with_job_seeker_assignment=True,
-    ).job_seeker
+
+    JobSeekerAssignmentFactory(
+        job_seeker=job_seeker_assigned_to_prescriber,
+        professional=other_prescriber_not_in_orga,
+    )
 
     client.force_login(prescriber)
     url = reverse("job_seekers_views:list_organization")
 
     response = client.get(url)
     assert response.context["page_obj"].object_list == [
-        job_seeker_applied_by_user_created_by_user_not_in_orga,
-        job_seeker_applied_by_old_member,
-        job_seeker_applied_by_member,
-        job_seeker_applied_by_user,
-        job_seeker_created_by_old_member,
-        job_seeker_created_by_member,
-        job_seeker_created_by_user,
+        job_seeker_assigned_to_old_member,
+        job_seeker_assigned_to_member,
+        job_seeker_assigned_to_prescriber,
     ]
 
     for organization_member in [prescriber, member, old_member]:
@@ -1028,16 +987,10 @@ def test_filtered_by_organization_members(client):
     assertNotContains(response, other_prescriber_not_in_orga.get_full_name())
 
     response = client.get(url, {"organization_members": member.pk})
-    assert response.context["page_obj"].object_list == [
-        job_seeker_applied_by_member,
-        job_seeker_created_by_member,
-    ]
+    assert response.context["page_obj"].object_list == [job_seeker_assigned_to_member]
 
     response = client.get(url, {"organization_members": old_member.pk})
-    assert response.context["page_obj"].object_list == [
-        job_seeker_applied_by_old_member,
-        job_seeker_created_by_old_member,
-    ]
+    assert response.context["page_obj"].object_list == [job_seeker_assigned_to_old_member]
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])

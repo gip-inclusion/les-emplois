@@ -69,14 +69,8 @@ class FilterForm(forms.Form):
         Get members of the current user's organization, present or past,
         that created or applied for a job seeker.
         """
-        created_by_id = {job_seeker.created_by_id for job_seeker in job_seeker_qs if job_seeker.created_by_id}
-        application_sent_by_id = sum(
-            [job_seeker.application_sent_by for job_seeker in job_seeker_qs if job_seeker.application_sent_by], []
-        )
-
-        past_and_present_members = request_organization.members.filter(
-            pk__in=(created_by_id | set(application_sent_by_id))
-        )
+        professionals_ids = job_seeker_qs.values_list("job_seeker_assignments__professional", flat=True)
+        past_and_present_members = request_organization.members.filter(pk__in=professionals_ids)
 
         users = [
             (user.id, user_full_name) for user in past_and_present_members if (user_full_name := user.get_full_name())
@@ -125,9 +119,8 @@ class FilterForm(forms.Form):
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):
             organization_members_filter = Q()
-            organization_members_filter |= Q(created_by__in=organization_members)
             for user in organization_members:
-                organization_members_filter |= Q(application_sent_by__contains=[user])
+                organization_members_filter |= Q(advisors__contains=[user])
             filters.append(organization_members_filter)
 
         return queryset.filter(*filters)

@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Q, Subquery, Value
+from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
@@ -287,14 +287,23 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         ),
         output_field=IntegerField(),
     )
-    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
-        full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
-        job_applications_nb=Coalesce(subquery_count, 0),
-        last_updated_at=subquery_last_action_at,
-        valid_eligibility_diagnosis=subquery_diagnosis,
-        application_sent_by=ArrayAgg(
-            "job_applications__sender", distinct=True, filter=Q(job_applications__sender__isnull=False)
-        ),
+    queryset = (
+        User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
+        .annotate(
+            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
+            job_applications_nb=Coalesce(subquery_count, 0),
+            last_updated_at=subquery_last_action_at,
+            valid_eligibility_diagnosis=subquery_diagnosis,
+            advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
+        )
+        .prefetch_related(
+            Prefetch(
+                "job_seeker_assignments",
+                queryset=JobSeekerAssignment.objects.select_related(
+                    "professional", "prescriber_organization", "company"
+                ).order_by("-updated_at"),
+            ),
+        )
     )
 
     form = FilterForm(
@@ -312,19 +321,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_UPDATED_AT_DESC
-    queryset = (
-        queryset.order_by(*order.order_by)
-        .select_related("jobseeker_profile")
-        .prefetch_related(
-            "approvals",
-            Prefetch(
-                "job_seeker_assignments",
-                queryset=JobSeekerAssignment.objects.select_related(
-                    "professional", "prescriber_organization", "company"
-                ).order_by("-updated_at"),
-            ),
-        )
-    )
+    queryset = queryset.order_by(*order.order_by).select_related("jobseeker_profile").prefetch_related("approvals")
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
