@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## 2026-06-08
+
+### Ajouté
+
+- [GEIQ : Permettre aux DDETS/DREETS d’exporter tous les contrats (indépendamment de la sélection du GEIQ)](https://github.com/gip-inclusion/les-emplois/pull/8149)
+- [Services : Ajout des zones d'éligibilité aux services d'insertion](https://github.com/gip-inclusion/les-emplois/pull/8132)
+
+### Modifié
+
+- [Admin : Autoriser les utilisateurs du groupe itou-admin à consulter la liste des GEIQ récupérés auprès de LABEL](https://github.com/gip-inclusion/les-emplois/pull/8155)
+- [Connexion : Refonte des interfaces 2FA](https://github.com/gip-inclusion/les-emplois/pull/8142)
+- [GEIQ : Ajout des données de gestion de contrat (motifs dérogatoires et motif de refus) dans les exports Excel](https://github.com/gip-inclusion/les-emplois/pull/8116)
+- [GEIQ : Tri amélioré des bilans GEIQ côté institutions](https://github.com/gip-inclusion/les-emplois/pull/8153)
+
 ## 2026-06-01
 
 ### Ajouté
