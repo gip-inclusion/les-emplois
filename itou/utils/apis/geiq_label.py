@@ -107,7 +107,7 @@ class LabelApiClient:
         if x_geiq_id := response_data.headers.get("x-geiq-id"):
             if x_geiq_id != str(geiq_id):
                 raise LabelAPIError(f"Unexpected x-geiq-id: {x_geiq_id}")
-        logger.info(f"Successfully retrieved {command} - sha256=%s", hashlib.sha256(response_data.content).digest())
+        logger.info(f"Successfully retrieved {command} - sha256={hashlib.sha256(response_data.content).hexdigest()}")
         return response_data.content
 
     def get_compte_pdf(self, *, geiq_id):
