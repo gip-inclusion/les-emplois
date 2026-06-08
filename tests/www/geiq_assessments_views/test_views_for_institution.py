@@ -67,6 +67,7 @@ class TestListAssessmentsView:
         AssessmentFactory(
             campaign=campaign,
             with_main_geiq=True,
+            label_geiq_id=1,
             label_geiq_name="Un Joli GEIQ",
             label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
@@ -108,11 +109,13 @@ class TestListAssessmentsView:
             id=uuid.UUID("00000000-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
             with_main_geiq=True,
+            label_geiq_id=2,
             label_geiq_name="Nouveau bilan",
         )
         submitted = AssessmentFactory(
             id=uuid.UUID("11111111-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
+            label_geiq_id=3,
             label_geiq_name="Bilan envoyé",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
@@ -126,6 +129,7 @@ class TestListAssessmentsView:
         reviewed = AssessmentFactory(
             id=uuid.UUID("22222222-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
+            label_geiq_id=4,
             label_geiq_name="Bilan à valider",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
@@ -143,6 +147,7 @@ class TestListAssessmentsView:
         final_reviewed = AssessmentFactory(
             id=uuid.UUID("33333333-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
+            label_geiq_id=5,
             label_geiq_name="Bilan validé",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
@@ -202,6 +207,7 @@ class TestListAssessmentsView:
             id=uuid.UUID("00000000-0d2c-4f29-ba5b-a27ffb8ecc84"),
             campaign=campaign,
             with_main_geiq=True,
+            label_geiq_id=1,
             label_geiq_name="Un Joli GEIQ",
             label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
@@ -241,6 +247,7 @@ class TestListAssessmentsView:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             with_main_geiq=True,
+            label_geiq_id=1,
             label_geiq_name="Un Joli GEIQ",
             label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
@@ -254,6 +261,7 @@ class TestListAssessmentsView:
             created_by__first_name="Marie",
             created_by__last_name="Curie",
             with_main_geiq=True,
+            label_geiq_id=2,
             label_geiq_name="Un Beau GEIQ",
             label_geiq_post_code="23456",
             with_submission_requirements=True,
@@ -270,6 +278,8 @@ class TestListAssessmentsView:
             campaign=campaign,
             created_by__first_name="Marie",
             created_by__last_name="Curie",
+            label_geiq_id=2,
+            label_geiq_name="Un Beau GEIQ",  # Should be listed once in the filter select
             label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
@@ -292,6 +302,7 @@ class TestListAssessmentsView:
             campaign=campaign,
             created_by__first_name="Marie",
             created_by__last_name="Curie",
+            label_geiq_id=3,
             label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
@@ -317,6 +328,7 @@ class TestListAssessmentsView:
             campaign=campaign,
             created_by__first_name="Marie",
             created_by__last_name="Curie",
+            label_geiq_id=3,
             label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
@@ -636,6 +648,52 @@ class TestListAssessmentsView:
             ordered=False,
         )
 
+    @freeze_time("2025-05-21 12:00", tick=True)
+    def test_company_filter(self, client, snapshot):
+        membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+        )
+        campaign = AssessmentCampaignFactory()
+
+        assessment_almond = AssessmentFactory(campaign=campaign, label_geiq_id=1, label_geiq_name="GEIQ Amande")
+        AssessmentInstitutionLink.objects.create(assessment=assessment_almond, institution=membership.institution)
+
+        assessment_almond2 = AssessmentFactory(
+            campaign=campaign,
+            label_geiq_id=assessment_almond.label_geiq_id,
+            label_geiq_name=assessment_almond.label_geiq_name,
+        )
+        AssessmentInstitutionLink.objects.create(assessment=assessment_almond2, institution=membership.institution)
+
+        assessment_cashew = AssessmentFactory(campaign=campaign, label_geiq_id=2, label_geiq_name="GEIQ Cajou")
+        AssessmentInstitutionLink.objects.create(assessment=assessment_cashew, institution=membership.institution)
+
+        # Another unlinked assessment that should not be seen anywhere
+        AssessmentFactory(campaign=campaign)
+
+        client.force_login(membership.user)
+        # No filter
+        response = client.get(self.URL)
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_almond, assessment_almond2, assessment_cashew], ordered=False
+        )
+
+        # Filter on GEIQ Amande
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(self.URL, {"company": "1"})
+        assertQuerySetEqual(response.context["assessments"], [assessment_almond, assessment_almond2], ordered=False)
+
+        # If several companies are provided, only the last one is used
+        response = client.get(self.URL, {"company": ["2", "1"]})
+        assertQuerySetEqual(response.context["assessments"], [assessment_almond, assessment_almond2], ordered=False)
+
+        # Invalid data: do nothing, ie. do not filter
+        response = client.get(self.URL, {"company": "invalid"})
+        assertQuerySetEqual(
+            response.context["assessments"], [assessment_almond, assessment_almond2, assessment_cashew], ordered=False
+        )
+
     def test_mishmash(self, client, snapshot):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         membership = InstitutionMembershipFactory(
@@ -646,19 +704,39 @@ class TestListAssessmentsView:
         campaign_2023 = AssessmentCampaignFactory(year=2023)
         campaign_2024 = AssessmentCampaignFactory(year=2024)
 
-        assessment_2023_ddets = AssessmentFactory(
+        assessment_2023_ddets_almond = AssessmentFactory(
             campaign=campaign_2023,
+            label_geiq_id=1,
+            label_geiq_name="GEIQ Amande",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
         )
-        AssessmentInstitutionLink.objects.create(assessment=assessment_2023_ddets, institution=membership.institution)
         AssessmentInstitutionLink.objects.create(
-            assessment=assessment_2023_ddets, institution=ddets, with_convention=True
+            assessment=assessment_2023_ddets_almond, institution=membership.institution
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_2023_ddets_almond, institution=ddets, with_convention=True
+        )
+        assessment_2023_ddets_cashew = AssessmentFactory(
+            campaign=campaign_2023,
+            label_geiq_id=2,
+            label_geiq_name="GEIQ Cajou",
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(hours=3),
+            submitted_by=geiq_membership.user,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_2023_ddets_cashew, institution=membership.institution
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment_2023_ddets_cashew, institution=ddets, with_convention=True
         )
 
         assessment_2024_ddets_dreets = AssessmentFactory(
             campaign=campaign_2024,
+            label_geiq_id=2,
+            label_geiq_name="GEIQ Cajou",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
@@ -678,19 +756,32 @@ class TestListAssessmentsView:
         client.force_login(membership.user)
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
-            # Select the DDETS only, the 2023 campaign and the SUBMITTED state
+            # Select the DDETS only, the 2023 campaign, the SUBMITTED state and GEIQ Amande
             response = client.get(
                 self.URL,
-                {"institutions": ddets.pk, "campaigns": campaign_2023.pk, "states": AssessmentState.SUBMITTED.value},
+                {
+                    "institutions": ddets.pk,
+                    "campaigns": campaign_2023.pk,
+                    "states": AssessmentState.SUBMITTED.value,
+                    "company": "1",
+                },
             )
-        assertQuerySetEqual(response.context["assessments"], [assessment_2023_ddets], ordered=False)
+        assertQuerySetEqual(response.context["assessments"], [assessment_2023_ddets_almond], ordered=False)
 
         # One invalid data: all the filters are sadly ignored
         response = client.get(
-            self.URL, {"institutions": ddets.pk, "campaigns": "invalid", "states": AssessmentState.SUBMITTED.value}
+            self.URL,
+            {
+                "institutions": ddets.pk,
+                "campaigns": "invalid",
+                "states": AssessmentState.SUBMITTED.value,
+                "company": "2",
+            },
         )
         assertQuerySetEqual(
-            response.context["assessments"], [assessment_2023_ddets, assessment_2024_ddets_dreets], ordered=False
+            response.context["assessments"],
+            [assessment_2023_ddets_almond, assessment_2023_ddets_cashew, assessment_2024_ddets_dreets],
+            ordered=False,
         )
 
     @freeze_time("2025-05-21 12:00", tick=True)

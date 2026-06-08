@@ -1,6 +1,8 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load django_bootstrap5 %}
 {% load static %}
+{% load str_filters %}
 
 {% block title %}Bilans d’exécution GEIQ {{ block.super }}{% endblock %}
 
@@ -15,11 +17,31 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <form hx-get="{{ request.path }}" hx-trigger="change delay:.5s" hx-indicator="#assessments-results" hx-target="#assessments-results" hx-swap="outerHTML" hx-push-url="true">
+            <form hx-get="{{ request.path }}"
+                  hx-trigger="change delay:.5s, change from:#id_company delay:.5s"
+                  hx-indicator="#assessments-results"
+                  hx-target="#assessments-results"
+                  hx-swap="outerHTML"
+                  hx-push-url="true"
+                  hx-include="#id_company">
                 {% include "geiq_assessments_views/includes/assessments_list_filters_for_institutions.html" with filters_form=filters_form only %}
             </form>
             <div class="s-section__row row">
-                {% include "geiq_assessments_views/includes/assessments_list_results_for_institutions.html" with request=request assessments=assessments can_access_details=can_access_details only %}
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        <div class="flex-md-grow-1">
+                            {% partialdef assessments-count inline %}
+                                <p class="mb-0" id="assessments-count"{% if hx_swap_oob|default:False %} hx-swap-oob="true"{% endif %}>
+                                    {{ assessments|length }} résultat{{ assessments|pluralizefr }}
+                                </p>
+                            {% endpartialdef %}
+                        </div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">
+                            {% bootstrap_field filters_form.company wrapper_class="w-lg-400px" show_label=False %}
+                        </div>
+                    </div>
+                    {% include "geiq_assessments_views/includes/assessments_list_results_for_institutions.html" with request=request assessments=assessments can_access_details=can_access_details only %}
+                </div>
             </div>
         </div>
     </section>
