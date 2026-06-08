@@ -291,7 +291,6 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
         extra={
             "group": group_id,
             "target_participant": target_participant.pk,
-            "target_participant_type": get_user_kind_display(target_participant),
             "beneficiary": follow_up_group.beneficiary_id,
             "current_user": request.user.pk,
             "current_user_type": get_user_kind_display(request.user),
