@@ -1,7 +1,7 @@
 import logging
 
 from django.db.models.functions import TruncDate
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.throttling import UserRateThrottle
 
@@ -25,7 +25,9 @@ class EmployeeRecordRateThrottle(UserRateThrottle):
     rate = "60/min"
 
 
-class AbstractEmployeeRecordViewSet(LoginNotRequiredMixin, ReadonlyViewMixin, viewsets.ReadOnlyModelViewSet):
+class AbstractEmployeeRecordViewSet(
+    LoginNotRequiredMixin, ReadonlyViewMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
     throttle_classes = [EmployeeRecordRateThrottle]
 
     # Possible authentication frameworks:
@@ -106,9 +108,6 @@ Cette API retourne la liste des fiches salarié saisies par les SIAE :
 - dans l'état `PROCESSED` (par défaut)
 - pour toutes les embauches / candidatures des SIAE liées au token d'identification
 - classées par date de création (plus récent au plus ancien)
-
-Il est également possible d'obtenir le détail d'une fiche salarié par son
-identifiant (dans les mêmes conditions d'autorisation que pour la liste complète).
 
 # Permissions
 
