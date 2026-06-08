@@ -254,27 +254,38 @@ class AssessmentsFilterForInstitutionForm(forms.Form):
         widget=CheckboxSelectMultiple,
         choices=[(choice.value, choice.get_label_for_institution()) for choice in AssessmentState],
     )
+    company = forms.ChoiceField(
+        required=False,
+        label="Nom du GEIQ",
+        widget=Select2Widget(attrs={"data-placeholder": "Nom du GEIQ"}),
+    )
 
     def __init__(self, assessments_qs, data, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
-        self.fields["campaigns"].choices = self._get_choices_for_campaigns(assessments_qs)
-        self.fields["institutions"].choices = self._get_choices_for_institutions(assessments_qs)
+        assessments = list(assessments_qs)
+        self.fields["campaigns"].choices = self._get_choices_for_campaigns(assessments)
+        self.fields["institutions"].choices = self._get_choices_for_institutions(assessments)
+        self.fields["company"].choices = self._get_choices_for_company(assessments)
 
-    def _get_choices_for_campaigns(self, assessments_qs):
-        campaigns = assessments_qs.order_by("-campaign__year").distinct().values_list("campaign__pk", "campaign__year")
-        return campaigns
+    def _get_choices_for_campaigns(self, assessments):
+        choices = {(assessment.campaign.pk, assessment.campaign.year) for assessment in assessments}
+        return sorted(choices, key=lambda c: c[1])
 
-    def _get_choices_for_institutions(self, assessments_qs):
+    def _get_choices_for_institutions(self, assessments):
         institutions_qs = Institution.objects.filter(
             Exists(
                 AssessmentInstitutionLink.objects.filter(
-                    assessment__pk__in=assessments_qs.values_list("pk", flat=True),
+                    assessment__pk__in=[assessment.pk for assessment in assessments],
                     institution=OuterRef("pk"),
                     with_convention=True,
                 )
             )
         ).order_by("name")
         return [(institution.pk, institution.name) for institution in institutions_qs]
+
+    def _get_choices_for_company(self, assessments):
+        choices = {(assessment.label_geiq_id, assessment.label_geiq_name) for assessment in assessments}
+        return sorted(choices, key=lambda c: c[1])
 
     def filter(self, queryset):
         filters = []
@@ -290,6 +301,9 @@ class AssessmentsFilterForInstitutionForm(forms.Form):
         if states := self.cleaned_data.get("states"):
             states_filter = Q(state__in=states)
             filters.append(states_filter)
+        if company := self.cleaned_data.get("company"):
+            company_filter = Q(label_geiq_id=company)
+            filters.append(company_filter)
 
         return queryset.filter(*filters)
 
