@@ -254,9 +254,14 @@ class Command(BaseCommand):
         self.logger.info(differ.summary_label())
 
     def _fill_service_from_dora_api_data(self, service, dora_services, non_orientable_structures):
-        service.is_orientable_with_form = service.structure.uid not in non_orientable_structures
-
         dora_data = dora_services.get(service.uid)
+
+        service.is_orientable_with_form = (
+            service.structure.uid not in non_orientable_structures
+            and dora_data
+            and dora_data["is_orientable_with_form"]
+        )
+
         if service.source.value != SOURCE_DORA_VALUE or not dora_data:
             if service.source.value == SOURCE_DORA_VALUE:
                 self.logger.warning("Service uid=%s was not returned by the DORA API", service.uid)
