@@ -32,7 +32,7 @@ class LabelCommand(enum.StrEnum):
 def check_data_salarie_geiq_id(data, geiq_id):
     for item in data:
         if item["salarie"]["geiq_id"] != geiq_id:
-            raise LabelAPIError(f"Data returned incorrect geiq_id={item['geiq_id']} (expected {geiq_id})")
+            raise LabelAPIError(f"Data returned incorrect geiq_id={item['salarie']['geiq_id']} (expected {geiq_id})")
 
 
 class LabelApiClient:

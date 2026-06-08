@@ -108,6 +108,30 @@ def test_get_all_contracts(respx_mock, label_settings):
     assert client.get_all_contracts(123) == expected_data
 
 
+def test_get_all_contracts_wrong_geiq(respx_mock, label_settings):
+    base = label_settings.API_GEIQ_LABEL_BASE_URL
+    expected_data = [
+        {"id": nb, "antenne": {}, "salarie": {"id": nb * 11, "geiq_id": 321, "nom": f"Salarie du contrat {nb}"}}
+        for nb in range(1, 91)
+    ]
+    respx_mock.get(
+        f"{base}/rest/SalarieContrat"
+        "?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+        "&where[]=s.geiq,=,123&where[]=nc.libelle_abr,in,CAPP;CPRO"
+        "&count=true"
+    ).respond(200, json={"status": "Success", "result": 90})
+    respx_mock.get(
+        f"{base}/rest/SalarieContrat"
+        "?join[]=salariecontrat.salarie,s&join[]=salariecontrat.nature_contrat,nc"
+        "&where[]=s.geiq,=,123&where[]=nc.libelle_abr,in,CAPP;CPRO"
+        "&sort=salariecontrat.id&n=100&p=1"
+    ).respond(200, json={"status": "Success", "result": expected_data})
+
+    client = geiq_label.get_client()
+    with pytest.raises(geiq_label.LabelAPIError, match=r"Data returned incorrect geiq_id=321 \(expected 123\)"):
+        assert client.get_all_contracts(123)
+
+
 def test_get_all_prequalifications_empty(respx_mock, label_settings):
     respx_mock.get(
         f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalariePreQualification?join=salarieprequalification.salarie,s&where=s.geiq,=,123&count=true"
@@ -137,6 +161,27 @@ def test_get_all_prequalifications(respx_mock, label_settings):
 
     client = geiq_label.get_client()
     assert client.get_all_prequalifications(123) == expected_data
+
+
+def test_get_all_prequalifications_wrong_geiq(respx_mock, label_settings):
+    expected_data = [
+        {
+            "id": nb,
+            "salarie": {"id": nb * 11, "geiq_id": 321, "nom": f"Salarie de la prequalification {nb}"},
+            "action_pre_qualification": {"id": 3, "libelle": "POE", "libelle_abr": "POE"},
+        }
+        for nb in range(1, 10)
+    ]
+    respx_mock.get(
+        f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalariePreQualification?join=salarieprequalification.salarie,s&where=s.geiq,=,123&count=true"
+    ).respond(200, json={"status": "Success", "result": 9})
+    respx_mock.get(
+        f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SalariePreQualification?join=salarieprequalification.salarie,s&where=s.geiq,=,123&sort=salarieprequalification.id&n=100&p=1"
+    ).respond(200, json={"status": "Success", "result": expected_data})
+
+    client = geiq_label.get_client()
+    with pytest.raises(geiq_label.LabelAPIError, match=r"Data returned incorrect geiq_id=321 \(expected 123\)"):
+        assert client.get_all_prequalifications(123)
 
 
 def test_get_taux_geiq_single(respx_mock, label_settings):
