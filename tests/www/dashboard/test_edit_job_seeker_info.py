@@ -13,11 +13,12 @@ from itou.cities.models import City
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.www.dashboard.forms import EditJobSeekerInfoForm
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers import factories as prescribers_factories
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -57,6 +58,63 @@ class TestEditJobSeekerInfo:
         assert user.city == self.city.name
         assert math.isclose(user.latitude, geocoding_data.get("latitude"), abs_tol=1e-5)
         assert math.isclose(user.longitude, geocoding_data.get("longitude"), abs_tol=1e-5)
+
+    def test_edit_job_seeker_info_form(self):
+        job_seeker = JobSeekerFactory(
+            born_in_france=True,
+            with_ban_geoloc_address=True,
+            title="M",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            jobseeker_profile__nir="178122978200508",
+        )
+        prescriber = PrescriberFactory()
+        post_data = {
+            "email": job_seeker.email,
+            "title": job_seeker.title,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birth_place": job_seeker.jobseeker_profile.birth_place.pk,
+            "phone": job_seeker.phone,
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "nir": job_seeker.jobseeker_profile.nir,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+        }
+        form = EditJobSeekerInfoForm(
+            instance=job_seeker,
+            editor=prescriber,
+            data=post_data,
+        )
+
+        assert form.is_valid()
+        assert form.has_changed() is False
+
+        birthdate = datetime.date(1978, 12, 1)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": birthdate.isoformat(),
+            "birth_country": job_seeker.jobseeker_profile.birth_country,
+            "birth_place": birth_place.pk,
+            "city": self.city.pk,
+            "nir": job_seeker.jobseeker_profile.nir,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "address_for_autocomplete": "0",
+        }
+        form = EditJobSeekerInfoForm(
+            instance=job_seeker,
+            editor=prescriber,
+            data=post_data,
+        )
+
+        assert form.is_valid()
+        assert form.has_changed()
 
     def test_edit_by_company_with_nir(self, client, mocker, snapshot):
         mocker.patch(
