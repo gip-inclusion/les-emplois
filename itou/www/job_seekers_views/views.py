@@ -274,6 +274,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             request.user, organization=request.current_organization, from_all_coworkers=list_organization
         )
         .filter(job_seeker=OuterRef("pk"))
+        .values("job_seeker")
         .annotate(last_action_at=Max("updated_at"))
         .values("last_action_at")[:1],
         output_field=DateTimeField(),

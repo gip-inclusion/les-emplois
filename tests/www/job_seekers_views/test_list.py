@@ -1183,3 +1183,37 @@ def test_htmx_order(client, url):
     )
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)
+
+
+@freeze_time("2026-06-11")
+def test_last_updated_at(client):
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    prescriber = organization.members.first()
+    job_seeker = JobSeekerFactory()
+    now = timezone.now()
+    ten_days_ago = now - datetime.timedelta(days=10)
+    thirty_days_ago = now - datetime.timedelta(days=30)
+    _assignment_no_org = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=prescriber,
+        updated_at=ten_days_ago,
+    )
+    assignment_with_org = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=prescriber,
+        prescriber_organization=organization,
+        updated_at=thirty_days_ago,
+    )
+
+    client.force_login(prescriber)
+    url = reverse("job_seekers_views:list")
+
+    response = client.get(url)
+    assertContains(response, ten_days_ago.strftime("%d/%m/%Y"))
+
+    assignment_with_org.updated_at = now
+    assignment_with_org.save()
+    assignment_with_org.refresh_from_db()
+
+    response = client.get(url)
+    assertContains(response, now.strftime("%d/%m/%Y"))

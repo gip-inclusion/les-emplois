@@ -996,7 +996,7 @@
                          AND U0."prescriber_organization_id" = %s
                          AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."id"
+             GROUP BY U0."job_seeker_id"
              LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
@@ -1088,7 +1088,7 @@
                          AND U0."prescriber_organization_id" = %s
                          AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."id"
+             GROUP BY U0."job_seeker_id"
              LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
@@ -1197,7 +1197,7 @@
                             AND U0."prescriber_organization_id" = %s
                             AND U0."professional_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."id"
+                GROUP BY U0."job_seeker_id"
                 LIMIT 1) AS "last_updated_at",
           
                (SELECT U0."id" AS "id"
@@ -1283,7 +1283,7 @@
                          AND U0."prescriber_organization_id" = %s
                          AND U0."professional_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."id"
+             GROUP BY U0."job_seeker_id"
              LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
@@ -2209,7 +2209,7 @@
                      OR (U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."id"
+             GROUP BY U0."job_seeker_id"
              LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
@@ -2299,7 +2299,7 @@
                      OR (U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."id"
+             GROUP BY U0."job_seeker_id"
              LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
@@ -2408,7 +2408,7 @@
                         OR (U0."company_id" IS NULL
                             AND U0."prescriber_organization_id" = %s))
                        AND U0."job_seeker_id" = ("users_user"."id"))
-                GROUP BY U0."id"
+                GROUP BY U0."job_seeker_id"
                 LIMIT 1) AS "last_updated_at",
           
                (SELECT U0."id" AS "id"
@@ -2492,7 +2492,7 @@
                      OR (U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" = %s))
                     AND U0."job_seeker_id" = ("users_user"."id"))
-             GROUP BY U0."id"
+             GROUP BY U0."job_seeker_id"
              LIMIT 1) AS "last_updated_at",
           
             (SELECT U0."id" AS "id"
