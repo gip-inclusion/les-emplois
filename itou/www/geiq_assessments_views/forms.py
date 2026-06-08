@@ -5,7 +5,7 @@ from django.utils import timezone
 from django_select2.forms import Select2Widget
 
 from itou.files.forms import ItouFileField
-from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason
+from itou.geiq_assessments.enums import AllowanceJustificationReason, AllowanceRefusalReason, AssessmentState
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, Employee
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -248,6 +248,12 @@ class ReviewForm(forms.ModelForm):
 class AssessmentsFilterForInstitutionForm(forms.Form):
     institutions = forms.MultipleChoiceField(required=False, label="Référent", widget=CheckboxSelectMultiple)
     campaigns = forms.MultipleChoiceField(required=False, label="Campagne", widget=CheckboxSelectMultiple)
+    states = forms.MultipleChoiceField(
+        required=False,
+        label="Statut",
+        widget=CheckboxSelectMultiple,
+        choices=[(choice.value, choice.get_label_for_institution()) for choice in AssessmentState],
+    )
 
     def __init__(self, assessments_qs, data, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
@@ -281,6 +287,9 @@ class AssessmentsFilterForInstitutionForm(forms.Form):
                 institution_links__institution__in=institutions, institution_links__with_convention=True
             )
             filters.append(institutions_filter)
+        if states := self.cleaned_data.get("states"):
+            states_filter = Q(state__in=states)
+            filters.append(states_filter)
 
         return queryset.filter(*filters)
 
