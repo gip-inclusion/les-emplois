@@ -385,6 +385,7 @@
       dict({
         'origin': list([
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -488,6 +489,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -506,6 +508,7 @@
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -524,6 +527,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -548,6 +552,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -574,6 +579,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -921,6 +927,7 @@
       dict({
         'origin': list([
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -1024,6 +1031,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -1049,6 +1057,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -1070,6 +1079,7 @@
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -1088,6 +1098,7 @@
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -1107,6 +1118,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''
@@ -1132,6 +1144,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/edit_job_seeker_info.html]',
           'edit_job_seeker_info[www/dashboard/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
           'wrapper[utils/views.py]',
         ]),
         'sql': '''

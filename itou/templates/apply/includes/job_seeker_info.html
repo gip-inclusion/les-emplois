@@ -10,7 +10,12 @@
     </div>
     <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
         {% if can_edit_personal_information %}
-            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}"
+            {% if request.user.pk == job_seeker.pk %}
+                {% url 'dashboard:edit_user_info' as edit_user_info_url %}
+            {% else %}
+                {% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id as edit_user_info_url %}
+            {% endif %}
+            <a href="{{ edit_user_info_url }}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}"
                class="btn btn-ico btn-outline-primary"
                {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
                aria-label="Modifier les informations personnelles de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}">

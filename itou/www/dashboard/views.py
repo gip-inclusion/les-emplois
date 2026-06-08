@@ -36,6 +36,7 @@ from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.auth import check_request
 from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -342,6 +343,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
 
 @with_triggers_context
+@check_request(lambda request: request.from_employer or request.from_prescriber)
 def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard/edit_job_seeker_info.html"):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
