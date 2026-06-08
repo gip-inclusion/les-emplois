@@ -3,8 +3,10 @@ from allauth.account.models import EmailAddress
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 
+from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
@@ -92,6 +94,16 @@ class EditJobSeekerInfoForm(
     def clean(self):
         super().clean()
         JobSeekerProfile.clean_nir_title_birthdate_fields(self.cleaned_data)
+
+    @cached_property
+    def changed_data(self):
+        changed_data = super().changed_data
+        ignored_fields = ["address_for_autocomplete"]
+        birth_country_is_france = self.instance.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+        if "birth_country" in changed_data and self.data.get("birth_country") is None and birth_country_is_france:
+            ignored_fields.append("birth_country")
+
+        return [field for field in changed_data if field not in ignored_fields]
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()
