@@ -77,6 +77,10 @@
                                     Votre token d’API est : <strong>{{ token.key }}</strong>
                                 </span>
                                 {% include 'includes/copy_to_clipboard.html' with content=token.key text="Copier le token" css_classes="btn btn-ico btn-primary btn-block" %}
+
+                                <button type="button" class="btn btn-secondary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#regenerate_token_modal">
+                                    Regénérer un nouveau token d’API
+                                </button>
                             {% endif %}
                         </div>
                     </div>
@@ -111,3 +115,32 @@
         </div>
     </section>
 {% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+
+    <div id="regenerate_token_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Êtes-vous sûr de vouloir regénérer votre token ?</h3>
+                </div>
+                <div class="modal-body">
+                    <p>La regénération du token entrainera la suppression du token existant.</p>
+                    <p>Cette action est irréversible.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <button class="btn btn-sm btn-danger" aria-label="Regénérer le token" name="action" value="regenerate">
+                            Confirmer la regénération
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock modals %}

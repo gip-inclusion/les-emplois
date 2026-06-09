@@ -1,4 +1,5 @@
 import enum
+import logging
 
 from allauth.account.internal.flows.email_verification import send_verification_email_to_address
 from allauth.account.models import EmailAddress
@@ -54,6 +55,9 @@ from itou.www.dashboard.forms import (
 from itou.www.search_views.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
+
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardStatsLayoutKind(enum.StrEnum):
@@ -441,7 +445,18 @@ def api_token(request, template_name="dashboard/api_token.html"):
         raise PermissionDenied
 
     if request.method == "POST":
-        token, _created = Token.objects.get_or_create(user=request.user)
+        deleted = False
+        if request.POST.get("action") == "regenerate":
+            deleted, _objs = Token.objects.filter(user=request.user).delete()
+        token, created = Token.objects.get_or_create(user=request.user)
+        if created:
+            if deleted:
+                msg = "Votre token a été regénéré avec succès."
+                logger.info("API token regenerated")
+            else:
+                msg = "Votre nouveau token a été créé avec succès."
+                logger.info("API token created")
+            messages.success(request, msg, extra_tags="toast")
     else:
         token = Token.objects.filter(user=request.user).first()  # May be None if no token
 
