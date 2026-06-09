@@ -207,8 +207,7 @@ class ItouModelMixin:
         prefetch_related_fields -= self.get_object_ignored_prefetch_related_fields
         select_related_fields |= self.get_object_extra_select_related_fields
         return (
-            super()
-            .get_queryset(request)
+            self.get_queryset(request)
             .select_related(*select_related_fields)
             .prefetch_related(*prefetch_related_fields)
             .defer(None)  # Clear possible deferred fields
