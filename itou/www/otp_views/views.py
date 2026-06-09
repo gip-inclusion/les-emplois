@@ -66,46 +66,46 @@ def enrollment_step_2_and_3_confirm_device(
         # should not happen, unless user manipulates the request
         return HttpResponseRedirect(previous_step_url)
 
-    unsaved_device = ItouTOTPDevice(
+    device = ItouTOTPDevice(
         user=request.user,
         key=binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
         if request.POST
         else generate_otp_key(),
     )
-    # Disable `throttle_increment()`, which is called when failing to
-    # verify a token (via our form validation) and saves the instance
-    # (which we don't want). The instance will be saved below only if
-    # the form is valid.
-    unsaved_device.throttle_increment = lambda *args, **kwargs: 1
 
     backup_code = None
     post_save_url = None
     form = ConfirmTOTPDeviceForm(
         data=request.POST or None,
         device_type=device_type,
-        device=unsaved_device,
+        device=device,
     )
-    if request.method == "POST" and form.is_valid():
-        unsaved_device.name = form.cleaned_data["name"]
-        unsaved_device.save()
-        device = unsaved_device
-        messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
-        otp_login(request, device)  # mark the user as verified
-        backup_code = create_otp_backup_code(request.user)
-        if len(get_user_devices(request.user)) > 1:
-            # User added _another_ device, redirect user to where they
-            # come from.
-            post_save_url = reverse("otp_views:otp_devices")
+    if request.method == "POST":
+        if not form.is_valid():
+            # Form calls `device.verify_token()` that saves the
+            # object. If the form is not valid, the object is useless,
+            # we can delete it.
+            device.delete()
         else:
-            # User added their _only_ device (required to use the
-            # application), they want to use the app.
-            post_save_url = reverse("dashboard:index")
+            device.name = form.cleaned_data["name"]
+            device.save()
+            messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
+            otp_login(request, device)  # mark the user as verified
+            backup_code = create_otp_backup_code(request.user)
+            if len(get_user_devices(request.user)) > 1:
+                # User added _another_ device, redirect user to where they
+                # come from.
+                post_save_url = reverse("otp_views:otp_devices")
+            else:
+                # User added their _only_ device (required to use the
+                # application), they want to use the app.
+                post_save_url = reverse("dashboard:index")
 
     context = {
         "previous_step_url": previous_step_url,
         "form": form,
         "otp_secret": form.fields["key"].initial,
-        "qrcode": segno.make(unsaved_device.config_url).svg_data_uri(),
+        "qrcode": segno.make(device.config_url).svg_data_uri(),
         "backup_code": backup_code,
         "post_save_url": post_save_url,
     }
