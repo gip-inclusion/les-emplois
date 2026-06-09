@@ -134,7 +134,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -143,9 +143,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
+                          </li>
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -452,7 +468,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -461,12 +477,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
                           </li>
-                          <li>
-                              Paul MARTIN - paul.martin@example.com
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -508,7 +537,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -517,9 +546,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
+                          </li>
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -818,7 +863,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -827,12 +872,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
                           </li>
-                          <li>
-                              Paul MARTIN - paul.martin@example.com
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -1133,7 +1191,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -1142,12 +1200,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
                           </li>
-                          <li>
-                              Paul MARTIN - paul.martin@example.com
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -1453,7 +1524,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -1462,12 +1533,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
                           </li>
-                          <li>
-                              Paul MARTIN - paul.martin@example.com
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -1761,7 +1845,7 @@
                       <strong>
                           Structures concernées par la convention
                       </strong>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (29)
                           </li>
@@ -1770,12 +1854,25 @@
                       <strong>
                           Contact(s) GEIQ
                       </strong>
-                      <ul class="mb-0">
-                          <li>
-                              Jean DUPONT - jean.dupont@example.com
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-user-line fw-normal me-2">
+                              </i>
+                              Jean DUPONT
                           </li>
-                          <li>
-                              Paul MARTIN - paul.martin@example.com
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:jean.dupont@example.com">
+                                  jean.dupont@example.com
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean.dupont@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>

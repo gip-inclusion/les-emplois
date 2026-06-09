@@ -269,16 +269,21 @@
                     <div class="c-box mb-3 mb-md-4">
                         <h4>Informations générales</h4>
                         <strong>Structures concernées par la convention</strong>
-                        <ul class="mb-0">
+                        <ul class="fs-sm mt-1 mb-0">
                             {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
                         </ul>
                         <hr class="my-3">
                         <strong>Contact(s) GEIQ</strong>
-                        <ul class="mb-0">
-                            <li>{{ assessment.created_by.get_full_name }} - {{ assessment.created_by.email }}</li>
-                            {% if assessment.submitted_by and assessment.submitted_by != assessment.created_by %}
-                                <li>{{ assessment.submitted_by.get_full_name }} - {{ assessment.submitted_by.email }}</li>
-                            {% endif %}
+                        <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                            <li class="d-flex">
+                                <i class="ri-user-line fw-normal me-2" aria-hidden="true"></i>
+                                {{ assessment.created_by.get_full_name }}
+                            </li>
+                            <li class="d-flex">
+                                <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                <a href="mailto:{{ assessment.created_by.email }}" aria-label="Contact par mail" class="text-break">{{ assessment.created_by.email }}</a>
+                                {% include 'includes/copy_to_clipboard.html' with content=assessment.created_by.email css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                            </li>
                         </ul>
                     </div>
                 </div>
