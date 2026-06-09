@@ -155,6 +155,13 @@ def get_allowance_stats_for_institution(assessment, *, for_assessment_details=Fa
     )
 
 
+def get_dreets_memberships_for_assessment(assessment):
+    return InstitutionMembership.objects.filter(
+        institution__kind=InstitutionKind.DREETS_GEIQ,
+        institution__assessment_links__assessment=assessment,
+    ).select_related("user")
+
+
 @require_safe
 @check_request(employer_has_access_to_assessments)
 def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.html"):
@@ -1075,11 +1082,7 @@ def assessment_details_for_institution(
                         extra={"geiq_assessment": assessment.pk},
                     )
                     dreets_members = {
-                        membership.user
-                        for membership in InstitutionMembership.objects.filter(
-                            institution__kind=InstitutionKind.DREETS_GEIQ,
-                            institution__assessment_links__assessment=assessment,
-                        ).select_related("user")
+                        membership.user for membership in get_dreets_memberships_for_assessment(assessment)
                     }
                     for member in dreets_members:
                         AssessmentReviewedForDREETSLaborInspectorNotification(member, assessment=assessment).send()
@@ -1174,6 +1177,16 @@ def assessment_details_for_institution(
         [log for log in assessment.logs.all() if log.transition == AssessmentTransition.ASK_FOR_GEIQ_FIX] or [None]
     )[0]
 
+    dreets_contact_emails = []
+    if request.current_organization.kind == InstitutionKind.DDETS_GEIQ:
+        dreets_contact_emails = list(
+            get_dreets_memberships_for_assessment(assessment)
+            .exclude(user__email=settings.PILOTAGE_INSTITUTION_EMAIL_CONTACT)
+            .values_list("user__email", flat=True)
+            .distinct()
+            .order_by("user__email")
+        )
+
     context = {
         "assessment": assessment,
         "back_url": reverse("geiq_assessments_views:list_for_institution"),
@@ -1184,10 +1197,12 @@ def assessment_details_for_institution(
         ),
         "matomo_custom_title": "Bilan d’exécution - page de detail Institution",
         "InstitutionAction": InstitutionAction,
+        "InstitutionKind": InstitutionKind,
         "ask_for_institution_fix_comment_form": ask_for_institution_fix_comment_form,
         "ask_for_geiq_fix_comment_form": ask_for_geiq_fix_comment_form,
         "abs_balance_amount": abs(assessment.granted_amount - assessment.advance_amount),
         "last_geiq_fix_transition": last_geiq_fix_transition,
+        "dreets_contact_emails": dreets_contact_emails,
     }
     return render(request, template_name, context)
 
