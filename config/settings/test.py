@@ -78,6 +78,11 @@ REQUIRE_OTP_FOR_STAFF = False
 
 BREVO_API_URL = "https://mailer.test.com"
 
+# Tests using the Label API set their own credentials (cf. `label_settings` fixture) and mock the HTTP calls.
+# Setting them to None prevents other tests from reaching the real API when creating an assessment.
+API_GEIQ_LABEL_BASE_URL = None
+API_GEIQ_LABEL_TOKEN = None
+
 # Nexus metabase db
 # ---------------------------------------
 NEXUS_METABASE_DB_HOST = DATABASES["default"]["HOST"]  # noqa: F405

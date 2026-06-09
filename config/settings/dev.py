@@ -61,6 +61,9 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
     "rest_framework.renderers.BrowsableAPIRenderer",
 ]
 
+API_GEIQ_LABEL_BASE_URL = os.getenv("API_GEIQ_LABEL_BASE_URL")
+API_GEIQ_LABEL_TOKEN = os.getenv("API_GEIQ_LABEL_TOKEN")
+
 # ITOU settings
 # -------------
 
