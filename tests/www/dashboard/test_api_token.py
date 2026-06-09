@@ -1,5 +1,6 @@
+from django.contrib import messages
 from django.urls import reverse, reverse_lazy
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains
 from rest_framework.authtoken.models import Token
 
 from tests.companies.factories import (
@@ -32,6 +33,10 @@ def test_api_token_view_for_company_admin(client):
     token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
     assertContains(response, "Copier le token")
+    assertMessages(
+        response,
+        [messages.Message(messages.SUCCESS, "Votre nouveau token a été créé avec succès.", extra_tags="toast")],
+    )
 
     # Check multi-posts
     response = client.post(API_TOKEN_URL)
@@ -72,4 +77,27 @@ def test_api_token_view_for_mixed_admin_nonadmin_company(client, snapshot):
     token = Token.objects.get()
     assert (
         pretty_indented(parse_response_to_soup(response, "#main")).replace(str(token), "[Token of user]") == snapshot
+    )
+
+
+def test_api_token_view_regenerate(client):
+    employer = CompanyMembershipFactory().user
+    client.force_login(employer)
+
+    assert not Token.objects.exists()
+
+    response = client.post(API_TOKEN_URL)
+    token = Token.objects.filter(user=employer).get()
+    assertContains(response, token.key)
+    assertContains(response, "Copier le token")
+
+    response = client.post(API_TOKEN_URL, {"action": "regenerate"})
+    # Previous token has been deleted
+    assert not Token.objects.filter(key=token.key).exists()
+
+    new_token = Token.objects.filter(user=employer).get()
+    assertContains(response, new_token.key)
+    assertContains(response, "Copier le token")
+    assertMessages(
+        response, [messages.Message(messages.SUCCESS, "Votre token a été regénéré avec succès.", extra_tags="toast")]
     )
