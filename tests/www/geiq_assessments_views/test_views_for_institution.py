@@ -19,11 +19,7 @@ from itou.www.geiq_assessments_views.views import (
     get_allowance_stats_for_institution,
 )
 from tests.companies.factories import CompanyMembershipFactory
-from tests.geiq_assessments.factories import (
-    AssessmentCampaignFactory,
-    AssessmentFactory,
-    EmployeeContractFactory,
-)
+from tests.geiq_assessments.factories import AssessmentCampaignFactory, AssessmentFactory, EmployeeContractFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -591,6 +587,13 @@ class TestAssessmentDetailsForInstitutionView:
             user__first_name="Jean",
             user__last_name="Dupont",
         )
+        dreets_membership = InstitutionMembershipFactory(
+            institution__name="DREETS-BRET",
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            user__email="beurre.sale@dre.ets",
+            user__first_name="Erwan",
+            user__last_name="GUÉZENNEC",
+        )
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
             user__first_name="Paul",
@@ -614,6 +617,11 @@ class TestAssessmentDetailsForInstitutionView:
             assessment=assessment,
             institution=ddets_membership.institution,
             with_convention=True,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=dreets_membership.institution,
+            with_convention=False,
         )
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(
@@ -679,10 +687,6 @@ class TestAssessmentDetailsForInstitutionView:
             name="assessment details section with review"
         )
 
-        dreets_membership = InstitutionMembershipFactory(
-            institution__name="DREETS BRET",
-            institution__kind=InstitutionKind.DREETS_GEIQ,
-        )
         with freeze_time(timezone.now() + datetime.timedelta(hours=8)):
             assessment.final_review(user=dreets_membership.user, institution=dreets_membership.institution)
         response = client.get(reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}))

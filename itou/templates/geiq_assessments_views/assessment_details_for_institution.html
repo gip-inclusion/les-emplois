@@ -1,7 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
 {% load django_bootstrap5 %}
-{% load enums %}
 {% load format_filters %}
 {% load geiq_assessments_badges %}
 
@@ -285,6 +284,20 @@
                                 {% include 'includes/copy_to_clipboard.html' with content=assessment.created_by.email css_classes="btn-link fw-medium ms-1" only_icon=True %}
                             </li>
                         </ul>
+                        {% if request.current_organization.kind == InstitutionKind.DDETS_GEIQ and dreets_contact_emails %}
+                            <hr class="my-3">
+                            <strong>Contact(s) DREETS</strong>
+                            <br>
+                            <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                                {% for email in dreets_contact_emails %}
+                                    <li class="d-flex">
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        <a href="mailto:{{ email }}" aria-label="Contact par mail" class="text-break">{{ email }}</a>
+                                        {% include 'includes/copy_to_clipboard.html' with content=email css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -294,7 +307,6 @@
 
 
 {% block modals %}
-    {% enums "institutions" "InstitutionKind" as InstitutionKind %}
     {{ block.super }}
     {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ and not assessment.final_reviewed_at %}
         <div id="final_review_modal" class="modal" tabindex="-1" aria-labelledby="final_review_modal_title" aria-hidden="true">
