@@ -239,6 +239,39 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         assertContains(response, data["key"])
         assert user.itou_totp_devices.count() == 0
 
+    def test_post_name_already_used(self, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        existing_user_device = ItouTOTPDeviceFactory(
+            name="existing",
+            user=user,
+        )
+        new_devices = user.itou_totp_devices.exclude(pk=existing_user_device.pk)
+        fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
+
+        # Use existing name.
+        data = {
+            "name": "existing",
+            "device_type": "smartphone",
+            "key": "R7QKTGB4PXO3JLFQCRWFKB2VGNY6T4QR",
+            "otp_token": TOTP(fake_device.bin_key).token(),
+        }
+        response = client.post(url, data)
+        assertContains(response, "Vous avez déjà enregistré un appareil sous le même nom.")
+        assert new_devices.count() == 0
+
+        # Use another name, which is used by another user, but not _our_ user.
+        ItouTOTPDeviceFactory(name="new-name")
+        data["name"] = "new-name"
+        response = client.post(url, data)
+        assertMessages(
+            response, [messages.Message(messages.SUCCESS, "Votre nouvel appareil est confirmé", extra_tags="toast")]
+        )
+        device = new_devices.get()
+        assert device.key == fake_device.key
+        assert device.name == data["name"]
+
 
 class TestItouStaffLogin:
     def test_login_with_totp(self, client, settings):
