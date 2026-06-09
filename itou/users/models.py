@@ -380,6 +380,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             ("hijack", "Can impersonate (hijack) other accounts"),
             ("export_cta", "Can export CTA file"),
             ("merge_users", "Can merge users"),
+            ("disable_password_auth", "Can disable password authentication"),
         ]
 
     def __init__(self, *args, _auto_create_job_seeker_profile=True, **kwargs):
