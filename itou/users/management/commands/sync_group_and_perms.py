@@ -187,6 +187,9 @@ def get_permissions_dict():
             geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
             geiq_assessments_models.Assessment: PERMS_DELETE,
         },
+        "disable-user-password-auth": {
+            users_models.User: PERMS_READ | PERMS_DISABLE_PASSWORD_AUTH,
+        },
     }
 
 
