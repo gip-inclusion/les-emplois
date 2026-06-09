@@ -19,7 +19,6 @@ from itou.nexus.utils import get_service_users
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.url_add_query import autologin_proconnect
-from itou.utils.urls import get_absolute_url
 
 
 logger = logging.getLogger(__name__)
@@ -115,7 +114,6 @@ class HomePageView(NexusMixin, TemplateView):
         context["new_service_shown"] = next(
             (service for service in Service.activable() if service not in context["activated_services"]), None
         )
-        context["a_b_test_url"] = get_absolute_url(reverse("nexus:homepage")).replace("/", "\\/")
         context["departments_list"] = ", ".join(settings.NEXUS_MVP_DEPARTMENTS)
         return context
 
