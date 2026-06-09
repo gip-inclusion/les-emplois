@@ -34,8 +34,12 @@ class ConfirmTOTPDeviceForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        otp_token = cleaned_data["otp_token"]
-        if self.device.verify_token(otp_token) is False:
+        if self.device.user.itou_totp_devices.filter(name=cleaned_data["name"]).exists():
+            self.add_error(
+                "name", "Vous avez déjà enregistré un appareil sous le même nom. Veuillez choisir un nom différent."
+            )
+
+        if self.device.verify_token(cleaned_data["otp_token"]) is False:
             self.add_error("otp_token", "Le code unique de validation (OTP) n’est pas correct.")
 
         return cleaned_data
