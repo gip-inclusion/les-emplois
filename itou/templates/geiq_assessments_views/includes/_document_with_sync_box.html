@@ -22,11 +22,10 @@
         </div>
     {% elif error %}
         <div class="c-box--summary__body">
-            {% if error %}
-                <p class="fs-sm">
-                    <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>Le document n’a pas été importé, merci de réessayer
-                </p>
-            {% endif %}
+            <p class="fs-sm">
+                <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>
+                Le document n’a pas pu être importé, merci de recharger la page dans quelques instants.
+            </p>
         </div>
     {% endif %}
 
@@ -35,21 +34,17 @@
             <a href="{{ download_url }}" class="btn-link btn-block w-100 w-md-auto" rel="noopener" target="_blank">
                 <span>{{ document_filename }}</span>
             </a>
-        {% else %}
-            <div class="d-flex justify-content-end">
-                <button type="button"
-                        class="btn btn-ico btn-primary btn-block w-100 w-md-auto"
-                        hx-post="{{ sync_url }}"
-                        hx-swap="outerHTML"
-                        hx-trigger="{{ error|yesno:"click,load" }}"
-                        hx-sync=".s-section:queue all"
-                        hx-include="#label-sync-form"
-                        hx-target="#{{ section_id }}">
-                    <i class="ri-refresh-line" aria-hidden="true"></i>
-                    <span class="stable-text">{{ error|yesno:"Réessayer,Récupération de Label" }}</span>
-                    <span class="loading-text">Récupération en cours</span>
-                </button>
-            </div>
+        {% elif not error %}
+            <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled"
+                  hx-post="{{ sync_url }}"
+                  hx-swap="outerHTML"
+                  hx-trigger="{% if syncing %}load delay:5s{% else %}load{% endif %}"
+                  hx-sync=".s-section:queue all"
+                  hx-include="#label-sync-form"
+                  hx-target="#{{ section_id }}">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span role="status">Récupération en cours</span>
+            </span>
         {% endif %}
     </div>
 </div>

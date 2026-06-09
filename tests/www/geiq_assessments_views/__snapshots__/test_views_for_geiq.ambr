@@ -77,13 +77,10 @@
   
       <div class="c-box--summary__footer">
           
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Récupération de Label</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
+              <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load">
+                  <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                  <span role="status">Récupération en cours</span>
+              </span>
           
       </div>
   </div>
@@ -111,13 +108,10 @@
   
       <div class="c-box--summary__footer">
           
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Récupération de Label</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
+              <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load">
+                  <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                  <span role="status">Récupération en cours</span>
+              </span>
           
       </div>
   </div>
@@ -1073,13 +1067,10 @@
   
       <div class="c-box--summary__footer">
           
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Récupération de Label</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
+              <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load">
+                  <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                  <span role="status">Récupération en cours</span>
+              </span>
           
       </div>
   </div>
@@ -1107,13 +1098,10 @@
   
       <div class="c-box--summary__footer">
           
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Récupération de Label</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
+              <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load">
+                  <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                  <span role="status">Récupération en cours</span>
+              </span>
           
       </div>
   </div>
@@ -2159,13 +2147,10 @@
   
       <div class="c-box--summary__footer">
           
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Récupération de Label</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
+              <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load">
+                  <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                  <span role="status">Récupération en cours</span>
+              </span>
           
       </div>
   </div>
@@ -2191,23 +2176,14 @@
       <hr class="m-0"/>
       
           <div class="c-box--summary__body">
-              
-                  <p class="fs-sm">
-                      <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>Le document n’a pas été importé, merci de réessayer
-                  </p>
-              
+              <p class="fs-sm">
+                  <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>
+                  Le document n’a pas pu être importé, merci de recharger la page dans quelques instants.
+              </p>
           </div>
       
   
       <div class="c-box--summary__footer">
-          
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="click" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Réessayer</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
           
       </div>
   </div>
@@ -2387,23 +2363,14 @@
       <hr class="m-0"/>
       
           <div class="c-box--summary__body">
-              
-                  <p class="fs-sm">
-                      <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>Le document n’a pas été importé, merci de réessayer
-                  </p>
-              
+              <p class="fs-sm">
+                  <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>
+                  Le document n’a pas pu être importé, merci de recharger la page dans quelques instants.
+              </p>
           </div>
       
   
       <div class="c-box--summary__footer">
-          
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="click" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Réessayer</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
           
       </div>
   </div>
@@ -2439,13 +2406,10 @@
   
       <div class="c-box--summary__footer">
           
-              <div class="d-flex justify-content-end">
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load" type="button">
-                      <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text">Récupération de Label</span>
-                      <span class="loading-text">Récupération en cours</span>
-                  </button>
-              </div>
+              <span class="btn-link btn-block w-100 w-md-auto btn-ico align-items-center disabled" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load">
+                  <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                  <span role="status">Récupération en cours</span>
+              </span>
           
       </div>
   </div>
