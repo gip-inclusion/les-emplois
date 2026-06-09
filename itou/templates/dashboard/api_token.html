@@ -24,7 +24,7 @@
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">APIs</h2>
                             <p>
-                                Une API (application programming interface ou « interface de programmation d'application ») est une interface logicielle qui permet de « connecter » le site des emplois de l'inclusion à un autre logiciel ou service afin d'échanger des données et des fonctionnalités.
+                                Une API (application programming interface ou « interface de programmation d’application ») est une interface logicielle qui permet de « connecter » le site des emplois de l’inclusion à un autre logiciel ou service afin d’échanger des données et des fonctionnalités.
                             </p>
                             <p>En tant qu’administrateur de structures, vous avez accès aux API suivantes :</p>
                             <ul class="list-unstyled">
@@ -52,19 +52,19 @@
                     </div>
                     <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                         <div class="c-box mb-3 mb-md-4">
-                            <h3>Connexion a l'API</h3>
+                            <h3>Connexion a l’API</h3>
                             <p>
                                 Pour vous connecter à l’API vous devez utiliser l’identifiant "<strong>{{ login_string }}</strong>" et comme mot de passe le token suivant.
                             </p>
                             {% if not token %}
                                 <form method="post" action="{% url 'dashboard:api_token' %}">
                                     {% csrf_token %}
-                                    <span class="d-block text-center mb-2">Vous n'avez pas encore de token d'API</span>
-                                    <button class="btn btn-primary btn-block">Créer un token d'API</button>
+                                    <span class="d-block text-center mb-2">Vous n’avez pas encore de token d’API</span>
+                                    <button class="btn btn-primary btn-block">Créer un token d’API</button>
                                 </form>
                             {% else %}
                                 <span class="d-block text-center mb-2">
-                                    Votre token d'API est : <strong>{{ token.key }}</strong>
+                                    Votre token d’API est : <strong>{{ token.key }}</strong>
                                 </span>
                                 {% include 'includes/copy_to_clipboard.html' with content=token.key text="Copier le token" css_classes="btn btn-ico btn-primary btn-block" %}
                             {% endif %}

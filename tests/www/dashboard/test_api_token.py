@@ -25,8 +25,8 @@ def test_api_token_view_for_company_admin(client):
     assertContains(response, API_TOKEN_URL)
 
     response = client.get(API_TOKEN_URL)
-    assertContains(response, "Vous n'avez pas encore de token d'API")
-    assertContains(response, "Créer un token d'API")
+    assertContains(response, "Vous n’avez pas encore de token d’API")
+    assertContains(response, "Créer un token d’API")
 
     response = client.post(API_TOKEN_URL)
     token = Token.objects.filter(user=employer).get()

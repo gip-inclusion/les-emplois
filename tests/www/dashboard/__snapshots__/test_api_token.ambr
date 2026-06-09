@@ -38,7 +38,7 @@
                                   APIs
                               </h2>
                               <p>
-                                  Une API (application programming interface ou « interface de programmation d'application ») est une interface logicielle qui permet de « connecter » le site des emplois de l'inclusion à un autre logiciel ou service afin d'échanger des données et des fonctionnalités.
+                                  Une API (application programming interface ou « interface de programmation d’application ») est une interface logicielle qui permet de « connecter » le site des emplois de l’inclusion à un autre logiciel ou service afin d’échanger des données et des fonctionnalités.
                               </p>
                               <p>
                                   En tant qu’administrateur de structures, vous avez accès aux API suivantes :
@@ -91,7 +91,7 @@
                       <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                           <div class="c-box mb-3 mb-md-4">
                               <h3>
-                                  Connexion a l'API
+                                  Connexion a l’API
                               </h3>
                               <p>
                                   Pour vous connecter à l’API vous devez utiliser l’identifiant "
@@ -101,7 +101,7 @@
                                   " et comme mot de passe le token suivant.
                               </p>
                               <span class="d-block text-center mb-2">
-                                  Votre token d'API est :
+                                  Votre token d’API est :
                                   <strong>
                                       [Token of user]
                                   </strong>
