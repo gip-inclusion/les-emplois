@@ -255,7 +255,7 @@
                           <h3>Informations générales</h3>
                           <strong>Structures concernées par la convention</strong>
                           <br/>
-                          <ul class="mb-0">
+                          <ul class="fs-sm mt-1 mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
@@ -1233,7 +1233,7 @@
                           <h3>Informations générales</h3>
                           <strong>Structures concernées par la convention</strong>
                           <br/>
-                          <ul class="mb-0">
+                          <ul class="fs-sm mt-1 mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
@@ -1244,9 +1244,19 @@
                                           <strong>Contact(s) DDETS</strong>
                                           <br/>
                                       
-                                      <ul class="mb-0">
+                                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
                                           
-                                              <li>paul@dd.ets</li>
+                                              
+                                                  <li class="d-flex">
+                                                      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
+                                                      <a aria-label="Contact par mail" class="text-break" href="mailto:paul@dd.ets">paul@dd.ets</a>
+                                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dd.ets" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                                  </li>
+                                              
                                           
                                       </ul>
                                   
@@ -1259,9 +1269,19 @@
                                           <strong>Contact(s) DREETS</strong>
                                           <br/>
                                       
-                                      <ul class="mb-0">
+                                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
                                           
-                                              <li>paul@dre.ets</li>
+                                              
+                                                  <li class="d-flex">
+                                                      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
+                                                      <a aria-label="Contact par mail" class="text-break" href="mailto:paul@dre.ets">paul@dre.ets</a>
+                                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dre.ets" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                                  </li>
+                                              
                                           
                                       </ul>
                                   
@@ -1567,7 +1587,7 @@
                           Structures concernées par la convention
                       </strong>
                       <br/>
-                      <ul class="mb-0">
+                      <ul class="fs-sm mt-1 mb-0">
                           <li>
                               Une antenne (12)
                           </li>
@@ -1580,9 +1600,20 @@
                           Contact(s) DDETS
                       </strong>
                       <br/>
-                      <ul class="mb-0">
-                          <li>
-                              paul@dd.ets
+                      <ul class="fs-sm mt-1 mb-0 list-unstyled">
+                          <li class="d-flex">
+                              <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                              </i>
+                              <a aria-label="Contact par mail" class="text-break" href="mailto:paul@dd.ets">
+                                  paul@dd.ets
+                              </a>
+                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="paul@dd.ets" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span class="visually-hidden">
+                                      Copier
+                                  </span>
+                              </button>
                           </li>
                       </ul>
                   </div>
@@ -2323,7 +2354,7 @@
                           <h3>Informations générales</h3>
                           <strong>Structures concernées par la convention</strong>
                           <br/>
-                          <ul class="mb-0">
+                          <ul class="fs-sm mt-1 mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
@@ -2541,7 +2572,7 @@
                           <h3>Informations générales</h3>
                           <strong>Structures concernées par la convention</strong>
                           <br/>
-                          <ul class="mb-0">
+                          <ul class="fs-sm mt-1 mb-0">
                               <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
