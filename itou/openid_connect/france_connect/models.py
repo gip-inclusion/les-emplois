@@ -1,3 +1,4 @@
+import contextlib
 import dataclasses
 import datetime
 from typing import ClassVar
@@ -48,6 +49,7 @@ class FranceConnectUserData(OIDConnectUserData):
                     "post_code": user_info["address"].get("postal_code"),
                     "city": user_info["address"].get("locality"),
                 }
-        if "gender" in user_info and (gender := user_info.get("gender")) in TITLE_MAP:
-            attrs |= {"title": TITLE_MAP[gender]}
+        with contextlib.suppress(KeyError):
+            gender = user_info["gender"]
+            attrs["title"] = TITLE_MAP[gender]
         return attrs
