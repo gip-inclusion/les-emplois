@@ -1,4 +1,10 @@
 # serializer version: 1
+# name: test_command[disable-user-password-auth]
+  list([
+    'disable_password_auth',
+    'view_user',
+  ])
+# ---
 # name: test_command[geiq-assessments]
   list([
     'delete_assessment',
@@ -300,6 +306,9 @@
 # ---
 # name: test_command[logs]
   list([
+    'group name=disable-user-password-auth created',
+    'group name=disable-user-password-auth, permission disable_password_auth added',
+    'group name=disable-user-password-auth, permission view_user added',
     'group name=geiq-assessments created',
     'group name=geiq-assessments, permission add_assessmentcampaign added',
     'group name=geiq-assessments, permission change_assessmentcampaign added',
