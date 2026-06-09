@@ -7,11 +7,13 @@ import zipfile
 import pytest
 from freezegun import freeze_time
 
+from itou.companies.enums import CompanyKind
 from itou.companies.management.commands import import_ea_eatt
 from itou.companies.management.commands.import_ea_eatt import FileOfTheWeekNotFound
 from itou.companies.models import Company
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.date import monday_of_the_week
+from tests.companies.factories import CompanyFactory
 
 
 @pytest.fixture(name="command")
@@ -58,6 +60,9 @@ def archive_file_fixture():
         # EA with missing email
         "ITOU|Entreprise Adaptée|00000001|5|00000000000002|Nomail SA|"
         "|00000000000002|Nomail SA|5||1||Rue|DE LA MOTTE|77550|77296|",
+        # EA already present in database
+        "ITOU|Entreprise Adaptée|00000001|6|00000000000003|Nomail SA|"
+        "|00000000000003|Adapted SA|6||1||Rue|DE LA MEUTE|77550|77296|",
         # File footer
         "Z|ASP|EA|20241231|235959|4|7|",
     ]
@@ -179,6 +184,8 @@ def test_clean_old_archives_dry_run(caplog, snapshot, faker, mocker, sftp_direct
 
 def test_process_file_from_archive(caplog, snapshot, settings, command, archive_file):
     settings.ASP_EA2_UNZIP_PASSWORD = "password"
+
+    CompanyFactory(kind=CompanyKind.EA, siret="00000000000003")
 
     command.handle(from_archive=archive_file, wet_run=True)
 
