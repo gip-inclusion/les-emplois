@@ -7,7 +7,6 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from itou.external_data.enums import RetrievalStatus
 from itou.utils import triggers
 
 
@@ -84,66 +83,6 @@ def _get_address(token):
     return _fields_or_failed(_call_api(ESD_COORDS_API, token), keys)
 
 
-def get_aggregated_user_data(token):
-    """
-    Aggregates all needed user data before formatting and storage.
-    Returns a pair status and a "flat" dict.
-    """
-    # Include API results "à volonté"
-    results = [
-        _get_birthdate(token),
-        _get_address(token),
-    ]
-
-    ok = all(results)
-    partial = not ok and any(results)
-    cleaned_results = [part for part in results if part]
-
-    if ok:
-        status = RetrievalStatus.OK
-    elif partial:
-        status = RetrievalStatus.PARTIAL
-    else:
-        status = RetrievalStatus.FAILED
-
-    user_data = {}
-    for result in cleaned_results:
-        user_data.update(result)
-
-    return status, user_data
-
-
-# External user data from PE Connect API:
-# * transform raw data from API
-# * dispatch data into models if possible
-# * or store as key / value if needed
-
-
-def set_pe_data_import_from_user_data(user, user_data):
-    fields_fetched = [k for k, v in user_data.items() if v is not None]
-
-    user_has_address = user.address_on_one_line
-    for k in fields_fetched:
-        v = user_data.get(k)
-
-        # User part:
-        if k == "dateDeNaissance":
-            new_value = user.jobseeker_profile.birthdate or timezone.localdate(parse_datetime(v))
-            user.jobseeker_profile.birthdate = new_value
-        elif k == "adresse4" and not user_has_address:
-            user.address_line_1 = v
-        elif k == "adresse2" and not user_has_address:
-            user.address_line_2 = v
-        elif k == "codePostal" and not user_has_address:
-            user.post_code = v
-        elif k == "libelleCommune" and not user_has_address:
-            user.city = v
-
-    # Atomicity in outer call
-    user.save()
-    user.jobseeker_profile.save(update_fields={"birthdate"})
-
-
 #  Public
 
 
@@ -158,19 +97,44 @@ def import_user_pe_data(
     """
 
     try:
-        # External requests
-        status, user_data = get_aggregated_user_data(token)
+        fetched_birthdate = None
+        if not user.jobseeker_profile.birthdate:
+            birthdate_info = _get_birthdate(token)
+            if birthdate_info is None:
+                logger.warning("Could not fetch birthdate for user=%s", user.pk)
+            else:
+                fetched_birthdate = timezone.localdate(parse_datetime(birthdate_info["dateDeNaissance"]))
+
+        fetched_address = None
+        if not user.address_on_one_line:
+            address_info = _get_address(token)
+            if address_info is None:
+                logger.warning("Could not fetch address for user=%s", user.pk)
+            elif all(address_info.get(k) for k in ["adresse4", "codePostal", "libelleCommune"]):
+                fetched_address = address_info
+            else:
+                logger.warning("Fetched address for user=%d seems incomplete", user.pk)
+
+        if not fetched_birthdate and not fetched_address:
+            logger.info("Nothing to do for user=%d", user.pk)
+            return
+
         with (
             transaction.atomic(),
             triggers.context(**triggers_context) if triggers_context is not None else contextlib.nullcontext(),
         ):
-            set_pe_data_import_from_user_data(user, user_data)
+            if fetched_birthdate:
+                user.jobseeker_profile.birthdate = fetched_birthdate
+                user.jobseeker_profile.save(update_fields={"birthdate"})
+                logger.info("Updated birthdate for user=%d", user.pk)
 
-        if status == RetrievalStatus.OK:
-            logger.info("Stored external data for user=%s", user.pk)
-        elif status == RetrievalStatus.PARTIAL:
-            logger.warning("Could only fetch partial results for user=%s", user.pk)
-        else:
-            logger.warning("Could not fetch any data for user=%s: not data stored", user.pk)
+            if fetched_address:
+                user.address_line_1 = fetched_address["adresse4"]
+                user.address_line_2 = fetched_address.get("adresse2", "")
+                user.post_code = fetched_address["codePostal"]
+                user.city = fetched_address["libelleCommune"]
+                user.save(update_fields={"address_line_1", "address_line_2", "post_code", "city"})
+                logger.info("Updated address for user=%d", user.pk)
+
     except Exception as e:
         logger.warning("Data import for user=%s failed: %s", user.pk, e)
