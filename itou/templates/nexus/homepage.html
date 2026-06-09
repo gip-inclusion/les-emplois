@@ -84,7 +84,7 @@
     {% endif %}
 
     {% if not all_services_activated %}
-        <section class="s-section" id="newServicesV1">
+        <section class="s-section">
             <div class="s-section__container container">
                 <div class="s-section__row row">
                     <div class="s-section__col col-12">
@@ -98,99 +98,21 @@
                         <div class="c-box">
                             <ul class="list-group list-group-flush">
                                 {% if Service.EMPLOIS not in activated_services %}
-                                    {% new_service_v1 service=Service.EMPLOIS %}
+                                    {% new_service service=Service.EMPLOIS %}
                                 {% endif %}
                                 {% if Service.DORA not in activated_services %}
-                                    {% new_service_v1 service=Service.DORA %}
+                                    {% new_service service=Service.DORA %}
                                 {% endif %}
                                 {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
-                                    {% new_service_v1 service=Service.MARCHE %}
+                                    {% new_service service=Service.MARCHE %}
                                 {% endif %}
                                 {% if Service.PILOTAGE not in activated_services %}
-                                    {% new_service_v1 service=Service.PILOTAGE %}
+                                    {% new_service service=Service.PILOTAGE %}
                                 {% endif %}
                                 {% if Service.MON_RECAP not in activated_services %}
-                                    {% new_service_v1 service=Service.MON_RECAP %}
+                                    {% new_service service=Service.MON_RECAP %}
                                 {% endif %}
                             </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="s-section d-none" id="newServicesV2">
-            <div class="s-section__container container">
-                <div class="s-section__row row">
-                    <div class="s-section__col col-12">
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
-                            <h2 class="mb-0">
-                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
-                                Services à découvrir
-                            </h2>
-                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inclusion</a>
-                        </div>
-                        <div class="c-box">
-                            <div class="row d-none d-xxl-flex">
-                                <div class="col-5" id="nxAccordionListGroup">
-                                    <ul class="list-group list-group-flush">
-                                        {% if Service.EMPLOIS not in activated_services %}
-                                            {% new_service_v2 service=Service.EMPLOIS %}
-                                        {% endif %}
-                                        {% if Service.DORA not in activated_services %}
-                                            {% new_service_v2 service=Service.DORA %}
-                                        {% endif %}
-                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
-                                            {% new_service_v2 service=Service.MARCHE %}
-                                        {% endif %}
-                                        {% if Service.PILOTAGE not in activated_services %}
-                                            {% new_service_v2 service=Service.PILOTAGE %}
-                                        {% endif %}
-                                        {% if Service.MON_RECAP not in activated_services %}
-                                            {% new_service_v2 service=Service.MON_RECAP %}
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                                <div class="col-7" id="nxAccordionInfoMore">
-                                    {% if Service.EMPLOIS not in activated_services %}
-                                        {% new_service_v2_details service=Service.EMPLOIS %}
-                                    {% endif %}
-                                    {% if Service.DORA not in activated_services %}
-                                        {% new_service_v2_details service=Service.DORA %}
-                                    {% endif %}
-                                    {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
-                                        {% new_service_v2_details service=Service.MARCHE %}
-                                    {% endif %}
-                                    {% if Service.PILOTAGE not in activated_services %}
-                                        {% new_service_v2_details service=Service.PILOTAGE %}
-                                    {% endif %}
-                                    {% if Service.MON_RECAP not in activated_services %}
-                                        {% new_service_v2_details service=Service.MON_RECAP %}
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="row d-xxl-none">
-                                <div class="col-12" id="nxAccordionListGroupCollapse">
-                                    <ul class="list-group list-group-flush">
-                                        {% if Service.EMPLOIS not in activated_services %}
-                                            {% new_service_v2_responsive service=Service.EMPLOIS %}
-                                        {% endif %}
-                                        {% if Service.DORA not in activated_services %}
-                                            {% new_service_v2_responsive service=Service.DORA %}
-                                        {% endif %}
-                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
-                                            {% new_service_v2_responsive service=Service.MARCHE %}
-                                        {% endif %}
-                                        {% if Service.PILOTAGE not in activated_services %}
-                                            {% new_service_v2_responsive service=Service.PILOTAGE %}
-                                        {% endif %}
-                                        {% if Service.MON_RECAP not in activated_services %}
-                                            {% new_service_v2_responsive service=Service.MON_RECAP %}
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -201,35 +123,6 @@
 
 
 {% block script %}
-    <!-- Matomo A/B test -->
-    <script nonce="{{ csp_nonce }}">
-        var _paq = _paq || [];
-        _paq.push(['AbTesting::create', {
-            name: 'NexusServicesADecouvrir', // the name is the same in both environment
-            percentage: 100,
-            includedTargets: [{
-                "attribute": "url",
-                "inverted": "0",
-                "type": "equals_simple",
-                "value": "{{ a_b_test_url }}"
-            }],
-            excludedTargets: [],
-            variations: [{
-                name: 'original',
-                activate: function(event) {}
-            }, {
-                name: 'VariationB',
-                activate: function(event) {
-                    $('#newServicesV1').addClass('d-none');
-                    $('#newServicesV2').removeClass('d-none');
-                }
-            }],
-            trigger: function() {
-                return true;
-            }
-        }]);
-    </script>
-
     <!-- IntroJS -->
     {% enums "nexus" "NexusUserKind" as NexusUserKind %}
     {% if user_kind == NexusUserKind.FACILITY_MANAGER %}

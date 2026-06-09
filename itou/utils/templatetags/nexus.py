@@ -245,26 +245,8 @@ def get_template_context(context, service):
 
 
 @register.simple_tag(takes_context=True)
-def new_service_v1(context, service):
-    template = get_template("nexus/components/new_service_v1.html")
-    return template.render(get_template_context(context, service))
-
-
-@register.simple_tag(takes_context=True)
-def new_service_v2(context, service):
-    template = get_template("nexus/components/new_service_v2.html")
-    return template.render(get_template_context(context, service))
-
-
-@register.simple_tag(takes_context=True)
-def new_service_v2_details(context, service):
-    template = get_template("nexus/components/new_service_v2_details.html")
-    return template.render(get_template_context(context, service))
-
-
-@register.simple_tag(takes_context=True)
-def new_service_v2_responsive(context, service):
-    template = get_template("nexus/components/new_service_v2_responsive.html")
+def new_service(context, service):
+    template = get_template("nexus/components/new_service.html")
     return template.render(get_template_context(context, service))
 
 
