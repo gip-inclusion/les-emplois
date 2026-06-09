@@ -3,11 +3,13 @@ import uuid
 
 import pytest
 from django.contrib import messages
+from django.core.cache import caches
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 from freezegun import freeze_time
+from huey.contrib.djhuey import HUEY
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import (
     assertContains,
@@ -18,6 +20,7 @@ from pytest_django.asserts import (
 )
 
 from itou.companies.enums import CompanyKind
+from itou.geiq_assessments import tasks
 from itou.geiq_assessments.enums import AllowanceRefusalReason, AssessmentState, AssessmentTransition
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, AssessmentTransitionLog, LabelInfos
 from itou.institutions.enums import InstitutionKind
@@ -43,6 +46,17 @@ def label_settings(settings):
     settings.API_GEIQ_LABEL_BASE_URL = "https://geiq.label"
     settings.API_GEIQ_LABEL_TOKEN = "S3cr3t!"
     return settings
+
+
+@pytest.fixture
+def defer_huey():
+    # To prevent Huey to run in immediate mode.
+    assert HUEY.immediate is True
+    HUEY.immediate = False
+    HUEY.storage.flush_queue()
+    yield HUEY
+    HUEY.storage.flush_queue()
+    HUEY.immediate = True
 
 
 class TestListAssessmentsView:
@@ -365,6 +379,36 @@ class TestCreateAssessmentView:
         assertQuerySetEqual(second_assessment.institutions.order_by("kind"), [dreets])
         assert second_assessment.conventionned_institutions() == [dreets]
 
+    def test_label_files_are_retrieved_on_creation(self, client, mocker, django_capture_on_commit_callbacks):
+        mocker.patch("itou.geiq_assessments.tasks.sync_assessment_file")  # Disabled during the test.
+        membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ, company__siret="12345678901234", company__post_code="29840"
+        )
+        dreets = InstitutionFactory(name="DREETS BRET", kind=InstitutionKind.DREETS_GEIQ, department=35)
+        InstitutionFactory(name="DREETS BRET", kind=InstitutionKind.DREETS_GEIQ, department=35)
+        client.force_login(membership.user)
+        campaign = AssessmentCampaignFactory()
+        LabelInfos.objects.create(
+            campaign=campaign,
+            data=[
+                {"id": 1234, "nom": "Un Joli GEIQ", "siret": membership.company.siret, "antennes": [], "cp": "12345"}
+            ],
+        )
+        # When creating the assessment, the two files are scheduled for retrieval (on commit).
+        with django_capture_on_commit_callbacks() as callbacks:
+            response = client.post(
+                reverse("geiq_assessments_views:create"),
+                {"main_geiq": True, "convention_with_dreets": True, "dreets": dreets.pk},
+            )
+        assessment = Assessment.objects.get()
+        assertRedirects(response, reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}))
+        # The on_commit callbacks are partials of `sync_assessment_file`, one per file.
+        assert {callback.args for callback in callbacks} == {(assessment.pk,)}
+        assert {callback.keywords["file_field"] for callback in callbacks} == {
+            "summary_document_file",
+            "structure_financial_assessment_file",
+        }
+
 
 class TestAssessmentDetailsForGEIQView:
     def test_anonymous_access(self, client):
@@ -452,11 +496,14 @@ class TestAssessmentDetailsForGEIQView:
                 "content-type": "application/pdf",
             },
         )
-        response = client.post(
-            reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk}),
-            headers={"HX-Request": "true"},
-        )
-        update_page_with_htmx(simulated_page, "#summary-document-section .c-box--summary__footer button", response)
+        summary_sync_url = reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk})
+        # First HTMX poll/fetch schedules the retrieval and shows the spinner while the second one renders the now
+        # available file download link.
+        for _ in range(2):
+            response = client.post(summary_sync_url, headers={"HX-Request": "true"})
+            update_page_with_htmx(
+                simulated_page, "#summary-document-section .c-box--summary__footer [hx-post]", response
+            )
         response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
         )
@@ -475,13 +522,14 @@ class TestAssessmentDetailsForGEIQView:
                 "content-type": "application/pdf",
             },
         )
-        response = client.post(
-            reverse("geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk}),
-            headers={"HX-Request": "true"},
+        structure_sync_url = reverse(
+            "geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk}
         )
-        update_page_with_htmx(
-            simulated_page, "#structure-financial-assessment-section .c-box--summary__footer button", response
-        )
+        for _ in range(2):
+            response = client.post(structure_sync_url, headers={"HX-Request": "true"})
+            update_page_with_htmx(
+                simulated_page, "#structure-financial-assessment-section .c-box--summary__footer [hx-post]", response
+            )
         response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
         )
@@ -880,15 +928,20 @@ class TestAssessmentSyncFile:
                 "content-type": "application/pdf",
             },
         )
-        response = client.post(
-            reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk}),
-        )
-        assertContains(response, reverse("geiq_assessments_views:summary_document", kwargs={"pk": assessment.pk}))
+        summary_sync_url = reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk})
+        summary_href = f'<a href="{reverse("geiq_assessments_views:summary_document", kwargs={"pk": assessment.pk})}"'
+        # First HTMX poll/fetch only schedules the retrieval.
+        response = client.post(summary_sync_url)
+        assertContains(response, "load delay:5s")
+        assertNotContains(response, summary_href)
         assessment.refresh_from_db()
         assert assessment.summary_document_file is not None
         assert len(default_storage_ls_files("geiq-assessments")) == 1
         with default_storage.open(assessment.summary_document_file.key) as f:
             assert f.read() == pdf_file_content
+        # The second HTMX poll/fetch renders the file download link.
+        response = client.post(summary_sync_url)
+        assertContains(response, summary_href)
 
         # Sync Structure Financial Assessment
         respx_mock.get(
@@ -902,16 +955,20 @@ class TestAssessmentSyncFile:
                 "content-type": "application/pdf",
             },
         )
-        response = client.post(
-            reverse("geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk}),
+        structure_sync_url = reverse(
+            "geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk}
         )
-        assertContains(
-            response, reverse("geiq_assessments_views:structure_financial_assessment", kwargs={"pk": assessment.pk})
-        )
+        structure_url = reverse("geiq_assessments_views:structure_financial_assessment", kwargs={"pk": assessment.pk})
+        structure_href = f'<a href="{structure_url}"'
+        response = client.post(structure_sync_url)
+        assertContains(response, "load delay:5s")
+        assertNotContains(response, structure_href)
         assessment.refresh_from_db()
         assert assessment.structure_financial_assessment_file is not None
         with default_storage.open(assessment.structure_financial_assessment_file.key) as f:
             assert f.read() == pdf_file_content
+        response = client.post(structure_sync_url)
+        assertContains(response, structure_href)
 
     def test_with_existing_files(self, client):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -952,31 +1009,77 @@ class TestAssessmentSyncFile:
             label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
-        detail_response = client.get(
+        details_response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
         )
 
         # Retrieve Summary Document PDF
-        # This will error due to lack of settings.API_GEIQ_LABEL_TOKEN
-        simulated_page = parse_response_to_soup(detail_response, selector=".s-section")
+        # First HTMX poll/fetch schedules the retrieval, which fails.
+        summary_url = reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk})
+        client.post(summary_url, headers={"HX-Request": "true"})
+        # Second poll indicates there was an error.
+        simulated_page = parse_response_to_soup(details_response, selector=".s-section")
+        response = client.post(summary_url, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, "#summary-document-section .c-box--summary__footer [hx-post]", response)
+        assert str(simulated_page) == snapshot(name="details page with error for summary document")
+        response = client.get(
+            reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
+        )
+        fresh_page = parse_response_to_soup(response, selector=".s-section")
+        assertSoupEqual(simulated_page, fresh_page)
+
+        # Retrieve Structure Financial Assessment PDF
+        structure_url = reverse(
+            "geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk}
+        )
+        client.post(structure_url, headers={"HX-Request": "true"})
+        simulated_page = parse_response_to_soup(details_response, selector=".s-section")
+        response = client.post(structure_url, headers={"HX-Request": "true"})
+        update_page_with_htmx(
+            simulated_page, "#structure-financial-assessment-section .c-box--summary__footer [hx-post]", response
+        )
+        assert str(simulated_page) == snapshot(name="details page with error for structure financial assessment")
+
+    def test_label_files_retrieval_is_async(self, client, defer_huey):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+        sync_url = reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk})
+        download_url = reverse("geiq_assessments_views:summary_document", kwargs={"pk": assessment.pk})
+        download_href = f'<a href="{download_url}"'
+
+        # Retrieval of the file is enqueued.
+        response = client.post(sync_url, headers={"HX-Request": "true"})
+        assert defer_huey.storage.queue_size() == 1
+        assertContains(response, "load delay:5s")  # HTMX keeps polling.
+        assertNotContains(response, download_href)
+        assessment.refresh_from_db()
+        assert assessment.summary_document_file is None  # File is not available yet.
+
+        # Once the file is associated with the assessment (i.e. a task has completed), the download
+        # link appears and no new retrieval is enqueued.
+        assessment.summary_document_file = FileFactory()
+        assessment.save(update_fields=("summary_document_file",))
+        response = client.post(sync_url, headers={"HX-Request": "true"})
+        assertContains(response, download_href)
+        assert defer_huey.storage.queue_size() == 1  # No additional task enqueued once the file exists.
+
+    def test_error_prevents_new_task(self, client, defer_huey):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+
+        # We first simulate a (recent) retrieval failure.
+        error_cache_key = tasks.file_error_cache_key(assessment.pk, "summary_document_file")
+        caches["failsafe"].set(error_cache_key, True, 5 * 60)
+
+        # User gets an error message as long as the error is cached.
         response = client.post(
             reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk}),
             headers={"HX-Request": "true"},
         )
-        update_page_with_htmx(simulated_page, "#summary-document-section .c-box--summary__footer button", response)
-        assert str(simulated_page) == snapshot(name="details page with error for summary document")
-
-        # Retrieve Structure Financial Assessment PDF
-        # This will error due to lack of settings.API_GEIQ_LABEL_TOKEN
-        simulated_page = parse_response_to_soup(detail_response, selector=".s-section")
-        response = client.post(
-            reverse("geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk}),
-            headers={"HX-Request": "true"},
-        )
-        update_page_with_htmx(
-            simulated_page, "#structure-financial-assessment-section .c-box--summary__footer button", response
-        )
-        assert str(simulated_page) == snapshot(name="details page with error for structure financial assessment")
+        assert defer_huey.storage.queue_size() == 0  # No additional task must be enqueud.
+        assertContains(response, "Le document n’a pas pu être importé")
 
 
 class TestAssessmentUploadActionFinancialAssessment:
@@ -1239,13 +1342,13 @@ class TestAssessmentContractsSync:
             label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
-        detail_response = client.get(
+        details_response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
         )
 
         # Retrieve Contracts
         # This will error due to lack of settings.API_GEIQ_LABEL_TOKEN
-        simulated_page = parse_response_to_soup(detail_response, selector=".s-section")
+        simulated_page = parse_response_to_soup(details_response, selector=".s-section")
         response = client.post(
             reverse("geiq_assessments_views:assessment_contracts_sync", kwargs={"pk": assessment.pk}),
             headers={"HX-Request": "true"},

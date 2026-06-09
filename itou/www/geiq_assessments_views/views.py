@@ -1,14 +1,13 @@
 import enum
 import logging
 import operator
-import uuid
 from functools import partial
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
-from django.core.files.base import ContentFile
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Case, Count, F, IntegerField, Prefetch, Q, Sum, Value, When
 from django.db.models.functions import Greatest
 from django.http import Http404, HttpResponseRedirect
@@ -22,7 +21,7 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import save_file
-from itou.geiq_assessments import sync
+from itou.geiq_assessments import sync, tasks
 from itou.geiq_assessments.enums import AssessmentContractDetailsTab, AssessmentTransition, InstitutionAction
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
@@ -42,7 +41,6 @@ from itou.geiq_assessments.notifications import (
 )
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
-from itou.utils.apis import geiq_label
 from itou.utils.auth import check_request
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
@@ -286,6 +284,10 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         logger.info(
             "user=%s created assessment=%s", request.user.pk, assessment.pk, extra={"geiq_assessment": assessment.pk}
         )
+        # Assessment creation immediately triggers the retrieval of the files.
+        for file_field in tasks.SYNC_FILE_API_METHOD:
+            # Useful for tests because we can inspect the callbacks using `django_capture_on_commit_callbacks`.
+            transaction.on_commit(partial(tasks.sync_assessment_file, assessment.pk, file_field=file_field))
         return HttpResponseRedirect(reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}))
 
     context["conflicting_antennas"] = conflicting_antennas
@@ -352,6 +354,7 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
             + f" ou la {conventionned_institutions[-1]}"
         )
 
+    failsafe_cache = caches["failsafe"]
     context = {
         "assessment": assessment,
         "back_url": reverse("geiq_assessments_views:list_for_geiq"),
@@ -359,6 +362,10 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
         "active_tab": AssessmentDetailsTab.MAIN,
         "PILOTAGE_INSTITUTION_EMAIL_CONTACT": settings.PILOTAGE_INSTITUTION_EMAIL_CONTACT,
         "institution_to_contact": institution_to_contact,
+        "summary_document_error": not assessment.summary_document_file_id
+        and bool(failsafe_cache.get(tasks.file_error_cache_key(assessment.pk, "summary_document_file"))),
+        "structure_financial_assessment_error": not assessment.structure_financial_assessment_file_id
+        and bool(failsafe_cache.get(tasks.file_error_cache_key(assessment.pk, "structure_financial_assessment_file"))),
     }
     if assessment.contracts_selection_validated_at:
         context["stats"] = get_allowance_stats_for_geiq(assessment, for_assessment_details=True)
@@ -401,35 +408,23 @@ def assessment_get_file(request, pk, *, file_field):
 def assessment_sync_file(request, pk, *, file_field):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
-    context = {"assessment": assessment, "error": False}
     match file_field:
         case "summary_document_file":
-            api_method = "get_synthese_pdf"
             template_name = "geiq_assessments_views/includes/summary_document_box.html"
         case "structure_financial_assessment_file":
-            api_method = "get_compte_pdf"
             template_name = "geiq_assessments_views/includes/structure_financial_assessment_box.html"
         case _:
             raise Http404
+
+    error = False
+    syncing = False
     if not getattr(assessment, file_field):
-        # Only sync if the file is not already set
-        try:
-            client = geiq_label.get_client()
-            pdf_content = getattr(client, api_method)(geiq_id=assessment.label_geiq_id)
-            file = save_file(
-                folder="geiq-assessments/",
-                file=ContentFile(content=pdf_content, name=f"{uuid.uuid4()}.pdf"),
-                anonymize_filename=False,
-            )
-            setattr(assessment, file_field, file)
-            assessment.save(update_fields=(file_field,))
-        except Exception as e:
-            # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
-            # but letting other exceptions slip breaks the interface so better catch them all
-            logger.exception(
-                "Exception while trying to retrieve a pdf from label API - field=%s exception=%s", file_field, e
-            )
-            context["error"] = True
+        error = caches["failsafe"].get(tasks.file_error_cache_key(assessment.pk, file_field))
+        if not error:
+            # We schedule the retrieval then let the front poll until the file is available (or an error is cached).
+            tasks.sync_assessment_file(assessment.pk, file_field=file_field)
+            syncing = True
+    context = {"assessment": assessment, "error": error, "syncing": syncing}
     return render(request, template_name, context)
 
 

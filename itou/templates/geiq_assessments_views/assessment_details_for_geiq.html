@@ -10,8 +10,8 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>Mon dossier</h2>
-                    {% include "geiq_assessments_views/includes/summary_document_box.html" with assessment=assessment error=False request=request only %}
-                    {% include "geiq_assessments_views/includes/structure_financial_assessment_box.html" with assessment=assessment error=False request=request only %}
+                    {% include "geiq_assessments_views/includes/summary_document_box.html" with assessment=assessment error=summary_document_error syncing=False request=request only %}
+                    {% include "geiq_assessments_views/includes/structure_financial_assessment_box.html" with assessment=assessment error=structure_financial_assessment_error syncing=False request=request only %}
                     {% include "geiq_assessments_views/includes/action_financial_assessment_box.html" with assessment=assessment request=request only %}
                     {% include "geiq_assessments_views/includes/contracts_box.html" with assessment=assessment request=request error=False only %}
                     {% include "geiq_assessments_views/includes/geiq_comment_box.html" with assessment=assessment request=request only %}
