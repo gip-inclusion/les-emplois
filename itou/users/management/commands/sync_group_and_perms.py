@@ -11,6 +11,7 @@ PERMS_HIJACK = {"view", "hijack"}
 PERMS_READ = {"view"}
 
 # Permissions for specific staff actions
+PERMS_DISABLE_PASSWORD_AUTH = {"disable_password_auth"}
 PERMS_EXPORT_FT_API_REJECTIONS = {"export_ft_api_rejections"}
 PERMS_EXPORT_JOB_APPLICATIONS_UNKNOWN_TO_FT = {"export_job_applications_unknown_to_ft"}
 PERMS_EXPORT_CTA = {"export_cta"}
@@ -113,7 +114,11 @@ def get_permissions_dict():
         siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
         siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
         siae_evaluations_models.Sanctions: PERMS_READ,
-        users_models.User: PERMS_ALL | PERMS_HIJACK | PERMS_EXPORT_CTA | PERMS_MERGE_USERS,
+        users_models.User: PERMS_ALL
+        | PERMS_HIJACK
+        | PERMS_EXPORT_CTA
+        | PERMS_MERGE_USERS
+        | PERMS_DISABLE_PASSWORD_AUTH,
         users_models.JobSeekerProfile: PERMS_EDIT | PERMS_DELETE | PERMS_IMPORT_FS_3437_FROM_ASP,
         users_models.JobSeekerAssignment: PERMS_ALL,
         users_models.NirModificationRequest: PERMS_EDIT | PERMS_DELETE,

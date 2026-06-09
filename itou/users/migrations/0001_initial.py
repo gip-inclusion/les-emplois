@@ -388,6 +388,7 @@ class Migration(migrations.Migration):
                     ("hijack", "Can impersonate (hijack) other accounts"),
                     ("export_cta", "Can export CTA file"),
                     ("merge_users", "Can merge users"),
+                    ("disable_password_auth", "Can disable password authentication"),
                 ],
                 "abstract": False,
                 "indexes": [

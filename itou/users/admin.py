@@ -872,7 +872,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             context,
         )
 
-    @admin.action(description="Désactiver l'authentification par mot de passe")
+    def has_disable_password_auth_permission(self, request):
+        return request.user.has_perm(f"{self.opts.app_label}.disable_password_auth")
+
+    @admin.action(description="Désactiver l'authentification par mot de passe", permissions=["disable_password_auth"])
     def disable_password_auth(self, request, queryset):
         users_to_update = {
             user

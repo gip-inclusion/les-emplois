@@ -5,6 +5,8 @@ import pytest
 from django.contrib import messages
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import (
@@ -21,6 +23,7 @@ from itou.users.models import IdentityCertification, JobSeekerProfile, NirModifi
 from tests.users.factories import (
     UNUSABLE_PASSWORD,
     EmployerFactory,
+    ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     PrescriberFactory,
@@ -563,3 +566,46 @@ def test_disable_password_auth_mixed_batch(admin_client, mailoutbox):
             ),
         ],
     )
+
+
+@pytest.mark.parametrize("with_permission", [True, False])
+def test_disable_password_auth_permission(client, with_permission):
+    job_seeker = JobSeekerFactory()
+    user = ItouStaffFactory()
+    content_type = ContentType.objects.get_for_model(User)
+    disable_permission = Permission.objects.get(content_type=content_type, codename="disable_password_auth")
+    read_permission = Permission.objects.get(content_type=content_type, codename="view_user")
+    user.user_permissions.add(read_permission)
+    if with_permission:
+        user.user_permissions.add(disable_permission)
+
+    client.force_login(user)
+
+    response = client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "disable_password_auth",
+            "select_across": "0",
+            "index": "0",
+            "_selected_action": [job_seeker.pk],
+        },
+    )
+    assert response.status_code == 302
+    job_seeker.refresh_from_db()
+    if with_permission:
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    (
+                        "Désactivation de l’authentification par mot de passe pour 1 utilisateur :<br>- "
+                        f"{job_seeker.email} (PK : {job_seeker.pk}, candidat, dernière connexion : jamais connecté)"
+                    ),
+                ),
+            ],
+        )
+        assert not job_seeker.has_usable_password()
+    else:
+        assertMessages(response, [messages.Message(level=messages.WARNING, message="Aucune action sélectionnée.")])
+        assert job_seeker.has_usable_password()
