@@ -4,7 +4,6 @@ import logging
 import httpx
 from django.conf import settings
 from django.db import transaction
-from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -112,15 +111,6 @@ def get_aggregated_user_data(token):
         user_data.update(result)
 
     return status, user_data
-
-
-def _model_fields_changed(initial, final_instance):
-    """
-    Return an array with fields of the model_instance object that will be changed on `save()`
-    """
-    final = model_to_dict(final_instance)
-    class_name = type(final_instance).__name__
-    return [f"{class_name}/{final_instance.pk}/{k}" for k, v in initial.items() if v != final.get(k)]
 
 
 # External user data from PE Connect API:
