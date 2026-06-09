@@ -40,15 +40,7 @@ class FranceConnectUserData(OIDConnectUserData):
         )
         attrs = standard_attrs | {
             "birthdate": datetime.date.fromisoformat(user_info["birthdate"]) if user_info.get("birthdate") else None,
-            "phone": user_info.get("phone_number"),
         }
-        if "address" in user_info:
-            if user_info["address"].get("country") == "France":
-                attrs |= {
-                    "address_line_1": user_info["address"].get("street_address"),
-                    "post_code": user_info["address"].get("postal_code"),
-                    "city": user_info["address"].get("locality"),
-                }
         with contextlib.suppress(KeyError):
             gender = user_info["gender"]
             attrs["title"] = TITLE_MAP[gender]
