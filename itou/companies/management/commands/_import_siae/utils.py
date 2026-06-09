@@ -14,7 +14,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.enums import CompanySource
+from itou.companies.enums import POLE_EMPLOI_SIRET, CompanySource
 from itou.companies.models import Company
 from itou.metabase.tables.utils import hash_content
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -141,7 +141,11 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     """
     print(f"Loaded {len(df)} {source} from export.")
 
-    db_sirets = {siae.siret for siae in Company.objects.filter(kind__in=kinds)}
+    # Use unfiltered_objects so EA/EATT are considered,
+    # but we still don't want to show France Travail as a company
+    company_qs = Company.unfiltered_objects.exclude(siret=POLE_EMPLOI_SIRET)
+
+    db_sirets = {siae.siret for siae in company_qs.filter(kind__in=kinds)}
     df_sirets = set(df.siret.tolist())
 
     creatable_sirets = df_sirets - db_sirets
@@ -170,7 +174,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     structures_updated = 0
     # Update structures which already exist in database.
     for siret in updatable_sirets:
-        siae = Company.objects.get(siret=siret, kind__in=kinds)
+        siae = company_qs.get(siret=siret, kind__in=kinds)
         if siae.source != source:
             # If a user/staff created structure already exists in db and its siret is later found in an export,
             # it makes sense to convert it.
@@ -185,7 +189,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     undeletable_count = 0
     deletable_skipped_count = 0
     for siret in deletable_sirets:
-        siae = Company.objects.get(siret=siret, kind__in=kinds)
+        siae = company_qs.get(siret=siret, kind__in=kinds)
 
         # Allow longer periods before activity than SIAE imports, because changes to
         # EA/EATT and GEIQ will take longer to reflect in their respective data source.
