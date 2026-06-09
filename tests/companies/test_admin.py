@@ -1,3 +1,4 @@
+import random
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -40,6 +41,19 @@ class TestCompanyAdmin:
             response = admin_client.get(reverse("admin:companies_company_add"))
         response = parse_response_to_soup(response, selector=".field-approvals_list")
         assert pretty_indented(response) == snapshot(name="approvals list")
+
+    def test_display_for_ea_eatt_company(self, admin_client):
+        company = CompanyFactory(
+            kind=random.choice([CompanyKind.EA, CompanyKind.EATT]), name="Ce n’est qu’un EA revoir"
+        )
+
+        list_url = reverse("admin:companies_company_changelist")
+        change_url = reverse("admin:companies_company_change", args=[company.pk])
+        response = admin_client.get(list_url)
+        assertContains(response, change_url)
+
+        response = admin_client.get(change_url)
+        assertContains(response, "Ce n’est qu’un EA revoir")
 
     def test_remove_last_admin_status(self, admin_client, mailoutbox):
         company = CompanyFactory(with_membership=True)
