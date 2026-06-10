@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_num_queries
   dict({
-    'num_queries': 19,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -568,6 +568,84 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ItouUserAdmin.extended_kind[users/admin.py]',
+          'VariableNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'IncludeNode[admin/change_form.html]',
+          'ForNode[admin/change_form.html]',
+          'BlockNode[admin/change_form.html]',
+          'BlockNode[admin/base.html]',
+          'ExtendsNode[admin/base_site.html]',
+          'ExtendsNode[admin/change_form.html]',
+          'ExtendsNode[admin/users/change_user_form.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouUserAdmin.extended_kind[users/admin.py]',
+          'VariableNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'IncludeNode[admin/change_form.html]',
+          'ForNode[admin/change_form.html]',
+          'BlockNode[admin/change_form.html]',
+          'BlockNode[admin/base.html]',
+          'ExtendsNode[admin/base_site.html]',
+          'ExtendsNode[admin/change_form.html]',
+          'ExtendsNode[admin/users/change_user_form.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouUserAdmin.extended_kind[users/admin.py]',
+          'VariableNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'IncludeNode[admin/change_form.html]',
+          'ForNode[admin/change_form.html]',
+          'BlockNode[admin/change_form.html]',
+          'BlockNode[admin/base.html]',
+          'ExtendsNode[admin/base_site.html]',
+          'ExtendsNode[admin/change_form.html]',
+          'ExtendsNode[admin/users/change_user_form.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
+          LIMIT 1
+        ''',
       }),
       dict({
         'origin': list([
