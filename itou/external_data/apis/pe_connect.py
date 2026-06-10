@@ -55,10 +55,9 @@ def _get_birthdate(token):
     """  # noqa: E501
     key = "dateDeNaissance"
     # code, resp = _call_api(ESD_BIRTHDATE_API, token)
-    result = _fields_or_failed(_call_api(ESD_BIRTHDATE_API, token), [key])
-    if result:
-        return {key: result.get(key)}
-
+    result = _call_api(ESD_BIRTHDATE_API, token)
+    if result and key in result:
+        return timezone.localdate(parse_datetime(result[key]))
     return None
 
 
@@ -99,11 +98,9 @@ def import_user_pe_data(
     try:
         fetched_birthdate = None
         if not user.jobseeker_profile.birthdate:
-            birthdate_info = _get_birthdate(token)
-            if birthdate_info is None:
+            fetched_birthdate = _get_birthdate(token)
+            if fetched_birthdate is None:
                 logger.warning("Could not fetch birthdate for user=%s", user.pk)
-            else:
-                fetched_birthdate = timezone.localdate(parse_datetime(birthdate_info["dateDeNaissance"]))
 
         fetched_address = None
         if not user.address_on_one_line:
