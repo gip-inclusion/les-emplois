@@ -217,6 +217,41 @@ def test_check_templates_ordering():
     assert sorted(errors) == []  # Group errors by template_name
 
 
+def test_unused_load_in_templates():
+    def iter_through_extends_node(nodelist):
+        for node in nodelist:
+            if isinstance(node, loader_tags.ExtendsNode):
+                yield from node.nodelist
+            else:
+                yield node
+
+    errors = []
+    for template_name in iter_template_names():
+        template = loader.get_template(template_name).template
+        unused_loads = []
+        for node in iter_through_extends_node(template.nodelist):
+            if isinstance(node, LoadNode):
+                [_load, library_name] = node.token.contents.split()
+
+                library = node.origin.loader.engine.template_libraries[library_name]
+                library_used = False
+                # Thanks to djlint, the check can be simple since the formatting is expected
+                for tag in library.tags:
+                    if f"{{% {tag}" in template.source:
+                        library_used = True
+                        break
+                if not library_used:
+                    for filter in library.filters:
+                        if f"|{filter}" in template.source:
+                            library_used = True
+                            break
+                if not library_used:
+                    unused_loads.append(library_name)
+        if unused_loads:
+            errors.append((template_name, f"Unused loads: {', '.join(sorted(unused_loads))}"))
+    assert sorted(errors) == []  # Group errors by template_name
+
+
 def test_files_foreign_keys():
     models = apps.get_models()
     for model in models:
