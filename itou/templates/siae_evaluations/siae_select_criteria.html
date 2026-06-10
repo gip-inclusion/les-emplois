@@ -1,10 +1,7 @@
 {% extends "layout/base.html" %}
 {% load approvals %}
 {% load components %}
-{% load django_bootstrap5 %}
-{% load format_filters %}
 {% load siae_evaluations_tags %}
-{% load static %}
 
 {% block title %}
     Auto-prescriptions à justifier pour {{ evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}

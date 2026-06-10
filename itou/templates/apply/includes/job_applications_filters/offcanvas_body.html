@@ -1,5 +1,3 @@
-{% load django_bootstrap5 %}
-
 <div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% include "apply/includes/job_applications_filters/status.html" %}
     {% if display_kind %}<input id="display-kind" type="hidden" name="display" value="{{ display_kind }}">{% endif %}

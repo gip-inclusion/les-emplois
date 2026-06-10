@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load format_filters %}
 {% block body %}
 
 Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion
