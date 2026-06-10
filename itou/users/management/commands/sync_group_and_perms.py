@@ -90,6 +90,8 @@ def get_permissions_dict():
         geo_models.ZRR: PERMS_READ,
         geiq_assessments_models.AssessmentCampaign: PERMS_READ,
         geiq_assessments_models.Assessment: PERMS_READ,
+        geiq_assessments_models.AssessmentInstitutionLink: PERMS_READ,
+        geiq_assessments_models.AssessmentTransitionLog: PERMS_READ,
         geiq_assessments_models.Employee: PERMS_READ,
         geiq_assessments_models.EmployeeContract: PERMS_READ,
         geiq_assessments_models.EmployeePrequalification: PERMS_READ,
