@@ -94,3 +94,27 @@ class DataInclusionApiClient:
 
     def doc(self, kind, **params) -> list[dict]:
         return self._request(f"/doc/{kind}", params).json()
+
+    def search_sps_services(self, *, code_commune: str) -> list[dict]:
+        """Return SPS services for a given INSEE city code.
+
+        Fetches in-person, free services from DORA and filters on the SPS networks
+        (reseaux_porteurs), which is not a supported query param on the API side (yet).
+        """
+
+        services = self.search_services(
+            code_commune=code_commune,
+            sources=["dora"],  # filter applied on services DI-sides
+            modes_accueil=["en-presentiel"],  # filter applied on structures DI-side
+            frais=["gratuit"],  # filter applied on services DI-sides
+        )
+
+        # Networks qualifying as structured pathway solutions (SPS / solutions de parcours structurées)
+        sps_networks = {
+            "epide",
+            "ecoles-de-la-deuxieme-chance",
+            "plie",
+            "alliance-villes-emploi",
+            "apprentis-dauteuil",
+        }
+        return [s for s in services if sps_networks & set(s["structure"].get("reseaux_porteurs") or [])]
