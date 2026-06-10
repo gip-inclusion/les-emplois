@@ -1,7 +1,3 @@
-{% load django_bootstrap5 %}
-{% load static %}
-{% load theme_inclusion %}
-
 {% for message in messages %}
     {% if "modal" in message.extra_tags %}
         <div class="modal fade" id="message-modal-{{ forloop.counter }}" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="message-modal-{{ forloop.counter }}-label" aria-modal="true">

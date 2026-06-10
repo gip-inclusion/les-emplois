@@ -1,5 +1,3 @@
-{% load django_bootstrap5 %}
-
 {% if filters_form.departments and filters_form.fields.departments.choices %}
     {% if btn_dropdown_filter|default:False %}
         {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.departments id_suffix="-top" only %}
