@@ -365,6 +365,24 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def birthdate(self, obj):
         return obj.jobseeker_profile.birthdate if obj.is_job_seeker else None
 
+    def extended_kind(self, obj):
+        if obj.is_professional:
+            membership_kinds = []
+            if obj.companymembership_set.exists():
+                membership_kinds.append("employeur")
+            if obj.prescribermembership_set.exists():
+                membership_kinds.append("prescripteur")
+            if obj.institutionmembership_set.exists():
+                membership_kinds.append("institutionnel")
+            if membership_kinds:
+                return f"{obj.get_kind_display()} ({', '.join(membership_kinds)})"
+            else:
+                return f"{obj.get_kind_display()} (sans organisation)"
+
+        return obj.get_kind_display()
+
+    extended_kind.short_description = "Type détaillé"
+
     @admin.display(boolean=True, description="email validé", ordering="_has_verified_email")
     def has_verified_email(self, obj):
         """
@@ -488,7 +506,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             if obj.identity_provider != IdentityProvider.PE_CONNECT:
                 readonly_fields.extend(["first_name", "last_name", "email"])
         if obj:
-            readonly_fields.append("kind")  # kind is never editable, but still addable
+            readonly_fields.append("extended_kind")
         return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
@@ -528,7 +546,16 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         assert fieldsets[1] == ("Informations personnelles", {"fields": ("first_name", "last_name", "email")})
         fieldsets[1] = (
             "Informations personnelles",
-            {"fields": ("first_name", "last_name", "email", "identity_provider", "kind", "jobseeker_profile_link")},
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                    "email",
+                    "identity_provider",
+                    "extended_kind",  # Add details to professional users
+                    "jobseeker_profile_link",
+                )
+            },
         )
 
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
