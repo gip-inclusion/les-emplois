@@ -728,15 +728,16 @@ def assessment_contracts_details(
                                 "allowance_request_justification_details",
                             )
                         )
-                    return HttpResponseRedirect(
-                        reverse(
-                            "geiq_assessments_views:assessment_contracts_details",
-                            kwargs={
-                                "contract_pk": str(contract.pk),
-                                "tab": AssessmentContractDetailsTab.CONTRACT.value,
-                            },
-                        )
+                    redirect_url = reverse(
+                        "geiq_assessments_views:assessment_contracts_details",
+                        kwargs={
+                            "contract_pk": str(contract.pk),
+                            "tab": AssessmentContractDetailsTab.CONTRACT.value,
+                        },
                     )
+                    if request.GET:
+                        redirect_url += f"?{request.GET.urlencode()}"
+                    return HttpResponseRedirect(redirect_url)
     elif request.from_institution:
         if not contract.employee.assessment.reviewed_at:
             editable = not contract.employee.assessment.grants_selection_validated_at
@@ -789,12 +790,13 @@ def assessment_contracts_details(
                     if details_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
                         redirect_to_tab = AssessmentContractDetailsTab.EMPLOYEE.value
                 if redirect_to_tab:
-                    return HttpResponseRedirect(
-                        reverse(
-                            "geiq_assessments_views:assessment_contracts_details",
-                            kwargs={"contract_pk": str(contract.pk), "tab": redirect_to_tab},
-                        )
+                    redirect_url = reverse(
+                        "geiq_assessments_views:assessment_contracts_details",
+                        kwargs={"contract_pk": str(contract.pk), "tab": redirect_to_tab},
                     )
+                    if request.GET:
+                        redirect_url += f"?{request.GET.urlencode()}"
+                    return HttpResponseRedirect(redirect_url)
 
             elif action is InstitutionAction.ALLOWANCE_REFUSAL_JUSTIFICATION:
                 if details_tab != AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION:
@@ -815,10 +817,14 @@ def assessment_contracts_details(
                         ]
                         contract.save(update_fields=("allowance_refusal_reason", "allowance_refusal_details"))
 
+    back_url = reverse(
+        "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
+    )
+    if request.GET:
+        back_url += f"?{request.GET.urlencode()}"
+
     context |= {
-        "back_url": reverse(
-            "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
-        ),
+        "back_url": back_url,
         "assessment": contract.employee.assessment,
         "editable": editable,
         "contract": contract,

@@ -30,14 +30,14 @@
 
     {% if request.from_employer and contract.requires_justification %}
         {% if contract.allowance_request_justification_reason %}
-            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
+            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                class="text-success text-decoration-none lh-1"
                data-bs-toggle="tooltip"
                data-bs-title="Vous avez motivé la demande d’aide de ce contrat">
                 <i class="ri-check-line" aria-label="Vous avez motivé la demande d’aide de ce contrat" role="button" tabindex="0"></i>
             </a>
         {% else %}
-            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}"
+            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REQUEST_JUSTIFICATION %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                class="text-warning text-decoration-none lh-1"
                data-bs-toggle="tooltip"
                data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat">
@@ -46,14 +46,14 @@
         {% endif %}
     {% elif request.from_institution and not contract.allowance_granted %}
         {% if contract.allowance_refusal_reason %}
-            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}"
+            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                class="text-success text-decoration-none lh-1"
                data-bs-toggle="tooltip"
                data-bs-title="Voir le motif de refus pour contrat.">
                 <i class="ri-check-line ri-xl" aria-label="Se rendre au formulaire de justification de refus" role="button" tabindex="0"></i>
             </a>
         {% else %}
-            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}"
+            <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                class="text-warning text-decoration-none lh-1"
                data-bs-toggle="tooltip"
                data-bs-title="Vous devez encore motiver le refus pour ce contrat.">

@@ -5953,7 +5953,7 @@
                                           Aide potentielle
                                       </th>
                                       <th scope="col">
-                                          Obtenir l’aide
+                                          Solliciter l’aide
                                       </th>
                                   </tr>
                               </thead>
@@ -5975,7 +5975,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           1 400 €
                                       </td>
                                       <td>
@@ -6009,7 +6009,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0 €
                                       </td>
                                       <td>
@@ -6043,7 +6043,7 @@
                                       <td>
                                           Non
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           814 €
                                       </td>
                                       <td>
@@ -6226,7 +6226,7 @@
                                           Aide potentielle
                                       </th>
                                       <th scope="col">
-                                          Obtenir l’aide
+                                          Solliciter l’aide
                                       </th>
                                   </tr>
                               </thead>
@@ -6248,7 +6248,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           1 400 €
                                       </td>
                                       <td>
@@ -6282,7 +6282,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0 €
                                       </td>
                                       <td>
@@ -6316,7 +6316,7 @@
                                       <td>
                                           Non
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           814 €
                                       </td>
                                       <td>
@@ -6548,7 +6548,7 @@
                                           Aide potentielle
                                       </th>
                                       <th scope="col">
-                                          Obtenir l’aide
+                                          Solliciter l’aide
                                       </th>
                                   </tr>
                               </thead>
@@ -6570,7 +6570,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           1 400 €
                                       </td>
                                       <td>
@@ -6604,7 +6604,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0 €
                                       </td>
                                       <td>
@@ -6638,7 +6638,7 @@
                                       <td>
                                           Non
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           814 €
                                       </td>
                                       <td>
@@ -7400,7 +7400,7 @@
                                               </i>
                                           </a>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           1 400 €
                                       </td>
                                       <td>
@@ -7438,7 +7438,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0 €
                                       </td>
                                       <td>
@@ -7476,7 +7476,7 @@
                                       <td>
                                           Non
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           814 €
                                       </td>
                                       <td>
@@ -7658,7 +7658,7 @@
                                               </i>
                                           </a>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           1 400 €
                                       </td>
                                       <td>
@@ -7696,7 +7696,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0 €
                                       </td>
                                       <td>
@@ -7734,7 +7734,7 @@
                                       <td>
                                           Non
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           814 €
                                       </td>
                                       <td>
@@ -7965,7 +7965,7 @@
                                               </i>
                                           </a>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           1 400 €
                                       </td>
                                       <td>
@@ -8003,7 +8003,7 @@
                                       <td>
                                           Oui
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0 €
                                       </td>
                                       <td>
@@ -8041,7 +8041,7 @@
                                       <td>
                                           Non
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           814 €
                                       </td>
                                       <td>
