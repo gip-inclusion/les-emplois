@@ -45,7 +45,7 @@
                                     {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
                                 </ul>
                             </td>
-                            <td>{{ assessment.campaign.year }}</td>
+                            <td class="text-end">{{ assessment.campaign.year }}</td>
                             <td>
                                 {% for institution in assessment.conventionned_institutions %}
                                     {{ institution.name }}
@@ -53,35 +53,35 @@
                                 {% endfor %}
                             </td>
                             <td>{% state_for_institution assessment %}</td>
-                            <td>
+                            <td class="text-end">
                                 {% if assessment.submitted_at %}
                                     {{ assessment.contracts_nb }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-end">
                                 {% if assessment.can_view_amounts %}
                                     {{ assessment.potential_allowance_amount|format_int_euros }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-end">
                                 {% if assessment.can_view_amounts %}
                                     {{ assessment.granted_amount|format_int_euros }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-end">
                                 {% if assessment.can_view_amounts %}
                                     {{ assessment.convention_amount|format_int_euros }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-end">
                                 {% if assessment.can_view_amounts %}
                                     {% grant_percentage_badge assessment %}
                                 {% else %}

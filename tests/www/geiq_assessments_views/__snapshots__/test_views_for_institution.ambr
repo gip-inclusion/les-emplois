@@ -4783,7 +4783,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -4794,19 +4794,19 @@
                                               À valider
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
                                               100 %
                                           </span>
@@ -4825,7 +4825,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -4836,19 +4836,19 @@
                                               À contrôler
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -4868,7 +4868,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -4879,19 +4879,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -4907,7 +4907,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -4918,19 +4918,19 @@
                                               Validé
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           90 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
                                               90 %
                                           </span>
@@ -4948,7 +4948,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -4959,19 +4959,19 @@
                                               Validé
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           0
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           80 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
                                               80 %
                                           </span>
@@ -5144,7 +5144,7 @@
                                           <ul class="mb-0">
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5154,19 +5154,19 @@
                                               À valider
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           3
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -5178,7 +5178,7 @@
                                           <ul class="mb-0">
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5188,19 +5188,19 @@
                                               À contrôler
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -5215,7 +5215,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5225,19 +5225,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -5249,7 +5249,7 @@
                                           <ul class="mb-0">
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5259,19 +5259,19 @@
                                               Validé
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           4
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           3 256 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           80 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
                                               80 %
                                           </span>
@@ -5446,7 +5446,7 @@
                                           <ul class="mb-0">
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5456,19 +5456,19 @@
                                               À valider
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           3
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2 442 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
                                               100 %
                                           </span>
@@ -5484,7 +5484,7 @@
                                           <ul class="mb-0">
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5494,19 +5494,19 @@
                                               À contrôler
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -5523,7 +5523,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5533,19 +5533,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -5559,7 +5559,7 @@
                                           <ul class="mb-0">
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5569,19 +5569,19 @@
                                               Validé
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           4
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           3 256 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           80 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           100 000 €
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
                                               80 %
                                           </span>
@@ -5865,7 +5865,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -5876,19 +5876,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -6066,7 +6066,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -6077,19 +6077,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -6741,7 +6741,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -6751,19 +6751,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
@@ -6931,7 +6931,7 @@
                                               </li>
                                           </ul>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           2024
                                       </td>
                                       <td>
@@ -6941,19 +6941,19 @@
                                               En attente
                                           </span>
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
-                                      <td>
+                                      <td class="text-end">
                                           -
                                       </td>
                                   </tr>
