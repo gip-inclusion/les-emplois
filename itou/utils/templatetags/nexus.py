@@ -313,7 +313,7 @@ def get_service_urls(user):
 
 @register.simple_tag(takes_context=True)
 def nexus_dropdown(context):
-    dropdown_status = context["request"].nexus_dropdown
+    dropdown_status = getattr(context["request"], "nexus_dropdown", {})
     if dropdown_status.get("mvp_enabled"):
         if dropdown_status["proconnect"] is False:
             template = get_template("nexus/components/dropdown_no_proconnect.html")
