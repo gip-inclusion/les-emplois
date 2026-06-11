@@ -444,12 +444,13 @@ def api_token(request, template_name="dashboard/api_token.html"):
     if not (request.from_employer and request.is_current_organization_admin):
         raise PermissionDenied
 
+    token_is_new = False
     if request.method == "POST":
         deleted = False
         if request.POST.get("action") == "regenerate":
             deleted, _objs = Token.objects.filter(user=request.user).delete()
-        token, created = Token.objects.get_or_create(user=request.user)
-        if created:
+        token, token_is_new = Token.objects.get_or_create(user=request.user)
+        if token_is_new:
             if deleted:
                 msg = "Votre token a été regénéré avec succès."
                 logger.info("API token regenerated")
@@ -459,11 +460,15 @@ def api_token(request, template_name="dashboard/api_token.html"):
             messages.success(request, msg, extra_tags="toast")
     else:
         token = Token.objects.filter(user=request.user).first()  # May be None if no token
-
+    if token:
+        token_key = token if token_is_new else ("*" * (len(token.key) - 3) + token.key[-3:])
+    else:
+        token_key = None
     context = {
         "back_url": reverse("dashboard:index"),
         "login_string": TOKEN_ID_STR,
-        "token": token,
+        "token_is_new": token_is_new,
+        "token_key": token_key,
         "companies": request.user.companymembership_set.order_by("pk").values(
             "is_admin",
             display_name=Coalesce(NullIf(F("company__brand"), Value("")), F("company__name")),

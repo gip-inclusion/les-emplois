@@ -38,6 +38,41 @@
                               </h1>
                           </div>
                       </div>
+                      <div class="alert alert-important" role="status">
+                          <div class="row">
+                              <div class="col-auto pe-0">
+                                  <i aria-hidden="true" class="ri-alert-line ri-xl text-important">
+                                  </i>
+                              </div>
+                              <div class="col">
+                                  <p class="mb-2">
+                                      <strong>
+                                          Votre nouveau token ne sera affiché qu’une seule fois
+                                      </strong>
+                                  </p>
+                                  <p>
+                                      Il est indispensable de le copier afin de le sauvegarder !
+                                  </p>
+                                  <ul class="list-data mb-0">
+                                      <li>
+                                          <small>
+                                              Votre nouveau token
+                                          </small>
+                                          <strong>
+                                              [Token of user]
+                                          </strong>
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="[Token of user]" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span class="visually-hidden">
+                                                  Copier
+                                              </span>
+                                          </button>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -116,22 +151,15 @@
                                   <strong>
                                       __token__
                                   </strong>
-                                  " et comme mot de passe le token suivant.
+                                  " et comme mot de passe votre token.
                               </p>
                               <span class="d-block text-center mb-2">
-                                  Votre token d’API est :
+                                  Votre token d’API est :
                                   <strong>
                                       [Token of user]
                                   </strong>
                               </span>
-                              <button class="btn btn-ico btn-primary btn-block" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="[Token of user]" type="button">
-                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                  </i>
-                                  <span>
-                                      Copier le token
-                                  </span>
-                              </button>
-                              <button class="btn btn-secondary btn-block mt-3" data-bs-target="#regenerate_token_modal" data-bs-toggle="modal" type="button">
+                              <button class="btn btn-primary btn-block mt-3" data-bs-target="#regenerate_token_modal" data-bs-toggle="modal" type="button">
                                   Regénérer un nouveau token d’API
                               </button>
                           </div>
