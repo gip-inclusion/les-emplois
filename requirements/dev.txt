@@ -576,9 +576,9 @@ django-pgtrigger==4.17.0 \
     --hash=sha256:06048cdeb57e20987fd0bf7dd673512a1413a08868eea248d70dbb970e967175 \
     --hash=sha256:55d297a756b5b6a8e0c533d3323fda1589c699e7d14aa3fff7fa7d774c46363c
     # via -r test.txt
-django-redis==6.0.0 \
-    --hash=sha256:20bf0063a8abee567eb5f77f375143c32810c8700c0674ced34737f8de4e36c0 \
-    --hash=sha256:2d9cb12a20424a4c4dde082c6122f486628bae2d9c2bee4c0126a4de7fda00dd
+django-redis==7.0.0 \
+    --hash=sha256:4b23aa6e0cd0937bb1242e9a463809e6004de3ca2150f34e986306bb6220d688 \
+    --hash=sha256:e48491c862f4350b0747ceb1016700686fb93c4f4e0fb9c490fe6c6658ffd933
     # via -r test.txt
 django-select2==8.4.8 \
     --hash=sha256:592e52effff2b5850cb7c98b265715b6704fb784699c4aedddfdd8ae1ffa1e81 \

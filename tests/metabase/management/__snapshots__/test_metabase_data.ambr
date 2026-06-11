@@ -1,6 +1,6 @@
 # serializer version: 1
 # name: test_fetch_kpi[False][cache]
-  OrderedDict({
+  dict({
   })
 # ---
 # name: test_fetch_kpi[False][logs]
@@ -87,22 +87,22 @@
   )
 # ---
 # name: test_fetch_kpi[True][cache]
-  OrderedDict({
+  dict({
     <DatumKey.DATA_UPDATED_AT: 'data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
     <DatumKey.FLUX_IAE_DATA_UPDATED_AT: 'flux_iae_data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
-    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: 'job_seeker_still_seeking_after_30_days'>: 4413,
-    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_DEPARTMENTS: 'job_seeker_still_seeking_after_30_days_by_departments'>: dict({
-      'Département': 4413,
-    }),
-    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_REGIONS: 'job_seeker_still_seeking_after_30_days_by_regions'>: dict({
-      'Région': 4413,
-    }),
     <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: 'job_application_with_hiring_difficulty'>: 1175,
     <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_DEPARTMENTS: 'job_application_with_hiring_difficulty_by_departments'>: dict({
       'Département Structure': 1175,
     }),
     <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_REGIONS: 'job_application_with_hiring_difficulty_by_regions'>: dict({
       'Région Structure': 1175,
+    }),
+    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: 'job_seeker_still_seeking_after_30_days'>: 4413,
+    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_DEPARTMENTS: 'job_seeker_still_seeking_after_30_days_by_departments'>: dict({
+      'Département': 4413,
+    }),
+    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_REGIONS: 'job_seeker_still_seeking_after_30_days_by_regions'>: dict({
+      'Région': 4413,
     }),
     <DatumKey.RATE_OF_AUTO_PRESCRIPTION: 'rate_of_auto_prescription'>: 5292,
     <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_DEPARTMENTS: 'rate_of_auto_prescription_by_departments'>: dict({
