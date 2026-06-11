@@ -8,15 +8,11 @@
 #}
 
 {% block body %}
-
-Bonjour {% if user.title %}{{ user.get_title_display }} {% endif %}{{ user.get_full_name }},
+Bonjour {{ user.get_full_name }},
 
 Vos informations personnelles ont été mises à jour sur les Emplois de l’inclusion par la structure {{ organization }}.
 
 Si vous n'êtes pas à l'origine de cette demande ou si vous souhaitez consulter, modifier ou supprimer vos données, vous pouvez vous connecter à votre espace candidat ici : {{ edit_user_info_url }}.
 
 Cet e-mail a été généré et envoyé automatiquement, merci de ne pas y répondre.
-
-Les Emplois de l’inclusion
-
 {% endblock body %}
