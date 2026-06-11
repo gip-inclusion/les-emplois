@@ -183,7 +183,7 @@
                                             {% for contract in contracts_page %}
                                                 <tr>
                                                     <td>
-                                                        <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
+                                                        <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details_employee" contract_pk=contract.pk %}">{{ contract.employee.get_full_name }}</a>
                                                         {% if contract.employee.allowance_granted_previous_year %}
                                                             <i class="ri-file-warning-line ri-lg text-warning"
                                                                aria-label="Salarié dont un des contrats a bénéficié d’une aide l’année dernière."
@@ -208,7 +208,7 @@
                                                         {% else %}
                                                             Non
                                                             {% if request.from_institution and contract.allowance_request_justification_reason %}
-                                                                <a href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.CONTRACT %}"
+                                                                <a href="{% url 'geiq_assessments_views:assessment_contracts_details_contract' contract_pk=contract.pk %}"
                                                                    class="text-info text-decoration-none lh-1"
                                                                    data-bs-toggle="tooltip"
                                                                    data-bs-title="Le GEIQ a motivé cette demande d’aide">

@@ -1,10 +1,13 @@
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load enums %}
+{% enums "geiq_assessments" "EmployerAction" as EmployerAction %}
 <div class="c-form mb-3 mb-md-4">
     <form method="post">
         {% csrf_token %}
         {% bootstrap_form_errors form type="all" %}
         <h2 class="h3">{{ form.allowance_request_reason.label }} *</h2>
+        <input type="hidden" name="action" value="{{ EmployerAction.ALLOWANCE_REQUEST_JUSTIFICATION }}" />
         {% for choice in form.allowance_request_reason %}
             <div class="form-group">
                 <div class="form-check">

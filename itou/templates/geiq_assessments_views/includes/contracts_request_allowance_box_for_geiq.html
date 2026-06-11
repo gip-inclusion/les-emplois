@@ -1,8 +1,9 @@
 {% load enums %}
+{% enums "geiq_assessments" "EmployerAction" as EmployerAction %}
 <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
     {% if contract.allowance_requested %}
+        <h3>Aide sollicitée pour ce contrat</h3>
         {% if contract.requires_justification %}
-            <h3>Aide sollicitée pour ce contrat</h3>
             <p>
                 La durée du contrat est inférieure à {{ MIN_DAYS_IN_YEAR_FOR_ALLOWANCE }} jours sur l’année {{ contract.employee.assessment.campaign.year }}.
                 {% if contract.allowance_request_justification_reason %}
@@ -14,36 +15,29 @@
             <p>Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».</p>
             {% if active_tab is not active_tab.ALLOWANCE_REQUEST_JUSTIFICATION %}
                 <a type="button"
-                   class="btn btn-primary w-100 mb-3"
-                   {% if disabled %}disabled{% endif %}
-                   href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=active_tab.ALLOWANCE_REQUEST_JUSTIFICATION.value %}">
+                   class="btn btn-primary w-100 mb-3{% if disabled %} disabled{% endif %}"
+                   href="{% url "geiq_assessments_views:assessment_contracts_details_request_justification" contract_pk=contract.pk %}">
                     {{ contract.allowance_request_justification_reason|yesno:"Modifier votre justification,Justifier la demande d’aide" }}
                 </a>
             {% endif %}
-            <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_exclude' contract_pk=contract.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100"{% if disabled %} disabled{% endif %}>
-                    <i class="ri-close-large-line font-weight-medium" aria-hidden="true"></i>
-                    <span>Ne plus solliciter l’aide</span>
-                </button>
-            </form>
         {% else %}
-            <h3>Aide sollicitée pour ce contrat</h3>
             <p>Vous avez la possibilité d’annuler la demande d’aide car le bilan n’a pas encore été envoyé.</p>
-            <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_exclude' contract_pk=contract.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100"{% if disabled %} disabled{% endif %}>
-                    <i class="ri-close-large-line font-weight-medium" aria-hidden="true"></i>
-                    <span>Ne plus solliciter l’aide</span>
-                </button>
-            </form>
         {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ico btn-outline-primary bg-white w-100" name="action" value="{{ EmployerAction.UNREQUEST_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
+                <i class="ri-close-large-line font-weight-medium" aria-hidden="true"></i>
+                <span>Ne plus solliciter l’aide</span>
+            </button>
+        </form>
     {% else %}
         <h3>Aide non sollicitée pour ce contrat</h3>
         <p>Vous avez la possibilité de présenter ce contrat tant que le bilan n’a pas été envoyé.</p>
-        <form method="post" action="{% url 'geiq_assessments_views:assessment_contracts_include' contract_pk=contract.pk %}">
+        <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100"{% if disabled %} disabled{% endif %}>Solliciter l’aide</button>
+            <button type="submit" class="btn btn-primary w-100" name="action" value="{{ EmployerAction.REQUEST_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
+                Solliciter l’aide
+            </button>
         </form>
     {% endif %}
 </div>

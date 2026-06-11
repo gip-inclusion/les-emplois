@@ -87,9 +87,34 @@ urlpatterns = [
         kwargs={"new_value": False},
     ),
     path(
-        "contracts/<uuid:contract_pk>/<str:tab>",
-        views.assessment_contracts_details,
-        name="assessment_contracts_details",
+        "contracts/<uuid:contract_pk>/employee",
+        views.AssessmentContractDetailsEmployeeView.as_view(),
+        name="assessment_contracts_details_employee",
+    ),
+    path(
+        "contracts/<uuid:contract_pk>/contract",
+        views.AssessmentContractDetailsContractView.as_view(),
+        name="assessment_contracts_details_contract",
+    ),
+    path(
+        "contracts/<uuid:contract_pk>/support-and-training",
+        views.AssessmentContractDetailsSupportAndTrainingView.as_view(),
+        name="assessment_contracts_details_support_and_training",
+    ),
+    path(
+        "contracts/<uuid:contract_pk>/exit",
+        views.AssessmentContractDetailsExitView.as_view(),
+        name="assessment_contracts_details_exit",
+    ),
+    path(
+        "contracts/<uuid:contract_pk>/request-justification",
+        views.AssessmentContractDetailsRequestJustificationView.as_view(),
+        name="assessment_contracts_details_request_justification",
+    ),
+    path(
+        "contracts/<uuid:contract_pk>/refusal-justification",
+        views.AssessmentContractDetailsRefusalJustificationView.as_view(),
+        name="assessment_contracts_details_refusal_justification",
     ),
     # institution urls
     path("institution/list", views.list_for_institution, name="list_for_institution"),
