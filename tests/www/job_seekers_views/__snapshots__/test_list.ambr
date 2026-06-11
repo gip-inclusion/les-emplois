@@ -137,7 +137,7 @@
               <fieldset>
                   <legend>
                       <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
-                          Collaborateurs
+                          Accompagnateur de ma structure
                       </button>
                   </legend>
                   <div class="mt-3 collapse" id="collapseSenders">
