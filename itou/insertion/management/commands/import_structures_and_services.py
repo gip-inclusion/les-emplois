@@ -421,6 +421,8 @@ class Command(BaseCommand):
 
         service.eligibility_zones = data["zone_eligibilite"] or []
 
+        service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
+
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""
         )  # service.mobilizations is a ManyToManyField

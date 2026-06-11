@@ -65,10 +65,32 @@
       "horaires_accueil": "Mo-Fr 09:00-12:00,14:00-17:00",
       "accessibilite_lieu": null,
       "reseaux_porteurs": null
+    },
+    {
+      "source": "mission-locale",
+      "id": "mission-locale--with-mobilization-link",
+      "nom": "Structure avec lien de mobilisation",
+      "date_maj": "2025-02-14",
+      "description": null,
+      "lien_source": null,
+      "siret": null,
+      "commune": null,
+      "code_postal": null,
+      "code_insee": null,
+      "adresse": null,
+      "complement_adresse": null,
+      "longitude": null,
+      "latitude": null,
+      "telephone": null,
+      "courriel": null,
+      "site_web": null,
+      "horaires_accueil": null,
+      "accessibilite_lieu": null,
+      "reseaux_porteurs": null
     }
   ],
-  "total": 3,
+  "total": 4,
   "page": 1,
-  "size": 3,
+  "size": 4,
   "pages": 1
 }
