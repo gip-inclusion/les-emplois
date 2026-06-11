@@ -221,9 +221,9 @@
                                                     <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                                     <td>
                                                         {% if request.from_employer %}
-                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request disable_stats_oob=True only %}
+                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token editable=can_validate request=request disable_stats_oob=True only %}
                                                         {% elif request.from_institution %}
-                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request disable_stats_oob=True only %}
+                                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token editable=can_validate request=request disable_stats_oob=True only %}
                                                         {% endif %}
                                                     </td>
                                                 </tr>

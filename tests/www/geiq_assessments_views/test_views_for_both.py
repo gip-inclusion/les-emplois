@@ -457,8 +457,7 @@ class TestAssessmentContractsListAndToggle:
             reverse(
                 "geiq_assessments_views:assessment_contracts_exclude",
                 kwargs={"contract_pk": str(contract_1.pk)},
-            )
-            + "?from_list=1",
+            ),
             headers={"HX-Request": "true"},
         )
         update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_1.pk} > form", response)
@@ -472,8 +471,7 @@ class TestAssessmentContractsListAndToggle:
             reverse(
                 "geiq_assessments_views:assessment_contracts_include",
                 kwargs={"contract_pk": str(contract_2.pk)},
-            )
-            + "?from_list=1",
+            ),
             headers={"HX-Request": "true"},
         )
         update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_2.pk} > form", response)
@@ -555,8 +553,7 @@ class TestAssessmentContractsListAndToggle:
             reverse(
                 "geiq_assessments_views:assessment_contracts_exclude",
                 kwargs={"contract_pk": str(contract_1.pk)},
-            )
-            + "?from_list=1",
+            ),
             headers={"HX-Request": "true"},
         )
         update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_1.pk} > form", response)
@@ -569,8 +566,7 @@ class TestAssessmentContractsListAndToggle:
             reverse(
                 "geiq_assessments_views:assessment_contracts_include",
                 kwargs={"contract_pk": str(contract_2.pk)},
-            )
-            + "?from_list=1",
+            ),
             headers={"HX-Request": "true"},
         )
         update_page_with_htmx(simulated_page, f"#toggle_allowance_for_contract_{contract_2.pk} > form", response)
@@ -658,8 +654,7 @@ class TestAssessmentContractsListAndToggle:
             reverse(
                 "geiq_assessments_views:assessment_contracts_exclude",
                 kwargs={"contract_pk": str(contract_1.pk)},
-            )
-            + "?from_list=1",
+            ),
             headers={"HX-Request": "true"},
         )
         contract_1.refresh_from_db()
