@@ -6,9 +6,7 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8">
-        <title>
-            {% block title %}- Les emplois de l'inclusion{% endblock %}
-        </title>
+        <title>{% block title %}- Les emplois de l'inclusion{% endblock %}</title>
         {% block meta_description %}
             <meta name="description"
                   content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs inclusifs (structures de l'insertion par l'activité économique et du secteur adapté)">
@@ -90,7 +88,8 @@
                 <div class="s-title-02__container container">
                     <div class="s-title-02__row row">
                         <div class="s-title-02__col col-12">
-                            {% block title_navinfo %}{% endblock %}
+                            {% block title_navinfo %}
+                            {% endblock %}
                             {% block title_content %}{% endblock %}
                             {% block title_messages %}
                                 {% bootstrap_messages %}

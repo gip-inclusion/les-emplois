@@ -126,7 +126,9 @@
                 <i class="text-disabled">Aucune information supplémentaire</i>
             {% elif other_infos|length > 1 %}
                 <ul>
-                    {% for item in other_infos %}<li>{{ profile|profile_field_display:item }}</li>{% endfor %}
+                    {% for item in other_infos %}
+                        <li>{{ profile|profile_field_display:item }}</li>
+                    {% endfor %}
                 </ul>
             {% else %}
                 <strong>{{ profile|profile_field_display:other_infos.0 }}</strong>

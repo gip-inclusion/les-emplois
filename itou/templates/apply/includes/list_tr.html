@@ -53,7 +53,9 @@
                 Candidature spontanée
             {% else %}
                 <ul class="list-unstyled">
-                    {% for job in all_jobs %}<li>{{ job.display_name }}</li>{% endfor %}
+                    {% for job in all_jobs %}
+                        <li>{{ job.display_name }}</li>
+                    {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
@@ -89,7 +91,9 @@
             <td>
                 {% if job_application.preloaded_administrative_criteria %}
                     <ul class="mb-0">
-                        {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
+                        {% for criteria in job_application.preloaded_administrative_criteria %}
+                            <li>{{ criteria.name }}</li>
+                        {% endfor %}
                     </ul>
                     {% if job_application.preloaded_administrative_criteria_extra_nb %}
                         <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
