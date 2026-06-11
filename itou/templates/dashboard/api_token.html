@@ -27,32 +27,42 @@
                                 Une API (application programming interface ou « interface de programmation d’application ») est une interface logicielle qui permet de « connecter » le site des emplois de l’inclusion à un autre logiciel ou service afin d’échanger des données et des fonctionnalités.
                             </p>
                             <p>En tant qu’administrateur de structures, vous avez accès aux API suivantes :</p>
-                            <ul class="list-unstyled">
+                            <ul>
                                 <li>
-                                    Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>) : cette API est disponible par défaut pour toutes vos structures.
-                                    {% component_alert content=content variant="warning" %}
-                                        {% fragment as content %}
+                                    <strong>Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>)</strong>
+                                    <br>
+                                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-2 mb-3" %}
+                                        {% fragment as c_info__summary %}
+                                            Cette API est disponible par défaut pour toutes vos structures
+                                        {% endfragment %}
+                                        {% fragment as c_info__detail %}
                                             <p class="mb-0">
                                                 Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.
                                             </p>
                                         {% endfragment %}
-                                    {% endcomponent_alert %}
+                                    {% endcomponent_info %}
                                 </li>
                                 <li>
-                                    Candidats  (<a href="{% url 'v1:redoc' %}#tag/candidats" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>) : cette API est disponible par défaut sur une seule structure mais vous pouvez utiliser
-                                    des paramètres pour accéder aux candidats de toutes vos structures.
-                                    {% component_alert content=content variant="warning" %}
-                                        {% fragment as content %}
-                                            <p class="mb-0">Vous devez être administrateur de toutes les structures ci-dessous pour utiliser cette API.</p>
+                                    <strong>Candidats  (<a href="{% url 'v1:redoc' %}#tag/candidats" target="_blank" class="has-external-link" rel="noopener">voir la documentation</a>)</strong>
+                                    <br>
+                                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-2" %}
+                                        {% fragment as c_info__summary %}
+                                            Cette API est disponible par défaut sur une seule structure
                                         {% endfragment %}
-                                    {% endcomponent_alert %}
+                                        {% fragment as c_info__detail %}
+                                            <ul class="mb-0">
+                                                <li>Vous pouvez utiliser des paramètres pour accéder aux candidats de toutes vos structures.</li>
+                                                <li>Vous devez être administrateur de toutes les structures ci-dessous pour utiliser cette API.</li>
+                                            </ul>
+                                        {% endfragment %}
+                                    {% endcomponent_info %}
                                 </li>
                             </ul>
                         </div>
                     </div>
                     <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                         <div class="c-box mb-3 mb-md-4">
-                            <h3>Connexion a l’API</h3>
+                            <h3>Connexion à l’API</h3>
                             <p>
                                 Pour vous connecter à l’API vous devez utiliser l’identifiant "<strong>{{ login_string }}</strong>" et comme mot de passe le token suivant.
                             </p>

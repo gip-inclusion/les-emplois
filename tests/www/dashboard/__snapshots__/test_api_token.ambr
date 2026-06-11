@@ -43,45 +43,49 @@
                               <p>
                                   En tant qu’administrateur de structures, vous avez accès aux API suivantes :
                               </p>
-                              <ul class="list-unstyled">
+                              <ul>
                                   <li>
-                                      Fiches salarié (
-                                      <a class="has-external-link" href="/api/v1/redoc/#tag/employee-records" rel="noopener" target="_blank">
-                                          voir la documentation
-                                      </a>
-                                      ) : cette API est disponible par défaut pour toutes vos structures.
-                                      <div class="alert alert-warning" role="status">
-                                          <div class="row">
-                                              <div class="col-auto pe-0">
-                                                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
-                                                  </i>
-                                              </div>
-                                              <div class="col">
-                                                  <p class="mb-0">
-                                                      Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.
-                                                  </p>
-                                              </div>
+                                      <strong>
+                                          Fiches salarié (
+                                          <a class="has-external-link" href="/api/v1/redoc/#tag/employee-records" rel="noopener" target="_blank">
+                                              voir la documentation
+                                          </a>
+                                          )
+                                      </strong>
+                                      <br/>
+                                      <div class="c-info mt-2 mb-3">
+                                          <span class="c-info__summary">
+                                              Cette API est disponible par défaut pour toutes vos structures
+                                          </span>
+                                          <div class="c-info__detail">
+                                              <p class="mb-0">
+                                                  Votre éditeur de logiciel doit filtrer les données par “SIRET” afin qu’elles soient rattachées dans les bonnes structures.
+                                              </p>
                                           </div>
                                       </div>
                                   </li>
                                   <li>
-                                      Candidats  (
-                                      <a class="has-external-link" href="/api/v1/redoc/#tag/candidats" rel="noopener" target="_blank">
-                                          voir la documentation
-                                      </a>
-                                      ) : cette API est disponible par défaut sur une seule structure mais vous pouvez utiliser
-                                      des paramètres pour accéder aux candidats de toutes vos structures.
-                                      <div class="alert alert-warning" role="status">
-                                          <div class="row">
-                                              <div class="col-auto pe-0">
-                                                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
-                                                  </i>
-                                              </div>
-                                              <div class="col">
-                                                  <p class="mb-0">
+                                      <strong>
+                                          Candidats  (
+                                          <a class="has-external-link" href="/api/v1/redoc/#tag/candidats" rel="noopener" target="_blank">
+                                              voir la documentation
+                                          </a>
+                                          )
+                                      </strong>
+                                      <br/>
+                                      <div class="c-info mt-2">
+                                          <span class="c-info__summary">
+                                              Cette API est disponible par défaut sur une seule structure
+                                          </span>
+                                          <div class="c-info__detail">
+                                              <ul class="mb-0">
+                                                  <li>
+                                                      Vous pouvez utiliser des paramètres pour accéder aux candidats de toutes vos structures.
+                                                  </li>
+                                                  <li>
                                                       Vous devez être administrateur de toutes les structures ci-dessous pour utiliser cette API.
-                                                  </p>
-                                              </div>
+                                                  </li>
+                                              </ul>
                                           </div>
                                       </div>
                                   </li>
@@ -91,7 +95,7 @@
                       <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                           <div class="c-box mb-3 mb-md-4">
                               <h3>
-                                  Connexion a l’API
+                                  Connexion à l’API
                               </h3>
                               <p>
                                   Pour vous connecter à l’API vous devez utiliser l’identifiant "
