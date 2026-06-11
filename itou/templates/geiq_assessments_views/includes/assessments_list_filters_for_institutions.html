@@ -1,9 +1,22 @@
+{% load str_filters %}
 <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
     <div class="col-12">
         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.campaigns only %}
             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.institutions only %}
             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.states only %}
+            {% partialdef assessments-filter-counter inline %}
+                <div class="ms-md-auto" id="assessments-filter-counter"{% if hx_swap_oob|default:False %} hx-swap-oob="true"{% endif %}>
+                    {% if filters_counter > 0 %}
+                        <a href="{% url "geiq_assessments_views:list_for_institution" %}"
+                           class="btn btn-ico btn-dropdown-filter"
+                           aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}">
+                            <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+                            <span>Effacer tout</span>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endpartialdef %}
         </div>
     </div>
 </div>

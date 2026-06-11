@@ -4286,6 +4286,8 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
+                          </div>
                       </div>
                   </div>
               </div>
@@ -4646,6 +4648,8 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
+                          </div>
                       </div>
                   </div>
               </div>
@@ -4943,6 +4947,8 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
                           </div>
                       </div>
                   </div>
@@ -5244,6 +5250,8 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
+                          </div>
                       </div>
                   </div>
               </div>
@@ -5361,6 +5369,8 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
                           </div>
                       </div>
                   </div>
@@ -5560,6 +5570,8 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
                           </div>
                       </div>
                   </div>
@@ -6230,6 +6242,8 @@
                                   </li>
                               </ul>
                           </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
+                          </div>
                       </div>
                   </div>
               </div>
@@ -6417,6 +6431,8 @@
                                       </div>
                                   </li>
                               </ul>
+                          </div>
+                          <div class="ms-md-auto" id="assessments-filter-counter">
                           </div>
                       </div>
                   </div>

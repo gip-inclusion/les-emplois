@@ -24,7 +24,7 @@
                   hx-swap="outerHTML"
                   hx-push-url="true"
                   hx-include="#id_company">
-                {% include "geiq_assessments_views/includes/assessments_list_filters_for_institutions.html" with filters_form=filters_form only %}
+                {% include "geiq_assessments_views/includes/assessments_list_filters_for_institutions.html" with filters_form=filters_form filters_counter=filters_counter only %}
             </form>
             <div class="s-section__row row">
                 <div class="col-12">

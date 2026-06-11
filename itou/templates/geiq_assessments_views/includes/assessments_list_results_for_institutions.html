@@ -98,4 +98,5 @@
 
 {% if request.htmx %}
     {% include "geiq_assessments_views/list_for_institution.html#assessments-count" with hx_swap_oob=True assessments=assessments only %}
+    {% include "geiq_assessments_views/includes/assessments_list_filters_for_institutions.html#assessments-filter-counter" with hx_swap_oob=True filters_counter=filters_counter only %}
 {% endif %}

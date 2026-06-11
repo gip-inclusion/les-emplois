@@ -307,6 +307,9 @@ class AssessmentsFilterForInstitutionForm(forms.Form):
 
         return queryset.filter(*filters)
 
+    def get_filters_counter(self):
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
+
 
 class ContractFilterForm(forms.Form):
     """

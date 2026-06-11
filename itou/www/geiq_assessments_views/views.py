@@ -1021,6 +1021,7 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
         "assessments": assessments,
         "can_access_details": organization_kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
         "filters_form": filters_form,
+        "filters_counter": filters_form.get_filters_counter(),
     }
     return render(
         request,
