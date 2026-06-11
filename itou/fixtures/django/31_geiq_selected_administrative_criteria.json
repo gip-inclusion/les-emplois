@@ -6,7 +6,8 @@
       "certified_at": null,
       "created_at": "2025-05-27T12:59:25.239Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 1,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 1
@@ -18,7 +19,8 @@
       "certified_at": null,
       "created_at": "2025-05-27T12:59:25.239Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 1,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 2
@@ -30,7 +32,8 @@
       "certified_at": null,
       "created_at": "2025-05-27T12:59:25.239Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 1,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 3
@@ -42,7 +45,8 @@
       "certified_at": null,
       "created_at": "2025-05-27T12:59:25.239Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 1,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 4
@@ -54,7 +58,8 @@
       "certified_at": null,
       "created_at": "2025-07-24T13:29:08.453Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 2
+      "eligibility_diagnosis": 2,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 5
@@ -66,7 +71,8 @@
       "certified_at": null,
       "created_at": "2025-07-24T13:29:08.453Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 2
+      "eligibility_diagnosis": 2,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 6
@@ -78,7 +84,8 @@
       "certified_at": null,
       "created_at": "2025-07-24T13:29:08.453Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 2
+      "eligibility_diagnosis": 2,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 7
@@ -90,7 +97,8 @@
       "certified_at": null,
       "created_at": "2025-07-24T13:29:08.453Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 2
+      "eligibility_diagnosis": 2,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 8
@@ -102,7 +110,8 @@
       "certified_at": null,
       "created_at": "2025-07-24T13:29:08.453Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 2
+      "eligibility_diagnosis": 2,
+      "last_certification_attempt_at": null
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 9
