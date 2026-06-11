@@ -5980,7 +5980,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" disabled="" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6014,7 +6014,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6048,7 +6048,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6253,7 +6253,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6287,7 +6287,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6321,7 +6321,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6575,7 +6575,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6609,7 +6609,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -6643,7 +6643,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7405,7 +7405,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" disabled="" id="allowance_for_contract_44444444-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7443,7 +7443,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7481,7 +7481,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7663,7 +7663,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" id="allowance_for_contract_44444444-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7701,7 +7701,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7739,7 +7739,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -7970,7 +7970,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_44444444-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" id="allowance_for_contract_44444444-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -8008,7 +8008,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
@@ -8046,7 +8046,7 @@
                                       </td>
                                       <td>
                                           <div class="d-flex align-items-start" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
+                                              <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude" hx-swap="outerHTML" hx-target="#toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444" hx-trigger="change">
                                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                   <div class="form-check form-switch mb-0">
                                                       <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>

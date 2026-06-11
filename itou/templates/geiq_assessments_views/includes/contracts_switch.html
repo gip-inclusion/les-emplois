@@ -8,16 +8,12 @@
 {% endif %}
 
 <div class="d-flex align-items-start" id="toggle_allowance_for_contract_{{ contract.pk }}">
-    <form hx-post="{{ post_url }}{% if from_list %}?from_list=1{% endif %}"
-          hx-trigger="change"
-          hx-target="#toggle_allowance_for_contract_{{ contract.pk }}"
-          hx-swap="outerHTML"
-          class="js-prevent-multiple-submit">
+    <form hx-post="{{ post_url }}" hx-trigger="change" hx-target="#toggle_allowance_for_contract_{{ contract.pk }}" hx-swap="outerHTML" class="js-prevent-multiple-submit">
         {% csrf_token %}
-        <div class="form-check form-switch mb-0{% if not from_list %} form-switch-lg{% endif %}">
+        <div class="form-check form-switch mb-0">
             <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if not editable %}disabled{% endif %} />
             <label class="form-check-label" for="allowance_for_contract_{{ contract.pk }}">
-                <span {% if from_list %}class="visually-hidden"{% endif %}>
+                <span class="visually-hidden">
                     {% if request.from_employer %}
                         Obtenir l’aide
                     {% elif request.from_institution %}
@@ -63,7 +59,7 @@
     {% endif %}
 </div>
 {% with disable_oob=disable_stats_oob|default:False %}
-    {% if from_list and request.htmx and not disable_oob %}
+    {% if request.htmx and not disable_oob %}
         {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True request=request only %}
         {% include "geiq_assessments_views/includes/contracts_list_validate_button_form.html" with ContractsAction=ContractsAction back_url=back_url contracts_awaiting_justification_nb=stats.contracts_awaiting_justification_nb csrf_token=csrf_token request=request hx_swap_oob=True only %}
         {% include "geiq_assessments_views/includes/contracts_list_justification_alert.html" with contracts_awaiting_justification_nb=stats.contracts_awaiting_justification_nb assessment=assessment request=request hx_swap_oob=True only %}

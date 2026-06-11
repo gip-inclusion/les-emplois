@@ -877,7 +877,6 @@ def assessment_contracts_toggle(
             contract.allowance_refusal_details = ""
             updated_fields += ["allowance_refusal_reason", "allowance_refusal_details"]
         contract.save(update_fields=updated_fields)
-    from_list = bool(request.GET.get("from_list"))
 
     # For the buttons not relying on HTMX (i.e. cards/boxes inside contract details tabs).
     if not request.htmx:
@@ -898,18 +897,16 @@ def assessment_contracts_toggle(
         )
 
     stats = None
-    if from_list:
-        if request.from_employer:
-            stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
-            back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
-        elif request.from_institution:
-            stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
-            back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+    if request.from_employer:
+        stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
+        back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
+    elif request.from_institution:
+        stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
+        back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
 
     context = {
         "assessment": assessment,
         "contract": contract,
-        "from_list": from_list,
         "editable": True,
         "value": new_value,
         "stats": stats,
