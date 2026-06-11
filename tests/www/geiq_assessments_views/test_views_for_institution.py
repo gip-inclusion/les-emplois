@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.enums import AssessmentState, AssessmentTransition
@@ -28,6 +28,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 class TestListAssessmentsView:
     URL = reverse("geiq_assessments_views:list_for_institution")
+    RESET_BTN_MARKUP = "<span>Effacer tout</span>"
 
     def test_anonymous_access(self, client):
         response = client.get(self.URL)
@@ -468,27 +469,32 @@ class TestListAssessmentsView:
         assertQuerySetEqual(
             response.context["assessments"], [assessment_2023, assessment_2024, another_assessment_2024], ordered=False
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on 2024
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(self.URL, {"campaigns": campaign_2024.pk})
         assertQuerySetEqual(response.context["assessments"], [assessment_2024, another_assessment_2024], ordered=False)
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on 2023
         response = client.get(self.URL, {"campaigns": campaign_2023.pk})
         assertQuerySetEqual(response.context["assessments"], [assessment_2023])
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on both 2023 and 2024
         response = client.get(self.URL, {"campaigns": [campaign_2023.pk, campaign_2024.pk]})
         assertQuerySetEqual(
             response.context["assessments"], [assessment_2023, assessment_2024, another_assessment_2024], ordered=False
         )
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Invalid data: do nothing, ie. do not filter
         response = client.get(self.URL, {"campaigns": "invalid"})
         assertQuerySetEqual(
             response.context["assessments"], [assessment_2023, assessment_2024, another_assessment_2024], ordered=False
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_institutions_filter(self, client, snapshot):
@@ -521,6 +527,7 @@ class TestListAssessmentsView:
         assertQuerySetEqual(
             response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on the DDETS
         with assertSnapshotQueries(snapshot(name="SQL queries")):
@@ -528,21 +535,25 @@ class TestListAssessmentsView:
         assertQuerySetEqual(
             response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
         )
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on the DREETS
         response = client.get(self.URL, {"institutions": membership.institution.pk})
         assertQuerySetEqual(response.context["assessments"], [assessment_dreets_ddets])
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
         # Filter on both the DDETS and the DREETS
         response = client.get(self.URL, {"institutions": [membership.institution.pk, ddets.pk]})
         assertQuerySetEqual(
             response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
         )
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Invalid data: do nothing, ie. do not filter
         response = client.get(self.URL, {"institutions": "invalid"})
         assertQuerySetEqual(
             response.context["assessments"], [assessment_dreets_ddets, assessment_ddets], ordered=False
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_states_filter(self, client, snapshot):
@@ -618,15 +629,18 @@ class TestListAssessmentsView:
             [assessment_new, assessment_submitted, assessment_reviewed, assessment_final_reviewed],
             ordered=False,
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on NEW
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(self.URL, {"states": AssessmentState.NEW.value})
         assertQuerySetEqual(response.context["assessments"], [assessment_new], ordered=False)
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on SUBMITTED
         response = client.get(self.URL, {"states": AssessmentState.SUBMITTED.value})
         assertQuerySetEqual(response.context["assessments"], [assessment_submitted], ordered=False)
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on both REVIEWED and FINAL_REVIEWED
         response = client.get(
@@ -635,6 +649,7 @@ class TestListAssessmentsView:
         assertQuerySetEqual(
             response.context["assessments"], [assessment_reviewed, assessment_final_reviewed], ordered=False
         )
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Invalid data: do nothing, ie. do not filter
         response = client.get(self.URL, {"states": "invalid"})
@@ -643,6 +658,7 @@ class TestListAssessmentsView:
             [assessment_new, assessment_submitted, assessment_reviewed, assessment_final_reviewed],
             ordered=False,
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_company_filter(self, client, snapshot):
@@ -674,21 +690,25 @@ class TestListAssessmentsView:
         assertQuerySetEqual(
             response.context["assessments"], [assessment_almond, assessment_almond2, assessment_cashew], ordered=False
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Filter on GEIQ Amande
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(self.URL, {"company": "1"})
         assertQuerySetEqual(response.context["assessments"], [assessment_almond, assessment_almond2], ordered=False)
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # If several companies are provided, only the last one is used
         response = client.get(self.URL, {"company": ["2", "1"]})
         assertQuerySetEqual(response.context["assessments"], [assessment_almond, assessment_almond2], ordered=False)
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # Invalid data: do nothing, ie. do not filter
         response = client.get(self.URL, {"company": "invalid"})
         assertQuerySetEqual(
             response.context["assessments"], [assessment_almond, assessment_almond2, assessment_cashew], ordered=False
         )
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
 
     def test_mishmash(self, client, snapshot):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -763,6 +783,7 @@ class TestListAssessmentsView:
                 },
             )
         assertQuerySetEqual(response.context["assessments"], [assessment_2023_ddets_almond], ordered=False)
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
         # One invalid data: all the filters are sadly ignored
         response = client.get(
@@ -779,6 +800,8 @@ class TestListAssessmentsView:
             [assessment_2023_ddets_almond, assessment_2023_ddets_cashew, assessment_2024_ddets_dreets],
             ordered=False,
         )
+        # one or more fields are valid so display the reset button
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_filters_htmx(self, client):
