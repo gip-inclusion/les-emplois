@@ -15,6 +15,28 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+
+    {% if token_is_new %}
+        {% component_alert title=title content=content variant="important" %}
+            {% fragment as title %}
+                Votre nouveau token ne sera affiché qu’une seule fois
+            {% endfragment %}
+            {% fragment as content %}
+                <p>Il est indispensable de le copier afin de le sauvegarder !</p>
+                <ul class="list-data mb-0">
+                    <li>
+                        <small>Votre nouveau token</small>
+                        <strong>{{ token_key }}</strong>
+                        {% include 'includes/copy_to_clipboard.html' with content=token_key css_classes="btn-link" only_icon=True %}
+                    </li>
+                </ul>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
@@ -64,9 +86,9 @@
                         <div class="c-box mb-3 mb-md-4">
                             <h3>Connexion à l’API</h3>
                             <p>
-                                Pour vous connecter à l’API vous devez utiliser l’identifiant "<strong>{{ login_string }}</strong>" et comme mot de passe le token suivant.
+                                Pour vous connecter à l’API vous devez utiliser l’identifiant "<strong>{{ login_string }}</strong>" et comme mot de passe votre token.
                             </p>
-                            {% if not token %}
+                            {% if not token_key %}
                                 <form method="post" action="{% url 'dashboard:api_token' %}">
                                     {% csrf_token %}
                                     <span class="d-block text-center mb-2">Vous n’avez pas encore de token d’API</span>
@@ -74,11 +96,9 @@
                                 </form>
                             {% else %}
                                 <span class="d-block text-center mb-2">
-                                    Votre token d’API est : <strong>{{ token.key }}</strong>
+                                    Votre token d’API {{ token_is_new|yesno:"est, se termine par" }} : <strong>{{ token_key }}</strong>
                                 </span>
-                                {% include 'includes/copy_to_clipboard.html' with content=token.key text="Copier le token" css_classes="btn btn-ico btn-primary btn-block" %}
-
-                                <button type="button" class="btn btn-secondary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#regenerate_token_modal">
+                                <button type="button" class="btn btn-primary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#regenerate_token_modal">
                                     Regénérer un nouveau token d’API
                                 </button>
                             {% endif %}

@@ -32,7 +32,7 @@ def test_api_token_view_for_company_admin(client):
     response = client.post(API_TOKEN_URL)
     token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
-    assertContains(response, "Copier le token")
+    assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
     assertMessages(
         response,
         [messages.Message(messages.SUCCESS, "Votre nouveau token a été créé avec succès.", extra_tags="toast")],
@@ -41,6 +41,8 @@ def test_api_token_view_for_company_admin(client):
     # Check multi-posts
     response = client.post(API_TOKEN_URL)
     assert Token.objects.filter(user=employer).count() == 1
+    # Token is not present on refresh
+    assertNotContains(response, token.key)
 
 
 def test_api_token_view_for_non_company_admin(client):
@@ -89,7 +91,7 @@ def test_api_token_view_regenerate(client):
     response = client.post(API_TOKEN_URL)
     token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
-    assertContains(response, "Copier le token")
+    assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
 
     response = client.post(API_TOKEN_URL, {"action": "regenerate"})
     # Previous token has been deleted
@@ -97,7 +99,11 @@ def test_api_token_view_regenerate(client):
 
     new_token = Token.objects.filter(user=employer).get()
     assertContains(response, new_token.key)
-    assertContains(response, "Copier le token")
+    assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
     assertMessages(
         response, [messages.Message(messages.SUCCESS, "Votre token a été regénéré avec succès.", extra_tags="toast")]
     )
+
+    # Token is not present on refresh
+    response = client.get(API_TOKEN_URL)
+    assertNotContains(response, token.key)
