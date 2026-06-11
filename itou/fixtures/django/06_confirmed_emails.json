@@ -141,16 +141,6 @@
   },
   {
     "fields": {
-      "email": "demo.emplois+ea@inclusion.gouv.fr",
-      "primary": true,
-      "user": 16,
-      "verified": true
-    },
-    "model": "account.emailaddress",
-    "pk": 16
-  },
-  {
-    "fields": {
       "email": "demo.emplois+dreets@inclusion.gouv.fr",
       "primary": true,
       "user": 24,
