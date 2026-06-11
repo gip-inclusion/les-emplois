@@ -72,7 +72,9 @@
                         </article>
                     </li>
                 {% endfor %}
-                {% if not news_page %}<p>Aucune nouveauté pour le moment.</p>{% endif %}
+                {% if not news_page %}
+                    <p>Aucune nouveauté pour le moment.</p>
+                {% endif %}
             </ul>
         </div>
         {% include "includes/pagination.html" with page=news_page %}

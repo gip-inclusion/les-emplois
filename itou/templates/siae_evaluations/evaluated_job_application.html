@@ -69,7 +69,9 @@
                                                         {% else %}
                                                             {% include "siae_evaluations/includes/criterion_validation.html" with evaluated_administrative_criteria=evaluated_administrative_criteria evaluated_siae=evaluated_siae %}
                                                         {% endif %}
-                                                        {% if not forloop.last %}<hr class="my-3">{% endif %}
+                                                        {% if not forloop.last %}
+                                                            <hr class="my-3">
+                                                        {% endif %}
                                                     </li>
                                                 {% endfor %}
                                             </ul>

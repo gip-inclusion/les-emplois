@@ -84,7 +84,9 @@
     {% endif %}
 {% endblock %}
 
-{% block extra_script_files %}<script src="{{ stats_base_url }}/app/iframeResizer.js"></script>{% endblock %}
+{% block extra_script_files %}
+    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
+{% endblock %}
 
 {% block script %}
     {{ block.super }}

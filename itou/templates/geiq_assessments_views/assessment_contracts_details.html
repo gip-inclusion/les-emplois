@@ -279,7 +279,9 @@
                                         {% with prior_actions=contract.employee.get_prior_actions %}
                                             {% if prior_actions %}
                                                 <ul class="mb-0">
-                                                    {% for prior_action in prior_actions %}<li>{{ prior_action }}</li>{% endfor %}
+                                                    {% for prior_action in prior_actions %}
+                                                        <li>{{ prior_action }}</li>
+                                                    {% endfor %}
                                                 </ul>
                                             {% else %}
                                                 -
