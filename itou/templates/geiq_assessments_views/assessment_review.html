@@ -116,7 +116,7 @@
                                     <time datetime="{{ assessment.final_reviewed_at.isoformat }}">
                                         Le {{ assessment.final_reviewed_at|date:"d/m/Y" }}
                                     </time>
-                                    <span>Décision validée par {{ assessment.final_reviewed_by.get_full_name }} - {{ assessment.final_reviewed_by_institution.name }}</span>
+                                    <span>Bilan validé et signé par {{ assessment.final_reviewed_by.get_full_name }} - {{ assessment.final_reviewed_by_institution.name }} (agent habilité)</span>
                                 </li>
                             {% endif %}
                             {% if assessment.reviewed_at %}
@@ -124,12 +124,12 @@
                                     <time datetime="{{ assessment.reviewed_at.isoformat }}">
                                         Le {{ assessment.reviewed_at|date:"d/m/Y" }}
                                     </time>
-                                    <span>Contrôle réalisé par {{ assessment.reviewed_by.get_full_name }} - {{ assessment.reviewed_by_institution.name }}</span>
+                                    <span>Bilan contrôlé et signé par {{ assessment.reviewed_by.get_full_name }} - {{ assessment.reviewed_by_institution.name }} (agent habilité)</span>
                                 </li>
                             {% endif %}
                             <li>
                                 <time datetime="{{ assessment.submitted_at.isoformat }}">Le {{ assessment.submitted_at|date:"d/m/Y" }}</time>
-                                <span>Bilan transmis par {{ assessment.submitted_by.get_full_name }} - GEIQ</span>
+                                <span>Bilan transmis et signé par {{ assessment.submitted_by.get_full_name }} - GEIQ</span>
                             </li>
                         </ul>
                     </div>

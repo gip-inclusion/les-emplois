@@ -2449,7 +2449,7 @@
                                   Le 21/05/2025
                               </time>
                               <span>
-                                  Décision validée par Julia THOMAS - Un DREETS GEIQ
+                                  Bilan validé et signé par Julia THOMAS - Un DREETS GEIQ (agent habilité)
                               </span>
                           </li>
                           <li>
@@ -2457,7 +2457,7 @@
                                   Le 21/05/2025
                               </time>
                               <span>
-                                  Contrôle réalisé par Jean DUPONT - Un DDETS GEIQ
+                                  Bilan contrôlé et signé par Jean DUPONT - Un DDETS GEIQ (agent habilité)
                               </span>
                           </li>
                           <li>
@@ -2465,7 +2465,7 @@
                                   Le 21/05/2025
                               </time>
                               <span>
-                                  Bilan transmis par Paul MARTIN - GEIQ
+                                  Bilan transmis et signé par Paul MARTIN - GEIQ
                               </span>
                           </li>
                       </ul>
@@ -2640,7 +2640,7 @@
                                   Le 21/05/2025
                               </time>
                               <span>
-                                  Contrôle réalisé par Jean DUPONT - Un DDETS GEIQ
+                                  Bilan contrôlé et signé par Jean DUPONT - Un DDETS GEIQ (agent habilité)
                               </span>
                           </li>
                           <li>
@@ -2648,7 +2648,7 @@
                                   Le 21/05/2025
                               </time>
                               <span>
-                                  Bilan transmis par Paul MARTIN - GEIQ
+                                  Bilan transmis et signé par Paul MARTIN - GEIQ
                               </span>
                           </li>
                       </ul>
@@ -2748,6 +2748,35 @@
                   .
               </p>
           </section>
+          <h2>
+              Responsables
+          </h2>
+          <dl class="list-data col-6">
+              <div class="d-flex gap-2">
+                  <dt class="flex-grow-1">
+                      Nom du responsable / Président du GEIQ
+                      <br/>
+                      <span class="fs-sm fw-normal">
+                          Ou signataire titulaire d’une délégation de signature
+                      </span>
+                  </dt>
+                  <dd>
+                      <strong>
+                          M. GEIQ
+                      </strong>
+                  </dd>
+              </div>
+              <div class="d-flex gap-2">
+                  <dt class="flex-grow-1">
+                      Nom du responsable de la DDETS ou de la DREETS
+                  </dt>
+                  <dd>
+                      <strong>
+                          Mme. DDETS
+                      </strong>
+                  </dd>
+              </div>
+          </dl>
           <section class="mt-5">
               <h2>
                   Conventionnement
@@ -2810,6 +2839,16 @@
                           </strong>
                       </dd>
                   </div>
+                  <div class="d-flex gap-2">
+                      <dt class="flex-grow-1">
+                          Numéro d’engagement juridique
+                      </dt>
+                      <dd>
+                          <strong>
+                              L3G4L
+                          </strong>
+                      </dd>
+                  </div>
               </dl>
           </section>
           <section class="mt-5">
@@ -2832,7 +2871,7 @@
                           Le 21/05/2025
                       </time>
                       <span>
-                          Décision validée par Julia THOMAS - Un DREETS GEIQ
+                          Bilan validé et signé par Julia THOMAS - Un DREETS GEIQ (agent habilité)
                       </span>
                   </li>
                   <li>
@@ -2840,7 +2879,7 @@
                           Le 21/05/2025
                       </time>
                       <span>
-                          Contrôle réalisé par Jean DUPONT - Un DDETS GEIQ
+                          Bilan contrôlé et signé par Jean DUPONT - Un DDETS GEIQ (agent habilité)
                       </span>
                   </li>
                   <li>
@@ -3058,7 +3097,7 @@
                                   Le 21/05/2025
                               </time>
                               <span>
-                                  Bilan transmis par Paul MARTIN - GEIQ
+                                  Bilan transmis et signé par Paul MARTIN - GEIQ
                               </span>
                           </li>
                       </ul>
