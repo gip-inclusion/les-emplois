@@ -2,6 +2,7 @@ from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.utils.emails import get_email_message
 
 
+##
 STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
 
 
