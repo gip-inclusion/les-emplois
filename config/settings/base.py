@@ -6,12 +6,14 @@ https://docs.djangoproject.com/en/dev/ref/settings
 import datetime
 import json
 import os
+import pathlib
 import re
 
 from botocore.config import Config
 from django.utils.csp import CSP
 from dotenv import load_dotenv
 
+import itou
 from config.sentry import sentry_init
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
@@ -896,3 +898,12 @@ pdi_jwt_key = os.getenv("PDI_JWT_KEY")
 PDI_JWT_KEY = json.loads(pdi_jwt_key) if pdi_jwt_key else None
 
 ENABLED_RECOMMENDATIONS_SAFIR_CODES = os.getenv("ENABLED_RECOMMENDATIONS_SAFIR_CODES", "").split(",")
+
+
+def _read_id_list(relative_path: str) -> set:
+    path = pathlib.Path(itou.__path__[0]) / relative_path
+    return {int(line) for line in path.read_text("ascii").splitlines() if line.strip()}
+
+
+REQUIRE_MFA_ON_COMPANY_IDS = _read_id_list("otp/data/mfa_required_companies.csv")
+REQUIRE_MFA_ON_ORGANIZATION_IDS = _read_id_list("otp/data/mfa_required_organizations.csv")
