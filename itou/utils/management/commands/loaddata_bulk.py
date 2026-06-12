@@ -17,8 +17,27 @@ class Command(LoadDataCommand):
         self.models.add(django_obj.__class__)
         model = django_obj._meta.model
         self.to_create[model].append(django_obj)
+        model_to_check = {model}
+
+        if any(obj.m2m_data.values()):
+            for accessor_name, object_list in obj.m2m_data.items():
+                field = getattr(django_obj, accessor_name)
+                model = field.through
+                model_to_check |= {model}
+
+                for target_object in object_list:
+                    self.to_create[model].append(
+                        model(
+                            **{
+                                field.source_field_name: django_obj,
+                                f"{field.target_field_name}_id": target_object,
+                            },
+                        )
+                    )
         # Don't store too much objects in memory to prevent OOM kills
-        if len(self.to_create[model]) >= self.BATCH_SIZE:
-            model.objects.bulk_create(self.to_create[model])
-            self.to_create[model] = []
+        for model in model_to_check:
+            objects = self.to_create[model]
+            if len(objects) >= self.BATCH_SIZE:
+                model.objects.bulk_create(objects)
+                self.to_create[model] = []
         return True
