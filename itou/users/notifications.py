@@ -80,3 +80,12 @@ class EditJobSeekerInfoNotification(EmailNotification):
         context = super().get_context()
         context["edit_user_info_url"] = get_absolute_url(reverse("dashboard:edit_user_info"))
         return context
+
+
+@notifications_registry.register
+class NewAPITokenNotification(EmailNotification):
+    name = "Génération d'un nouveau token d’API"
+    category = NotificationCategory.SECURITY
+    subject_template = "account/email/email_new_API_token_subject.txt"
+    body_template = "account/email/email_new_API_token_body.txt"
+    can_be_disabled = False

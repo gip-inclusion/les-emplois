@@ -19,6 +19,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
+from django_datadog_logger.formatters.datadog import get_client_ip
 from rest_framework.authtoken.models import Token
 
 from itou.api.token_auth.views import TOKEN_ID_STR
@@ -36,7 +37,7 @@ from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.users.notifications import EditJobSeekerInfoNotification
+from itou.users.notifications import EditJobSeekerInfoNotification, NewAPITokenNotification
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_request
 from itou.utils.legal_terms import bypass_terms_acceptance
@@ -458,6 +459,9 @@ def api_token(request, template_name="dashboard/api_token.html"):
                 msg = "Votre nouveau token a été créé avec succès."
                 logger.info("API token created")
             messages.success(request, msg, extra_tags="toast")
+            NewAPITokenNotification(
+                request.user, token_created_at=token.created, request_ip_address=get_client_ip(request)
+            ).send()
     else:
         token = Token.objects.filter(user=request.user).first()  # May be None if no token
     if token:

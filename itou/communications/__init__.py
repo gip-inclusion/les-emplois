@@ -14,6 +14,7 @@ class NotificationCategory(StrEnum):
     REGISTRATION = "Inscription"
     DELETION = "Archivage"
     JOB_DESCRIPTION = "Gestion des fiches de poste"
+    SECURITY = "Sécurité"
 
 
 class NotificationRegistry:
