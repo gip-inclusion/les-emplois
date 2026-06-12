@@ -1,0 +1,2 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}Génération d’un nouveau token d’API sur les Emplois de l'inclusion{% endblock subject %}

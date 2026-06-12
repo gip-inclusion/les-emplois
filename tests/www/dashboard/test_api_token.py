@@ -14,7 +14,7 @@ TOKEN_MENU_STR = "Accès aux APIs"
 API_TOKEN_URL = reverse_lazy("dashboard:api_token")
 
 
-def test_api_token_view_for_company_admin(client):
+def test_api_token_view_for_company_admin(client, mailoutbox):
     employer = CompanyMembershipFactory().user
     client.force_login(employer)
 
@@ -29,7 +29,8 @@ def test_api_token_view_for_company_admin(client):
     assertContains(response, "Vous n’avez pas encore de token d’API")
     assertContains(response, "Créer un token d’API")
 
-    response = client.post(API_TOKEN_URL)
+    user_ip_address = "123.45.67.89"
+    response = client.post(API_TOKEN_URL, REMOTE_ADDR=user_ip_address)
     token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
     assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
@@ -37,10 +38,15 @@ def test_api_token_view_for_company_admin(client):
         response,
         [messages.Message(messages.SUCCESS, "Votre nouveau token a été créé avec succès.", extra_tags="toast")],
     )
+    [email] = mailoutbox
+    assert email.subject.endswith("Génération d’un nouveau token d’API sur les Emplois de l'inclusion")
+    assert user_ip_address in email.body
 
     # Check multi-posts
     response = client.post(API_TOKEN_URL)
     assert Token.objects.filter(user=employer).count() == 1
+    # No new mail is sent
+    assert len(mailoutbox) == 1
     # Token is not present on refresh
     assertNotContains(response, token.key)
 
@@ -82,7 +88,7 @@ def test_api_token_view_for_mixed_admin_nonadmin_company(client, snapshot):
     )
 
 
-def test_api_token_view_regenerate(client):
+def test_api_token_view_regenerate(client, mailoutbox):
     employer = CompanyMembershipFactory().user
     client.force_login(employer)
 
@@ -92,12 +98,17 @@ def test_api_token_view_regenerate(client):
     token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
     assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
+    [email] = mailoutbox
+    assert email.subject.endswith("Génération d’un nouveau token d’API sur les Emplois de l'inclusion")
 
     response = client.post(API_TOKEN_URL, {"action": "regenerate"})
     # Previous token has been deleted
     assert not Token.objects.filter(key=token.key).exists()
 
     new_token = Token.objects.filter(user=employer).get()
+    assert len(mailoutbox) == 2
+    new_email = mailoutbox[-1]
+    assert new_email.subject.endswith("Génération d’un nouveau token d’API sur les Emplois de l'inclusion")
     assertContains(response, new_token.key)
     assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
     assertMessages(

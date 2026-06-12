@@ -1,0 +1,25 @@
+{% extends "layout/base_email_text_body.txt" %}
+
+{% block body %}
+
+Bonjour {{ user.get_full_name }},
+
+Nous vous informons qu'un nouveau token API vient d'être généré sur votre compte des Emplois de l’inclusion.
+
+Détails de l’opération :
+• Date et heure : {{ token_created_at }}
+• Adresse IP d’origine : {{ request_ip_address|default_if_none:"inconnue" }}
+
+Vous êtes à l'origine de cette action ?
+Aucune action n'est requise de votre part. Vous pouvez ignorer ce message.
+
+Vous n'êtes pas à l'origine de cette action ?
+Votre compte est peut-être compromis. Nous vous recommandons d'agir immédiatement :
+1. Regénérez ce token depuis votre espace - Menu "Accès aux APIs"
+2. Modifiez votre mot de passe sans attendre
+3. Contactez notre équipe sécurité si vous constatez une activité suspecte : security@inclusion.gouv.fr
+
+Pour rappel, un token API donne accès à votre compte, ne le partagez jamais et stockez-le de manière sécurisée.
+
+Cordialement,
+{% endblock body %}
