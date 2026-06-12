@@ -52,6 +52,7 @@ class ItouTOTPDevice(
             models.UniqueConstraint(
                 fields=["user", "name"],
                 name="unique_name_per_user",
+                condition=models.Q(disabled_at=None),
             )
         ]
 
