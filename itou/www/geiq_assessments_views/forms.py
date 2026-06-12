@@ -174,6 +174,9 @@ class ReviewForm(forms.ModelForm):
             "convention_amount",
             "granted_amount",
             "advance_amount",
+            "geiq_responsible_person",
+            "institution_responsible_person",
+            "legal_commitment_number",
         ]
         labels = {
             "review_comment": "Commentaire",
@@ -194,6 +197,23 @@ class ReviewForm(forms.ModelForm):
 
     balance_amount = forms.CharField(label="Deuxième versement à prévoir", required=False, disabled=True)
     refund_amount = forms.CharField(label="Ordre de reversement", required=False, disabled=True)
+
+    geiq_responsible_person = forms.CharField(
+        label="Nom du responsable / Président du GEIQ",
+        help_text="À défaut le signataire titulaire d’une délégation de signature.",
+        required=True,
+        strip=True,
+    )
+    institution_responsible_person = forms.CharField(
+        label="Nom du responsable de la DDETS ou de la DREETS",
+        required=True,
+        strip=True,
+    )
+    legal_commitment_number = forms.CharField(
+        label="Numéro d’engagement juridique",
+        required=True,
+        strip=True,
+    )
 
     def __init__(self, *args, instance, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)

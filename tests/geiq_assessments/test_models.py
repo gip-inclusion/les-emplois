@@ -170,6 +170,32 @@ def test_assessment_state_submitted_at_constraint():
     assessment.save()
 
 
+def test_assessment_responsible_persons_legal_commitment_number():
+    assessment = AssessmentFactory(
+        campaign__year=2023,
+        with_submission_requirements=True,
+        submitted_at=timezone.now() + datetime.timedelta(hours=1),
+        submitted_by=EmployerFactory(),
+        grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=1),
+        decision_validated_at=timezone.now() + datetime.timedelta(hours=1),
+    )
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_responsible_persons_legal_commitment_number.*"):
+        with transaction.atomic():
+            assessment.geiq_responsible_person = "M. GEIQ"
+            assessment.institution_responsible_person = "Mme. DDETS"
+            assessment.save()
+    with pytest.raises(IntegrityError, match=r".*geiq_assessment_responsible_persons_legal_commitment_number.*"):
+        with transaction.atomic():
+            assessment.geiq_responsible_person = ""
+            assessment.institution_responsible_person = "Mme. DDETS"
+            assessment.legal_commitment_number = "L3G4L"
+            assessment.save()
+
+    # Add missing fields
+    assessment.geiq_responsible_person = "M. GEIQ"
+    assessment.save()
+
+
 def test_assessment_full_or_no_review_constraint():
     assessment = AssessmentFactory(
         campaign__year=2023,

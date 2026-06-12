@@ -179,9 +179,12 @@ class AssessmentAdmin(ItouModelAdmin):
                 "fields": (
                     "grants_selection_validated_at",
                     "review_comment",
+                    "geiq_responsible_person",
+                    "institution_responsible_person",
                     "convention_amount",
                     "granted_amount",
                     "advance_amount",
+                    "legal_commitment_number",
                     "decision_validated_at",
                     "reviewed_at",
                     "reviewed_by",
