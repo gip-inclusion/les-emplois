@@ -688,11 +688,12 @@ class TestProConnectLoginWithRequiredMfa:
 
     def test_mfa_not_provided_by_proconnect_with_no_device(self, client, settings, pro_connect):
         settings.REQUIRE_MFA_FOR_PROS = True
-        PrescriberFactory(
+        user = PrescriberFactory(
             email=pro_connect.oidc_userinfo["email"],
             membership=True,
             has_completed_welcoming_tour=True,
         )
+        settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {user.prescriberorganization_set.first().id}
 
         response = pro_connect.mock_oauth_dance(
             client,
@@ -709,6 +710,7 @@ class TestProConnectLoginWithRequiredMfa:
             membership=True,
             has_completed_welcoming_tour=True,
         )
+        settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {user.prescriberorganization_set.first().id}
         device = ItouTOTPDeviceFactory(user=user)
 
         dashboard_url = reverse("dashboard:index")

@@ -1,6 +1,8 @@
 from django.conf import settings
 
+from itou.companies.models import CompanyMembership
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
+from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
 
 
@@ -44,9 +46,24 @@ def require_otp(user):
     if settings.REQUIRE_OTP_FOR_STAFF and user.is_itou_staff:
         return True
 
-    if settings.REQUIRE_MFA_FOR_PROS and user.is_professional:
+    if user.is_professional and _require_otp_for_pro(user):
         return True
 
+    return False
+
+
+def _require_otp_for_pro(user):
+    assert user.is_professional
+    if not settings.REQUIRE_MFA_FOR_PROS:
+        return False
+    org_ids = set(
+        PrescriberMembership.objects.active().filter(user_id=user.id).values_list("organization_id", flat=True)
+    )
+    if org_ids & settings.REQUIRE_MFA_ON_ORGANIZATION_IDS:
+        return True
+    company_ids = set(CompanyMembership.objects.active().filter(user_id=user.id).values_list("company_id", flat=True))
+    if company_ids & settings.REQUIRE_MFA_ON_COMPANY_IDS:
+        return True
     return False
 
 
