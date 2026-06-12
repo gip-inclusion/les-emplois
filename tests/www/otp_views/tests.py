@@ -21,6 +21,7 @@ from pytest_django.asserts import (
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
 from itou.otp.utils import create_otp_backup_code
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
+from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -470,3 +471,28 @@ class TestItouStaffLogin:
         response = client.get(reverse("otp_views:verify_otp"))
 
         assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot()
+
+
+class TestConfirmTOTPDeviceForm:
+    def test_name_unicity(self):
+        user = ItouStaffFactory()
+        existing_device = ItouTOTPDeviceFactory(name="Mon appareil", user=user)
+
+        unsaved_device_for_form = ItouTOTPDeviceFactory.build(user=user)
+        data = {"name": "Mon appareil", "otp_token": "123456"}
+        form = ConfirmTOTPDeviceForm(
+            data=data,
+            device_type="smartphone",
+            device=unsaved_device_for_form,
+        )
+        assert "name" in form.errors
+
+        # Disabled device is ignored when checking name.
+        existing_device.disabled_at = timezone.now()
+        existing_device.save()
+        form = ConfirmTOTPDeviceForm(
+            data=data,
+            device_type="smartphone",
+            device=unsaved_device_for_form,
+        )
+        assert "name" not in form.errors
