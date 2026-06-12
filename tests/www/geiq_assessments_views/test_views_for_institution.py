@@ -30,6 +30,13 @@ class TestListAssessmentsView:
     URL = reverse("geiq_assessments_views:list_for_institution")
     RESET_BTN_MARKUP = "<span>Effacer tout</span>"
 
+    @staticmethod
+    def replace_attrs(soup, attrs, attrs_to_update):
+        nodes = soup.find_all(attrs=attrs)
+        for node in nodes:
+            node.attrs.update(attrs_to_update)
+        return soup
+
     def test_anonymous_access(self, client):
         response = client.get(self.URL)
         assertRedirects(response, reverse("account_login") + f"?next={self.URL}")
@@ -72,15 +79,14 @@ class TestListAssessmentsView:
 
         client.force_login(user)
         response = client.get(self.URL)
-        assert pretty_indented(
-            parse_response_to_soup(
-                response,
-                ".s-section",
-                replace_in_attr=[
-                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
-                ],
-            )
-        ) == snapshot(name="assessment list without links to details")
+
+        soup = parse_response_to_soup(response, ".s-section")
+        soup = self.replace_attrs(
+            soup,
+            attrs={"name": "campaigns", "value": campaign.pk},
+            attrs_to_update={"value": "[PK of AssessmentCampaign]"},
+        )
+        assert pretty_indented(soup) == snapshot(name="assessment list without links to details")
 
     @pytest.mark.parametrize("with_limited_access", [True, False], ids=["limited access", "unlimited access"])
     def test_display_amounts(self, client, with_limited_access, snapshot):
@@ -180,15 +186,13 @@ class TestListAssessmentsView:
 
         client.force_login(membership.user)
         response = client.get(self.URL)
-        assert pretty_indented(
-            parse_response_to_soup(
-                response,
-                ".s-section",
-                replace_in_attr=[
-                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
-                ],
-            )
-        ) == snapshot(name="assessment list with amounts")
+        soup = parse_response_to_soup(response, ".s-section")
+        soup = self.replace_attrs(
+            soup,
+            attrs={"name": "campaigns", "value": campaign.pk},
+            attrs_to_update={"value": "[PK of AssessmentCampaign]"},
+        )
+        assert pretty_indented(soup) == snapshot(name="assessment list with amounts")
 
     @pytest.mark.parametrize(
         "institution_kind",
@@ -218,16 +222,18 @@ class TestListAssessmentsView:
 
         client.force_login(membership.user)
         response = client.get(self.URL)
-        assert pretty_indented(
-            parse_response_to_soup(
-                response,
-                ".s-section",
-                replace_in_attr=[
-                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
-                    ("value", f"{membership.institution.pk}", "[PK of Institution]"),
-                ],
-            )
-        ) == snapshot(name="assessment list with links to details")
+        soup = parse_response_to_soup(response, ".s-section")
+        soup = self.replace_attrs(
+            soup,
+            attrs={"name": "campaigns", "value": campaign.pk},
+            attrs_to_update={"value": "[PK of AssessmentCampaign]"},
+        )
+        soup = self.replace_attrs(
+            soup,
+            attrs={"name": "institutions", "value": membership.institution.pk},
+            attrs_to_update={"value": "[PK of Institution]"},
+        )
+        assert pretty_indented(soup) == snapshot(name="assessment list with links to details")
 
     @freeze_time("2025-05-21 12:00", tick=True)
     def test_complex_list(self, client, snapshot):
@@ -350,16 +356,18 @@ class TestListAssessmentsView:
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(self.URL)
-        assert pretty_indented(
-            parse_response_to_soup(
-                response,
-                ".s-section",
-                replace_in_attr=[
-                    ("value", f"{campaign.pk}", "[PK of Campaign]"),
-                    ("value", f"{membership.institution.pk}", "[PK of Institution]"),
-                ],
-            )
-        ) == snapshot(name="assessments complex list")
+        soup = parse_response_to_soup(response, ".s-section")
+        soup = self.replace_attrs(
+            soup,
+            attrs={"name": "campaigns", "value": campaign.pk},
+            attrs_to_update={"value": "[PK of AssessmentCampaign]"},
+        )
+        soup = self.replace_attrs(
+            soup,
+            attrs={"name": "institutions", "value": membership.institution.pk},
+            attrs_to_update={"value": "[PK of Institution]"},
+        )
+        assert pretty_indented(soup) == snapshot(name="assessments complex list")
         assertQuerySetEqual(
             response.context["assessments"],
             [
