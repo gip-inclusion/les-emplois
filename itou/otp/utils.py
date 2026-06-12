@@ -1,4 +1,5 @@
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
+from itou.utils.emails import get_email_message
 
 
 STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
@@ -18,3 +19,13 @@ def create_otp_backup_code(user) -> str:
     )
     clear_code, _ = ItouStaticToken.objects.create(device)
     return clear_code
+
+
+def notify_backup_code_has_been_used(user):
+    email = get_email_message(
+        to=[user.email],
+        context={"user": user},
+        subject="common/emails/used_otp_backup_code_subject.txt",
+        body="common/emails/used_otp_backup_code_body.txt",
+    )
+    email.send()
