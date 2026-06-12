@@ -341,7 +341,7 @@ class TestItouStaffLogin:
         response = client.post(next_url, data=post_data)
         assertRedirects(response, admin_url)
 
-    def test_login_with_backup_code(self, client, settings):
+    def test_login_with_backup_code(self, client, settings, mailoutbox):
         settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
         device = ItouTOTPDeviceFactory(user=user)
@@ -409,6 +409,8 @@ class TestItouStaffLogin:
         )
         device.refresh_from_db()
         assert device.disabled_at is not None
+        [email] = mailoutbox
+        assert "Utilisation d'un code de récupération" in email.subject
 
     def test_login_otp_not_required(self, client):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)

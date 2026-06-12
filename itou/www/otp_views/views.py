@@ -14,7 +14,7 @@ from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
-from itou.otp.utils import create_otp_backup_code, get_user_devices
+from itou.otp.utils import create_otp_backup_code, get_user_devices, notify_backup_code_has_been_used
 from itou.utils.auth import check_user
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_safe_url
@@ -172,7 +172,8 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         ItouTOTPDevice.objects.filter(user=request.user).update(disabled_at=timezone.now())
         ItouStaticDevice.objects.filter(user=request.user).delete()
 
-        # FIXME (dbaty): send mail to user (when wording is ready)
+        notify_backup_code_has_been_used(request.user)
+
         # FIXME (dbaty): shall we also logout the user so that they
         # have to input their password again?
 
