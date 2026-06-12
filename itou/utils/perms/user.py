@@ -7,11 +7,14 @@ logger = logging.getLogger(__name__)
 
 
 def has_hijack_perm(*, hijacker, hijacked):
-    if not hijacker.is_active or not hijacked.is_active:
-        return False
-
-    # Staff members (especially superusers) shouldn't be hijacked
-    if hijacked.is_staff or hijacked.is_superuser:
+    if any(
+        [
+            not hijacked.is_active,  # Don't hijack inactive user
+            not hijacked.email,  # Don't hijack user with no email : our middlewares don't like it
+            hijacked.is_staff,  # staff members shouldn't be hijacked
+            hijacked.is_superuser,  # Superusers really shouldn't be hijacked
+        ]
+    ):
         return False
 
     # Superusers can do (almost) anything
