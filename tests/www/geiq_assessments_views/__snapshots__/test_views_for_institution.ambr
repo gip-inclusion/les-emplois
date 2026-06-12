@@ -2351,6 +2351,26 @@
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <fieldset>
                               <legend>
+                                  Responsables
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_geiq_responsible_person">
+                                      Nom du responsable / Président du GEIQ
+                                  </label>
+                                  <input aria-describedby="id_geiq_responsible_person_helptext" class="form-control" disabled="" id="id_geiq_responsible_person" name="geiq_responsible_person" required="" type="text" value="M. GEIQ"/>
+                                  <div class="form-text" id="id_geiq_responsible_person_helptext">
+                                      À défaut le signataire titulaire d’une délégation de signature.
+                                  </div>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_institution_responsible_person">
+                                      Nom du responsable de la DDETS ou de la DREETS
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_institution_responsible_person" name="institution_responsible_person" required="" type="text" value="Mme. DDETS"/>
+                              </div>
+                          </fieldset>
+                          <fieldset>
+                              <legend>
                                   Conventionnement
                               </legend>
                               <div class="form-group form-group-required">
@@ -2388,6 +2408,12 @@
                                       Ordre de reversement
                                   </label>
                                   <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_legal_commitment_number">
+                                      Numéro d’engagement juridique
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_legal_commitment_number" name="legal_commitment_number" required="" type="text" value="L3G4L"/>
                               </div>
                           </fieldset>
                           <div class="form-group form-group-required">
@@ -2516,6 +2542,26 @@
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <fieldset>
                               <legend>
+                                  Responsables
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_geiq_responsible_person">
+                                      Nom du responsable / Président du GEIQ
+                                  </label>
+                                  <input aria-describedby="id_geiq_responsible_person_helptext" class="form-control" disabled="" id="id_geiq_responsible_person" name="geiq_responsible_person" required="" type="text" value="M. GEIQ"/>
+                                  <div class="form-text" id="id_geiq_responsible_person_helptext">
+                                      À défaut le signataire titulaire d’une délégation de signature.
+                                  </div>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_institution_responsible_person">
+                                      Nom du responsable de la DDETS ou de la DREETS
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_institution_responsible_person" name="institution_responsible_person" required="" type="text" value="Mme. DDETS"/>
+                              </div>
+                          </fieldset>
+                          <fieldset>
+                              <legend>
                                   Conventionnement
                               </legend>
                               <div class="form-group form-group-required">
@@ -2553,6 +2599,12 @@
                                       Ordre de reversement
                                   </label>
                                   <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_legal_commitment_number">
+                                      Numéro d’engagement juridique
+                                  </label>
+                                  <input class="form-control" disabled="" id="id_legal_commitment_number" name="legal_commitment_number" required="" type="text" value="L3G4L"/>
                               </div>
                           </fieldset>
                           <div class="form-group form-group-required">
@@ -2882,6 +2934,26 @@
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <fieldset>
                               <legend>
+                                  Responsables
+                              </legend>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_geiq_responsible_person">
+                                      Nom du responsable / Président du GEIQ
+                                  </label>
+                                  <input aria-describedby="id_geiq_responsible_person_helptext" class="form-control" id="id_geiq_responsible_person" name="geiq_responsible_person" required="" type="text"/>
+                                  <div class="form-text" id="id_geiq_responsible_person_helptext">
+                                      À défaut le signataire titulaire d’une délégation de signature.
+                                  </div>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_institution_responsible_person">
+                                      Nom du responsable de la DDETS ou de la DREETS
+                                  </label>
+                                  <input class="form-control" id="id_institution_responsible_person" name="institution_responsible_person" required="" type="text"/>
+                              </div>
+                          </fieldset>
+                          <fieldset>
+                              <legend>
                                   Conventionnement
                               </legend>
                               <div class="form-group form-group-required">
@@ -2919,6 +2991,12 @@
                                       Ordre de reversement
                                   </label>
                                   <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
+                              </div>
+                              <div class="form-group form-group-required">
+                                  <label class="form-label" for="id_legal_commitment_number">
+                                      Numéro d’engagement juridique
+                                  </label>
+                                  <input class="form-control" id="id_legal_commitment_number" name="legal_commitment_number" required="" type="text"/>
                               </div>
                           </fieldset>
                           <div class="form-group form-group-required">
@@ -3207,6 +3285,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -3241,11 +3322,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -3366,6 +3447,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -3401,11 +3485,11 @@
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."campaign_id" IN (%s))
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -3684,6 +3768,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -3718,11 +3805,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -3843,6 +3930,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -3878,11 +3968,11 @@
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."label_geiq_id" = %s)
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -4161,6 +4251,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -4195,11 +4288,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -4322,6 +4415,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -4356,11 +4452,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -6154,6 +6250,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -6188,11 +6287,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -6312,6 +6411,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -6349,11 +6451,11 @@
                  AND T8."institution_id" IN (%s)
                  AND T8."with_convention")
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -7012,6 +7114,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -7046,11 +7151,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -7171,6 +7276,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -7211,11 +7319,11 @@
                  AND "geiq_assessments_assessment"."state" IN (%s)
                  AND "geiq_assessments_assessment"."label_geiq_id" = %s)
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -7519,6 +7627,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -7553,11 +7664,11 @@
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({
@@ -7679,6 +7790,9 @@
                  "geiq_assessments_assessment"."convention_amount",
                  "geiq_assessments_assessment"."granted_amount",
                  "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."geiq_responsible_person",
+                 "geiq_assessments_assessment"."institution_responsible_person",
+                 "geiq_assessments_assessment"."legal_commitment_number",
                  "geiq_assessments_assessment"."decision_validated_at",
                  "geiq_assessments_assessment"."grants_selection_validated_at",
                  "geiq_assessments_assessment"."reviewed_at",
@@ -7714,11 +7828,11 @@
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."state" IN (%s))
           GROUP BY "geiq_assessments_assessment"."id",
-                   34,
-                   35,
+                   37,
+                   38,
                    "geiq_assessments_assessmentcampaign"."id"
-          ORDER BY 34 ASC,
-                   35 DESC
+          ORDER BY 37 ASC,
+                   38 DESC
         ''',
       }),
       dict({

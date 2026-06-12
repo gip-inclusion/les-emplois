@@ -75,6 +75,12 @@
                             {% bootstrap_form_errors form type='non_fields' %}
 
                             <fieldset>
+                                <legend>Responsables</legend>
+                                {% bootstrap_field form.geiq_responsible_person %}
+                                {% bootstrap_field form.institution_responsible_person %}
+                            </fieldset>
+
+                            <fieldset>
                                 <legend>Conventionnement</legend>
                                 {% bootstrap_field form.convention_amount %}
                             </fieldset>
@@ -86,6 +92,7 @@
                                 {% bootstrap_field form.advance_amount %}
                                 {% bootstrap_field form.balance_amount %}
                                 {% bootstrap_field form.refund_amount %}
+                                {% bootstrap_field form.legal_commitment_number %}
                             </fieldset>
                             {% bootstrap_field form.review_comment %}
                             {% if not assessment.reviewed_at %}

@@ -176,6 +176,9 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
     convention_amount = models.PositiveIntegerField("montant conventionné", default=0)
     granted_amount = models.PositiveIntegerField("montant total accordé", default=0)
     advance_amount = models.PositiveIntegerField("montant déjà versé", default=0)
+    geiq_responsible_person = models.CharField("nom du responsable GEIQ", db_default="")
+    institution_responsible_person = models.CharField("nom du responsable DDETS ou DREETS", db_default="")
+    legal_commitment_number = models.CharField("numéro d’engagement juridique", db_default="")
 
     decision_validated_at = models.DateTimeField("décision saisie le", blank=True, null=True)
     grants_selection_validated_at = models.DateTimeField("aides accordées validées le", blank=True, null=True)
@@ -318,6 +321,25 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
                             reviewed_by_institution__isnull=False,
                         )
                         & ~models.Q(review_comment="")
+                    )
+                ),
+            ),
+            # The fields geiq_responsible_person, institution_responsible_person, legal_commitment_number are mandatory
+            # but were added later. We cannot force all reviewed assessments to have those fields non-empty, but we can
+            # force filling them together.
+            models.CheckConstraint(
+                name="geiq_assessment_responsible_persons_legal_commitment_number",
+                violation_error_message="Impossible d'avoir un contrôle partiel",
+                condition=(
+                    models.Q(
+                        geiq_responsible_person="",
+                        institution_responsible_person="",
+                        legal_commitment_number="",
+                    )
+                    | ~(
+                        models.Q(geiq_responsible_person="")
+                        | models.Q(institution_responsible_person="")
+                        | models.Q(legal_commitment_number="")
                     )
                 ),
             ),

@@ -1637,6 +1637,9 @@ class TestAssessmentReviewView:
                 "advance_amount": "50000",
                 "granted_amount": "80000",
                 "review_comment": "",
+                "geiq_responsible_person": " ",  # field will be stripped
+                "institution_responsible_person": " ",  # field will be stripped
+                "legal_commitment_number": " ",  # field will be stripped
             },
         )
         assertContains(response, "Ce champ est obligatoire.")
@@ -1646,6 +1649,9 @@ class TestAssessmentReviewView:
             "review_comment": ["Ce champ est obligatoire."],
             "granted_amount": ["Le montant total accordé ne peut être supérieur au montant conventionné."],
             "advance_amount": ["Le montant du premier versement ne peut être supérieur au montant conventionné."],
+            "geiq_responsible_person": ["Ce champ est obligatoire."],
+            "institution_responsible_person": ["Ce champ est obligatoire."],
+            "legal_commitment_number": ["Ce champ est obligatoire."],
         }
 
         with freeze_time(timezone.now() + datetime.timedelta(hours=5)):
@@ -1656,6 +1662,9 @@ class TestAssessmentReviewView:
                     "advance_amount": "50000",
                     "granted_amount": "80000",
                     "review_comment": "Bravo !",
+                    "geiq_responsible_person": "M. GEIQ",
+                    "institution_responsible_person": "Mme. DREETS",
+                    "legal_commitment_number": "L3G4L",
                 },
             )
         assertRedirects(
@@ -1699,6 +1708,9 @@ class TestAssessmentReviewView:
             convention_amount=100_000,
             advance_amount=50_000,
             granted_amount=80_000,
+            geiq_responsible_person="M. GEIQ",
+            institution_responsible_person="Mme. DDETS",
+            legal_commitment_number="L3G4L",
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
             reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             reviewed_by=ddets_membership.user,
@@ -1723,6 +1735,9 @@ class TestAssessmentReviewView:
                 "advance_amount": "4000",
                 "granted_amount": "7000",
                 "review_comment": "Un grand bravo !",
+                "geiq_responsible_person": "M. Autre",
+                "institution_responsible_person": "Mme. Autre",
+                "legal_commitment_number": "1LL3G4L",
             },
         )
         assert response.status_code == 200
@@ -1732,6 +1747,9 @@ class TestAssessmentReviewView:
         assert assessment.advance_amount == 50_000
         assert assessment.granted_amount == 80_000
         assert assessment.review_comment == "Bravo !"
+        assert assessment.geiq_responsible_person == "M. GEIQ"
+        assert assessment.institution_responsible_person == "Mme. DDETS"
+        assert assessment.legal_commitment_number == "L3G4L"
 
         # Check snapshot with a final review
         dreets_membership = InstitutionMembershipFactory(
