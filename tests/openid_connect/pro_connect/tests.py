@@ -667,6 +667,25 @@ class TestProConnectLoginWithRequiredMfa:
         response = client.get(response.url)
         assertContains(response, "Tableau de bord")
 
+    def test_allowlisted_mfa(self, client, settings, pro_connect):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        settings.PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [pro_connect.oidc_userinfo["idp_id"]]
+        PrescriberFactory(
+            email=pro_connect.oidc_userinfo["email"],
+            membership=True,
+            has_completed_welcoming_tour=True,
+        )
+
+        response = pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=reverse("dashboard:index"),
+            # "mfa" is missing, but the identity provided is
+            # allowlisted because we know it implements MFA.
+            id_token_data=ID_TOKEN_DATA | {"amr": ["pwd"]},
+        )
+        response = client.get(response.url)
+        assertContains(response, "Tableau de bord")
+
     def test_mfa_not_provided_by_proconnect_with_no_device(self, client, settings, pro_connect):
         settings.REQUIRE_MFA_FOR_PROS = True
         PrescriberFactory(
