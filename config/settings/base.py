@@ -470,6 +470,11 @@ PRO_CONNECT_BASE_URL = os.getenv("PRO_CONNECT_BASE_URL")
 PRO_CONNECT_CLIENT_ID = os.getenv("PRO_CONNECT_CLIENT_ID")
 PRO_CONNECT_CLIENT_SECRET = os.getenv("PRO_CONNECT_CLIENT_SECRET")
 PRO_CONNECT_FT_IDP_HINT = os.getenv("PRO_CONNECT_FT_IDP_HINT")
+# List of ProConnect identity providers that implement MFA but do not
+# inform ProConnect about it through the `amr` claim.
+PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST = [
+    _idp_id.strip() for _idp_id in os.getenv("PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST", "").split(",")
+]
 
 TALLY_URL = os.getenv("TALLY_URL")
 

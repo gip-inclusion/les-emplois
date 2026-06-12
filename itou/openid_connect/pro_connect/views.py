@@ -385,13 +385,11 @@ def pro_connect_callback(request):
 
     login(request, user)
 
-    if "mfa" in amr:
-        # If the user used an MFA through ProConnect, mark it as such
-        # to avoid requiring our own MFA verification, by simulating
-        # what django_otp.OTPMiddleware does.
+    mfa_allowlisted_idp = idp_id in settings.PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST
+    if "mfa" in amr or mfa_allowlisted_idp:
         logger.info(
-            "User authenticated through ProConnect with MFA (idp_id=%s), sidestep from our own MFA",
-            extra={"idp_id": idp_id},
+            "User authenticated through ProConnect with MFA, sidestep from our own MFA",
+            extra={"idp_id": idp_id, "mfa_allowlisted_idp": mfa_allowlisted_idp},
         )
         otp_login(request, create_placeholder_for_external_totp_device(user))
 
