@@ -535,3 +535,43 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         for key, value in expected_data.items():
             assert data[key] == value
         assert data["raw_response"] == json_response
+
+    @respx.mock
+    def test_informations_administratives_usager(self):
+        endpoint = Endpoints.INFORMATIONS_ADMINISTRATIVES_USAGER
+        mocked_response = RESPONSES[endpoint][ResponseKind.CERTIFIED]
+        respx.get(settings.API_ESD["BASE_URL"] + endpoint).respond(200, json=mocked_response)
+        with self.api_client as client:
+            data = client.informations_administratives_usager("a_long_token")
+
+        assert data == mocked_response
+
+    @respx.mock
+    def test_statut_usager(self):
+        endpoint = Endpoints.STATUT_USAGER
+        mocked_response = RESPONSES[endpoint][ResponseKind.CERTIFIED]
+        respx.get(settings.API_ESD["BASE_URL"] + endpoint).respond(200, json=mocked_response)
+        with self.api_client as client:
+            data = client.statut_usager("a_long_token")
+
+        assert data == mocked_response
+
+    @respx.mock
+    def test_orientation_usager(self):
+        endpoint = Endpoints.LECTURE_ORIENTATION_USAGER
+        mocked_response = RESPONSES[endpoint][ResponseKind.CERTIFIED]
+        respx.get(settings.API_ESD["BASE_URL"] + endpoint).respond(200, json=mocked_response)
+        with self.api_client as client:
+            data = client.orientation_usager("a_long_token")
+
+        assert data == mocked_response
+
+    @respx.mock
+    def test_diagnostic_usager(self):
+        endpoint = Endpoints.DIAGNOSTIC_USAGER_DIAGNOSTIC_AGREGE
+        mocked_response = RESPONSES[endpoint][ResponseKind.CERTIFIED]
+        respx.get(settings.API_ESD["BASE_URL"] + endpoint).respond(200, json=mocked_response)
+        with self.api_client as client:
+            data = client.diagnostic_usager_dossier_agrege("a_long_token")
+
+        assert data == mocked_response
