@@ -457,6 +457,8 @@ API_ESD = {
     "KEY": os.getenv("API_ESD_KEY"),
     "SECRET": os.getenv("API_ESD_SECRET"),
     "BASE_URL": os.getenv("API_ESD_BASE_URL"),
+    "RECOMMENDATIONS_KEY": os.getenv("API_ESD_RECOMMENDATIONS_KEY"),
+    "RECOMMENDATIONS_SECRET": os.getenv("API_ESD_RECOMMENDATIONS_SECRET"),
 }
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.

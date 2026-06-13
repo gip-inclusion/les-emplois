@@ -21,12 +21,17 @@ REFRESH_TOKEN_MARGIN_SECONDS = 10  # arbitrary value, in order not to be *right*
 
 class Apps(enum.Enum):
     EMPLOIS = "emplois"
+    SPS = "sps"
 
 
 class Endpoints(enum.StrEnum):
+    DIAGNOSTIC_USAGER_DIAGNOSTIC_AGREGE = "/diagnosticargumente/v4/dossiers"
+    INFORMATIONS_ADMINISTRATIVES_USAGER = "/informations-administratives/v1/usager"
+    LECTURE_ORIENTATION_USAGER = "/orientationusager/v1/lectureOrientation"
     RECHERCHER_USAGER_DATE_NAISSANCE_NIR = "/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
     RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL = "/rechercher-usager/v2/usagers/par-numero-francetravail"
     RQTH = "/donnees-rqth/v1/rqth"
+    STATUT_USAGER = "/contrat-usager/v2/contrat"
 
 
 class TopIdentiteCertifiee(enum.StrEnum):
@@ -50,6 +55,11 @@ def get_credentials(app):
             return {
                 "key": settings.API_ESD["KEY"],
                 "secret": settings.API_ESD["SECRET"],
+            }
+        case Apps.SPS:
+            return {
+                "key": settings.API_ESD["RECOMMENDATIONS_KEY"],
+                "secret": settings.API_ESD["RECOMMENDATIONS_SECRET"],
             }
     raise ValueError(f"Unknown app: {app}")
 
@@ -361,6 +371,20 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         "profil_accedant",
         "api_donnees-rqthv1",
         "h2a",
+        # Informations Administratives Usager
+        "api_informations-administrativesv1",
+        "informationsadministrativesusager",
+        "profil_accedant",
+        # Statut Usager
+        "api_contrat-usagerv2",
+        "statutcontratusager",
+        # again "profil_accedant",
+        # Orientation Usager
+        "api_orientationusagerv1",
+        "orientationusager",
+        # Diagnostic usager
+        "api_diagnosticargumentev4",
+        "diagnosticusageragent",
     ]
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
@@ -484,6 +508,38 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "certification_period": certification_period,
             "raw_response": data,
         }
+
+    def informations_administratives_usager(self, jeton_usager):
+        # https://francetravail.io/produits-partages/catalogue/rechercher-usager/informations-administratives-usager/documentation#/api-reference/operations/recupererDonneesParIdRci
+        return self._request(
+            f"{self.base_url}{Endpoints.INFORMATIONS_ADMINISTRATIVES_USAGER}",
+            method="GET",
+            jeton_usager=jeton_usager,
+        )
+
+    def statut_usager(self, jeton_usager):
+        # https://francetravail.io/produits-partages/catalogue/rechercher-usager/statut-usager/documentation#/api-reference/operations/recupererContratV2
+        return self._request(
+            f"{self.base_url}{Endpoints.STATUT_USAGER}",
+            method="GET",
+            jeton_usager=jeton_usager,
+        )
+
+    def orientation_usager(self, jeton_usager):
+        # https://francetravail.io/produits-partages/catalogue/rechercher-usager/orientation-usager/documentation#/api-reference/paths/lectureOrientation/get
+        return self._request(
+            f"{self.base_url}{Endpoints.LECTURE_ORIENTATION_USAGER}",
+            method="GET",
+            jeton_usager=jeton_usager,
+        )
+
+    def diagnostic_usager_dossier_agrege(self, jeton_usager):
+        # https://francetravail.io/produits-partages/catalogue/rechercher-usager/diagnostics-individus/documentation#/api-reference/operations/recupererDossierIndividuV4
+        return self._request(
+            f"{self.base_url}{Endpoints.DIAGNOSTIC_USAGER_DIAGNOSTIC_AGREGE}",
+            method="GET",
+            jeton_usager=jeton_usager,
+        )
 
 
 def pole_emploi_partenaire_api_client(app=Apps.EMPLOIS):
