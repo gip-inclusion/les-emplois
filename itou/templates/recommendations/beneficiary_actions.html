@@ -86,12 +86,23 @@
                 {% endpartialdef %}
             </div>
             <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                {# FIXME llalba: pas de leaflet pour le moment, juste un placeholder statique #}
-                <div class="c-box mb-3 mb-md-4">
+                <div class="c-box c-box--recommendations-map mb-3 mb-md-4">
                     <h3>Carte des solutions</h3>
-                    <p class="mb-0">Bientôt disponible.</p>
+                    <div class="c-box--recommendations-map__wrapper">
+                        {{ map_points|json_script:"recommendations-map-points" }}
+                        <div id="recommendations-map">
+                            <div id="recommendations-map-popup"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_script_files %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'vendor/ol/ol.css' %}">
+    <script src="{% static 'vendor/ol/ol.js' %}"></script>
+    <script src="{% static 'js/recommendations_map.js' %}"></script>
 {% endblock %}

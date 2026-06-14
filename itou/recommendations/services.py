@@ -86,3 +86,19 @@ def beneficiary_diagnostic_for(*, beneficiary):
 def recommendations_for(*, beneficiary, filters=None):
     # FIXME llalba: hardcoded
     return _mock_data.HARDCODED_RECOMMENDATIONS
+
+
+def map_points_for(recommendations):
+    """Flatten the recommendations into the marker list consumed by the OpenLayers map."""
+    return [
+        {
+            "name": provider["name"],
+            "kind_label": item["kind_label"],
+            "address": provider["address"],
+            "lat": provider["lat"],
+            "lon": provider["lon"],
+        }
+        for item in recommendations
+        for provider in item["providers"]
+        if provider["show_map"]
+    ]

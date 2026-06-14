@@ -97,6 +97,8 @@ HARDCODED_RECOMMENDATIONS = [
                     "socio-professionnelle."
                 ),
                 "show_map": True,
+                "lat": 45.8326,
+                "lon": 4.7719,
                 "jobs": [],
                 "pk": "77739d9b-2fe3-4a41-a57d-d8e0ebc44ff8",
             },
@@ -113,6 +115,8 @@ HARDCODED_RECOMMENDATIONS = [
                 "distance_km": "2,7",
                 "address": "513 Rue Sans Souci, 69760 Limonest",
                 "show_map": False,
+                "lat": 45.8201,
+                "lon": 4.7853,
                 "jobs": [
                     {"label": "Exploitant / Exploitante agricole", "city": "Le Bouscat - 33"},
                 ],
@@ -130,7 +134,7 @@ HARDCODED_RECOMMENDATIONS = [
                 "subtitle": "(Régie De Quartier Tremblay)",
                 "distance_km": "2,7",
                 "address": "513 Rue Sans Souci, 69760 Limonest",
-                "show_map": False,
+                "show_map": True,
                 "jobs": [
                     {"label": "Aide maçon/maçonne Voirie et réseaux divers", "city": "Le Bouscat - 33"},
                     {
@@ -141,6 +145,8 @@ HARDCODED_RECOMMENDATIONS = [
                     {"label": "Aide plombier / plombière", "city": "Le Bouscat - 33"},
                     *_SIAE_MORE_JOBS,
                 ],
+                "lat": 45.8410,
+                "lon": 4.7601,
                 "pk": "820a949d-7c81-4250-921c-87b1255510b1",
             },
             {
@@ -149,7 +155,7 @@ HARDCODED_RECOMMENDATIONS = [
                 "subtitle": "(Régie De Quartier Tremblay)",
                 "distance_km": "2,7",
                 "address": "513 Rue Sans Souci, 69760 Limonest",
-                "show_map": False,
+                "show_map": True,
                 "jobs": [
                     {"label": "Aide maçon/maçonne Voirie et réseaux divers", "city": "Le Bouscat - 33"},
                     {
@@ -160,6 +166,8 @@ HARDCODED_RECOMMENDATIONS = [
                     {"label": "Aide plombier / plombière", "city": "Le Bouscat - 33"},
                     *_SIAE_MORE_JOBS,
                 ],
+                "lat": 45.8152,
+                "lon": 4.7902,
                 "pk": "a72e4c09-3fd4-45c0-8477-bb85f17c5da9",
             },
         ],

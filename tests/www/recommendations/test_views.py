@@ -2,6 +2,7 @@ import uuid
 from functools import partial
 
 import pytest
+from django.templatetags.static import static
 from django.test import override_settings
 from django.urls import reverse
 from itoutils.django.testing import assertSnapshotQueries
@@ -270,6 +271,39 @@ class TestBeneficiaryActions:
         assert response.context["recommendations_count"] == sum(
             len(item["providers"]) for item in _mock_data.HARDCODED_RECOMMENDATIONS
         )
+
+    def test_map_points_only_expose_show_map_true(self, client, advisor):
+        user, _ = advisor
+        beneficiary = BeneficiaryFactory(referent_email=user.email, organization_safir=SAFIR)
+        client.force_login(user)
+        response = client.get(
+            reverse("recommendations:beneficiary_actions", kwargs={"public_id": beneficiary.public_id})
+        )
+        shown = [
+            p["name"] for item in _mock_data.HARDCODED_RECOMMENDATIONS for p in item["providers"] if p["show_map"]
+        ]
+        hidden = sum(
+            1 for item in _mock_data.HARDCODED_RECOMMENDATIONS for p in item["providers"] if not p["show_map"]
+        )
+        assert [point["name"] for point in response.context["map_points"]] == shown
+        assert hidden > 0
+
+    def test_map_assets_and_data_rendered(self, client, advisor, snapshot):
+        user, _ = advisor
+        beneficiary = BeneficiaryFactory(referent_email=user.email, organization_safir=SAFIR)
+        client.force_login(user)
+        response = client.get(
+            reverse("recommendations:beneficiary_actions", kwargs={"public_id": beneficiary.public_id})
+        )
+        body = response.content.decode()
+        # OpenLayers loaded from the vendored bundle, not a CDN. static() resolves the
+        # ManifestStaticFilesStorage hash (CI) or the plain path (local) for us.
+        assert static("vendor/ol/ol.js") in body
+        assert static("vendor/ol/ol.css") in body
+        assert static("js/recommendations_map.js") in body
+        # Map container, its JSON data island, and the popup container
+        soup = parse_response_to_soup(response, ".c-box--recommendations-map")
+        assert pretty_indented(soup) == snapshot
 
 
 class TestMobilise:

@@ -1,4 +1,23 @@
 # serializer version: 1
+# name: TestBeneficiaryActions.test_map_assets_and_data_rendered
+  '''
+  <div class="c-box c-box--recommendations-map mb-3 mb-md-4">
+      <h3>
+          Carte des solutions
+      </h3>
+      <div class="c-box--recommendations-map__wrapper">
+          <script id="recommendations-map-points" type="application/json">
+              [{"name": "Lille Avenirs", "kind_label": "PLIE", "address": "513 Rue Sans Souci, 69760 Limonest", "lat": 45.8326, "lon": 4.7719}, {"name": "Une nouvelle chance", "kind_label": "emplois d\u2019insertion (SIAE)", "address": "513 Rue Sans Souci, 69760 Limonest", "lat": 45.841, "lon": 4.7601}, {"name": "Une nouvelle chance", "kind_label": "emplois d\u2019insertion (SIAE)", "address": "513 Rue Sans Souci, 69760 Limonest", "lat": 45.8152, "lon": 4.7902}]
+          </script>
+          <div id="recommendations-map">
+              <div id="recommendations-map-popup">
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestBeneficiaryProfile.test_renders_beneficiary_fields
   '''
   <div aria-labelledby="profile-tab" class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel">
