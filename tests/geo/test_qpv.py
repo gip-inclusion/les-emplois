@@ -5,7 +5,7 @@ import pytest
 
 from itou.geo.models import QPV
 from itou.geo.utils import coords_to_geometry
-from tests.geo.factories import QPVFactory
+from tests.geo.factories import create_qpv
 
 
 @dataclass
@@ -26,7 +26,7 @@ class _GoodCoordsType:
 @pytest.fixture(autouse=True)
 def qpv():
     for code in ["QP093028", "QP075019"]:
-        QPVFactory(code=code)
+        create_qpv(code)
 
 
 def test_user_in_qpv():

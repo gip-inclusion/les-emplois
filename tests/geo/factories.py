@@ -1,3 +1,4 @@
+from collections import namedtuple
 from random import sample
 
 import factory
@@ -45,8 +46,10 @@ class ZRRFactory(factory.django.DjangoModelFactory):
         return _params_for_zrr_status(ZRRStatus.IN_ZRR)
 
 
+QPVData = namedtuple("QPVData", ["code", "name", "communes_info", "geometry"])
+
 QPVS = [
-    (
+    QPVData(
         "QP075019",
         "Les Portes Du Vingtième",
         "Paris 20ème arrondissement",
@@ -152,7 +155,7 @@ QPVS = [
         "2.411452124268841 48.87371563163225, "
         "2.4128913231573907 48.874084057785005)))",
     ),
-    (
+    QPVData(
         "QP094025",
         "L'Egalité",
         "Champigny-sur-Marne",
@@ -173,7 +176,7 @@ QPVS = [
         "2.5201064741585313 48.81813500626882, "
         "2.5203776956356165 48.818104418744454)))",
     ),
-    (
+    QPVData(
         "QP093028",
         "Franc Moisin - Cosmonautes - Cristino Garcia - Landy",
         "Aubervilliers, La Courneuve, Saint-Denis",
@@ -726,29 +729,15 @@ QPVS = [
 ]
 
 
-def _format_qpv_tuple(qpv):
-    code, name, infos, spec = qpv
-    return {
-        "code": code,
-        "name": name,
-        "communes_info": infos,
-        "geometry": multipolygon_to_geometry(spec),
-    }
+def _create_qpv(data: QPVData) -> QPV:
+    return QPV.objects.create(
+        code=data.code,
+        name=data.name,
+        communes_info=data.communes_info,
+        geometry=multipolygon_to_geometry(data.geometry),
+    )
 
 
-def _params_for_random_qpv() -> dict:
-    return _format_qpv_tuple(sample(QPVS, 1))
-
-
-class QPVFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = QPV
-
-    code = name = communes_info = geometry = None
-
-    @classmethod
-    def _adjust_kwargs(cls, **kwargs):
-        if code := kwargs["code"]:
-            [qpv] = filter(lambda qpv: qpv[0] == code, QPVS)
-            return _format_qpv_tuple(qpv)
-        return _params_for_random_qpv()
+def create_qpv(code: str) -> QPV:
+    [data] = (qpv for qpv in QPVS if qpv.code == code)
+    return _create_qpv(data)

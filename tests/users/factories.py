@@ -22,7 +22,7 @@ from itou.utils.mocks.address_format import (
 )
 from itou.utils.validators import validate_nir
 from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
-from tests.geo.factories import QPVFactory, ZRRFactory
+from tests.geo.factories import ZRRFactory, create_qpv
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
@@ -280,7 +280,7 @@ class JobSeekerFactory(UserFactory):
         # Using ZRR or QPV means that we must have some factories / data ready beforehand
         # Did not find a better way to do Traits additional setup...
         if kwargs.get("with_address_in_qpv"):
-            QPVFactory(code="QP093028")  # Aubervilliers : in QPV
+            create_qpv("QP093028")  # Aubervilliers : in QPV
 
         if kwargs.get("with_city_in_zrr"):
             ZRRFactory(insee_code="12018")
