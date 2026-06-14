@@ -65,6 +65,7 @@ def beneficiary_actions(request, public_id, template_name="recommendations/benef
     )
     context["recommendations"] = services.recommendations_for(beneficiary=context["beneficiary"])
     context["recommendations_count"] = sum(len(item["providers"]) for item in context["recommendations"])
+    context["map_points"] = services.map_points_for(context["recommendations"])
     if request.htmx:
         template_name += "#actions-results"
     return render(request, template_name, context)

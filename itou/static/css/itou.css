@@ -435,3 +435,28 @@ table.table td > .modal .modal-content {
         display: none !important;
     }
 }
+
+/* Recommendations map (OpenLayers) */
+.c-box--recommendations-map {
+
+    overflow: hidden;
+
+    .c-box--recommendations-map__wrapper {
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+        margin-bottom: -1.5rem;
+        aspect-ratio: 21 / 9;
+    }
+
+    #recommendations-map {
+        display: block;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+@media (min-width: 1640px) {
+    .c-box--recommendations-map .c-box--recommendations-map__wrapper {
+        aspect-ratio: 1 / 1;
+    }
+}

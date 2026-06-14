@@ -167,3 +167,35 @@ class TestProfileHelpers:
         only_rsa = {ProfileFlag.RSA.value: True}
         labels = services.profile_criteria_labels(only_rsa)
         assert labels == [ProfileFlag.RSA.label]
+
+
+class TestMapPointsFor:
+    def test_keeps_only_show_map_providers_and_promotes_kind_label(self):
+        recommendations = [
+            {
+                "kind_label": "Formation",
+                "providers": [
+                    {"name": "Alpha", "address": "1 rue A", "lat": 45.0, "lon": 4.0, "show_map": True},
+                    {"name": "Beta", "address": "2 rue B", "lat": 45.1, "lon": 4.1, "show_map": False},
+                ],
+            },
+            {
+                "kind_label": "Emploi",
+                "providers": [
+                    {"name": "Gamma", "address": "3 rue C", "lat": 46.0, "lon": 5.0, "show_map": True},
+                ],
+            },
+        ]
+        assert services.map_points_for(recommendations) == [
+            {"name": "Alpha", "kind_label": "Formation", "address": "1 rue A", "lat": 45.0, "lon": 4.0},
+            {"name": "Gamma", "kind_label": "Emploi", "address": "3 rue C", "lat": 46.0, "lon": 5.0},
+        ]
+
+    def test_empty_when_no_provider_is_shown(self):
+        recommendations = [
+            {
+                "kind_label": "Formation",
+                "providers": [{"name": "Alpha", "address": "a", "lat": 1.0, "lon": 2.0, "show_map": False}],
+            },
+        ]
+        assert services.map_points_for(recommendations) == []
