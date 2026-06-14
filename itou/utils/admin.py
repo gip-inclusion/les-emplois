@@ -67,6 +67,21 @@ class ItouGISMixin:
             field.widget = OSMWidget(attrs={"map_width": 800, "map_height": 500})
         return field
 
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        """Relax the site-wide `Referrer-Policy: same-origin` for this view only.
+
+        The GeoDjango map widget loads OpenStreetMap tiles cross-origin. The
+        site-wide `Referrer-Policy: same-origin` strips the Referer, which OSM
+        now rejects with an "Access blocked" tile. Relax the policy to send the
+        bare origin as Referer ON THIS ADMIN PAGE ONLY, so tiles load without
+        weakening the global default.
+
+        See also: https://wiki.openstreetmap.org/wiki/Blocked_tiles#If_you_are_the_owner/a_developer_of_the_application/website
+        """
+        response = super().changeform_view(request, object_id, form_url, extra_context=extra_context)
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
 
 class ItouTabularInline(TabularInline):
     list_select_related = None
