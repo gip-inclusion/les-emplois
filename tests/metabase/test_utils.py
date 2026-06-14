@@ -3,13 +3,13 @@ import pytest
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import get_code_commune, get_qpv_job_seeker_pks, get_zrr_status_for_insee_code
 from tests.cities.factories import create_test_cities
-from tests.geo.factories import QPVFactory, ZRRFactory
+from tests.geo.factories import ZRRFactory, create_qpv
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 
 
 def test_get_qpv_job_seeker_pks():
-    QPVFactory(code="QP093028")
+    create_qpv("QP093028")
 
     # Somewhere in QPV QP093028 (Aubervilliers)
     job_seeker_in_qpv = JobSeekerFactory(coords=coords_to_geometry("48.917735", "2.387311"), geocoding_score=0.9)

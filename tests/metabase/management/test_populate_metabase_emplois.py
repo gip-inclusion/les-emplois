@@ -31,7 +31,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.geo.factories import QPVFactory
+from tests.geo.factories import create_qpv
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -131,7 +131,7 @@ def test_populate_analytics(snapshot):
 # return datetime.date objects that are not equal...
 @pytest.mark.django_db(transaction=True)
 def test_populate_job_seekers(snapshot):
-    QPVFactory(code="QP075019")
+    create_qpv("QP075019")
 
     # Importing this file makes a query so we need to do it inside a test
     # and before the assertNumQueries

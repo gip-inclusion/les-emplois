@@ -29,7 +29,7 @@ from tests.companies.factories import SiaeFinancialAnnexFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentCampaignFactory
-from tests.geo.factories import QPVFactory
+from tests.geo.factories import create_qpv
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -129,7 +129,7 @@ def test_all_admin(admin_client, mocker, subtests):
     )
 
     # Call factories that need parameters
-    QPVFactory(code="QP093028")
+    create_qpv("QP093028")
     GEIQEligibilityDiagnosisFactory(from_employer=True)
     IAEEligibilityDiagnosisFactory(from_employer=True)
 
@@ -157,7 +157,6 @@ def test_all_admin(admin_client, mocker, subtests):
             JobSeekerFactory,  # Already used above
             LaborInspectorInvitationFactory,  # Already used above
             NexusRessourceSyncStatusFactory,  # Already used above
-            QPVFactory,  # Already used above
             SanctionsFactory,  # Called by EvaluatedJobApplicationSanctionFactory
             SiaeFinancialAnnexFactory,  # Called by SiaeConventionFactory
             UserFactory,  # A lot of subfactories, no need to use it
