@@ -1,0 +1,924 @@
+[
+  {
+    "model": "insertion.service",
+    "pk": 1,
+    "fields": {
+      "address_line_1": "14 Rue de Badonviller",
+      "address_line_2": "",
+      "post_code": "90000",
+      "city": "Belfort",
+      "insee_city": 34249,
+      "coordinates": "SRID=4326;POINT (6.848865 47.64518)",
+      "uid": "carif-oref--10_381282S",
+      "source": 241,
+      "source_link": "https://www.lycee.pro/formation.html",
+      "structure": 1,
+      "name": "Ouvrir l'école aux parents pour la réussite des enfants - OEPRE",
+      "description": "### Objectif de la formation\n\nFavoriser l'intégration des parents d'élèves, primo-arrivants, immigrés ou étrangers hors Union européenne, volontaires, en les impliquant notamment dans la scolarité de leur enfant.\n\n### Contenu de la formation\n\nLes formations portent sur trois axes d'apprentissage :  \n- l'acquisition du français (comprendre, parler, lire et écrire),  \n- la connaissance des valeurs de la République et leur mise en oeuvre dans la société française,  \n- la connaissance du fonctionnement et des attentes de l'école vis-à-vis des élèves et des parents.",
+      "description_short": "",
+      "kind": 137,
+      "fee": null,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Avoir un enfant scolarise dans l etablissement ou se deroule le dispositif ou dans un etablissement proche.\nJours et horaires des ateliers : Mardi : 9h-11h ou 18h - 20h en alternance",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"21\", \"25\", \"39\", \"58\", \"70\", \"71\", \"89\", \"90\"]",
+      "mobilizations_details": "",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "contact@email.fake",
+      "contact_phone": "",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2025-12-18",
+      "created_at": "2026-06-15T09:15:21.499Z",
+      "thematics": [
+        167
+      ],
+      "publics": [
+        127
+      ],
+      "receptions": [
+        132
+      ],
+      "mobilizations": [
+        3,
+        5
+      ],
+      "mobilization_publics": [
+        7
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 2,
+    "fields": {
+      "address_line_1": "3 Avenue de Porrentruy",
+      "address_line_2": "",
+      "post_code": "13150",
+      "city": "Tarascon",
+      "insee_city": 4401,
+      "coordinates": "SRID=4326;POINT (4.660613 43.808203)",
+      "uid": "carif-oref--24_1561517",
+      "source": 241,
+      "source_link": "https://www.ecole.edu/formation.html",
+      "structure": 2,
+      "name": "Ouvrir l'école aux parents pour la réussite des enfants - OEPRE",
+      "description": "### Objectif de la formation\n\nFavoriser l'intégration des parents d'élèves, primo-arrivants, immigrés ou étrangers hors Union européenne, volontaires, en les impliquant notamment dans la scolarité de leur enfant.\n\n### Contenu de la formation\n\nLes formations portent sur trois axes d'apprentissage :\n- l'acquisition du français (comprendre, parler, lire et écrire) ;\n- la connaissance des valeurs de la République et leur mise en œuvre dans la société française ;\n- la connaissance du fonctionnement et des attentes de l'école vis-à-vis des élèves et des parents.\nCette formation est assurée par des enseignants en Français Langue Seconde, des enseignants des UPE2A, ou des membres d'associations diplômés en FLE-FLS",
+      "description_short": "",
+      "kind": 137,
+      "fee": null,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Primo-arrivant, refugies sans niveau specifique",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"04\", \"05\", \"06\", \"13\", \"83\", \"84\"]",
+      "mobilizations_details": "",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "email@ac-aix-marseille.fake",
+      "contact_phone": "+00190519058",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2024-03-05",
+      "created_at": "2026-06-15T09:15:35.313Z",
+      "thematics": [
+        166,
+        167
+      ],
+      "publics": [
+        127
+      ],
+      "receptions": [
+        132
+      ],
+      "mobilizations": [
+        3,
+        5
+      ],
+      "mobilization_publics": [
+        7
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 3,
+    "fields": {
+      "address_line_1": "Place de l'Europe",
+      "address_line_2": "Locaux de la MIFE Belfort",
+      "post_code": "90000",
+      "city": "Belfort",
+      "insee_city": 34249,
+      "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
+      "uid": "dora--0d9e86b2-fe6f-4099-a836-9bd559514241",
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/cibc-formation",
+      "structure": 5,
+      "name": "Mon conseil en évolution professionnelle (Mon CEP) par Avenir Actifs - Belfort",
+      "description": "Mon conseil en évolution professionnelle (Mon CEP) est un service d’écoute et d’appui **gratuit** pour accompagner les **salariés du privé et les indépendants** dans leurs parcours et leurs choix professionnels. Le service Mon CEP peut être sollicité **à tout moment de la vie professionnelle**, pour une **aide ponctuelle** ou un **accompagnement dans la durée**. L’accompagnement peut être proposé **en agence ou à distance** (téléphone ou visio).",
+      "description_short": "Mon conseil en évolution professionnelle (Mon CEP) est le service public d’accompagnement professionnel délivré par Avenir Actifs, opérateur régional habilité à délivrer Mon CEP. Nous accompagnons les salariés et les indépendants dans leurs démarches d’évolution professionnelle.",
+      "kind": 136,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "Salarié intérimaire, Créateur ou repreneur d’entreprise  avec statut de salarié, Créateur repreneur d'entreprise, Salarié cadre, Demandeur d'emploi en contrat, Salarié, Senior de + de 45 ans, Salarié en mobilité, Salarié nouvellement embauché, Salarié du secteur privé non agricole, Travailleur indépendant",
+      "access_conditions_di": "",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"90\"]",
+      "mobilizations_details": "",
+      "mobilization_modes_beneficiaries_external_form_link": "https://site.fake/demande-rappel/",
+      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "https://site.fake/demande-rappel/",
+      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "RDV possible du lundi au vendredi de 8h à 19h30 et le samedi matin 9h-12h",
+      "contact_full_name": "Mariana PETIT",
+      "contact_email": "contact@email.fake",
+      "contact_phone": "",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": "2026-06-15T09:15:45.184Z",
+      "updated_on": "2026-02-05",
+      "created_at": "2026-06-15T09:15:45.184Z",
+      "thematics": [
+        139,
+        140,
+        141,
+        142,
+        143,
+        145,
+        198,
+        199
+      ],
+      "publics": [
+        117,
+        119,
+        129
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [
+        217,
+        221
+      ],
+      "mobilization_modes_professionals": [
+        218,
+        222
+      ],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 4,
+    "fields": {
+      "address_line_1": "Chemin de Ronde de la Caserne",
+      "address_line_2": "",
+      "post_code": "13150",
+      "city": "Tarascon",
+      "insee_city": 4401,
+      "coordinates": "SRID=4326;POINT (4.662042 43.800196)",
+      "uid": "dora--1907599a-42e6-4345-b115-d588cd075193",
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/chambre-commerce",
+      "structure": 4,
+      "name": "Mon Conseil en Evolution Professionnelle par Avenir Actifs – Tarascon",
+      "description": "Mon Conseil en Evolution Professionnelle est un service d’écoute et d’appui gratuit pour accompagner les salariés du privé et les indépendants dans leurs parcours et leurs choix professionnels. Le service Mon CEP peut être sollicité à tout moment de la vie professionnelle, pour une aide ponctuelle ou un accompagnement dans la durée. L’accompagnement peut être proposé en agence ou à distance (téléphone ou visio). Il est personnalisé et confidentiel.\n\nMon CEP par Avenir Actifs vous accompagne sur les besoins suivants :\n\n· Prendre du recul sur votre situation : faire le point sur votre situation professionnelle afin d’éclairer votre parcours et vous aider dans la suite de votre vie professionnelle.\n\n· Vous informer sur les opportunités : vous informer sur les opportunités emploi et formation possibles selon votre situation pour faire évoluer votre carrière.\n\n",
+      "description_short": "Mon Conseil en Evolution professionnelle est le service public d’accompagnement professionnel délivré par Avenir Actifs, opérateur régional habilité à délivrer Mon CEP. Nous accompagnons les salariés et les indépendants dans leurs démarches d’évolution professionnelle.",
+      "kind": 136,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "Salarié intérimaire, Créateur ou repreneur d’entreprise  avec statut de salarié, Créateur repreneur d'entreprise, Salarié cadre, Public senior + de 50 ans, Demandeur d'emploi en contrat, Public moins de 26 ans, Salarié, Senior de + de 45 ans, Jeune de moins de 30 ans inclus, Salarié en mobilité, Salarié nouvellement embauché, Salarié du secteur privé non agricole, Travailleur indépendant",
+      "access_conditions_di": "",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"13108\"]",
+      "mobilizations_details": "",
+      "mobilization_modes_beneficiaries_external_form_link": "https://site.fake/demande-rappel/",
+      "mobilization_modes_beneficiaries_external_form_link_text": "Faire une demande",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "https://site.fake/demande-rappel/",
+      "mobilization_modes_professionals_external_form_link_text": "Orienter votre bénéficiaire",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "RDV possible le mercredi matin de 9h à 12h30",
+      "contact_full_name": "Marin JEAN",
+      "contact_email": "contat@email.fake",
+      "contact_phone": "4150990808",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": "2026-06-15T09:15:49.231Z",
+      "updated_on": "2026-01-05",
+      "created_at": "2026-06-15T09:15:49.231Z",
+      "thematics": [
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        198,
+        199
+      ],
+      "publics": [
+        117,
+        119,
+        123,
+        129
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [
+        221
+      ],
+      "mobilization_modes_professionals": [
+        218
+      ],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 5,
+    "fields": {
+      "address_line_1": "Place de l'Europe",
+      "address_line_2": "",
+      "post_code": "90000",
+      "city": "Belfort",
+      "insee_city": 34249,
+      "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
+      "uid": "dora--869e04c8-4be3-43cf-923b-f59e0300fafe",
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/mission-locale",
+      "structure": 3,
+      "name": "CEJ - Contrat d'Engagement Jeune",
+      "description": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi.\n\nIl s'agit d'un programme intensif d’accompagnement de 15 à 20 heures par semaine minimum.\n\n- avec une **mise en activité systématique et régulière du premier au dernier jour**, pendant une période pouvant aller jusqu’à 12 mois (et jusqu’à 18 mois sous conditions).\n\n- des points réguliers avec la mission locale, des ateliers collectifs et des démarches personnelles\n\n- une **allocation** mensuelle sous condition de revenus, d’assiduité et d’acceptation des offres d’activité reçues.\n\n\n<!-- -->\n\n**Plusieurs solutions** peuvent être proposées pendant les parcours comme par exemple :\n\n- Une formation qualifiante ou préqualifiante ;\n\n- Une mission d’utilité sociale (ex. : service civique) ;\n\n- Des mises en situation en emploi (ex. : stages ou immersions en entreprise) ;\n\n- Une alternance (ex. : contrat d’apprentissage ou de professionnalisation).\n\n- Un contrat de travail de moins de 6 mois, un contrat \"aidé\" ou un contrat dans une structure de l'IAE\n\n\n<!-- -->\n\n**Un référent unique tout au long du parcours **\n\nChaque jeune est accompagné par un conseiller qui reste son référent tout au long du parcours.\n\n**Une application** facilite les échanges avec le conseiller mission locale et le jeune accompagné.\n\n**Des droits pour les jeunes bénéficiaires et des devoirs**\n\nLe Contrat d’Engagement Jeune fonctionne à une condition : être motivé, accepter les formations, les stages, les emplois qui sont proposés. Le dispositif est suspendu en cas de refus du bénéficiaire.\n\n**Le Contrat d’Engagement Jeune mobilise les entreprises** pour favoriser les découvertes de métiers, les immersions dans un collectif de travail et la formation en alternance.\n\n",
+      "description_short": "Le contrat d'engagement jeune s'adresse aux jeunes qui souhaitent s’engager activement dans un parcours vers l’emploi. Il s'agit d'un programme intensif d’accompagnement dans le projet professionnel et l'emploi.",
+      "kind": 134,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "Public moins de 26 ans, Jeunes (16-26 ans)",
+      "access_conditions_di": "",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"90\"]",
+      "mobilizations_details": "",
+      "mobilization_modes_beneficiaries_external_form_link": "https://missionslocales.com/contact/",
+      "mobilization_modes_beneficiaries_external_form_link_text": "Nous contacter",
+      "mobilization_modes_beneficiaries_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "contact_is_public": true,
+      "is_orientable_with_form": true,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": "2026-06-15T09:16:29.343Z",
+      "updated_on": "2026-02-09",
+      "created_at": "2026-06-15T09:16:29.343Z",
+      "thematics": [
+        186
+      ],
+      "publics": [
+        123
+      ],
+      "receptions": [
+        132
+      ],
+      "mobilizations": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [
+        213,
+        215,
+        217,
+        221
+      ],
+      "mobilization_modes_professionals": [
+        216,
+        218,
+        220,
+        222
+      ],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 6,
+    "fields": {
+      "address_line_1": "rue GUSTAVE DESPLACES",
+      "address_line_2": "",
+      "post_code": "13150",
+      "city": "TARASCON",
+      "insee_city": 4401,
+      "coordinates": null,
+      "uid": "finess--130806755--cmp",
+      "source": 243,
+      "source_link": "",
+      "structure": 6,
+      "name": "Consultations médico-psychologiques et sociales",
+      "description": "Le centre médico- psychologique (CMP) est un lieu de soins public qui offre des consultations médico-psychologiques et sociales à toute personne en difficulté psychique.",
+      "description_short": "",
+      "kind": 133,
+      "fee": 1,
+      "fee_details": "Prise en charge gratuite et intégralement remboursée par la sécurité sociale",
+      "publics_details": "",
+      "access_conditions_di": "",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"13\"]",
+      "mobilizations_details": "Il existe deux types de centres médico-psychologiques : ceux destinés aux enfants et adolescents (CMPEA), et ceux réservés aux adultes (CMP). Se référer au nom de la structure pour confirmer le public.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2016-12-08",
+      "created_at": "2026-06-15T09:17:07.520Z",
+      "thematics": [
+        163,
+        194,
+        196
+      ],
+      "publics": [
+        130
+      ],
+      "receptions": [
+        132
+      ],
+      "mobilizations": [
+        4,
+        5
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 7,
+    "fields": {
+      "address_line_1": "10 Rue Pasteur",
+      "address_line_2": "",
+      "post_code": "30300",
+      "city": "Beaucaire",
+      "insee_city": 10946,
+      "coordinates": "SRID=4326;POINT (4.638919 43.805192)",
+      "uid": "finess--300017084--cmp",
+      "source": 243,
+      "source_link": "",
+      "structure": 7,
+      "name": "Consultations médico-psychologiques et sociales",
+      "description": "Le centre médico- psychologique (CMP) est un lieu de soins public qui offre des consultations médico-psychologiques et sociales à toute personne en difficulté psychique.",
+      "description_short": "",
+      "kind": 133,
+      "fee": 1,
+      "fee_details": "Prise en charge gratuite et intégralement remboursée par la sécurité sociale",
+      "publics_details": "",
+      "access_conditions_di": "",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"30\"]",
+      "mobilizations_details": "Il existe deux types de centres médico-psychologiques : ceux destinés aux enfants et adolescents (CMPEA), et ceux réservés aux adultes (CMP). Se référer au nom de la structure pour confirmer le public.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2026-04-13",
+      "created_at": "2026-06-15T09:17:08.262Z",
+      "thematics": [
+        163,
+        194,
+        196
+      ],
+      "publics": [
+        130
+      ],
+      "receptions": [
+        132
+      ],
+      "mobilizations": [
+        4,
+        5
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 8,
+    "fields": {
+      "address_line_1": "8 Place de l'Europe",
+      "address_line_2": "",
+      "post_code": "90000",
+      "city": "Belfort",
+      "insee_city": 34249,
+      "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
+      "uid": "france-travail--BFC0105-24",
+      "source": 233,
+      "source_link": "",
+      "structure": 8,
+      "name": "Activ'Projet",
+      "description": "Vous souhaitez ou devez changer de métier ? Vous doutez de la voie à suivre ? Changer de métier, ça se prépare ! \nAvant de choisir un métier ou de vous reconvertir, il est essentiel de confronter l’idée que vous vous faites du nouveau métier avec sa réalité et les perspectives d’emploi.\n\nActiv'projet est un service délivré par France Travail. Il vous permet d’élaborer ou de confirmer un ou plusieurs projets professionnels avec un conseiller en évolution professionnelle.\n\nActiv’projet vous permet :\n\n- D’explorer des pistes professionnelles correspondant à vos critères et aux compétences recherchées par les entreprises\n\n- De clarifier vos souhaits et aspirations\n\n- De Réaliser une ou plusieurs immersions professionnelles (PMSMP) pour découvrir un métier ou confirmer votre projet professionnel.\n\n- De Sécuriser la poursuite de votre parcours en étant informé sur les dispositifs adaptés si vous avez un besoin de formation.\n\nSur une durée de 8 à 12 semaines vous pourrez :\n\n- Faire le point sur vos expériences et votre parcours professionnel,\n\n- Identifier vos compétences, centres d’intérêt, valeurs et aspirations,\n\n- Découvrir les emplois et métiers qui correspondent à vos critères et aux compétences recherchées par les entreprises,\n\n- Préciser ou confirmer les éléments de votre projet professionnel,\n\nA l’issue, repartir avec une feuille de route permettant de rendre concret votre projet professionnel \n\nInscription :\n\n- depuis l'espace personnel France Travail\n\n- ou en contactant un conseiller France Travail",
+      "description_short": "",
+      "kind": 133,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Être inscrit à France Travail.",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"90\"]",
+      "mobilizations_details": "Pour les usagers, la demande est à faire depuis l’espace personnel du demandeur d’emploi via le lien fourni.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "Mo-Fr 08:30-12:30 open \"Sans rendez-vous\"; PH off",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "3949",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2026-03-31",
+      "created_at": "2026-06-15T09:17:17.115Z",
+      "thematics": [
+        139,
+        141,
+        142
+      ],
+      "publics": [
+        119
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 9,
+    "fields": {
+      "address_line_1": "8 Place de l'Europe",
+      "address_line_2": "",
+      "post_code": "90000",
+      "city": "Belfort",
+      "insee_city": 34249,
+      "coordinates": "SRID=4326;POINT (6.844403 47.634914)",
+      "uid": "france-travail--BFC0105-25",
+      "source": 233,
+      "source_link": "",
+      "structure": 8,
+      "name": "Activ'Créa",
+      "description": "Entrepreneur, pourquoi pas vous ?\nAvec l’appui d’un professionnel, venez explorer l’opportunité de créer ou reprendre une entreprise, à partir de votre situation et du marché du travail.\nL’entretien de bilan vous permet de décider de poursuivre ou d’abandonner l’idée de création d’entreprise.\n\nActiv'créa vous permet d'identifier :\n\n- Les compétences et atouts sur lesquels vous appuyer.\n\n- Des idées de création ou de reprise d’entreprise réalistes et réalisables.\n\n- Les conditions de réussite et les actions à mettre en œuvre pour sécuriser votre projet.\n\nDurée : 3 mois maximum, en présentiel ou à distance\n\nInscription : \n- depuis l'espace personnel France Travail\n- ou en contactant un conseiller France Travail",
+      "description_short": "",
+      "kind": 133,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Être inscrit à France Travail.",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"90\"]",
+      "mobilizations_details": "Pour les usagers, la demande est à faire depuis l’espace personnel du demandeur d’emploi via le lien fourni.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "Mo-Fr 08:30-12:30 open \"Sans rendez-vous\"; PH off",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "3949",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2026-03-31",
+      "created_at": "2026-06-15T09:17:17.117Z",
+      "thematics": [
+        143
+      ],
+      "publics": [
+        119
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 10,
+    "fields": {
+      "address_line_1": "1133 Chemin du Clapas de Cornut",
+      "address_line_2": "",
+      "post_code": "30300",
+      "city": "Beaucaire",
+      "insee_city": 10946,
+      "coordinates": "SRID=4326;POINT (4.613615 43.811378)",
+      "uid": "france-travail--OCC0163-22",
+      "source": 233,
+      "source_link": "",
+      "structure": 9,
+      "name": "Réaliser son Cv en anglais/ en allemand/ en espagnol",
+      "description": "Vous vous demandez comment rédiger un bon CV en anglais/ en allemand ou en espagnol ?\nQuels sont les incontournables à respecter selon les pays visés ?\n\nCet atelier-conseil vous permet de :\n\n- Identifier vos compétences à mettre en valeur dans un contexte interculturel\n\n- Rédiger votre CV en anglais/ en allemand/ en espagnol\n\n- Adapter votre CV aux attentes des recruteurs des pays ciblés\n\n- Bénéficier de conseils pour améliorer votre candidature.\n\n<!-- -->\n\nDurée : Une demi-journée\n\nInscription :\n\n- depuis l'espace personnel France Travail \n- ou en contactant un conseiller France Travail\n\n<!-- -->",
+      "description_short": "",
+      "kind": 136,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Être inscrit à France Travail.",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"30\"]",
+      "mobilizations_details": "Pour les usagers, la demande est à faire depuis l’espace personnel du demandeur d’emploi via le lien fourni.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "Mo-Fr 08:30-12:30 open \"Sans rendez-vous\"; PH off",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "3949",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2026-03-31",
+      "created_at": "2026-06-15T09:17:40.084Z",
+      "thematics": [
+        187
+      ],
+      "publics": [
+        119
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 11,
+    "fields": {
+      "address_line_1": "1133 Chemin du Clapas de Cornut",
+      "address_line_2": "",
+      "post_code": "30300",
+      "city": "Beaucaire",
+      "insee_city": 10946,
+      "coordinates": "SRID=4326;POINT (4.613615 43.811378)",
+      "uid": "france-travail--OCC0163-24",
+      "source": 233,
+      "source_link": "",
+      "structure": 8,
+      "name": "Activ'Projet",
+      "description": "Vous souhaitez ou devez changer de métier ? Vous doutez de la voie à suivre ? Changer de métier, ça se prépare ! \nAvant de choisir un métier ou de vous reconvertir, il est essentiel de confronter l’idée que vous vous faites du nouveau métier avec sa réalité et les perspectives d’emploi.\n\nActiv'projet est un service délivré par France Travail. Il vous permet d’élaborer ou de confirmer un ou plusieurs projets professionnels avec un conseiller en évolution professionnelle.\n\nActiv’projet vous permet :\n\n- D’explorer des pistes professionnelles correspondant à vos critères et aux compétences recherchées par les entreprises\n\n- De clarifier vos souhaits et aspirations\n\n- De Réaliser une ou plusieurs immersions professionnelles (PMSMP) pour découvrir un métier ou confirmer votre projet professionnel.\n\n- De Sécuriser la poursuite de votre parcours en étant informé sur les dispositifs adaptés si vous avez un besoin de formation.\n\nSur une durée de 8 à 12 semaines vous pourrez :\n\n- Faire le point sur vos expériences et votre parcours professionnel,\n\n- Identifier vos compétences, centres d’intérêt, valeurs et aspirations,\n\n- Découvrir les emplois et métiers qui correspondent à vos critères et aux compétences recherchées par les entreprises,\n\n- Préciser ou confirmer les éléments de votre projet professionnel,\n\nA l’issue, repartir avec une feuille de route permettant de rendre concret votre projet professionnel \n\nInscription :\n\n- depuis l'espace personnel France Travail\n\n- ou en contactant un conseiller France Travail",
+      "description_short": "",
+      "kind": 133,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Être inscrit à France Travail.",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"30\"]",
+      "mobilizations_details": "Pour les usagers, la demande est à faire depuis l’espace personnel du demandeur d’emploi via le lien fourni.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "Mo-Fr 08:30-12:30 open \"Sans rendez-vous\"; PH off",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "3949",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2026-03-31",
+      "created_at": "2026-06-15T09:17:40.086Z",
+      "thematics": [
+        139,
+        141,
+        142
+      ],
+      "publics": [
+        119
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 12,
+    "fields": {
+      "address_line_1": "1133 Chemin du Clapas de Cornut",
+      "address_line_2": "",
+      "post_code": "30300",
+      "city": "Beaucaire",
+      "insee_city": 10946,
+      "coordinates": "SRID=4326;POINT (4.613615 43.811378)",
+      "uid": "france-travail--OCC0163-28",
+      "source": 233,
+      "source_link": "",
+      "structure": 8,
+      "name": "Optimiser et organiser ma recherche d'emploi",
+      "description": "Vous souhaitez mieux organiser vos démarches pour trouver un emploi plus efficacement ?",
+      "description_short": "",
+      "kind": 136,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "",
+      "access_conditions_di": "Être inscrit à France Travail.",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"30\"]",
+      "mobilizations_details": "Pour les usagers, la demande est à faire depuis l’espace personnel du demandeur d’emploi via le lien fourni.",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "Mo-Fr 08:30-12:30 open \"Sans rendez-vous\"; PH off",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "",
+      "contact_phone": "3949",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2026-03-31",
+      "created_at": "2026-06-15T09:17:40.093Z",
+      "thematics": [
+        206
+      ],
+      "publics": [
+        119
+      ],
+      "receptions": [
+        131,
+        132
+      ],
+      "mobilizations": [
+        5,
+        6
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  },
+  {
+    "model": "insertion.service",
+    "pk": 13,
+    "fields": {
+      "address_line_1": "place georges clémenceau",
+      "address_line_2": "",
+      "post_code": "30300",
+      "city": "Beaucaire",
+      "insee_city": 10946,
+      "coordinates": "SRID=4326;POINT (4.643671 43.807256)",
+      "uid": "ma-boussole-aidants--10004420--1",
+      "source": 242,
+      "source_link": "https://maboussoleaidants.fr/mes-solutions/centre-communal-action-sociale",
+      "structure": 10,
+      "name": "Premiers contacts",
+      "description": "Interlocuteur de premier niveau pour des conseils, orientation et accompagnement dans les démarches d’accès aux droits et aux aides financières. Ils sont en général la première porte d’entrée dans le parcours d’un aidant.",
+      "description_short": "",
+      "kind": 133,
+      "fee": 1,
+      "fee_details": "",
+      "publics_details": "Âge minimum : 0 Âge maximum : 120",
+      "access_conditions_di": "",
+      "access_conditions_dora": "[]",
+      "eligibility_zones": "[\"30032\"]",
+      "mobilizations_details": "",
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "credentials": "[]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "contact_full_name": "",
+      "contact_email": "ccas@email.fake.fr",
+      "contact_phone": "+0011111363",
+      "contact_is_public": true,
+      "is_orientable_with_form": false,
+      "average_orientation_response_delay_days": null,
+      "dora_synced_at": null,
+      "updated_on": "2025-09-15",
+      "created_at": "2026-06-15T09:17:54.328Z",
+      "thematics": [
+        146,
+        148
+      ],
+      "publics": [],
+      "receptions": [
+        132
+      ],
+      "mobilizations": [
+        3,
+        5
+      ],
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_professionals": [],
+      "funding_labels": []
+    }
+  }
+]
