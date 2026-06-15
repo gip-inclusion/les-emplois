@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2026-06-15
+
+### Ajouté
+
+- [GEIQ : Ajout de champs dans le contrôle des bilans pour assurer la conformité réglementaire](https://github.com/gip-inclusion/les-emplois/pull/8254)
+- [GEIQ : Ajout des filtres Campagne, Status et Nom du GEIQ à la liste des bilans d’exécution des institutions](https://github.com/gip-inclusion/les-emplois/pull/8201)
+- [GEIQ : Ajout d’un premier filtre, "Référent", sur la liste des bilans d’exécution des institutions](https://github.com/gip-inclusion/les-emplois/pull/8194)
+
+### Modifié
+
+- [API : Limiter la recherche de candidatures aux 3 derniers mois](https://github.com/gip-inclusion/les-emplois/pull/8198)
+- [Connexion : Ajout du code de récupération pour la 2FA](https://github.com/gip-inclusion/les-emplois/pull/8196)
+- [Demandeur d’emploi : Elargir la modification des données d'un candidat aux prescripteurs et employeurs](https://github.com/gip-inclusion/les-emplois/pull/8218)
+- [GEIQ : Affichage du SIRET de la structure](https://github.com/gip-inclusion/les-emplois/pull/8180)
+- [GEIQ : Ajout du “Montant potentiel” sur la liste des bilans d'exécutions](https://github.com/gip-inclusion/les-emplois/pull/8185)
+- [GEIQ : Récupération asynchrone des PDF via l'API Label](https://github.com/gip-inclusion/les-emplois/pull/8177)
+- [Tech : Utiliser les assignations pour filtrer les accompagnements par accompagnateur de la structure](https://github.com/gip-inclusion/les-emplois/pull/8242)
+
+### Supprimé
+
+- [Demandeur d’emploi : Ne pas importer les adresses et numéro de téléphone de FranceConnect](https://github.com/gip-inclusion/les-emplois/pull/8221)
+- [GEIQ : Suppression du paramètre `from_list` des switchs](https://github.com/gip-inclusion/les-emplois/pull/8245)
+
 ## 2026-06-08
 
 ### Ajouté
