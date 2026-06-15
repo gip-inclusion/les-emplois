@@ -38,5 +38,6 @@ echo "Dump models data into $FIXTURES_DIRECTORY"
 
 
 for file in $(find "$FIXTURES_DIRECTORY" -iname '*.json' | sort); do
-    jq . --sort-keys "$file" | sponge "$file"
+    jq . --sort-keys "$file" > tempfile
+    mv tempfile "$file"
 done
