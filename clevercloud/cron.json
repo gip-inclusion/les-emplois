@@ -53,6 +53,7 @@
   "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 1 * * MON $ROOT/clevercloud/run_management_command.sh delete_unused_files",
   "0 2 * * MON $ROOT/clevercloud/run_management_command.sh populate_metabase_matomo --wet-run",
+  "10 5 * * MON $ROOT/clevercloud/run_management_command.sh purge_disabled_otp_devices --wet-run",
 
   "0 0 1 * * $ROOT/clevercloud/run_management_command.sh sync_cities --wet-run",
   "0 0 3 * * $ROOT/clevercloud/run_management_command.sh delete_old_nir_modification_requests --wet-run",

@@ -851,6 +851,9 @@ SERIALIZATION_MODULES = {
 OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
 OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
+OTP_DEVICES_GRACE_PERIOD_BEFORE_DELETION = datetime.timedelta(
+    days=int(os.getenv("OTP_DEVICES_GRACE_PERIOD_BEFORE_DELETION_DAYS", 90))
+)
 
 # anonymize users
 # ------------------------------------------------------------------------------
