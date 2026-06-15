@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+#
+# To keep the fixtures up to date:
+# load them (without the dynamic fixtures)
+# $ ./manage.py loaddata_bulk itou/fixtures/django/*.json
+# Don't use populate_db or dumpcreate or dumprestore ...
+# Then run the migrations adding fields or modifying the database
+# then run this script
+# $ ./itou/fixtures/django/dumpdata.sh
+
 
 FIXTURES_DIRECTORY=$(dirname "$0")
 
