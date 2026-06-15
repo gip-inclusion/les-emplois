@@ -4046,7 +4046,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with granted allowance]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02-light">
       <h3>
           L’aide financière est accordée
       </h3>
@@ -4072,7 +4072,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with refused allowance, filled reason, common tab]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02-light">
       <h3>
           L’aide financière n’est pas accordée
       </h3>
@@ -4090,17 +4090,15 @@
       <p>
           Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.
       </p>
-      <a class="btn btn-outline-primary btn-block btn-lg mb-2" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+      <a class="btn btn-outline-primary bg-white btn-block mb-3" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
           <span>
               Modifier le motif de refus
           </span>
       </a>
       <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary btn-block btn-lg" name="action" type="submit" value="grant_allowance">
-              <span>
-                  Accorder l’aide
-              </span>
+          <button class="btn btn-primary btn-block" name="action" type="submit" value="grant_allowance">
+              Accorder l’aide
           </button>
       </form>
   </div>
@@ -4109,7 +4107,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with refused allowance, missing reason, common tab]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02-light">
       <h3>
           L’aide financière n’est pas accordée
       </h3>
@@ -4124,17 +4122,15 @@
               
               tant que le bilan n'a pas été validé.
       </p>
-      <a class="btn btn-outline-primary btn-block btn-lg mb-2" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+      <a class="btn btn-outline-primary bg-white btn-block mb-3" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
           <span>
               Justifier le refus
           </span>
       </a>
       <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary btn-block btn-lg" name="action" type="submit" value="grant_allowance">
-              <span>
-                  Accorder l’aide
-              </span>
+          <button class="btn btn-primary btn-block" name="action" type="submit" value="grant_allowance">
+              Accorder l’aide
           </button>
       </form>
   </div>
@@ -4143,7 +4139,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution[contract detail side box with refused allowance, missing reason, justification tab]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02-light">
       <h3>
           L’aide financière n’est pas accordée
       </h3>
@@ -4160,10 +4156,8 @@
       </p>
       <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary btn-block btn-lg" name="action" type="submit" value="grant_allowance">
-              <span>
-                  Accorder l’aide
-              </span>
+          <button class="btn btn-primary btn-block" name="action" type="submit" value="grant_allowance">
+              Accorder l’aide
           </button>
       </form>
   </div>
@@ -4172,7 +4166,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_grant_or_refuse_allowance_as_institution_after_selection_validation[contract detail side box with refused allowance and validated selection]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02-light">
       <h3>
           L’aide financière n’est pas accordée
       </h3>
@@ -4190,17 +4184,15 @@
       <p>
           Si vous décidez d’accorder l'aide, le motif et le commentaire de refus seront supprimés.
       </p>
-      <a class="btn btn-outline-primary btn-block btn-lg mb-2 disabled" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
+      <a class="btn btn-outline-primary bg-white btn-block mb-3 disabled" href="/geiq-assessments/contracts/[Pk of EmployeeContract]/refusal-justification">
           <span>
               Modifier le motif de refus
           </span>
       </a>
       <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary btn-block btn-lg" disabled="" name="action" type="submit" value="grant_allowance">
-              <span>
-                  Accorder l’aide
-              </span>
+          <button class="btn btn-primary btn-block" disabled="" name="action" type="submit" value="grant_allowance">
+              Accorder l’aide
           </button>
       </form>
   </div>
@@ -4209,7 +4201,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract < 90 days][allowance request box with allowance not requested]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide non sollicitée pour ce contrat
       </h3>
@@ -4218,7 +4210,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" type="submit">
+          <button class="btn btn-primary btn-block" type="submit">
               Solliciter l’aide
           </button>
       </form>
@@ -4228,7 +4220,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract < 90 days][allowance request box with allowance requested, filled reason, common tab]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide sollicitée pour ce contrat
       </h3>
@@ -4242,12 +4234,12 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary w-100 mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+      <a class="btn btn-primary btn-block mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
           Modifier votre justification
       </a>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4261,7 +4253,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract < 90 days][allowance request box with allowance requested, missing reason, common tab]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide sollicitée pour ce contrat
       </h3>
@@ -4277,12 +4269,12 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary w-100 mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+      <a class="btn btn-primary btn-block mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
           Justifier la demande d’aide
       </a>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4296,7 +4288,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract >= 90 days][allowance request box with allowance not requested]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide non sollicitée pour ce contrat
       </h3>
@@ -4305,7 +4297,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" type="submit">
+          <button class="btn btn-primary btn-block" type="submit">
               Solliciter l’aide
           </button>
       </form>
@@ -4315,7 +4307,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq[contract >= 90 days][allowance request box with allowance requested]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide sollicitée pour ce contrat
       </h3>
@@ -4324,7 +4316,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4338,7 +4330,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract < 90 days][allowance request box with allowance not requested after contract selection]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide non sollicitée pour ce contrat
       </h3>
@@ -4347,7 +4339,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" disabled="" type="submit">
+          <button class="btn btn-primary btn-block" disabled="" type="submit">
               Solliciter l’aide
           </button>
       </form>
@@ -4357,7 +4349,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract < 90 days][allowance request box with allowance requested after contract selection]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide sollicitée pour ce contrat
       </h3>
@@ -4371,12 +4363,12 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary w-100 mb-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification" type="button">
+      <a class="btn btn-primary btn-block mb-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
           Modifier votre justification
       </a>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white btn-block" disabled="" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4390,7 +4382,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract >= 90 days][allowance request box with allowance not requested after contract selection]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide non sollicitée pour ce contrat
       </h3>
@@ -4399,7 +4391,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/include" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-primary w-100" disabled="" type="submit">
+          <button class="btn btn-primary btn-block" disabled="" type="submit">
               Solliciter l’aide
           </button>
       </form>
@@ -4409,7 +4401,7 @@
 # ---
 # name: TestAssessmentContractsDetails.test_contract_request_allowance_as_geiq_after_contract_selection[contract >= 90 days][allowance request box with allowance requested after contract selection]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
       <h3>
           Aide sollicitée pour ce contrat
       </h3>
@@ -4418,7 +4410,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white w-100" disabled="" type="submit">
+          <button class="btn btn-ico btn-outline-primary bg-white btn-block" disabled="" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>

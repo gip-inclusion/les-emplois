@@ -41,7 +41,7 @@
                 <h2>Informations personnelles</h2>
                 <div class="row mb-5" id="users_info">
                     <div class="col">
-                        <div class="c-box {% if to_user_error %}bg-danger-lightest border-danger{% endif %}" id="left_user_box">
+                        <div class="c-box {% if to_user_error %}bg-danger-lightest border-danger-light{% endif %}" id="left_user_box">
                             <ul class="list-unstyled">
                                 <li>
                                     <a href="{{ to_user_admin_link }}">Lien vers l'admin</a>
@@ -77,7 +77,7 @@
                         </div>
                     </div>
                     <div class="col">
-                        <div class="c-box {% if from_user_error %}bg-danger-lightest border-danger{% endif %}" id="right_user_box">
+                        <div class="c-box {% if from_user_error %}bg-danger-lightest border-danger-light{% endif %}" id="right_user_box">
                             <ul class="list-unstyled">
                                 <li>
                                     <a href="{{ from_user_admin_link }}">Lien vers l'admin</a>
@@ -153,18 +153,18 @@
 
     <script nonce="{{ csp_nonce }}">
         htmx.onLoad(function() {
-            const left_user_box = $("#left_user_box");
-            const right_user_box = $("#right_user_box");
-            const left_user_choice = $("#id_keep_to_user");
-            const right_user_choice = $("#id_keep_from_user");
-            left_user_choice.change(function() {
-                left_user_box.addClass("bg-success-lightest border-success")
-                right_user_box.removeClass("bg-success-lightest border-success")
-            })
-            right_user_choice.change(function() {
-                left_user_box.removeClass("bg-success-lightest border-success")
-                right_user_box.addClass("bg-success-lightest border-success")
-            })
-        });
+                    const left_user_box = $("#left_user_box");
+                    const right_user_box = $("#right_user_box");
+                    const left_user_choice = $("#id_keep_to_user");
+                    const right_user_choice = $("#id_keep_from_user");
+                    left_user_choice.change(function() {
+                        left_user_box.addClass("bg-success-lightest border-success-light")
+                        right_user_box.removeClass("bg-success-lightest border-success-light")
+                    })
+                    right_user_choice.change(function() {
+                            left_user_box.removeClass("bg-success-lightest border-success-light)
+                                right_user_box.addClass("bg-success-lightest border-success-light")
+                            })
+                    });
     </script>
 {% endblock %}

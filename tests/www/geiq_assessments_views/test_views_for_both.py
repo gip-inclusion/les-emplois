@@ -22,10 +22,7 @@ from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
 from tests.companies.factories import CompanyMembershipFactory
-from tests.geiq_assessments.factories import (
-    AssessmentFactory,
-    EmployeeContractFactory,
-)
+from tests.geiq_assessments.factories import AssessmentFactory, EmployeeContractFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -1375,11 +1372,11 @@ class TestAssessmentContractsDetails:
     ):
         JUSTIFICATION_TITLE = "<h3>Demande d’aide motivée</h3>"
         JUSTIFICATION_LABEL = (
-            f"<span>{AllowanceJustificationReason(allowance_request_justification_reason).label}</span>"
+            f"{AllowanceJustificationReason(allowance_request_justification_reason).label}"
             if allowance_request_justification_reason
             else ""
         )
-        JUSTIFICATION_DETAILS = '<div class="fst-italic">Détails saisissants.</div>'
+        JUSTIFICATION_DETAILS = "<i>Détails saisissants.</i>"
 
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(

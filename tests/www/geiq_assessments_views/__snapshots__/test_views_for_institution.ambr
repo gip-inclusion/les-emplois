@@ -119,7 +119,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
                       <h3>
                           Bilan d’exécution à valider
                       </h3>
@@ -395,7 +395,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
                       <h3>
                           Bilan d’exécution à contrôler
                       </h3>
@@ -417,7 +417,7 @@
                               </strong>
                           </li>
                       </ul>
-                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
+                      <button class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
                           Renvoyer au GEIQ pour correction
                       </button>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
@@ -564,7 +564,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
                       <h3>
                           Bilan d’exécution à valider
                       </h3>
@@ -844,14 +844,14 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
                       <h3>
                           Bilan d’exécution à contrôler
                       </h3>
                       <p>
                           Vous avez jusqu’au 26/07/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
-                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
+                      <button class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
                           Renvoyer au GEIQ pour correction
                       </button>
                       <form method="post">
@@ -1195,7 +1195,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
                       <h3>
                           Bilan d’exécution traité le 27/05/2025
                       </h3>
@@ -1540,7 +1540,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
                       <h3>
                           Bilan d’exécution à contrôler
                       </h3>
@@ -1557,7 +1557,7 @@
                               </strong>
                           </li>
                       </ul>
-                      <button class="btn btn-outline-primary btn-block mb-2" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
+                      <button class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-target="#ask_for_geiq_fix_modal" data-bs-toggle="modal" type="button">
                           Renvoyer au GEIQ pour correction
                       </button>
                       <button class="btn btn-primary btn-block" disabled="" type="button">
@@ -1898,7 +1898,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
                       <h3>
                           Bilan d’exécution à valider
                       </h3>

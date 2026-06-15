@@ -1,6 +1,6 @@
 {% load enums %}
 {% enums "geiq_assessments" "InstitutionAction" as InstitutionAction %}
-<div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02">
+<div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-02-light">
     {% if contract.allowance_granted %}
         <h3>L’aide financière est accordée</h3>
         <p>La demande d’aide est approuvée.</p>
@@ -32,7 +32,7 @@
         {% endif %}
 
         {% if active_tab != active_tab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
-            <a class="btn btn-outline-primary btn-block btn-lg mb-2{% if disabled %} disabled{% endif %}"
+            <a class="btn btn-outline-primary bg-white btn-block mb-3{% if disabled %} disabled{% endif %}"
                href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=active_tab.ALLOWANCE_REFUSAL_JUSTIFICATION.value %}">
                 <span>{{ contract.allowance_refusal_reason|yesno:"Modifier le motif de refus,Justifier le refus" }}</span>
             </a>
@@ -40,9 +40,7 @@
 
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-block btn-lg" name="action" value="{{ InstitutionAction.GRANT_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>
-                <span>Accorder l’aide</span>
-            </button>
+            <button type="submit" class="btn btn-primary btn-block" name="action" value="{{ InstitutionAction.GRANT_ALLOWANCE }}"{% if disabled %} disabled{% endif %}>Accorder l’aide</button>
         </form>
     {% endif %}
 </div>

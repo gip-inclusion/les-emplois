@@ -213,7 +213,7 @@
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
-      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
           
               <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
@@ -271,7 +271,7 @@
 # ---
 # name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: contracts, summary document & structure financial assessment missing]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
       <h3>
           Votre dossier n’est pas encore complet
       </h3>
@@ -311,16 +311,14 @@
 # ---
 # name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: ready for submission]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
       <h3>
           Votre dossier est en attente d’envoi
       </h3>
       <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-primary btn-block" type="submit">
-              <span>
-                  Envoyer le bilan d’exécution
-              </span>
+              Envoyer le bilan d’exécution
           </button>
       </form>
   </div>
@@ -329,7 +327,7 @@
 # ---
 # name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: summary document & structure financial assessment missing]
   '''
-  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
       <h3>
           Votre dossier n’est pas encore complet
       </h3>
@@ -1194,7 +1192,7 @@
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
-      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
           
               <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
@@ -1539,7 +1537,7 @@
                   </div>
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
                       <h3>
                           Votre dossier a été transmis le 27/05/2025
                       </h3>
@@ -2315,7 +2313,7 @@
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
-      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
           
               <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
@@ -2533,7 +2531,7 @@
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
-      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light" id="assessment-status-box">
           
               <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>

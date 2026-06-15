@@ -1,14 +1,14 @@
 {% load enums %}
 {% enums "institutions" "InstitutionKind" as InstitutionKind %}
 {% if not assessment.submitted_at %}
-    <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+    <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
         <h3>Bilan d’exécution à valider</h3>
         <p class="mb-0">
             Le GEIQ a jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour importer son rapport d’activité et valider le bilan.
         </p>
     </div>
 {% elif not assessment.reviewed_at %}
-    <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+    <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning-light">
         <h3>Bilan d’exécution à contrôler</h3>
         <p>
             Vous avez jusqu’au {{ assessment.campaign.review_deadline|date:"d/m/Y" }} pour contrôler les informations de ce bilan d’exécution.
@@ -22,7 +22,7 @@
                     </li>
                 {% endfor %}
             </ul>
-            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
+            <button type="button" class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
                 Renvoyer au GEIQ pour correction
             </button>
             {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
@@ -31,14 +31,14 @@
                 <button type="button" class="btn btn-primary btn-block" disabled>Valider le contrôle</button>
             {% endif %}
         {% elif request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
-            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
+            <button type="button" class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
                 Renvoyer au GEIQ pour correction
             </button>
             <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#final_review_modal">
                 Valider et transmettre la décision au GEIQ
             </button>
         {% else %}
-            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
+            <button type="button" class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
                 Renvoyer au GEIQ pour correction
             </button>
             <form method="post">
@@ -50,18 +50,18 @@
         {% endif %}
     </div>
 {% elif not assessment.final_reviewed_at %}
-    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
         <h3>Bilan d’exécution à valider</h3>
         <p>
             Ce bilan a été contrôlé le {{ assessment.reviewed_at|date:"d/m/Y" }} par {{ assessment.reviewed_by.get_full_name }}. Il doit désormais être validé par la DREETS.
         </p>
         {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
-            <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
+            <button type="button" class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-toggle="modal" data-bs-target="#ask_for_geiq_fix_modal">
                 Renvoyer au GEIQ pour correction
             </button>
             <form method="post">
                 {% csrf_token %}
-                <button type="button" class="btn btn-outline-primary btn-block mb-2" data-bs-toggle="modal" data-bs-target="#ask_for_institution_fix_modal">
+                <button type="button" class="btn btn-outline-primary bg-white btn-block mb-3" data-bs-toggle="modal" data-bs-target="#ask_for_institution_fix_modal">
                     Renvoyer à la DDETS pour correction
                 </button>
             </form>
@@ -71,7 +71,7 @@
         {% endif %}
     </div>
 {% else %}
-    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
         <h3>Bilan d’exécution traité le {{ assessment.final_reviewed_at|date:"d/m/Y" }}</h3>
         <p>La décision a été envoyée au GEIQ.</p>
         <a class="btn btn-primary btn-block btn-ico" href="{% url 'geiq_assessments_views:assessment_print' pk=assessment.pk %}" rel="noopener" target="_blank">
