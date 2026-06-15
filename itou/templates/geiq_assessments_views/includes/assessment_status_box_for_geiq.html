@@ -1,5 +1,5 @@
 {% if not assessment.submitted_at %}
-    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
         {% if assessment.missing_actions_to_submit %}
             <h3>Votre dossier n’est pas encore complet</h3>
             <p class="mb-0">Actions restantes :</p>
@@ -20,14 +20,12 @@
             <h3>Votre dossier est en attente d’envoi</h3>
             <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary btn-block">
-                    <span>Envoyer le bilan d’exécution</span>
-                </button>
+                <button type="submit" class="btn btn-primary btn-block">Envoyer le bilan d’exécution</button>
             </form>
         {% endif %}
     </div>
 {% elif not assessment.final_reviewed_at %}
-    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info-light">
         <h3>Votre dossier a été transmis le {{ assessment.submitted_at|date:"d/m/Y" }}</h3>
         <p class="mb-0">
             Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter {{ institution_to_contact }}.
@@ -36,11 +34,9 @@
         </p>
     </div>
 {% else %}
-    <div id="assessment-status-box" class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
+    <div id="assessment-status-box" class="c-box mb-3 mb-md-4 bg-success-lightest border-success-light">
         <h3>Votre dossier a été traité le {{ assessment.final_reviewed_at|date:"d/m/Y" }}</h3>
         <p>Retrouvez le détail de la décision en cliquant ici.</p>
-        <a class="btn btn-primary btn-block" href="{% url 'geiq_assessments_views:assessment_result' pk=assessment.pk %}">
-            <span>Voir le résultat</span>
-        </a>
+        <a class="btn btn-primary btn-block" href="{% url 'geiq_assessments_views:assessment_result' pk=assessment.pk %}">Voir le résultat</a>
     </div>
 {% endif %}
