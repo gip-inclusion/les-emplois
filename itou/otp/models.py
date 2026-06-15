@@ -47,6 +47,8 @@ class ItouTOTPDevice(
     disabled_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
 
     class Meta:
+        verbose_name = "appareil d’authentification (TOTP)"
+        verbose_name_plural = "appareils d’authentification (TOTP)"
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "name"],

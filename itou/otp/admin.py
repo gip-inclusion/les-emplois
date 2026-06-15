@@ -7,7 +7,16 @@ from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
 @admin.register(ItouTOTPDevice)
 class ItouTOTPDeviceAdmin(ReadonlyMixin, ItouModelAdmin):
-    pass  # FIXME
+    list_display = (
+        "user",
+        "last_used_at",
+    )
+    list_select_related = ("user",)
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj=obj)
+        fields.remove("key")
+        return fields
 
 
 admin.site.unregister(TOTPDevice)

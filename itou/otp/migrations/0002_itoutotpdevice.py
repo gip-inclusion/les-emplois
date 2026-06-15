@@ -99,6 +99,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 "constraints": [models.UniqueConstraint(fields=("user", "name"), name="unique_name_per_user")],
+                "verbose_name": "appareil d’authentification (TOTP)",
+                "verbose_name_plural": "appareils d’authentification (TOTP)",
             },
         ),
     ]
