@@ -23,13 +23,13 @@
 
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "45 0 * * * $ROOT/clevercloud/run_management_command.sh populate_metabase_nexus",
-  "20 1 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
+  "20 1 * * * $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh retry_certify_criteria --wet-run",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "45 1 * * * $ROOT/clevercloud/run_management_command.sh migrate_resume_to_private --wet-run",
   "0 2 * * * $ROOT/clevercloud/run_management_command.sh cleanup_oidc_states",
   "50 2 * * * $ROOT/clevercloud/run_management_command.sh import_structures_and_services --wet-run",
-  "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
+  "0 3 * * * $ROOT/clevercloud/run_management_command.sh clearsessions",
   "30 3 * * * $ROOT/clevercloud/run_management_command.sh fetch_riae_contracts",
   "45 3 * * * $ROOT/clevercloud/run_management_command.sh migrate_resume_to_private --wet-run",
   "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
@@ -50,7 +50,7 @@
   "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
-  "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
+  "0 0 * * MON $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 1 * * MON $ROOT/clevercloud/run_management_command.sh delete_unused_files",
   "0 2 * * MON $ROOT/clevercloud/run_management_command.sh populate_metabase_matomo --wet-run",
 
