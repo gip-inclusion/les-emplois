@@ -165,8 +165,8 @@ class TestThemeInclusion:
 
 @pytest.fixture
 def load_test_users():
-    call_command("loaddata", "05_test_users.json")
-    call_command("loaddata", "06_confirmed_emails.json")
+    call_command("loaddata", "users__user.json")
+    call_command("loaddata", "account__email_address.json")
 
 
 class TestDemoAccount:
