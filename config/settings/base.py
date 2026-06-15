@@ -856,7 +856,6 @@ SERIALIZATION_MODULES = {
 # OTP
 # ------------------------------------------------------------------------------
 OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
-OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 REQUIRE_MFA_FOR_PROS = os.getenv("REQUIRE_MFA_FOR_PROS", "False") == "True"
 OTP_DEVICES_GRACE_PERIOD_BEFORE_DELETION = datetime.timedelta(
