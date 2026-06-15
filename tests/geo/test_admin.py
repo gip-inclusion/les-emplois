@@ -2,14 +2,6 @@ import pytest
 from django.urls import reverse
 
 from tests.geo.factories import create_qpv
-from tests.users.factories import ItouStaffFactory
-
-
-@pytest.fixture
-def admin_client(client, db):
-    admin = ItouStaffFactory(is_staff=True, is_superuser=True)
-    client.force_login(admin)
-    return client
 
 
 @pytest.mark.parametrize(
