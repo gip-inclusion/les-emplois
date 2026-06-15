@@ -1,2918 +1,2918 @@
 [
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 1,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "FEE",
-      "value": "gratuit",
-      "label": "Gratuit",
+      "created_at": "2026-06-15T09:12:50.234Z",
       "description": "L’accès au lieu et/ou à ses services est gratuit",
-      "created_at": "2026-06-15T09:12:50.234Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 2,
-    "fields": {
-      "source": "DATA_INCLUSION",
       "kind": "FEE",
-      "value": "payant",
-      "label": "Payant",
+      "label": "Gratuit",
+      "source": "DATA_INCLUSION",
+      "value": "gratuit"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.234Z",
       "description": "L’accès au lieu et/ou à ses services est payant",
-      "created_at": "2026-06-15T09:12:50.234Z"
-    }
+      "kind": "FEE",
+      "label": "Payant",
+      "source": "DATA_INCLUSION",
+      "value": "payant"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 2
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 3,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "MOBILIZATION",
-      "value": "envoyer-un-courriel",
-      "label": "Envoyer un courriel",
+      "created_at": "2026-06-15T09:12:50.263Z",
       "description": "Envoyer un courriel à l’adresse électronique associée au service, ou à défaut, à la structure.",
-      "created_at": "2026-06-15T09:12:50.263Z"
-    }
+      "kind": "MOBILIZATION",
+      "label": "Envoyer un courriel",
+      "source": "DATA_INCLUSION",
+      "value": "envoyer-un-courriel"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 3
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 4,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "MOBILIZATION",
-      "value": "se-presenter",
-      "label": "Se présenter",
+      "created_at": "2026-06-15T09:12:50.263Z",
       "description": "Se présenter directement à l’adresse associée au service ou, à défaut, à la structure.",
-      "created_at": "2026-06-15T09:12:50.263Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 5,
-    "fields": {
-      "source": "DATA_INCLUSION",
       "kind": "MOBILIZATION",
-      "value": "telephoner",
-      "label": "Téléphoner",
-      "description": "Téléphoner au numéro associé au service, ou à défaut, à la structure.",
-      "created_at": "2026-06-15T09:12:50.263Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 6,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "MOBILIZATION",
-      "value": "utiliser-lien-mobilisation",
-      "label": "Utiliser le lien de mobilisation",
-      "description": "Utiliser le lien de mobilisation du service.",
-      "created_at": "2026-06-15T09:12:50.263Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 7,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "MOBILIZATION_PUBLIC",
-      "value": "professionnels",
-      "label": "Professionnels",
-      "description": "Service mobilisable par les professionnels de l’insertion.",
-      "created_at": "2026-06-15T09:12:50.290Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 8,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "MOBILIZATION_PUBLIC",
-      "value": "usagers",
-      "label": "Usagers",
-      "description": "Service mobilisable par les usagers.",
-      "created_at": "2026-06-15T09:12:50.290Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 9,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "60000-rebonds",
-      "label": "60 000 Rebonds",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 10,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "aci",
-      "label": "Structures d’Insertion par l’Activité Économique - Ateliers et Chantiers d’Insertion",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 11,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "action-logement",
-      "label": "Action Logement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 12,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "adie",
-      "label": "Association pour le Droit à l’Initiative Économique",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 13,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "afpa",
-      "label": "Agence Nationale pour la Formation Professionnelle des Adultes",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 14,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "agefiph",
-      "label": "Agefiph",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 15,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ai",
-      "label": "Associations Intermédiaires",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 16,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "aidants-connect",
-      "label": "Aidants Connect",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 17,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "alliance-villes-emploi",
-      "label": "Alliance Villes Emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 18,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "anlci",
-      "label": "Agence Nationale de Lutte Contre l’Illettrisme",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 19,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "apprentis-dauteuil",
-      "label": "Apprentis d’Auteuil",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 20,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ase",
-      "label": "Aide Sociale à l’Enfance",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 21,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "banques-alimentaires",
-      "label": "Banques Alimentaires",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 22,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "caarud",
-      "label": "Centres d’Accueil et d’Accompagnement à la Réduction de Risques pour Usagers de Drogues",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 23,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cada",
-      "label": "Centres d’Accueil de Demandeurs d’Asile",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 24,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "caf",
-      "label": "Caisse d’Allocations Familiales",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.317Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 25,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "campus-connecte",
-      "label": "Campus Connecté",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 26,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cap-emploi-reseau-cheops",
-      "label": "CAP Emploi - Réseau CHEOPS",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 27,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cava",
-      "label": "Centres d’Adaptation à la Vie Active",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 28,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ccas-cias",
-      "label": "Les Centres Communaux d’Action Sociale et les Centres Intercommunaux d’Action Sociale",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 29,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "chambres-consulaires",
-      "label": "Chambres Consulaires",
-      "description": "Les Chambres de Commerce et d’Industrie (CCI), les Chambres des Métiers et de l’Artisanat (CMA) et les Chambres d’Agriculture (CA).",
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 30,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "chantier-ecole",
-      "label": "Réseau Chantier École",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 31,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "chrs",
-      "label": "Centres d’Hébergement et de Réinsertion Sociale",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 32,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "chu",
-      "label": "Centres d’Hébergement d’Urgence",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 33,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cidff",
-      "label": "Centres d’Information sur les Droits des Femmes et des Familles",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 34,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cmp",
-      "label": "Centres Médico-Psychologiques",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 35,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cms",
-      "label": "Centres Médico-Sociaux",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 36,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cnam",
-      "label": "Conservatoire National des Arts et Métiers",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 37,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "collectif-emploi",
-      "label": "Collectif Emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 38,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "communes",
-      "label": "Communes, mairies, communautés de communes, etc.",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 39,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "conseillers-numeriques",
-      "label": "Conseillers Numériques",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 40,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "coorace",
-      "label": "Fédération COORACE",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 41,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cpam",
-      "label": "Caisses Primaires d’Assurance Maladie",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 42,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cph",
-      "label": "Centres Provisoires d’Hébergement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 43,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "creches-avip",
-      "label": "Crèches à Vocation d’Insertion Professionnelle",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 44,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "crepi",
-      "label": "CREPI",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 45,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "cresus",
-      "label": "Fédération Française des Associations CRÉSUS",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 46,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "croix-rouge",
-      "label": "Croix-Rouge",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 47,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "csapa",
-      "label": "Centres de Soins, d’Accompagnement et de Prévention en Addictologie",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 48,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "delegataire-conseil-departemental",
-      "label": "Organisation délégataire d’un Conseil Départemental",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 49,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "departements",
-      "label": "Départements et Services Départementaux",
-      "description": "Les Conseils Départementaux (CD), les Unions Départementales des Associations Familiales (UDAF), les Centres Départementaux d’Action Sociale (CDAS), etc.",
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 50,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "duo-for-a-job",
-      "label": "DUO for a JOB",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 51,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ea",
-      "label": "Entreprises Adaptées",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.318Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 52,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "eatt",
-      "label": "Entreprises Adaptées de Travail Temporaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 53,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ecoles-de-la-deuxieme-chance",
-      "label": "Écoles de la 2ᵉ Chance",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 54,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "egee",
-      "label": "Association EGEE",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 55,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ei",
-      "label": "Structures d’Insertion par l’Activité Économique - Entreprises d’Insertion",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 56,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "eiti",
-      "label": "Structures d’Insertion par l’Activité Économique - Entreprises d’Insertion par le Travail Indépendant",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 57,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "emmaus",
-      "label": "Emmaüs",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 58,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "epide",
-      "label": "EPIDE",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 59,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "esat",
-      "label": "Établissement et Service d’Accompagnement par le Travail",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 60,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "espaces-publics-numeriques",
-      "label": "Espaces Publics Numériques",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 61,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "etcld",
-      "label": "Expérimentation Territoriale contre le Chômage de Longue Durée",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 62,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "etti",
-      "label": "Structures d’Insertion par l’Activité Économique - Entreprises de Travail Temporaire d’Insertion",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 63,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "fabrique-de-territoire",
-      "label": "Fabrique de Territoire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 64,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "face",
-      "label": "Fondation FACE",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 65,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "fcsf",
-      "label": "Fédération des Centres Sociaux et Socioculturels de France",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 66,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "federation-des-acteurs-de-la-solidarite",
-      "label": "Fédération des Acteurs de la Solidarité",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 67,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "federation-professionnelle-femmes",
-      "label": "Fédération Professionnelle pour les Femmes",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 68,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "france-active",
-      "label": "France Active",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 69,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "france-service",
-      "label": "France Service",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 70,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "france-travail",
-      "label": "France Travail",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 71,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "french-tech",
-      "label": "French Tech",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 72,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "geiq",
-      "label": "GEIQ",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 73,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "grandes-ecoles-du-numerique",
-      "label": "Grandes Écoles du Numérique",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 74,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "huda",
-      "label": "Hébergement d’Urgence pour Demandeurs d’Asile",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 75,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "hup",
-      "label": "Association H’UP",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 76,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "inae",
-      "label": "INAÉ Nouvelle Aquitaine",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 77,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "initiative-france",
-      "label": "Initiative France",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 78,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "konexio",
-      "label": "Association Konexio",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 79,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "la-cravate-solidaire",
-      "label": "La Cravate Solidaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 80,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "la-poste",
-      "label": "La Poste",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 81,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "les-premieres",
-      "label": "Les Premières",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.319Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 82,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "maison-departementale-de-lautonomie",
-      "label": "Maisons Départementales de l’Autonomie",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 83,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "maisons-de-l-emploi",
-      "label": "Maisons de l’Emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 84,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "maisons-des-solidarites",
-      "label": "Maisons Départementales des Solidarités (MDS)",
-      "description": "Les Maisons Départementales des Solidarités sont des services départementaux. Par conséquent, le réseau `departements` devrait être également défini pour ces structures.",
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 85,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "mdph",
-      "label": "Maisons Départementales pour les Personnes Handicapées (MDPH)",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 86,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "mission-locale",
-      "label": "Mission Locale",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 87,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "mjc",
-      "label": "Maisons des Jeunes et de la Culture",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 88,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "mobin",
-      "label": "Mob’In",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 89,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "msap",
-      "label": "Maisons de Services Au Public",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 90,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "mutualite-sociale-agricole",
-      "label": "Mutualité Sociale Agricole",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 91,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "nqt",
-      "label": "Association NQT",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 92,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "pimms-mediation",
-      "label": "Point Information Médiation Multi Services",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 93,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "pjj",
-      "label": "Protection Judiciaire de la Jeunesse",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 94,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "plie",
-      "label": "Plans Locaux pour l’Insertion et l’Emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 95,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "points-conseil-budget",
-      "label": "Points Conseil Budget",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 96,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "points-justice",
-      "label": "Points Justice",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 97,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "positive-planet",
-      "label": "Positive Planet",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 98,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "regions",
-      "label": "Régions, Préfectures et services régionaux",
-      "description": "Les Conseils Régionaux (CR), les préfectures, les Directions Régionales de l’Économie, de l’Emploi, du Travail et desSolidarités (DREETS), etc.",
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 99,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "reseau-app",
-      "label": "Réseau APP",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 100,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "reseau-bge",
-      "label": "Réseau BGE",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 101,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "reseau-entreprendre",
-      "label": "Réseau Entreprendre",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 102,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "reseau-information-jeunesse",
-      "label": "Réseau Information Jeunesse",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.320Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 103,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "residences-fjt",
-      "label": "Résidences - Foyers Jeunes Travailleurs",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 104,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "ressourceries",
-      "label": "Ressourceries",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 105,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "restos-du-coeur",
-      "label": "Restos du Coeur",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 106,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "secours-populaire",
-      "label": "Secours Populaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 107,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "siao",
-      "label": "Services Intégrés d’Accueil et d’Orientation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 108,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "simplon",
-      "label": "Simplon",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 109,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "singa",
-      "label": "Association SINGA",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 110,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "snc",
-      "label": "Solidarité Nouvelle Face au Chômage",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 111,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "spip",
-      "label": "Services Pénitentiaires d’Insertion et de Probation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 112,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "tous-tes-possibles",
-      "label": "Tous Tes Possibles",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 113,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "unaf",
-      "label": "Union Nationale de l’Aide aux Familles",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 114,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "unea",
-      "label": "Union Nationale des Entreprises Adaptées",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 115,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "unis-cite",
-      "label": "UnisCité",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 116,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "NETWORK",
-      "value": "wimoov",
-      "label": "Wimoov",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.321Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 117,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "actifs",
-      "label": "Actifs",
-      "description": "Toute personne ayant un emploi, qu’il soit salarié, libéral ou à son compte",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 118,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "beneficiaires-des-minimas-sociaux",
-      "label": "Bénéficiaires des minimas sociaux",
-      "description": "Personnes touchant des aides financières telles que RSA, SMIC, allocations familiales, bourses, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 119,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "demandeurs-emploi",
-      "label": "Demandeurs d’emploi",
-      "description": "Demandeurs d’emploi de tout type",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 120,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "etudiants",
-      "label": "Étudiants",
-      "description": "Étudiants",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 121,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "familles",
-      "label": "Familles",
-      "description": "Familles, parents, enfants, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 122,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "femmes",
-      "label": "Femmes",
-      "description": "Femmes isolées, victimes de violence, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 123,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "jeunes",
-      "label": "Jeunes",
-      "description": "Jeunes au sens large, jeunes adultes, adolescents, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 124,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "personnes-en-situation-de-handicap",
-      "label": "Personnes en situation de handicap",
-      "description": "Personnes en situation de handicap de tout type",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 125,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "personnes-en-situation-durgence",
-      "label": "Personnes en situation d’urgence",
-      "description": "SDF, victimes de violence, grande précarité, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 126,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "personnes-en-situation-juridique-specifique",
-      "label": "Personnes en situation juridique spécifique",
-      "description": "Personnes sortant de détention, détenus ou autre statut juridique spécifique",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 127,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "personnes-exilees",
-      "label": "Personnes exilées",
-      "description": "Réfugiés, demandeurs d’asile, personnes immigrées, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 128,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "residents-qpv-frr",
-      "label": "Résidents en QPV ou FRR",
-      "description": "Personnes résidentes en zone Quartier Prioritaire de la Ville ou France Ruralités Revitalisation (anciennement ZRR)",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 129,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "seniors",
-      "label": "Séniors",
-      "description": "Personnes âgées, retraités, etc",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 130,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "PUBLIC",
-      "value": "tous-publics",
-      "label": "Tous publics",
-      "description": "Tous publics",
-      "created_at": "2026-06-15T09:12:50.348Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 131,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "RECEPTION",
-      "value": "a-distance",
-      "label": "À distance",
-      "description": "Le service est proposé à distance, par téléphone ou internet.",
-      "created_at": "2026-06-15T09:12:50.376Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 132,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "RECEPTION",
-      "value": "en-presentiel",
-      "label": "En présentiel",
-      "description": "Le service est proposé en présentiel, à l’adresse associée à ce service.",
-      "created_at": "2026-06-15T09:12:50.376Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 133,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SERVICE_KIND",
-      "value": "accompagnement",
-      "label": "Accompagnement",
-      "description": "Accompagnement global pour le retour à l’emploi",
-      "created_at": "2026-06-15T09:12:50.401Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 134,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SERVICE_KIND",
-      "value": "aide-financiere",
-      "label": "Aide financière",
-      "description": "Prise en charge financière, aide ou rémunération soutenant le retour à l’emploi",
-      "created_at": "2026-06-15T09:12:50.401Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 135,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SERVICE_KIND",
-      "value": "aide-materielle",
-      "label": "Aide materielle",
-      "description": "Accéder à du matériel soutenant le retour à l’emploi (voiture, vélo, ordinateur, alimentation, etc)",
-      "created_at": "2026-06-15T09:12:50.401Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 136,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SERVICE_KIND",
-      "value": "atelier",
-      "label": "Atelier",
-      "description": "Groupe de travail constitué autour d’une activité, d’un thème soutenant le retour à l’emploi",
-      "created_at": "2026-06-15T09:12:50.401Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 137,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SERVICE_KIND",
-      "value": "formation",
-      "label": "Formation",
-      "description": "Formation dispensée par des professionnels pour les bénéficiaires",
-      "created_at": "2026-06-15T09:12:50.401Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 138,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SERVICE_KIND",
-      "value": "information",
-      "label": "Information",
-      "description": "Premier niveau d’information apporté par des professionnels du secteur",
-      "created_at": "2026-06-15T09:12:50.401Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 139,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "choisir-un-metier--confirmer-son-choix-de-metier",
-      "label": "Confirmer son choix de métier",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.432Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 140,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "choisir-un-metier--connaitre-les-opportunites-demploi",
-      "label": "Connaître les opportunités d’emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.432Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 141,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "choisir-un-metier--decouvrir-un-metier-ou-un-secteur-dactivite",
-      "label": "Découvrir un métier ou un secteur d’activité",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.432Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 142,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "choisir-un-metier--identifier-ses-points-forts-et-ses-competences",
-      "label": "Identifier ses points forts et ses compétences",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.432Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 143,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "creer-une-entreprise--definir-son-projet-de-creation-dentreprise",
-      "label": "Définir son projet de création d’entreprise",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.432Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 144,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "creer-une-entreprise--developper-son-entreprise",
-      "label": "Développer son entreprise",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 145,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "creer-une-entreprise--structurer-son-projet-de-creation-dentreprise",
-      "label": "Structurer son projet de création d’entreprise",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 146,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-administratives-ou-juridiques--accompagnement-aux-demarches-administratives",
-      "label": "Accompagnement aux démarches administratives",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 147,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete",
-      "label": "Accompagnement pour l’accès à la citoyenneté",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 148,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-aux-droits",
-      "label": "Accompagnement pour l’accès aux droits",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 149,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-administratives-ou-juridiques--beneficier-dune-mesure-daccompagnement-adapte",
-      "label": "Bénéficier d’une mesure d’accompagnement adapté",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 150,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-administratives-ou-juridiques--connaitre-ses-droits-face-a-une-discrimination",
-      "label": "Connaître ses droits face à une discrimination",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 151,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-administratives-ou-juridiques--prendre-en-compte-une-problematique-judiciaire",
-      "label": "Prendre en compte une problématique judiciaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 152,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-financieres--acquerir-une-autonomie-budgetaire",
-      "label": "Acquérir une autonomie budgétaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 153,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-financieres--ameliorer-sa-gestion-budgetaire",
-      "label": "Améliorer sa gestion budgétaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 154,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-financieres--mettre-en-place-une-mesure-de-protection-financiere",
-      "label": "Mettre en place une mesure de protection financière",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 155,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-financieres--prevenir-une-degradation-de-la-situation-financiere",
-      "label": "Prévenir une dégradation de la situation financière",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 156,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "difficultes-financieres--situation-dendettement-surendettement",
-      "label": "Situation d’endettement ou de surendettement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 157,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "equipement-et-alimentation--aide-menagere",
-      "label": "Aide ménagère",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 158,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "equipement-et-alimentation--alimentation",
-      "label": "Alimentation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 159,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "equipement-et-alimentation--electromenager",
-      "label": "Électroménager",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 160,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "equipement-et-alimentation--habillement",
-      "label": "Habillement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 161,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "famille--garde-denfants",
-      "label": "Garde d’enfants",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 162,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "famille--prise-en-charge-personne-dependante",
-      "label": "Prise en charge d’une personne dépendante",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 163,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "famille--soutien-a-la-parentalite-et-a-leducation",
-      "label": "Soutien à la parentalité et à l’éducation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 164,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "famille--soutien-aidants",
-      "label": "Soutien aux aidants",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 165,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "famille--surmonter-conflits-separation-violence",
-      "label": "Surmonter les conflits liés à la séparation ou à la violence",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 166,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "lecture-ecriture-calcul--maitriser-le-calcul",
-      "label": "Maîtriser le calcul",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 167,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "lecture-ecriture-calcul--maitriser-le-francais",
-      "label": "Maîtriser le français",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 168,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--acheter-un-logement",
-      "label": "Acheter un logement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 169,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--changer-de-logement",
-      "label": "Changer de logement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 170,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--louer-un-logement",
-      "label": "Louer un logement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.433Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 171,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--rechercher-une-solution-dhebergement-temporaire",
-      "label": "Rechercher une solution d’hébergement temporaire",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 172,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--reduire-les-impayes-de-loyer",
-      "label": "Réduire les impayés de loyer",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 173,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--se-maintenir-dans-le-logement",
-      "label": "Se maintenir dans le logement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 174,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "logement-hebergement--sinformer-sur-les-demarches-liees-a-lacces-au-logement",
-      "label": "S’informer sur les démarches liées à l’accès au logement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 175,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "mobilite--acceder-a-un-vehicule",
-      "label": "Accéder à un véhicule",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 176,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "mobilite--entretenir-reparer-son-vehicule",
-      "label": "Entretenir et réparer son véhicule",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 177,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "mobilite--etre-accompagne-dans-son-parcours-mobilite",
-      "label": "Être accompagné dans son parcours mobilité",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 178,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "mobilite--financer-ma-mobilite",
-      "label": "Financer ma mobilité",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 179,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "mobilite--mobilite-douce-partagee-collective",
-      "label": "Utiliser des services de mobilité douce, partagée ou collective",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 180,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "mobilite--preparer-un-permis",
-      "label": "Préparer un permis",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 181,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "numerique--acceder-a-des-services-en-ligne",
-      "label": "Accéder à des services en ligne",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 182,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "numerique--acceder-a-une-connexion-internet",
-      "label": "Accéder à une connexion Internet",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 183,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "numerique--acquerir-un-equipement",
-      "label": "Acquérir un équipement",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 184,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "numerique--maitriser-les-fondamentaux-du-numerique",
-      "label": "Maîtriser les fondamentaux du numérique",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 185,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "preparer-sa-candidature--developper-son-reseau",
-      "label": "Développer son réseau",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 186,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "preparer-sa-candidature--organiser-ses-demarches-de-recherche-demploi",
-      "label": "Organiser ses démarches de recherche d’emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 187,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "preparer-sa-candidature--realiser-un-cv-et-ou-une-lettre-de-motivation",
-      "label": "Réaliser un CV et/ou une lettre de motivation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 188,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "preparer-sa-candidature--valoriser-ses-competences",
-      "label": "Valoriser ses compétences",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 189,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "remobilisation--activites-sportives-et-culturelles",
-      "label": "Activités sportives et culturelles",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 190,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "remobilisation--benevolat-action-citoyenne",
-      "label": "Bénévolat et action citoyenne",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 191,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "remobilisation--bien-etre-confiance-en-soi",
-      "label": "Bien-être et confiance en soi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 192,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "remobilisation--lien-social",
-      "label": "Lien social",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 193,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "sante--acces-aux-soins",
-      "label": "Accès aux soins",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 194,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "sante--addictions",
-      "label": "Addictions",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 195,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "sante--constituer-un-dossier-mdph-invalidite",
-      "label": "Constituer un dossier MDPH pour invalidité",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 196,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "sante--sante-mentale",
-      "label": "Santé mentale",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 197,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "sante--sante-sexuelle",
-      "label": "Santé sexuelle",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 198,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "se-former--monter-son-dossier-de-formation",
-      "label": "Monter son dossier de formation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.434Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 199,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "se-former--trouver-sa-formation",
-      "label": "Trouver sa formation",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 200,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "souvrir-a-linternational--connaitre-les-opportunites-demploi-a-letranger",
-      "label": "Connaître les opportunités d’emploi à l’étranger",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 201,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "souvrir-a-linternational--sinformer-sur-les-aides-pour-travailler-a-letranger",
-      "label": "S’informer sur les aides pour travailler à l’étranger",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 202,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "souvrir-a-linternational--sorganiser-suite-a-son-retour-en-france",
-      "label": "S’organiser suite à son retour en France",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 203,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "trouver-un-emploi--convaincre-un-recruteur-en-entretien",
-      "label": "Convaincre un recruteur en entretien",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 204,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "trouver-un-emploi--faire-des-candidatures-spontanees",
-      "label": "Faire des candidatures spontanées",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 205,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "trouver-un-emploi--maintien-dans-lemploi",
-      "label": "Maintien dans l’emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 206,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "trouver-un-emploi--repondre-a-des-offres-demploi",
-      "label": "Répondre à des offres d’emploi",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 207,
-    "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "THEMATIC",
-      "value": "trouver-un-emploi--suivre-ses-candidatures-et-relancer-les-employeurs",
-      "label": "Suivre ses candidatures et relancer les employeurs",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.435Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 208,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_PROFESSIONAL",
-      "value": "autre",
-      "label": "Autre modalité (préciser)",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.700Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 209,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-savoie",
-      "label": "Conseil départemental de la Savoie",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.700Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 210,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-essonne",
-      "label": "Conseil Départemental de l'Essonne",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.700Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 211,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_BENEFICIARY",
-      "value": "professionnel",
-      "label": "Se faire orienter par un professionnel",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 212,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-vienne",
-      "label": "Conseil départemental de la Vienne",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 213,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_BENEFICIARY",
-      "value": "se-presenter",
       "label": "Se présenter",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 214,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "rg-reunion",
-      "label": "Région Réunion",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 215,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_BENEFICIARY",
-      "value": "envoyer-un-mail",
-      "label": "Nous envoyer un e-mail",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 216,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_PROFESSIONAL",
-      "value": "formulaire-dora",
-      "label": "Via le formulaire DORA",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 217,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_BENEFICIARY",
-      "value": "telephoner",
-      "label": "Nous téléphoner",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 218,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_PROFESSIONAL",
-      "value": "completer-le-formulaire-dadhesion",
-      "label": "Via notre propre formulaire en ligne/site internet",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.701Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 219,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-bouches-du-rhone",
-      "label": "Conseil départemental des Bouches-du-Rhône",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.702Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 220,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_PROFESSIONAL",
-      "value": "envoyer-un-mail",
-      "label": "Nous envoyer un e-mail",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.702Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 221,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_BENEFICIARY",
-      "value": "completer-le-formulaire-dadhesion",
-      "label": "Via notre propre formulaire en ligne/site internet",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.702Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 222,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_PROFESSIONAL",
-      "value": "telephoner",
-      "label": "Nous téléphoner",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.702Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 223,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_BENEFICIARY",
-      "value": "autre",
-      "label": "Autre modalité (préciser)",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.703Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 224,
-    "fields": {
-      "source": "DORA",
-      "kind": "MOBILIZATION_PROFESSIONAL",
-      "value": "envoyer-un-mail-avec-une-fiche-de-prescription",
-      "label": "Nous envoyer un e-mail avec une fiche de prescription",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.703Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 225,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-charente-maritime",
-      "label": "Conseil départemental de la Charente-Maritime",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.703Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 226,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-aveyron",
-      "label": "Conseil départemental de l’Aveyron",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.703Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 227,
-    "fields": {
-      "source": "DORA",
-      "kind": "FUNDING_LABEL",
-      "value": "cd-drome",
-      "label": "Conseil départemental de la Drôme",
-      "description": null,
-      "created_at": "2026-06-15T09:12:50.703Z"
-    }
-  },
-  {
-    "model": "insertion.genericreferenceitem",
-    "pk": 228,
-    "fields": {
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "action-logement",
+      "value": "se-presenter"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.263Z",
+      "description": "Téléphoner au numéro associé au service, ou à défaut, à la structure.",
+      "kind": "MOBILIZATION",
+      "label": "Téléphoner",
+      "source": "DATA_INCLUSION",
+      "value": "telephoner"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.263Z",
+      "description": "Utiliser le lien de mobilisation du service.",
+      "kind": "MOBILIZATION",
+      "label": "Utiliser le lien de mobilisation",
+      "source": "DATA_INCLUSION",
+      "value": "utiliser-lien-mobilisation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.290Z",
+      "description": "Service mobilisable par les professionnels de l’insertion.",
+      "kind": "MOBILIZATION_PUBLIC",
+      "label": "Professionnels",
+      "source": "DATA_INCLUSION",
+      "value": "professionnels"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.290Z",
+      "description": "Service mobilisable par les usagers.",
+      "kind": "MOBILIZATION_PUBLIC",
+      "label": "Usagers",
+      "source": "DATA_INCLUSION",
+      "value": "usagers"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "60 000 Rebonds",
+      "source": "DATA_INCLUSION",
+      "value": "60000-rebonds"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Structures d’Insertion par l’Activité Économique - Ateliers et Chantiers d’Insertion",
+      "source": "DATA_INCLUSION",
+      "value": "aci"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
       "label": "Action Logement",
-      "description": "Aides et solutions pour accompagner les salariés dans leur parcours logement. Contient les services proposés par les structures d’Action Logement sur tout le territoire.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "source": "DATA_INCLUSION",
+      "value": "action-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 11
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 229,
     "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Association pour le Droit à l’Initiative Économique",
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "agefiph",
-      "label": "AGEFIPH",
-      "description": "Association chargée de soutenir le développement de l’emploi des personnes handicapées. Contient leur offre de service nationale.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "value": "adie"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 12
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 230,
     "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Agence Nationale pour la Formation Professionnelle des Adultes",
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "cd35",
-      "label": "Annuaire social d’Ille-et-Vilaine",
-      "description": "Contient les structures et services inclusifs du département de l’Ille-et-Vilaine.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "value": "afpa"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 13
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 231,
     "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Agefiph",
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "dora",
-      "label": "DORA",
-      "description": "Service public numérique de recensement de l’offre d’insertion développé par la Plateforme de l’inclusion. Contient leurs structures et services inclusifs sur de nombreuses thématiques.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "value": "agefiph"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 14
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 232,
     "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Associations Intermédiaires",
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "emplois-de-linclusion",
-      "label": "Emplois de l’inclusion",
-      "description": "Service public numérique de mise en relation entre employeurs solidaires et accompagnateurs. Contient les structures employeuses et accompagnatrices dans le domaine de l’insertion par l’activité économique (IAE).",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "value": "ai"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 15
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 233,
     "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Aidants Connect",
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "france-travail",
-      "label": "Offre nationale de services de France Travail",
-      "description": "Contient l’offre de service nationale de France Travail.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "value": "aidants-connect"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 16
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 234,
     "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Alliance Villes Emploi",
       "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "mission-locale",
+      "value": "alliance-villes-emploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 17
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Agence Nationale de Lutte Contre l’Illettrisme",
+      "source": "DATA_INCLUSION",
+      "value": "anlci"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Apprentis d’Auteuil",
+      "source": "DATA_INCLUSION",
+      "value": "apprentis-dauteuil"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Aide Sociale à l’Enfance",
+      "source": "DATA_INCLUSION",
+      "value": "ase"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 20
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Banques Alimentaires",
+      "source": "DATA_INCLUSION",
+      "value": "banques-alimentaires"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 21
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres d’Accueil et d’Accompagnement à la Réduction de Risques pour Usagers de Drogues",
+      "source": "DATA_INCLUSION",
+      "value": "caarud"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 22
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres d’Accueil de Demandeurs d’Asile",
+      "source": "DATA_INCLUSION",
+      "value": "cada"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.317Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Caisse d’Allocations Familiales",
+      "source": "DATA_INCLUSION",
+      "value": "caf"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Campus Connecté",
+      "source": "DATA_INCLUSION",
+      "value": "campus-connecte"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "CAP Emploi - Réseau CHEOPS",
+      "source": "DATA_INCLUSION",
+      "value": "cap-emploi-reseau-cheops"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres d’Adaptation à la Vie Active",
+      "source": "DATA_INCLUSION",
+      "value": "cava"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 27
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Les Centres Communaux d’Action Sociale et les Centres Intercommunaux d’Action Sociale",
+      "source": "DATA_INCLUSION",
+      "value": "ccas-cias"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": "Les Chambres de Commerce et d’Industrie (CCI), les Chambres des Métiers et de l’Artisanat (CMA) et les Chambres d’Agriculture (CA).",
+      "kind": "NETWORK",
+      "label": "Chambres Consulaires",
+      "source": "DATA_INCLUSION",
+      "value": "chambres-consulaires"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Réseau Chantier École",
+      "source": "DATA_INCLUSION",
+      "value": "chantier-ecole"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres d’Hébergement et de Réinsertion Sociale",
+      "source": "DATA_INCLUSION",
+      "value": "chrs"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres d’Hébergement d’Urgence",
+      "source": "DATA_INCLUSION",
+      "value": "chu"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 32
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres d’Information sur les Droits des Femmes et des Familles",
+      "source": "DATA_INCLUSION",
+      "value": "cidff"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 33
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres Médico-Psychologiques",
+      "source": "DATA_INCLUSION",
+      "value": "cmp"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres Médico-Sociaux",
+      "source": "DATA_INCLUSION",
+      "value": "cms"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 35
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Conservatoire National des Arts et Métiers",
+      "source": "DATA_INCLUSION",
+      "value": "cnam"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 36
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Collectif Emploi",
+      "source": "DATA_INCLUSION",
+      "value": "collectif-emploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 37
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Communes, mairies, communautés de communes, etc.",
+      "source": "DATA_INCLUSION",
+      "value": "communes"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 38
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Conseillers Numériques",
+      "source": "DATA_INCLUSION",
+      "value": "conseillers-numeriques"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 39
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fédération COORACE",
+      "source": "DATA_INCLUSION",
+      "value": "coorace"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 40
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Caisses Primaires d’Assurance Maladie",
+      "source": "DATA_INCLUSION",
+      "value": "cpam"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 41
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres Provisoires d’Hébergement",
+      "source": "DATA_INCLUSION",
+      "value": "cph"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 42
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Crèches à Vocation d’Insertion Professionnelle",
+      "source": "DATA_INCLUSION",
+      "value": "creches-avip"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 43
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "CREPI",
+      "source": "DATA_INCLUSION",
+      "value": "crepi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 44
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fédération Française des Associations CRÉSUS",
+      "source": "DATA_INCLUSION",
+      "value": "cresus"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 45
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Croix-Rouge",
+      "source": "DATA_INCLUSION",
+      "value": "croix-rouge"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 46
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Centres de Soins, d’Accompagnement et de Prévention en Addictologie",
+      "source": "DATA_INCLUSION",
+      "value": "csapa"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 47
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Organisation délégataire d’un Conseil Départemental",
+      "source": "DATA_INCLUSION",
+      "value": "delegataire-conseil-departemental"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 48
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": "Les Conseils Départementaux (CD), les Unions Départementales des Associations Familiales (UDAF), les Centres Départementaux d’Action Sociale (CDAS), etc.",
+      "kind": "NETWORK",
+      "label": "Départements et Services Départementaux",
+      "source": "DATA_INCLUSION",
+      "value": "departements"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 49
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "DUO for a JOB",
+      "source": "DATA_INCLUSION",
+      "value": "duo-for-a-job"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 50
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.318Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Entreprises Adaptées",
+      "source": "DATA_INCLUSION",
+      "value": "ea"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 51
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Entreprises Adaptées de Travail Temporaire",
+      "source": "DATA_INCLUSION",
+      "value": "eatt"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 52
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Écoles de la 2ᵉ Chance",
+      "source": "DATA_INCLUSION",
+      "value": "ecoles-de-la-deuxieme-chance"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 53
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Association EGEE",
+      "source": "DATA_INCLUSION",
+      "value": "egee"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 54
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Structures d’Insertion par l’Activité Économique - Entreprises d’Insertion",
+      "source": "DATA_INCLUSION",
+      "value": "ei"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 55
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Structures d’Insertion par l’Activité Économique - Entreprises d’Insertion par le Travail Indépendant",
+      "source": "DATA_INCLUSION",
+      "value": "eiti"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 56
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Emmaüs",
+      "source": "DATA_INCLUSION",
+      "value": "emmaus"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 57
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "EPIDE",
+      "source": "DATA_INCLUSION",
+      "value": "epide"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 58
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Établissement et Service d’Accompagnement par le Travail",
+      "source": "DATA_INCLUSION",
+      "value": "esat"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 59
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Espaces Publics Numériques",
+      "source": "DATA_INCLUSION",
+      "value": "espaces-publics-numeriques"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 60
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Expérimentation Territoriale contre le Chômage de Longue Durée",
+      "source": "DATA_INCLUSION",
+      "value": "etcld"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 61
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Structures d’Insertion par l’Activité Économique - Entreprises de Travail Temporaire d’Insertion",
+      "source": "DATA_INCLUSION",
+      "value": "etti"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 62
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fabrique de Territoire",
+      "source": "DATA_INCLUSION",
+      "value": "fabrique-de-territoire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 63
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fondation FACE",
+      "source": "DATA_INCLUSION",
+      "value": "face"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 64
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fédération des Centres Sociaux et Socioculturels de France",
+      "source": "DATA_INCLUSION",
+      "value": "fcsf"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 65
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fédération des Acteurs de la Solidarité",
+      "source": "DATA_INCLUSION",
+      "value": "federation-des-acteurs-de-la-solidarite"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 66
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Fédération Professionnelle pour les Femmes",
+      "source": "DATA_INCLUSION",
+      "value": "federation-professionnelle-femmes"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 67
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "France Active",
+      "source": "DATA_INCLUSION",
+      "value": "france-active"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 68
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "France Service",
+      "source": "DATA_INCLUSION",
+      "value": "france-service"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 69
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "France Travail",
+      "source": "DATA_INCLUSION",
+      "value": "france-travail"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 70
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "French Tech",
+      "source": "DATA_INCLUSION",
+      "value": "french-tech"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 71
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "GEIQ",
+      "source": "DATA_INCLUSION",
+      "value": "geiq"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 72
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Grandes Écoles du Numérique",
+      "source": "DATA_INCLUSION",
+      "value": "grandes-ecoles-du-numerique"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 73
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Hébergement d’Urgence pour Demandeurs d’Asile",
+      "source": "DATA_INCLUSION",
+      "value": "huda"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 74
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Association H’UP",
+      "source": "DATA_INCLUSION",
+      "value": "hup"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 75
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "INAÉ Nouvelle Aquitaine",
+      "source": "DATA_INCLUSION",
+      "value": "inae"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 76
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Initiative France",
+      "source": "DATA_INCLUSION",
+      "value": "initiative-france"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 77
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Association Konexio",
+      "source": "DATA_INCLUSION",
+      "value": "konexio"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 78
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "La Cravate Solidaire",
+      "source": "DATA_INCLUSION",
+      "value": "la-cravate-solidaire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 79
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "La Poste",
+      "source": "DATA_INCLUSION",
+      "value": "la-poste"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 80
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.319Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Les Premières",
+      "source": "DATA_INCLUSION",
+      "value": "les-premieres"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 81
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Maisons Départementales de l’Autonomie",
+      "source": "DATA_INCLUSION",
+      "value": "maison-departementale-de-lautonomie"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 82
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Maisons de l’Emploi",
+      "source": "DATA_INCLUSION",
+      "value": "maisons-de-l-emploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 83
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": "Les Maisons Départementales des Solidarités sont des services départementaux. Par conséquent, le réseau `departements` devrait être également défini pour ces structures.",
+      "kind": "NETWORK",
+      "label": "Maisons Départementales des Solidarités (MDS)",
+      "source": "DATA_INCLUSION",
+      "value": "maisons-des-solidarites"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 84
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Maisons Départementales pour les Personnes Handicapées (MDPH)",
+      "source": "DATA_INCLUSION",
+      "value": "mdph"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 85
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
       "label": "Mission Locale",
+      "source": "DATA_INCLUSION",
+      "value": "mission-locale"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 86
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Maisons des Jeunes et de la Culture",
+      "source": "DATA_INCLUSION",
+      "value": "mjc"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 87
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Mob’In",
+      "source": "DATA_INCLUSION",
+      "value": "mobin"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 88
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Maisons de Services Au Public",
+      "source": "DATA_INCLUSION",
+      "value": "msap"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 89
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Mutualité Sociale Agricole",
+      "source": "DATA_INCLUSION",
+      "value": "mutualite-sociale-agricole"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 90
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Association NQT",
+      "source": "DATA_INCLUSION",
+      "value": "nqt"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 91
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Point Information Médiation Multi Services",
+      "source": "DATA_INCLUSION",
+      "value": "pimms-mediation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 92
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Protection Judiciaire de la Jeunesse",
+      "source": "DATA_INCLUSION",
+      "value": "pjj"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 93
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Plans Locaux pour l’Insertion et l’Emploi",
+      "source": "DATA_INCLUSION",
+      "value": "plie"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 94
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Points Conseil Budget",
+      "source": "DATA_INCLUSION",
+      "value": "points-conseil-budget"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 95
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Points Justice",
+      "source": "DATA_INCLUSION",
+      "value": "points-justice"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 96
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Positive Planet",
+      "source": "DATA_INCLUSION",
+      "value": "positive-planet"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 97
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": "Les Conseils Régionaux (CR), les préfectures, les Directions Régionales de l’Économie, de l’Emploi, du Travail et desSolidarités (DREETS), etc.",
+      "kind": "NETWORK",
+      "label": "Régions, Préfectures et services régionaux",
+      "source": "DATA_INCLUSION",
+      "value": "regions"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 98
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Réseau APP",
+      "source": "DATA_INCLUSION",
+      "value": "reseau-app"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 99
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Réseau BGE",
+      "source": "DATA_INCLUSION",
+      "value": "reseau-bge"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 100
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Réseau Entreprendre",
+      "source": "DATA_INCLUSION",
+      "value": "reseau-entreprendre"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 101
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.320Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Réseau Information Jeunesse",
+      "source": "DATA_INCLUSION",
+      "value": "reseau-information-jeunesse"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 102
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Résidences - Foyers Jeunes Travailleurs",
+      "source": "DATA_INCLUSION",
+      "value": "residences-fjt"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 103
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Ressourceries",
+      "source": "DATA_INCLUSION",
+      "value": "ressourceries"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 104
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Restos du Coeur",
+      "source": "DATA_INCLUSION",
+      "value": "restos-du-coeur"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 105
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Secours Populaire",
+      "source": "DATA_INCLUSION",
+      "value": "secours-populaire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 106
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Services Intégrés d’Accueil et d’Orientation",
+      "source": "DATA_INCLUSION",
+      "value": "siao"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 107
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Simplon",
+      "source": "DATA_INCLUSION",
+      "value": "simplon"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 108
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Association SINGA",
+      "source": "DATA_INCLUSION",
+      "value": "singa"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 109
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Solidarité Nouvelle Face au Chômage",
+      "source": "DATA_INCLUSION",
+      "value": "snc"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 110
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Services Pénitentiaires d’Insertion et de Probation",
+      "source": "DATA_INCLUSION",
+      "value": "spip"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 111
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Tous Tes Possibles",
+      "source": "DATA_INCLUSION",
+      "value": "tous-tes-possibles"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 112
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Union Nationale de l’Aide aux Familles",
+      "source": "DATA_INCLUSION",
+      "value": "unaf"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 113
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Union Nationale des Entreprises Adaptées",
+      "source": "DATA_INCLUSION",
+      "value": "unea"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 114
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "UnisCité",
+      "source": "DATA_INCLUSION",
+      "value": "unis-cite"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 115
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.321Z",
+      "description": null,
+      "kind": "NETWORK",
+      "label": "Wimoov",
+      "source": "DATA_INCLUSION",
+      "value": "wimoov"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 116
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Toute personne ayant un emploi, qu’il soit salarié, libéral ou à son compte",
+      "kind": "PUBLIC",
+      "label": "Actifs",
+      "source": "DATA_INCLUSION",
+      "value": "actifs"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 117
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Personnes touchant des aides financières telles que RSA, SMIC, allocations familiales, bourses, etc",
+      "kind": "PUBLIC",
+      "label": "Bénéficiaires des minimas sociaux",
+      "source": "DATA_INCLUSION",
+      "value": "beneficiaires-des-minimas-sociaux"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 118
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Demandeurs d’emploi de tout type",
+      "kind": "PUBLIC",
+      "label": "Demandeurs d’emploi",
+      "source": "DATA_INCLUSION",
+      "value": "demandeurs-emploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 119
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Étudiants",
+      "kind": "PUBLIC",
+      "label": "Étudiants",
+      "source": "DATA_INCLUSION",
+      "value": "etudiants"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 120
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Familles, parents, enfants, etc",
+      "kind": "PUBLIC",
+      "label": "Familles",
+      "source": "DATA_INCLUSION",
+      "value": "familles"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 121
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Femmes isolées, victimes de violence, etc",
+      "kind": "PUBLIC",
+      "label": "Femmes",
+      "source": "DATA_INCLUSION",
+      "value": "femmes"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 122
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Jeunes au sens large, jeunes adultes, adolescents, etc",
+      "kind": "PUBLIC",
+      "label": "Jeunes",
+      "source": "DATA_INCLUSION",
+      "value": "jeunes"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 123
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Personnes en situation de handicap de tout type",
+      "kind": "PUBLIC",
+      "label": "Personnes en situation de handicap",
+      "source": "DATA_INCLUSION",
+      "value": "personnes-en-situation-de-handicap"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 124
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "SDF, victimes de violence, grande précarité, etc",
+      "kind": "PUBLIC",
+      "label": "Personnes en situation d’urgence",
+      "source": "DATA_INCLUSION",
+      "value": "personnes-en-situation-durgence"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 125
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Personnes sortant de détention, détenus ou autre statut juridique spécifique",
+      "kind": "PUBLIC",
+      "label": "Personnes en situation juridique spécifique",
+      "source": "DATA_INCLUSION",
+      "value": "personnes-en-situation-juridique-specifique"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 126
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Réfugiés, demandeurs d’asile, personnes immigrées, etc",
+      "kind": "PUBLIC",
+      "label": "Personnes exilées",
+      "source": "DATA_INCLUSION",
+      "value": "personnes-exilees"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 127
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Personnes résidentes en zone Quartier Prioritaire de la Ville ou France Ruralités Revitalisation (anciennement ZRR)",
+      "kind": "PUBLIC",
+      "label": "Résidents en QPV ou FRR",
+      "source": "DATA_INCLUSION",
+      "value": "residents-qpv-frr"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 128
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Personnes âgées, retraités, etc",
+      "kind": "PUBLIC",
+      "label": "Séniors",
+      "source": "DATA_INCLUSION",
+      "value": "seniors"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 129
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.348Z",
+      "description": "Tous publics",
+      "kind": "PUBLIC",
+      "label": "Tous publics",
+      "source": "DATA_INCLUSION",
+      "value": "tous-publics"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 130
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.376Z",
+      "description": "Le service est proposé à distance, par téléphone ou internet.",
+      "kind": "RECEPTION",
+      "label": "À distance",
+      "source": "DATA_INCLUSION",
+      "value": "a-distance"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 131
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.376Z",
+      "description": "Le service est proposé en présentiel, à l’adresse associée à ce service.",
+      "kind": "RECEPTION",
+      "label": "En présentiel",
+      "source": "DATA_INCLUSION",
+      "value": "en-presentiel"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 132
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.401Z",
+      "description": "Accompagnement global pour le retour à l’emploi",
+      "kind": "SERVICE_KIND",
+      "label": "Accompagnement",
+      "source": "DATA_INCLUSION",
+      "value": "accompagnement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 133
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.401Z",
+      "description": "Prise en charge financière, aide ou rémunération soutenant le retour à l’emploi",
+      "kind": "SERVICE_KIND",
+      "label": "Aide financière",
+      "source": "DATA_INCLUSION",
+      "value": "aide-financiere"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 134
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.401Z",
+      "description": "Accéder à du matériel soutenant le retour à l’emploi (voiture, vélo, ordinateur, alimentation, etc)",
+      "kind": "SERVICE_KIND",
+      "label": "Aide materielle",
+      "source": "DATA_INCLUSION",
+      "value": "aide-materielle"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 135
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.401Z",
+      "description": "Groupe de travail constitué autour d’une activité, d’un thème soutenant le retour à l’emploi",
+      "kind": "SERVICE_KIND",
+      "label": "Atelier",
+      "source": "DATA_INCLUSION",
+      "value": "atelier"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 136
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.401Z",
+      "description": "Formation dispensée par des professionnels pour les bénéficiaires",
+      "kind": "SERVICE_KIND",
+      "label": "Formation",
+      "source": "DATA_INCLUSION",
+      "value": "formation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 137
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.401Z",
+      "description": "Premier niveau d’information apporté par des professionnels du secteur",
+      "kind": "SERVICE_KIND",
+      "label": "Information",
+      "source": "DATA_INCLUSION",
+      "value": "information"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 138
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.432Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Confirmer son choix de métier",
+      "source": "DATA_INCLUSION",
+      "value": "choisir-un-metier--confirmer-son-choix-de-metier"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 139
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.432Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Connaître les opportunités d’emploi",
+      "source": "DATA_INCLUSION",
+      "value": "choisir-un-metier--connaitre-les-opportunites-demploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 140
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.432Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Découvrir un métier ou un secteur d’activité",
+      "source": "DATA_INCLUSION",
+      "value": "choisir-un-metier--decouvrir-un-metier-ou-un-secteur-dactivite"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 141
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.432Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Identifier ses points forts et ses compétences",
+      "source": "DATA_INCLUSION",
+      "value": "choisir-un-metier--identifier-ses-points-forts-et-ses-competences"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 142
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.432Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Définir son projet de création d’entreprise",
+      "source": "DATA_INCLUSION",
+      "value": "creer-une-entreprise--definir-son-projet-de-creation-dentreprise"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 143
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Développer son entreprise",
+      "source": "DATA_INCLUSION",
+      "value": "creer-une-entreprise--developper-son-entreprise"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 144
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Structurer son projet de création d’entreprise",
+      "source": "DATA_INCLUSION",
+      "value": "creer-une-entreprise--structurer-son-projet-de-creation-dentreprise"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 145
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accompagnement aux démarches administratives",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-administratives-ou-juridiques--accompagnement-aux-demarches-administratives"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 146
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accompagnement pour l’accès à la citoyenneté",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 147
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accompagnement pour l’accès aux droits",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-aux-droits"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 148
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Bénéficier d’une mesure d’accompagnement adapté",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-administratives-ou-juridiques--beneficier-dune-mesure-daccompagnement-adapte"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 149
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Connaître ses droits face à une discrimination",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-administratives-ou-juridiques--connaitre-ses-droits-face-a-une-discrimination"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 150
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Prendre en compte une problématique judiciaire",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-administratives-ou-juridiques--prendre-en-compte-une-problematique-judiciaire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 151
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Acquérir une autonomie budgétaire",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-financieres--acquerir-une-autonomie-budgetaire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 152
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Améliorer sa gestion budgétaire",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-financieres--ameliorer-sa-gestion-budgetaire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 153
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Mettre en place une mesure de protection financière",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-financieres--mettre-en-place-une-mesure-de-protection-financiere"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 154
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Prévenir une dégradation de la situation financière",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-financieres--prevenir-une-degradation-de-la-situation-financiere"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 155
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Situation d’endettement ou de surendettement",
+      "source": "DATA_INCLUSION",
+      "value": "difficultes-financieres--situation-dendettement-surendettement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 156
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Aide ménagère",
+      "source": "DATA_INCLUSION",
+      "value": "equipement-et-alimentation--aide-menagere"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 157
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Alimentation",
+      "source": "DATA_INCLUSION",
+      "value": "equipement-et-alimentation--alimentation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 158
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Électroménager",
+      "source": "DATA_INCLUSION",
+      "value": "equipement-et-alimentation--electromenager"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 159
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Habillement",
+      "source": "DATA_INCLUSION",
+      "value": "equipement-et-alimentation--habillement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 160
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Garde d’enfants",
+      "source": "DATA_INCLUSION",
+      "value": "famille--garde-denfants"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 161
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Prise en charge d’une personne dépendante",
+      "source": "DATA_INCLUSION",
+      "value": "famille--prise-en-charge-personne-dependante"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 162
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Soutien à la parentalité et à l’éducation",
+      "source": "DATA_INCLUSION",
+      "value": "famille--soutien-a-la-parentalite-et-a-leducation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 163
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Soutien aux aidants",
+      "source": "DATA_INCLUSION",
+      "value": "famille--soutien-aidants"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 164
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Surmonter les conflits liés à la séparation ou à la violence",
+      "source": "DATA_INCLUSION",
+      "value": "famille--surmonter-conflits-separation-violence"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 165
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Maîtriser le calcul",
+      "source": "DATA_INCLUSION",
+      "value": "lecture-ecriture-calcul--maitriser-le-calcul"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 166
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Maîtriser le français",
+      "source": "DATA_INCLUSION",
+      "value": "lecture-ecriture-calcul--maitriser-le-francais"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 167
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Acheter un logement",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--acheter-un-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 168
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Changer de logement",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--changer-de-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 169
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.433Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Louer un logement",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--louer-un-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 170
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Rechercher une solution d’hébergement temporaire",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--rechercher-une-solution-dhebergement-temporaire"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 171
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Réduire les impayés de loyer",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--reduire-les-impayes-de-loyer"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 172
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Se maintenir dans le logement",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--se-maintenir-dans-le-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 173
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "S’informer sur les démarches liées à l’accès au logement",
+      "source": "DATA_INCLUSION",
+      "value": "logement-hebergement--sinformer-sur-les-demarches-liees-a-lacces-au-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 174
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accéder à un véhicule",
+      "source": "DATA_INCLUSION",
+      "value": "mobilite--acceder-a-un-vehicule"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 175
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Entretenir et réparer son véhicule",
+      "source": "DATA_INCLUSION",
+      "value": "mobilite--entretenir-reparer-son-vehicule"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 176
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Être accompagné dans son parcours mobilité",
+      "source": "DATA_INCLUSION",
+      "value": "mobilite--etre-accompagne-dans-son-parcours-mobilite"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 177
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Financer ma mobilité",
+      "source": "DATA_INCLUSION",
+      "value": "mobilite--financer-ma-mobilite"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 178
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Utiliser des services de mobilité douce, partagée ou collective",
+      "source": "DATA_INCLUSION",
+      "value": "mobilite--mobilite-douce-partagee-collective"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 179
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Préparer un permis",
+      "source": "DATA_INCLUSION",
+      "value": "mobilite--preparer-un-permis"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 180
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accéder à des services en ligne",
+      "source": "DATA_INCLUSION",
+      "value": "numerique--acceder-a-des-services-en-ligne"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 181
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accéder à une connexion Internet",
+      "source": "DATA_INCLUSION",
+      "value": "numerique--acceder-a-une-connexion-internet"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 182
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Acquérir un équipement",
+      "source": "DATA_INCLUSION",
+      "value": "numerique--acquerir-un-equipement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 183
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Maîtriser les fondamentaux du numérique",
+      "source": "DATA_INCLUSION",
+      "value": "numerique--maitriser-les-fondamentaux-du-numerique"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 184
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Développer son réseau",
+      "source": "DATA_INCLUSION",
+      "value": "preparer-sa-candidature--developper-son-reseau"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 185
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Organiser ses démarches de recherche d’emploi",
+      "source": "DATA_INCLUSION",
+      "value": "preparer-sa-candidature--organiser-ses-demarches-de-recherche-demploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 186
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Réaliser un CV et/ou une lettre de motivation",
+      "source": "DATA_INCLUSION",
+      "value": "preparer-sa-candidature--realiser-un-cv-et-ou-une-lettre-de-motivation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 187
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Valoriser ses compétences",
+      "source": "DATA_INCLUSION",
+      "value": "preparer-sa-candidature--valoriser-ses-competences"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 188
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Activités sportives et culturelles",
+      "source": "DATA_INCLUSION",
+      "value": "remobilisation--activites-sportives-et-culturelles"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 189
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Bénévolat et action citoyenne",
+      "source": "DATA_INCLUSION",
+      "value": "remobilisation--benevolat-action-citoyenne"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 190
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Bien-être et confiance en soi",
+      "source": "DATA_INCLUSION",
+      "value": "remobilisation--bien-etre-confiance-en-soi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 191
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Lien social",
+      "source": "DATA_INCLUSION",
+      "value": "remobilisation--lien-social"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 192
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Accès aux soins",
+      "source": "DATA_INCLUSION",
+      "value": "sante--acces-aux-soins"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 193
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Addictions",
+      "source": "DATA_INCLUSION",
+      "value": "sante--addictions"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 194
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Constituer un dossier MDPH pour invalidité",
+      "source": "DATA_INCLUSION",
+      "value": "sante--constituer-un-dossier-mdph-invalidite"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 195
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Santé mentale",
+      "source": "DATA_INCLUSION",
+      "value": "sante--sante-mentale"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 196
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Santé sexuelle",
+      "source": "DATA_INCLUSION",
+      "value": "sante--sante-sexuelle"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 197
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.434Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Monter son dossier de formation",
+      "source": "DATA_INCLUSION",
+      "value": "se-former--monter-son-dossier-de-formation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 198
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Trouver sa formation",
+      "source": "DATA_INCLUSION",
+      "value": "se-former--trouver-sa-formation"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 199
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Connaître les opportunités d’emploi à l’étranger",
+      "source": "DATA_INCLUSION",
+      "value": "souvrir-a-linternational--connaitre-les-opportunites-demploi-a-letranger"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 200
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "S’informer sur les aides pour travailler à l’étranger",
+      "source": "DATA_INCLUSION",
+      "value": "souvrir-a-linternational--sinformer-sur-les-aides-pour-travailler-a-letranger"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 201
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "S’organiser suite à son retour en France",
+      "source": "DATA_INCLUSION",
+      "value": "souvrir-a-linternational--sorganiser-suite-a-son-retour-en-france"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 202
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Convaincre un recruteur en entretien",
+      "source": "DATA_INCLUSION",
+      "value": "trouver-un-emploi--convaincre-un-recruteur-en-entretien"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 203
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Faire des candidatures spontanées",
+      "source": "DATA_INCLUSION",
+      "value": "trouver-un-emploi--faire-des-candidatures-spontanees"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 204
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Maintien dans l’emploi",
+      "source": "DATA_INCLUSION",
+      "value": "trouver-un-emploi--maintien-dans-lemploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 205
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Répondre à des offres d’emploi",
+      "source": "DATA_INCLUSION",
+      "value": "trouver-un-emploi--repondre-a-des-offres-demploi"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 206
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.435Z",
+      "description": null,
+      "kind": "THEMATIC",
+      "label": "Suivre ses candidatures et relancer les employeurs",
+      "source": "DATA_INCLUSION",
+      "value": "trouver-un-emploi--suivre-ses-candidatures-et-relancer-les-employeurs"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 207
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.700Z",
+      "description": null,
+      "kind": "MOBILIZATION_PROFESSIONAL",
+      "label": "Autre modalité (préciser)",
+      "source": "DORA",
+      "value": "autre"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 208
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.700Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil départemental de la Savoie",
+      "source": "DORA",
+      "value": "cd-savoie"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 209
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.700Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil Départemental de l'Essonne",
+      "source": "DORA",
+      "value": "cd-essonne"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 210
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "MOBILIZATION_BENEFICIARY",
+      "label": "Se faire orienter par un professionnel",
+      "source": "DORA",
+      "value": "professionnel"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 211
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil départemental de la Vienne",
+      "source": "DORA",
+      "value": "cd-vienne"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 212
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "MOBILIZATION_BENEFICIARY",
+      "label": "Se présenter",
+      "source": "DORA",
+      "value": "se-presenter"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 213
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Région Réunion",
+      "source": "DORA",
+      "value": "rg-reunion"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 214
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "MOBILIZATION_BENEFICIARY",
+      "label": "Nous envoyer un e-mail",
+      "source": "DORA",
+      "value": "envoyer-un-mail"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 215
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "MOBILIZATION_PROFESSIONAL",
+      "label": "Via le formulaire DORA",
+      "source": "DORA",
+      "value": "formulaire-dora"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 216
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "MOBILIZATION_BENEFICIARY",
+      "label": "Nous téléphoner",
+      "source": "DORA",
+      "value": "telephoner"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 217
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.701Z",
+      "description": null,
+      "kind": "MOBILIZATION_PROFESSIONAL",
+      "label": "Via notre propre formulaire en ligne/site internet",
+      "source": "DORA",
+      "value": "completer-le-formulaire-dadhesion"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 218
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.702Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil départemental des Bouches-du-Rhône",
+      "source": "DORA",
+      "value": "cd-bouches-du-rhone"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 219
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.702Z",
+      "description": null,
+      "kind": "MOBILIZATION_PROFESSIONAL",
+      "label": "Nous envoyer un e-mail",
+      "source": "DORA",
+      "value": "envoyer-un-mail"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 220
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.702Z",
+      "description": null,
+      "kind": "MOBILIZATION_BENEFICIARY",
+      "label": "Via notre propre formulaire en ligne/site internet",
+      "source": "DORA",
+      "value": "completer-le-formulaire-dadhesion"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 221
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.702Z",
+      "description": null,
+      "kind": "MOBILIZATION_PROFESSIONAL",
+      "label": "Nous téléphoner",
+      "source": "DORA",
+      "value": "telephoner"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 222
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.703Z",
+      "description": null,
+      "kind": "MOBILIZATION_BENEFICIARY",
+      "label": "Autre modalité (préciser)",
+      "source": "DORA",
+      "value": "autre"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 223
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.703Z",
+      "description": null,
+      "kind": "MOBILIZATION_PROFESSIONAL",
+      "label": "Nous envoyer un e-mail avec une fiche de prescription",
+      "source": "DORA",
+      "value": "envoyer-un-mail-avec-une-fiche-de-prescription"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 224
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.703Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil départemental de la Charente-Maritime",
+      "source": "DORA",
+      "value": "cd-charente-maritime"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 225
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.703Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil départemental de l’Aveyron",
+      "source": "DORA",
+      "value": "cd-aveyron"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 226
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.703Z",
+      "description": null,
+      "kind": "FUNDING_LABEL",
+      "label": "Conseil départemental de la Drôme",
+      "source": "DORA",
+      "value": "cd-drome"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 227
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
+      "description": "Aides et solutions pour accompagner les salariés dans leur parcours logement. Contient les services proposés par les structures d’Action Logement sur tout le territoire.",
+      "kind": "SOURCE",
+      "label": "Action Logement",
+      "source": "DATA_INCLUSION",
+      "value": "action-logement"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 228
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
+      "description": "Association chargée de soutenir le développement de l’emploi des personnes handicapées. Contient leur offre de service nationale.",
+      "kind": "SOURCE",
+      "label": "AGEFIPH",
+      "source": "DATA_INCLUSION",
+      "value": "agefiph"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 229
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
+      "description": "Contient les structures et services inclusifs du département de l’Ille-et-Vilaine.",
+      "kind": "SOURCE",
+      "label": "Annuaire social d’Ille-et-Vilaine",
+      "source": "DATA_INCLUSION",
+      "value": "cd35"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 230
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
+      "description": "Service public numérique de recensement de l’offre d’insertion développé par la Plateforme de l’inclusion. Contient leurs structures et services inclusifs sur de nombreuses thématiques.",
+      "kind": "SOURCE",
+      "label": "DORA",
+      "source": "DATA_INCLUSION",
+      "value": "dora"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 231
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
+      "description": "Service public numérique de mise en relation entre employeurs solidaires et accompagnateurs. Contient les structures employeuses et accompagnatrices dans le domaine de l’insertion par l’activité économique (IAE).",
+      "kind": "SOURCE",
+      "label": "Emplois de l’inclusion",
+      "source": "DATA_INCLUSION",
+      "value": "emplois-de-linclusion"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 232
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
+      "description": "Contient l’offre de service nationale de France Travail.",
+      "kind": "SOURCE",
+      "label": "Offre nationale de services de France Travail",
+      "source": "DATA_INCLUSION",
+      "value": "france-travail"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 233
+  },
+  {
+    "fields": {
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "La Mission Locale accompagne les jeunes de 16 à 25 ans dans leurs démarches d’insertion sociale et professionnelle en développant une approche globale et de proximité.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Mission Locale",
+      "source": "DATA_INCLUSION",
+      "value": "mission-locale"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 234
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 235,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "mediation-numerique",
-      "label": "Cartographie Nationale des lieux de médiation numérique",
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "Contient les lieux d’inclusion numériques recensés par l’ANCT et les hubs régionaux.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Cartographie Nationale des lieux de médiation numérique",
+      "source": "DATA_INCLUSION",
+      "value": "mediation-numerique"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 235
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 236,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "mes-aides",
-      "label": "Mes Aides France Travail",
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "Service numérique public développé par France Travail. Contient leurs structures et services inclusifs sur la thématique Mobilité.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Mes Aides France Travail",
+      "source": "DATA_INCLUSION",
+      "value": "mes-aides"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 236
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 237,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "monenfant",
-      "label": "Monenfant.fr",
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "Service numérique public développé par la Caisse Nationale des Allocations Familiales. Contient leurs structures et services inclusifs sur la thématique Famille.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Monenfant.fr",
+      "source": "DATA_INCLUSION",
+      "value": "monenfant"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 237
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 238,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "reseau-alpha",
-      "label": "Réseau Alpha",
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "Association référençant l’offre d’apprentissage du français en Île-de-France. Contient leurs structures et services inclusifs sur la thématique Apprendre le Français.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Réseau Alpha",
+      "source": "DATA_INCLUSION",
+      "value": "reseau-alpha"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 238
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 239,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "soliguide",
-      "label": "Soliguide",
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "Service numérique de recensement de l’offre d’insertion développé par l’association Solinum. Contient leurs structures et services sur des thématiques variées d’urgence sociale.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Soliguide",
+      "source": "DATA_INCLUSION",
+      "value": "soliguide"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 239
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 240,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "fredo",
-      "label": "Fredo",
+      "created_at": "2026-06-15T09:12:50.734Z",
       "description": "Fredo est un outil diagnostique terrain pour les travailleurs sociaux. Il permet de mettre en relation les bénéficiaires diagnostiqués et les structures d'accompagnements grâce à une personne ressource.",
-      "created_at": "2026-06-15T09:12:50.734Z"
-    }
+      "kind": "SOURCE",
+      "label": "Fredo",
+      "source": "DATA_INCLUSION",
+      "value": "fredo"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 240
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 241,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "carif-oref",
-      "label": "Réseau des CARIF OREF",
+      "created_at": "2026-06-15T09:12:50.735Z",
       "description": "Association qui accompagne les acteurs de l’emploi, de la formation et de l’orientation. Contient l’offre de formation FLE et Illettrisme nationale référencée par RCO.",
-      "created_at": "2026-06-15T09:12:50.735Z"
-    }
+      "kind": "SOURCE",
+      "label": "Réseau des CARIF OREF",
+      "source": "DATA_INCLUSION",
+      "value": "carif-oref"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 241
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 242,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "ma-boussole-aidants",
-      "label": "Ma Boussole Aidants",
+      "created_at": "2026-06-15T09:12:50.735Z",
       "description": "“Ma Boussole Aidants est une coopérative portée par la Fédération Agirc-Arrco dédiée à l’accompagnement des aidants. Contient les CCAS, CIAS, MDS et MDA ainsi que leur offre de service pour les aidants.",
-      "created_at": "2026-06-15T09:12:50.735Z"
-    }
+      "kind": "SOURCE",
+      "label": "Ma Boussole Aidants",
+      "source": "DATA_INCLUSION",
+      "value": "ma-boussole-aidants"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 242
   },
   {
-    "model": "insertion.genericreferenceitem",
-    "pk": 243,
     "fields": {
-      "source": "DATA_INCLUSION",
-      "kind": "SOURCE",
-      "value": "finess",
-      "label": "FINESS",
+      "created_at": "2026-06-15T09:12:50.735Z",
       "description": "Fichier national des établissements sanitaires et sociaux. Seuls les structures de type ESAT et CMP sont présents dans cette source.",
-      "created_at": "2026-06-15T09:12:50.735Z"
-    }
+      "kind": "SOURCE",
+      "label": "FINESS",
+      "source": "DATA_INCLUSION",
+      "value": "finess"
+    },
+    "model": "insertion.genericreferenceitem",
+    "pk": 243
   }
 ]
