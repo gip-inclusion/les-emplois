@@ -44,7 +44,6 @@ class ItouTOTPDevice(
         related_name="itou_totp_devices",
         on_delete=models.CASCADE,
     )
-    # FIXME (dbaty): add cronjob to purge disabled devices after 3 months
     disabled_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
 
     class Meta:
