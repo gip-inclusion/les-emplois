@@ -105,8 +105,6 @@ def _generate_pro_params_from_session(pc_data):
                             "values": [
                                 "eidas2",
                                 "eidas3",
-                                "https://proconnect.gouv.fr/assurance/self-asserted-2fa",
-                                "https://proconnect.gouv.fr/assurance/consistency-checked-2fa",
                             ],
                         },
                     },
