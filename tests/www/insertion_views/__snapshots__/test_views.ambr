@@ -1,4 +1,182 @@
 # serializer version: 1
+# name: test_card_view_anonymous_renders_description_tab
+  dict({
+    'num_queries': 2,
+    'queries': list([
+      dict({
+        'origin': list([
+          'StructureCardView.setup[www/insertion_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_structure"."id",
+                 "insertion_structure"."address_line_1",
+                 "insertion_structure"."address_line_2",
+                 "insertion_structure"."post_code",
+                 "insertion_structure"."city",
+                 "insertion_structure"."insee_city_id",
+                 "insertion_structure"."coordinates",
+                 "insertion_structure"."uid",
+                 "insertion_structure"."source_id",
+                 "insertion_structure"."source_link",
+                 "insertion_structure"."siret",
+                 "insertion_structure"."name",
+                 "insertion_structure"."description",
+                 "insertion_structure"."website",
+                 "insertion_structure"."email",
+                 "insertion_structure"."phone",
+                 "insertion_structure"."opening_hours",
+                 "insertion_structure"."updated_on",
+                 "insertion_structure"."created_at",
+                 "insertion_structure"."updated_at",
+                 "insertion_genericreferenceitem"."id",
+                 "insertion_genericreferenceitem"."source",
+                 "insertion_genericreferenceitem"."kind",
+                 "insertion_genericreferenceitem"."value",
+                 "insertion_genericreferenceitem"."label",
+                 "insertion_genericreferenceitem"."description",
+                 "insertion_genericreferenceitem"."created_at",
+                 "insertion_genericreferenceitem"."updated_at"
+          FROM "insertion_structure"
+          INNER JOIN "insertion_genericreferenceitem" ON ("insertion_structure"."source_id" = "insertion_genericreferenceitem"."id")
+          WHERE "insertion_structure"."uid" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'StructureCardView.setup[www/insertion_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "insertion_service"."id",
+                 "insertion_service"."address_line_1",
+                 "insertion_service"."address_line_2",
+                 "insertion_service"."post_code",
+                 "insertion_service"."city",
+                 "insertion_service"."insee_city_id",
+                 "insertion_service"."coordinates",
+                 "insertion_service"."uid",
+                 "insertion_service"."source_id",
+                 "insertion_service"."source_link",
+                 "insertion_service"."structure_id",
+                 "insertion_service"."name",
+                 "insertion_service"."description",
+                 "insertion_service"."description_short",
+                 "insertion_service"."kind_id",
+                 "insertion_service"."fee_id",
+                 "insertion_service"."fee_details",
+                 "insertion_service"."publics_details",
+                 "insertion_service"."access_conditions_di",
+                 "insertion_service"."access_conditions_dora",
+                 "insertion_service"."eligibility_zones",
+                 "insertion_service"."mobilizations_details",
+                 "insertion_service"."mobilization_modes_beneficiaries_external_form_link",
+                 "insertion_service"."mobilization_modes_beneficiaries_external_form_link_text",
+                 "insertion_service"."mobilization_modes_beneficiaries_other",
+                 "insertion_service"."mobilization_modes_professionals_external_form_link",
+                 "insertion_service"."mobilization_modes_professionals_external_form_link_text",
+                 "insertion_service"."mobilization_modes_professionals_other",
+                 "insertion_service"."credentials",
+                 "insertion_service"."credentials_documents",
+                 "insertion_service"."credentials_online_form",
+                 "insertion_service"."opening_hours",
+                 "insertion_service"."opening_hours_text",
+                 "insertion_service"."contact_full_name",
+                 "insertion_service"."contact_email",
+                 "insertion_service"."contact_phone",
+                 "insertion_service"."contact_is_public",
+                 "insertion_service"."is_orientable_with_form",
+                 "insertion_service"."average_orientation_response_delay_days",
+                 "insertion_service"."dora_synced_at",
+                 "insertion_service"."updated_on",
+                 "insertion_service"."created_at",
+                 "insertion_service"."updated_at",
+                 "insertion_genericreferenceitem"."id",
+                 "insertion_genericreferenceitem"."source",
+                 "insertion_genericreferenceitem"."kind",
+                 "insertion_genericreferenceitem"."value",
+                 "insertion_genericreferenceitem"."label",
+                 "insertion_genericreferenceitem"."description",
+                 "insertion_genericreferenceitem"."created_at",
+                 "insertion_genericreferenceitem"."updated_at"
+          FROM "insertion_service"
+          LEFT OUTER JOIN "insertion_genericreferenceitem" ON ("insertion_service"."kind_id" = "insertion_genericreferenceitem"."id")
+          WHERE "insertion_service"."structure_id" IN (%s)
+          ORDER BY "insertion_service"."name" ASC
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: test_card_view_contact_modal_contains_structure_coordinates
+  '''
+  <div aria-labelledby="structure-contact-modal-label" aria-modal="true" class="modal fade" id="structure-contact-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="structure-contact-modal-label">
+                      Coordonnées de contact
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <div class="d-flex">
+                      <i aria-hidden="true" class="ri-map-pin-2-line me-2">
+                      </i>
+                      <address class="m-0">
+                          10 rue de la Paix, 75002 Paris
+                      </address>
+                  </div>
+                  <hr class="my-3"/>
+                  <ul class="list-unstyled mb-0">
+                      <li>
+                          <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                          </i>
+                          <a aria-label="Contact par mail" class="text-break" href="mailto:contact@structure.test">
+                              contact@structure.test
+                          </a>
+                          <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@structure.test" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="copier-email-contact" type="button">
+                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                              </i>
+                              <span class="visually-hidden">
+                                  Copier l’adresse e-mail
+                              </span>
+                          </button>
+                      </li>
+                      <li>
+                          <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                          </i>
+                          01 02 03 04 05
+                          <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33102030405" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="copier-email-contact" type="button">
+                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                              </i>
+                              <span class="visually-hidden">
+                                  Copier
+                              </span>
+                          </button>
+                      </li>
+                      <li>
+                          <i aria-hidden="true" class="ri-global-line fw-normal me-2">
+                          </i>
+                          <a aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)" class="btn-link fw-medium has-external-link" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="lien-site-web" href="https://structure.test" rel="noopener noreferrer" target="_blank">
+                              https://structure.test
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-primary" data-bs-dismiss="modal" type="button">
+                      Terminer
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_detail_basic_dora
   '''
   <main class="s-main" id="main" role="main">
