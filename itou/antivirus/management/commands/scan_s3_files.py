@@ -122,9 +122,17 @@ class Command(BaseCommand):
 
         viruses_keys = set(viruses)
         scans = []
-        for scan in Scan.objects.filter(file_id__in=viruses):
-            scan.clamav_signature = viruses.pop(scan.file_id)
+        for scan in Scan.objects.select_related("file").filter(file__key__in=viruses):
+            scan.clamav_signature = viruses.pop(scan.file.key)
             scans.append(scan)
         Scan.objects.bulk_update(scans, fields=["clamav_signature"])
-        Scan.objects.bulk_create(Scan(file_id=key, clamav_signature=signature) for key, signature in viruses.items())
+        new_infected_files = File.objects.filter(key__in=viruses.keys(), scan__isnull=True)
+        Scan.objects.bulk_create(
+            Scan(
+                file_id=id,
+                clamav_signature=signature,
+                infected=True,
+            )
+            for id, signature in [(file.id, viruses[file.key]) for file in new_infected_files]
+        )
         return viruses_keys
