@@ -131,6 +131,7 @@ INSTALLED_APPS = [
     "itou.nexus",
     "itou.insertion",
     "itou.recommendations",
+    "itoutils.django.decoupage_administratif",
 ]
 
 MIDDLEWARE = [
@@ -424,6 +425,10 @@ API_GEOPF_BASE_URL = "https://data.geopf.fr"
 
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL")
+
+GEO_API_GOUV_BASE_URL = os.getenv("GEO_API_GOUV_BASE_URL", "https://geo.api.gouv.fr")
+GEO_API_GOUV_TIMEOUT_SECONDS = int(os.getenv("GEO_API_GOUV_TIMEOUT_SECONDS", 10))
+
 
 # https://portail-api.insee.fr/catalog/all
 API_INSEE_AUTH_URL = os.getenv("API_INSEE_AUTH_URL")
