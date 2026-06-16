@@ -299,11 +299,18 @@ def test_detail_orientation_url_with_jwt_for_authorized_prescriber(client):
     )
     client.force_login(prescriber)
 
-    response = client.get(detail_url(service))
+    orientation_token = "jwt-token"
+
+    with patch("itou.www.insertion_views.views.get_orientation_jwt", return_value=orientation_token):
+        response = client.get(detail_url(service))
 
     assert response.status_code == 200
     # Authorized ProConnect prescribers get orientation URL wrapped in nexus auto_login with JWT
-    assertContains(response, reverse("nexus:auto_login"))
+    dora_url = (
+        f"https://dora.inclusion.gouv.fr/services/di--{service.uid}/orienter"
+        f"?mtm_campaign=lesemplois&mtm_kwd=service-professional&op={orientation_token}"
+    )
+    assertContains(response, reverse("nexus:auto_login", query={"next_url": dora_url}))
 
 
 def test_detail_orientation_url_without_jwt_for_regular_prescriber(client, db):
@@ -321,7 +328,12 @@ def test_detail_orientation_url_without_jwt_for_regular_prescriber(client, db):
 
     assert response.status_code == 200
     # Regular prescribers get direct DORA URL without nexus auto_login
-    assertNotContains(response, reverse("nexus:auto_login"))
+    assertContains(
+        response,
+        f"https://dora.inclusion.gouv.fr/services/di--{service.uid}/orienter?mtm_campaign=lesemplois&amp;mtm_kwd=service-professional",
+    )
+    assertNotContains(response, "/portal/auto-login?next_url")
+    assertNotContains(response, "op=")
 
 
 def test_detail_credential_documents_empty(client, db):
