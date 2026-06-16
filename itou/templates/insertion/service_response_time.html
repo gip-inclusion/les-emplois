@@ -1,0 +1,26 @@
+{% if days <= 1 %}
+    <p class="fs-sm text-success">
+        <i class="ri-time-line" aria-hidden="true"></i>
+        <strong>Réponse très rapide : dans les 24h</strong>
+    </p>
+{% elif days <= 3 %}
+    <p class="fs-sm text-success">
+        <i class="ri-time-line" aria-hidden="true"></i>
+        <strong>Réponse rapide : sous 3 jours</strong>
+    </p>
+{% elif days <= 7 %}
+    <p class="text-info fs-sm">
+        <i class="ri-time-line" aria-hidden="true"></i>
+        <strong>Réponse en quelques jours : entre 5 et 7 jours</strong>
+    </p>
+{% elif days <= 14 %}
+    <p class="fs-sm text-warning">
+        <i class="ri-time-line" aria-hidden="true"></i>
+        <strong>Délai de réponse modéré : 8 à 14 jours</strong>
+    </p>
+{% else %}
+    <p class="fs-sm text-danger">
+        <i class="ri-time-line" aria-hidden="true"></i>
+        <strong>Réponse tardive : plus de 14 jours</strong>
+    </p>
+{% endif %}

@@ -772,6 +772,11 @@ DORA_WWW_BASE_URL = os.getenv("DORA_WWW_BASE_URL", "https://dora.inclusion.gouv.
 DORA_API_BASE_URL = os.getenv("DORA_API_BASE_URL", "https://api.dora.inclusion.gouv.fr")
 DORA_API_TOKEN = os.getenv("DORA_API_TOKEN")
 
+DORA_AWS_S3_ENDPOINT_URL = os.getenv("DORA_AWS_S3_ENDPOINT_URL")
+DORA_AWS_S3_ACCESS_KEY_ID = os.getenv("DORA_AWS_S3_ACCESS_KEY_ID")
+DORA_AWS_S3_SECRET_ACCESS_KEY = os.getenv("DORA_AWS_S3_SECRET_ACCESS_KEY")
+DORA_AWS_S3_STORAGE_BUCKET_NAME = os.getenv("DORA_AWS_S3_STORAGE_BUCKET_NAME")
+
 # GPS
 # ------------------------------------------------------------------------------
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)

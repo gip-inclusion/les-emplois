@@ -1,0 +1,587 @@
+# serializer version: 1
+# name: test_detail_basic_dora
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <h1>
+                          Mon service de test
+                          <span class="badge badge-base rounded-pill text-bg-success">
+                              Mise à jour 15/01/2025
+                          </span>
+                      </h1>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/test-service-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
+                                      Orienter le bénéficiaire
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                                          <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                                          </i>
+                                      </button>
+                                      <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-service-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span>
+                                                  Copier le lien de cette page
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Informations du service
+                          </h2>
+                          <ul class="list-data">
+                          </ul>
+                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
+                              Source : Dora
+                          </span>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Informations de la structure
+                          </h2>
+                          <p>
+                              Ma structure de test
+                          </p>
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-uid/card" type="button">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-8 order-3">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Description du service
+                          </h2>
+                          <p class="mb-0">
+                          </p>
+                          <p>
+                              Description du service.
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Pré-requis et justificatifs
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  Avoir plus de 18 ans
+                              </li>
+                              <li>
+                                  Résider en France
+                              </li>
+                              <li>
+                                  Pièce d'identité en cours de validité
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_detail_basic_not_dora
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <h1>
+                          Mon service de test
+                          <span class="badge badge-base rounded-pill text-bg-success">
+                              Mise à jour 15/01/2025
+                          </span>
+                      </h1>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/di--test-service-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
+                                      Orienter le bénéficiaire
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                                          <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                                          </i>
+                                      </button>
+                                      <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-service-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span>
+                                                  Copier le lien de cette page
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Informations du service
+                          </h2>
+                          <ul class="list-data">
+                          </ul>
+                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
+                              Source : Other
+                          </span>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Informations de la structure
+                          </h2>
+                          <p>
+                              Ma structure de test
+                          </p>
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-uid/card" type="button">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-8 order-3">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Description du service
+                          </h2>
+                          <p class="mb-0">
+                          </p>
+                          <p>
+                              Description du service.
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Pré-requis et justificatifs
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  Être orienté par un prescripteur
+                              </li>
+                              <li>
+                                  Avoir 18 ans
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_detail_credential_documents
+  '''
+  <div class="c-box mb-3 mb-md-4" id="credentials-documents">
+      <h2 class="h3">
+          Documents à compléter
+      </h2>
+      <ul class="mb-0">
+          <li>
+              <a href="https://s3.example.com/my_form.pdf?token=aaa" rel="noopener noreferrer" target="_blank">
+                  my_form.pdf
+              </a>
+          </li>
+          <li>
+              <a href="https://s3.example.com/justificatif.docx?token=bbb" rel="noopener noreferrer" target="_blank">
+                  justificatif.docx
+              </a>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: test_detail_not_orientable
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-not-orientable-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_detail_orientable_and_user_authenticated
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/di--test-orientable-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
+                  Orienter le bénéficiaire
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-orientable-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_detail_with_all_optional_fields
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <h1>
+                          Service complet
+                          <span class="badge badge-base rounded-pill text-bg-success">
+                              Mise à jour 01/06/2025
+                          </span>
+                      </h1>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/test/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
+                                      Orienter le bénéficiaire
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                                      Voir les coordonnées de contact du service
+                                  </button>
+                              </div>
+                              <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                                          <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                                          </i>
+                                      </button>
+                                      <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-service-full-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span>
+                                                  Copier le lien de cette page
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3 mb-2">
+                              Informations du service
+                          </h2>
+                          <p class="fs-sm text-success">
+                              <i aria-hidden="true" class="ri-time-line">
+                              </i>
+                              <strong>
+                                  Réponse rapide : sous 3 jours
+                              </strong>
+                          </p>
+                          <p>
+                              Résumé court du service.
+                          </p>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Public concerné
+                                      <i aria-label="Toute personne majeure." class="ri-information-line ri-xl text-info" data-bs-title="Toute personne majeure." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong>
+                                      Adultes
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Lieu d'accueil
+                                  </small>
+                                  <strong>
+                                      En présentiel — 12 rue de la Paix, Bâtiment B, 75001 Paris
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Frais à charge
+                                      <i aria-label="Sous conditions de ressources." class="ri-information-line ri-xl text-info" data-bs-title="Sous conditions de ressources." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong>
+                                      Gratuit
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Fréquence et horaires
+                                      <i aria-label="Hors jours fériés" class="ri-information-line ri-xl text-info" data-bs-title="Hors jours fériés" data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Lundi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Mardi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Mercredi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Jeudi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                      <div class="d-flex gap-2">
+                                          <strong>
+                                              Vendredi :
+                                          </strong>
+                                          <strong>
+                                              9h00 à 17h00
+                                          </strong>
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                          <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
+                              Source : Dora
+                          </span>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12 col-lg-4 order-1 order-lg-2">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Informations de la structure
+                          </h2>
+                          <p>
+                              Structure complète
+                          </p>
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-full-uid/card" type="button">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-8 order-3">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Description du service
+                          </h2>
+                          <p class="mb-0">
+                              Description complète
+                          </p>
+                          <p>
+                              Avec du
+                              <strong>
+                                  markdown
+                              </strong>
+                              .
+                          </p>
+                          <p>
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Thématiques et besoins associés
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  <b>
+                                      Logement et hébergement
+                                  </b>
+                                  : Louer un logement
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Pré-requis et justificatifs
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  Être orienté par un prescripteur.
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_detail_with_external_orientation_link
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+                  Orienter le bénéficiaire
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-orientable-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---

@@ -30,6 +30,24 @@ def pilotage_s3_client():
     )
 
 
+def dora_s3_client():
+    return boto3.client(
+        "s3",
+        endpoint_url=settings.DORA_AWS_S3_ENDPOINT_URL,
+        aws_access_key_id=settings.DORA_AWS_S3_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.DORA_AWS_S3_SECRET_ACCESS_KEY,
+        config=settings.AWS_S3_CLIENT_CONFIG,
+    )
+
+
+def generate_dora_storage_url(form_key: str) -> str:
+    return dora_s3_client().generate_presigned_url(
+        "get_object",
+        Params={"Bucket": settings.DORA_AWS_S3_STORAGE_BUCKET_NAME, "Key": form_key},
+        ExpiresIn=24 * 3600,  # 1 day
+    )
+
+
 class PublicStorage(S3Storage):
     # Not using the S3StaticStorage backend to ensure the listdir() operation remains forbidden.
     # Don’t sign URLs, objects are public.

@@ -256,7 +256,7 @@ class Command(BaseCommand):
     def _fill_service_from_dora_api_data(self, service, dora_services, non_orientable_structures):
         dora_data = dora_services.get(service.uid)
 
-        service.is_orientable_with_form = (
+        service.is_orientable_with_form = bool(
             service.structure.uid not in non_orientable_structures
             and dora_data
             and dora_data["is_orientable_with_form"]
@@ -420,6 +420,8 @@ class Command(BaseCommand):
         service.access_conditions_di = data["conditions_acces"] or ""
 
         service.eligibility_zones = data["zone_eligibilite"] or []
+
+        service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
 
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""

@@ -193,7 +193,7 @@ def test_results_html(snapshot, client, search_services_route):
     ],
 )
 def test_results_html_link(snapshot, client, mocker, search_services_route, user_factory):
-    mocker.patch("itou.www.search_views.views.generate_token", return_value="op_jwt_token")
+    mocker.patch("itou.www.search_views.views.get_orientation_jwt", return_value="op_jwt_token")
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
