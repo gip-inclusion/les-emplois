@@ -14,6 +14,9 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestStructures:
+    def get_structure_url(self, structure):
+        return reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid})
+
     def test_card_view_anonymous_renders_description_tab(self, client, snapshot):
         structure = StructureFactory(
             name="Structure test",
@@ -26,7 +29,7 @@ class TestStructures:
             source_link=f"{settings.DORA_WWW_BASE_URL}/structures/structure-test",
         )
         with assertSnapshotQueries(snapshot):
-            response = client.get(reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid}))
+            response = client.get(self.get_structure_url(structure))
 
         assert response.context["structure"] == structure
         assertTemplateUsed(response, "insertion/structure_card.html")
@@ -48,7 +51,7 @@ class TestStructures:
             ),
             source_link="https://example.com/structures/structure-test",
         )
-        response = client.get(reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid}))
+        response = client.get(self.get_structure_url(structure))
 
         assertNotContains(response, 'rel="canonical"', html=True)
 
@@ -66,14 +69,14 @@ class TestStructures:
             city="Paris",
             website="https://structure.test",
         )
-        response = client.get(reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid}))
+        response = client.get(self.get_structure_url(structure))
 
         modal = parse_response_to_soup(response, selector="#structure-contact-modal")
         assert pretty_indented(modal) == snapshot
 
 
 class TestServices:
-    def detail_url(self, service):
+    def get_service_url(self, service):
         return reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
 
     def test_detail_accessible_without_login(self, client, db):
@@ -87,7 +90,7 @@ class TestServices:
             structure__name="Ma structure de test",
             structure__updated_on="2025-01-15",
         )
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.status_code == 200
 
     def test_detail_basic_dora(self, client, snapshot):
@@ -109,7 +112,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.status_code == 200
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
@@ -132,7 +135,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.status_code == 200
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
@@ -185,7 +188,7 @@ class TestServices:
         service.mobilizations.add(mobilization)
 
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.status_code == 200
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
@@ -202,7 +205,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertContains(response, "Orienter le bénéficiaire")
         assertContains(response, f'href="{test_link}"')
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
@@ -218,7 +221,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertContains(response, "Orienter le bénéficiaire")
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
@@ -232,7 +235,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
 
-        service_url = self.detail_url(service)
+        service_url = self.get_service_url(service)
         response = client.get(service_url)
         login_url = reverse("login:existing_user")
         assertContains(response, f'href="{login_url}?next={service_url}"')
@@ -248,7 +251,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertNotContains(response, "Orienter le bénéficiaire")
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
@@ -264,7 +267,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertNotContains(response, "Voir les coordonnées de contact du service")
 
     def test_detail_contact_button_shown_when_authenticated(self, client, db):
@@ -278,7 +281,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertContains(response, 'data-bs-target="#service-contact-modal"')
 
     def test_detail_contact_button_shown_when_public(self, client, db):
@@ -290,7 +293,7 @@ class TestServices:
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
         )
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertContains(response, 'data-bs-target="#service-contact-modal"')
 
     def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client, db):
@@ -302,7 +305,7 @@ class TestServices:
             structure__uid="test-structure-contact-private-uid",
             structure__updated_on="2025-01-15",
         )
-        service_url = self.detail_url(service)
+        service_url = self.get_service_url(service)
         response = client.get(service_url)
         login_url = reverse("login:existing_user")
         assertContains(response, f'href="{login_url}?next={service_url}"')
@@ -319,7 +322,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service_with_link))
+        response = client.get(self.get_service_url(service_with_link))
         assertContains(response, '<link rel="canonical" href="https://dora.inclusion.gouv.fr/services/test">')
 
     def test_detail_without_source_link(self, client, db):
@@ -332,7 +335,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
-        response = client.get(self.detail_url(service_no_link))
+        response = client.get(self.get_service_url(service_no_link))
         assertNotContains(response, 'rel="canonical"')
 
     @pytest.mark.parametrize("is_authorized", [True, False])
@@ -351,7 +354,8 @@ class TestServices:
         orientation_token = "jwt-token"
 
         with patch("itou.www.insertion_views.views.get_orientation_jwt", return_value=orientation_token):
-            response = client.get(self.detail_url(service))
+            response = client.get(self.get_service_url(service))
+
         assert response.status_code == 200
 
         # Regular prescribers get direct DORA URL without nexus auto_login
@@ -383,7 +387,7 @@ class TestServices:
             structure__uid="test-structure-creds-empty-uid",
             structure__updated_on="2025-01-15",
         )
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.status_code == 200
         assert response.context["credential_documents"] == []
         assertNotContains(response, "Documents à compléter")
@@ -404,7 +408,7 @@ class TestServices:
             "itou.insertion.models.generate_dora_storage_url",
             side_effect=s3_urls,
         ):
-            response = client.get(self.detail_url(service))
+            response = client.get(self.get_service_url(service))
 
         assert response.status_code == 200
         assert response.context["credential_documents"] == [
@@ -420,7 +424,7 @@ class TestServices:
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
         )
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.context["formatted_categories"] == []
 
     def test_format_categories_single_thematic(self, client, db):
@@ -436,7 +440,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.thematics.add(thematic)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.context["formatted_categories"] == [("Choisir un métier", "Explorer des métiers")]
 
     def test_format_categories_multiple_categories(self, client, db):
@@ -457,7 +461,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.thematics.add(thematic_a, thematic_b)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert sorted(response.context["formatted_categories"]) == [
             ("Choisir un métier", "Explorer des métiers"),
             ("Créer une entreprise", "Définir son projet"),
@@ -480,7 +484,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_professionals.add(mode)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.context["professionals_has_autre"] is True
 
     def test_professionals_has_autre_false_without_autre_mode(self, client, db):
@@ -498,7 +502,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_professionals.add(mode)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.context["professionals_has_autre"] is False
 
     def test_beneficiaries_has_autre_true_when_autre_mode_selected(self, client, db):
@@ -516,7 +520,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_beneficiaries.add(mode)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.context["beneficiaries_has_autre"] is True
 
     def test_beneficiaries_has_autre_false_without_autre_mode(self, client, db):
@@ -534,7 +538,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_beneficiaries.add(mode)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assert response.context["beneficiaries_has_autre"] is False
 
     def test_autre_mode_label_not_rendered_in_list(self, client, db):
@@ -559,7 +563,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_professionals.add(mode_autre, mode_phone)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertNotContains(response, "Autre (ne doit pas apparaître)")
         assertContains(response, "Par téléphone")
         assertContains(response, "Contacter par courrier")
@@ -580,7 +584,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_professionals.add(mode_autre)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertContains(response, "Contacter le service par email")
 
     def test_other_field_not_shown_without_autre_mode(self, client, db):
@@ -599,7 +603,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_professionals.add(mode_phone)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertNotContains(response, "Ce texte ne doit pas apparaître")
 
     def test_beneficiaries_autre_mode_label_not_rendered_in_list(self, client, db):
@@ -624,7 +628,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_beneficiaries.add(mode_autre, mode_presentiel)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertNotContains(response, "Autre (bénéficiaire ne doit pas apparaître)")
         assertContains(response, "En présentiel")
         assertContains(response, "Prise en charge specifique")
@@ -645,5 +649,5 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         service.mobilization_modes_beneficiaries.add(mode_presentiel)
-        response = client.get(self.detail_url(service))
+        response = client.get(self.get_service_url(service))
         assertNotContains(response, "Ce texte beneficiaire ne doit pas apparaitre")
