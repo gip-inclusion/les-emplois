@@ -79,7 +79,7 @@ class TestServices:
     def get_service_url(self, service):
         return reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
 
-    def test_detail_accessible_without_login(self, client, db):
+    def test_detail_accessible_without_login(self, client):
         service = ServiceFactory(
             uid="test-service-uid",
             name="Mon service de test",
@@ -225,7 +225,7 @@ class TestServices:
         assertContains(response, "Orienter le bénéficiaire")
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
-    def test_detail_orientable_and_user_not_authenticated(self, client, db):
+    def test_detail_orientable_and_user_not_authenticated(self, client):
         service = ServiceFactory(
             uid="test-orientable-uid",
             name="Service orientable",
@@ -255,7 +255,7 @@ class TestServices:
         assertNotContains(response, "Orienter le bénéficiaire")
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
-    def test_detail_contact_section_hidden_without_contact_info(self, client, db):
+    def test_detail_contact_section_hidden_without_contact_info(self, client):
         user = PrescriberFactory(membership=True)
         service = ServiceFactory(
             uid="test-no-contact-uid",
@@ -270,7 +270,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Voir les coordonnées de contact du service")
 
-    def test_detail_contact_button_shown_when_authenticated(self, client, db):
+    def test_detail_contact_button_shown_when_authenticated(self, client):
         user = PrescriberFactory(membership=True)
         service = ServiceFactory(
             uid="test-contact-auth-uid",
@@ -284,7 +284,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertContains(response, 'data-bs-target="#service-contact-modal"')
 
-    def test_detail_contact_button_shown_when_public(self, client, db):
+    def test_detail_contact_button_shown_when_public(self, client):
         service = ServiceFactory(
             uid="test-contact-public-uid",
             updated_on="2025-01-15",
@@ -296,7 +296,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertContains(response, 'data-bs-target="#service-contact-modal"')
 
-    def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client, db):
+    def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client):
         service = ServiceFactory(
             uid="test-contact-private-uid",
             updated_on="2025-01-15",
@@ -311,7 +311,7 @@ class TestServices:
         assertContains(response, f'href="{login_url}?next={service_url}"')
         assertNotContains(response, 'data-bs-target="#service-contact-modal"')
 
-    def test_detail_with_source_link(self, client, db):
+    def test_detail_with_source_link(self, client):
         user = PrescriberFactory(membership=True)
         service_with_link = ServiceFactory(
             uid="test-with-link-uid",
@@ -325,7 +325,7 @@ class TestServices:
         response = client.get(self.get_service_url(service_with_link))
         assertContains(response, '<link rel="canonical" href="https://dora.inclusion.gouv.fr/services/test">')
 
-    def test_detail_without_source_link(self, client, db):
+    def test_detail_without_source_link(self, client):
         user = PrescriberFactory(membership=True)
         service_no_link = ServiceFactory(
             uid="test-no-link-uid",
@@ -379,7 +379,7 @@ class TestServices:
             assertContains(response, regular_dora_url)
             assertNotContains(response, "op=")
 
-    def test_detail_credential_documents_empty(self, client, db):
+    def test_detail_credential_documents_empty(self, client):
         service = ServiceFactory(
             uid="test-creds-empty-uid",
             updated_on="2025-01-15",
@@ -392,7 +392,7 @@ class TestServices:
         assert response.context["credential_documents"] == []
         assertNotContains(response, "Documents à compléter")
 
-    def test_detail_credential_documents(self, client, db, snapshot):
+    def test_detail_credential_documents(self, client, snapshot):
         service = ServiceFactory(
             uid="test-creds-uid",
             updated_on="2025-01-15",
@@ -417,7 +417,7 @@ class TestServices:
         ]
         assert pretty_indented(parse_response_to_soup(response, "#credentials-documents")) == snapshot
 
-    def test_format_categories_no_thematics(self, client, db):
+    def test_format_categories_no_thematics(self, client):
         service = ServiceFactory(
             uid="test-categories-uid",
             updated_on="2025-01-15",
@@ -427,7 +427,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.context["formatted_categories"] == []
 
-    def test_format_categories_single_thematic(self, client, db):
+    def test_format_categories_single_thematic(self, client):
         thematic = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.THEMATIC,
             value="choisir-un-metier--explorer-des-metiers",
@@ -443,7 +443,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.context["formatted_categories"] == [("Choisir un métier", "Explorer des métiers")]
 
-    def test_format_categories_multiple_categories(self, client, db):
+    def test_format_categories_multiple_categories(self, client):
         thematic_a = GenericReferenceItemFactory(
             kind=GenericReferenceItemKind.THEMATIC,
             value="choisir-un-metier--explorer-des-metiers",
@@ -469,7 +469,7 @@ class TestServices:
 
     # --- Mobilization modes: 'autre' handling ---
 
-    def test_professionals_has_autre_true_when_autre_mode_selected(self, client, db):
+    def test_professionals_has_autre_true_when_autre_mode_selected(self, client):
         mode = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
@@ -487,7 +487,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.context["professionals_has_autre"] is True
 
-    def test_professionals_has_autre_false_without_autre_mode(self, client, db):
+    def test_professionals_has_autre_false_without_autre_mode(self, client):
         mode = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
@@ -505,7 +505,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.context["professionals_has_autre"] is False
 
-    def test_beneficiaries_has_autre_true_when_autre_mode_selected(self, client, db):
+    def test_beneficiaries_has_autre_true_when_autre_mode_selected(self, client):
         mode = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
@@ -523,7 +523,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.context["beneficiaries_has_autre"] is True
 
-    def test_beneficiaries_has_autre_false_without_autre_mode(self, client, db):
+    def test_beneficiaries_has_autre_false_without_autre_mode(self, client):
         mode = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
@@ -541,7 +541,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.context["beneficiaries_has_autre"] is False
 
-    def test_autre_mode_label_not_rendered_in_list(self, client, db):
+    def test_autre_mode_label_not_rendered_in_list(self, client):
         mode_autre = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
@@ -568,7 +568,7 @@ class TestServices:
         assertContains(response, "Par téléphone")
         assertContains(response, "Contacter par courrier")
 
-    def test_other_field_shown_when_autre_mode_selected(self, client, db):
+    def test_other_field_shown_when_autre_mode_selected(self, client):
         mode_autre = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
@@ -587,7 +587,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertContains(response, "Contacter le service par email")
 
-    def test_other_field_not_shown_without_autre_mode(self, client, db):
+    def test_other_field_not_shown_without_autre_mode(self, client):
         mode_phone = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
@@ -606,7 +606,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Ce texte ne doit pas apparaître")
 
-    def test_beneficiaries_autre_mode_label_not_rendered_in_list(self, client, db):
+    def test_beneficiaries_autre_mode_label_not_rendered_in_list(self, client):
         mode_autre = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
@@ -633,7 +633,7 @@ class TestServices:
         assertContains(response, "En présentiel")
         assertContains(response, "Prise en charge specifique")
 
-    def test_beneficiaries_other_field_not_shown_without_autre_mode(self, client, db):
+    def test_beneficiaries_other_field_not_shown_without_autre_mode(self, client):
         mode_presentiel = GenericReferenceItemFactory(
             source=GenericReferenceItemSource.DORA,
             kind=GenericReferenceItemKind.MOBILIZATION_BENEFICIARY,
