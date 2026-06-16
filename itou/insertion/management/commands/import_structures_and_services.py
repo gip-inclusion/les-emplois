@@ -233,7 +233,7 @@ class Command(BaseCommand):
 
         differ = diff.CollectionDiffer(
             Structure.objects.all(),
-            DataInclusionApiItemsIterator(client.structures, page_size=10_000, params={"sources": sources}),
+            DataInclusionApiItemsIterator(client.structures, page_size=1000, params={"sources": sources}),
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
@@ -449,7 +449,7 @@ class Command(BaseCommand):
 
         differ = diff.CollectionDiffer(
             Service.objects.all(),
-            DataInclusionApiItemsIterator(di_client.services, page_size=10_000, params={"sources": sources}),
+            DataInclusionApiItemsIterator(di_client.services, page_size=1000, params={"sources": sources}),
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
