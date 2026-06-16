@@ -13,7 +13,7 @@
         "formulaire-dora"
       ],
       "coach_orientation_modes_other": "S'inscrire et postuler sur https://emplois.inclusion.beta.gouv.fr/",
-      "coach_orientation_modes_external_form_link": "",
+      "coach_orientation_modes_external_form_link": "https://dora-link.precendence.test.com",
       "coach_orientation_modes_external_form_link_text": "Orienter votre bénéficiaire",
       "beneficiaries_access_modes": [
         "autre"

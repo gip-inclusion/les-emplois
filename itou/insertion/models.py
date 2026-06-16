@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
+from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.validators import validate_post_code
 
 
@@ -320,6 +321,28 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    @property
+    def is_dora(self):
+        return self.source.value == "dora"
+
+    def has_mobilization_modes(self):
+        return (not self.is_dora and bool(self.mobilizations.all())) or (
+            self.is_dora
+            and (
+                bool(self.mobilization_modes_professionals.all())
+                or self.mobilization_modes_professionals_external_form_link
+                or self.mobilization_modes_professionals_other
+                or bool(self.mobilization_modes_beneficiaries.all())
+                or self.mobilization_modes_beneficiaries_external_form_link
+                or self.mobilization_modes_beneficiaries_other
+            )
+        )
+
+    def generate_credential_documents_info(self) -> list[tuple[str, str]]:
+        return [
+            (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
+        ]
 
     class Meta:
         verbose_name = "service d'insertion"

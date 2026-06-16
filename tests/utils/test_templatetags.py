@@ -1,16 +1,19 @@
 from datetime import UTC, date, datetime
+from urllib.parse import urlsplit
 
 import pytest
 from django import forms
 from django.contrib.auth import authenticate, get_user
 from django.contrib.auth.models import AnonymousUser
 from django.core.management import call_command
+from django.http import QueryDict
 from django.template import Context, Template
 from django.test import override_settings
-from django.urls import URLPattern, URLResolver, get_resolver
+from django.urls import URLPattern, URLResolver, get_resolver, reverse as django_reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertHTMLEqual
 
+from itou.insertion.models import GenericReferenceItemKind
 from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -20,10 +23,12 @@ from itou.utils.templatetags.demo_accounts import (
     job_seekers_accounts_tag,
     prescribers_accounts_tag,
 )
-from itou.utils.templatetags.dora import dora_service_url
+from itou.utils.templatetags.dora import dora_orientation_url, dora_service_url
 from itou.utils.templatetags.nav import NAV_ENTRIES
+from itou.utils.templatetags.str_filters import urlize_new_tab
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
+from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.testing import get_request, pretty_indented
 from tests.www.eligibility_views.utils import (
@@ -369,3 +374,66 @@ class TestDORAServiceURL:
             request=get_request(AnonymousUser()),
         )
         assert service_url == expected
+
+
+class TestDORAOrientationURL:
+    def test_dora_source_with_source_link(self, settings):
+        source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="dora")
+        service = ServiceFactory.build(
+            source=source,
+            source_link="https://dora.inclusion.gouv.fr/services/mon-service",
+            uid="my-uid",
+        )
+        url = dora_orientation_url(service, orientation_jwt=None, source="foo")
+        expected = (
+            f"{settings.DORA_WWW_BASE_URL}/services/mon-service/orienter?mtm_campaign=lesemplois&mtm_kwd=service-foo"
+        )
+        assert url == expected
+
+    def test_non_dora_source(self, settings):
+        source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="di")
+        service = ServiceFactory.build(source=source, uid="my-uid")
+        url = dora_orientation_url(service, orientation_jwt=None, source="bar")
+        expected = (
+            f"{settings.DORA_WWW_BASE_URL}/services/di--my-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-bar"
+        )
+        assert url == expected
+
+    def test_with_orientation_jwt(self, settings):
+        source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="dora")
+        service = ServiceFactory.build(
+            source=source,
+            source_link="https://dora.inclusion.gouv.fr/services/mon-service",
+            uid="my-uid",
+        )
+        url = dora_orientation_url(service, orientation_jwt="my-jwt", source="foo")
+        parsed = urlsplit(url)
+        assert parsed.path == django_reverse("nexus:auto_login")
+        next_url_query = QueryDict(urlsplit(QueryDict(parsed.query)["next_url"]).query)
+        assert next_url_query["op"] == "my-jwt"
+        assert next_url_query["mtm_campaign"] == "lesemplois"
+
+    def test_mtm_source_param(self, settings):
+        source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="di")
+        service = ServiceFactory.build(source=source, uid="my-uid")
+        url = dora_orientation_url(service, orientation_jwt=None, source="prescriber")
+        assert "mtm_kwd=service-prescriber" in url
+
+
+class TestUrlizeNewTab:
+    def test_plain_text_unchanged(self):
+        result = urlize_new_tab("Hello world")
+        assert "target=" not in result
+        assert "<a" not in result
+
+    def test_url_gets_new_tab_attrs(self):
+        result = urlize_new_tab("Visit https://example.com for info")
+        assert (
+            result
+            == 'Visit <a target="_blank" rel="noopener noreferrer" href="https://example.com" rel="nofollow">https://example.com</a> for info'  # noqa: E501
+        )
+
+    def test_multiple_urls(self):
+        result = urlize_new_tab("See https://example.com and https://other.com")
+        assert result.count('target="_blank"') == 2
+        assert result.count('rel="noopener noreferrer"') == 2
