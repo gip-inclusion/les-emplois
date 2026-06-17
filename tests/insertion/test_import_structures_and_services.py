@@ -71,6 +71,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
     assert Structure.objects.get(uid="emplois-de-linclusion--null").opening_hours == ""
 
     assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").is_orientable_with_form is False
+    assert Service.objects.get(uid="mission-locale--with-mobilization-link").is_orientable_with_form is False
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").is_orientable_with_form is True
 
     assert (
