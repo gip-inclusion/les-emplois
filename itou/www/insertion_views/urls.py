@@ -6,6 +6,6 @@ from itou.www.insertion_views import views
 app_name = "insertion_views"
 
 urlpatterns = [
-    path("structure/<str:structure_uid>/card", views.StructureCardView.as_view(), name="structure_card"),
-    path("service/<str:service_uid>/card", views.ServiceDetailView.as_view(), name="service_detail"),
+    path("structures/<str:structure_uid>/", views.StructureCardView.as_view(), name="structure_card"),
+    path("services/<str:service_uid>/", views.ServiceDetailView.as_view(), name="service_detail"),
 ]
