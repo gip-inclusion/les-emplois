@@ -809,9 +809,9 @@ httpx==0.28.1 \
     #   -r base.txt
     #   itoutils
     #   respx
-huey==3.0.1 \
-    --hash=sha256:5de8ff852021da670efe8d4d78db8719c0255ebbde0772766a0114f997ea61f6 \
-    --hash=sha256:83ca54fa77c4ee27349393212fc13088142244f491be903f620a9e46e8fca4ce
+huey==3.0.3 \
+    --hash=sha256:1a17fef95fc8432f75413f1b77439cef5f3493c1ddbfba9151756b31a1b2dad3 \
+    --hash=sha256:d1c687734778b8282c035a943eead8368c1736bb28abc006596fbbc01bdc96dc
     # via -r base.txt
 idna==3.18 \
     --hash=sha256:7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2 \
