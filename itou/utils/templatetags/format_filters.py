@@ -11,6 +11,8 @@ from django.template.defaultfilters import floatformat, stringfilter
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 
+from itou.utils.phone import normalize_phone_number
+
 
 register = template.Library()
 
@@ -27,12 +29,7 @@ def format_phone(phone_number):
     """
     if not phone_number:
         return ""
-    normalized = phone_number.strip()
-    if normalized.startswith("+33"):
-        rest = re.sub(r"\D", "", normalized[3:])
-        if rest:
-            normalized = f"0{rest}"
-    return " ".join(wrap(normalized, 2))
+    return " ".join(wrap(normalize_phone_number(phone_number) or phone_number.strip(), 2))
 
 
 @register.filter
