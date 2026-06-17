@@ -3,33 +3,29 @@
 <div id="alert-contracts-awaiting-justification"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     {% if contracts_awaiting_justification_nb %}
         {% if request.from_employer %}
-            {% component_alert title=title content=content call_to_action=call_to_action variant="warning" extra_classes="mt-3" %}
+            {% component_alert title=title content=content variant="warning" extra_classes="mt-3 mb-3 mb-md-4" %}
                 {% fragment as title %}
                     {{ contracts_awaiting_justification_nb|pluralizefr:"Demande d’aide,Demandes d’aides" }} à justifier
                 {% endfragment %}
                 {% fragment as content %}
-                    <p class="mb-0">
+                    <p>
                         Vous devez encore motiver {{ contracts_awaiting_justification_nb|pluralizefr:"la demande,les demandes" }} d’aide de {{ contracts_awaiting_justification_nb }} {{ contracts_awaiting_justification_nb|pluralizefr:"contrat,contrats" }}.
                     </p>
-                {% endfragment %}
-                {% fragment as call_to_action %}
-                    <a class="btn btn-sm btn-primary" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
+                    <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
                         Afficher les contrats concernés
                     </a>
                 {% endfragment %}
             {% endcomponent_alert %}
         {% elif request.from_institution %}
-            {% component_alert title=title content=content call_to_action=call_to_action variant="warning" extra_classes="mt-3" %}
+            {% component_alert title=title content=content variant="warning" extra_classes="mt-3 mb-3 mb-md-4" %}
                 {% fragment as title %}
                     Refus à justifier
                 {% endfragment %}
                 {% fragment as content %}
-                    <p class="mb-0">
+                    <p>
                         Vous devez encore motiver {{ contracts_awaiting_justification_nb|pluralizefr:"le,les" }} refus d’aide de {{ contracts_awaiting_justification_nb }} {{ contracts_awaiting_justification_nb|pluralizefr:"contrat,contrats" }}.
                     </p>
-                {% endfragment %}
-                {% fragment as call_to_action %}
-                    <a type="button" class="btn btn-sm btn-primary" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?allowance_eligibility_off=on#contracts-results-table">
+                    <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}?allowance_eligibility_off=on#contracts-results-table">
                         Afficher les contrats concernés
                     </a>
                 {% endfragment %}

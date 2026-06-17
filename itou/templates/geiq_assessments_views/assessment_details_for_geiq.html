@@ -19,26 +19,30 @@
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                     {% include "geiq_assessments_views/includes/assessment_status_box_for_geiq.html" with assessment=assessment csrf_token=csrf_token request=request institution_to_contact=institution_to_contact only %}
                     {% if assessment.contracts_selection_validated_at %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <ul class="list-data mb-3">
-                                <li>
-                                    <small>Nombre d’aide à 814 €</small>
-                                    <strong>{{ stats.allowance_of_814_selected_nb }}</strong>
-                                </li>
-                                <li>
-                                    <small>Nombre d’aide à 1 400 €</small>
-                                    <strong>{{ stats.allowance_of_1400_selected_nb }}</strong>
-                                </li>
-                                <div class="d-flex flex-column">
-                                    <small>Montant total potentiel</small>
-                                    <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                        <div class="c-box c-box--summary mb-3 mb-md-4">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Nombre d’aide à 814 €</span>
+                                            <strong>{{ stats.allowance_of_814_selected_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Nombre d’aide à 1 400 €</span>
+                                            <strong>{{ stats.allowance_of_1400_selected_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant total potentiel</span>
+                                            <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </ul>
-                            {% component_info borderless=True c_info__summary=c_info__summary %}
-                                {% fragment as c_info__summary %}
-                                    Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                                {% endfragment %}
-                            {% endcomponent_info %}
+                                {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-3" %}
+                                    {% fragment as c_info__summary %}
+                                        Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                                    {% endfragment %}
+                                {% endcomponent_info %}
+                            </div>
                         </div>
                     {% endif %}
                     <div class="c-box mb-3 mb-md-4">
