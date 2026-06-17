@@ -6,6 +6,7 @@
         data-bs-toggle="tooltip"
         data-bs-placement="{{ placement|default:"top" }}"
         data-bs-trigger="manual"
+        {% if in_modal|default:False %}data-bs-container="body" data-bs-custom-class="modal-tooltip"{% endif %}
         data-bs-title="Copié !">
     <i class="ri-file-copy-line fw-normal" aria-hidden="true"></i>
     <span {% if only_icon|default:False %}class="visually-hidden"{% endif %}>{{ text|default:"Copier" }}</span>

@@ -339,7 +339,7 @@
                                 <a href="mailto:{{ service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ service.contact_email }}</a>
                             </div>
                             {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
-                            {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs %}
+                            {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True %}
                         </div>
                     {% endif %}
                     {% if service.contact_phone %}
