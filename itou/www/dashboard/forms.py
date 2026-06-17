@@ -20,11 +20,17 @@ class SSOReadonlyMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.has_sso_provider:
-            # When users log in with a SSO, the fields should be disabled
-            # (that’s a requirement on FranceConnect’s side).
+            # When users log in with a SSO, the fields populated by the provider should be
+            # disabled (that’s a requirement on FranceConnect’s side). A field left empty by
+            # the SSO (e.g. the 'title', not provided by PE Connect) must stay editable:
+            # a disabled + required + empty field makes the form impossible to submit.
+
+            # We use "the field has an initial value" as a proxy for "the provider supplied it".
+            # Known limitation: once a user fills an initially-empty field (e.g. 'title') and
+            # saves, it becomes non-empty and will be disabled on the next edit.
             disabled_fields = ["first_name", "last_name", "email", "birthdate", "title"]
-            for name in self.fields.keys():
-                if name in disabled_fields:
+            for name in disabled_fields:
+                if name in self.fields and self.get_initial_for_field(self.fields[name], name):
                     self.fields[name].disabled = True
 
 

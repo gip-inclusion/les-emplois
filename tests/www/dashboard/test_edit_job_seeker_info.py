@@ -879,3 +879,57 @@ class TestEditJobSeekerInfo:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
         for attr in profile_fields:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
+
+    def test_pe_connect_empty_title_is_editable(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+        org = prescribers_factories.PrescriberOrganizationFactory()
+        member = prescribers_factories.PrescriberMembershipFactory(organization=org).user
+        birthdate = datetime.date(1978, 12, 1)
+        job_seeker = JobSeekerFactory(
+            identity_provider=IdentityProvider.PE_CONNECT,
+            title="",
+            created_by=member,
+            jobseeker_profile__nir="178121111111151",
+            jobseeker_profile__birthdate=birthdate,
+        )
+
+        client.force_login(member)
+        url = reverse(
+            "dashboard:edit_job_seeker_info",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+        )
+
+        # The 'civilité' field, being empty, should NOT be disabled...
+        response = client.get(url)
+        form = response.context["form"]
+        assert form["title"].field.disabled is False
+        # ... but the fields provided by the SSO stay disabled
+        for name in ["first_name", "last_name", "email", "birthdate"]:
+            assert form[name].field.disabled is True
+
+        # ... and submitting with a 'civilité' should succeed
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
+        response = client.post(
+            url,
+            {
+                "title": Title.M,
+                "first_name": job_seeker.first_name,
+                "last_name": job_seeker.last_name,
+                "email": job_seeker.email,
+                "birthdate": birthdate.isoformat(),
+                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+                "birth_place": birth_place.pk,
+                "confirm": True,
+                **self.address_form_fields,
+            },
+        )
+        assertRedirects(response, reverse("dashboard:index"))
+        job_seeker.refresh_from_db()
+        assert job_seeker.title == Title.M
+
+        # Once filled in, the civilité is no longer empty -> it is now disabled
+        response = client.get(url)
+        assert response.context["form"]["title"].field.disabled is True
