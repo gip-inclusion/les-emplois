@@ -62,43 +62,44 @@
                 </div>
                 <div class="modal-body">
                     {% if structure.address_on_one_line %}
-                        <div class="d-flex">
+                        <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
                             <i class="ri-map-pin-2-line me-2" aria-hidden="true"></i>
                             <address class="m-0">{{ structure.address_on_one_line }}</address>
                         </div>
-                        {% if structure.email or structure.phone or structure.website %}<hr class="my-3">{% endif %}
                     {% endif %}
                     {% if structure.email or structure.phone or structure.website %}
-                        <ul class="list-unstyled mb-0">
-                            {% if structure.email %}
-                                <li>
+                        {% if structure.email %}
+                            <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                                <div class="d-flex align-items-start overflow-hidden me-2">
                                     <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
                                     <a href="mailto:{{ structure.email }}" aria-label="Contact par mail" class="text-break">{{ structure.email }}</a>
-                                    {% matomo_event "fiche-structure" "clic" "copier-email-contact" as matomo_event_attrs %}
-                                    {% include "includes/copy_to_clipboard.html" with content=structure.email css_classes="btn-link fw-medium ms-1" only_icon=True text="Copier l’adresse e-mail" matomo_event_attrs=matomo_event_attrs %}
-                                </li>
-                            {% endif %}
-                            {% if structure.phone %}
-                                <li>
+                                </div>
+                                {% matomo_event "fiche-structure" "clic" "copier-email-contact" as matomo_event_attrs %}
+                                {% include "includes/copy_to_clipboard.html" with content=structure.email css_classes="btn-link fw-medium ms-1" only_icon=True text="Copier l’adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True %}
+                            </div>
+                        {% endif %}
+                        {% if structure.phone %}
+                            <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                                <div class="d-flex align-items-start overflow-hidden me-2">
                                     <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
                                     {{ structure.phone|format_phone }}
-                                    {% include 'includes/copy_to_clipboard.html' with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True %}
-                                </li>
-                            {% endif %}
-                            {% if structure.website %}
-                                <li>
-                                    <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
-                                    <a href="{{ structure.website }}"
-                                       rel="noopener noreferrer"
-                                       target="_blank"
-                                       class="btn-link fw-medium has-external-link"
-                                       aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)"
-                                       {% matomo_event "fiche-structure" "clic" "lien-site-web" %}>
-                                        {{ structure.website }}
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
+                                </div>
+                                {% include 'includes/copy_to_clipboard.html' with content=structure.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True in_modal=True %}
+                            </div>
+                        {% endif %}
+                        {% if structure.website %}
+                            <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                                <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
+                                <a href="{{ structure.website }}"
+                                   rel="noopener noreferrer"
+                                   target="_blank"
+                                   class="btn-link fw-medium has-external-link"
+                                   aria-label="Voir le site web de la structure (ouverture dans un nouvel onglet)"
+                                   {% matomo_event "fiche-structure" "clic" "lien-site-web" %}>
+                                    {{ structure.website }}
+                                </a>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
                 <div class="modal-footer">
