@@ -1,0 +1,36 @@
+{% load format_filters %}
+{% load str_filters %}
+
+<div class="c-box mb-3 mb-md-4 position-relative">
+    <div class="position-absolute top-0 end-0 m-3">
+        {% if can_edit_personal_information %}
+            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+               class="btn btn-outline-primary w-100 w-md-auto"
+               aria-label="Modifier les coordonnées de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+                Modifier
+            </a>
+        {% else %}
+            <span tabindex="0"
+                  class="btn btn-outline-primary w-100 w-md-auto disabled"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.">
+                Modifier
+            </span>
+        {% endif %}
+    </div>
+    <ul class="list-data mb-0 pe-md-5">
+        <li class="has-forced-line-break">
+            <small>Adresse</small>
+            {{ job_seeker.address_on_one_line|default:""|mask_unless:can_view_personal_information|strong_or_disabled_non_filled:"Non renseignée" }}
+        </li>
+        <li class="has-forced-line-break">
+            <small>N&deg; de téléphone</small>
+            {{ job_seeker.phone|default:""|format_phone|mask_unless:can_view_personal_information|strong_or_disabled_non_filled }}
+        </li>
+        <li class="has-forced-line-break">
+            <small>Adresse mail</small>
+            {{ job_seeker.email|default:""|mask_unless:can_view_personal_information|strong_or_disabled_non_filled:"Non renseignée" }}
+        </li>
+    </ul>
+</div>

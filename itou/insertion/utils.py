@@ -7,6 +7,20 @@ from itoutils.django.nexus.token import generate_token
 
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.phone import normalize_phone_number
+
+
+def get_missing_orientation_beneficiary_field_labels(job_seeker: User) -> list[str]:
+    missing = []
+    if not job_seeker.first_name or not job_seeker.first_name.strip():
+        missing.append("Prénom")
+    if not job_seeker.last_name or not job_seeker.last_name.strip():
+        missing.append("Nom")
+    if not job_seeker.email or not job_seeker.email.strip():
+        missing.append("Adresse e-mail")
+    if not normalize_phone_number(job_seeker.phone or ""):
+        missing.append("Téléphone")
+    return missing
 
 
 def get_job_seeker_from_request(request) -> User | None:

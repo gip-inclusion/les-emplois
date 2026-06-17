@@ -2,24 +2,20 @@
 # name: test_api_error
   '''
   <div id="services-search-results">
-      <div class="c-box c-box--results mb-3 mb-md-4">
-          <div class="c-box--results__body">
-              <div class="alert alert-warning" role="status">
-                  <div class="row">
-                      <div class="col-auto pe-0">
-                          <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
-                          </i>
-                      </div>
-                      <div class="col">
-                          <p class="mb-0">
-                              Une erreur est survenue lors de l'appel à
-                              <a class="has-external-link" href="https://data.inclusion.gouv.fr/" rel="noopener" target="_blank">
-                                  data·inclusion
-                              </a>
-                              . Veuillez réessayer ultérieurement.
-                          </p>
-                      </div>
-                  </div>
+      <div class="alert alert-warning" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-0">
+                      Une erreur est survenue lors de l'appel à
+                      <a class="has-external-link" href="https://data.inclusion.gouv.fr/" rel="noopener" target="_blank">
+                          data·inclusion
+                      </a>
+                      . Veuillez réessayer ultérieurement.
+                  </p>
               </div>
           </div>
       </div>
@@ -75,14 +71,20 @@
               <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                       <li>
+                          <i aria-hidden="true" class="ri-navigation-line fw-normal me-1">
+                          </i>
+                          à
+                          <strong class="text-info mx-1">
+                              0 km
+                          </strong>
+                          de votre lieu de recherche
+                      </li>
+                      <li>
                           <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
                           </i>
                           <address class="m-0">
                               Une adresse en présentiel à Vannes, 56260 Vannes
                           </address>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary ms-1">
-                              0 km
-                          </span>
                       </li>
                   </ul>
                   <div class="mt-md-1">
@@ -123,14 +125,20 @@
               <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                       <li>
+                          <i aria-hidden="true" class="ri-navigation-line fw-normal me-1">
+                          </i>
+                          à
+                          <strong class="text-info mx-1">
+                              0 km
+                          </strong>
+                          de votre lieu de recherche
+                      </li>
+                      <li>
                           <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
                           </i>
                           <address class="m-0">
                               56260 Vannes
                           </address>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary ms-1">
-                              0 km
-                          </span>
                       </li>
                   </ul>
                   <div class="mt-md-1">
@@ -471,15 +479,23 @@
               <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                       <li>
+                          <i aria-hidden="true" class="ri-navigation-line fw-normal me-1">
+                          </i>
+                          à
+                          <strong class="text-info mx-1">
+                              0 km
+                          </strong>
+                          de votre lieu de recherche
+                      </li>
+                      <li>
                           <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
                           </i>
                           <address class="m-0">
                               44350 Guérande
                           </address>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary ms-1">
-                              0 km
-                          </span>
-                          <span class="badge badge-xs rounded-pill bg-light text-primary">
+                      </li>
+                      <li>
+                          <span class="badge badge-sm rounded-pill bg-info text-white">
                               Également disponible à distance
                           </span>
                       </li>

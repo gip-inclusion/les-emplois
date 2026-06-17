@@ -17,6 +17,12 @@
                 <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                     <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                         {% if service.is_local %}
+                            {% if service.distance is not None %}
+                                <li>
+                                    <i class="ri-navigation-line fw-normal me-1" aria-hidden="true"></i>
+                                    à <strong class="text-info mx-1">{{ service.distance|floatformat:"-1" }}&nbsp;km</strong> de votre lieu de recherche
+                                </li>
+                            {% endif %}
                             <li>
                                 <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
                                 {% if service.code_postal and service.commune %}
@@ -28,13 +34,12 @@
                                         {% endif %}
                                     </address>
                                 {% endif %}
-                                {% if service.distance is not None %}
-                                    <span class="badge badge-xs rounded-pill bg-light text-primary ms-1">{{ service.distance|floatformat:"-1" }} km</span>
-                                {% endif %}
-                                {% if service.is_remote %}
-                                    <span class="badge badge-xs rounded-pill bg-light text-primary">Également disponible à distance</span>
-                                {% endif %}
                             </li>
+                            {% if service.is_remote %}
+                                <li>
+                                    <span class="badge badge-sm rounded-pill bg-info text-white">Également disponible à distance</span>
+                                </li>
+                            {% endif %}
                         {% elif service.is_remote %}
                             <li>
                                 <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
@@ -68,17 +73,13 @@
         </div>
     {% empty %}
         {% if api_error %}
-            <div class="c-box c-box--results mb-3 mb-md-4">
-                <div class="c-box--results__body">
-                    {% component_alert content=content variant="warning" %}
-                        {% fragment as content %}
-                            <p class="mb-0">
-                                Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/" target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez réessayer ultérieurement.
-                            </p>
-                        {% endfragment %}
-                    {% endcomponent_alert %}
-                </div>
-            </div>
+            {% component_alert content=content variant="warning" %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/" target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez réessayer ultérieurement.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
         {% else %}
             <div class="c-box c-box--results mb-3 mb-md-4">
                 <div class="c-box--results__body">

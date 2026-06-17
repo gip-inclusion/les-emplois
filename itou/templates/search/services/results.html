@@ -18,9 +18,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <div class="d-flex align-items-center pb-4">
-                <h1 class="mb-0">Rechercher un service d'insertion {% beta_badge extra_classes="badge-base" %}</h1>
-            </div>
+            <h1>Rechercher un service d'insertion {% beta_badge extra_classes="badge-base" %}</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -46,7 +44,7 @@
             {% fragment as content %}
                 {# Authorized prescribers can_view_personal_information, it is not checked here. #}
                 {# Needs to change with can_prefill_orientation_on_dora #}
-                <strong>Vous recherchez un service pour {{ orientation.job_seeker.get_inverted_full_name }}</strong>
+                <strong>Vous recherchez un service pour {{ orientation.job_seeker.get_full_name }}</strong>
             {% endfragment %}
         {% endcomponent_alert_global %}
     {% endif %}

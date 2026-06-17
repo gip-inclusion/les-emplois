@@ -29,8 +29,10 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/test-service-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
-                                      Orienter le bénéficiaire
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
+                                      <span>
+                                          Orienter un bénéficiaire
+                                      </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -172,8 +174,10 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/di--test-service-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
-                                      Orienter le bénéficiaire
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
+                                      <span>
+                                          Orienter un bénéficiaire
+                                      </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -341,8 +345,10 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/di--test-orientable-uid/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
-                  Orienter le bénéficiaire
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
+                  <span>
+                      Orienter un bénéficiaire
+                  </span>
               </a>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -397,8 +403,10 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://dora.inclusion.gouv.fr/services/test/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional" rel="noopener" target="_blank">
-                                      Orienter le bénéficiaire
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
+                                      <span>
+                                          Orienter un bénéficiaire
+                                      </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
@@ -601,8 +609,10 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
-                  Orienter le bénéficiaire
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+                  <span>
+                      Test link
+                  </span>
               </a>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -612,7 +622,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-external-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                           </i>
                           <span>

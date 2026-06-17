@@ -1,0 +1,22 @@
+{% load theme_inclusion %}
+
+<div class="c-stepper mb-3 mb-md-4">
+    <div class="progress">
+        <div class="progress-bar progress-bar-{{ wizard_steps|stepper_progress }}"
+             role="progressbar"
+             aria-valuenow="{{ wizard_steps|stepper_progress }}"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-labelledby="currentProgressState"></div>
+    </div>
+    <p id="currentProgressState">
+        <strong>Étape {{ wizard_steps.step1 }}/{{ wizard_steps.count }}</strong> :
+        {% if wizard_steps.current == OrientationStep.CONFORMITY %}
+            Valider la conformité
+        {% elif wizard_steps.current == OrientationStep.REFERENT %}
+            Compléter la demande
+        {% elif wizard_steps.current == OrientationStep.DOCUMENTS %}
+            Documents et justificatifs requis
+        {% endif %}
+    </p>
+</div>

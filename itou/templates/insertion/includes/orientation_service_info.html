@@ -1,0 +1,33 @@
+{% load matomo %}
+
+<div class="c-box c-box--organization mb-3 mb-md-4">
+    <button class="c-box--organization__summary w-100"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseOrientationService-{{ service.uid }}"
+            aria-expanded="false"
+            aria-controls="collapseOrientationService-{{ service.uid }}">
+        <i class="ri-community-line" aria-hidden="true"></i>
+        <div>
+            {% if service.kind %}
+                <span data-bs-toggle="tooltip" data-bs-title="{{ service.kind.label }}">{{ service.kind.label }}</span>
+            {% endif %}
+            <span class="d-block h3">{{ service.name }}</span>
+        </div>
+    </button>
+    <div class="c-box--organization__detail collapse" id="collapseOrientationService-{{ service.uid }}">
+        <hr class="my-4">
+        <p class="mb-0">{{ service.structure.name }}</p>
+        {% if service.structure.address_on_one_line %}
+            <ul class="c-box--organization__list-contact mt-4">
+                <li>
+                    <i class="ri-map-pin-2-line fw-normal me-2" aria-hidden="true"></i>
+                    <address class="m-0">{{ service.structure.address_on_one_line }}</address>
+                </li>
+            </ul>
+        {% endif %}
+        <a href="{% url 'insertion_views:structure_card' structure_uid=service.structure.uid %}?back_url={{ request.get_full_path|urlencode }}"
+           class="btn btn-secondary btn-block mt-4"
+           {% matomo_event "orientation" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
+    </div>
+</div>
