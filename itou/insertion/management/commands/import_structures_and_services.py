@@ -422,6 +422,7 @@ class Command(BaseCommand):
         service.eligibility_zones = data["zone_eligibilite"] or []
 
         service.mobilization_modes_professionals_external_form_link = data["lien_mobilisation"] or ""
+        self._void_if_max_len(service, "mobilization_modes_professionals_external_form_link")
 
         service.mobilizations_details = (
             data["mobilisation_precisions"] or ""

@@ -112,7 +112,7 @@ class Structure(GeolocatedAddressMixin, models.Model):
 
     name = models.CharField(verbose_name="nom")
     description = models.TextField(blank=True)
-    website = models.URLField(verbose_name="site web", max_length=512, blank=True)
+    website = models.URLField(verbose_name="site web", max_length=2000, blank=True)
 
     email = models.EmailField(verbose_name="e-mail", blank=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
@@ -252,7 +252,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         related_name="+",
     )
     mobilization_modes_beneficiaries_external_form_link = models.URLField(
-        verbose_name="lien vers le formulaire externe", blank=True
+        verbose_name="lien vers le formulaire externe", blank=True, max_length=2000
     )
     mobilization_modes_beneficiaries_external_form_link_text = models.CharField(
         verbose_name="l’intitulé du lien vers le formulaire externe",
@@ -269,7 +269,7 @@ class Service(GeolocatedAddressMixin, models.Model):
         related_name="+",
     )
     mobilization_modes_professionals_external_form_link = models.URLField(
-        verbose_name="lien vers le formulaire externe", blank=True
+        verbose_name="lien vers le formulaire externe", blank=True, max_length=2000
     )
     mobilization_modes_professionals_external_form_link_text = models.CharField(
         verbose_name="l’intitulé du lien vers le formulaire externe",
