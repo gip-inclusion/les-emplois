@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-import pytest
 from django.conf import settings
 from django.urls import reverse
 from itoutils.django.testing import assertSnapshotQueries
@@ -8,7 +7,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertTempl
 
 from itou.insertion.models import SOURCE_DORA_VALUE, GenericReferenceItemKind, GenericReferenceItemSource
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory, StructureFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -77,7 +75,7 @@ class TestStructures:
 
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")
-    ORIENT_BTN_LABEL = "Orienter le bénéficiaire"
+    ORIENT_BTN_LABEL = "Orienter un bénéficiaire"
     DISPLAY_SERVICE_CONTACT_BTN = 'data-bs-target="#service-contact-modal"'
     FORMS_TO_FILL = "Documents à compléter"
 
@@ -206,19 +204,38 @@ class TestServices:
         user = PrescriberFactory(membership=True)
         test_link = "https://test.example.com"
         service = ServiceFactory(
-            uid="test-orientable-uid",
-            name="Service orientable",
+            uid="test-external-uid",
+            name="Service avec lien externe",
             updated_on="2025-01-15",
             is_orientable_with_form=False,
             mobilization_modes_professionals_external_form_link="https://test.example.com",
-            structure__uid="test-structure-orientable-uid",
+            mobilization_modes_professionals_external_form_link_text="Test link",
+            structure__uid="test-structure-external-uid",
             structure__updated_on="2025-01-15",
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, "Test link")
         assertContains(response, f'href="{test_link}"')
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
+
+    def test_detail_orientable_with_external_link_prefers_wizard(self, client):
+        user = PrescriberFactory(membership=True)
+        external_link = "https://test.example.com"
+        service = ServiceFactory(
+            uid="test-orientable-ext-uid",
+            name="Service orientable avec lien externe",
+            updated_on="2025-01-15",
+            is_orientable_with_form=True,
+            mobilization_modes_professionals_external_form_link=external_link,
+            mobilization_modes_professionals_external_form_link_text="Lien externe",
+            structure__uid="test-structure-orientable-ext-uid",
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
+        assertNotContains(response, f'href="{external_link}"')
 
     def test_detail_orientable_and_user_authenticated(self, client, snapshot):
         user = PrescriberFactory(membership=True)
@@ -346,46 +363,24 @@ class TestServices:
         response = client.get(self.get_service_url(service_no_link))
         assertNotContains(response, 'rel="canonical"')
 
-    @pytest.mark.parametrize("is_authorized", [True, False])
-    def test_detail_orientation_url_with_jwt_for_prescriber(self, client, is_authorized):
-        organization = PrescriberOrganizationFactory(authorized=is_authorized)
-        prescriber = PrescriberFactory(membership=True, membership__organization=organization)
+    def test_detail_orientation_url_points_to_wizard_start(self, client):
+        user = PrescriberFactory(membership=True)
         service = ServiceFactory(
-            uid="test-jwt-uid",
+            uid="test-wizard-uid",
             updated_on="2025-01-15",
             is_orientable_with_form=True,
-            structure__uid="test-structure-jwt-uid",
+            structure__uid="test-structure-wizard-uid",
             structure__updated_on="2025-01-15",
         )
-        client.force_login(prescriber)
+        client.force_login(user)
 
-        orientation_token = "jwt-token"
-
-        with patch("itou.www.insertion_views.views.get_orientation_jwt", return_value=orientation_token):
-            response = client.get(self.get_service_url(service))
+        response = client.get(self.get_service_url(service))
 
         assert response.status_code == 200
-
-        # Regular prescribers get direct DORA URL without nexus auto_login
-        regular_dora_url = (
-            f"https://dora.inclusion.gouv.fr/services/di--{service.uid}/orienter"
-            f"?mtm_campaign=lesemplois&amp;mtm_kwd=service-professional"
-        )
-        # Authorized ProConnect prescribers get orientation URL wrapped in nexus auto_login with JWT
-        authorized_dora_url = reverse(
-            "nexus:auto_login",
-            query={
-                "next_url": f"https://dora.inclusion.gouv.fr/services/di--{service.uid}/orienter"
-                f"?mtm_campaign=lesemplois&mtm_kwd=service-professional&op={orientation_token}"
-            },
-        )
-
-        if is_authorized:
-            assertContains(response, authorized_dora_url)
-        else:
-            assertNotContains(response, authorized_dora_url)
-            assertContains(response, regular_dora_url)
-            assertNotContains(response, "op=")
+        action_box = str(parse_response_to_soup(response, ".c-box--action"))
+        wizard_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+        assert wizard_url in action_box
+        assert reverse("nexus:auto_login") not in action_box
 
     def test_detail_credential_documents_empty(self, client):
         service = ServiceFactory(

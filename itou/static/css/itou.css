@@ -87,6 +87,15 @@ Force the display of `.invalid-feedback` for django-bootstrap5 25.2.
     border: 2px dashed var(--bs-danger);
 }
 
+/*
+The theme only renders the required asterisk on direct .form-label/label children,
+so checkbox labels (nested in .form-check) never get it. Restore it here.
+*/
+.form-group-required-check .form-check-label::after {
+    content: " *";
+    font-weight: 700;
+}
+
 .form-group > .select2-container--bootstrap-5 {
     width: 100% !important;
 }

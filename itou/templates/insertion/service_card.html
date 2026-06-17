@@ -1,8 +1,8 @@
 {% extends "layout/base.html" %}
-{% load dora %}
 {% load format_filters %}
 {% load matomo %}
 {% load str_filters %}
+{% load url_add_query %}
 
 
 {% block title %}{{ service.name }} {{ block.super }}{% endblock %}
@@ -27,22 +27,35 @@
         <div class="form-row align-items-center gx-3">
             {% if service.is_orientable_with_form or service.mobilization_modes_professionals_external_form_link %}
                 <div class="form-group col-12 col-lg-auto">
+                    {% if request.GET.job_seeker_public_id %}
+                        {% url_add_query 'insertion_views:start_orientation' service_uid=service.uid job_seeker_public_id=request.GET.job_seeker_public_id as start_orientation_url %}
+                    {% else %}
+                        {% url 'insertion_views:start_orientation' service_uid=service.uid as start_orientation_url %}
+                    {% endif %}
                     {% if service.is_orientable_with_form and user.is_authenticated %}
-                        <a class="btn btn-lg btn-white btn-block justify-content-center"
-                           rel="noopener"
-                           target="_blank"
-                           href="{% dora_orientation_url service orientation_jwt=orientation_jwt source=request.user.kind|default:"accueil" %}"
-                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>Orienter le bénéficiaire</a>
+                        <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="{{ start_orientation_url }}" {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
+                            {% if request.GET.job_seeker_public_id %}
+                                Orienter le bénéficiaire
+                            {% else %}
+                                Orienter un bénéficiaire
+                            {% endif %}
+                        </span> </a>
                     {% elif service.is_orientable_with_form and not user.is_authenticated %}
-                        <a class="btn btn-lg btn-white btn-block justify-content-center"
+                        <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                            href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>Orienter le bénéficiaire</a>
+                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
+                            {% if request.GET.job_seeker_public_id %}
+                                Orienter le bénéficiaire
+                            {% else %}
+                                Orienter un bénéficiaire
+                            {% endif %}
+                        </span> </a>
                     {% elif service.mobilization_modes_professionals_external_form_link %}
-                        <a class="btn btn-lg btn-white btn-block justify-content-center"
+                        <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                            rel="noopener"
                            target="_blank"
                            href="{{ service.mobilization_modes_professionals_external_form_link }}"
-                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>Orienter le bénéficiaire</a>
+                           {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>{{ service.mobilization_modes_professionals_external_form_link_text }}</span> </a>
                     {% endif %}
                 </div>
             {% endif %}

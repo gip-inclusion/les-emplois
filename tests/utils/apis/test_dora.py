@@ -1,5 +1,4 @@
 import io
-import json
 
 import pytest
 import respx
@@ -25,7 +24,11 @@ def test_reference_data(dora_client):
 
 
 def test_create_orientation_posts_multipart_with_attachments(dora_client):
-    payload = {"di_service_id": "soliguide--svc-1", "beneficiary_email": "boris@example.org"}
+    payload = {
+        "di_service_id": "soliguide--svc-1",
+        "beneficiary_email": "boris@example.org",
+        "emplois_data": {"beneficiary_id": "123", "prescriber_phone": "0612345678"},
+    }
 
     with respx.mock(base_url=f"{DORA_BASE_URL}/api/emplois/") as respx_mock:
         route = respx_mock.post("/orientations/").respond(201, json={"id": "orientation-1"})
@@ -36,13 +39,15 @@ def test_create_orientation_posts_multipart_with_attachments(dora_client):
     request = route.calls.last.request
     assert request.headers["content-type"].startswith("multipart/form-data")
     body = request.content
-    assert b'name="data"' in body
-    assert json.dumps(payload).encode() in body
+    assert b'name="di_service_id"' in body
+    assert b"soliguide--svc-1" in body
+    assert b'name="emplois_data.beneficiary_id"' in body
     assert b'name="attachments"; filename="doc.pdf"' in body
     assert b"file-content" in body
+    assert b'name="data"' not in body
 
 
-def test_create_orientation_without_attachments_sends_data_only(dora_client):
+def test_create_orientation_without_attachments_sends_flat_form_fields(dora_client):
     payload = {"di_service_id": "soliguide--svc-1"}
 
     with respx.mock(base_url=f"{DORA_BASE_URL}/api/emplois/") as respx_mock:
@@ -50,7 +55,9 @@ def test_create_orientation_without_attachments_sends_data_only(dora_client):
         response = dora_client.create_orientation(payload)
 
     assert response == {"id": "orientation-1"}
-    assert b"di_service_id" in route.calls.last.request.content
+    request = route.calls.last.request
+    assert request.headers["content-type"].startswith("application/x-www-form-urlencoded")
+    assert b"di_service_id=soliguide--svc-1" in request.content
 
 
 def test_create_orientation_raises_on_http_error(dora_client):

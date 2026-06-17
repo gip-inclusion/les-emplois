@@ -1,0 +1,173 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load str_filters %}
+
+{% block title %}Orienter vers un service d'insertion{{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Orienter {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} vers un service d'insertion</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% if show_orientation_disclaimer %}
+        {% include "insertion/includes/orientation_disclaimer_alert.html" with orientation_session_uuid=orientation_session_uuid request=request csrf_token=csrf_token ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {% include "insertion/includes/orientation_wizard_stepper.html" with wizard_steps=wizard_steps OrientationStep=OrientationStep only %}
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+
+                    {% if wizard_steps.current == OrientationStep.CONFORMITY %}
+                        {% if missing_beneficiary_fields %}
+                            {% component_alert title=alert_title content=alert_content variant="warning" extra_id="missing-beneficiary-infos-warning" extra_classes="mb-3 mb-md-4" %}
+                                {% fragment as alert_title %}
+                                    Informations manquantes
+                                {% endfragment %}
+                                {% fragment as alert_content %}
+                                    <p class="mb-0">Les informations suivantes doivent être renseignées pour poursuivre l'orientation :</p>
+                                    <ul class="mb-0">
+                                        {% for field in missing_beneficiary_fields %}
+                                            <li>
+                                                <strong>{{ field }}</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% if can_edit_personal_information %}
+                                        <p class="mb-0 mt-3">
+                                            <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-sm">Compléter les informations du candidat</a>
+                                        </p>
+                                    {% endif %}
+                                {% endfragment %}
+                            {% endcomponent_alert %}
+                        {% endif %}
+                        <div class="c-form mb-3 mb-md-4">
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+                                {% component_alert content=coordinates_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                    {% fragment as coordinates_alert_content %}
+                                        <p class="mb-0">Veuillez vous assurer que les coordonnées de votre usager sont bien à jour</p>
+                                    {% endfragment %}
+                                {% endcomponent_alert %}
+                                {% include "insertion/includes/orientation_beneficiary_contact.html" with job_seeker=job_seeker can_edit_personal_information=can_edit_personal_information can_view_personal_information=can_view_personal_information request=request only %}
+                                <hr class="my-3">
+                                {% include "insertion/includes/orientation_conditions.html" with service=service form=form only %}
+                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields %}
+                            </form>
+                        </div>
+
+                    {% elif wizard_steps.current == OrientationStep.REFERENT %}
+                        <div class="c-form mb-3 mb-md-4">
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+                                <fieldset>
+                                    <legend class="mb-0">Conseiller ou conseillère référent(e)</legend>
+                                    <p class="fs-sm">
+                                        Personne en charge de l'accompagnement et du suivi professionnel de la situation
+                                        de l'usager. Si ce n'est pas vous, veuillez modifier les informations ci-dessous
+                                    </p>
+                                    {% bootstrap_field form.referent_last_name wrapper_class="form-group form-group-input-w-lg-66" %}
+                                    {% bootstrap_field form.referent_first_name wrapper_class="form-group form-group-input-w-lg-66" %}
+                                    {% bootstrap_field form.referent_phone wrapper_class="form-group form-group-input-w-lg-66" %}
+                                    {% bootstrap_field form.referent_email wrapper_class="form-group form-group-input-w-lg-66" %}
+                                </fieldset>
+                                <hr class="my-3">
+                                <fieldset>
+                                    <legend>Motif de l'orientation (facultatif)</legend>
+                                    {% bootstrap_field form.orientation_reason %}
+                                </fieldset>
+                                {% include "insertion/includes/orientation_wizard_form_buttons.html" with reset_url=reset_url prev_url=wizard_steps.prev primary_label="Suivant" only %}
+                            </form>
+                        </div>
+
+                    {% elif wizard_steps.current == OrientationStep.DOCUMENTS %}
+                        <div class="c-form mb-3 mb-md-4">
+                            <form method="post" enctype="multipart/form-data" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+
+                                <h2 class="h3">Documents et justificatifs requis</h2>
+
+                                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                                    {% fragment as c_info__summary %}
+                                        Attention à ne télécharger que les pièces strictement nécessaires à la demande.
+                                    {% endfragment %}
+                                    {% fragment as c_info__detail %}
+                                        <p class="mb-0">
+                                            Pour des raisons de confidentialité, l'envoi de la carte vitale, des attestations
+                                            de droits santé/CPAM ou de tout autre document contenant le NIR (numéro de sécurité
+                                            sociale) n'est pas autorisé.
+                                        </p>
+                                    {% endfragment %}
+                                {% endcomponent_info %}
+
+                                {% if service.credentials_documents %}
+                                    <h3 class="h4">Documents à compléter</h3>
+                                    <ul class="list-unstyled mb-3">
+                                        {% for document_name, document_url in credential_documents %}
+                                            <li class="mb-2">
+                                                <a href="{{ document_url }}" target="_blank" rel="noopener noreferrer" class="has-external-link" download>
+                                                    <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                                                    {{ document_name }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% bootstrap_field form.credentials_documents_files show_label=False %}
+                                    <hr class="my-3">
+                                {% endif %}
+
+                                {% if service.credentials_online_form %}
+                                    <h3 class="h4">Liens</h3>
+                                    <p>Informations complémentaires ou formulaires à compléter</p>
+                                    <ul>
+                                        <li>
+                                            <a href="{{ service.credentials_online_form }}" target="_blank" rel="noopener" class="has-external-link">
+                                                {{ service.credentials_online_form }}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <hr class="my-3">
+                                {% endif %}
+
+                                {% if service.credentials %}
+                                    <h3 class="h4">Pré-requis et justificatifs</h3>
+                                    <p>(A récupérer auprès de l'usager)</p>
+                                    <ul>
+                                        {% for credential in service.credentials %}
+                                            <li>{{ credential }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% bootstrap_field form.credentials_proof_files show_label=False %}
+                                    <hr class="my-3">
+                                {% endif %}
+
+                                {% bootstrap_field form.gdpr_consent %}
+                                {% include "insertion/includes/orientation_wizard_form_buttons.html" with reset_url=reset_url prev_url=wizard_steps.prev primary_label="Suivant" only %}
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                    {% include "insertion/includes/orientation_service_info.html" with service=service request=request only %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

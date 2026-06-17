@@ -51,7 +51,12 @@ def test_clean_returns_list(data, expected_count):
 
 def test_clean_rejects_invalid_extension():
     with pytest.raises(forms.ValidationError):
-        _create_multifile_input().clean([SimpleUploadedFile("left-pad.exe", b"boo")])
+        _create_multifile_input().clean(
+            [
+                SimpleUploadedFile("ok.pdf", b"valid"),
+                SimpleUploadedFile("left-pad.exe", b"boo"),
+            ]
+        )
 
 
 def test_clean_rejects_oversized_file():

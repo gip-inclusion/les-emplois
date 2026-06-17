@@ -377,7 +377,7 @@ class GetOrCreateJobSeekerStartView(View):
         super().setup(request, *args, **kwargs)
 
         self.tunnel = request.GET.get("tunnel")
-        if self.tunnel not in ("sender", "hire", "gps", "standalone"):
+        if self.tunnel not in ("sender", "hire", "gps", "standalone", "orientation"):
             raise Http404
         self.from_url = get_safe_url(request, "from_url")
         if not self.from_url:
@@ -409,6 +409,11 @@ class GetOrCreateJobSeekerStartView(View):
             except ValueError:  # In case the pk isn't an integer
                 raise Http404("Aucune entreprise n'a été trouvée")
             data["apply"] = apply_data
+        elif self.tunnel == "orientation":
+            service_uid = request.GET.get("service_uid")
+            if not service_uid:
+                raise Http404
+            data["orientation"] = {"service_uid": service_uid}
 
         self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
@@ -419,7 +424,7 @@ class GetOrCreateJobSeekerStartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.tunnel in ("sender", "gps", "standalone"):
+        if self.tunnel in ("sender", "gps", "standalone", "orientation"):
             view_name = "job_seekers_views:check_nir_for_sender"
         elif self.tunnel == "hire":
             view_name = "job_seekers_views:check_nir_for_hire"
@@ -461,15 +466,17 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         self.prescription_process = None
         self.auto_prescription_process = None
         self.standalone_creation = None
+        self.is_orientation = False
         self.is_gps = False
 
     def setup(self, request, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
         self.is_gps = self.job_seeker_session.get("config", {}).get("tunnel") == "gps"
+        self.is_orientation = self.job_seeker_session.get("config", {}).get("tunnel") == "orientation"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             if not self.is_gps:
                 self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.standalone_creation = not self.is_gps and self.company is None
+        self.standalone_creation = not self.is_gps and self.company is None and not self.is_orientation
         self.hire_process = hire_process
         self.prescription_process = (
             not self.hire_process
@@ -495,6 +502,13 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
             return reverse("gps:group_list")
+        if self.is_orientation:
+            service_uid = self.job_seeker_session.get("orientation", {}).get("service_uid")
+            return reverse(
+                "insertion_views:start_orientation",
+                kwargs={"service_uid": service_uid},
+                query={"job_seeker_public_id": job_seeker.public_id},
+            )
         if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
             params = {
                 "job_seeker_public_id": job_seeker.public_id,

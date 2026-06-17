@@ -1,0 +1,752 @@
+# serializer version: 1
+# name: test_conformity_step_blocks_when_beneficiary_info_is_incomplete
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12">
+                  <div class="c-stepper mb-3 mb-md-4">
+                      <div class="progress">
+                          <div aria-labelledby="currentProgressState" aria-valuemax="100" aria-valuemin="0" aria-valuenow="33" class="progress-bar progress-bar-33" role="progressbar">
+                          </div>
+                      </div>
+                      <p id="currentProgressState">
+                          <strong>
+                              Étape 1/3
+                          </strong>
+                          :
+          
+              Valider la conformité
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="alert alert-warning mb-3 mb-md-4" id="missing-beneficiary-infos-warning" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                              </i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-2">
+                                  <strong>
+                                      Informations manquantes
+                                  </strong>
+                              </p>
+                              <p class="mb-0">
+                                  Les informations suivantes doivent être renseignées pour poursuivre l'orientation :
+                              </p>
+                              <ul class="mb-0">
+                                  <li>
+                                      <strong>
+                                          Prénom
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-form mb-3 mb-md-4">
+                      <form class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <div class="alert alert-danger" data-emplois-give-focus-if-exist="" role="alert" tabindex="0">
+                              <p class="mb-2">
+                                  <strong>
+                                      Votre formulaire contient une erreur
+                                  </strong>
+                              </p>
+                              <ul class="mb-0">
+                                  <li>
+                                      Les informations du candidat sont incomplètes : Prénom.
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="alert alert-info mb-3 mb-md-4" role="status">
+                              <div class="row">
+                                  <div class="col-auto pe-0">
+                                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                      </i>
+                                  </div>
+                                  <div class="col">
+                                      <p class="mb-0">
+                                          Veuillez vous assurer que les coordonnées de votre usager sont bien à jour
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="c-box mb-3 mb-md-4 position-relative">
+                              <div class="position-absolute top-0 end-0 m-3">
+                                  <span class="btn btn-outline-primary w-100 w-md-auto disabled" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" tabindex="0">
+                                      Modifier
+                                  </span>
+                              </div>
+                              <ul class="list-data mb-0 pe-md-5">
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Adresse
+                                      </small>
+                                      <i class="text-disabled">
+                                          Non renseignée
+                                      </i>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          N° de téléphone
+                                      </small>
+                                      <strong>
+                                          0… 0… 0… 0… 0…
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Adresse mail
+                                      </small>
+                                      <strong>
+                                          t…
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <hr class="my-3"/>
+                          <h2 class="h3">
+                              Conditions et critères requis
+                          </h2>
+                          <div class="form-group form-group-required-check form-group-required">
+                              <div class="form-check">
+                                  <input checked="" class="form-check-input is-valid" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
+                                  <label class="form-check-label" for="id_confirms_conditions">
+                                      Je confirme que l'usager remplit au moins une condition et un critère requis.
+                                  </label>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/insertion/services/test-orientation-incomplete-uid/">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button class="btn btn-block btn-primary disabled" type="button">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                  <div class="c-box c-box--organization mb-3 mb-md-4">
+                      <button aria-controls="collapseOrientationService-test-orientation-incomplete-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-incomplete-uid" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <span class="d-block h3">
+                                  Service orientation incomplete
+                              </span>
+                          </div>
+                      </button>
+                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-incomplete-uid">
+                          <hr class="my-4"/>
+                          <p class="mb-0">
+                              Structure orientation wizard
+                          </p>
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-incomplete-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: test_orientation_wizard_happy_path[confirmation]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="c-form">
+                      <h2 class="h3">
+                          Votre demande a bien été transmise !
+                      </h2>
+                      <p>
+                          Le récapitulatif de la demande vous a été envoyé, ainsi qu'à l'adresse e-mail de
+                              Jane DOE :
+                              usager@example.org.
+                      </p>
+                      <a class="btn btn-primary" href="/dashboard/">
+                          Retour à l'accueil
+                      </a>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                  <div class="c-box c-box--organization mb-3 mb-md-4">
+                      <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <span class="d-block h3">
+                                  Service orientation wizard
+                              </span>
+                          </div>
+                      </button>
+                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-wizard-uid">
+                          <hr class="my-4"/>
+                          <p class="mb-0">
+                              Structure orientation wizard
+                          </p>
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/confirmation/%3Fjob_seeker_public_id%3D7614fc4b-aef9-4694-ab17-12324300180a">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: test_orientation_wizard_happy_path[conformity]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12">
+                  <div class="c-stepper mb-3 mb-md-4">
+                      <div class="progress">
+                          <div aria-labelledby="currentProgressState" aria-valuemax="100" aria-valuemin="0" aria-valuenow="33" class="progress-bar progress-bar-33" role="progressbar">
+                          </div>
+                      </div>
+                      <p id="currentProgressState">
+                          <strong>
+                              Étape 1/3
+                          </strong>
+                          :
+          
+              Valider la conformité
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="c-form mb-3 mb-md-4">
+                      <form class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <div class="alert alert-info mb-3 mb-md-4" role="status">
+                              <div class="row">
+                                  <div class="col-auto pe-0">
+                                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                      </i>
+                                  </div>
+                                  <div class="col">
+                                      <p class="mb-0">
+                                          Veuillez vous assurer que les coordonnées de votre usager sont bien à jour
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="c-box mb-3 mb-md-4 position-relative">
+                              <div class="position-absolute top-0 end-0 m-3">
+                                  <a aria-label="Modifier les coordonnées de Jane DOE" class="btn btn-outline-primary w-100 w-md-auto" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                                      Modifier
+                                  </a>
+                              </div>
+                              <ul class="list-data mb-0 pe-md-5">
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Adresse
+                                      </small>
+                                      <strong>
+                                          9 Allée des Peupliers, 33000 Bordeaux
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          N° de téléphone
+                                      </small>
+                                      <strong>
+                                          06 07 08 09 10
+                                      </strong>
+                                  </li>
+                                  <li class="has-forced-line-break">
+                                      <small>
+                                          Adresse mail
+                                      </small>
+                                      <strong>
+                                          usager@example.org
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <hr class="my-3"/>
+                          <h2 class="h3">
+                              Conditions et critères requis
+                          </h2>
+                          <div class="alert alert-info mb-3 mb-md-4" role="status">
+                              <div class="row">
+                                  <div class="col-auto pe-0">
+                                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                      </i>
+                                  </div>
+                                  <div class="col">
+                                      <p class="mb-0">
+                                          Frais à la charge de l'usager : 20€
+                                          <i aria-label="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location" class="ri-information-line ri-xl text-info" data-bs-title="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location" data-bs-toggle="tooltip" role="button" tabindex="0">
+                                          </i>
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                          <p class="fw-bold mb-2">
+                              Publics concernés par ce service
+                          </p>
+                          <ul class="mb-3 mb-md-4">
+                              <li>
+                                  Demandeur d'emploi
+                              </li>
+                          </ul>
+                          <p class="fw-bold mb-2">
+                              Critères de condition d'accès
+                          </p>
+                          <ul class="mb-3 mb-md-4">
+                              <li>
+                                  Résident QPV / ZFRR
+                              </li>
+                          </ul>
+                          <div class="form-group form-group-required-check form-group-required">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
+                                  <label class="form-check-label" for="id_confirms_conditions">
+                                      Je confirme que l'usager remplit au moins une condition et un critère requis.
+                                  </label>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/insertion/services/test-orientation-wizard-uid/">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                  <div class="c-box c-box--organization mb-3 mb-md-4">
+                      <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <span class="d-block h3">
+                                  Service orientation wizard
+                              </span>
+                          </div>
+                      </button>
+                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-wizard-uid">
+                          <hr class="my-4"/>
+                          <p class="mb-0">
+                              Structure orientation wizard
+                          </p>
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: test_orientation_wizard_happy_path[documents]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12">
+                  <div class="c-stepper mb-3 mb-md-4">
+                      <div class="progress">
+                          <div aria-labelledby="currentProgressState" aria-valuemax="100" aria-valuemin="0" aria-valuenow="100" class="progress-bar progress-bar-100" role="progressbar">
+                          </div>
+                      </div>
+                      <p id="currentProgressState">
+                          <strong>
+                              Étape 3/3
+                          </strong>
+                          :
+          
+              Documents et justificatifs requis
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="c-form mb-3 mb-md-4">
+                      <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <h2 class="h3">
+                              Documents et justificatifs requis
+                          </h2>
+                          <div class="c-info mb-3 mb-md-4">
+                              <span class="c-info__summary">
+                                  Attention à ne télécharger que les pièces strictement nécessaires à la demande.
+                              </span>
+                              <div class="c-info__detail">
+                                  <p class="mb-0">
+                                      Pour des raisons de confidentialité, l'envoi de la carte vitale, des attestations
+                                              de droits santé/CPAM ou de tout autre document contenant le NIR (numéro de sécurité
+                                              sociale) n'est pas autorisé.
+                                  </p>
+                              </div>
+                          </div>
+                          <div class="form-group form-group-required">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_gdpr_consent" name="gdpr_consent" required="" type="checkbox"/>
+                                  <label class="form-check-label" for="id_gdpr_consent">
+                                      Je m'engage en tant qu'accompagnateur, à informer la personne concernée du traitement de ses données personnelles dans le cadre de cette orientation.
+                                  </label>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/insertion/services/test-orientation-wizard-uid/">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/insertion/orientations/[UUID of session]/create/fill/">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                  <div class="c-box c-box--organization mb-3 mb-md-4">
+                      <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <span class="d-block h3">
+                                  Service orientation wizard
+                              </span>
+                          </div>
+                      </button>
+                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-wizard-uid">
+                          <hr class="my-4"/>
+                          <p class="mb-0">
+                              Structure orientation wizard
+                          </p>
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/submit/">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: test_orientation_wizard_happy_path[referent]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12">
+                  <div class="c-stepper mb-3 mb-md-4">
+                      <div class="progress">
+                          <div aria-labelledby="currentProgressState" aria-valuemax="100" aria-valuemin="0" aria-valuenow="66" class="progress-bar progress-bar-66" role="progressbar">
+                          </div>
+                      </div>
+                      <p id="currentProgressState">
+                          <strong>
+                              Étape 2/3
+                          </strong>
+                          :
+          
+              Compléter la demande
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="c-form mb-3 mb-md-4">
+                      <form class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <fieldset>
+                              <legend class="mb-0">
+                                  Conseiller ou conseillère référent(e)
+                              </legend>
+                              <p class="fs-sm">
+                                  Personne en charge de l'accompagnement et du suivi professionnel de la situation
+                                          de l'usager. Si ce n'est pas vous, veuillez modifier les informations ci-dessous
+                              </p>
+                              <div class="form-group form-group-input-w-lg-66 form-group-required">
+                                  <label class="form-label" for="id_referent_last_name">
+                                      Nom
+                                  </label>
+                                  <input class="form-control" id="id_referent_last_name" name="referent_last_name" required="" type="text" value="Dupont"/>
+                              </div>
+                              <div class="form-group form-group-input-w-lg-66 form-group-required">
+                                  <label class="form-label" for="id_referent_first_name">
+                                      Prénom
+                                  </label>
+                                  <input class="form-control" id="id_referent_first_name" name="referent_first_name" required="" type="text" value="Pierre"/>
+                              </div>
+                              <div class="form-group form-group-input-w-lg-66 form-group-required">
+                                  <label class="form-label" for="id_referent_phone">
+                                      Téléphone
+                                  </label>
+                                  <input aria-describedby="id_referent_phone_helptext" class="form-control" id="id_referent_phone" name="referent_phone" required="" type="tel" value="0612345678"/>
+                                  <div class="form-text" id="id_referent_phone_helptext">
+                                      Ex : 0123456789
+                                  </div>
+                              </div>
+                              <div class="form-group form-group-input-w-lg-66 form-group-required">
+                                  <label class="form-label" for="id_referent_email">
+                                      Adresse e-mail
+                                  </label>
+                                  <input aria-describedby="id_referent_email_helptext" class="form-control" id="id_referent_email" maxlength="320" name="referent_email" required="" type="email" value="pierre.dupont@test.local"/>
+                                  <div class="form-text" id="id_referent_email_helptext">
+                                      Ex : mail@domaine.fr
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <hr class="my-3"/>
+                          <fieldset>
+                              <legend>
+                                  Motif de l'orientation (facultatif)
+                              </legend>
+                              <div class="form-group">
+                                  <label class="form-label" for="id_orientation_reason">
+                                      Si besoin, détaillez ici le motif de l'orientation
+                                  </label>
+                                  <textarea aria-describedby="id_orientation_reason_helptext" class="form-control" cols="40" id="id_orientation_reason" name="orientation_reason" rows="4"></textarea>
+                                  <div class="form-text" id="id_orientation_reason_helptext">
+                                      Merci de ne pas fournir des informations considérées comme sensibles (situation personnelle ou professionnelle autre que celles cochées à l'étape 1 de la demande, etc.).
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/insertion/services/test-orientation-wizard-uid/">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/insertion/orientations/[UUID of session]/create/confirm/">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                  <div class="c-box c-box--organization mb-3 mb-md-4">
+                      <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <span class="d-block h3">
+                                  Service orientation wizard
+                              </span>
+                          </div>
+                      </button>
+                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-wizard-uid">
+                          <hr class="my-4"/>
+                          <p class="mb-0">
+                              Structure orientation wizard
+                          </p>
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/fill/">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: test_orientation_wizard_happy_path[select-job-seeker]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="c-form mb-5">
+                      <h2 class="h3">
+                          Rechercher un usager
+                      </h2>
+                      <p>
+                          Dans le menu déroulant ci-dessous, vous trouverez la liste de vos usagers.
+                      </p>
+                      <form class="c-form js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <div class="form-group form-group-input-w-lg-66 form-group-required">
+                              <label class="form-label" for="id_job_seeker">
+                                  Nom de l'usager
+                              </label>
+                              <select class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-placeholder="Nom de l'usager" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker" required="">
+                                  <option selected="" value="">
+                                      ---------
+                                  </option>
+                                  <option value="7614fc4b-aef9-4694-ab17-12324300180a">
+                                      DOE Jane
+                                  </option>
+                              </select>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/insertion/services/test-orientation-wizard-uid/">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+                  <hr class="my-5" data-it-text="ou"/>
+                  <div class="text-center mb-3">
+                      Votre usager n'a pas encore de compte ?
+                      <a class="btn-link" data-matomo-action="clic" data-matomo-category="compte-candidat" data-matomo-event="true" data-matomo-option="creer-un-compte-candidat-orientation" href="/job-seekers/start?tunnel=orientation&from_url=%2Finsertion%2Fservices%2Ftest-orientation-wizard-uid%2F&service_uid=test-orientation-wizard-uid">
+                          Créer un compte usager
+                      </a>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
+                  <div class="c-box c-box--organization mb-3 mb-md-4">
+                      <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <span class="d-block h3">
+                                  Service orientation wizard
+                              </span>
+                          </div>
+                      </button>
+                      <div class="c-box--organization__detail collapse" id="collapseOrientationService-test-orientation-wizard-uid">
+                          <hr class="my-4"/>
+                          <p class="mb-0">
+                              Structure orientation wizard
+                          </p>
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/job-seeker/">
+                              Voir la fiche structure
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---

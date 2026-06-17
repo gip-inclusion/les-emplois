@@ -1,0 +1,20 @@
+<div class="alert alert-warning alert-dismissible fade show mb-3 mb-md-4" role="status">
+    <form method="post" action="{% url 'insertion_views:orientation_dismiss_disclaimer' session_uuid=orientation_session_uuid %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn-close" aria-label="Fermer"></button>
+    </form>
+    <div class="row">
+        <div class="col-auto pe-0">
+            <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
+        </div>
+        <div class="col">
+            <p class="mb-2">
+                <strong>Rappel</strong>
+            </p>
+            <p class="mb-0">
+                Les orientations non valides (test/fictives) nécessitent une vérification manuelle, ce qui augmente la charge de travail de nos équipes. Pour comprendre le fonctionnement du formulaire, nous vous invitons à consulter <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" class="has-external-link">notre documentation</a>.
+            </p>
+        </div>
+    </div>
+</div>
