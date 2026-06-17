@@ -82,8 +82,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="col-12 mb-3 mb-md-4">
-                    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False request=request only %}
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% if request.from_employer %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
                         <p>
@@ -103,8 +102,8 @@
                         </p>
                     {% elif request.from_institution %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide</h2>
-                        <p class="mb-0">
-                            L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                        <p>L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.</p>
+                        <p>
                             Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                         </p>
                     {% endif %}
@@ -122,6 +121,9 @@
                             {% endfragment %}
                         {% endcomponent_alert %}
                     {% endif %}
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False request=request only %}
                 </div>
             </div>
             <div class="s-section__row row">

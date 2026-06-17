@@ -319,7 +319,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
+                              <div class="c-info c-info--borderless mt-3">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -424,62 +424,68 @@
                           Valider le contrôle
                       </button>
                   </div>
-                  <div class="c-box mb-3 mb-md-4">
-                      <ul class="list-data mb-3">
-                          <li>
-                              <small>
-                                  Taux de rupture en période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de rupture hors période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi durable
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux d’obtention de qualification
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Nombre de salariés sur l’année N-1
-                              </small>
-                              <strong>
-                                  0
-                              </strong>
-                          </li>
-                      </ul>
-                      <div class="c-info">
-                          <span class="c-info__summary">
-                              Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
-                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                          </span>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture en période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture hors période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi durable
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux d’obtention de qualification
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de salariés sur l’année N-1
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
+                              </span>
+                              <div class="c-info__detail">
+                                  Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                              </div>
+                          </div>
                       </div>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -764,7 +770,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
+                              <div class="c-info c-info--borderless mt-3">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -861,62 +867,68 @@
                           </button>
                       </form>
                   </div>
-                  <div class="c-box mb-3 mb-md-4">
-                      <ul class="list-data mb-3">
-                          <li>
-                              <small>
-                                  Taux de rupture en période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de rupture hors période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi durable
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux d’obtention de qualification
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Nombre de salariés sur l’année N-1
-                              </small>
-                              <strong>
-                                  0
-                              </strong>
-                          </li>
-                      </ul>
-                      <div class="c-info">
-                          <span class="c-info__summary">
-                              Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
-                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                          </span>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture en période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture hors période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi durable
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux d’obtention de qualification
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de salariés sur l’année N-1
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
+                              </span>
+                              <div class="c-info__detail">
+                                  Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                              </div>
+                          </div>
                       </div>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -1111,7 +1123,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
+                              <div class="c-info c-info--borderless mt-3">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -1210,62 +1222,68 @@
                           </span>
                       </a>
                   </div>
-                  <div class="c-box mb-3 mb-md-4">
-                      <ul class="list-data mb-3">
-                          <li>
-                              <small>
-                                  Taux de rupture en période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de rupture hors période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi durable
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux d’obtention de qualification
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Nombre de salariés sur l’année N-1
-                              </small>
-                              <strong>
-                                  0
-                              </strong>
-                          </li>
-                      </ul>
-                      <div class="c-info">
-                          <span class="c-info__summary">
-                              Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
-                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                          </span>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture en période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture hors période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi durable
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux d’obtention de qualification
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de salariés sur l’année N-1
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
+                              </span>
+                              <div class="c-info__detail">
+                                  Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                              </div>
+                          </div>
                       </div>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -1460,7 +1478,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
+                              <div class="c-info c-info--borderless mt-3">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -1564,62 +1582,68 @@
                           Valider le contrôle
                       </button>
                   </div>
-                  <div class="c-box mb-3 mb-md-4">
-                      <ul class="list-data mb-3">
-                          <li>
-                              <small>
-                                  Taux de rupture en période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de rupture hors période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi durable
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux d’obtention de qualification
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Nombre de salariés sur l’année N-1
-                              </small>
-                              <strong>
-                                  0
-                              </strong>
-                          </li>
-                      </ul>
-                      <div class="c-info">
-                          <span class="c-info__summary">
-                              Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
-                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                          </span>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture en période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture hors période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi durable
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux d’obtention de qualification
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de salariés sur l’année N-1
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
+                              </span>
+                              <div class="c-info__detail">
+                                  Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                              </div>
+                          </div>
                       </div>
                   </div>
                   <div class="c-box mb-3 mb-md-4">
@@ -1814,7 +1838,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
+                              <div class="c-info c-info--borderless mt-3">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -1906,62 +1930,68 @@
                           Ce bilan a été contrôlé le 27/05/2025 par Jean DUPONT. Il doit désormais être validé par la DREETS.
                       </p>
                   </div>
-                  <div class="c-box mb-3 mb-md-4">
-                      <ul class="list-data mb-3">
-                          <li>
-                              <small>
-                                  Taux de rupture en période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de rupture hors période d’essai
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi durable
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux de sortie emploi
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Taux d’obtention de qualification
-                              </small>
-                              <strong>
-                                  -
-                              </strong>
-                          </li>
-                          <li>
-                              <small>
-                                  Nombre de salariés sur l’année N-1
-                              </small>
-                              <strong>
-                                  0
-                              </strong>
-                          </li>
-                      </ul>
-                      <div class="c-info">
-                          <span class="c-info__summary">
-                              Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
-                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                          </span>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture en période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de rupture hors période d’essai
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi durable
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux de sortie emploi
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Taux d’obtention de qualification
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de salariés sur l’année N-1
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Les taux présentés ci-dessus correspondent aux résultats en sortie de parcours.
+                              </span>
+                              <div class="c-info__detail">
+                                  Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                              </div>
+                          </div>
                       </div>
                   </div>
                   <div class="c-box mb-3 mb-md-4">

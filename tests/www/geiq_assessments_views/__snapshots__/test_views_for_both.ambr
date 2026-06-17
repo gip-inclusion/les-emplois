@@ -4234,9 +4234,6 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary btn-block mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
-          Modifier votre justification
-      </a>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
@@ -4247,6 +4244,9 @@
               </span>
           </button>
       </form>
+      <a class="btn btn-primary btn-block mt-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
+          Modifier votre justification
+      </a>
   </div>
   
   '''
@@ -4269,9 +4269,6 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary btn-block mb-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
-          Justifier la demande d’aide
-      </a>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
@@ -4282,6 +4279,9 @@
               </span>
           </button>
       </form>
+      <a class="btn btn-primary btn-block mt-3" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
+          Justifier la demande d’aide
+      </a>
   </div>
   
   '''
@@ -4316,7 +4316,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white btn-block" type="submit">
+          <button class="btn btn-ico btn-primary btn-block" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -4363,9 +4363,6 @@
       <p>
           Si vous ne souhaitez plus présenter ce contrat, cliquez sur « Ne plus solliciter l’aide ».
       </p>
-      <a class="btn btn-primary btn-block mb-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
-          Modifier votre justification
-      </a>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-ico btn-outline-primary bg-white btn-block" disabled="" type="submit">
@@ -4376,6 +4373,9 @@
               </span>
           </button>
       </form>
+      <a class="btn btn-primary btn-block mt-3" disabled="" href="/geiq-assessments/contracts/[PK of EmployeeContract]/request-justification">
+          Modifier votre justification
+      </a>
   </div>
   
   '''
@@ -4410,7 +4410,7 @@
       </p>
       <form action="/geiq-assessments/contracts/[PK of EmployeeContract]/exclude" method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button class="btn btn-ico btn-outline-primary bg-white btn-block" disabled="" type="submit">
+          <button class="btn btn-ico btn-primary btn-block" disabled="" type="submit">
               <i aria-hidden="true" class="ri-close-large-line font-weight-medium">
               </i>
               <span>
@@ -5843,46 +5843,7 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  2 / 3
-                              </strong>
-                              Contrats présentés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  814 €
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
                   </h2>
@@ -5913,6 +5874,61 @@
                               <p class="mb-0">
                                   Un contrat concerne un salarié déjà présent dans le bilan précédent. Nous vous invitons à vérifier la liste.
                               </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats présentés
+                                      </span>
+                                      <strong>
+                                          2 / 3
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          814 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
                           </div>
                       </div>
                   </div>
@@ -6093,7 +6109,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
                                                   <i aria-label="Vous avez motivé la demande d’aide de ce contrat" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -6116,46 +6132,7 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  2 / 3
-                              </strong>
-                              Contrats présentés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  814 €
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
                   </h2>
@@ -6186,6 +6163,61 @@
                               <p class="mb-0">
                                   Un contrat concerne un salarié déjà présent dans le bilan précédent. Nous vous invitons à vérifier la liste.
                               </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats présentés
+                                      </span>
+                                      <strong>
+                                          2 / 3
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          814 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
                           </div>
                       </div>
                   </div>
@@ -6366,7 +6398,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
+                                              <a class="text-success text-decoration-none" data-bs-title="Vous avez motivé la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
                                                   <i aria-label="Vous avez motivé la demande d’aide de ce contrat" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -6415,46 +6447,7 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  2 / 3
-                              </strong>
-                              Contrats présentés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  814 €
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
                   </h2>
@@ -6474,7 +6467,7 @@
                               Conformément à l’accord conclu entre la FFGEIQ et la DGEFP, les DDETS/DREETS en charge de votre dossier peuvent accéder à l’ensemble des contrats importés.
                   </p>
                   <div id="alert-contracts-awaiting-justification">
-                      <div class="alert alert-warning mt-3" role="status">
+                      <div class="alert alert-warning mt-3 mb-3 mb-md-4" role="status">
                           <div class="row">
                               <div class="col-auto pe-0">
                                   <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
@@ -6486,12 +6479,10 @@
                                           Demande d’aide à justifier
                                       </strong>
                                   </p>
-                                  <p class="mb-0">
+                                  <p>
                                       Vous devez encore motiver la demande d’aide de 1 contrat.
                                   </p>
-                              </div>
-                              <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                  <a class="btn btn-sm btn-primary" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
+                                  <a class="btn-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts?duration_strictly_shorter_90=on&allowance_requested_on=on#contracts-results-table">
                                       Afficher les contrats concernés
                                   </a>
                               </div>
@@ -6508,6 +6499,61 @@
                               <p class="mb-0">
                                   Un contrat concerne un salarié déjà présent dans le bilan précédent. Nous vous invitons à vérifier la liste.
                               </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats présentés
+                                      </span>
+                                      <strong>
+                                          2 / 3
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          814 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
                           </div>
                       </div>
                   </div>
@@ -6688,7 +6734,7 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-warning text-decoration-none lh-1" data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
+                                              <a class="text-warning text-decoration-none" data-bs-title="Vous devez encore motiver la demande d’aide de ce contrat" data-bs-toggle="tooltip" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/request-justification">
                                                   <i aria-label="Vous devez encore motiver la demande d’aide de ce contrat" class="ri-error-warning-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
@@ -6737,46 +6783,7 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0 / 0
-                              </strong>
-                              Contrats présentés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  -
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
                   </h2>
@@ -6796,6 +6803,61 @@
                               Conformément à l’accord conclu entre la FFGEIQ et la DGEFP, les DDETS/DREETS en charge de votre dossier peuvent accéder à l’ensemble des contrats importés.
                   </p>
                   <div id="alert-contracts-awaiting-justification">
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats présentés
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -7293,57 +7355,75 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1 / 3
-                              </strong>
-                              Contrats acceptés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                  / 1
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 1
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 1
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  814 €
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p class="mb-0">
+                  <p>
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
-                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <p>
+                      Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
                   <div id="alert-contracts-awaiting-justification">
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats acceptés
+                                      </span>
+                                      <strong>
+                                          1 / 3
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          1
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          814 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -7456,8 +7536,8 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
-                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
+                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
                                           </div>
@@ -7494,8 +7574,8 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
-                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
+                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
                                           </div>
@@ -7551,57 +7631,75 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1 / 3
-                              </strong>
-                              Contrats acceptés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                  / 1
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 1
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 1
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  814 €
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p class="mb-0">
+                  <p>
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
-                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <p>
+                      Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
                   <div id="alert-contracts-awaiting-justification">
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats acceptés
+                                      </span>
+                                      <strong>
+                                          1 / 3
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          1
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          814 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -7714,8 +7812,8 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
-                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
+                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
                                           </div>
@@ -7752,8 +7850,8 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
-                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
+                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
                                           </div>
@@ -7835,58 +7933,18 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1 / 3
-                              </strong>
-                              Contrats acceptés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  1
-                  / 1
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 1
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 1
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  814 €
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p class="mb-0">
+                  <p>
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
-                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <p>
+                      Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
                   <div id="alert-contracts-awaiting-justification">
-                      <div class="alert alert-warning mt-3" role="status">
+                      <div class="alert alert-warning mt-3 mb-3 mb-md-4" role="status">
                           <div class="row">
                               <div class="col-auto pe-0">
                                   <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
@@ -7898,15 +7956,71 @@
                                           Refus à justifier
                                       </strong>
                                   </p>
-                                  <p class="mb-0">
+                                  <p>
                                       Vous devez encore motiver le refus d’aide de 1 contrat.
                                   </p>
-                              </div>
-                              <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                  <a class="btn btn-sm btn-primary" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts?allowance_eligibility_off=on#contracts-results-table" type="button">
+                                  <a class="btn-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts?allowance_eligibility_off=on#contracts-results-table">
                                       Afficher les contrats concernés
                                   </a>
                               </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats acceptés
+                                      </span>
+                                      <strong>
+                                          1 / 3
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          1
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 1
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          814 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
                           </div>
                       </div>
                   </div>
@@ -8021,8 +8135,8 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-warning text-decoration-none lh-1" data-bs-title="Vous devez encore motiver le refus pour ce contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
-                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-error-warning-line ri-xl" role="button" tabindex="0">
+                                              <a class="text-warning text-decoration-none" data-bs-title="Vous devez encore motiver le refus pour ce contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/44444444-4444-4444-4444-444444444444/refusal-justification">
+                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-error-warning-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
                                           </div>
@@ -8059,8 +8173,8 @@
                                                       </label>
                                                   </div>
                                               </form>
-                                              <a class="text-success text-decoration-none lh-1" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
-                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line ri-xl" role="button" tabindex="0">
+                                              <a class="text-success text-decoration-none" data-bs-title="Voir le motif de refus pour contrat." data-bs-toggle="tooltip" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/refusal-justification">
+                                                  <i aria-label="Se rendre au formulaire de justification de refus" class="ri-check-line" role="button" tabindex="0">
                                                   </i>
                                               </a>
                                           </div>
@@ -8142,57 +8256,75 @@
   <section class="s-section">
       <div class="s-section__container container">
           <div class="s-section__row row">
-              <div class="col-12 mb-3 mb-md-4">
-                  <div class="c-box mb-3" id="contracts-list-stats">
-                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0 / 0
-                              </strong>
-                              Contrats acceptés
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 0
-                              </strong>
-                              Aides à 814€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 0
-                              </strong>
-                              Aides à 1400€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  0
-                  / 0
-                              </strong>
-                              Aides à 0€
-                          </div>
-                          <div class="d-flex flex-column">
-                              <strong>
-                                  -
-                              </strong>
-                              Montant total potentiel
-                          </div>
-                      </div>
-                      <div class="c-info c-info--borderless">
-                          <span class="c-info__summary">
-                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
-                          </span>
-                      </div>
-                  </div>
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p class="mb-0">
+                  <p>
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
-                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <p>
+                      Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
                   <div id="alert-contracts-awaiting-justification">
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                  <div class="c-box c-box--summary mb-3 mb-md-4" id="contracts-list-stats">
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats acceptés
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 814 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 1 400 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Aide à 0 €
+                                      </span>
+                                      <strong>
+                                          0
+                          / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info c-info--borderless mt-3">
+                              <span class="c-info__summary">
+                                  Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                              </span>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
