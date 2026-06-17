@@ -40,7 +40,7 @@
                                           </i>
                                       </button>
                                       <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-service-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-service-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                                               <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                               </i>
                                               <span>
@@ -87,7 +87,7 @@
                           <p>
                               Ma structure de test
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-uid/card" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/" type="button">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -183,7 +183,7 @@
                                           </i>
                                       </button>
                                       <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-service-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-service-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                                               <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                               </i>
                                               <span>
@@ -230,7 +230,7 @@
                           <p>
                               Ma structure de test
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-uid/card" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/" type="button">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -318,7 +318,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-not-orientable-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-not-orientable-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                           </i>
                           <span>
@@ -352,7 +352,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-orientable-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                           </i>
                           <span>
@@ -413,7 +413,7 @@
                                           </i>
                                       </button>
                                       <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-service-full-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                                          <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-service-full-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                                               <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                               </i>
                                               <span>
@@ -539,7 +539,7 @@
                           <p>
                               Structure complète
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structure/test-structure-full-uid/card" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-full-uid/" type="button">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -612,7 +612,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
-                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/service/test-orientable-uid/card" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                           </i>
                           <span>
