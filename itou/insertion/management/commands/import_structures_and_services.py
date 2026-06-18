@@ -3,6 +3,7 @@ import enum
 import functools
 
 from django.conf import settings
+from django.db.models.functions import Substr
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 
@@ -26,6 +27,118 @@ class ArgumentData(enum.StrEnum):
     REFERENCES = "references"
     STRUCTURES = "structures"
     SERVICES = "services"
+
+
+ORIENTATION_SIRENE_BLACKLIST = [
+    # CAF
+    "303336192",
+    "314307828",
+    "314560822",
+    "314635368",
+    "315190751",
+    "327398152",
+    "380980300",
+    "380992255",
+    "381002534",
+    "381016534",
+    "381050996",
+    "381067784",
+    "381202282",
+    "534037254",
+    "534089529",
+    "534092499",
+    "534155403",
+    "534172481",
+    "534175179",
+    "534214051",
+    "534216080",
+    "534224282",
+    "534224613",
+    "534738778",
+    "535326656",
+    "535363071",
+    "775021801",
+    "775103955",
+    "775189038",
+    "775347875",
+    "775369598",
+    "775513708",
+    "775548555",
+    "775549371",
+    "775555642",
+    "775558364",
+    "775561343",
+    "775562531",
+    "775564669",
+    "775573397",
+    "775613227",
+    "775613995",
+    "775615529",
+    "775622335",
+    "775624588",
+    "775627383",
+    "775629256",
+    "775634264",
+    "775640238",
+    "775653330",
+    "775710791",
+    "775714124",
+    "775716202",
+    "775717333",
+    "775915085",
+    "776115255",
+    "776531576",
+    "776656209",
+    "776744005",
+    "776950446",
+    "776986671",
+    "777053125",
+    "777169046",
+    "777187691",
+    "777306184",
+    "777461336",
+    "777749375",
+    "777907700",
+    "777927138",
+    "777998881",
+    "778073189",
+    "778213348",
+    "778274613",
+    "778297242",
+    "778422832",
+    "778477737",
+    "778542837",
+    "778600130",
+    "778649525",
+    "778714964",
+    "778868497",
+    "778953844",
+    "779145598",
+    "779311224",
+    "780004032",
+    "780254702",
+    "780349759",
+    "780428975",
+    "780808010",
+    "780860292",
+    "781172366",
+    "781459599",
+    "781847488",
+    "782099121",
+    "782152888",
+    "782437586",
+    "782620520",
+    "782993133",
+    "783169196",
+    "783382344",
+    "783806110",
+    "783911951",
+    "784971343",
+    "786019554",
+    "786338871",
+    "786448050",
+    "831358262",
+]
 
 
 class Command(BaseCommand):
@@ -253,11 +366,7 @@ class Command(BaseCommand):
 
         self.logger.info(differ.summary_label())
 
-    def _fill_service_from_dora_api_data(self, service, dora_services, non_orientable_structures):
-        service.is_orientable_with_form = bool(
-            service.structure.uid not in non_orientable_structures and service.structure.email
-        )
-
+    def _fill_service_from_dora_api_data(self, service, dora_services):
         dora_data = dora_services.get(service.uid)
 
         if service.source.value != SOURCE_DORA_VALUE or not dora_data:
@@ -382,7 +491,7 @@ class Command(BaseCommand):
             ),
         )
 
-    def _fill_and_save_service_from_api_data(self, obj, data, dora_services, non_orientable_structures, structures):
+    def _fill_and_save_service_from_api_data(self, obj, data, dora_services, structures):
         service, is_creation = (obj, False) if obj is not None else (Service(), True)
         # Fill non ManyToManyField
         service.uid = data["id"]
@@ -437,7 +546,7 @@ class Command(BaseCommand):
         self._void_if_max_len(service, "contact_phone")
 
         self._fill_geolocation_from_api_data(service, data)
-        self._fill_service_from_dora_api_data(service, dora_services, non_orientable_structures)
+        self._fill_service_from_dora_api_data(service, dora_services)
 
         service.updated_on = data["date_maj"]
 
@@ -445,7 +554,7 @@ class Command(BaseCommand):
 
         self._fill_service_related_fields_from_data(service, data, dora_services, is_creation)  # Fill ManyToManyField
 
-    def import_services(self, di_client, dora_client, sources, non_orientable_structures):
+    def import_services(self, di_client, dora_client, sources):
         self.logger.info("Importing services")
         dora_services = {"dora--" + item["id"]: item for item in DoraApiItemsIterator(dora_client.emplois_services)}
         structures = Structure.objects.only("uid").in_bulk(field_name="uid")
@@ -465,7 +574,6 @@ class Command(BaseCommand):
                     None,
                     diff_item.comparative_item,
                     dora_services,
-                    non_orientable_structures,
                     structures,
                 )
             elif diff_item.kind is diff.DiffItemKind.UPDATED:
@@ -473,7 +581,6 @@ class Command(BaseCommand):
                     diff_item.current_item,
                     diff_item.comparative_item,
                     dora_services,
-                    non_orientable_structures,
                     structures,
                 )
             elif diff_item.kind is diff.DiffItemKind.REMOVED:
@@ -484,14 +591,27 @@ class Command(BaseCommand):
     def import_disabled_structures(self, non_orientable_structures):
         self.logger.info("Import disabled structures from DORA")
 
+        blacklisted_structures = (
+            Structure.objects.annotate(siren=Substr("siret", 1, 9))
+            .filter(siren__in=ORIENTATION_SIRENE_BLACKLIST)
+            .values_list("uid", flat=True)
+        )
+
+        structures_without_email = Structure.objects.filter(email="").values_list("uid", flat=True)
+
+        all_disabled_structures = (
+            non_orientable_structures | set(blacklisted_structures) | set(structures_without_email)
+        )
+
         updated_services = Service.objects.filter(
-            structure__uid__in=non_orientable_structures,
+            structure__uid__in=all_disabled_structures,
             is_orientable_with_form=True,
         ).update(is_orientable_with_form=False)
+
         self.logger.info(
             "Change 'is_orientable_with_form' ('True' -> 'False') for count=%d services based on count=%d structures",
             updated_services,
-            len(non_orientable_structures),
+            len(all_disabled_structures),
         )
 
     @dry_runnable
@@ -513,12 +633,14 @@ class Command(BaseCommand):
                 sources_except_emplois = sorted(
                     source["slug"] for source in di_client.sources() if source["slug"] != "emplois-de-linclusion"
                 )
-                # Some data·inclusion services are non orientable with DORA's form.
-                non_orientable_structures = dora_client.disabled_dora_form_di_structures()
 
             if ArgumentData.STRUCTURES in data:
                 self.import_structures(di_client, sources_except_emplois)
-                self.import_disabled_structures(non_orientable_structures)
 
             if ArgumentData.SERVICES in data:
-                self.import_services(di_client, dora_client, sources_except_emplois, non_orientable_structures)
+                self.import_services(di_client, dora_client, sources_except_emplois)
+
+            if ArgumentData.STRUCTURES in data or ArgumentData.SERVICES in data:
+                # Some data·inclusion services are non orientable with DORA's form.
+                non_orientable_structures = dora_client.disabled_dora_form_di_structures()
+                self.import_disabled_structures(non_orientable_structures)
