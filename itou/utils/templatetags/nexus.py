@@ -314,43 +314,43 @@ def get_service_urls(user):
 @register.simple_tag(takes_context=True)
 def nexus_dropdown(context):
     dropdown_status = getattr(context["request"], "nexus_dropdown", {})
-    if dropdown_status.get("mvp_enabled"):
-        if dropdown_status["proconnect"] is False:
-            template = get_template("nexus/components/dropdown_no_proconnect.html")
-            proconnect_params = {
-                "previous_url": context["request"].get_full_path(),
-                "next_url": reverse("nexus:homepage"),
-            }
-            pro_connect_url = (
-                reverse("pro_connect:authorize", query=proconnect_params) if settings.PRO_CONNECT_BASE_URL else None
-            )
-            template_context = {
-                "pro_connect_url": pro_connect_url,
-                "SHOW_DEMO_ACCOUNTS_BANNER": settings.SHOW_DEMO_ACCOUNTS_BANNER,
-            }
-            return template.render(template_context)
-        template = get_template("nexus/components/dropdown.html")
-        # Prepare context
-        services_context = get_services_context()
-        service_urls = get_service_urls(context["user"])
-        activated_services, activable_services = [], []
-        for service in Service.activable():
-            if service == Service.EMPLOIS:
-                continue  # Don't display emplois since we already are on it
-            if service in dropdown_status["activated_services"]:
-                activated_services.append(
-                    {"service": service, **services_context[service], "url": service_urls[service]["activated"]}
-                )
-            else:
-                activable_services.append(
-                    {"service": service, **services_context[service], "url": service_urls[service]["activable"]}
-                )
-
+    if not dropdown_status:  # This only happens if the middleware breaks
+        return ""
+    if dropdown_status["proconnect"] is False:
+        template = get_template("nexus/components/dropdown_no_proconnect.html")
+        proconnect_params = {
+            "previous_url": context["request"].get_full_path(),
+            "next_url": reverse("nexus:homepage"),
+        }
+        pro_connect_url = (
+            reverse("pro_connect:authorize", query=proconnect_params) if settings.PRO_CONNECT_BASE_URL else None
+        )
         template_context = {
-            "user_name": f"{context['user'].first_name} {context['user'].last_name[0]}",
-            "user": context["user"],
-            "activated_services": activated_services,
-            "activable_services": activable_services,
+            "pro_connect_url": pro_connect_url,
+            "SHOW_DEMO_ACCOUNTS_BANNER": settings.SHOW_DEMO_ACCOUNTS_BANNER,
         }
         return template.render(template_context)
-    return ""
+    template = get_template("nexus/components/dropdown.html")
+    # Prepare context
+    services_context = get_services_context()
+    service_urls = get_service_urls(context["user"])
+    activated_services, activable_services = [], []
+    for service in Service.activable():
+        if service == Service.EMPLOIS:
+            continue  # Don't display emplois since we already are on it
+        if service in dropdown_status["activated_services"]:
+            activated_services.append(
+                {"service": service, **services_context[service], "url": service_urls[service]["activated"]}
+            )
+        else:
+            activable_services.append(
+                {"service": service, **services_context[service], "url": service_urls[service]["activable"]}
+            )
+
+    template_context = {
+        "user_name": f"{context['user'].first_name} {context['user'].last_name[0]}",
+        "user": context["user"],
+        "activated_services": activated_services,
+        "activable_services": activable_services,
+    }
+    return template.render(template_context)

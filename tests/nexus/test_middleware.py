@@ -1,8 +1,6 @@
-import random
 from functools import partial
 
 import pytest
-from django.conf import settings
 from django.urls import reverse
 from itoutils.django.nexus.token import generate_auto_login_token
 from pytest_django.asserts import assertRedirects
@@ -94,7 +92,7 @@ class TestAutoLoginMiddleware:
 class TestDropDownMiddleware:
     def test_context(self, client):
         user = EmployerFactory()
-        CompanyMembershipFactory(user=user, company__post_code=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        CompanyMembershipFactory(user=user)
         client.force_login(user)
         response = client.get(reverse("dashboard:index"))
         assert response.wsgi_request.nexus_dropdown == {
@@ -105,7 +103,7 @@ class TestDropDownMiddleware:
 
     def test_nexus_page(self, client):
         user = EmployerFactory()
-        CompanyMembershipFactory(user=user, company__post_code=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        CompanyMembershipFactory(user=user)
         client.force_login(user)
         response = client.get(reverse("nexus:homepage"))
         assert response.wsgi_request.nexus_dropdown == {}

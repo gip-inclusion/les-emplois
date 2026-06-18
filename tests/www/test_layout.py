@@ -116,21 +116,18 @@ def test_nav_dropdown_with_multiple_org_types(snapshot, client):
     assert pretty_indented(switcher_offcanvas) == snapshot(name="multi organization structure switcher in offcanvas")
 
 
-@pytest.mark.parametrize("case", ["disabled", "enabled_no_proconnect", "enabled", "enabled_all_activated"])
+@pytest.mark.parametrize("case", ["default", "no_proconnect", "all_activated"])
 def test_nexus_dropdown(snapshot, client, case, pro_connect):
     user = PrescriberFactory(
         for_snapshot=True,
-        identity_provider=IdentityProvider.DJANGO if case == "enabled_no_proconnect" else IdentityProvider.PRO_CONNECT,
+        identity_provider=IdentityProvider.DJANGO if case == "no_proconnect" else IdentityProvider.PRO_CONNECT,
     )
     PrescriberMembershipFactory(
         user=user,
         organization__name="On vous aide",
         organization__siret="01234567891010",
-        organization__post_code="31"
-        if case in ["enabled_no_proconnect", "enabled", "enabled_all_activated"]
-        else "32",
     )
-    if case == "enabled_all_activated":
+    if case == "all_activated":
         ActivatedService.objects.create(user=user, service=Service.PILOTAGE)
         ActivatedService.objects.create(user=user, service=Service.MON_RECAP)
         NexusUserFactory(email=user.email, source=Service.DORA)
