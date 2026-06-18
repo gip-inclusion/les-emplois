@@ -99,8 +99,8 @@ def assert_contains_apply_nir_modal(response, job_seeker, with_personal_informat
         f"""
         <div class="modal-body">
             <p>
-                Le numéro {format_nir(job_seeker.jobseeker_profile.nir)} est associé au compte de
-                <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>.
+                <b>Le numéro {format_nir(job_seeker.jobseeker_profile.nir)} est associé au compte de
+                {mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}.</b>
             </p>
             <p>
                 Si cette candidature n'est pas pour
@@ -134,8 +134,8 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
         f"""
         <div class="modal-body">
             <p>
-                L'adresse {job_seeker.email} est associée au compte de
-                <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>.
+                <b>L'adresse {job_seeker.email} est associée au compte de
+                {mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}.</b>
             </p>
             <p>
                 L'identité du candidat est une information clé pour la structure.
