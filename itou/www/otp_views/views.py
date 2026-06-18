@@ -142,9 +142,12 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
             # Reject by redirecting to dashboard, user will be
             # redirected if an OTP is required.
             return HttpResponseRedirect(reverse("dashboard:index"))
-        # This should not happen: if user enrolled a device, they must
-        # have a static device (backup code).
-        logger.error("User %s has a TOTP device but no backup code", request.user.id)
+        # If user enrolled a device after June 2026, they must have a
+        # static device (backup code). If they enrolled before (which
+        # is the case for most staff users), they don't have a static
+        # device and it's fine.
+        if not request.user.is_staff:
+            logger.error("User %s has a TOTP device but no backup code", request.user.id)
         context = {"form": LoginWithBackupCodeForm(static_device=None)}
         messages.warning(
             request,
