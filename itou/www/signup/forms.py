@@ -306,12 +306,11 @@ class PrescriberChooseOrgKindForm(forms.Form):
             member = org.memberships.first()
             if member:
                 error += (
-                    " Pour rejoindre cette organisation, vous pouvez être ajouté(e) par : {} {}."
+                    " Pour rejoindre cette organisation, vous pouvez être ajouté(e) par : {}."
                     ' <a href="{}">Demander l\'ajout</a>'
                 )
                 error_args += [
-                    member.user.first_name.title(),
-                    member.user.last_name[0].upper(),
+                    member.user.get_truncated_full_name(),
                     reverse("signup:prescriber_request_invitation", args=[member.id]),
                 ]
             raise forms.ValidationError(format_html(error, *error_args))

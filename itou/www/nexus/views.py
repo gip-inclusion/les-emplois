@@ -62,7 +62,7 @@ class NexusMixin:
         context["activated_services"] = self.activated_services
         context["user_kind"] = self.user_kind
         context["logout_url"] = add_url_params(reverse("account_logout"), {"redirect_url": reverse("nexus:login")})
-        context["user_name"] = f"{self.request.user.first_name} {self.request.user.last_name[0]}"
+        context["user_name"] = self.request.user.get_truncated_full_name()
         context["emplois_badge_count"] = None
         if Service.EMPLOIS in self.activated_services and self.user_kind == NexusUserKind.FACILITY_MANAGER:
             # No job descriptions for prescribers : The user may have a facility manager role in another service
