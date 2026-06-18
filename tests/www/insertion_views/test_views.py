@@ -76,8 +76,16 @@ class TestStructures:
 
 
 class TestServices:
+    LOGIN_URL = reverse("login:existing_user")
+    ORIENT_BTN_LABEL = "Orienter le bénéficiaire"
+    DISPLAY_SERVICE_CONTACT_BTN = 'data-bs-target="#service-contact-modal"'
+    FORMS_TO_FILL = "Documents à compléter"
+
     def get_service_url(self, service):
         return reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+
+    def get_nexus_auto_login_url(self, service_url):
+        return reverse("nexus:auto_login", query={"next_url": service_url})
 
     def test_detail_accessible_without_login(self, client):
         service = ServiceFactory(
@@ -206,7 +214,7 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, "Orienter le bénéficiaire")
+        assertContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, f'href="{test_link}"')
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
@@ -222,7 +230,7 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, "Orienter le bénéficiaire")
+        assertContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_orientable_and_user_not_authenticated(self, client):
@@ -237,8 +245,7 @@ class TestServices:
 
         service_url = self.get_service_url(service)
         response = client.get(service_url)
-        login_url = reverse("login:existing_user")
-        assertContains(response, f'href="{login_url}?next={service_url}"')
+        assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
 
     def test_detail_not_orientable(self, client, snapshot):
         user = PrescriberFactory(membership=True)
@@ -252,7 +259,7 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertNotContains(response, "Orienter le bénéficiaire")
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_contact_section_hidden_without_contact_info(self, client):
@@ -282,7 +289,7 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, 'data-bs-target="#service-contact-modal"')
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
 
     def test_detail_contact_button_shown_when_public(self, client):
         service = ServiceFactory(
@@ -294,7 +301,7 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         response = client.get(self.get_service_url(service))
-        assertContains(response, 'data-bs-target="#service-contact-modal"')
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
 
     def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client):
         service = ServiceFactory(
@@ -307,9 +314,8 @@ class TestServices:
         )
         service_url = self.get_service_url(service)
         response = client.get(service_url)
-        login_url = reverse("login:existing_user")
-        assertContains(response, f'href="{login_url}?next={service_url}"')
-        assertNotContains(response, 'data-bs-target="#service-contact-modal"')
+        assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
+        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
 
     def test_detail_with_source_link(self, client):
         user = PrescriberFactory(membership=True)
@@ -390,7 +396,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.status_code == 200
         assert response.context["credential_documents"] == []
-        assertNotContains(response, "Documents à compléter")
+        assertNotContains(response, self.FORMS_TO_FILL)
 
     def test_detail_credential_documents(self, client, snapshot):
         service = ServiceFactory(
@@ -410,7 +416,7 @@ class TestServices:
         ):
             response = client.get(self.get_service_url(service))
 
-        assert response.status_code == 200
+        assertContains(response, self.FORMS_TO_FILL)
         assert response.context["credential_documents"] == [
             ("my_form.pdf", "https://s3.example.com/my_form.pdf?token=aaa"),
             ("justificatif.docx", "https://s3.example.com/justificatif.docx?token=bbb"),
