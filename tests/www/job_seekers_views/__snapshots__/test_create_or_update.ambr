@@ -18,14 +18,15 @@
                       </b>
                   </p>
                   <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
                   </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-outline-primary" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" role="button">
-                      Consulter le profil
-                  </a>
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Postuler
+                      M'ajouter en tant qu'accompagnateur
                   </button>
               </div>
           </div>
@@ -53,14 +54,15 @@
                       </b>
                   </p>
                   <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
                   </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-outline-primary" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" role="button">
-                      Consulter le profil
-                  </a>
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Postuler
+                      M'ajouter en tant qu'accompagnateur
                   </button>
               </div>
           </div>
@@ -88,14 +90,15 @@
                       </b>
                   </p>
                   <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
                   </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-outline-primary" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" role="button">
-                      Consulter le profil
-                  </a>
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Postuler
+                      M'ajouter en tant qu'accompagnateur
                   </button>
               </div>
           </div>
@@ -181,14 +184,15 @@
                       </b>
                   </p>
                   <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
                   </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-outline-primary" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" role="button">
-                      Consulter le profil
-                  </a>
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Postuler
+                      M'ajouter en tant qu'accompagnateur
                   </button>
               </div>
           </div>
@@ -238,14 +242,15 @@
                       </b>
                   </p>
                   <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
                   </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-outline-primary" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" role="button">
-                      Consulter le profil
-                  </a>
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Postuler
+                      M'ajouter en tant qu'accompagnateur
                   </button>
               </div>
           </div>
@@ -295,14 +300,15 @@
                       </b>
                   </p>
                   <p>
+                      Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
                   </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-outline-primary" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" role="button">
-                      Consulter le profil
-                  </a>
+                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                      Retour
+                  </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
-                      Postuler
+                      M'ajouter en tant qu'accompagnateur
                   </button>
               </div>
           </div>
