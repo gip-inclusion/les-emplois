@@ -348,7 +348,7 @@ def nexus_dropdown(context):
             )
 
     template_context = {
-        "user_name": f"{context['user'].first_name} {context['user'].last_name[0]}",
+        "user_name": context["user"].get_truncated_full_name(),
         "user": context["user"],
         "activated_services": activated_services,
         "activable_services": activable_services,
