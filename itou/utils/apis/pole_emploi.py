@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import time
+from typing import TYPE_CHECKING
 
 import httpx
 from django.conf import settings
@@ -11,6 +12,10 @@ from django.core.cache import caches
 from unidecode import unidecode
 
 from itou.utils.types import InclusiveDateRange
+
+
+if TYPE_CHECKING:
+    from itou.users.models import JobSeekerProfile
 
 
 logger = logging.getLogger(__name__)
@@ -447,12 +452,11 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             },
         )
 
-    def rechercher_usager(self, jobseeker_profile=None, france_travail_id=None):
+    def rechercher_usager(
+        self, jobseeker_profile: "JobSeekerProfile | None" = None, france_travail_id: str | None = None
+    ):
         """Find a user by pivot data (birthdate and nir or pole_emploi_id)
         and return a crypted token (`jeton usager`).
-        `jobseeker_profile`: users.models.JobSeekerProfile (not included as a type hint because of circular imports).
-        `france_travail_id`: str
-        return: "a_long_jeton_usager"
         """
         assert (jobseeker_profile is None) ^ (france_travail_id is None), (
             "One and only one of jobseeker_profile and france_travail_id is required"
