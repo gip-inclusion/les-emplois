@@ -174,7 +174,7 @@
                                                 <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
                                                 <th scope="col">Aide potentielle</th>
                                                 {% if request.from_employer %}
-                                                    <th scope="col">Obtenir l’aide</th>
+                                                    <th scope="col">Solliciter l’aide</th>
                                                 {% elif request.from_institution %}
                                                     <th scope="col">Éligible à l’aide</th>
                                                 {% endif %}
@@ -220,7 +220,7 @@
                                                         {% endif %}
 
                                                     </td>
-                                                    <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
+                                                    <td class="text-end">{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                                     <td>
                                                         {% if request.from_employer %}
                                                             {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token editable=can_validate request=request disable_stats_oob=True only %}
