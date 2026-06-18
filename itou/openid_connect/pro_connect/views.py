@@ -105,8 +105,12 @@ def _generate_pro_params_from_session(pc_data):
                         "acr": {
                             "essential": False,
                             "values": [
+                                "eidas0-mfa",
+                                "eidas1-mfa",
                                 "eidas2",
                                 "eidas3",
+                                "https://proconnect.gouv.fr/assurance/self-asserted-2fa",
+                                "https://proconnect.gouv.fr/assurance/consistency-checked-2fa",
                             ],
                         },
                     },
