@@ -21,7 +21,6 @@ from django_xworkflows import models as xwf_models
 
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import (
     JobApplication,
     JobApplicationComment,
@@ -102,9 +101,6 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     geiq_eligibility_diagnosis = job_application.get_geiq_eligibility_diagnosis()
     eligibility_diagnosis = job_application.get_eligibility_diagnosis()
 
-    group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-    user_in_group = False if group is None else group.members.contains(request.user)
-
     context = {
         "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
         "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
@@ -118,8 +114,6 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "group": group,
-        "user_in_group": user_in_group,
     }
 
     return render(request, template_name, context)
@@ -225,9 +219,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
     comments = list(job_application.comments.select_related("created_by").filter(company=job_application.to_company))
 
-    group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-    user_in_group = False if group is None else group.members.contains(request.user)
-
     # Display a warning in the cancel modal for old job applications: cancelling a job application will immediately
     # hide it from the user.
     display_warning_in_cancel_modal = (
@@ -259,8 +250,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             ),
             "matomo_custom_title": "Candidature",
             "job_application_sender_left_org": job_application_sender_left_org(job_application),
-            "group": group,
-            "user_in_group": user_in_group,
         }
         | get_siae_actions_context(request, job_application)
     )
@@ -393,9 +382,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         refused_by = None
         refusal_contact_email = ""
 
-    group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-    user_in_group = False if group is None else group.members.contains(request.user)
-
     context = {
         "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
         "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
@@ -412,8 +398,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "refusal_contact_email": refusal_contact_email,
         "with_job_seeker_detail_url": True,
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "group": group,
-        "user_in_group": user_in_group,
     }
 
     return render(request, template_name, context)

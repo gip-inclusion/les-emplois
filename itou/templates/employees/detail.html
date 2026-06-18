@@ -46,8 +46,8 @@
                         {% endfor %}
                     </div>
 
-                    {# Job referent ------------------------------------------------------------------------ #}
-                    {% include "gps/includes/membership_referent.html" %}
+                    {# Last known advisor ------------------------------------------------------------------------ #}
+                    {% include "job_seekers_views/includes/last_known_advisor.html" with job_seeker=job_seeker can_view_personal_information=can_view_personal_information request=request csrf_token=csrf_token only %}
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}

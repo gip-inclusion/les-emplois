@@ -178,9 +178,6 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
         )
 
-        group = FollowUpGroup.objects.filter(beneficiary=self.object).first()
-        user_in_group = False if group is None else group.members.contains(self.request.user)
-
         can_see_external = can_see_external_job_applications(self.object, self.request)
         job_applications = self.get_job_applications(can_see_external)
         received_job_applications, sent_job_applications = None, job_applications
@@ -210,8 +207,6 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
-            "group": group,
-            "user_in_group": user_in_group,
         }
 
     def get_job_applications(self, can_see_external):
