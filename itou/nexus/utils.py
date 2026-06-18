@@ -50,7 +50,6 @@ def dropdown_status(*, email=None, user=None):
     return {
         "proconnect": Auth.PRO_CONNECT in {user.auth for user in service_users},
         "activated_services": sorted([user.source for user in service_users]),
-        "mvp_enabled": True,
     }
 
 

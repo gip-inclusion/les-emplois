@@ -730,7 +730,6 @@ class TestDropDownStatus(NexusApiTestMixin):
         payload = {
             "proconnect": True,
             "activated_services": ["dora", "les-emplois"],
-            "mvp_enabled": True,
         }
         response = api_client.post(self.url, data={"email": user.email})
         assert response.status_code == 200

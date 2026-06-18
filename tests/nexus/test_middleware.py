@@ -98,7 +98,6 @@ class TestDropDownMiddleware:
         assert response.wsgi_request.nexus_dropdown == {
             "proconnect": True,
             "activated_services": [Service.EMPLOIS],
-            "mvp_enabled": True,
         }
 
     def test_nexus_page(self, client):
