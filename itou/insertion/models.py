@@ -119,6 +119,17 @@ class Structure(GeolocatedAddressMixin, models.Model):
 
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)
 
+    reseaux_porteurs = models.ManyToManyField(
+        verbose_name="réseaux porteurs",
+        to=GenericReferenceItem,
+        limit_choices_to={
+            "source": GenericReferenceItemSource.DATA_INCLUSION,
+            "kind": GenericReferenceItemKind.NETWORK,
+        },
+        related_name="+",
+        blank=True,
+    )
+
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)

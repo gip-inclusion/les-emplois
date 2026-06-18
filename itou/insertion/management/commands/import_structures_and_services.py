@@ -341,6 +341,18 @@ class Command(BaseCommand):
 
         structure.updated_on = data["date_maj"]
 
+    def _fill_structure_related_fields_from_data(self, structure, data, is_creation):
+        objs = self.get_reference_set_from_data(
+            data,
+            "reseaux_porteurs",
+            GenericReferenceItemSource.DATA_INCLUSION,
+            GenericReferenceItemKind.NETWORK,
+        )
+        if is_creation:
+            structure.reseaux_porteurs.add(*objs)
+        else:
+            structure.reseaux_porteurs.set(objs)
+
     def import_structures(self, client, sources):
         self.logger.info("Importing structures")
 
@@ -358,9 +370,13 @@ class Command(BaseCommand):
                 structure = Structure()
                 self._fill_structure_from_api_data(structure, diff_item.comparative_item)
                 structure.save()
+                self._fill_structure_related_fields_from_data(structure, diff_item.comparative_item, is_creation=True)
             elif diff_item.kind is diff.DiffItemKind.UPDATED:
                 self._fill_structure_from_api_data(diff_item.current_item, diff_item.comparative_item)
                 diff_item.current_item.save()
+                self._fill_structure_related_fields_from_data(
+                    diff_item.current_item, diff_item.comparative_item, is_creation=False
+                )
             elif diff_item.kind is diff.DiffItemKind.REMOVED:
                 diff_item.current_item.delete()
 

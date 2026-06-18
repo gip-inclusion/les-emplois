@@ -86,7 +86,7 @@
       "site_web": null,
       "horaires_accueil": null,
       "accessibilite_lieu": null,
-      "reseaux_porteurs": null
+      "reseaux_porteurs": ["mission-locale"]
     },
     {
       "source": "dora",
