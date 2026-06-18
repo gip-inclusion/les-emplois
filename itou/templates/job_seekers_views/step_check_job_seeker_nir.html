@@ -75,6 +75,13 @@
                         </p>
                     {% endfragment %}
                 {% endcomponent_info %}
+                {% if standalone_creation %}
+                    {% component_alert content=content variant="info" %}
+                        {% fragment as content %}
+                            <p class="mb-0">Vous serez automatiquement désigné comme dernier accompagnateur connu de cet usager.</p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% endif %}
             {% endif %}
             {# Reload this page and show a modal containing more information about the job seeker. #}
             {% itou_buttons_form primary_label="Suivant" primary_name="preview" primary_value="1" reset_url=reset_url %}
