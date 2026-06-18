@@ -99,6 +99,30 @@ def build_services_search_url(request, job_seeker):
     return reverse("search:services_results", query=query)
 
 
+def assign_user_as_job_seeker_last_advisor(request, job_seeker):
+    last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
+    if (last_advisor and last_advisor.pk == request.user.pk) and (
+        last_advisor_org and last_advisor_org.pk == request.current_organization.pk
+    ):
+        messages.info(
+            request,
+            f"Vous êtes déjà le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}.",
+            extra_tags="toast",
+        )
+    else:
+        JobSeekerAssignment.objects.upsert_assignment(
+            job_seeker=job_seeker,
+            professional=request.user,
+            organization=request.current_organization,
+            last_action_kind=ActionKind.SELF_ASSIGN,
+        )
+        toast_title = "Accompagnateur mis à jour"
+        toast_message = (
+            f"Vous êtes désormais le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}."
+        )
+        messages.success(request, f"{toast_title}||{toast_message}", extra_tags="toast")
+
+
 class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
@@ -509,12 +533,6 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
                 kwargs={"service_uid": service_uid},
                 query={"job_seeker_public_id": job_seeker.public_id},
             )
-        if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
-            params = {
-                "job_seeker_public_id": job_seeker.public_id,
-                "city": job_seeker.city_slug if can_view_personal_information(self.request, job_seeker) else "",
-            }
-            return reverse("search:employers_results", query=params)
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
@@ -543,11 +561,11 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         }
 
     def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
-        if not self.request.from_prescriber:
-            return False
-
+        # Retrieve the previous url: if the user was last on the list view, we only want his own assignments
+        previous_url = self.job_seeker_session.get("config", {}).get("from_url")
+        from_all_coworkers = not (previous_url == reverse("job_seekers_views:list"))
         return job_seeker.pk in User.objects.assigned_job_seeker_ids(
-            self.request.user, self.request.current_organization, from_all_coworkers=True
+            self.request.user, self.request.current_organization, from_all_coworkers=from_all_coworkers
         )
 
 
@@ -659,6 +677,8 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
+                if self.standalone_creation:
+                    assign_user_as_job_seeker_last_advisor(request, job_seeker)
                 return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
             context = {
@@ -739,6 +759,8 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 if not can_add_nir:
                     if self.is_gps:
                         gps_utils.add_beneficiary(request, job_seeker, created=True)
+                    if self.standalone_creation:
+                        assign_user_as_job_seeker_last_advisor(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
                 try:
@@ -758,6 +780,8 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 else:
                     if self.is_gps:
                         gps_utils.add_beneficiary(request, job_seeker, created=True)
+                    if self.standalone_creation:
+                        assign_user_as_job_seeker_last_advisor(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
         return self.render_to_response(
