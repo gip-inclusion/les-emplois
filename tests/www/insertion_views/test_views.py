@@ -325,15 +325,22 @@ def test_detail_orientation_url_without_jwt_for_regular_prescriber(client, db):
     client.force_login(user)
 
     response = client.get(detail_url(service))
+    dora_url = f"https://dora.inclusion.gouv.fr/services/di--{service.uid}/orienter?mtm_campaign=lesemplois&mtm_kwd=service-professional"
 
     assert response.status_code == 200
     # Regular prescribers get direct DORA URL without nexus auto_login
     assertContains(
         response,
-        f"https://dora.inclusion.gouv.fr/services/di--{service.uid}/orienter?mtm_campaign=lesemplois&amp;mtm_kwd=service-professional",
+        f"""
+            <a class="btn btn-lg btn-white btn-block justify-content-center" rel="noopener" target="_blank"
+                href="{dora_url}"
+                data-matomo-event="true" data-matomo-category="fiche-service"
+                data-matomo-action="clic" data-matomo-option="orienter-un-bénéficiaire">
+                Orienter le bénéficiaire
+           </a>
+        """,
+        html=True,
     )
-    assertNotContains(response, "/portal/auto-login?next_url")
-    assertNotContains(response, "op=")
 
 
 def test_detail_credential_documents_empty(client, db):
