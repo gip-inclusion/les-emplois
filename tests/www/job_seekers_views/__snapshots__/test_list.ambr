@@ -19,7 +19,7 @@
                                   <i aria-hidden="true" class="ri-user-add-line fw-medium">
                                   </i>
                                   <span>
-                                      Créer un compte usager
+                                      Ajouter un usager
                                   </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results">
@@ -341,7 +341,7 @@
                                   <i aria-hidden="true" class="ri-user-add-line fw-medium">
                                   </i>
                                   <span>
-                                      Créer un compte usager
+                                      Ajouter un usager
                                   </span>
                               </a>
                               <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results">
