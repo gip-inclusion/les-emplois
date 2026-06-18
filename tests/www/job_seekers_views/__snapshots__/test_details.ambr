@@ -1913,7 +1913,7 @@
 # ---
 # name: test_job_application_tab[SQL queries]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -2139,6 +2139,67 @@
           FROM "nexus_activatedservice"
           WHERE "nexus_activatedservice"."user_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
         ''',
       }),
       dict({
@@ -3047,7 +3108,7 @@
 # ---
 # name: test_job_application_tab_as_siae[SQL queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -3359,6 +3420,67 @@
           FROM "nexus_activatedservice"
           WHERE "nexus_activatedservice"."user_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
         ''',
       }),
       dict({
@@ -4201,7 +4323,7 @@
 # ---
 # name: test_job_application_tab_shows_external_application_to_authorized_prescriber[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -4427,6 +4549,67 @@
           FROM "nexus_activatedservice"
           WHERE "nexus_activatedservice"."user_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
         ''',
       }),
       dict({
@@ -7174,7 +7357,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -7400,6 +7583,67 @@
           FROM "nexus_activatedservice"
           WHERE "nexus_activatedservice"."user_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
         ''',
       }),
       dict({
@@ -8519,7 +8763,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -8745,6 +8989,67 @@
           FROM "nexus_activatedservice"
           WHERE "nexus_activatedservice"."user_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
         ''',
       }),
       dict({

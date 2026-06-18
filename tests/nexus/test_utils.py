@@ -1,6 +1,7 @@
 import random
 
 import pytest
+from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -15,7 +16,9 @@ from itou.nexus.utils import (
     serialize_user,
 )
 from itou.users.enums import IdentityProvider
-from tests.nexus.factories import NexusRessourceSyncStatusFactory, NexusUserFactory
+from tests.companies.factories import CompanyMembershipFactory
+from tests.nexus.factories import NexusMembershipFactory, NexusRessourceSyncStatusFactory, NexusUserFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -121,6 +124,42 @@ class TestDropDownStatus:
 
         assert dropdown_status(user=user)["proconnect"] == (pc_on_emplois or pc_on_service)
         assert dropdown_status(email=user.email)["proconnect"] == (pc_on_emplois or pc_on_service)
+
+    def test_mvp_enabled_prescriber(self):
+        user = PrescriberFactory()
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        PrescriberMembershipFactory(user=user, organization__department=75)
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        PrescriberMembershipFactory(user=user, organization__department=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        assert dropdown_status(user=user)["mvp_enabled"] is True
+        assert dropdown_status(email=user.email)["mvp_enabled"] is True
+
+    def test_mvp_enabled_employer(self):
+        user = EmployerFactory()
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        CompanyMembershipFactory(user=user, company__department=75)
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        CompanyMembershipFactory(user=user, company__department=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        assert dropdown_status(user=user)["mvp_enabled"] is True
+        assert dropdown_status(email=user.email)["mvp_enabled"] is True
+
+    def test_mvp_enabled_external_service(self):
+        user = NexusUserFactory()
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        NexusMembershipFactory(user=user, structure__department=75)
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        NexusMembershipFactory(user=user, structure__department=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        assert dropdown_status(email=user.email)["mvp_enabled"] is True
 
     def test_activated_service(self):
         user = PrescriberFactory()

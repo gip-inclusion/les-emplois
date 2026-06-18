@@ -115,6 +115,7 @@ class HomePageView(NexusMixin, TemplateView):
         context["new_service_shown"] = next(
             (service for service in Service.activable() if service not in context["activated_services"]), None
         )
+        context["departments_list"] = ", ".join(settings.NEXUS_MVP_DEPARTMENTS)
         return context
 
 
