@@ -334,7 +334,7 @@
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 61,
+    'num_queries': 63,
     'queries': list([
       dict({
         'origin': list([
@@ -820,6 +820,48 @@
                                              "created_at",
                                              "updated_at")
           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.reference_data_by_value[insertion/management/commands/import_structures_and_services.py]',
+          'Command.get_reference_set_from_data[insertion/management/commands/import_structures_and_services.py]',
+          'Command._fill_structure_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
+          'Command.import_structures[insertion/management/commands/import_structures_and_services.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON ("insertion_genericreferenceitem"."value") "insertion_genericreferenceitem"."id",
+                             "insertion_genericreferenceitem"."source",
+                             "insertion_genericreferenceitem"."kind",
+                             "insertion_genericreferenceitem"."value",
+                             "insertion_genericreferenceitem"."label",
+                             "insertion_genericreferenceitem"."description",
+                             "insertion_genericreferenceitem"."created_at",
+                             "insertion_genericreferenceitem"."updated_at"
+          FROM "insertion_genericreferenceitem"
+          WHERE ("insertion_genericreferenceitem"."kind" = %s
+                 AND "insertion_genericreferenceitem"."source" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command._fill_structure_related_fields_from_data[insertion/management/commands/import_structures_and_services.py]',
+          'Command.import_structures[insertion/management/commands/import_structures_and_services.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "insertion_structure_reseaux_porteurs" ("structure_id",
+                                                              "genericreferenceitem_id")
+          VALUES (%s, %s) ON CONFLICT DO NOTHING
         ''',
       }),
       dict({

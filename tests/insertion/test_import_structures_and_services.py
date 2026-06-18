@@ -94,6 +94,12 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
         == ""
     )
 
+    assertQuerySetEqual(
+        Structure.objects.get(uid="mission-locale--with-mobilization-link").reseaux_porteurs.all(),
+        ["mission-locale"],
+        transform=attrgetter("value"),
+    )
+
     assert set(GenericReferenceItem.objects.all().values_list("kind", flat=True)) == {
         e.value for e in GenericReferenceItemKind
     }
