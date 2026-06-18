@@ -22,19 +22,6 @@
         </div>
     </section>
 
-    <section class="s-section">
-        <div class="s-section__container container">
-            {% component_alert content=content variant="info" dismissible=True %}
-                {% fragment as content %}
-                    <p class="mb-0">
-                        Cet espace est en phase d’expérimentation dans les départements {{ departments_list }}.
-                        Nous prévoyons de l’étendre progressivement à d’autres territoires.
-                    </p>
-                {% endfragment %}
-            {% endcomponent_alert %}
-        </div>
-    </section>
-
     {% if activated_services %}
         <section class="s-section">
             <div class="s-section__container container">

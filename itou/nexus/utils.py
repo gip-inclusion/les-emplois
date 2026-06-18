@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.utils import timezone
 
-from itou.companies.models import CompanyMembership
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
 from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
-from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 
@@ -50,23 +47,10 @@ def dropdown_status(*, email=None, user=None):
     service_users = get_service_users(email=email, user=user)
     email = email or user.email
 
-    mvp_enabled = (
-        CompanyMembership.objects.filter(user__email=email, company__department__in=settings.NEXUS_MVP_DEPARTMENTS)
-        .union(
-            PrescriberMembership.objects.filter(
-                user__email=email, organization__department__in=settings.NEXUS_MVP_DEPARTMENTS
-            )
-        )
-        .union(
-            NexusMembership.objects.filter(user__email=email, structure__department__in=settings.NEXUS_MVP_DEPARTMENTS)
-        )
-        .exists()
-    )
-
     return {
         "proconnect": Auth.PRO_CONNECT in {user.auth for user in service_users},
         "activated_services": sorted([user.source for user in service_users]),
-        "mvp_enabled": mvp_enabled,
+        "mvp_enabled": True,
     }
 
 
