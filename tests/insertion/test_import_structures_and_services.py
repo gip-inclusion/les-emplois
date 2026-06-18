@@ -45,6 +45,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
             "emplois-de-linclusion--empty",
             "dora--cc4e1fbc-533b-46e2-8b33-bc31c33c9ffd",
             "mission-locale--with-mobilization-link",
+            "dora--blacklisted-siren-structure",
         ],
         transform=attrgetter("uid"),
         ordered=False,
@@ -57,6 +58,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
             "dora--46f7ea19-c97b-4f45-90a9-027b44cad927",
             "dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e",
             "mission-locale--with-mobilization-link",
+            "dora--blacklisted-service",
         ],
         transform=attrgetter("uid"),
         ordered=False,
@@ -72,6 +74,7 @@ def test_full_import_wet_run(caplog, snapshot, apis_mocks):
 
     assert Service.objects.get(uid="dora--b6f651e2-56d7-4ffa-a1c6-ae7295089a9e").is_orientable_with_form is False
     assert Service.objects.get(uid="mission-locale--with-mobilization-link").is_orientable_with_form is False
+    assert Service.objects.get(uid="dora--blacklisted-service").is_orientable_with_form is False
     assert Service.objects.get(uid="dora--46f7ea19-c97b-4f45-90a9-027b44cad927").is_orientable_with_form is True
 
     assert (
