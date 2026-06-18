@@ -73,6 +73,7 @@ class Migration(migrations.Migration):
                             ("ACCEPT", "acceptation de candidature"),
                             ("IAE_ELIGIBILITY", "validation de l'éligibilité IAE"),
                             ("GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"),
+                            ("SELF_ASSIGN", "se positionner comme accompagnateur"),
                         ],
                         default="CREATE",
                         verbose_name="dernière action effectuée",
