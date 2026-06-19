@@ -1,4 +1,5 @@
 import json
+import logging
 from urllib.parse import urljoin
 
 import httpx
@@ -6,7 +7,10 @@ from django.conf import settings
 
 from itou.utils.command import BaseCommand
 from itou.utils.enums import ItouEnvironment
-from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
+from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, dora_s3_client, s3_client
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -39,12 +43,23 @@ class Command(BaseCommand):
                         ],
                     }
                 ],
+                "ignore": False,
             },
         }
+
+        if settings.ITOU_ENVIRONMENT in [ItouEnvironment.TEST, ItouEnvironment.DEV]:
+            buckets[settings.DORA_AWS_S3_STORAGE_BUCKET_NAME] = {
+                "client": dora_s3_client(),
+                "url": settings.DORA_AWS_S3_ENDPOINT_URL,
+                "ignore": settings.ITOU_ENVIRONMENT not in [ItouEnvironment.DEV, ItouEnvironment.TEST],
+            }
 
         # The environment variables may not be configured in some environments such as DEMO
         buckets = {key: value for key, value in buckets.items() if key}
 
+        expected_length = 2
+        if (detected_length := len(buckets)) < expected_length:
+            logger.warning(f"Expected {expected_length} configurations but only {detected_length} found.")
         return buckets
 
     def handle(self, *args, autoexpire=False, **options):

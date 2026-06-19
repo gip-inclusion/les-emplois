@@ -86,9 +86,11 @@ PILOTAGE_DATASTORE_DB_DATABASE = os.getenv("PILOTAGE_DATASTORE_DB_DATABASE", os.
 PILOTAGE_DATA_HASH_SALT = os.getenv("PILOTAGE_DATA_HASH_SALT")
 
 AWS_STORAGE_BUCKET_NAME = "dev"
-SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
 PILOTAGE_DATASTORE_S3_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+DORA_AWS_S3_STORAGE_BUCKET_NAME = "doradev"
+
+SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
