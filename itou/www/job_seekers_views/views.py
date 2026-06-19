@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, View
 
 from itou.approvals.enums import ProlongationRequestStatus
@@ -37,7 +38,11 @@ from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
-from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.perms.utils import (
+    can_edit_personal_information,
+    can_view_last_advisor_contact_info,
+    can_view_personal_information,
+)
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -206,6 +211,7 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             # already checked in test_func because the user name is displayed in the title
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
+            "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
         }
 
@@ -1533,3 +1539,31 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
     if request.htmx:
         template_name += "#nir-modification-request"
     return render(request, template_name, context)
+
+
+@require_POST
+@check_request(lambda request: request.user.is_job_seeker or request.user.is_professional)
+def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode):
+    template_name = {
+        "email": "job_seekers_views/includes/last_known_advisor.html#last-known-advisor-email",
+        "phone": "job_seekers_views/includes/last_known_advisor.html#last-known-advisor-phone",
+    }.get(mode, None)
+    if not template_name:
+        raise ValueError("Invalid mode: %s", mode)
+
+    job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
+
+    professional_is_advisor = (
+        request.user.is_professional
+        and JobSeekerAssignment.objects.assigned_to(request.user, request.current_organization)
+        .filter(job_seeker=job_seeker)
+        .exists()
+    )
+    user_is_target_jobseeker = request.user.pk == job_seeker.pk
+
+    # Only return if the user is the job seeker themselves or a professional acting as an advisor for the job seeker
+    if professional_is_advisor or user_is_target_jobseeker:
+        last_advisor, _ = job_seeker.last_advisor_with_org
+        return render(request, template_name, {"last_advisor": last_advisor})
+
+    raise PermissionDenied
