@@ -534,6 +534,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         return self._request(
             f"{self.base_url}{Endpoints.LECTURE_ORIENTATION_USAGER}",
             method="GET",
+            params={"etatOrientation": "OUVERT"},
             jeton_usager=jeton_usager,
         )
 
