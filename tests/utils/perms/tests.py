@@ -8,13 +8,18 @@ from pytest_django.asserts import assertRedirects
 from itou.employee_record import enums as employee_record_enums
 from itou.users.enums import IdentityProvider
 from itou.utils.perms import employee_record
-from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.perms.utils import (
+    can_edit_personal_information,
+    can_view_last_advisor_contact_info,
+    can_view_personal_information,
+)
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -185,4 +190,36 @@ class TestUtils:
                 request = get_request(locals()[user_type])
                 assert can_view_personal_information(request, locals()[other_user_type]) is expected, (
                     f"{user_type} can_view_personal_information {other_user_type}"
+                )
+
+    def test_can_view_last_advisor_contact_info(self):
+        job_seeker = JobSeekerFactory()
+        professional_with_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker).professional
+        professional_without_assignment = PrescriberFactory()
+        last_known_advisor = JobSeekerAssignmentFactory(job_seeker=job_seeker).professional
+
+        specs = {
+            "professional_with_assignment": {
+                "professional_with_assignment": False,
+                "professional_without_assignment": False,
+                "job_seeker": True,
+            },
+            "professional_without_assignment": {
+                "professional_with_assignment": False,
+                "professional_without_assignment": False,
+                "job_seeker": False,
+            },
+            "job_seeker": {
+                "professional_with_assignment": False,
+                "professional_without_assignment": False,
+                "job_seeker": True,
+            },
+        }
+
+        for user_type, user_specs in specs.items():
+            for other_user_type, expected in user_specs.items():
+                request = get_request(locals()[user_type])
+                request.current_organization = None
+                assert can_view_last_advisor_contact_info(request, locals()[other_user_type]) is expected, (
+                    f"{user_type} can_view_last_advisor_contact_info {other_user_type}"
                 )
