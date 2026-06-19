@@ -205,24 +205,40 @@ def temporary_bucket_name_fixture():
     yield f"tests-{uuid.uuid4()}"
 
 
+@pytest.fixture(name="temporary_dora_bucket_name", scope="session")
+def temporary_dora_bucket_name_fixture():
+    yield f"tests-dora-{uuid.uuid4()}"
+
+
 @pytest.fixture(name="temporary_bucket_setup", scope="session")
-def temporary_bucket_setup_fixture(temporary_bucket_name):
-    with override_settings(AWS_STORAGE_BUCKET_NAME=temporary_bucket_name):
+def temporary_bucket_setup_fixture(temporary_bucket_name, temporary_dora_bucket_name):
+    with override_settings(
+        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, DORA_AWS_S3_STORAGE_BUCKET_NAME=temporary_dora_bucket_name
+    ):
         call_command("configure_buckets")
     yield temporary_bucket_name
     client = s3_client()
     with contextlib.suppress(NoObjectsInBucket):
         delete_all_objects_versions(client, bucket=temporary_bucket_name)
+        delete_all_objects_versions(client, bucket=temporary_dora_bucket_name)
     client.delete_bucket(Bucket=temporary_bucket_name)
+    client.delete_bucket(Bucket=temporary_dora_bucket_name)
 
 
 @pytest.fixture(scope="function", autouse=True)
-def temporary_bucket_settings(temporary_bucket_name, monkeypatch):
+def temporary_bucket_settings(temporary_bucket_name, temporary_dora_bucket_name, monkeypatch):
+    buckets_data = {
+        "default": temporary_bucket_name,
+        "public": temporary_bucket_name,
+        "dora": temporary_dora_bucket_name,
+    }
     with override_settings(
-        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name
+        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name,
+        PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name,
+        DORA_AWS_S3_STORAGE_BUCKET_NAME=temporary_dora_bucket_name,
     ):
-        for storage in {"default", "public"}:
-            monkeypatch.setattr(storages[storage], "bucket_name", temporary_bucket_name)
+        for storage, bucket_name in buckets_data.items():
+            monkeypatch.setattr(storages[storage], "bucket_name", bucket_name)
             monkeypatch.setattr(storages[storage], "_bucket", None)
         yield
 

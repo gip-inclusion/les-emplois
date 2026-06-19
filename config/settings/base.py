@@ -266,12 +266,49 @@ STATIC_ROOT = os.path.join(APPS_DIR, "static_collected")
 
 STATIC_URL = "/static/"
 
+# S3 uploads
+# ------------------------------------------------------------------------------
+# django-storages
+AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
+AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
+AWS_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
+# CleverCloud S3 implementation does not support recent data integrity features from AWS.
+# https://github.com/boto/boto3/issues/4392
+# https://github.com/boto/boto3/issues/4398#issuecomment-2619946229
+AWS_S3_CLIENT_CONFIG = Config(
+    request_checksum_calculation="when_required",
+    response_checksum_validation="when_required",
+)
+
+# The maximum amount of memory (in bytes) a file can take up before being rolled over into a temporary file on disk.
+# Picked 5 MB, the max size for a resume. Keep it fast for files under that size, and avoid filling up the RAM.
+AWS_S3_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_REGION_NAME = "eu-west-3"
+AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CELLAR_ADDON_HOST')}/"
+
+MIGRATE_RESUME_MAX_RUNTIME_MINUTES = int(os.getenv("MIGRATE_RESUME_MAX_RUNTIME_MINUTES", "60"))
+
+DORA_AWS_S3_ENDPOINT_URL = os.getenv("DORA_AWS_S3_ENDPOINT_URL")
+DORA_AWS_S3_ACCESS_KEY_ID = os.getenv("DORA_AWS_S3_ACCESS_KEY_ID")
+DORA_AWS_S3_SECRET_ACCESS_KEY = os.getenv("DORA_AWS_S3_SECRET_ACCESS_KEY")
+DORA_AWS_S3_STORAGE_BUCKET_NAME = os.getenv("DORA_AWS_S3_STORAGE_BUCKET_NAME")
+
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
     },
     "public": {
         "BACKEND": "itou.utils.storage.s3.PublicStorage",
+    },
+    "dora": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": DORA_AWS_S3_STORAGE_BUCKET_NAME,
+            "access_key": DORA_AWS_S3_ACCESS_KEY_ID,
+            "secret_key": DORA_AWS_S3_SECRET_ACCESS_KEY,
+            "endpoint_url": DORA_AWS_S3_ENDPOINT_URL,
+        },
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
@@ -653,29 +690,6 @@ ASP_SFTP_KNOWN_HOSTS = os.getenv("ASP_SFTP_KNOWN_HOSTS")
 # ASP data archive passwords
 ASP_EA2_UNZIP_PASSWORD = os.getenv("ASP_EA2_UNZIP_PASSWORD")
 
-# S3 uploads
-# ------------------------------------------------------------------------------
-# django-storages
-AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
-AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
-AWS_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
-# CleverCloud S3 implementation does not support recent data integrity features from AWS.
-# https://github.com/boto/boto3/issues/4392
-# https://github.com/boto/boto3/issues/4398#issuecomment-2619946229
-AWS_S3_CLIENT_CONFIG = Config(
-    request_checksum_calculation="when_required",
-    response_checksum_validation="when_required",
-)
-
-# The maximum amount of memory (in bytes) a file can take up before being rolled over into a temporary file on disk.
-# Picked 5 MB, the max size for a resume. Keep it fast for files under that size, and avoid filling up the RAM.
-AWS_S3_MAX_MEMORY_SIZE = 5 * 1024 * 1024
-AWS_S3_FILE_OVERWRITE = False
-AWS_S3_REGION_NAME = "eu-west-3"
-AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CELLAR_ADDON_HOST')}/"
-
-MIGRATE_RESUME_MAX_RUNTIME_MINUTES = int(os.getenv("MIGRATE_RESUME_MAX_RUNTIME_MINUTES", "60"))
-
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
 # Replaced by ACCOUNT_ADAPTER (see above) for general purpose. We still need it to redirect after hijack
 LOGIN_REDIRECT_URL = "/dashboard/"
@@ -767,11 +781,6 @@ BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True
 DORA_WWW_BASE_URL = os.getenv("DORA_WWW_BASE_URL", "https://dora.inclusion.gouv.fr")
 DORA_API_BASE_URL = os.getenv("DORA_API_BASE_URL", "https://api.dora.inclusion.gouv.fr")
 DORA_API_TOKEN = os.getenv("DORA_API_TOKEN")
-
-DORA_AWS_S3_ENDPOINT_URL = os.getenv("DORA_AWS_S3_ENDPOINT_URL")
-DORA_AWS_S3_ACCESS_KEY_ID = os.getenv("DORA_AWS_S3_ACCESS_KEY_ID")
-DORA_AWS_S3_SECRET_ACCESS_KEY = os.getenv("DORA_AWS_S3_SECRET_ACCESS_KEY")
-DORA_AWS_S3_STORAGE_BUCKET_NAME = os.getenv("DORA_AWS_S3_STORAGE_BUCKET_NAME")
 
 # GPS
 # ------------------------------------------------------------------------------
