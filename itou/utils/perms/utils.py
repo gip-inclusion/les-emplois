@@ -1,3 +1,6 @@
+from itou.users.models import JobSeekerAssignment
+
+
 def can_view_personal_information(request, user):
     """
     To view the personal information of another user, one must either be:
@@ -42,3 +45,27 @@ def _can_edit_personal_information(editor, user, *, is_allowed):
         return True
 
     return user.is_job_seeker and editor.is_professional and (is_allowed or user.is_created_by(editor))
+
+
+def can_view_last_advisor_contact_info(request, job_seeker):
+    """
+    To view the contact info of a job seeker's last known advisor, a user must either be:
+    - the job seeker themselves
+    - a professional involved in an assignment with the job seeker
+    """
+    if (
+        job_seeker.is_job_seeker and request.user.pk == job_seeker.pk
+    ):  # A job seeker can view the contact info of his last known advisor
+        return True
+
+    return (
+        job_seeker.is_job_seeker
+        and request.user.is_professional
+        and (
+            JobSeekerAssignment.objects.assigned_to(
+                professional=request.user, organization=request.current_organization
+            )
+            .filter(job_seeker=job_seeker)
+            .exists()
+        )
+    )
