@@ -6,7 +6,7 @@ from django.conf import settings
 
 from itou.utils.command import BaseCommand
 from itou.utils.enums import ItouEnvironment
-from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, pilotage_s3_client, s3_client
+from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, dora_s3_client, pilotage_s3_client, s3_client
 
 
 BUCKETS = {
@@ -21,6 +21,21 @@ BUCKETS = {
                 "Action": "s3:GetObject",
                 "Resource": [
                     f"arn:aws:s3:::{settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME}/*",
+                ],
+            }
+        ],
+    },
+    settings.DORA_AWS_S3_STORAGE_BUCKET_NAME: {
+        "client": dora_s3_client(),
+        "url": settings.DORA_AWS_S3_ENDPOINT_URL,
+        "policy_statements": [
+            {
+                "Sid": "AllowPublicRead",
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Action": "s3:GetObject",
+                "Resource": [
+                    f"arn:aws:s3:::{settings.DORA_AWS_S3_STORAGE_BUCKET_NAME}/*",
                 ],
             }
         ],

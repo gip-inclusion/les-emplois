@@ -195,7 +195,9 @@ def temporary_bucket_name_fixture():
 @pytest.fixture(name="temporary_bucket_setup", scope="session")
 def temporary_bucket_setup_fixture(temporary_bucket_name):
     with override_settings(
-        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name
+        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name,
+        PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name,
+        DORA_AWS_S3_STORAGE_BUCKET_NAME=temporary_bucket_name,
     ):
         # Only one bucket is created for tests, the last item of configure_bucket.BUCKETS will be used.
         call_command("configure_bucket")
@@ -209,7 +211,9 @@ def temporary_bucket_setup_fixture(temporary_bucket_name):
 @pytest.fixture(scope="function", autouse=True)
 def temporary_bucket_settings(temporary_bucket_name, monkeypatch):
     with override_settings(
-        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name
+        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name,
+        PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name,
+        DORA_AWS_S3_STORAGE_BUCKET_NAME=temporary_bucket_name,
     ):
         for storage in {"default", "public"}:
             monkeypatch.setattr(storages[storage], "bucket_name", temporary_bucket_name)
