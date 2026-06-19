@@ -16,7 +16,7 @@
 # ---
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 32,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -1029,6 +1029,25 @@
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" = %s
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
         ''',
       }),
       dict({

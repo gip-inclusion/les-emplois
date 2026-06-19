@@ -148,4 +148,9 @@ urlpatterns = [
         views.CheckJobSeekerInformations.as_view(),
         name="check_job_seeker_info",
     ),
+    path(
+        "display/<uuid:job_seeker_public_id>/<str:mode>",
+        views.display_last_known_advisor_contact_info,
+        name="display_last_known_advisor_contact_info",
+    ),
 ]
