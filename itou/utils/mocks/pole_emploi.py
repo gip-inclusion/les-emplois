@@ -218,6 +218,7 @@ class ResponseKind(enum.Enum):
     NOT_CERTIFIED = "not_certified"  # 200
     NOT_FOUND = "not_found"  # 200
     MULTIPLE_USERS_RETURNED = "multiple_users_returned"  # 200
+    NO_DATA_FOUND = "no_data_found"  # 204
     BAD_REQUEST = "validation_error"  # 400
     FORBIDDEN = "not_allowed"  # 403
     INTERNAL_SERVER_ERROR = "server_error"  # 500
@@ -332,6 +333,7 @@ RESPONSES = {
             },
             "telephones": [{"numeroTelephone": "0972723949"}],
         },
+        ResponseKind.NO_DATA_FOUND: {},
     },
     Endpoints.STATUT_USAGER: {
         ResponseKind.CERTIFIED: {
@@ -351,6 +353,7 @@ RESPONSES = {
                 "m_motif_cloture_lib": "ABANDON ACTION AIDE A LA RECHERCHE D'UNE ACTIVITE SUPPRESSION DE 1 MOIS",
             },
         },
+        ResponseKind.NO_DATA_FOUND: {},
     },
     Endpoints.LECTURE_ORIENTATION_USAGER: {
         ResponseKind.CERTIFIED: [
@@ -887,5 +890,6 @@ RESPONSES = {
                 },
             },
         },
+        ResponseKind.NO_DATA_FOUND: {},
     },
 }
