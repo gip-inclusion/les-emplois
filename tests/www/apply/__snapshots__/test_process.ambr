@@ -1288,7 +1288,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 30,
+    'num_queries': 31,
     'queries': list([
       dict({
         'origin': list([
@@ -2380,6 +2380,25 @@
       }),
       dict({
         'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'job_application_sender_left_org[www/apply/views/process_views.py]',
           'details_for_company[www/apply/views/process_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
@@ -2791,7 +2810,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 31,
+    'num_queries': 32,
     'queries': list([
       dict({
         'origin': list([
@@ -3899,6 +3918,25 @@
           WHERE ("job_applications_jobapplicationcomment"."job_application_id" = %s
                  AND "job_applications_jobapplicationcomment"."company_id" = %s)
           ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
         ''',
       }),
       dict({
