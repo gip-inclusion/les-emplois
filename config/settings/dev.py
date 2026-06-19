@@ -88,7 +88,7 @@ PILOTAGE_DATA_HASH_SALT = os.getenv("PILOTAGE_DATA_HASH_SALT")
 AWS_STORAGE_BUCKET_NAME = "dev"
 SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
-PILOTAGE_DATASTORE_S3_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+PILOTAGE_DATASTORE_S3_BUCKET_NAME = "pilotagedev"
 
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405

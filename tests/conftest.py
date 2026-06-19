@@ -194,7 +194,10 @@ def temporary_bucket_name_fixture():
 
 @pytest.fixture(name="temporary_bucket_setup", scope="session")
 def temporary_bucket_setup_fixture(temporary_bucket_name):
-    with override_settings(AWS_STORAGE_BUCKET_NAME=temporary_bucket_name):
+    with override_settings(
+        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name
+    ):
+        # Only one bucket is created for tests, the last item of configure_bucket.BUCKETS will be used.
         call_command("configure_bucket")
     yield temporary_bucket_name
     client = s3_client()
