@@ -214,6 +214,37 @@ class TestEmployeeRecordAPIFetchList:
         assert results.get("adresse").get("adrTelephone") == self.user.phone
         assert results.get("adresse").get("adrMail") == self.user.email
 
+    def test_salarieLangueFrancaise(self, api_client, caplog):
+        # Test use of `X-API-salarieLangueFrancaise-like-asp`.
+        api_client.force_login(self.employer)
+
+        # Force value to True to avoid depending on factory.
+        profile = self.employee_record.job_application.job_seeker.jobseeker_profile
+        profile.low_level_in_french = True
+        profile.save()
+
+        # Old-style behaviour (without HTTP header)
+        response = api_client.get(self.endpoint_url + "?status=READY", format="json")
+        [item] = response.json()["results"]
+        sent = item["situationSalarie"]["salarieLangueFrancaise"]
+        assert sent is not profile.low_level_in_french  # True
+        assert len(caplog.messages) == 2
+        assert "without X-API-salarieLangueFrancaise-like-asp" in caplog.messages[0]
+        assert caplog.messages[1] == "HTTP 200 OK"
+        caplog.clear()
+
+        # New-style behaviour (with HTTP header)
+        response = api_client.get(
+            self.endpoint_url + "?status=READY",
+            headers={"X-API-salarieLangueFrancaise-like-asp": "1"},
+            format="json",
+        )
+        [item] = response.json()["results"]
+        sent = item["situationSalarie"]["salarieLangueFrancaise"]
+        assert sent is profile.low_level_in_french  # False
+        assert len(caplog.messages) == 1
+        assert caplog.messages[0] == "HTTP 200 OK"
+
 
 class TestEmployeeRecordAPIParameters:
     endpoint_url = reverse("v1:employee-records-list")

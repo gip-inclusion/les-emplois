@@ -14,6 +14,7 @@ from django.utils.csp import CSP
 from dotenv import load_dotenv
 
 import itou
+import itou.api.changelog
 from config.sentry import sentry_init
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
@@ -602,7 +603,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "API - Les emplois de l'inclusion",
-    "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
+    "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**\n\n" + itou.api.changelog.CHANGELOG,
     "VERSION": "1.0.0",
     "ENUM_NAME_OVERRIDES": {
         "Civilite": "itou.users.enums.Title",
