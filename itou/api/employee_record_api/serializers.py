@@ -1,3 +1,4 @@
+import logging
 import re
 
 from rest_framework import serializers
@@ -10,6 +11,9 @@ from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
 from itou.users.models import User
 from itou.utils.serializers import NullField, NullIfEmptyCharField
+
+
+logger = logging.getLogger(__name__)
 
 
 # Employee record serializers are mostly the same as the ones used
@@ -187,8 +191,30 @@ class _API_SituationSerializer(serializers.Serializer):
     salarieMobilite = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.mobility_issue")
 
     def get_salarieLangueFrancaise(self, obj: EmployeeRecord) -> bool:
-        # In ASP, True means that the job seeker can speak French
-        return not obj.job_application.job_seeker.jobseeker_profile.low_level_in_french
+        request = self.context["request"]
+        has_low_level_in_french = obj.job_application.job_seeker.jobseeker_profile.low_level_in_french
+        # ASP inverted the meaning of this field on 2026-07-09. We
+        # want to mirror it without breaking users of our API.
+        # Clients must send an HTTP header to have the new behaviour.
+        # FIXME (dbaty): Between 2026-11-01 and 2026-11-15,
+        # permanently switch to the new behaviour by deleting the
+        # whole method and define the field like this:
+        #   salarieLangueFrancaise = serializers.BooleanField(
+        #     source="job_application.job_seeker.jobseeker_profile.low_level_in_french"
+        #   )
+        # Also, update the API doc (changelog + note about the HTTP
+        # header) and remove addition of `context` in tests of
+        # serializers (+ test_salarieLangueFrancaise).
+        if "X-API-salarieLangueFrancaise-like-asp" not in request.headers:
+            logger.info(
+                "User %s accessed employee record API without X-API-salarieLangueFrancaise-like-asp HTTP header",
+                request.user.id,
+            )
+            # Old behaviour: True means that the job seeker DO speak French.
+            return not has_low_level_in_french
+        # New behaviour: True indicates an obstacle (as for other
+        # `salarie*` fields), i.e. the person does NOT speak French.
+        return has_low_level_in_french
 
 
 class EmployeeRecordAPISerializer(serializers.Serializer):

@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+from django.test import RequestFactory
 from django.utils import timezone
 
 from itou.api.employee_record_api.serializers import (
@@ -15,6 +16,16 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
+
+
+def make_dummy_request():
+    class DummyUser:
+        id = 1
+
+    request = RequestFactory().get("/whatever")
+    # Log expects a request with a user (just an id)
+    request.user = DummyUser()
+    return request
 
 
 def test_address_serializer_hexa_additional_address():
@@ -167,7 +178,8 @@ def test_oeth_employee(kind):
         job_application__to_company__kind=kind,
     )
     employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
-    data = EmployeeRecordAPISerializer(employee_record).data
+
+    data = EmployeeRecordAPISerializer(employee_record, context={"request": make_dummy_request()}).data
 
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"]["salarieOETH"] is True
@@ -184,7 +196,8 @@ def test_notification_serializer():
     employee_record.save()
 
     data = EmployeeRecordUpdateNotificationAPISerializer(
-        EmployeeRecordUpdateNotification(employee_record=employee_record)
+        EmployeeRecordUpdateNotification(employee_record=employee_record),
+        context={"request": make_dummy_request()},
     ).data
     assert data is not None
     assert data.get("siret") == employee_record.siret
