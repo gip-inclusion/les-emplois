@@ -18,6 +18,12 @@ if [[ "$INSTANCE_NUMBER" != "0" ]]; then
     exit 0
 fi
 
+# TEMPORARILY disable cronjobs.
+# FIXME: restore when ASP has deployed their changes.
+exit 0
+
 cd "$APP_HOME" || exit
+ # shellcheck disable=SC2317
 django-admin transfer_employee_records --wet-run "$@"
+ # shellcheck disable=SC2317
 django-admin transfer_employee_records_updates --wet-run "$@"

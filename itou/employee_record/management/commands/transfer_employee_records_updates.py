@@ -156,6 +156,9 @@ class Command(EmployeeRecordTransferCommand):
             self._upload_batch_file(sftp, batch, dry_run)
 
     def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
+        # TEMPORARILY disable cronjob
+        # FIXME: restore when ASP has deployed their changes.
+        return
         if preflight:
             self.logger.info("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecordUpdateNotification)
