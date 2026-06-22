@@ -42,6 +42,7 @@ def get_permissions_dict():
     import itou.geiq_assessments.models as geiq_assessments_models
     import itou.geo.models as geo_models
     import itou.gps.models as gps_models
+    import itou.insertion.models as insertion_models
     import itou.institutions.models as institution_models
     import itou.invitations.models as invitation_models
     import itou.job_applications.models as job_applications_models
@@ -98,6 +99,9 @@ def get_permissions_dict():
         geiq_assessments_models.LabelInfos: PERMS_READ,
         gps_models.FollowUpGroup: PERMS_DELETE,
         gps_models.FollowUpGroupMembership: PERMS_DELETE,
+        insertion_models.GenericReferenceItem: PERMS_READ,
+        insertion_models.Service: PERMS_READ,
+        insertion_models.Structure: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
         institution_models.InstitutionMembership: PERMS_ADD,
         invitation_models.EmployerInvitation: PERMS_EDIT | PERMS_DELETE,
