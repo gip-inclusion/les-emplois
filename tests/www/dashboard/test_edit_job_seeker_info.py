@@ -716,7 +716,6 @@ class TestEditJobSeekerInfo:
         url = f"{url}?back_url={back_url}"
 
         response = client.get(url)
-        assertNotContains(response, self.EMAIL_LABEL)
 
         birthdate = datetime.date(1978, 12, 20)
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
@@ -740,8 +739,7 @@ class TestEditJobSeekerInfo:
         assert response.url == back_url
 
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        # The email is not changed, but other fields are taken into account
-        assert job_seeker.email != new_email
+        assert job_seeker.email == new_email
         assert job_seeker.jobseeker_profile.birthdate == birthdate
         assert job_seeker.address_line_1 == post_data["address_line_1"]
         assert job_seeker.post_code == post_data["post_code"]

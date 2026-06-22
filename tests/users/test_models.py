@@ -464,29 +464,6 @@ class TestModel:
             },
         ]
 
-    def test_can_edit_email(self):
-        user = PrescriberFactory()
-        job_seeker = JobSeekerFactory()
-
-        # Same user.
-        assert not user.can_edit_email(user)
-
-        # All conditions are met.
-        job_seeker = JobSeekerFactory(created_by=user)
-        assert user.can_edit_email(job_seeker)
-
-        # Job seeker logged in, he is not longer handled by a proxy.
-        job_seeker = JobSeekerFactory(last_login=timezone.now())
-        assert not user.can_edit_email(job_seeker)
-
-        # User did not create the job seeker's account.
-        job_seeker = JobSeekerFactory(created_by=PrescriberFactory())
-        assert not user.can_edit_email(job_seeker)
-
-        # Job seeker has verified his email.
-        job_seeker = JobSeekerFactory(created_by=user, with_verified_email=True)
-        assert not user.can_edit_email(job_seeker)
-
     @pytest.mark.parametrize("email", ["user@example.com", None])
     @pytest.mark.parametrize("upcoming_deletion_notified", [True, False])
     @pytest.mark.parametrize("has_sso_provider", [True, False])

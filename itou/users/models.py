@@ -504,9 +504,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             return department_from_postcode(self.jobseeker_profile.hexa_post_code)
         return ""
 
-    def can_edit_email(self, user):
-        return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
-
     def can_be_reactivated(self):
         if self.is_active:  # Already active
             return False
