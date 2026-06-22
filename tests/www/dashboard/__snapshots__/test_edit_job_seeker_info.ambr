@@ -133,7 +133,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -575,24 +575,6 @@
       }),
       dict({
         'origin': list([
-          'User.has_verified_email[users/models.py]',
-          'User.can_edit_email[users/models.py]',
-          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
-          'edit_job_seeker_info[www/dashboard/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "account_emailaddress"
-          WHERE ("account_emailaddress"."user_id" = %s
-                 AND "account_emailaddress"."email" = %s
-                 AND "account_emailaddress"."verified")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
@@ -733,7 +715,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1133,24 +1115,6 @@
           FROM "users_identitycertification"
           WHERE "users_identitycertification"."jobseeker_profile_id" = %s
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.has_verified_email[users/models.py]',
-          'User.can_edit_email[users/models.py]',
-          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
-          'edit_job_seeker_info[www/dashboard/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "account_emailaddress"
-          WHERE ("account_emailaddress"."user_id" = %s
-                 AND "account_emailaddress"."email" = %s
-                 AND "account_emailaddress"."verified")
-          LIMIT 1
         ''',
       }),
       dict({

@@ -88,7 +88,7 @@ class EditJobSeekerInfoForm(
                 f"<a href='{get_zendesk_form_url()}' target='_blank'>"
                 "contacter notre support technique</a>"
             )
-        elif editor and editor.can_edit_email(self.instance):
+        elif editor and editor.pk != self.instance.pk:
             # Only prescribers and employers can edit the job seeker's email here under certain conditions
             self.fields["email"].disabled = False
         else:
