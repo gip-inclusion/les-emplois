@@ -73,7 +73,9 @@ class TestStructures:
         assert pretty_indented(modal) == snapshot
 
     def test_card_view_renders_bootstrap_tabs_with_full_payload(self, client, snapshot):
-        structure = StructureFactory(name="Structure test", description="Description of test structure")
+        structure = StructureFactory(
+            uid="structure-uid", name="Structure test", description="Description of test structure"
+        )
 
         services = []
         for i in range(3):
@@ -94,7 +96,10 @@ class TestStructures:
 
         response = client.get(self.get_structure_url(structure))
 
-        expected_href = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+        service_url = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+        structure_url = reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid})
+        expected_href = f"{service_url}?back_url={structure_url}%23structure-services"
+
         assertContains(response, f'href="{expected_href}"')
 
 

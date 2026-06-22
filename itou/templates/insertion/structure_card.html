@@ -125,4 +125,12 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/sliding_tabs.js" %}'></script>
+    <script nonce="{{ csp_nonce }}">
+        if (window.location.hash) {
+            const tab = document.querySelector(`a[data-bs-toggle="tab"][href="${window.location.hash}"]`);
+            if (tab) {
+                bootstrap.Tab.getOrCreateInstance(tab).show();
+            }
+        }
+    </script>
 {% endblock %}
