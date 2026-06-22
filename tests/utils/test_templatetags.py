@@ -122,7 +122,8 @@ class TestButtonsForm:
 
 class TestNav:
     @pytest.fixture(scope="class")
-    def named_urls(self):
+    @classmethod
+    def named_urls(cls):
         resolver = get_resolver()
         known_urls = set()
         for resolver in resolver.url_patterns:
