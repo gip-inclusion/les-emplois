@@ -9,7 +9,7 @@
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
                       <div class="c-prevstep">
-                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/search/services">
                               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
                               </i>
                               <span>
@@ -89,7 +89,7 @@
                           <p>
                               Ma structure de test
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/?back_url=/insertion/services/test-service-uid/" type="button">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -154,7 +154,7 @@
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
                       <div class="c-prevstep">
-                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/search/services">
                               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
                               </i>
                               <span>
@@ -234,7 +234,7 @@
                           <p>
                               Ma structure de test
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-uid/?back_url=/insertion/services/test-service-uid/" type="button">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -383,7 +383,7 @@
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
                       <div class="c-prevstep">
-                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/search/services">
                               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
                               </i>
                               <span>
@@ -547,7 +547,7 @@
                           <p>
                               Structure complète
                           </p>
-                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-full-uid/" type="button">
+                          <a class="btn btn-secondary w-100" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-full-uid/?back_url=/insertion/services/test-service-full-uid/" type="button">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -827,7 +827,7 @@
                   <div class="s-title-02__col col-12">
                       <div class="c-navinfo">
                           <div class="c-navinfo__prevstep">
-                              <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/">
+                              <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/search/services">
                                   <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
                                   </i>
                                   <span>
@@ -908,7 +908,7 @@
                                           <div class="d-flex align-items-center">
                                               <div>
                                                   <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-0/" rel="noopener" target="_blank">
+                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-0/?back_url=/insertion/structures/structure-uid/%23structure-services">
                                                           Test service 0
                                                       </a>
                                                   </div>
@@ -924,7 +924,7 @@
                                           <div class="d-flex align-items-center">
                                               <div>
                                                   <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-1/" rel="noopener" target="_blank">
+                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-1/?back_url=/insertion/structures/structure-uid/%23structure-services">
                                                           Test service 1
                                                       </a>
                                                   </div>
@@ -940,7 +940,7 @@
                                           <div class="d-flex align-items-center">
                                               <div>
                                                   <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-2/" rel="noopener" target="_blank">
+                                                      <a class="fw-bold text-decoration-none stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/service-uid-2/?back_url=/insertion/structures/structure-uid/%23structure-services">
                                                           Test service 2
                                                       </a>
                                                   </div>

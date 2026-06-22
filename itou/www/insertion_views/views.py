@@ -55,15 +55,42 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
             uid=structure_uid,
         )
 
+    def format_opening_hours(self):
+        opening_hours = []
+
+        osm_hours = format_osm_hours(self.structure.opening_hours)
+
+        if not osm_hours:
+            return None
+
+        for entry in osm_hours["entries"]:
+            label = entry["label"][:3]
+            hours = entry["hours"]
+            comment = f"({entry['comment']}) " if entry["comment"] else ""
+
+            opening_hours.append(f"{label}: {hours} {comment}")
+
+        formatted_opening_hours = "• ".join(opening_hours).rstrip()
+
+        public_holidays_notice = "(Hors jours fériés)" if osm_hours["has_ph_off"] else ""
+
+        return f"{formatted_opening_hours} {public_holidays_notice}"
+
     def get_context_data(self, **kwargs):
         services = list(self.structure.services.all())
         for service in services:
             service.perimeter = get_division_label(service.eligibility_zones) or "France entière"
+
         return super().get_context_data(**kwargs) | {
             "structure": self.structure,
             "matomo_custom_title": "Fiche structure d’insertion",
-            "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("home:hp")),
+            "back_url": get_safe_url(
+                self.request,
+                "back_url",
+                fallback_url=reverse("search:services_home"),
+            ),
             "services": services,
+            "formatted_opening_hours": self.format_opening_hours(),
         }
 
 
@@ -104,8 +131,8 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
         context["back_url"] = get_safe_url(
             self.request,
-            url=self.request.META.get("HTTP_REFERER"),
-            fallback_url=reverse("home:hp"),
+            "back_url",
+            fallback_url=reverse("search:services_home"),
         )
         context["matomo_custom_title"] = "Fiche de la service d'insértion"
         context["orientation_jwt"] = (
