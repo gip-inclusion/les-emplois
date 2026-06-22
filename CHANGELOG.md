@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2026-06-22
+
+### Ajouté
+
+- [Insertion : Ajouter la fiche service](https://github.com/gip-inclusion/les-emplois/pull/7810)
+- [Interface : Ajout d'une vue "Accompagnements" côté employeur (IAE)](https://github.com/gip-inclusion/les-emplois/pull/8192)
+- [Interface : Ajout de messages explicatifs concernant les PASS suspendus](https://github.com/gip-inclusion/les-emplois/pull/8199)
+- [Prescripteur : Nouvelles vues avec des données factices](https://github.com/gip-inclusion/les-emplois/pull/8162)
+
+### Modifié
+
+- [Demandeur d’emploi : Bloquer l’édition des informations d’identité lorsqu’elles sont fournies par un service externe](https://github.com/gip-inclusion/les-emplois/pull/8208)
+- [Inscription : Résolution d'un bug empêchant certains utilisateurs venant de certains fournisseurs d'identité de s'inscrire](https://github.com/gip-inclusion/les-emplois/pull/8285)
+- [Nexus : Généraliser à l'ensemble des départements](https://github.com/gip-inclusion/les-emplois/pull/8295)
+- [Tech : Autoriser la regénération du token d'API et ne l'afficher qu'à la création](https://github.com/gip-inclusion/les-emplois/pull/8229)
+
 ## 2026-06-15
 
 ### Ajouté
