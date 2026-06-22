@@ -1619,7 +1619,7 @@ class JobSeekerAssignmentManager(models.Manager):
         filters = [Q(professional=professional, prescriber_organization__isnull=True, company__isnull=True)]
         if organization:
             prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
-            company = None  # For now, we do not support employers
+            company = organization if isinstance(organization, Company) else None
             if from_all_coworkers:
                 filters.append(Q(prescriber_organization=prescriber_organization, company=company))
             else:

@@ -25,6 +25,7 @@ from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
     IdentityCertificationAuthorities,
@@ -39,7 +40,7 @@ from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -1443,9 +1444,21 @@ class TestJobSeekerAssignment:
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
 
-    def test_assigned_to(self):
-        organization = PrescriberOrganizationFactory()
-        prescriber = PrescriberMembershipFactory(organization=organization).user
+    @pytest.mark.parametrize(
+        "organization_factory,membership_factory",
+        [
+            (PrescriberOrganizationFactory, lambda org: partial(PrescriberMembershipFactory, organization=org)),
+            (CompanyFactory, lambda company: partial(CompanyMembershipFactory, company=company)),
+        ],
+        ids=["assigned_to_pro_with_prescriber_organization", "assigned_to_pro_with_company"],
+    )
+    def test_assigned_to(self, organization_factory, membership_factory):
+        organization = organization_factory()
+        is_prescriber_organization = isinstance(organization, PrescriberOrganization)
+        is_company = not is_prescriber_organization
+        prescriber_organization = is_prescriber_organization and organization or None
+        company = is_company and organization or None
+        prescriber = membership_factory(organization)().user
 
         # From the prescriber as a member of no organization
         assignment_no_organization = JobSeekerAssignmentFactory(
@@ -1454,14 +1467,16 @@ class TestJobSeekerAssignment:
 
         # From the prescriber as a member of the organization
         assignment_with_organization = JobSeekerAssignmentFactory(
-            professional=prescriber, prescriber_organization=organization
+            professional=prescriber, prescriber_organization=prescriber_organization, company=company
         )
 
         # From the prescriber as a member of another organization or company. We won't display those
         JobSeekerAssignmentFactory(professional=prescriber, prescriber_organization=PrescriberOrganizationFactory())
         JobSeekerAssignmentFactory(professional=prescriber, company=CompanyFactory())
 
-        assignment_coworker_organization = JobSeekerAssignmentFactory(prescriber_organization=organization)
+        assignment_coworker_organization = JobSeekerAssignmentFactory(
+            prescriber_organization=prescriber_organization, company=company
+        )
 
         assertQuerySetEqual(
             JobSeekerAssignment.objects.assigned_to(prescriber, organization=None),
