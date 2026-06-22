@@ -12,7 +12,7 @@ from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import User
-from itou.users.notifications import EditJobSeekerInfoNotification
+from itou.users.notifications import EditJobSeekerEmailNotification, EditJobSeekerInfoNotification
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.www.dashboard.forms import EditJobSeekerInfoForm
 from tests.companies.factories import CompanyFactory
@@ -174,6 +174,11 @@ class TestEditJobSeekerInfo:
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
 
+        # create mocks to track calls
+        spy_form = mocker.spy(EditJobSeekerInfoForm, "save")
+        mock_info_edited_notification = mocker.patch("itou.www.dashboard.views.EditJobSeekerInfoNotification")
+        mock_email_changed_notification = mocker.patch("itou.www.dashboard.views.EditJobSeekerEmailNotification")
+
         if born_in_france:
             post_data |= {"birth_place": job_seeker.jobseeker_profile.birth_place_id}
         else:
@@ -182,11 +187,6 @@ class TestEditJobSeekerInfo:
         response = client.post(url, data=post_data | {"preview": 1})
         assert response.status_code == 302
         assert response.url == back_url
-        spy_form = mocker.spy(EditJobSeekerInfoForm, "save")
-        spy_form.assert_not_called()
-        # ensure no mail was sent
-        mock_mail = mocker.patch("itou.www.dashboard.views.EditJobSeekerInfoNotification")
-        mock_mail.return_value.send.assert_not_called()
 
         birthdate = datetime.date(1990, 1, 10)
         post_data = {
@@ -222,9 +222,17 @@ class TestEditJobSeekerInfo:
         )
         _response = client.post(url, data=post_data | {"confirm": 1})
         spy_form.assert_called_once()
-        mock_mail.return_value.send.assert_called_once()
+        mock_info_edited_notification.return_value.send.assert_called_once()
+
+        old_email_address = job_seeker.email
+        post_data["email"] = "odile.deray@test.local"
+        _response = client.post(url, data=post_data | {"confirm": 1})
+        spy_form.assert_called()
+        mock_info_edited_notification.return_value.send.assert_called()
+        mock_email_changed_notification.return_value.send.assert_called_once()
 
         job_seeker = User.objects.get(id=job_seeker.id)
+        assert job_seeker.email == post_data["email"]
         assert job_seeker.first_name == post_data["first_name"]
         assert job_seeker.last_name == post_data["last_name"]
         assert job_seeker.phone == post_data["phone"]
@@ -243,7 +251,7 @@ class TestEditJobSeekerInfo:
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-        # Check content of the generated email
+        # Check content of the generated emails
         email = EditJobSeekerInfoNotification(
             job_seeker,
             organization=job_application.to_company,
@@ -256,6 +264,23 @@ class TestEditJobSeekerInfo:
         # Body
         assert job_seeker.get_full_name() in email.body
         assert job_application.to_company.name in email.body
+        assert reverse("dashboard:edit_user_info") in email.body
+
+        email = EditJobSeekerEmailNotification(
+            job_seeker,
+            organization=job_application.to_company,
+            old_email_address=old_email_address,
+        ).build()
+        # To
+        assert email.to == [job_seeker.email, old_email_address]
+        assert len(email.bcc) == 0
+        # Subject
+        assert "Votre adresse e-mail a été mise à jour sur les Emplois de l'inclusion" in email.subject
+        # Body
+        assert job_seeker.get_full_name() in email.body
+        assert job_application.to_company.name in email.body
+        assert old_email_address in email.body
+        assert job_seeker.email in email.body
         assert reverse("dashboard:edit_user_info") in email.body
 
     def test_edit_by_company_with_nir(self, client, mocker, snapshot):
