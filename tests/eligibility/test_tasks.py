@@ -19,7 +19,7 @@ from itou.eligibility.tasks import (
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis import api_particulier
-from itou.utils.apis.pole_emploi import Endpoints as PE_Endpoints
+from itou.utils.apis.pole_emploi import Endpoints as PE_Endpoints, PoleEmploiAPIException
 from itou.utils.mocks.api_particulier import (
     RESPONSES as API_PARTICULIER_RESPONSES,
     ResponseKind as ApiParticulierResponseKind,
@@ -399,11 +399,11 @@ class TestCertifyCriteriaWithFranceTravail:
         ]
         respx_mock.post(rechercher_usager_url).respond(500, json=json_response)
 
-        with pytest.raises(httpx.HTTPError) as excinfo:
+        with pytest.raises(PoleEmploiAPIException) as excinfo:
             async_certify_criterion_with_france_travail.call_local(criterion._meta.model_name, criterion.pk)
 
-        assert excinfo.value.response.status_code == 500
-        assert excinfo.value.response.json() == json_response
+        assert excinfo.value.error_code == 500
+        assert excinfo.value.response_content == json_response
         assert [call.request.url for call in respx_mock.calls] == [
             "https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent",
             rechercher_usager_url,

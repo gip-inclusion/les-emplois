@@ -112,7 +112,9 @@ class MultipleUsersReturned(PoleEmploiAPIBadResponse):
 
 
 class PoleEmploiRateLimitException(PoleEmploiAPIException):
-    pass
+    def __init__(self, error_code=None, response_content=None, retry_after=0):
+        super().__init__(error_code, response_content)
+        self.retry_after = retry_after
 
 
 API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
@@ -197,6 +199,48 @@ class BasePoleEmploiApiClient:
         )
         return token
 
+    def _header(self, token, **kwargs):
+        return {
+            "Authorization": token,
+            "Content-Type": "application/json",
+        }
+
+    def _request(self, url, data=None, params=None, method="POST", **kwargs):
+        try:
+            token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
+            if not token:
+                token = self._refresh_token()
+
+            response = self._get_httpx_client().request(
+                method=method,
+                url=url,
+                params=params,
+                json=data,
+                headers=self._header(token, **kwargs),
+                timeout=API_TIMEOUT_SECONDS,
+            )
+
+            if response.status_code == 204:
+                return None
+            if response.status_code == 429:
+                logger.warning("Request on url=%s triggered rate limit", url)
+                # https://francetravail.io/produits-partages/documentation/utilisation-api-france-travail/erreurs-frequentes#:~:text=429 Too Many Requests  # noqa: E501
+                raise PoleEmploiRateLimitException(429, retry_after=response.headers.get("Retry-After", "60"))
+            if response.status_code not in (200, 206):
+                logger.warning("Request on url=%s returned status_code=%s", url, response.status_code)
+                try:
+                    content = response.json()
+                    # This might look like:
+                    # {'codeErreur': 'JCS0011G', 'codeHttp': 500,
+                    #  'message': 'La vue service retournée par le connecteur HTTP est nulle ou mal formée'}
+                except json.decoder.JSONDecodeError:
+                    content = response.content
+                raise PoleEmploiAPIException(error_code=response.status_code, response_content=content)
+            data = response.json()
+            return data
+        except httpx.RequestError as exc:
+            raise PoleEmploiAPIException(API_CLIENT_HTTP_ERROR_CODE) from exc
+
 
 class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
     # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
@@ -214,41 +258,6 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
     ]
     REALM = "/partenaire"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_partenaire_client_token"
-
-    def _request(self, url, data=None, params=None, method="POST"):
-        try:
-            token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
-            if not token:
-                token = self._refresh_token()
-
-            response = self._get_httpx_client().request(
-                method=method,
-                url=url,
-                params=params,
-                json=data,
-                headers={"Authorization": token, "Content-Type": "application/json"},
-                timeout=API_TIMEOUT_SECONDS,
-            )
-
-            if response.status_code == 204:
-                return None
-            if response.status_code == 429:
-                logger.warning("Request on url=%s triggered rate limit", url)
-                raise PoleEmploiRateLimitException(429)
-            if response.status_code not in (200, 206):
-                logger.warning("Request on url=%s returned status_code=%s", url, response.status_code)
-                try:
-                    content = response.json()
-                    # This might look like:
-                    # {'codeErreur': 'JCS0011G', 'codeHttp': 500,
-                    #  'message': 'La vue service retournée par le connecteur HTTP est nulle ou mal formée'}
-                except json.decoder.JSONDecodeError:
-                    content = response.content
-                raise PoleEmploiAPIException(response.status_code, response_content=content)
-            data = response.json()
-            return data
-        except httpx.RequestError as exc:
-            raise PoleEmploiAPIException(API_CLIENT_HTTP_ERROR_CODE) from exc
 
     def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
         """Example data:
@@ -394,11 +403,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
 
-    def _request(self, url, data=None, params=None, method="POST", jeton_usager=None):
-        token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
-        if not token:
-            token = self._refresh_token()
-
+    def _header(self, token, jeton_usager=None):
         headers = {
             "Authorization": token,
             "Content-Type": "application/json",
@@ -416,20 +421,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         }
         if jeton_usager is not None:
             headers["ft-jeton-usager"] = jeton_usager
-
-        response = (
-            self._get_httpx_client()
-            .request(
-                method,
-                url,
-                params=params,
-                json=data,
-                headers=headers,
-                timeout=API_TIMEOUT_SECONDS,
-            )
-            .raise_for_status()
-        )
-        return response.json()
+        return headers
 
     def _rechercher_usager_by_pole_emploi_id(self, pole_emploi_id):
         if not pole_emploi_id:
