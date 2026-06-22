@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalsListView.test_approval_contract_filters[approvals list ended contracts filter]
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -463,25 +463,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/list.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -650,7 +631,7 @@
 # ---
 # name: TestApprovalsListView.test_approval_contract_filters[approvals list ongoing contracts filter]
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1112,25 +1093,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/list.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -1302,7 +1264,7 @@
 # ---
 # name: TestApprovalsListView.test_job_seeker_filters[approvals list]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1728,25 +1690,6 @@
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "employee_record_employeerecord"."status" = %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/list.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
         ''',
       }),
       dict({
