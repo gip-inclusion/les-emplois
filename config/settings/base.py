@@ -693,7 +693,6 @@ csp_img_src = [
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
     "https://tile.openstreetmap.org",
     "https://*.tile.openstreetmap.org",
-    "*.hotjar.com",
     "https://cdn.redoc.ly",
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
 ]
@@ -701,15 +700,11 @@ csp_script_src = [
     CSP.SELF,
     CSP.NONCE,
     "https://stats.inclusion.beta.gouv.fr",
-    "*.hotjar.com",
     "https://tally.so",
 ]
 csp_connect_src = [
     CSP.SELF,
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
-    "*.hotjar.com",
-    "*.hotjar.io",
-    "wss://*.hotjar.com",
     API_GEOPF_BASE_URL,
 ]
 
@@ -732,7 +727,6 @@ SECURE_CSP = {
     ],
     "frame-src": [
         "https://app.livestorm.co",  # Upcoming events from the homepage
-        "*.hotjar.com",
         # For stats/pilotage views
         "https://tally.so",
         "https://stats.inclusion.beta.gouv.fr",
