@@ -760,22 +760,15 @@
                   </button>
               </div>
               <div class="modal-body">
-                  <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                      <i aria-hidden="true" class="ri-map-pin-2-line me-2">
-                      </i>
-                      <address class="m-0">
-                          10 rue de la Paix, 75002 Paris
-                      </address>
-                  </div>
                   <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
                       <div class="d-flex align-items-start overflow-hidden me-2">
-                          <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                          <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
                           </i>
                           <a aria-label="Contact par mail" class="text-break" href="mailto:contact@structure.test">
                               contact@structure.test
                           </a>
                       </div>
-                      <button class="btn-link fw-medium ms-1" data-bs-container="body" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@structure.test" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="copier-email-contact" type="button">
+                      <button class="flex-shrink-0 btn-link fw-medium ms-1" data-bs-container="body" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@structure.test" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="copier-email-contact" type="button">
                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                           </i>
                           <span class="visually-hidden">
@@ -789,13 +782,25 @@
                           </i>
                           01 02 03 04 05
                       </div>
-                      <button class="btn-link fw-medium ms-1" data-bs-container="body" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33102030405" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="copier-email-contact" type="button">
+                      <button class="btn-link fw-medium ms-1" data-bs-container="body" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33102030405" type="button">
                           <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                           </i>
                           <span class="visually-hidden">
                               Copier
                           </span>
                       </button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                      <i aria-hidden="true" class="ri-map-pin-2-line me-2">
+                      </i>
+                      <address class="m-0">
+                          10 rue de la Paix, 75002 Paris
+                      </address>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                      <i aria-hidden="true" class="ri-time-line fw-normal me-2">
+                      </i>
+                      Lun: 8h30 à 12h30 • Mar: 8h30 à 12h30 • Mer: 8h30 à 12h30 • Jeu: 8h30 à 12h30 • Ven: 8h30 à 12h30 (Hors jours fériés)
                   </div>
                   <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
                       <i aria-hidden="true" class="ri-global-line fw-normal me-2">

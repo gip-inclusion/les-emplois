@@ -66,11 +66,29 @@ class TestStructures:
             post_code="75002",
             city="Paris",
             website="https://structure.test",
+            opening_hours="Mo-Fr 08:30-12:30 open; PH off",
         )
         response = client.get(self.get_structure_url(structure))
 
         modal = parse_response_to_soup(response, selector="#structure-contact-modal")
         assert pretty_indented(modal) == snapshot
+
+    def test_card_view_contact_modal_with_opening_hours(self, client):
+        opening_hours = """Mo 09:00-12:00,14:00-17:30"Sans rendez-vous";Tu 09:00-12:00,14:00-17:30;
+        We 09:00-12:00,14:00-17:30;Th 09:00-12:00,14:00-17:30;Fr 09:00-12:00,14:00-17:30; PH off"""
+        structure = StructureFactory(
+            opening_hours=opening_hours,
+        )
+        response = client.get(self.get_structure_url(structure))
+
+        assertContains(
+            response,
+            (
+                "Lun: 9h00 à 12h00 - 14h00 à 17h30 (Sans rendez-vous) "
+                "• Mar: 9h00 à 12h00 - 14h00 à 17h30 • Mer: 9h00 à 12h00 - 14h00 à 17h30 "
+                "• Jeu: 9h00 à 12h00 - 14h00 à 17h30 • Ven: 9h00 à 12h00 - 14h00 à 17h30 (Hors jours fériés)"
+            ),
+        )
 
     def test_card_view_renders_bootstrap_tabs_with_full_payload(self, client, snapshot):
         structure = StructureFactory(
