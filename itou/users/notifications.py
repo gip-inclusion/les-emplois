@@ -83,6 +83,27 @@ class EditJobSeekerInfoNotification(EmailNotification):
 
 
 @notifications_registry.register
+class EditJobSeekerEmailNotification(EmailNotification):
+    name = "Modification des informations personnelles d'un candidat"
+    category = NotificationCategory.ACCOUNT_MANAGEMENT
+    subject_template = "account/email/email_jobseeker_email_edited_subject.txt"
+    body_template = "account/email/email_jobseeker_email_edited_body.txt"
+    can_be_disabled = False
+
+    def get_context(self):
+        context = super().get_context()
+        context["edit_user_info_url"] = get_absolute_url(reverse("dashboard:edit_user_info"))
+        return context
+
+    def build(self):
+        email_message = super().build()
+        old_email_address = self.context["old_email_address"]
+        if old_email_address:  # Do not include the old address if it doesn't exist
+            email_message.to += [old_email_address]
+        return email_message
+
+
+@notifications_registry.register
 class NewAPITokenNotification(EmailNotification):
     name = "Génération d'un nouveau token d’API"
     category = NotificationCategory.SECURITY
