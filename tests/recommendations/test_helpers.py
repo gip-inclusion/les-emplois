@@ -225,8 +225,6 @@ class TestFetchAndParseUserData:
         ],
     )
     def test_204(self, respx_mock, settings, endpoint):
-        respx_mock.get(settings.API_ESD["BASE_URL"] + endpoint).respond(
-            204, json=RESPONSES[endpoint][ResponseKind.NO_DATA_FOUND]
-        )
+        respx_mock.get(settings.API_ESD["BASE_URL"] + endpoint).respond(204)  # We don't know yet if there's a body
         with pytest.raises(ValueError):
             fetch_and_parse_user_data("any_id")

@@ -333,7 +333,7 @@ RESPONSES = {
             },
             "telephones": [{"numeroTelephone": "0972723949"}],
         },
-        ResponseKind.NO_DATA_FOUND: {},
+        ResponseKind.NO_DATA_FOUND: None,
     },
     Endpoints.STATUT_USAGER: {
         ResponseKind.CERTIFIED: {
@@ -353,7 +353,7 @@ RESPONSES = {
                 "m_motif_cloture_lib": "ABANDON ACTION AIDE A LA RECHERCHE D'UNE ACTIVITE SUPPRESSION DE 1 MOIS",
             },
         },
-        ResponseKind.NO_DATA_FOUND: {},
+        ResponseKind.NO_DATA_FOUND: None,
     },
     Endpoints.LECTURE_ORIENTATION_USAGER: {
         ResponseKind.CERTIFIED: [
@@ -890,6 +890,6 @@ RESPONSES = {
                 },
             },
         },
-        ResponseKind.NO_DATA_FOUND: {},
+        ResponseKind.NO_DATA_FOUND: None,
     },
 }

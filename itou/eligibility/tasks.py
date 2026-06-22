@@ -17,6 +17,8 @@ from itou.utils.apis.pole_emploi import (
     IdentityNotCertified,
     MultipleUsersReturned,
     PoleEmploiAPIBadResponse,
+    PoleEmploiAPIException,
+    PoleEmploiRateLimitException,
     UserDoesNotExist,
     pole_emploi_agent_api_client,
 )
@@ -130,17 +132,14 @@ def certify_criterion_with_api_france_travail(criterion):
         except PoleEmploiAPIBadResponse as e:
             logger.error("Error certifying criterion %r: code=%d json=%s", criterion, e.response_code, e.response_data)
             criterion.data_returned_by_api = e.response_data
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code == 429:
-                # https://francetravail.io/produits-partages/documentation/utilisation-api-france-travail/erreurs-frequentes#:~:text=429 Too Many Requests  # noqa: E501
-                delay_str = e.response.headers.get("Retry-After", "60")
-                try:
-                    delay = int(delay_str)
-                except ValueError:
-                    logging.info("Invalid Retry-After header %s.", delay_str)
-                    delay = 60
-                raise RetryTask(delay=delay) from e
-            raise e
+        except PoleEmploiRateLimitException as e:
+            delay_str = e.retry_after
+            try:
+                delay = int(delay_str)
+            except ValueError:
+                logging.info("Invalid Retry-After header %s.", delay_str)
+                delay = 60
+            raise RetryTask(delay=delay) from e
         else:
             user_found = True
             criterion.certified_at = timezone.now()
@@ -186,6 +185,7 @@ def _async_certify_criterion(model_name, selected_administrative_criteria_id, *,
             certification_func(criterion)
         except (
             httpx.HTTPError,  # Could not connect, unexpected status code, …
+            PoleEmploiAPIException,  # Could not connect, unexpected status code, …
             JSONDecodeError,  # Response was not JSON (text, HTML, …).
             RetryTask,  # Rate limiting.
         ) as e:
