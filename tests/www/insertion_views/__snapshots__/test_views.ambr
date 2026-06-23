@@ -65,6 +65,14 @@
                               Informations du service
                           </h2>
                           <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Lieu d'accueil
+                                  </small>
+                                  <strong>
+                                      en-presentiel
+                                  </strong>
+                              </li>
                           </ul>
                           <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
                               Source : Dora
@@ -96,6 +104,19 @@
                           </p>
                           <p>
                           </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Thématiques et besoins associés
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  <b>
+                                      Mobilité
+                                  </b>
+                                  : mobilite--acceder-a-un-vehicule
+                              </li>
+                          </ul>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">
@@ -187,6 +208,14 @@
                               Informations du service
                           </h2>
                           <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Lieu d'accueil
+                                  </small>
+                                  <strong>
+                                      en-presentiel
+                                  </strong>
+                              </li>
                           </ul>
                           <span class="badge badge-xs rounded-pill bg-light text-primary mt-3">
                               Source : Other
@@ -218,6 +247,19 @@
                           </p>
                           <p>
                           </p>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Thématiques et besoins associés
+                          </h2>
+                          <ul class="mb-0">
+                              <li>
+                                  <b>
+                                      Mobilité
+                                  </b>
+                                  : mobilite--acceder-a-un-vehicule
+                              </li>
+                          </ul>
                       </div>
                       <div class="c-box mb-3 mb-md-4">
                           <h2 class="h3">

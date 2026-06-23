@@ -189,6 +189,8 @@ class TestServices:
             structure__uid="test-structure-full-uid",
             structure__name="Structure complète",
             structure__updated_on="2025-06-01",
+            thematics=[],
+            receptions=[],
         )
         service.publics.add(public)
         service.receptions.add(reception)
@@ -429,6 +431,7 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
+            thematics=[],
         )
         response = client.get(self.get_service_url(service))
         assert response.context["formatted_categories"] == []
@@ -444,6 +447,7 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
+            thematics=[],
         )
         service.thematics.add(thematic)
         response = client.get(self.get_service_url(service))
@@ -465,6 +469,7 @@ class TestServices:
             updated_on="2025-01-15",
             structure__uid="test-structure-categories-uid",
             structure__updated_on="2025-01-15",
+            thematics=[],
         )
         service.thematics.add(thematic_a, thematic_b)
         response = client.get(self.get_service_url(service))

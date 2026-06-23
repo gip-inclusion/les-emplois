@@ -1,6 +1,10 @@
+from data_inclusion.schema import v1 as data_inclusion_v1
 from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
 
 from itou.utils.storage.s3 import generate_dora_storage_url
@@ -8,6 +12,8 @@ from itou.utils.validators import validate_post_code
 
 
 SOURCE_DORA_VALUE = "dora"
+
+SERVICE_SEARCH_RADIUS_KM = 50
 
 
 class GeolocatedAddressMixin(models.Model):
@@ -34,7 +40,7 @@ class GeolocatedAddressMixin(models.Model):
         blank=True,
     )
     city = models.CharField(verbose_name="ville", blank=True)
-    insee_city = models.ForeignKey("cities.City", on_delete=models.RESTRICT, null=True, related_name="+")
+    insee_city = models.ForeignKey("cities.City", on_delete=models.SET_NULL, null=True, related_name="+")
 
     coordinates = gis_models.PointField(geography=True, null=True, blank=True)
 
@@ -93,6 +99,18 @@ class GenericReferenceItem(models.Model):
     def __str__(self):
         return self.label
 
+    @classmethod
+    def in_person_reception_ids(cls):
+        return list(
+            cls.objects.filter(value=data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value).values_list("id", flat=True)
+        )
+
+    @classmethod
+    def remote_reception_ids(cls):
+        return list(
+            cls.objects.filter(value=data_inclusion_v1.ModeAccueil.A_DISTANCE.value).values_list("id", flat=True)
+        )
+
 
 class Structure(GeolocatedAddressMixin, models.Model):
     uid = models.CharField(unique=True)
@@ -141,6 +159,81 @@ class Structure(GeolocatedAddressMixin, models.Model):
 
     def __str__(self):
         return self.uid
+
+
+class ServiceQuerySet(models.QuerySet):
+    def search(self, *, city, thematics, reception, service_types):
+        # NOTE(vperron): always search with ids directly instead of letting Django create JOINs with .through
+        # as it might become horrribly slow on those tables
+        thematic_ids = list(GenericReferenceItem.objects.filter(value__in=thematics).values_list("id", flat=True))
+        eligibility_codes = [code for code in [city.code_insee, city.department, city.siren_epci, "france"] if code]
+        # An empty eligibility zone means national availability (aligned on data·inclusion).
+        eligibility_filter = Q(eligibility_zones__overlap=eligibility_codes) | Q(eligibility_zones=[])
+        queryset = (
+            self.annotate(
+                distance=Distance("coordinates", city.coords) / 1000,
+                has_thematic=Exists(
+                    self.model.thematics.through.objects.filter(
+                        service=OuterRef("pk"),
+                        genericreferenceitem_id__in=thematic_ids,
+                    )
+                ),
+            )
+            .filter(
+                has_thematic=True,
+                coordinates__isnull=False,
+                **({"kind__value__in": service_types} if service_types else {}),
+            )
+            .exclude(city="")
+        )
+
+        if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value:
+            return (
+                queryset.filter(
+                    receptions__id__in=GenericReferenceItem.in_person_reception_ids(),
+                    coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)),
+                )
+                .filter(eligibility_filter)
+                .annotate(
+                    is_in_person=Value(True, output_field=BooleanField()),
+                    is_remote=Value(False, output_field=BooleanField()),
+                )
+                .order_by("distance", "pk")
+            )
+
+        if reception == data_inclusion_v1.ModeAccueil.A_DISTANCE.value:
+            return (
+                queryset.filter(receptions__id__in=GenericReferenceItem.remote_reception_ids())
+                .filter(eligibility_filter)
+                .annotate(
+                    is_in_person=Value(False, output_field=BooleanField()),
+                    is_remote=Value(True, output_field=BooleanField()),
+                )
+                .order_by("distance", "pk")
+            )
+
+        return (
+            queryset.annotate(
+                is_in_person=Exists(
+                    self.model.receptions.through.objects.filter(
+                        service=OuterRef("pk"),
+                        genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
+                    )
+                ),
+                is_remote=Exists(
+                    self.model.receptions.through.objects.filter(
+                        service=OuterRef("pk"),
+                        genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
+                    )
+                ),
+            )
+            .filter(
+                Q(is_in_person=True) & Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
+                | Q(is_remote=True)
+            )
+            .filter(eligibility_filter)
+            .order_by("-is_in_person", "distance", "pk")
+        )
 
 
 class Service(GeolocatedAddressMixin, models.Model):
@@ -354,6 +447,8 @@ class Service(GeolocatedAddressMixin, models.Model):
         return [
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
         ]
+
+    objects = ServiceQuerySet.as_manager()
 
     class Meta:
         verbose_name = "service d'insertion"
