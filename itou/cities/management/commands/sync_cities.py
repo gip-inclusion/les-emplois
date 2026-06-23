@@ -26,7 +26,7 @@ def strip_arrondissement(raw_city):
 
 def fetch_cities(districts_only=False):
     params = {
-        "fields": "nom,code,codesPostaux,codeDepartement,codeRegion,centre",
+        "fields": "nom,code,codesPostaux,codeDepartement,centre,codeEpci",
         "format": "json",
     }
     if districts_only:
@@ -78,6 +78,7 @@ def api_city_to_db_city(data, last_synced_at):
         department=department,
         post_codes=sorted(data["codesPostaux"]),
         code_insee=data["code"],
+        siren_epci=data.get("codeEpci"),
         coords=point_from_api_data(data),
         edition_mode=EditionModeChoices.AUTO,
         last_synced_at=last_synced_at,
@@ -183,6 +184,7 @@ class Command(BaseCommand):
                 ("nom", "name"),
                 ("codeDepartement", "department"),
                 (lambda obj: sorted(obj["codesPostaux"]), "post_codes"),
+                (lambda obj: obj.get("codeEpci"), "siren_epci"),
                 (point_from_api_data, "coords"),
             ],
         ):
@@ -212,6 +214,7 @@ class Command(BaseCommand):
                 "department",
                 "post_codes",
                 "code_insee",
+                "siren_epci",
                 "coords",
                 "last_synced_at",
             ],

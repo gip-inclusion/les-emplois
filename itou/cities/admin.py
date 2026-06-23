@@ -7,15 +7,24 @@ from itou.utils.admin import ItouGISMixin, ItouModelAdmin, ReadonlyMixin
 
 @admin.register(models.City)
 class CityAdmin(ReadonlyMixin, ItouGISMixin, ItouModelAdmin):
-    list_display = ("name", "department", "post_codes", "code_insee")
+    list_display = ("name", "department", "post_codes", "code_insee", "siren_epci")
 
     list_filter = ("department",)
 
-    search_fields = ("name", "department", "post_codes", "code_insee")
+    search_fields = ("name", "department", "post_codes", "code_insee", "siren_epci")
 
     readonly_fields = ("zrr", "edition_mode")
 
-    fields = ("name", "department", "post_codes", "code_insee", "zrr", "coords", "edition_mode")
+    fields = (
+        "name",
+        "department",
+        "post_codes",
+        "code_insee",
+        "siren_epci",
+        "zrr",
+        "coords",
+        "edition_mode",
+    )
 
     @admin.display(description="commune en ZRR")
     def zrr(self, obj):

@@ -3855,6 +3855,7 @@
                  "cities_city"."department",
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
@@ -4973,6 +4974,7 @@
                  "cities_city"."department",
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
@@ -5984,6 +5986,7 @@
                  "cities_city"."department",
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at"
