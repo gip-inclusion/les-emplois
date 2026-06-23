@@ -1,5 +1,3 @@
-{% load components %}
-{% load dora %}
 {% load markdownify %}
 {% load str_filters %}
 
@@ -10,8 +8,8 @@
                 <div class="c-box--results__summary">
                     <i class="ri-community-line" aria-hidden="true"></i>
                     <div>
-                        <span>{{ service.structure.nom }}</span>
-                        <h3>{{ service.nom }}</h3>
+                        <span>{{ service.structure.name }}</span>
+                        <h3>{{ service.name }}</h3>
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
@@ -25,12 +23,12 @@
                             {% endif %}
                             <li>
                                 <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
-                                {% if service.code_postal and service.commune %}
+                                {% if service.post_code and service.city %}
                                     <address class="m-0">
-                                        {% if service.adresse %}
-                                            {{ service.adresse }}, {{ service.code_postal }} {{ service.commune }}
+                                        {% if service.address_line_1 %}
+                                            {{ service.address_line_1 }}, {{ service.post_code }} {{ service.city }}
                                         {% else %}
-                                            {{ service.code_postal }} {{ service.commune }}
+                                            {{ service.post_code }} {{ service.city }}
                                         {% endif %}
                                     </address>
                                 {% endif %}
@@ -48,19 +46,10 @@
                         {% endif %}
                     </ul>
                     <div class="mt-md-1">
-                        <a href="{% dora_service_url service orientation_jwt=orientation.jwt request=request %}"
+                        <a href="{% url 'insertion_views:service_detail' service_uid=service.uid %}?{{ detail_query_string }}"
                            class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link"
-                           target="_blank"
-                           rel="noopener"
-                           aria-label="Voir la fiche de {{ service.structure.nom }} sur DORA (ouverture dans un nouvel onglet)">
-                            <span>
-                                {% if request.from_employer or request.from_prescriber %}
-                                    Orienter
-                                {% else %}
-                                    Voir la fiche détaillée
-                                {% endif %}
-                            </span>
-                            <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
+                           aria-label="Voir la fiche détaillée de {{ service.structure.name }}">
+                            <span>Voir la fiche détaillée</span>
                         </a>
                     </div>
                 </div>
@@ -68,31 +57,21 @@
             <hr class="m-0">
             <div class="c-box--results__body">
                 <p class="mb-2">{{ service.description|markdownify|striptags|shorten:200 }}</p>
-                <span class="badge badge-xs rounded-pill bg-light text-primary">Source : {{ service.source }}, via data·inclusion</span>
+                <span class="badge badge-xs rounded-pill bg-light text-primary">Source : {{ service.source.value }}, via data·inclusion</span>
             </div>
         </div>
     {% empty %}
-        {% if api_error %}
-            {% component_alert content=content variant="warning" %}
-                {% fragment as content %}
-                    <p class="mb-0">
-                        Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/" target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez réessayer ultérieurement.
-                    </p>
-                {% endfragment %}
-            {% endcomponent_alert %}
-        {% else %}
-            <div class="c-box c-box--results mb-3 mb-md-4">
-                <div class="c-box--results__body">
-                    <p class="mb-0">
-                        {% if suppress_category_error %}
-                            Veuillez sélectionner une thématique pour voir les résultats.
-                        {% else %}
-                            Aucun résultat avec les filtres actuels.
-                        {% endif %}
-                    </p>
-                </div>
+        <div class="c-box c-box--results mb-3 mb-md-4">
+            <div class="c-box--results__body">
+                <p class="mb-0">
+                    {% if suppress_category_error %}
+                        Veuillez sélectionner une thématique pour voir les résultats.
+                    {% else %}
+                        Aucun résultat avec les filtres actuels.
+                    {% endif %}
+                </p>
             </div>
-        {% endif %}
+        </div>
     {% endfor %}
 
     {% include "includes/pagination.html" with page=results boost=True boost_indicator="#services-search-results" request=request only %}

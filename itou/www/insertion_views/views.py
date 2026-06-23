@@ -129,11 +129,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
-        context["back_url"] = get_safe_url(
-            self.request,
-            "back_url",
-            fallback_url=reverse("search:services_home"),
-        )
+        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("search:services_home"))
         context["matomo_custom_title"] = "Fiche de la service d'insértion"
         context["orientation_jwt"] = (
             get_orientation_jwt(self.request) if can_prefill_orientation_on_dora(self.request) else None
