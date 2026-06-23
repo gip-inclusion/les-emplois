@@ -10,7 +10,7 @@
       "email": "",
       "insee_city": 34249,
       "name": "LYCEE PROFESSIONNEL ",
-      "opening_hours": "",
+      "opening_hours": "Mo 09:00-12:00,14:00-17:30\"Sans rendez-vous\";Tu 09:00-12:00,14:00-17:30;We 09:00-12:00,14:00-17:30;Th 09:00-12:00,14:00-17:30;Fr 09:00-12:00,14:00-17:30; PH off",
       "phone": "",
       "post_code": "90000",
       "siret": "11111583400027",
@@ -18,7 +18,7 @@
       "source_link": "https://www.lycee.pro",
       "uid": "carif-oref--10_10_1281",
       "updated_on": "2025-12-18",
-      "website": ""
+      "website": "https://www.lycee.pro"
     },
     "model": "insertion.structure",
     "pk": 1
@@ -34,7 +34,7 @@
       "email": "email@ac-aix-marseille.fake",
       "insee_city": 4401,
       "name": "Ecole elémentaire Jean Petit",
-      "opening_hours": "",
+      "opening_hours": "9.00 à 12.00 - 14.00 à 17.00",
       "phone": "+00190519058",
       "post_code": "13150",
       "siret": "22222128000068",
