@@ -1,5 +1,3 @@
-import hashlib
-import json
 import logging
 import warnings
 from collections import defaultdict, namedtuple
@@ -9,7 +7,6 @@ from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
-from django.core.cache import caches
 from django.db.models import Case, F, Prefetch, Q, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -20,18 +17,15 @@ from django.views.generic import FormView
 from itoutils.urls import add_url_params
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
-from itou.common_apps.address.models import lat_lon_to_coords
 from itou.companies.enums import CompanyKind, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
-from itou.geo.utils import MAX_DISTANCE_FROM_EARTH_CIRCUMFERENCE, distance_in_km
-from itou.insertion.utils import get_job_seeker_from_request, get_orientation_jwt
+from itou.insertion.models import Service
+from itou.insertion.utils import get_job_seeker_from_request
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.users.perms import can_prefill_orientation_on_dora
-from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
@@ -386,37 +380,12 @@ def search_services_home(request, template_name="search/services/home.html"):
     return render(request, template_name, {"form": ServiceSearchForm()})
 
 
-def _enrich_api_result(result, *, city, local_distance_cutoff):
-    distance = None
-    if result.get("longitude") and result.get("latitude"):
-        distance = int(distance_in_km(city.coords, lat_lon_to_coords(result["latitude"], result["longitude"])))
-
-    modes_accueil = set(result["modes_accueil"] or [])
-    result["is_in_person"] = data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in modes_accueil
-    result["is_remote"] = data_inclusion_v1.ModeAccueil.A_DISTANCE in modes_accueil
-    result["is_local"] = any(
-        [
-            # If we get an "in person" only service than trust DI at the API only give us those in a 50km radius
-            modes_accueil == {data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value},
-            result["is_in_person"] and (distance <= int(local_distance_cutoff) if distance is not None else False),
-        ]
-    )
-    result["distance"] = distance
-
-
-def _api_results_sorter(result):
-    return (
-        0 if result["is_in_person"] else 1,
-        result["distance"] if result["distance"] is not None else MAX_DISTANCE_FROM_EARTH_CIRCUMFERENCE,
-        0 if result["source"] == "dora" else 1,
-    )
-
-
 @login_not_required
 @readonly_view
 def search_services_results(request, template_name="search/services/results.html"):
     city, category = None, None
     form = ServiceSearchForm(data=request.GET or None)
+    services = Service.objects.none()
 
     suppress_category_error = False
     if form.is_valid():
@@ -427,90 +396,44 @@ def search_services_results(request, template_name="search/services/results.html
         ]
         reception = form.cleaned_data["reception"]
         if reception == form.RECEPTION_ALL_VALUE:
-            reception = []
-        services = form.cleaned_data["services"]
-
-        search_query = {
-            "code_commune": city.code_insee,
-            "thematiques": thematics,
-            "modes_accueil": [reception] if reception else [],
-            "types": services,
-        }
-        search_query_hash = hashlib.md5(
-            json.dumps(search_query, sort_keys=True, default=str).encode("utf-8")
-        ).hexdigest()
-        cache_key = f"data_inclusion_api_results:search:{search_query_hash}"
-        cached_data = caches["failsafe"].get(cache_key)
-        if cached_data is None:
-            client = DataInclusionApiClient(
-                global_constants.API_DATA_INCLUSION_BASE_URL,
-                settings.API_DATA_INCLUSION_TOKEN,
-            )
-            try:
-                results = client.search_services(**search_query)
-            except DataInclusionApiException:
-                logger.exception("Failed to search services from data·inclusion API with query=%s", search_query)
-                api_error, results = True, []
-                # 15 minutes seems like a reasonable amount of time for DI to get back on track
-                caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
-            else:
-                # Choose 70 km as our distance cutoff to take into account our distance approximation
-                # and that DI seems to compute the distance from the city limit while we use the city center.
-                local_distance_cutoff = 70
-                for result in results:
-                    _enrich_api_result(result, city=city, local_distance_cutoff=local_distance_cutoff)
-                # In person services should only be displayed if they are within local distance
-                if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL:
-                    results = [
-                        r for r in results if r["distance"] is not None and r["distance"] <= local_distance_cutoff
-                    ]
-                api_error, results = (
-                    False,
-                    sorted(
-                        results,
-                        key=_api_results_sorter,
-                    ),
-                )
-                # 6 hours is reasonable enough to get fresh results while still avoiding
-                # hitting the API too much. The API content is updated daily or hourly;
-                # we want changes to be propagated at a reasonable time.
-                caches["failsafe"].set(cache_key, (api_error, results), 6 * 60 * 60)
+            reception = ""
+        services = Service.objects.search(
+            city=city,
+            thematics=thematics,
+            reception=reception,
+            service_types=form.cleaned_data["services"],
+        ).select_related("structure", "source")
+    elif len(form.errors) == 1:
+        try:
+            # When searching for a job seeker (param job_seeker_public_id), the
+            # location is pre-filled with their city_slug. A category is
+            # also required, so the initial page load displays an error.
+            [category_error] = form.errors["category"]
+        except (KeyError, ValueError):
+            pass
         else:
-            api_error, results = cached_data
-    else:
-        api_error, results = None, []
-        if len(form.errors) == 1:
-            try:
-                # When searching for a job seeker (param job_seeker_public_id), the
-                # location is pre-filled with their city_slug. A category is
-                # also required, so the initial page load displays an error.
-                [category_error] = form.errors["category"]
-            except (KeyError, ValueError):
-                pass
-            else:
-                # Category not provided or empty.
-                suppress_category_error = not request.GET.get("category")
-                if suppress_category_error:
-                    del form.errors["category"]
+            # Category not provided or empty.
+            suppress_category_error = not request.GET.get("category")
+            if suppress_category_error:
+                del form.errors["category"]
 
-    orientation_jwt = None
-    job_seeker = None
-    if not api_error:
-        orientation_jwt = get_orientation_jwt(request) if can_prefill_orientation_on_dora(request) else None
-        if orientation_jwt:
-            job_seeker = get_job_seeker_from_request(request)
+    job_seeker = get_job_seeker_from_request(request) if can_prefill_orientation_on_dora(request) else None
+    detail_query = {"back_url": request.get_full_path()}
+    if job_seeker:
+        detail_query["job_seeker_public_id"] = str(job_seeker.public_id)
+
+    results = pager(services, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
 
     context = {
         "form": form,
         "city": city,
         "category": category,
-        "api_error": api_error,
         "suppress_category_error": suppress_category_error,
-        "results": pager(results, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL),
+        "results": results,
+        "detail_query_string": urlencode(detail_query),
         "orientation": {
             "exit_url": get_safe_url(request, "back_url", reverse("job_seekers_views:list")),
             "job_seeker": job_seeker,
-            "jwt": orientation_jwt,
         },
         "matomo_custom_title": "Recherche de services d'insertion",
         "back_url": reverse("search:services_home"),
