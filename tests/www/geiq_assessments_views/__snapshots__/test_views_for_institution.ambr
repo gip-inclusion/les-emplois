@@ -3141,7 +3141,7 @@
 # ---
 # name: TestListAssessmentsView.test_campaigns_filter[SQL queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -3319,15 +3319,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -3403,6 +3398,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -3421,6 +3417,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -3451,6 +3448,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -3490,6 +3488,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -3569,6 +3568,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -3589,6 +3589,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -3613,18 +3614,12 @@
           WHERE ("institutions_institution"."id") IN ((%s))
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestListAssessmentsView.test_company_filter[SQL queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -3802,15 +3797,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -3886,6 +3876,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -3904,6 +3895,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -3934,6 +3926,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -3973,6 +3966,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -4052,6 +4046,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -4072,6 +4067,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -4096,18 +4092,12 @@
           WHERE ("institutions_institution"."id") IN ((%s))
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestListAssessmentsView.test_complex_list[SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -4285,15 +4275,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -4369,6 +4354,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -4389,6 +4375,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -4419,6 +4406,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -4458,6 +4446,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -4536,6 +4525,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -4559,6 +4549,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -4582,12 +4573,6 @@
           FROM "institutions_institution"
           WHERE ("institutions_institution"."id") IN ((%s))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -6106,7 +6091,7 @@
 # ---
 # name: TestListAssessmentsView.test_institutions_filter[SQL queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -6284,15 +6269,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -6368,6 +6348,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -6385,6 +6366,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -6415,6 +6397,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -6454,6 +6437,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -6535,6 +6519,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -6555,6 +6540,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -6578,12 +6564,6 @@
           FROM "institutions_institution"
           WHERE ("institutions_institution"."id") IN ((%s), (%s))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
@@ -6970,7 +6950,7 @@
 # ---
 # name: TestListAssessmentsView.test_mishmash[SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -7148,15 +7128,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -7232,6 +7207,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -7250,6 +7226,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -7280,6 +7257,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -7319,6 +7297,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -7403,6 +7382,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -7422,6 +7402,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -7445,12 +7426,6 @@
           FROM "institutions_institution"
           WHERE ("institutions_institution"."id") IN ((%s), (%s))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -7483,7 +7458,7 @@
 # ---
 # name: TestListAssessmentsView.test_states_filter[SQL queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -7661,15 +7636,10 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -7745,6 +7715,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -7764,6 +7735,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -7794,6 +7766,7 @@
           'AssessmentsFilterForInstitutionForm.__init__[www/geiq_assessments_views/forms.py]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -7833,6 +7806,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -7912,6 +7886,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -7931,6 +7906,7 @@
           'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
           'list_for_institution[www/geiq_assessments_views/views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
           SELECT "institutions_institution"."id",
@@ -7954,12 +7930,6 @@
           FROM "institutions_institution"
           WHERE ("institutions_institution"."id") IN ((%s))
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

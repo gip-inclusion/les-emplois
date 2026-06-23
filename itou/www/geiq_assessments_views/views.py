@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_POST
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
@@ -44,6 +44,7 @@ from itou.institutions.models import Institution, InstitutionMembership
 from itou.utils.auth import check_request
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
+from itou.utils.readonly import http_methods, readonly_view
 from itou.www.geiq_assessments_views.export import get_export_format, serialize_employee_contract
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
@@ -160,7 +161,7 @@ def get_dreets_memberships_for_assessment(assessment):
     ).select_related("user")
 
 
-@require_safe
+@readonly_view
 @check_request(employer_has_access_to_assessments)
 def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.html"):
     assessments = (
@@ -181,6 +182,7 @@ def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.h
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(employer_has_access_to_assessments)
 def create_assessment(request, template_name="geiq_assessments_views/create.html"):
     organization_siret = request.current_organization.siret
@@ -311,6 +313,7 @@ class AssessmentDetailsTab(models.TextChoices):
     RESULT = "result", "Résultat"
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(employer_has_access_to_assessments)
 def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_views/assessment_details_for_geiq.html"):
     assessment = get_object_or_404(
@@ -382,6 +385,7 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
     return render(request, template_name, context)
 
 
+@readonly_view
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_get_file(request, pk, *, file_field):
     if request.from_employer:
@@ -438,6 +442,7 @@ def assessment_sync_file(request, pk, *, file_field):
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(employer_has_access_to_assessments)
 def upload_action_financial_assessment(
     request, pk, template_name="geiq_assessments_views/action_financial_assessment_upload.html"
@@ -460,6 +465,7 @@ def upload_action_financial_assessment(
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(employer_has_access_to_assessments)
 def assessment_comment(request, pk, template_name="geiq_assessments_views/assessment_comment.html"):
     assessment = get_object_or_404(
@@ -513,6 +519,7 @@ class ContractsAction(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
     if request.from_employer:
@@ -628,7 +635,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     return render(request, template_name, context)
 
 
-@require_safe
+@readonly_view
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_contracts_export(request, pk, include_unselected_by_geiq):
     contract_filter_kwargs = {}
@@ -666,6 +673,7 @@ def assessment_contracts_export(request, pk, include_unselected_by_geiq):
     )
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.from_institution)
 def assessment_contracts_details(
     request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
@@ -916,7 +924,7 @@ def assessment_contracts_toggle(
     return render(request, template_name, context)
 
 
-@require_safe
+@readonly_view
 @check_request(employer_has_access_to_assessments)
 def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment_kpi.html"):
     assessment = get_object_or_404(
@@ -940,7 +948,7 @@ def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment
     return render(request, template_name, context)
 
 
-@require_safe
+@readonly_view
 @check_request(employer_has_access_to_assessments)
 def assessment_result(request, pk, template_name="geiq_assessments_views/assessment_result.html"):
     assessment = get_object_or_404(
@@ -974,7 +982,7 @@ def assessment_result(request, pk, template_name="geiq_assessments_views/assessm
     return render(request, template_name, context)
 
 
-@require_safe
+@readonly_view
 @check_request(lambda request: request.from_institution)
 def list_for_institution(request, template_name="geiq_assessments_views/list_for_institution.html"):
     organization_kind = request.current_organization.kind
@@ -1036,6 +1044,7 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
     )
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.from_institution)
 def assessment_details_for_institution(
     request, pk, template_name="geiq_assessments_views/assessment_details_for_institution.html"
@@ -1203,6 +1212,7 @@ def assessment_details_for_institution(
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.from_institution)
 def assessment_review(request, pk, template_name="geiq_assessments_views/assessment_review.html"):
     assessment = get_object_or_404(
@@ -1251,6 +1261,7 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
     return render(request, template_name, context)
 
 
+@readonly_view
 @check_request(lambda request: request.from_institution)
 def assessment_print(request, pk, template_name="geiq_assessments_views/assessment_print.html"):
     assessment = get_object_or_404(
