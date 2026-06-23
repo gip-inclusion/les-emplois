@@ -22,7 +22,7 @@ def test_create_test_cities():
 def test_sync_cities(settings, caplog, respx_mock):
     settings.API_GEO_BASE_URL = "https://geo.foo"
     respx_mock.get(
-        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,codeRegion,centre&format=json"
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci&format=json"
     ).respond(
         200,
         json=[
@@ -30,7 +30,6 @@ def test_sync_cities(settings, caplog, respx_mock):
                 "centre": {"coordinates": [4.9306, 46.1517], "type": "Point"},
                 "code": "01001",
                 "codeDepartement": "01",
-                "codeRegion": "84",
                 "codesPostaux": ["01400", "01234"],
                 "nom": "L'Abergement-Clémenciat",
             },
@@ -38,14 +37,13 @@ def test_sync_cities(settings, caplog, respx_mock):
                 "centre": {"coordinates": [5.4247, 46.0071], "type": "Point"},
                 "code": "01002",
                 "codeDepartement": "01",
-                "codeRegion": "84",
                 "codesPostaux": ["01640"],
                 "nom": "L'Abergement-de-Varey",
             },
         ],
     )
     respx_mock.get(
-        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,codeRegion,centre"
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci"
         "&format=json&type=arrondissement-municipal"
     ).respond(
         200,
@@ -54,7 +52,6 @@ def test_sync_cities(settings, caplog, respx_mock):
                 "centre": {"coordinates": [5.3828, 43.3002], "type": "Point"},
                 "code": "13201",
                 "codeDepartement": "13",
-                "codeRegion": "93",
                 "codesPostaux": ["13001"],
                 "nom": "Marseille 1er Arrondissement",
             },
@@ -62,7 +59,6 @@ def test_sync_cities(settings, caplog, respx_mock):
                 "centre": {"coordinates": [5.3496, 43.3225], "type": "Point"},
                 "code": "13202",
                 "codeDepartement": "13",
-                "codeRegion": "93",
                 "codesPostaux": ["13002"],
                 "nom": "Marseille 2e Arrondissement",
             },
@@ -87,12 +83,13 @@ def test_sync_cities(settings, caplog, respx_mock):
     management.call_command("sync_cities", wet_run=True)
     assert caplog.messages[:-1] == [
         (
-            "HTTP Request: GET https://geo.foo/communes"
-            '?fields=nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json "HTTP/1.1 200 OK"'
+            "HTTP Request: GET https://geo.foo/communes?fields="
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
+            ' "HTTP/1.1 200 OK"'
         ),
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
-            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json"
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
             '&type=arrondissement-municipal "HTTP/1.1 200 OK"'
         ),
         "count=1 label=City had the same key in collection and queryset",
@@ -101,13 +98,13 @@ def test_sync_cities(settings, caplog, respx_mock):
         "\tCHANGED coords=SRID=4326;POINT (-2.4747713 47.3358576) changed to value=SRID=4326;POINT (4.9306 46.1517)",
         "count=3 label=City added by collection",
         '\tADDED {"centre": {"coordinates": [5.4247, 46.0071], "type": "Point"}, '
-        '"code": "01002", "codeDepartement": "01", "codeRegion": "84", '
+        '"code": "01002", "codeDepartement": "01", '
         '"codesPostaux": ["01640"], "nom": "L\'Abergement-de-Varey"}',
         '\tADDED {"centre": {"coordinates": [5.3828, 43.3002], "type": "Point"}, '
-        '"code": "13201", "codeDepartement": "13", "codeRegion": "93", '
+        '"code": "13201", "codeDepartement": "13", '
         '"codesPostaux": ["13001"], "nom": "Marseille 1er"}',
         '\tADDED {"centre": {"coordinates": [5.3496, 43.3225], "type": "Point"}, '
-        '"code": "13202", "codeDepartement": "13", "codeRegion": "93", '
+        '"code": "13202", "codeDepartement": "13", '
         '"codesPostaux": ["13002"], "nom": "Marseille 2e"}',
         "count=1 label=City removed by collection",
         "\tREMOVED Guérande (44)",
@@ -131,7 +128,7 @@ def test_sync_cities(settings, caplog, respx_mock):
     # - even though the slug is already registered in our DB
     # Check that it does not crash; this demonstrates an "INSEE code change".
     respx_mock.get(
-        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,codeRegion,centre&format=json"
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci&format=json"
     ).respond(
         200,
         json=[
@@ -139,7 +136,6 @@ def test_sync_cities(settings, caplog, respx_mock):
                 "centre": {"coordinates": [4.9306, 46.1517], "type": "Point"},
                 "code": "01001",
                 "codeDepartement": "01",
-                "codeRegion": "84",
                 "codesPostaux": ["01234", "01400"],  # changing the post codes order should not change
                 "nom": "L'Abergement-Clémenciat",
             },
@@ -147,7 +143,6 @@ def test_sync_cities(settings, caplog, respx_mock):
                 "centre": {"coordinates": [4.9306, 46.1517], "type": "Point"},
                 "code": "01003",  # same new INSEE code
                 "codeDepartement": "01",
-                "codeRegion": "84",
                 "codesPostaux": ["01400"],
                 "nom": "L'Abergement-de-Varey",
             },
@@ -164,19 +159,20 @@ def test_sync_cities(settings, caplog, respx_mock):
     management.call_command("sync_cities", wet_run=True)
     assert caplog.messages[:-1] == [
         (
-            "HTTP Request: GET https://geo.foo/communes"
-            '?fields=nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json "HTTP/1.1 200 OK"'
+            "HTTP Request: GET https://geo.foo/communes?fields="
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
+            ' "HTTP/1.1 200 OK"'
         ),
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
-            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json"
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
             '&type=arrondissement-municipal "HTTP/1.1 200 OK"'
         ),
         "count=3 label=City had the same key in collection and queryset",
         "skipping manually edited city=Marssssssssseillle bébé (13) from update",
         "count=1 label=City added by collection",
         '\tADDED {"centre": {"coordinates": [4.9306, 46.1517], "type": "Point"}, '
-        '"code": "01003", "codeDepartement": "01", "codeRegion": "84", '
+        '"code": "01003", "codeDepartement": "01", '
         '"codesPostaux": ["01400"], "nom": "L\'Abergement-de-Varey"}',
         "count=1 label=City removed by collection",
         "\tREMOVED L'Abergement-de-Varey (01)",
@@ -252,7 +248,7 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
     settings.API_INSEE_METADATA_URL = "https://insee.foo/metadata/"
 
     respx_mock.get(
-        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,codeRegion,centre&format=json"
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci&format=json"
     ).respond(
         200,
         json=[
@@ -260,7 +256,6 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
                 "centre": {"coordinates": [4.9306, 46.1517], "type": "Point"},
                 "code": "01001",
                 "codeDepartement": "01",
-                "codeRegion": "84",
                 "codesPostaux": ["01400", "01234"],
                 "nom": "L'Abergement-Clémenciat",
             },
@@ -268,14 +263,13 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
                 "centre": {"coordinates": [5.3496, 43.3225], "type": "Point"},
                 "code": "19248",
                 "codeDepartement": "19",
-                "codeRegion": "75",
                 "codesPostaux": ["19210"],
                 "nom": "Les Trois-Saints",
             },
         ],
     )
     respx_mock.get(
-        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,codeRegion,centre"
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci"
         "&format=json&type=arrondissement-municipal"
     ).respond(
         200,
@@ -284,7 +278,6 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
                 "centre": {"coordinates": [5.3828, 43.3002], "type": "Point"},
                 "code": "13201",
                 "codeDepartement": "13",
-                "codeRegion": "93",
                 "codesPostaux": ["13001"],
                 "nom": "Marseille 1er Arrondissement",
             },
@@ -327,29 +320,30 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
     new_city = City.objects.get(code_insee="19248")
     assert caplog.messages[:-1] == [
         (
-            "HTTP Request: GET https://geo.foo/communes"
-            '?fields=nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json "HTTP/1.1 200 OK"'
+            "HTTP Request: GET https://geo.foo/communes?fields="
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
+            ' "HTTP/1.1 200 OK"'
         ),
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
-            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json"
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
             '&type=arrondissement-municipal "HTTP/1.1 200 OK"'
         ),
         "count=0 label=City had the same key in collection and queryset",
         "count=3 label=City added by collection",
         (
             '\tADDED {"centre": {"coordinates": [4.9306, 46.1517], "type": "Point"}, '
-            '"code": "01001", "codeDepartement": "01", "codeRegion": "84", '
+            '"code": "01001", "codeDepartement": "01", '
             '"codesPostaux": ["01400", "01234"], "nom": "L\'Abergement-Clémenciat"}'
         ),
         (
             '\tADDED {"centre": {"coordinates": [5.3828, 43.3002], "type": "Point"}, '
-            '"code": "13201", "codeDepartement": "13", "codeRegion": "93", '
+            '"code": "13201", "codeDepartement": "13", '
             '"codesPostaux": ["13001"], "nom": "Marseille 1er"}'
         ),
         (
             '\tADDED {"centre": {"coordinates": [5.3496, 43.3225], "type": "Point"}, '
-            '"code": "19248", "codeDepartement": "19", "codeRegion": "75", '
+            '"code": "19248", "codeDepartement": "19", '
             '"codesPostaux": ["19210"], "nom": "Les Trois-Saints"}'
         ),
         "count=2 label=City removed by collection",
@@ -386,6 +380,43 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
     assert job_seeker_to_refill.insee_city.code_insee == "19248"
     job_description_to_refill.refresh_from_db()
     assert job_description_to_refill.location.code_insee == "19248"
+
+
+def test_sync_cities_populates_siren_epci(settings, respx_mock):
+    settings.API_GEO_BASE_URL = "https://geo.foo"
+    respx_mock.get(
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci&format=json"
+    ).respond(
+        200,
+        json=[
+            {
+                "centre": {"coordinates": [4.9306, 46.1517], "type": "Point"},
+                "code": "01001",
+                "codeDepartement": "01",
+                "codesPostaux": ["01400"],
+                "codeEpci": "240100610",
+                "nom": "L'Abergement-Clémenciat",
+            },
+            {
+                "centre": {"coordinates": [5.4247, 46.0071], "type": "Point"},
+                "code": "01002",
+                "codeDepartement": "01",
+                "codesPostaux": ["01640"],
+                "nom": "L'Abergement-de-Varey",
+            },
+        ],
+    )
+    respx_mock.get(
+        "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,centre,codeEpci"
+        "&format=json&type=arrondissement-municipal"
+    ).respond(200, json=[])
+
+    management.call_command("sync_cities", wet_run=True)
+
+    abergement_clemenciat = City.objects.get(code_insee="01001")
+    assert abergement_clemenciat.siren_epci == "240100610"
+    abergement_de_varey = City.objects.get(code_insee="01002")
+    assert abergement_de_varey.siren_epci is None
 
 
 def test_resolve_insee_cities(caplog, snapshot):

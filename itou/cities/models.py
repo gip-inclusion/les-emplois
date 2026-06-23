@@ -32,6 +32,8 @@ class City(models.Model):
     post_codes = ArrayField(models.CharField(max_length=5), verbose_name="codes postaux", blank=True)
     code_insee = models.CharField(verbose_name="code INSEE", max_length=5, unique=True)
 
+    siren_epci = models.CharField(verbose_name="code de l'EPCI", max_length=9, null=True, blank=True, db_index=True)
+
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
