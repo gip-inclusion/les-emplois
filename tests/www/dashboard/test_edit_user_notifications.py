@@ -32,7 +32,11 @@ def test_labor_inspector_not_allowed(client):
 
 
 def test_employer_allowed(client, snapshot):
-    employer = EmployerFactory(membership=True)
+    employer = EmployerFactory(
+        membership=True,
+        # Fixed company kind as query count differs (in snapshots) whether SIAE or not.
+        membership__company__subject_to_iae_rules=True,
+    )
     client.force_login(employer)
     url = reverse("dashboard:edit_user_notifications")
     with assertSnapshotQueries(snapshot(name="view queries")):
