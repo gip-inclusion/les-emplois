@@ -4,7 +4,6 @@ from urllib.parse import urlsplit
 import pytest
 from django import forms
 from django.contrib.auth import authenticate, get_user
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages import SUCCESS
 from django.contrib.messages.storage.base import Message
 from django.core.management import call_command
@@ -26,14 +25,14 @@ from itou.utils.templatetags.demo_accounts import (
     job_seekers_accounts_tag,
     prescribers_accounts_tag,
 )
-from itou.utils.templatetags.dora import dora_orientation_url, dora_service_url
+from itou.utils.templatetags.dora import dora_orientation_url
 from itou.utils.templatetags.nav import NAV_ENTRIES
 from itou.utils.templatetags.str_filters import urlize_new_tab
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.testing import get_request, pretty_indented
+from tests.utils.testing import pretty_indented
 from tests.www.eligibility_views.utils import (
     CERTIFICATION_ERROR_BADGE_HTML,
     CERTIFIED_BADGE_HTML,
@@ -364,32 +363,6 @@ class TestCriterionCertificationBadge:
             criterion_certification_badge(criterion, job_application),
             IN_PROGRESS_BADGE_HTML,
         )
-
-
-class TestDORAServiceURL:
-    def test_source_dora_with_matching_base_url(self, settings):
-        expected = (
-            f"{settings.DORA_WWW_BASE_URL}/services/dora-service?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil"
-        )
-
-        service_url = dora_service_url(
-            {"source": "dora", "lien_source": settings.DORA_WWW_BASE_URL + "/services/dora-service"},
-            orientation_jwt=False,
-            request=get_request(AnonymousUser()),
-        )
-        assert service_url == expected
-
-    def test_source_dora_without_matching_base_url(self, settings):
-        expected = (
-            f"{settings.DORA_WWW_BASE_URL}/services/dora-service?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil"
-        )
-
-        service_url = dora_service_url(
-            {"source": "dora", "lien_source": "https://sub.dom.tld/services/dora-service"},
-            orientation_jwt=False,
-            request=get_request(AnonymousUser()),
-        )
-        assert service_url == expected
 
 
 class TestDORAOrientationURL:
