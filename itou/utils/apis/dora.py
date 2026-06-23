@@ -1,4 +1,5 @@
 import dataclasses
+import json
 import logging
 
 import httpx
@@ -81,14 +82,7 @@ class DoraAPIClient:
 
     def create_orientation(self, payload: dict, attachments=()) -> dict:
         files = [("attachments", (file_name, file_obj)) for file_name, file_obj in attachments]
-        form_data = {}
-        for key, value in payload.items():
-            if key == "emplois_data":
-                for nested_key, nested_value in value.items():
-                    if nested_value is not None:
-                        form_data[f"emplois_data.{nested_key}"] = nested_value
-            elif value is not None:
-                form_data[key] = value
+        form_data = {"data": json.dumps(payload)}
         try:
             response = self.client.post(
                 "/orientations/",
