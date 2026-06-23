@@ -456,3 +456,7 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     def __str__(self):
         return self.uid
+
+    @property
+    def is_local(self):
+        return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM

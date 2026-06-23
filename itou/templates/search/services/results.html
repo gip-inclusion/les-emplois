@@ -30,7 +30,6 @@
                 {% if orientation.job_seeker.public_id %}
                     <input type="hidden" name="job_seeker_public_id" value="{{ orientation.job_seeker.public_id }}">
                 {% endif %}
-                {% if orientation.jwt %}<input type="hidden" name="op" value="{{ orientation.jwt }}">{% endif %}
                 {% include "search/services/includes/form.html" with form=form is_home=False only %}
             </form>
         </div>
