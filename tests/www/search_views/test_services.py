@@ -94,7 +94,8 @@ class TestSearchServices:
         )
         href = parse_response_to_soup(response, selector=self.FIRST_RESULT_LINK)["href"]
         assert f"job_seeker_public_id={job_seeker.public_id}" in href
-        assertContains(response, "Vous recherchez un service pour")
+        assertContains(response, "Vous orientez actuellement")
+        assertContains(response, "vers un service")
 
     def test_category_error_suppression(self, client):
         vannes = create_city_vannes()

@@ -20,17 +20,15 @@ from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.companies.enums import CompanyKind, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.insertion.models import Service
-from itou.insertion.utils import get_job_seeker_from_request
+from itou.insertion.utils import get_orient_for_job_seeker_context
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
-from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.readonly import ReadonlyViewMixin, readonly_view
-from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.search_views.forms import (
     JobDescriptionSearchForm,
@@ -417,7 +415,8 @@ def search_services_results(request, template_name="search/services/results.html
             if suppress_category_error:
                 del form.errors["category"]
 
-    job_seeker = get_job_seeker_from_request(request) if can_orient_towards_insertion_service(request) else None
+    banner_context = get_orient_for_job_seeker_context(request)
+    job_seeker = banner_context["job_seeker"]
     detail_query = {"back_url": request.get_full_path()}
     if job_seeker:
         detail_query["job_seeker_public_id"] = str(job_seeker.public_id)
@@ -431,10 +430,7 @@ def search_services_results(request, template_name="search/services/results.html
         "suppress_category_error": suppress_category_error,
         "results": results,
         "detail_query_string": urlencode(detail_query),
-        "orientation": {
-            "exit_url": get_safe_url(request, "back_url", reverse("job_seekers_views:list")),
-            "job_seeker": job_seeker,
-        },
+        **banner_context,
         "matomo_custom_title": "Recherche de services d'insertion",
         "back_url": reverse("search:services_home"),
     }
