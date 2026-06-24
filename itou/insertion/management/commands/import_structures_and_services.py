@@ -21,6 +21,7 @@ from itou.utils import constants as global_constants, diff
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiItemsIterator
 from itou.utils.apis.dora import DoraAPIClient, DoraApiItemsIterator
 from itou.utils.command import BaseCommand
+from itou.utils.db import lock_timeout
 
 
 class ArgumentData(enum.StrEnum):
@@ -635,6 +636,7 @@ class Command(BaseCommand):
     @dry_runnable
     def handle(self, *args, data, **options):
         with (
+            lock_timeout(10 * 60 * 1000),
             DataInclusionApiClient(
                 global_constants.API_DATA_INCLUSION_BASE_URL,
                 settings.API_DATA_INCLUSION_TOKEN,
