@@ -334,7 +334,7 @@
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 63,
+    'num_queries': 66,
     'queries': list([
       dict({
         'origin': list([
@@ -347,8 +347,7 @@
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'CollectionDiffer.__iter__[utils/diff.py]',
-          'Command.import_data_inclusion_reference_data[insertion/management/commands/import_structures_and_services.py]',
+          'set_runtime_parameter[utils/db.py]',
           'Command.handle[insertion/management/commands/import_structures_and_services.py]',
           'wrapper[itoutils/django/commands.py]',
           'Command.execute[utils/command.py]',
@@ -356,6 +355,31 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
+          'set_runtime_parameter[utils/db.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'SHOW lock_timeout',
+      }),
+      dict({
+        'origin': list([
+          'set_runtime_parameter[utils/db.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          
+          SET SESSION lock_timeout TO 600000
+        ''',
       }),
       dict({
         'origin': list([
@@ -1985,6 +2009,20 @@
                                        %s,
                                        %s,
                                        %s)))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'set_runtime_parameter[utils/db.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          
+          SET SESSION lock_timeout TO 600000
         ''',
       }),
       dict({
