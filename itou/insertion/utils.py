@@ -3,10 +3,13 @@ import time
 from math import ceil
 
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from itoutils.django.nexus.token import generate_token
 
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.users.perms import can_orient_towards_insertion_service
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.phone import normalize_phone_number
 
 
@@ -32,6 +35,29 @@ def get_job_seeker_from_request(request) -> User | None:
                 .first()
             )
     return None
+
+
+def get_orient_for_job_seeker_context(request) -> dict:
+    job_seeker = None
+    exit_url = reverse("home:hp")
+    can_view = False
+
+    if can_orient_towards_insertion_service(request):
+        if request.from_prescriber:
+            exit_url = reverse("job_seekers_views:list")
+        elif request.from_employer:
+            exit_url = reverse("job_seekers_views:list_organization")
+
+        job_seeker = get_job_seeker_from_request(request)
+        if job_seeker:
+            can_view = can_view_personal_information(request, job_seeker)
+
+    return {
+        "job_seeker": job_seeker,
+        "exit_url": exit_url,
+        "can_view_personal_information": can_view,
+        "can_orient_towards_insertion_service": can_orient_towards_insertion_service(request),
+    }
 
 
 def get_orientation_jwt(request) -> str | None:

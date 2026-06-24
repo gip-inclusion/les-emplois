@@ -2,14 +2,13 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
-{% load str_filters %}
 
 {% block title %}Orienter vers un service d'insertion{{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Orienter {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} vers un service d'insertion</h1>
+            <h1>Orienter vers un service d'insertion</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -19,6 +18,11 @@
     {% if show_orientation_disclaimer %}
         {% include "insertion/includes/orientation_disclaimer_alert.html" with orientation_session_uuid=orientation_session_uuid request=request csrf_token=csrf_token ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
     {% endif %}
+{% endblock %}
+
+{% block global_messages %}
+    {{ block.super }}
+    {% include "search/includes/services_orientation_banner.html" %}
 {% endblock %}
 
 {% block content %}

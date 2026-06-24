@@ -1,0 +1,10 @@
+{% load components %}
+{% load str_filters %}
+
+{% if job_seeker %}
+    {% component_alert_global content=content variant="primary" exit_url=exit_url %}
+        {% fragment as content %}
+            <strong>Vous orientez actuellement {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} vers un service</strong>
+        {% endfragment %}
+    {% endcomponent_alert_global %}
+{% endif %}

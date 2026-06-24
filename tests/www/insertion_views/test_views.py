@@ -7,7 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertTempl
 
 from itou.insertion.models import SOURCE_DORA_VALUE, GenericReferenceItemKind, GenericReferenceItemSource
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory, StructureFactory
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -267,6 +267,24 @@ class TestServices:
         assertContains(response, f'href="{test_link}"')
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
+    def test_detail_with_external_orientation_link_without_text(self, client):
+        user = PrescriberFactory(membership=True)
+        external_link = "https://test.example.com"
+        service = ServiceFactory(
+            uid="test-external-no-text-uid",
+            name="Service avec lien externe sans intitulé",
+            updated_on="2025-01-15",
+            is_orientable_with_form=False,
+            mobilization_modes_professionals_external_form_link=external_link,
+            mobilization_modes_professionals_external_form_link_text="",
+            structure__uid="test-structure-external-no-text-uid",
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, f'href="{external_link}"')
+
     def test_detail_orientable_with_external_link_prefers_wizard(self, client):
         user = PrescriberFactory(membership=True)
         external_link = "https://test.example.com"
@@ -299,6 +317,25 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
+
+    def test_detail_orientable_and_job_seeker_authenticated(self, client):
+        user = JobSeekerFactory()
+        service = ServiceFactory(
+            uid="test-orientable-job-seeker-uid",
+            updated_on="2025-01-15",
+            is_orientable_with_form=True,
+            structure__uid="test-structure-orientable-job-seeker-uid",
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(
+            response,
+            reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}),
+        )
+        assertNotContains(response, "c-box--action")
+        assertNotContains(response, "Informations de contact non renseignées")
 
     def test_detail_orientable_and_user_not_authenticated(self, client):
         service = ServiceFactory(
@@ -334,6 +371,7 @@ class TestServices:
         service = ServiceFactory(
             uid="test-no-contact-uid",
             updated_on="2025-01-15",
+            is_orientable_with_form=False,
             contact_full_name="",
             contact_email="",
             contact_phone="",
@@ -343,6 +381,7 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Voir les coordonnées de contact du service")
+        assertContains(response, "Informations de contact non renseignées")
 
     def test_detail_contact_button_shown_when_authenticated(self, client):
         user = PrescriberFactory(membership=True)

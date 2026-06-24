@@ -315,6 +315,13 @@
           Actions rapides
       </h2>
       <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg">
+              <p class="mb-0 fst-italic text-white">
+                  <i aria-hidden="true" class="ri-information-line fw-normal me-1">
+                  </i>
+                  Informations de contact non renseignées
+              </p>
+          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
               <div class="dropdown">
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
