@@ -430,6 +430,10 @@ class Service(GeolocatedAddressMixin, models.Model):
     def is_dora(self):
         return self.source.value == "dora"
 
+    @property
+    def has_orientation_action(self):
+        return self.is_orientable_with_form or bool(self.mobilization_modes_professionals_external_form_link)
+
     def has_mobilization_modes(self):
         return (not self.is_dora and bool(self.mobilizations.all())) or (
             self.is_dora

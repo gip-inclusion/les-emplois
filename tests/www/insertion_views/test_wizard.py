@@ -231,6 +231,27 @@ def test_session_isolation_between_users(client):
     assert response.status_code == 404
 
 
+def test_orientation_wizard_shows_banner_and_generic_title(client):
+    prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+    job_seeker = JobSeekerFactory(first_name="Jane", last_name="Doe")
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.get(conformity_url)
+    assertContains(response, "Vous orientez actuellement")
+    assertContains(response, "vers un service")
+    assertContains(response, "DOE Jane")
+    assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
+
+
 def test_conformity_step_blocks_when_beneficiary_info_is_incomplete(client, snapshot):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(first_name="", last_name="DUPONT", phone="0606060606", email="test@example.org")
@@ -372,3 +393,37 @@ def test_documents_step_normalizes_beneficiary_phone_for_dora(client, mocker):
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload["beneficiary_phone"] == "0601901570"
+
+
+def test_orientation_banner_quitter_ignores_back_url(client):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory()
+    service = ServiceFactory(is_orientable_with_form=True)
+    service_detail_url = (
+        reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+        + f"?job_seeker_public_id={job_seeker.public_id}&back_url=/search/services/results"
+    )
+
+    client.force_login(prescriber)
+    response = client.get(service_detail_url)
+    quit_link = parse_response_to_soup(response, 'a[aria-label="Quitter la procédure"]')
+    assert quit_link["href"] == reverse("job_seekers_views:list")
+
+
+def test_orientation_wizard_banner_quitter_goes_to_job_seekers_list(client):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory()
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.get(conformity_url)
+    quit_link = parse_response_to_soup(response, 'a[aria-label="Quitter la procédure"]')
+    assert quit_link["href"] == reverse("job_seekers_views:list")
