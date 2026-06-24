@@ -25,7 +25,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
-from itou.users.perms import can_prefill_orientation_on_dora
+from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
@@ -417,7 +417,7 @@ def search_services_results(request, template_name="search/services/results.html
             if suppress_category_error:
                 del form.errors["category"]
 
-    job_seeker = get_job_seeker_from_request(request) if can_prefill_orientation_on_dora(request) else None
+    job_seeker = get_job_seeker_from_request(request) if can_orient_towards_insertion_service(request) else None
     detail_query = {"back_url": request.get_full_path()}
     if job_seeker:
         detail_query["job_seeker_public_id"] = str(job_seeker.public_id)
