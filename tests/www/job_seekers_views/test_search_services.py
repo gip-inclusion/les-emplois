@@ -3,6 +3,9 @@ from django.urls import reverse
 from django.utils.html import escape
 from pytest_django.asserts import assertContains
 
+from tests.approvals.factories import ApprovalFactory
+from tests.companies.factories import CompanyMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
 )
@@ -92,3 +95,53 @@ def test_search_services_no_city(client, make_url, expected_markup, has_city_slu
         expected_markup(expected_url),
         html=True,
     )
+
+
+def assert_has_more_actions(response, list_url, job_seeker):
+    query = {
+        "job_seeker_public_id": job_seeker.public_id,
+        "back_url": list_url,
+    }
+    if job_seeker.city_slug:
+        query["city"] = job_seeker.city_slug
+    expected_url = reverse("search:services_results", query=query)
+    assertContains(response, list_markup(expected_url), html=True)
+    assertContains(response, 'aria-label="Plus d\'actions"')
+
+
+def test_search_services_from_list_as_authorized_prescriber(client):
+    professional = PrescriberMembershipFactory(organization__authorized=True).user
+    job_seeker = JobSeekerFactory(created_by=professional, with_address=True)
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=professional)
+    ApprovalFactory(user=job_seeker)
+    client.force_login(professional)
+    list_url = reverse("job_seekers_views:list")
+
+    assert_has_more_actions(client.get(list_url), list_url, job_seeker)
+
+
+def test_search_services_from_list_as_orienteur(client):
+    professional = PrescriberMembershipFactory(organization__authorized=False).user
+    job_seeker = JobSeekerFactory(created_by=professional, with_address=True)
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=professional)
+    ApprovalFactory(user=job_seeker)
+    client.force_login(professional)
+    list_url = reverse("job_seekers_views:list")
+
+    assert_has_more_actions(client.get(list_url), list_url, job_seeker)
+
+
+def test_search_services_from_list_as_employer(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    professional = membership.user
+    job_seeker = JobApplicationFactory(
+        sent_by_employer=True,
+        sender=professional,
+        sender_company=membership.company,
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    ApprovalFactory(user=job_seeker)
+    client.force_login(professional)
+    list_url = reverse("job_seekers_views:list_organization")
+
+    assert_has_more_actions(client.get(list_url), list_url, job_seeker)

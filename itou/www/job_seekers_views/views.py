@@ -31,7 +31,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
-from itou.users.perms import can_prefill_orientation_on_dora
+from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
@@ -86,14 +86,14 @@ def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
 
 
 def build_services_search_url(request, job_seeker):
-    if not can_prefill_orientation_on_dora(request):
+    if not can_orient_towards_insertion_service(request):
         return None
 
     query = {
         "job_seeker_public_id": job_seeker.public_id,
         "back_url": request.get_full_path(),
     }
-    # Authorized prescribers can_view_personal_information, it is not checked here.
+    # can_view_personal_information is handled in templates, not here.
     if job_seeker.city_slug:
         query["city"] = job_seeker.city_slug
     return reverse("search:services_results", query=query)
@@ -356,12 +356,13 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         job_seeker.show_more_actions = (
             not job_seeker.has_valid_approval
             or job_seeker.jobseeker_profile.is_stalled
-            or can_prefill_orientation_on_dora(request)
+            or can_orient_towards_insertion_service(request)
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
+        "can_orient_towards_insertion_service": can_orient_towards_insertion_service(request),
         "list_organization": list_organization,
         "filters_form": form,
         "filters_counter": filters_counter,
