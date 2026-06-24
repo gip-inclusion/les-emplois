@@ -68,7 +68,7 @@
                 {% if request.from_employer and request.current_organization.is_subject_to_iae_rules %}
                     {% component_alert_global content=content variant="warning" %}
                         {% fragment as content %}
-                            <strong>Le service d’envoi des fiches salariés</strong> sera temporairement suspendu au cours de la journée du <strong>26/06/2026</strong>, en raison d’une opération de mise à jour de l’Extranet IAE 2.0 de l’ASP.
+                            <strong>Le service d’envoi des fiches salariés</strong> sera temporairement suspendu au cours de la journée du <strong>09/07/2026</strong>, en raison d’une opération de mise à jour de l’Extranet IAE 2.0 de l’ASP.
                         {% endfragment %}
                     {% endcomponent_alert_global %}
                 {% elif request.from_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
