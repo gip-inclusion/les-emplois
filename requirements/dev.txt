@@ -464,9 +464,9 @@ cryptography==49.0.0 \
     #   django-fernet-encrypted-fields
     #   jwcrypto
     #   paramiko
-cssbeautifier==1.15.4 \
-    --hash=sha256:78c84d5e5378df7d08622bbd0477a1abdbd209680e95480bf22f12d5701efc98 \
-    --hash=sha256:9bb08dc3f64c101a01677f128acf01905914cf406baf87434dcde05b74c0acf5
+cssbeautifier==2.0.1 \
+    --hash=sha256:ed3bd34a1db4649a49278e69090343ec61c741d4bbfc0b8d0c3e071cc7278cc6 \
+    --hash=sha256:f6102c0589c85be3c1a016cee76ee3661ee4bd5da88d48a5f8708bfaf663ae26
     # via
     #   -r test.txt
     #   djlint
@@ -2670,7 +2670,6 @@ six==1.17.0 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via
     #   -r test.txt
-    #   cssbeautifier
     #   html5lib
     #   jsbeautifier
     #   python-dateutil
