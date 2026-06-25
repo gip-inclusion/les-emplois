@@ -10,32 +10,32 @@ import tempfile
 import time
 
 
-def get_deployments(clever_cli, app_alias):
-    activity_output = subprocess.check_output([clever_cli, "activity", "--format=json", "--alias", app_alias])
+def get_deployments(clever_cli, app_id):
+    activity_output = subprocess.check_output([clever_cli, "activity", "--format=json", "--app", app_id])
     return json.loads(activity_output)
 
 
 def deploy():
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", required=True)
-    parser.add_argument("--app-alias", required=True)
+    parser.add_argument("--app-id", required=True)
     parser.add_argument("--clever-cli", default="clever")
 
     args = parser.parse_args()
     branch = args.branch
     clever_cli = args.clever_cli
-    app_alias = args.app_alias
+    app_id= args.app_id
 
     if not os.getenv("CLEVER_TOKEN") or not os.getenv("CLEVER_SECRET"):
         sys.exit("Environment variables CLEVER_TOKEN & CLEVER_SECRET are mandatory")
 
     applications_data = subprocess.check_output([clever_cli, "applications", "--json"])
     try:
-        [deploy_url] = [info["deploy_url"] for info in json.loads(applications_data) if info["alias"] == app_alias]
+        [deploy_url] = [info["deploy_url"] for info in json.loads(applications_data) if info["app_id"] == app_id]
     except ValueError:
-        sys.exit(f"Could not find the deploy url for {app_alias} - check your linked applications")
+        sys.exit(f"Could not find the deploy url for {app_id} - check your linked applications")
 
-    known_deployment_uids = {d["uuid"] for d in get_deployments(clever_cli, app_alias)}
+    known_deployment_uids = {d["uuid"] for d in get_deployments(clever_cli, app_id)}
 
     with tempfile.NamedTemporaryFile(prefix="clever_git_alias", delete_on_close=False) as f:
         f.write(b"""#!/bin/bash
@@ -56,7 +56,7 @@ esac
         )
 
     for _attempt in range(10):
-        new_deployments = [d for d in get_deployments(clever_cli, app_alias) if d["uuid"] not in known_deployment_uids]
+        new_deployments = [d for d in get_deployments(clever_cli, app_id) if d["uuid"] not in known_deployment_uids]
         if new_deployments:
             break
         time.sleep(1)
@@ -70,7 +70,7 @@ esac
     print(f"Following deployment {deployment_uid}")
 
     while True:
-        deployments = get_deployments(clever_cli, app_alias)
+        deployments = get_deployments(clever_cli, app_id)
         deployment_info = [d for d in deployments if d["uuid"] == deployment_uid][0]
         print(deployment_info)
         if deployment_info["state"] != "WIP":
