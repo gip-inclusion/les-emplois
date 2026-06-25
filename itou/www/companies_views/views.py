@@ -24,7 +24,7 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.readonly import ReadonlyViewMixin, http_methods
+from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
@@ -47,6 +47,7 @@ def report_tally_url(user, company, job_description=None):
 ### Main company view
 
 
+@readonly_view
 @check_request(lambda request: request.from_employer)
 def overview(request, template_name="companies/overview.html"):
     context = {
@@ -393,6 +394,7 @@ def edit_job_description_preview(
 ### Financial annexes views
 
 
+@readonly_view
 def show_financial_annexes(request, template_name="companies/show_financial_annexes.html"):
     """
     Show a summary of the financial annexes of the convention to the siae admin user. Financial annexes are grouped
@@ -437,6 +439,7 @@ def show_financial_annexes(request, template_name="companies/show_financial_anne
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def select_financial_annex(request, template_name="companies/select_financial_annex.html"):
     """
     Let siae admin user select a new convention via a financial annex number.
@@ -523,6 +526,7 @@ class CompanyCardView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJobSeeke
         }
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(can_create_antenna)
 def create_company(request, template_name="companies/create_siae.html"):
     current_company = request.current_organization
@@ -669,6 +673,7 @@ class MemberList(BaseMemberList):
         return context
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.from_employer)
 def deactivate_member(request, public_id, template_name="companies/deactivate_member.html"):
     user = get_object_or_404(User, public_id=public_id)
@@ -680,6 +685,7 @@ def deactivate_member(request, public_id, template_name="companies/deactivate_me
     )
 
 
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_request(lambda request: request.from_employer)
 def update_admin_role(request, action, public_id, template_name="companies/update_admins.html"):
     if action not in ["add", "remove"]:

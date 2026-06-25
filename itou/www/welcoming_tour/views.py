@@ -2,7 +2,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from itou.utils.readonly import http_methods
 
+
+@http_methods(db_write=["GET", "HEAD"])
 def index(request):
     user = request.user
 
