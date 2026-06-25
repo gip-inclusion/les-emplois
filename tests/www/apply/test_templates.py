@@ -15,14 +15,11 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
 )
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
-from itou.job_applications.enums import JobApplicationState, Origin
-from itou.jobs.models import Appellation
+from itou.job_applications.enums import JobApplicationState
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.types import InclusiveDateRange
-from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import get_request, load_template
@@ -38,110 +35,6 @@ def situation_tooltip_text(kind):
         + (" ayant permis la délivrance d’un PASS IAE" if kind == "IAE" else "")
         + ", elle a peut-être changé depuis cette date."
     )
-
-
-# Job applications list (company)
-
-
-def test_job_application_multiple_jobs():
-    create_test_romes_and_appellations(["M1805"], appellations_per_rome=3)
-
-    tmpl = load_template("apply/includes/list_card_body.html")
-
-    job_application = JobApplicationFactory(
-        sent_by_employer=True,
-        selected_jobs=Appellation.objects.all(),
-    )
-    job_application.user_can_view_personal_information = True
-    job_application.jobseeker_valid_eligibility_diagnosis = None
-
-    rendered = tmpl.render(
-        Context(
-            {
-                "job_application": job_application,
-                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
-                "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(EmployerFactory()),
-            }
-        )
-    )
-
-    # We have 3 selected_jobs, so we should display the first one
-    # and 2 more
-    assertInHTML(
-        f"""
-        <button class="c-info__summary collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapse-job-application-{job_application.pk}"
-                aria-expanded="false"
-                type="button"
-                aria-controls="collapse-job-application-{job_application.pk}">
-            <span>3 postes recherchés</span>
-        </button>
-        """,
-        rendered,
-    )
-
-
-def test_job_application_auto_prescription_badge_in_list():
-    tmpl = load_template("apply/includes/list_card_body.html")
-    job_application = JobApplicationFactory(sent_by_employer=True)
-    job_application.user_can_view_personal_information = True
-    job_application.jobseeker_valid_eligibility_diagnosis = None
-    rendered = tmpl.render(
-        Context(
-            {
-                "job_application": job_application,
-                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
-                "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(EmployerFactory(membership=True)),
-            }
-        )
-    )
-
-    assert "Auto-prescription" in rendered
-
-
-def test_job_application_imported_from_pe_in_list():
-    tmpl = load_template("apply/includes/list_card_body.html")
-    job_application = JobApplicationFactory(sent_by_employer=True, origin=Origin.PE_APPROVAL)
-    job_application.user_can_view_personal_information = True
-    job_application.jobseeker_valid_eligibility_diagnosis = None
-    rendered = tmpl.render(
-        Context(
-            {
-                "job_application": job_application,
-                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
-                "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(EmployerFactory(membership=True)),
-            }
-        )
-    )
-
-    assert "Import agrément Pôle emploi" in rendered
-
-
-def test_job_application_job_seeker_in_list():
-    tmpl = load_template("apply/includes/list_card_body.html")
-    job_application = JobApplicationFactory(sent_by_job_seeker=True)
-    job_application.user_can_view_personal_information = True
-    job_application.jobseeker_valid_eligibility_diagnosis = None
-    rendered = tmpl.render(
-        Context(
-            {
-                "job_application": job_application,
-                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
-                "JobApplicationsListKind": JobApplicationsListKind,
-                "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(EmployerFactory()),
-            }
-        )
-    )
-
-    assert "Le candidat lui-même" in rendered
 
 
 # QPV / ZRR eligibility details

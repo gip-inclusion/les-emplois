@@ -7,7 +7,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
-from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
+from itou.www.apply.views.list_views import JobApplicationOrder
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -58,18 +58,18 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     )
 
     client.force_login(hit_pit.members.get())
-    response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
+    response = client.get(reverse("apply:list_for_siae"))
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
 
     assert pretty_indented(results_section) == snapshot(name="SIAE - warnings for 2222 and 3333")
 
     client.force_login(sender)
-    response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.LIST})
+    response = client.get(reverse("apply:list_prescriptions"))
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
     assert pretty_indented(results_section) == snapshot(name="PRESCRIBER - warnings for 2222 and 3333")
 
     client.force_login(job_seeker)
-    response = client.get(reverse("apply:list_for_job_seeker"), {"display": JobApplicationsDisplayKind.LIST})
+    response = client.get(reverse("apply:list_for_job_seeker"))
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
     assert pretty_indented(results_section) == snapshot(name="JOB SEEKER - no warnings")
 
