@@ -916,9 +916,9 @@ jmespath==1.1.0 \
     #   -r test.txt
     #   boto3
     #   botocore
-jsbeautifier==1.15.4 \
-    --hash=sha256:5bb18d9efb9331d825735fbc5360ee8f1aac5e52780042803943aa7f854f7592 \
-    --hash=sha256:72f65de312a3f10900d7685557f84cb61a9733c50dcc27271a39f5b0051bf528
+jsbeautifier==2.0.1 \
+    --hash=sha256:45603b2097410feee8d3a6ef8ad5a8e0a0e89f347331888a97e46f332ce8d953 \
+    --hash=sha256:e70bad11b394d538139e05b02ace5706a0125c580a1ec9f8599cb75bf609e6f7
     # via
     #   -r test.txt
     #   cssbeautifier
@@ -2672,7 +2672,6 @@ six==1.17.0 \
     #   -r test.txt
     #   cssbeautifier
     #   html5lib
-    #   jsbeautifier
     #   python-dateutil
 slippers==0.7.0 \
     --hash=sha256:35059d4025845a46e252633a16a04136f21b28469dee7c4a2a361e00aee5335e \
