@@ -6,8 +6,11 @@ from django.contrib.auth.decorators import login_not_required
 from django.shortcuts import render
 from django.utils.html import mark_safe
 
+from itou.utils.readonly import readonly_view
+
 
 @login_not_required
+@readonly_view
 def releases(request, template_name="releases/list.html"):
     """
     Render our CHANGELOG.md file in HTML
