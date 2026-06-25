@@ -1994,7 +1994,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 26,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -3125,27 +3125,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_for_siae.html]',
-          'list_for_siae[www/apply/views/list_views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -3204,7 +3183,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 23,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -4261,27 +4240,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_for_siae.html]',
-          'list_for_siae[www/apply/views/list_views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -4314,7 +4272,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with all filters but job_seeker]
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -5537,27 +5495,6 @@
       }),
       dict({
         'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_for_siae.html]',
-          'list_for_siae[www/apply/views/list_views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -5739,7 +5676,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with only job_seeker filter]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -6754,27 +6691,6 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_for_siae.html]',
-          'list_for_siae[www/apply/views/list_views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
-          WHERE (NOT ("companies_company"."kind" IN (%s,
-                                                     %s))
-                 AND "companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
         ''',
       }),
       dict({
