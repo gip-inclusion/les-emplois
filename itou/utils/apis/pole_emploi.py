@@ -385,20 +385,6 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         "profil_accedant",
         "api_donnees-rqthv1",
         "h2a",
-        # Informations Administratives Usager
-        "api_informations-administrativesv1",
-        "informationsadministrativesusager",
-        "profil_accedant",
-        # Statut Usager
-        "api_contrat-usagerv2",
-        "statutcontratusager",
-        # again "profil_accedant",
-        # Orientation Usager
-        "api_orientationusagerv1",
-        "orientationusager",
-        # Diagnostic usager
-        "api_diagnosticargumentev4",
-        "diagnosticusageragent",
     ]
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
