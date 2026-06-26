@@ -1047,12 +1047,12 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 if request.from_prescriber:
                     self.profile.created_by_prescriber_organization = request.current_organization
                 if self.standalone_creation:
-                    messages.success(
-                        request,
-                        f"Le compte du candidat {self.profile.user.get_inverted_full_name()} a "
-                        "bien été créé et ajouté à votre liste de candidats.",
-                        extra_tags="toast",
+                    message = format_html(
+                        "Usager ajouté||Le compte de {} a été créé et ajouté à votre liste d'accompagnements.<br>"
+                        "Vous êtes désigné comme son dernier accompagnateur connu.",
+                        self.profile.user.get_inverted_full_name(),
                     )
+                    messages.success(request, message, extra_tags="toast")
                 self.profile.save()
                 # TODO(ewen): add tunnel information when we have it in self.tunnel
                 logger.info("user=%s created job_seeker=%s", self.sender.pk, user.pk)
