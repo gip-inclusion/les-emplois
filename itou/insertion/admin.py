@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 
-from itou.insertion.models import GenericReferenceItem, Service, Structure
+from itou.insertion.models import GenericReferenceItem, MobilizationEvent, Service, Structure
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 
 
@@ -132,3 +132,50 @@ class ServiceAdmin(InsertionAdmin):
     @admin.display(description="structure")
     def structure_link(self, obj):
         return get_admin_view_link(obj.structure, content=obj.structure.name)
+
+
+@admin.register(MobilizationEvent)
+class MobilizationEventAdmin(InsertionAdmin):
+    list_display = [
+        "pk",
+        "kind",
+        "service__name",
+        "structure__name",
+        "user",
+        "prescriber_organization",
+        "company",
+        "created_at",
+    ]
+    list_display_links = ["pk", "kind"]
+    list_select_related = ["structure", "service"]
+    list_filter = ["kind"]
+    ordering = ["-created_at"]
+    show_full_result_count = False
+
+    fields = readonly_fields = [
+        "pk",
+        "kind",
+        "user",
+        "service_link",
+        "structure_link",
+        "prescriber_organization_link",
+        "company_link",
+        "service_external_link",
+        "created_at",
+    ]
+
+    @admin.display(description="structure")
+    def structure_link(self, obj):
+        return get_admin_view_link(obj.structure, content=obj.structure.name)
+
+    @admin.display(description="service")
+    def service_link(self, obj):
+        return get_admin_view_link(obj.service, content=obj.service.name)
+
+    @admin.display(description="organisation prescriptrice")
+    def prescriber_organization_link(self, obj):
+        return get_admin_view_link(obj.prescriber_organization, content=obj.prescriber_organization.name)
+
+    @admin.display(description="entreprise")
+    def company_link(self, obj):
+        return get_admin_view_link(obj.company, content=obj.company.name)

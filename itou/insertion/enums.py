@@ -19,3 +19,10 @@ class GenericReferenceItemKind(models.TextChoices):
     SERVICE_KIND = "SERVICE_KIND", "Type de service"
     SOURCE = "SOURCE", "Source"
     THEMATIC = "THEMATIC", "Thématique"
+
+
+class MobilizationEventKind(models.TextChoices):
+    SERVICE_ORIENTATION = "service_orientation", "Orientation vers un service"
+    SERVICE_EXT_LINK = "service_ext_link", "Orientation via un lien externe ou clic sur un lien de démarche à réaliser"
+    SERVICE_CONTACT = "service_contact", "Affichage des informations de contact du service"
+    STRUCTURE_CONTACT = "structure_contact", "Affichage des informations de contact de la structure"
