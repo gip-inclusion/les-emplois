@@ -5,11 +5,14 @@ import pytest
 from django import forms
 from django.contrib.auth import authenticate, get_user
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.messages import SUCCESS
+from django.contrib.messages.storage.base import Message
 from django.core.management import call_command
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import override_settings
 from django.urls import URLPattern, URLResolver, get_resolver, reverse as django_reverse
+from django.utils.safestring import mark_safe
 from freezegun import freeze_time
 from pytest_django.asserts import assertHTMLEqual
 
@@ -167,6 +170,18 @@ class TestThemeInclusion:
         template = Template("{% load theme_inclusion %}" + field_markup * 2)
         with pytest.raises(NotImplementedError):
             template.render(Context({"form": NIRForm()}))
+
+    def test_itou_toast_content(self):
+        TOAST_TITLE = "title"
+        TOAST_CONTENT = "<b>content</b>"
+        MESSAGE = f"{TOAST_TITLE}||{TOAST_CONTENT}"
+        UNSAFE_MESSAGE = Message(message=MESSAGE, level=SUCCESS)
+        SAFE_MESSAGE = Message(message=mark_safe(MESSAGE), level=SUCCESS)
+        template = Template(
+            "{% load theme_inclusion %}<b>{{message|itou_toast_title}}</b><p>{{message|itou_toast_content}}</p>"
+        )
+        assert template.render(Context({"message": UNSAFE_MESSAGE})) == "<b>title</b><p>&lt;b&gt;content&lt;/b&gt;</p>"
+        assert template.render(Context({"message": SAFE_MESSAGE})) == "<b>title</b><p><b>content</b></p>"
 
 
 @pytest.fixture
