@@ -1,3 +1,5 @@
+import logging
+
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
@@ -7,9 +9,19 @@ from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
 
-from itou.insertion.enums import GenericReferenceItemKind, GenericReferenceItemSource
+from itou.companies.models import Company
+from itou.insertion.enums import (
+    GenericReferenceItemKind,
+    GenericReferenceItemSource,
+    MobilizationEventKind,
+)
+from itou.prescribers.models import PrescriberOrganization
+from itou.users.models import User
 from itou.utils.storage.s3 import generate_dora_storage_url
 from itou.utils.validators import validate_post_code
+
+
+logger = logging.getLogger(__name__)
 
 
 SOURCE_DORA_VALUE = "dora"
@@ -467,3 +479,85 @@ class Service(GeolocatedAddressMixin, models.Model):
     @property
     def is_local(self):
         return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM
+
+
+class MobilizationEventManager(models.Manager):
+    def create_mobilization_event(self, *, session_key, kind, user, organization, structure, service=None):
+        # The provided organization can be a prescriber organization, a company,
+        # or None if the user is not authenticated
+        prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
+        company = organization if isinstance(organization, Company) else None
+
+        if user.is_authenticated and not prescriber_organization and not company:
+            # Ignore job seekers, labor inspectors and itou_staff
+            return
+
+        MobilizationEvent(
+            session_key=session_key,
+            kind=kind,
+            user=user if user.is_authenticated else None,
+            prescriber_organization=prescriber_organization,
+            company=company,
+            structure=structure,
+            service=service,
+        ).save()
+
+
+class MobilizationEvent(models.Model):
+    session_key = models.CharField(verbose_name="clé de session", max_length=40)
+    kind = models.CharField(verbose_name="type", choices=MobilizationEventKind)
+    user = models.ForeignKey(
+        User, verbose_name="prescripteur ou employeur", on_delete=models.CASCADE, null=True, related_name="+"
+    )
+    prescriber_organization = models.ForeignKey(
+        PrescriberOrganization,
+        verbose_name="organisation prescriptrice",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="+",
+    )
+    company = models.ForeignKey(
+        Company,
+        verbose_name="entreprise",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="+",
+    )
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name="+")
+    structure = models.ForeignKey(Structure, on_delete=models.CASCADE, related_name="+")
+    service_external_link = models.CharField(verbose_name="lien externe", blank=True)
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now=True)
+
+    objects = MobilizationEventManager()
+
+    class Meta:
+        verbose_name = "intention de mise en relation (iMER)"
+        verbose_name_plural = "intentions de mise en relation (iMER)"
+
+        constraints = [
+            models.CheckConstraint(
+                name="service_and_structure_kind_coherence",
+                condition=models.Q(
+                    kind__in=[
+                        MobilizationEventKind.SERVICE_ORIENTATION,
+                        MobilizationEventKind.SERVICE_CONTACT,
+                        MobilizationEventKind.SERVICE_EXT_LINK,
+                    ],
+                    service__isnull=False,
+                )
+                | models.Q(kind=MobilizationEventKind.STRUCTURE_CONTACT, service__isnull=True),
+            ),
+            models.CheckConstraint(
+                name="authenticated_user_has_organization",
+                condition=models.Q(user=None, prescriber_organization=None, company=None)
+                | (
+                    models.Q(user__isnull=False)
+                    & (models.Q(prescriber_organization__isnull=False) | models.Q(company__isnull=False))
+                ),
+            ),
+            models.CheckConstraint(
+                name="service_external_link_coherence",
+                condition=models.Q(kind=MobilizationEventKind.SERVICE_EXT_LINK) & ~models.Q(service_external_link="")
+                | (~models.Q(kind=MobilizationEventKind.SERVICE_EXT_LINK) & models.Q(service_external_link="")),
+            ),
+        ]
