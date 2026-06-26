@@ -257,6 +257,11 @@
     }),
     dict({
       'field': 'user',
+      'hidden': True,
+      'model': 'insertion.MobilizationEvent',
+    }),
+    dict({
+      'field': 'user',
       'hidden': False,
       'model': 'institutions.InstitutionMembership',
     }),
