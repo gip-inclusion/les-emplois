@@ -4,6 +4,7 @@ from django import template
 from django.contrib.messages import constants as message_constants
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.utils.safestring import SafeString, mark_safe
 from django_bootstrap5.templatetags.django_bootstrap5 import bootstrap_field
 
 
@@ -53,7 +54,10 @@ def itou_toast_title(message):
 @register.filter
 def itou_toast_content(message):
     try:
-        return message.message.split("||", maxsplit=1)[1]
+        content = message.message.split("||", maxsplit=1)[1]
+        if isinstance(message.message, SafeString):
+            return mark_safe(content)
+        return content
     except IndexError:
         return None
 
