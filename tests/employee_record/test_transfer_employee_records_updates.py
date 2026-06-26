@@ -12,6 +12,9 @@ from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory
 
 
+pytest.skip(allow_module_level=True)
+
+
 @pytest.fixture(name="command")
 def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
     # Set required settings

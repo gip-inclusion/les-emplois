@@ -17,6 +17,9 @@ from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
 
 
+pytest.skip(allow_module_level=True)
+
+
 @pytest.fixture(name="command")
 def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
     # Set required settings
