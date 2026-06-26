@@ -247,14 +247,12 @@ class _SituationSerializer(serializers.Serializer):
     salarieSortantDetention = serializers.BooleanField(
         source="job_application.job_seeker.jobseeker_profile.detention_exit_or_ppsmj"
     )  # Required
-    salarieLangueFrancaise = serializers.SerializerMethodField()  # Required
+    salarieLangueFrancaise = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.low_level_in_french"
+    )  # Required
     salarieMobilite = serializers.BooleanField(
         source="job_application.job_seeker.jobseeker_profile.mobility_issue"
     )  # Required
-
-    def get_salarieLangueFrancaise(self, obj: EmployeeRecord) -> bool:
-        # In ASP, True means that the job seeker can speak French
-        return not obj.job_application.job_seeker.jobseeker_profile.low_level_in_french
 
 
 class _SituationForEITISerializer(_SituationSerializer):
