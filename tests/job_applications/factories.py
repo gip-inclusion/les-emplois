@@ -5,6 +5,7 @@ import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from django.core.files.storage import default_storage
+from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
@@ -158,8 +159,8 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     to_company = factory.SubFactory(CompanyFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
-    hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
-    hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2))
+    hiring_start_at = factory.LazyFunction(timezone.localdate)
+    hiring_end_at = factory.LazyFunction(lambda: timezone.localdate() + relativedelta(years=2))
     resume = factory.SubFactory(FileFactory)
     sender_kind = None  # Force all calls to use a sent_by_xxx trait as the db doesn't allow null values
     processed_at = factory.LazyAttribute(
@@ -245,8 +246,8 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
     action = factory.fuzzy.FuzzyChoice(Prequalification.values + ProfessionalSituationExperience.values)
     dates = factory.LazyFunction(
         lambda: InclusiveDateRange(
-            datetime.now(UTC).date(),
-            datetime.now(UTC).date() + relativedelta(years=2),
+            timezone.localdate(),
+            timezone.localdate() + relativedelta(years=2),
         )
     )
 
