@@ -10,7 +10,6 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.users.perms import can_orient_towards_insertion_service
 from itou.utils.perms.utils import can_view_personal_information
-from itou.utils.phone import normalize_phone_number
 
 
 def get_missing_orientation_beneficiary_field_labels(job_seeker: User) -> list[str]:
@@ -21,8 +20,6 @@ def get_missing_orientation_beneficiary_field_labels(job_seeker: User) -> list[s
         missing.append("Nom")
     if not job_seeker.email or not job_seeker.email.strip():
         missing.append("Adresse e-mail")
-    if not normalize_phone_number(job_seeker.phone or ""):
-        missing.append("Téléphone")
     return missing
 
 
