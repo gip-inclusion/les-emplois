@@ -50,6 +50,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         fee=fee,
         fee_details="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location",
         access_conditions_dora=["Résident QPV / ZFRR"],
+        credentials=["Pièce d'identité", "Justificatif de domicile"],
     )
     service.publics.add(public)
 
