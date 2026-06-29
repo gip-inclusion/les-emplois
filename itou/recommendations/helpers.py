@@ -142,9 +142,10 @@ class Constraint:
     """Data structure for "contrainte" objects from Diagnostic Usager - dossier agrégé"""
 
     # NB: Each item in details is a "objectif" or a "situation" from the API.
-    # These have their own author, value, and imptact
+    # These have their own author, value, and impact
     # but we chose not to use them for now (too much information to display)
 
+    code: str
     label: str
     details: list[str]
     author: Author
@@ -154,6 +155,7 @@ class Constraint:
     @classmethod
     def from_dict(cls, agent, data):
         return cls(
+            code=data["code"],
             label=data["libelle"],
             impact=data.get("impact", ""),  # This field is missing in one of the examples from the doc.
             details=[o["libelle"] for o in data["objectifs"] + data["situations"]],

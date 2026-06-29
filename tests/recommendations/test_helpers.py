@@ -113,6 +113,7 @@ class TestFetchAndParseUserData:
                             "organization": "CDG Alpes Haute Provence",
                             "timestamp": datetime.datetime(2021, 5, 17, 14, 47, 11, tzinfo=datetime.UTC),
                         },
+                        "code": "23",
                         "details": [
                             "Faire un point complet sur sa mobilité",
                             "Accéder à un véhicule",
@@ -170,6 +171,7 @@ class TestFetchAndParseUserData:
                         "organization": "CDG Alpes Haute Provence",
                         "timestamp": datetime.datetime(2021, 5, 17, 14, 47, 11, tzinfo=datetime.UTC),
                     },
+                    "code": "22",
                     "details": [
                         "Acquérir un équipement",
                         "Accéder à  une connexion internet",
