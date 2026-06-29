@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 2026-06-29
+
+### Ajouté
+
+- [Insertion : Ajout du nouveau "tunnel" d'orientation depuis les Emplois](https://github.com/gip-inclusion/les-emplois/pull/8130)
+
+### Modifié
+
+- [Admin : Permettre au groupe itou-admin d’accéder en lecture aux objets de l’app Insertion](https://github.com/gip-inclusion/les-emplois/pull/8314)
+- [Demandeur d'emploi : Permettre aux pros de modifier l'email d'un candidat](https://github.com/gip-inclusion/les-emplois/pull/8320)
+- [Insertion : Recherche de services native](https://github.com/gip-inclusion/les-emplois/pull/8182)
+- [Insertion : Aligner le design des modals pour la fiche service et la fiche structure](https://github.com/gip-inclusion/les-emplois/pull/8291)
+- [Interface : Suppression de l'affichage en liste des résultats](https://github.com/gip-inclusion/les-emplois/pull/8157)
+- [Page d’accueil : Stabilisation d'un test flaky](https://github.com/gip-inclusion/les-emplois/pull/8326)
+- [Vie privée : Mise à jour de la politique de confidentialité](https://github.com/gip-inclusion/les-emplois/pull/8302)
+
+### Tech
+
+- [Tech : Ajout des réseaux porteurs dans l'imports des données data-inclusion](https://github.com/gip-inclusion/les-emplois/pull/8297)
+
 ## 2026-06-22
 
 ### Ajouté
