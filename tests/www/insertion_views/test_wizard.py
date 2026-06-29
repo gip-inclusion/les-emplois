@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -345,12 +346,31 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
     assert get_session_name(client.session, OrientationWizardView.expected_session_kind) == session_uuid
 
 
-def test_documents_step_normalizes_beneficiary_phone_for_dora(client, mocker):
+@pytest.mark.parametrize(
+    "service_kwargs,expected_di_service_address_line",
+    [
+        (
+            {
+                "address_line_1": "12 rue des terreaux",
+                "address_line_2": "Bât. B",
+                "post_code": "38110",
+                "city": "La Tour du Pin",
+            },
+            "12 rue des terreaux, Bât. B, 38110 La Tour du Pin",
+        ),
+        ({}, "À distance"),
+    ],
+)
+def test_documents_step_normalizes_beneficiary_phone_for_dora(
+    client, mocker, service_kwargs, expected_di_service_address_line
+):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(phone="+33601901570")
     service = ServiceFactory(
         is_orientable_with_form=True,
+        contact_email="contact@example.org",
         structure__name="Structure orientation wizard",
+        **service_kwargs,
     )
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
@@ -394,6 +414,8 @@ def test_documents_step_normalizes_beneficiary_phone_for_dora(client, mocker):
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload["beneficiary_phone"] == "0601901570"
+    assert payload["di_contact_email"] == "contact@example.org"
+    assert payload["di_service_address_line"] == expected_di_service_address_line
 
 
 def test_conformity_step_allows_missing_beneficiary_phone(client):
