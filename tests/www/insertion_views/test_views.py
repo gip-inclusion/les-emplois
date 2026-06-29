@@ -6,7 +6,13 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
 
 from itou.insertion.models import SOURCE_DORA_VALUE, GenericReferenceItemKind, GenericReferenceItemSource
-from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory, StructureFactory
+from tests.insertion.factories import (
+    GenericReferenceItemFactory,
+    InPersonReceptionFactory,
+    RemoteReceptionFactory,
+    ServiceFactory,
+    StructureFactory,
+)
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -119,6 +125,33 @@ class TestStructures:
         expected_href = f"{service_url}?back_url={structure_url}%23structure-services"
 
         assertContains(response, f'href="{expected_href}"')
+
+    def test_card_view_services_display_reception_location(self, client):
+        structure = StructureFactory()
+        ServiceFactory(
+            structure=structure,
+            name="Service Poitiers",
+            city="Poitiers",
+            receptions=[InPersonReceptionFactory()],
+        )
+        ServiceFactory(
+            structure=structure,
+            name="Service Loudun",
+            city="Loudun",
+            receptions=[InPersonReceptionFactory()],
+        )
+        ServiceFactory(
+            structure=structure,
+            name="Service à distance",
+            receptions=[RemoteReceptionFactory()],
+        )
+
+        response = client.get(self.get_structure_url(structure))
+
+        assertContains(response, "Lieu d'accueil : Poitiers")
+        assertContains(response, "Lieu d'accueil : Loudun")
+        assertContains(response, "Lieu d'accueil : à distance")
+
 
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")

@@ -15,6 +15,7 @@
                         <span class="fs-sm mt-1 d-flex align-items-center">
                             <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>
                             Périmètre : {{ service.perimeter }}
+                            {% if service.reception_location_label %}/ Lieu d'accueil : {{ service.reception_location_label }}{% endif %}
                         </span>
                     </div>
                 </div>
