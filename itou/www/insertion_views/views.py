@@ -51,7 +51,9 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
             insertion_models.Structure.objects.select_related("source").prefetch_related(
                 Prefetch(
                     "services",
-                    queryset=insertion_models.Service.objects.order_by("name").select_related("kind"),
+                    queryset=insertion_models.Service.objects.order_by("name")
+                    .select_related("kind")
+                    .prefetch_related("receptions"),
                 ),
             ),
             uid=structure_uid,

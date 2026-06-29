@@ -462,5 +462,17 @@ class Service(GeolocatedAddressMixin, models.Model):
         return self.uid
 
     @property
+    def reception_location_label(self):
+        reception_values = {reception.value for reception in self.receptions.all()}
+        if (
+            data_inclusion_v1.ModeAccueil.A_DISTANCE.value in reception_values
+            and data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value not in reception_values
+        ):
+            return "à distance"
+        if self.city:
+            return self.city
+        return None
+
+    @property
     def is_local(self):
         return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM
