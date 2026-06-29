@@ -297,6 +297,17 @@ def has_access_to_assignments(request):
     return request.from_prescriber or (request.from_employer and request.current_organization.is_subject_to_iae_rules)
 
 
+@http_methods(db_write=["POST"])
+@check_request(has_access_to_assignments)
+def assign_oneself_as_last_known_advisor(request, public_id):
+    job_seeker = get_object_or_404(
+        User.objects.filter(kind=UserKind.JOB_SEEKER),
+        public_id=public_id,
+    )
+    assign_user_as_job_seeker_last_advisor(request, job_seeker)
+    return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
+
+
 @readonly_view
 @check_request(has_access_to_assignments)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
