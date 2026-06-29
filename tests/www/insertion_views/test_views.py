@@ -2,8 +2,9 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.urls import reverse
+from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
+from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertTemplateUsed
 
 from itou.insertion.models import SOURCE_DORA_VALUE, GenericReferenceItemKind, GenericReferenceItemSource
 from tests.insertion.factories import (
@@ -107,8 +108,8 @@ class TestStructures:
             services.append(service)
 
         with patch(
-            "itou.www.insertion_views.views.get_division_label",
-            side_effect=["Perimeter 1", "Perimeter 2", "Perimeter 3"],
+            "itou.www.insertion_views.views.bulk_load_division_labels",
+            return_value=["Perimeter 1", "Perimeter 2", "Perimeter 3"],
         ):
             response = client.get(self.get_structure_url(structure))
 
@@ -125,6 +126,32 @@ class TestStructures:
         expected_href = f"{service_url}?back_url={structure_url}%23structure-services"
 
         assertContains(response, f'href="{expected_href}"')
+
+    def test_card_view_loads_service_perimeters_without_n_plus_one(self, client):
+        Region.objects.create(code="53", name="Bretagne")
+        for code, name in [("29", "Finistère"), ("56", "Morbihan"), ("35", "Ille-et-Vilaine")]:
+            Department.objects.create(code=code, name=name, region="53")
+
+        structure = StructureFactory()
+        for code in ("29", "56", "35"):
+            ServiceFactory(structure=structure, eligibility_zones=[code])
+
+        with assertNumQueries(
+            1  # structure + source
+            + 1  # services prefetch
+            + 1  # service receptions prefetch
+            + 1  # departments bulk (eligibility_zones)
+            + 1  # cities bulk (eligibility_zones)
+            + 1  # epcis bulk (eligibility_zones)
+        ):
+            response = client.get(self.get_structure_url(structure))
+
+        assert response.status_code == 200
+        perimeters = [service.perimeter for service in response.context["services"]]
+        assert perimeters == ["Finistère", "Morbihan", "Ille-et-Vilaine"]
+        assertContains(response, "Périmètre : Finistère")
+        assertContains(response, "Périmètre : Morbihan")
+        assertContains(response, "Périmètre : Ille-et-Vilaine")
 
     def test_card_view_services_display_reception_location(self, client):
         structure = StructureFactory()

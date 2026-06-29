@@ -16,6 +16,7 @@ from django.views.generic.edit import FormView
 from itoutils.django.decoupage_administratif.admin_division_parsing import get_division_label
 
 from itou.insertion import models as insertion_models
+from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import (
     get_missing_orientation_beneficiary_field_labels,
@@ -82,9 +83,11 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         services = list(self.structure.services.all())
-        for service in services:
-            service.perimeter = get_division_label(service.eligibility_zones) or "France entière"
-
+        for service, perimeter in zip(
+            services,
+            bulk_load_division_labels([service.eligibility_zones for service in services]),
+        ):
+            service.perimeter = perimeter or "France entière"
         return super().get_context_data(**kwargs) | {
             "structure": self.structure,
             "matomo_custom_title": "Fiche structure d’insertion",
