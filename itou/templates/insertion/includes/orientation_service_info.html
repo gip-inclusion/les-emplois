@@ -7,7 +7,7 @@
             data-bs-target="#collapseOrientationService-{{ service.uid }}"
             aria-expanded="false"
             aria-controls="collapseOrientationService-{{ service.uid }}">
-        <i class="ri-community-line" aria-hidden="true"></i>
+        <i class="ri-hand-heart-line" aria-hidden="true"></i>
         <div>
             {% if service.kind %}
                 <span data-bs-toggle="tooltip" data-bs-title="{{ service.kind.label }}">{{ service.kind.label }}</span>
@@ -28,6 +28,8 @@
         {% endif %}
         <a href="{% url 'insertion_views:structure_card' structure_uid=service.structure.uid %}?back_url={{ request.get_full_path|urlencode }}"
            class="btn btn-secondary btn-block mt-4"
+           target="_blank"
+           rel="noopener noreferrer"
            {% matomo_event "orientation" "clic" "voir-fiche-structure" %}>Voir la fiche structure</a>
     </div>
 </div>

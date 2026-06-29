@@ -153,7 +153,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-incomplete-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-incomplete-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -166,7 +166,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-incomplete-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-incomplete-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -201,7 +201,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -214,7 +214,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/confirmation/%3Fjob_seeker_public_id%3D7614fc4b-aef9-4694-ab17-12324300180a">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/confirmation/%3Fjob_seeker_public_id%3D7614fc4b-aef9-4694-ab17-12324300180a" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -379,7 +379,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -392,7 +392,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -526,7 +526,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -539,7 +539,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/submit/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/submit/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -671,7 +671,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -684,7 +684,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/fill/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/fill/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -763,7 +763,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -776,7 +776,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/job-seeker/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/job-seeker/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
