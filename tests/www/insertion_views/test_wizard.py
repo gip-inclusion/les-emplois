@@ -396,6 +396,33 @@ def test_documents_step_normalizes_beneficiary_phone_for_dora(client, mocker):
     assert payload["beneficiary_phone"] == "0601901570"
 
 
+def test_conformity_step_allows_missing_beneficiary_phone(client):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory(
+        first_name="Jean",
+        last_name="Dupont",
+        phone="",
+        email="test@example.org",
+    )
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.post(conformity_url, {"confirms_conditions": "on"})
+    referent_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.REFERENT},
+    )
+    assertRedirects(response, referent_url, fetch_redirect_response=False)
+
+
 def test_orientation_banner_quitter_ignores_back_url(client):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory()
