@@ -431,6 +431,16 @@ class Service(GeolocatedAddressMixin, models.Model):
         return self.source.value == "dora"
 
     @property
+    def prerequisites(self) -> list[str]:
+        if self.is_dora:
+            return [*self.access_conditions_dora, *self.credentials]
+        return [line for line in self.access_conditions_di.split("\\n") if line]
+
+    @property
+    def has_prerequisites(self) -> bool:
+        return bool(self.prerequisites)
+
+    @property
     def has_orientation_action(self):
         return self.is_orientable_with_form or bool(self.mobilization_modes_professionals_external_form_link)
 

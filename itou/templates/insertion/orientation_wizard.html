@@ -150,14 +150,10 @@
                                     <hr class="my-3">
                                 {% endif %}
 
+                                {% if service.has_prerequisites %}
+                                    {% include "insertion/includes/orientation_credentials_list.html" with service=service show_section_heading=True show_heading=False show_recovery_note=True only %}
+                                {% endif %}
                                 {% if service.credentials %}
-                                    <h3 class="h4">Pré-requis et justificatifs</h3>
-                                    <p>(A récupérer auprès de l'usager)</p>
-                                    <ul>
-                                        {% for credential in service.credentials %}
-                                            <li>{{ credential }}</li>
-                                        {% endfor %}
-                                    </ul>
                                     {% bootstrap_field form.credentials_proof_files show_label=False %}
                                     <hr class="my-3">
                                 {% endif %}
