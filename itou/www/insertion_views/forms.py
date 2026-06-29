@@ -68,7 +68,10 @@ class OrientationSelectJobSeekerForm(forms.Form):
 class OrientationConformityForm(forms.Form):
     confirms_conditions = forms.BooleanField(
         required=True,
-        label="Je confirme que l'usager remplit au moins une condition et un critère requis.",
+        label=(
+            "Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. "
+            "Je dispose des justificatifs qui me seront demandés à l'étape 3."
+        ),
     )
 
     def __init__(self, job_seeker, *args, **kwargs):

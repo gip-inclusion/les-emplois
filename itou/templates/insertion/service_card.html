@@ -326,21 +326,11 @@
                         </div>
                     {% endif %}
 
-                    {# Pré-requis et justificatifs #}
-                    {% if service.access_conditions_di or service.access_conditions_dora or service.credentials %}
+                    {% if service.has_prerequisites %}
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">Pré-requis et justificatifs</h2>
                             <ul class="mb-0">
-                                {% if service.is_dora %}
-                                    {% for condition in service.access_conditions_dora %}<li>{{ condition }}</li>{% endfor %}
-                                    {% for document in service.credentials %}
-                                        <li>{{ document }}</li>
-                                    {% endfor %}
-                                {% else %}
-                                    {% for condition in service.access_conditions_di|split_literal_newlines %}
-                                        <li>{{ condition }}</li>
-                                    {% endfor %}
-                                {% endif %}
+                                {% for prerequisite in service.prerequisites %}<li>{{ prerequisite }}</li>{% endfor %}
                             </ul>
                         </div>
                     {% endif %}
