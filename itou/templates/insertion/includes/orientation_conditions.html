@@ -1,12 +1,12 @@
 {% load components %}
 {% load django_bootstrap5 %}
 
-<h2 class="h3">Pré-requis et justificatifs</h2>
+<h2 class="h3">Critères et conditions d'accès</h2>
 
 {% if service.fee %}
     {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
         {% fragment as fee_alert_content %}
-            <p class="mb-0">
+            <p class="mb-0 h-100 d-flex align-items-center">
                 Frais à la charge de l'usager : {{ service.fee.label }}
                 {% if service.fee_details %}({{ service.fee_details }}){% endif %}
             </p>
@@ -21,6 +21,6 @@
     </ul>
 {% endif %}
 
-{% include "insertion/includes/orientation_credentials_list.html" with service=service show_recovery_note=True only %}
+{% include "insertion/includes/orientation_credentials_list.html" with service=service show_section_heading=True show_heading=True show_recovery_note=False only %}
 
 {% bootstrap_field form.confirms_conditions wrapper_class="form-group form-group-required-check" %}

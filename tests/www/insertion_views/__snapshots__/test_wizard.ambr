@@ -111,7 +111,7 @@
                           </div>
                           <hr class="my-3"/>
                           <h2 class="h3">
-                              Pré-requis et justificatifs
+                              Critères et conditions d'accès
                           </h2>
                           <div class="form-group form-group-required-check form-group-required">
                               <div class="form-check">
@@ -301,7 +301,7 @@
                           </div>
                           <hr class="my-3"/>
                           <h2 class="h3">
-                              Pré-requis et justificatifs
+                              Critères et conditions d'accès
                           </h2>
                           <div class="alert alert-info mb-3 mb-md-4" role="status">
                               <div class="row">
@@ -310,7 +310,7 @@
                                       </i>
                                   </div>
                                   <div class="col">
-                                      <p class="mb-0">
+                                      <p class="mb-0 h-100 d-flex align-items-center">
                                           Frais à la charge de l'usager : 20€
                   (adhésion annuelle de 10€ à la MJC Champ Libre + frais de location)
                                       </p>
@@ -325,8 +325,8 @@
                                   Demandeur d'emploi
                               </li>
                           </ul>
-                          <p>
-                              (A récupérer auprès de l'usager)
+                          <p class="fw-bold mb-2">
+                              Pré-requis et justificatifs
                           </p>
                           <ul class="mb-3 mb-md-4">
                               <li>
