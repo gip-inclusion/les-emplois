@@ -211,7 +211,14 @@ class TestStructures:
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")
     ORIENT_BTN_LABEL = "Orienter un bénéficiaire"
-    DISPLAY_SERVICE_CONTACT_BTN = 'data-bs-target="#service-contact-modal"'
+    DISPLAY_SERVICE_CONTACT_BTN = """
+    <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
+            data-bs-target="#service-contact-modal" data-emplois-mobilization-kind="service_contact"
+            data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+            data-matomo-option="voir-coordonnees-contact">
+        Voir les coordonnées de contact du service
+    </button>"""
+    DISPLAY_SERVICE_CONTACT_JS = 'body.set("service_uid", "%s");'
     FORMS_TO_FILL = "Documents à compléter"
 
     def get_service_url(self, service):
@@ -482,7 +489,8 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
 
     def test_detail_contact_button_shown_when_public(self, client):
@@ -495,7 +503,8 @@ class TestServices:
             structure__updated_on="2025-01-15",
         )
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
 
     def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client):
@@ -510,7 +519,8 @@ class TestServices:
         service_url = self.get_service_url(service)
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
+        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertNotContains(response, "contact@example.com")
 
     def test_detail_with_source_link(self, client):
