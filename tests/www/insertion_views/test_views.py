@@ -483,6 +483,7 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
+        assertContains(response, "contact@example.com")
 
     def test_detail_contact_button_shown_when_public(self, client):
         service = ServiceFactory(
@@ -495,6 +496,7 @@ class TestServices:
         )
         response = client.get(self.get_service_url(service))
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
+        assertContains(response, "contact@example.com")
 
     def test_detail_contact_login_link_shown_when_anonymous_and_not_public(self, client):
         service = ServiceFactory(
@@ -509,6 +511,7 @@ class TestServices:
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN)
+        assertNotContains(response, "contact@example.com")
 
     def test_detail_with_source_link(self, client):
         user = PrescriberFactory(membership=True)
