@@ -361,41 +361,43 @@
 {% endblock %}
 
 {% block modals %}
-    <div class="modal fade" id="service-contact-modal" tabindex="-1" aria-labelledby="service-contact-modal-label" aria-modal="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="service-contact-modal-label">Coordonnées de contact</h3>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-                <div class="modal-body">
-                    {% if service.contact_full_name %}
-                        <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                            <i class="ri-user-line me-2" aria-hidden="true"></i>
-                            <span>{{ service.contact_full_name }}</span>
-                        </div>
-                    {% endif %}
-                    {% if service.contact_email %}
-                        <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
-                            <div class="d-flex align-items-start overflow-hidden me-2">
-                                <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                                <a href="mailto:{{ service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ service.contact_email }}</a>
+    {% if can_view_modal %}
+        <div class="modal fade" id="service-contact-modal" tabindex="-1" aria-labelledby="service-contact-modal-label" aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="service-contact-modal-label">Coordonnées de contact</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if service.contact_full_name %}
+                            <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                                <i class="ri-user-line me-2" aria-hidden="true"></i>
+                                <span>{{ service.contact_full_name }}</span>
                             </div>
-                            {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
-                            {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}
-                        </div>
-                    {% endif %}
-                    {% if service.contact_phone %}
-                        <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                            <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
-                            {{ service.contact_phone|format_phone }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+                        {% endif %}
+                        {% if service.contact_email %}
+                            <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                                <div class="d-flex align-items-start overflow-hidden me-2">
+                                    <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
+                                    <a href="mailto:{{ service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ service.contact_email }}</a>
+                                </div>
+                                {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
+                                {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}
+                            </div>
+                        {% endif %}
+                        {% if service.contact_phone %}
+                            <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
+                                <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                {{ service.contact_phone|format_phone }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminer</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
