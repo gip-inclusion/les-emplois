@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
 {% load str_filters %}
@@ -27,6 +28,7 @@
 {% endblock %}
 
 {% block title_extra %}
+    {% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
     {% if not user.is_job_seeker %}
         <div class="c-box c-box--action">
             <h2 class="visually-hidden">Actions rapides</h2>
@@ -84,6 +86,7 @@
                                     type="button"
                                     data-bs-toggle="modal"
                                     data-bs-target="#service-contact-modal"
+                                    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT }}"
                                     {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
                                 Voir les coordonnées de contact du service
                             </button>
@@ -399,5 +402,13 @@
                 </div>
             </div>
         </div>
+
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    {% if can_view_modal %}
+        {{ block.super }}
+        {% include "insertion/includes/register_mobilization_event.html" with service_uid=service.uid csp_nonce=csp_nonce csrf_token=csrf_token only %}
     {% endif %}
 {% endblock %}

@@ -417,7 +417,7 @@
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
-                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
                                       Voir les coordonnées de contact du service
                                   </button>
                               </div>
