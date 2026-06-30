@@ -1288,7 +1288,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 30,
+    'num_queries': 31,
     'queries': list([
       dict({
         'origin': list([
@@ -2380,21 +2380,20 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'details_for_company[www/apply/views/process_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
           LIMIT 1
         ''',
       }),
@@ -2564,6 +2563,33 @@
                                                                      %s,
                                                                      %s))
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({
@@ -2784,7 +2810,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 31,
+    'num_queries': 32,
     'queries': list([
       dict({
         'origin': list([
@@ -3896,21 +3922,20 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'details_for_company[www/apply/views/process_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
           LIMIT 1
         ''',
       }),
@@ -4080,6 +4105,33 @@
                                                                      %s,
                                                                      %s))
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({
@@ -5216,25 +5268,6 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
-          'details_for_jobseeker[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'IfNode[apply/process_details.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
@@ -5344,6 +5377,32 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[apply/process_details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details.html]',
+          'details_for_jobseeker[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({
@@ -5524,183 +5583,6 @@
           </span>
       </li>
   </ul>
-  
-  '''
-# ---
-# name: TestProcessViews.test_display_referent_info_for_company
-  '''
-  <div class="has-links-inside" id="card-[Public ID of prescriber]">
-      <ul class="list-data">
-          <li class="d-flex flex-row align-items-center">
-              <small>
-                  Accompagnateur
-              </small>
-              <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
-                  <strong>
-                      Pierre DUPONT
-                  </strong>
-              </div>
-          </li>
-          <li>
-              <small>
-                  Type
-              </small>
-              <strong>
-                  Professionnel
-              </strong>
-          </li>
-          <li>
-              <small>
-                  Organisation
-              </small>
-              <strong>
-                  Les Olivades
-              </strong>
-          </li>
-          <li>
-              <small>
-                  Accompagnateur depuis le
-              </small>
-              <strong>
-                  01/01/2025
-              </strong>
-          </li>
-          <li>
-              <small>
-                  Motif de l’accompagnement
-              </small>
-              <i class="text-disabled">
-                  Non renseigné
-              </i>
-          </li>
-          <li>
-              <small>
-                  Téléphone
-              </small>
-              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-include="#display-contact-info-form" hx-post="/gps/display/[PK of group]/[Public ID of participant]/phone" hx-swap="outerHTML" id="phone-[PK of participant]">
-                  <div class="stable-text">
-                      <i aria-hidden="true" class="ri-phone-line fw-medium">
-                      </i>
-                      <span>
-                          Afficher le téléphone
-                      </span>
-                  </div>
-                  <div class="loading-text">
-                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
-                      </span>
-                      <span>
-                          Affichage en cours
-                      </span>
-                  </div>
-              </button>
-          </li>
-          <li>
-              <small>
-                  Adresse e-mail
-              </small>
-              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-include="#display-contact-info-form" hx-post="/gps/display/[PK of group]/[Public ID of participant]/email" hx-swap="outerHTML" id="email-[PK of participant]">
-                  <div class="stable-text">
-                      <i aria-hidden="true" class="ri-mail-line fw-medium">
-                      </i>
-                      <span>
-                          Afficher l'email
-                      </span>
-                  </div>
-                  <div class="loading-text">
-                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status">
-                      </span>
-                      <span>
-                          Affichage en cours
-                      </span>
-                  </div>
-              </button>
-          </li>
-      </ul>
-  </div>
-  
-  '''
-# ---
-# name: TestProcessViews.test_display_referent_info_for_prescriber
-  '''
-  <div class="has-links-inside" id="card-[Public ID of prescriber]">
-      <ul class="list-data">
-          <li class="d-flex flex-row align-items-center">
-              <small>
-                  Accompagnateur
-              </small>
-              <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
-                  <strong>
-                      Pierre DUPONT
-                  </strong>
-                  <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">
-                      c’est vous
-                  </span>
-              </div>
-          </li>
-          <li>
-              <small>
-                  Type
-              </small>
-              <strong>
-                  Professionnel
-              </strong>
-          </li>
-          <li>
-              <small>
-                  Organisation
-              </small>
-              <strong>
-                  Les Olivades
-              </strong>
-          </li>
-          <li>
-              <small>
-                  Accompagnateur depuis le
-              </small>
-              <strong>
-                  01/01/2024
-              </strong>
-          </li>
-          <li>
-              <small>
-                  Motif de l’accompagnement
-              </small>
-              <i class="text-disabled">
-                  Non renseigné
-              </i>
-          </li>
-          <li>
-              <small>
-                  Téléphone
-              </small>
-              <strong>
-                  0612345678
-              </strong>
-              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                  </i>
-                  <span class="visually-hidden">
-                      Copier
-                  </span>
-              </button>
-          </li>
-          <li>
-              <small>
-                  Adresse e-mail
-              </small>
-              <strong>
-                  pierre.dupont@test.local
-              </strong>
-              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" type="button">
-                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                  </i>
-                  <span class="visually-hidden">
-                      Copier
-                  </span>
-              </button>
-          </li>
-      </ul>
-  </div>
   
   '''
 # ---

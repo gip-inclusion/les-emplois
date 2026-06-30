@@ -10,14 +10,13 @@ from itou.approvals.models import (
     Approval,
     ProlongationRequest,
 )
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.perms.utils import can_edit_personal_information
+from itou.utils.perms.utils import can_edit_personal_information, can_view_last_advisor_contact_info
 from itou.utils.readonly import ReadonlyViewMixin
 from itou.utils.urls import get_safe_url
 
@@ -108,15 +107,9 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
 
         eligibility_diagnosis = job_application and job_application.get_eligibility_diagnosis()
 
-        group = (
-            None
-            if job_application is None
-            else FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-        )
-        user_in_group = False if group is None else group.members.contains(self.request.user)
-
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.object)
+        context["can_view_last_advisor_contact_info"] = can_view_last_advisor_contact_info(self.request, self.object)
         context["approval"] = approval
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
@@ -137,8 +130,5 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
             .select_related("sender", "to_company")
             .prefetch_related("selected_jobs")
         )
-
-        context["group"] = group
-        context["user_in_group"] = user_in_group
 
         return context

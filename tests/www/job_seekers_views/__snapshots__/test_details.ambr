@@ -475,14 +475,10 @@
                                               </div>
                                           </div>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -752,14 +748,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1000,14 +992,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1348,14 +1336,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1374,337 +1358,164 @@
   
   '''
 # ---
-# name: test_display_job_seeker_referent
+# name: test_display_last_known_advisor
   '''
-  <main class="s-main" id="main" role="main">
-      <div aria-atomic="true" aria-live="polite" class="toast-container">
+  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+      <h3>
+          Dernier accompagnateur connu
+      </h3>
+      <form id="display-contact-info-form">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      </form>
+      <div id="card-788bc466-3747-4cdb-aafc-80c888d6b69d">
+          <ul class="list-data mb-3">
+              <li>
+                  <small>
+                      Accompagnateur
+                  </small>
+                  <strong class="d-flex gap-2">
+                      Pierre DUBOIS
+                      <span class="badge badge-xs rounded-pill bg-emploi-light text-primary font-weight-normal">
+                          c’est vous
+                      </span>
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Type
+                  </small>
+                  <strong>
+                      Professionnel
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Organisation
+                  </small>
+                  <strong>
+                      Pres. Org.
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Accompagnateur depuis le
+                  </small>
+                  <strong>
+                      31/05/2026
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0606060606
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0606060606" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      pierre.dubois@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dubois@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
       </div>
-      <section class="s-title-02">
-          <div class="s-title-02__container container">
-              <div class="s-title-02__row row">
-                  <div class="s-title-02__col col-12">
-                      <div class="c-prevstep">
-                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
-                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
-                              </i>
-                              <span>
-                                  Retour
-                  à la liste
-                              </span>
-                          </a>
-                      </div>
-                      <div class="c-title">
-                          <div class="c-title__main">
-                              <h1>
-                                  DOE Jane
-                              </h1>
-                              <p id="copy_public_id">
-                                  Copier l'ID de l'usager
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier l'ID de l'usager
-                                      </span>
-                                  </button>
-                              </p>
-                          </div>
-                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
-                              <a class="btn btn-lg btn-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35" id="introjs-orienter-vers-service-insertion">
-                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Orienter vers un service d’insertion
-                                  </span>
-                              </a>
-                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
-                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
-                                  </i>
-                                  <span>
-                                      Postuler pour cet usager
-                                  </span>
-                              </a>
-                          </div>
-                      </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
-                          <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Informations générales
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Candidatures
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="suivi contrats iae" href="/job-seekers/contracts/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
-                                  Suivi des contrats IAE
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-      </section>
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="s-section__row row">
-                  <div class="s-section__col col-12">
-                      <div class="tab-content">
-                          <div class="tab-pane fade show active">
-                              <div class="row">
-                                  <div class="col-12 col-xxl-12 order-1 order-xxl-1">
-                                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
-                                          <h2 class="mb-0">
-                                              Informations générales
-                                          </h2>
-                                          <div class="d-flex flex-column flex-md-row gap-2">
-                                              <a class="btn btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Valider son éligibilité IAE
-                                                  </span>
-                                              </a>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="col-12 order-3 order-xxl-2">
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Informations personnelles
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
-                                                      </i>
-                                                      <span>
-                                                          Modifier
-                                                      </span>
-                                                  </a>
-                                              </div>
-                                          </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Prénom
-                                                  </small>
-                                                  <strong>
-                                                      Jane
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Nom
-                                                  </small>
-                                                  <strong>
-                                                      DOE
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Téléphone
-                                                  </small>
-                                                  <strong>
-                                                      06 12 34 56 78
-                                                  </strong>
-                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
-                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                      </i>
-                                                      <span class="visually-hidden">
-                                                          Copier
-                                                      </span>
-                                                  </button>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Adresse e-mail
-                                                  </small>
-                                                  <strong>
-                                                      jane.doe@test.local
-                                                  </strong>
-                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
-                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                      </i>
-                                                      <span class="visually-hidden">
-                                                          Copier
-                                                      </span>
-                                                  </button>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Date de naissance
-                                                  </small>
-                                                  <strong>
-                                                      01/01/1990
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Adresse
-                                                  </small>
-                                                  <address>
-                                                      12 rue Georges Bizet, 35000 Rennes
-                                                  </address>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Numéro de sécurité sociale
-                                                  </small>
-                                                  <strong>
-                                                      <span>
-                                                          2
-                                                      </span>
-                                                      <span class="ms-1">
-                                                          90
-                                                      </span>
-                                                      <span class="ms-1">
-                                                          01
-                                                      </span>
-                                                      <span class="ms-1">
-                                                          01
-                                                      </span>
-                                                      <span class="ms-1">
-                                                          010
-                                                      </span>
-                                                      <span class="ms-1">
-                                                          101
-                                                      </span>
-                                                      <span class="ms-1">
-                                                          25
-                                                      </span>
-                                                  </strong>
-                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
-                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                      </i>
-                                                      <span class="visually-hidden">
-                                                          Copier
-                                                      </span>
-                                                  </button>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Identifiant France Travail
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                          </ul>
-                                      </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap" href="/gps/groups/[PK of FollowUpGroup]/edition">
-                                                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
-                                                      </i>
-                                                      <span>
-                                                          Modifier mon intervention
-                                                      </span>
-                                                  </a>
-                                              </div>
-                                          </div>
-                                          <form id="display-contact-info-form">
-                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          </form>
-                                          <div class="has-links-inside" id="card-[Public ID of prescriber]">
-                                              <ul class="list-data">
-                                                  <li class="d-flex flex-row align-items-center">
-                                                      <small>
-                                                          Accompagnateur
-                                                      </small>
-                                                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
-                                                          <strong>
-                                                              Pierre DUPONT
-                                                          </strong>
-                                                          <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">
-                                                              c’est vous
-                                                          </span>
-                                                      </div>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Type
-                                                      </small>
-                                                      <strong>
-                                                          Professionnel
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Organisation
-                                                      </small>
-                                                      <strong>
-                                                          Les Olivades
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Accompagnateur depuis le
-                                                      </small>
-                                                      <strong>
-                                                          01/01/2024
-                                                      </strong>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Motif de l’accompagnement
-                                                      </small>
-                                                      <i class="text-disabled">
-                                                          Non renseigné
-                                                      </i>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Téléphone
-                                                      </small>
-                                                      <strong>
-                                                          0612345678
-                                                      </strong>
-                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                          </i>
-                                                          <span class="visually-hidden">
-                                                              Copier
-                                                          </span>
-                                                      </button>
-                                                  </li>
-                                                  <li>
-                                                      <small>
-                                                          Adresse e-mail
-                                                      </small>
-                                                      <strong>
-                                                          pierre.dupont@test.local
-                                                      </strong>
-                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" type="button">
-                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                                          </i>
-                                                          <span class="visually-hidden">
-                                                              Copier
-                                                          </span>
-                                                      </button>
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-  </main>
+  </div>
+  
+  '''
+# ---
+# name: test_display_last_known_advisor_contact_info
+  '''
+  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+      <h3>
+          Dernier accompagnateur connu
+      </h3>
+      <form id="display-contact-info-form">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      </form>
+      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
+          <ul class="list-data mb-3">
+              <li>
+                  <small>
+                      Accompagnateur
+                  </small>
+                  <strong class="d-flex gap-2">
+                      Marie LAFORÊT
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Type
+                  </small>
+                  <strong>
+                      Professionnel
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Organisation
+                  </small>
+                  <i class="text-disabled">
+                      Sans organisation
+                  </i>
+              </li>
+              <li>
+                  <small>
+                      Accompagnateur depuis le
+                  </small>
+                  <strong>
+                      23/06/2026
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0707070707
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      marie.laforet@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
   
   '''
 # ---
@@ -2599,26 +2410,6 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
-          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'can_see_external_job_applications[www/job_seekers_views/views.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -2848,6 +2639,25 @@
                                                                                              %s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
         ''',
       }),
       dict({
@@ -3665,26 +3475,6 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
-          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -3915,6 +3705,25 @@
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
         ''',
       }),
       dict({
@@ -4887,26 +4696,6 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
-          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'can_see_external_job_applications[www/job_seekers_views/views.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -5136,6 +4925,25 @@
                                                                                              %s))
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
         ''',
       }),
       dict({
@@ -5496,14 +5304,10 @@
                                               </div>
                                           </div>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -5799,14 +5603,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6028,14 +5828,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6312,14 +6108,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6615,14 +6407,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6844,14 +6632,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -7085,14 +6869,10 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -7174,7 +6954,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -7859,26 +7639,6 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
-          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'can_see_external_job_applications[www/job_seekers_views/views.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -8059,6 +7819,49 @@
                        AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                       OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
           ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({
@@ -8423,18 +8226,81 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
-                                              <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
-                                                      Dernier accompagnateur connu
-                                                  </h3>
-                                              </div>
-                                          </div>
-                                          <div class="fs-sm" id="card-no-referent">
-                                              <i>
-                                                  L’accompagnateur de DOE Jane n’est pas connu de nos services
-                                              </i>
+                                      <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <h3>
+                                              Dernier accompagnateur connu
+                                          </h3>
+                                          <form id="display-contact-info-form">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          </form>
+                                          <div id="card-03580247-b036-4578-bf9d-f92c9c2f68cd">
+                                              <ul class="list-data mb-3">
+                                                  <li>
+                                                      <small>
+                                                          Accompagnateur
+                                                      </small>
+                                                      <strong class="d-flex gap-2">
+                                                          Pierre DUPONT
+                                                          <span class="badge badge-xs rounded-pill bg-emploi-light text-primary font-weight-normal">
+                                                              c’est vous
+                                                          </span>
+                                                      </strong>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Type
+                                                      </small>
+                                                      <strong>
+                                                          Professionnel
+                                                      </strong>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Organisation
+                                                      </small>
+                                                      <strong>
+                                                          Pres. Org.
+                                                      </strong>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Accompagnateur depuis le
+                                                      </small>
+                                                      <strong>
+                                                          14/08/2024
+                                                      </strong>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Téléphone
+                                                      </small>
+                                                      <strong>
+                                                          0612345678
+                                                      </strong>
+                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                          </i>
+                                                          <span class="visually-hidden">
+                                                              Copier
+                                                          </span>
+                                                      </button>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Adresse e-mail
+                                                      </small>
+                                                      <strong>
+                                                          pierre.dupont@test.local
+                                                      </strong>
+                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" type="button">
+                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                          </i>
+                                                          <span class="visually-hidden">
+                                                              Copier
+                                                          </span>
+                                                      </button>
+                                                  </li>
+                                              </ul>
                                           </div>
                                       </div>
                                   </div>
@@ -8519,7 +8385,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -9227,26 +9093,6 @@
       }),
       dict({
         'origin': list([
-          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
-          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id",
-                 "gps_followupgroup"."created_at",
-                 "gps_followupgroup"."created_in_bulk",
-                 "gps_followupgroup"."updated_at",
-                 "gps_followupgroup"."beneficiary_id"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "gps_followupgroup"."beneficiary_id" = %s)
-          ORDER BY "gps_followupgroup"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'can_see_external_job_applications[www/job_seekers_views/views.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -9403,6 +9249,25 @@
       }),
       dict({
         'origin': list([
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Approval.is_suspended[approvals/models.py]',
           'Approval.state[approvals/models.py]',
           'approval_state_badge[utils/templatetags/badges.py]',
@@ -9450,6 +9315,125 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" = %s
+          LIMIT 21
         ''',
       }),
       dict({

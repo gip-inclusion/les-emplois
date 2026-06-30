@@ -21,7 +21,6 @@ from django_xworkflows import models as xwf_models
 
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import (
     JobApplication,
     JobApplicationComment,
@@ -32,7 +31,11 @@ from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title
 from itou.utils.auth import check_request
-from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.perms.utils import (
+    can_edit_personal_information,
+    can_view_last_advisor_contact_info,
+    can_view_personal_information,
+)
 from itou.utils.readonly import readonly_view
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -102,12 +105,10 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     geiq_eligibility_diagnosis = job_application.get_geiq_eligibility_diagnosis()
     eligibility_diagnosis = job_application.get_eligibility_diagnosis()
 
-    group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-    user_in_group = False if group is None else group.members.contains(request.user)
-
     context = {
         "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
         "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
+        "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(request, job_application.job_seeker),
         "display_refusal_info": False,
         "eligibility_diagnosis": eligibility_diagnosis,
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
@@ -118,8 +119,6 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "group": group,
-        "user_in_group": user_in_group,
     }
 
     return render(request, template_name, context)
@@ -225,9 +224,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
     comments = list(job_application.comments.select_related("created_by").filter(company=job_application.to_company))
 
-    group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-    user_in_group = False if group is None else group.members.contains(request.user)
-
     # Display a warning in the cancel modal for old job applications: cancelling a job application will immediately
     # hide it from the user.
     display_warning_in_cancel_modal = (
@@ -239,6 +235,9 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "can_be_cancelled": can_be_cancelled,
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
+            "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(
+                request, job_application.job_seeker
+            ),
             "display_refusal_info": False,
             "display_warning_in_cancel_modal": display_warning_in_cancel_modal,
             "eligibility_diagnosis": eligibility_diagnosis,
@@ -259,8 +258,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             ),
             "matomo_custom_title": "Candidature",
             "job_application_sender_left_org": job_application_sender_left_org(job_application),
-            "group": group,
-            "user_in_group": user_in_group,
         }
         | get_siae_actions_context(request, job_application)
     )
@@ -393,12 +390,10 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         refused_by = None
         refusal_contact_email = ""
 
-    group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
-    user_in_group = False if group is None else group.members.contains(request.user)
-
     context = {
         "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
         "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
+        "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(request, job_application.job_seeker),
         "eligibility_diagnosis": eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
@@ -412,8 +407,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "refusal_contact_email": refusal_contact_email,
         "with_job_seeker_detail_url": True,
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "group": group,
-        "user_in_group": user_in_group,
     }
 
     return render(request, template_name, context)
