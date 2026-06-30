@@ -29,7 +29,7 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
                                           Orienter un bénéficiaire
                                       </span>
@@ -174,7 +174,7 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
                                           Orienter un bénéficiaire
                                       </span>
@@ -352,7 +352,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
                   <span>
                       Orienter un bénéficiaire
                   </span>
@@ -410,14 +410,14 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
                                       <span>
                                           Orienter un bénéficiaire
                                       </span>
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
-                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
                                       Voir les coordonnées de contact du service
                                   </button>
                               </div>
@@ -616,7 +616,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
                   <span>
                       Test link
                   </span>
@@ -646,7 +646,7 @@
 # ---
 # name: TestStructures.test_card_view_anonymous_renders_description_tab
   dict({
-    'num_queries': 2,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -750,6 +750,46 @@
           WHERE "insertion_service"."structure_id" IN (%s)
           ORDER BY "insertion_service"."name" ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "django_session"
+          WHERE "django_session"."session_key" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "django_session" ("session_key",
+                                        "session_data",
+                                        "expire_date")
+          VALUES (%s, %s, %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
@@ -904,7 +944,7 @@
                                               <h3>
                                                   Informations pratiques
                                               </h3>
-                                              <button class="btn btn-secondary btn-block" data-bs-target="#structure-contact-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-coordonnees-structure" type="button">
+                                              <button class="btn btn-secondary btn-block listen-for-mobilization-event" data-bs-target="#structure-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="structure_contact" data-matomo-action="clic" data-matomo-category="fiche-structure" data-matomo-event="true" data-matomo-option="voir-coordonnees-structure" type="button">
                                                   Voir les coordonnées de la structure
                                               </button>
                                           </div>

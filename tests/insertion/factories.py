@@ -1,12 +1,16 @@
 import datetime
+import uuid
 
 import factory
+import factory.fuzzy
 from django.utils import timezone
 
+from itou.insertion.enums import MobilizationEventKind
 from itou.insertion.models import (
     GenericReferenceItem,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
+    MobilizationEvent,
     Service,
     Structure,
 )
@@ -96,3 +100,12 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     def thematics(self, create, extracted, **kwargs):
         if create:
             self.thematics.set(extracted if extracted is not None else [DefaultThematicFactory()])
+
+
+class MobilizationEventFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = MobilizationEvent
+
+    session_key = factory.LazyFunction(lambda: str(uuid.uuid4()).replace("-", ""))
+    kind = MobilizationEventKind.STRUCTURE_CONTACT
+    structure = factory.SubFactory(StructureFactory)

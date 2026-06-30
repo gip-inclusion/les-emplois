@@ -1,5 +1,8 @@
+{% load enums %}
 {% load markdownify %}
 {% load matomo %}
+
+{% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
 
 <h2>Description de la structure</h2>
 <div class="row">
@@ -14,7 +17,12 @@
     <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
         <div class="c-box mb-3 mb-md-4">
             <h3>Informations pratiques</h3>
-            <button class="btn btn-secondary btn-block" type="button" data-bs-toggle="modal" data-bs-target="#structure-contact-modal" {% matomo_event "fiche-structure" "clic" "voir-coordonnees-structure" %}>
+            <button class="btn btn-secondary btn-block listen-for-mobilization-event"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#structure-contact-modal"
+                    data-emplois-mobilization-kind="{{ MobilizationEventKind.STRUCTURE_CONTACT }}"
+                    {% matomo_event "fiche-structure" "clic" "voir-coordonnees-structure" %}>
                 Voir les coordonnées de la structure
             </button>
         </div>

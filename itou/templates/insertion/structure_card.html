@@ -132,6 +132,7 @@
 
 {% block script %}
     {{ block.super }}
+    {% csrf_token %} {# For registering mobilization events #}
     <script src='{% static "js/sliding_tabs.js" %}'></script>
     <script nonce="{{ csp_nonce }}">
         if (window.location.hash) {
@@ -140,5 +141,6 @@
                 bootstrap.Tab.getOrCreateInstance(tab).show();
             }
         }
+        {% include "insertion/includes/register_mobilization_event.js" with structure_uid=structure.uid only %}
     </script>
 {% endblock %}

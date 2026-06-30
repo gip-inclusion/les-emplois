@@ -1,18 +1,33 @@
-import pytest
-from django.contrib.gis.geos import Point
+import random
 
-from itou.insertion.models import GenericReferenceItemKind, Service
+import pytest
+from allauth.account.adapter import AnonymousUser
+from django.contrib.gis.geos import Point
+from django.db import IntegrityError, transaction
+
+from itou.insertion.enums import MobilizationEventKind
+from itou.insertion.models import GenericReferenceItemKind, MobilizationEvent, Service
 from tests.cities.factories import create_city_geispolsheim, create_city_vannes
+from tests.companies.factories import CompanyFactory
 from tests.insertion.factories import (
     IN_PERSON_RECEPTION_VALUE,
     REMOTE_RECEPTION_VALUE,
     THEMATIC_VALUE,
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
+    MobilizationEventFactory,
     OtherThematicFactory,
     RemoteReceptionFactory,
     ServiceFactory,
     StructureFactory,
+)
+from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
 )
 
 
@@ -237,3 +252,99 @@ class TestServiceSearch:
         sql = str(_search(vannes, reception=IN_PERSON_RECEPTION_VALUE).query)
         assert 'INNER JOIN "insertion_genericreferenceitem"' not in sql
         assert "genericreferenceitem_id" in sql
+
+
+class TestMobilizationEvent:
+    def test_structure_not_null(self):
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*null value in column \"structure_id\".*"):
+                MobilizationEventFactory(
+                    structure=None, service=ServiceFactory(), kind=MobilizationEventKind.SERVICE_CONTACT
+                )
+
+        # No integrity error
+        MobilizationEventFactory(
+            structure=StructureFactory(), service=ServiceFactory(), kind=MobilizationEventKind.SERVICE_CONTACT
+        )
+
+    def test_service_and_structure_kind_coherence(self):
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*service_and_structure_kind_coherence.*"):
+                MobilizationEventFactory(service=ServiceFactory())
+
+        # No integrity error
+        MobilizationEventFactory(service=ServiceFactory(), kind=MobilizationEventKind.SERVICE_CONTACT)
+
+    def test_authenticated_user_has_organization(self):
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
+                MobilizationEventFactory(user=None, company=CompanyFactory())
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
+                MobilizationEventFactory(user=None, prescriber_organization=PrescriberOrganizationFactory())
+
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*authenticated_user_has_organization.*"):
+                MobilizationEventFactory(user=EmployerFactory())
+
+    def test_service_external_link_coherence(self):
+        service = ServiceFactory()
+
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*service_external_link_coherence.*"):
+                MobilizationEventFactory(
+                    kind=MobilizationEventKind.SERVICE_EXT_LINK, service=service, service_external_link=""
+                )
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*service_external_link_coherence.*"):
+                MobilizationEventFactory(
+                    kind=MobilizationEventKind.SERVICE_CONTACT,
+                    service=service,
+                    service_external_link="https://site.fake",
+                )
+        MobilizationEventFactory(
+            kind=MobilizationEventKind.SERVICE_EXT_LINK, service=service, service_external_link="https://site.fake"
+        )
+
+    @pytest.mark.parametrize(
+        "user_factory,organization_factory",
+        [
+            (None, None),
+            (PrescriberFactory, PrescriberOrganizationFactory),
+            (EmployerFactory, CompanyFactory),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "kind,service_factory",
+        [
+            (MobilizationEventKind.STRUCTURE_CONTACT, None),
+            (MobilizationEventKind.SERVICE_CONTACT, ServiceFactory),
+        ],
+    )
+    def test_create_mobilization_event(self, kind, user_factory, organization_factory, service_factory):
+        user = user_factory() if user_factory else AnonymousUser()
+        service = service_factory() if service_factory else None
+        organization = organization_factory() if organization_factory else None
+        MobilizationEvent.objects.create_mobilization_event(
+            session_key="session123",
+            user=user,
+            kind=kind,
+            organization=organization,
+            structure=StructureFactory(),
+            service=service,
+        )
+
+        assert MobilizationEvent.objects.filter(session_key="session123", kind=kind).count() == 1
+
+    def test_create_mobilization_event_bad_user_kind(self):
+        user = random.choice([JobSeekerFactory(), ItouStaffFactory(), LaborInspectorFactory()])
+        MobilizationEvent.objects.create_mobilization_event(
+            session_key="session123",
+            kind=MobilizationEventKind.STRUCTURE_CONTACT,
+            user=user,
+            organization=None,
+            structure=StructureFactory(),
+            service=ServiceFactory(),
+        )
+
+        assert not MobilizationEvent.objects.exists()
