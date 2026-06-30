@@ -7,6 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.common_apps.organizations.views import BaseMemberList
 from itou.companies.enums import CompanyKind
+from itou.utils.tokens import admin_request_token_generator
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.companies.factories import (
     CompanyFactory,
@@ -446,3 +447,167 @@ class TestCompanyAdminMembersManagement:
             )
         )
         assert response.status_code == 400
+
+
+class TestRequestAdminRole:
+    URL = reverse("companies_views:request_admin_role")
+
+    def test_banner_shown_when_no_admin_and_auth_email(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        response = client.get(reverse("companies_views:members"))
+        assertContains(response, "aucun administrateur")
+        assertContains(response, self.URL)
+
+    def test_banner_not_shown_when_admin_exists(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=True,
+        )
+        client.force_login(membership.user)
+        response = client.get(reverse("companies_views:members"))
+        assertNotContains(response, self.URL)
+
+    def test_banner_not_shown_without_auth_email(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="",
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        response = client.get(reverse("companies_views:members"))
+        assertNotContains(response, self.URL)
+
+    @freeze_time("2026-01-15")
+    def test_post_sends_email_to_auth_email(self, client, mailoutbox, snapshot):
+        membership = CompanyMembershipFactory(
+            company__for_snapshot=True,
+            company__pk=1000,
+            user__for_snapshot=True,
+            user__pk=1000,
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        response = client.post(self.URL)
+        assertRedirects(response, reverse("companies_views:members"), fetch_redirect_response=False)
+        assert len(mailoutbox) == 1
+        [admin_request_email] = mailoutbox
+        assert admin_request_email.subject == snapshot(name="admin_request email subject")
+        assert admin_request_email.body == snapshot(name="admin_request email body")
+
+    def test_post_forbidden_if_no_auth_email(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="",
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        response = client.post(self.URL)
+        assert response.status_code == 403
+
+    def test_post_forbidden_if_admin_already_exists(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=True,
+        )
+        client.force_login(membership.user)
+        response = client.post(self.URL)
+        assert response.status_code == 403
+
+    def test_post_requires_employer(self, client):
+        user = PrescriberFactory(membership=True)
+        client.force_login(user)
+        response = client.post(self.URL)
+        assert response.status_code == 403
+
+
+class TestConfirmAdminRole:
+    def _get_url(self, company, user):
+        token = admin_request_token_generator.make_token(company, user)
+        return reverse(
+            "companies_views:confirm_admin_role",
+            kwargs={"company_pk": company.pk, "token": token},
+        )
+
+    @freeze_time("2026-01-15")
+    def test_promotes_user_to_admin(self, client, mailoutbox, snapshot):
+        membership = CompanyMembershipFactory(
+            company__for_snapshot=True,
+            company__pk=1000,
+            user__for_snapshot=True,
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        url = self._get_url(membership.company, membership.user)
+        response = client.get(url)
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+        membership.refresh_from_db()
+        assert membership.is_admin
+        assert len(mailoutbox) == 1
+        [add_admin_email] = mailoutbox
+        assert add_admin_email.subject == snapshot(name="add_admin email subject")
+        assert add_admin_email.body == snapshot(name="add_admin email body")
+
+    def test_invalid_token_rejected(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        url = reverse(
+            "companies_views:confirm_admin_role",
+            kwargs={"company_pk": membership.company.pk, "token": "bad-token"},
+        )
+        response = client.get(url)
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+        membership.refresh_from_db()
+        assert not membership.is_admin
+
+    def test_token_invalidated_after_use(self, client, mailoutbox):
+        membership = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        url = self._get_url(membership.company, membership.user)
+
+        client.get(url)
+        membership.refresh_from_db()
+        assert membership.is_admin
+        email_count_after_first = len(mailoutbox)
+
+        # Second use of the same token: already admin, token hash changes → rejected
+        response = client.get(url)
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+        assert len(mailoutbox) == email_count_after_first  # no additional email
+
+    def test_unknown_company_returns_404(self, client):
+        membership = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=False,
+        )
+        client.force_login(membership.user)
+        url = reverse(
+            "companies_views:confirm_admin_role",
+            kwargs={"company_pk": 99999999, "token": "any-token"},
+        )
+        response = client.get(url)
+        assert response.status_code == 404
+
+    def test_rejected_if_admin_already_exists(self, client, mailoutbox):
+        existing_admin = CompanyMembershipFactory(
+            company__auth_email="contact@example.com",
+            is_admin=True,
+        )
+        requester = CompanyMembershipFactory(
+            company=existing_admin.company,
+            is_admin=False,
+        )
+        url = self._get_url(requester.company, requester.user)
+        client.force_login(requester.user)
+        response = client.get(url)
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+        requester.refresh_from_db()
+        assert not requester.is_admin
+        assert len(mailoutbox) == 0

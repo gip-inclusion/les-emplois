@@ -1,4 +1,21 @@
 # serializer version: 1
+# name: TestAutoAttributeCompanyAdmins.test_email_content[auto_admin_attribution email body]
+  '''
+  Bonjour John DOE
+  
+  L'espace de travail de votre structure ACME Inc. (EI) sur les emplois de l'inclusion ne disposait plus d'administrateur actif. Nous vous avons donc attribué automatiquement ce rôle afin d'en assurer la gestion.
+  
+  Ce statut vous permet d'avoir accès à certaines fonctionnalités, la liste complète est disponible ici : https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409.
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestAutoAttributeCompanyAdmins.test_email_content[auto_admin_attribution email subject]
+  "[TEST] Vous êtes désormais administrateur de l'espace ACME Inc."
+# ---
 # name: TestCommandSendUsersToBrevo.test_wet_run_batch[send_users_to_brevo_batch]
   list([
     tuple(
