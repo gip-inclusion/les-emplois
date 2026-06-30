@@ -75,6 +75,13 @@
                         </p>
                     {% endfragment %}
                 {% endcomponent_info %}
+                {% if standalone_creation %}
+                    {% component_alert content=content variant="info" %}
+                        {% fragment as content %}
+                            <p class="mb-0">Vous serez automatiquement désigné comme dernier accompagnateur connu de cet usager.</p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% endif %}
             {% endif %}
             {# Reload this page and show a modal containing more information about the job seeker. #}
             {% itou_buttons_form primary_label="Suivant" primary_name="preview" primary_value="1" reset_url=reset_url %}
@@ -91,16 +98,18 @@
                         <div class="modal-body">
                             {# djlint:off #}
                             <p>
-                                Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>{% if standalone_creation and is_job_seeker_in_list %} figurant dans votre liste de candidats{% endif %}.
+                                <b>Le numéro {{ form.nir.value|format_nir }} est associé au compte de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}.</b>
                             </p>
                             {# djlint:on #}
                             <p>
                                 {% if is_gps|default:False %}
                                     Si ce n'est pas le bénéficiaire que vous souhaitez suivre, cliquez sur « Suivre un autre bénéficiaire » afin de modifier le numéro de sécurité sociale.
-                                {% elif standalone_creation and not is_job_seeker_in_list %}
-                                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez
-                                    {% if request.from_authorized_prescriber %}validé son éligibilité à l’IAE ou{% endif %}
-                                    postulé pour lui.
+                                {% elif standalone_creation %}
+                                    {% if is_job_seeker_in_list %}
+                                        Cet usager figure déjà dans votre liste d'accompagnements. Vous pouvez vous désigner comme son dernier accompagnateur connu.
+                                    {% else %}
+                                        Cet usager sera ajouté à votre liste d'accompagnements et vous serez automatiquement désigné comme dernier accompagnateur connu.
+                                    {% endif %}
                                 {% elif not is_job_seeker_in_list %}
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
                                 {% endif %}
@@ -108,9 +117,8 @@
                         </div>
                         <div class="modal-footer">
                             {% if standalone_creation and is_job_seeker_in_list %}
-                                {% url "job_seekers_views:details" public_id=job_seeker.public_id as job_seeker_details %}
-                                {% bootstrap_button "Consulter le profil" button_type="link" href=job_seeker_details button_class="btn btn-sm btn-outline-primary" %}
-                                {% bootstrap_button "Postuler" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% bootstrap_button "M'ajouter en tant qu'accompagnateur" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% else %}
                                 {% if is_gps|default:False %}
                                     {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}

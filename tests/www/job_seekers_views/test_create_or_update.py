@@ -480,6 +480,107 @@ class TestStandaloneCreateAsPrescriber:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
+    @pytest.mark.parametrize(
+        "list_view,in_list,is_last_known_advisor",
+        [
+            pytest.param("list", False, False, id="jobseeker_not_in_user_list"),
+            pytest.param("list", True, False, id="jobseeker_in_user_list"),
+            pytest.param("list", True, True, id="jobseeker_in_user_list_with_last_advisor"),
+            pytest.param("list_organization", False, False, id="jobseeker_not_in_orga_list"),
+            pytest.param("list_organization", True, False, id="jobseeker_in_orga_list"),
+            pytest.param("list_organization", True, True, id="jobseeker_in_orga_list_with_last_advisor"),
+        ],
+    )
+    @pytest.mark.parametrize("check_nir", [True, False])
+    def test_standalone_creation_as_prescriber_last_known_advisor(
+        self, client, list_view, in_list, is_last_known_advisor, check_nir
+    ):
+        from_url = reverse(f"job_seekers_views:{list_view}")
+        prescriber_organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+        user = prescriber_organization.members.first()
+        other_user = prescriber_organization.members.last()
+        client.force_login(user)
+
+        job_seeker = JobSeekerFactory()
+
+        if in_list:
+            existing_assignment = JobSeekerAssignmentFactory(
+                job_seeker=job_seeker,
+                professional=user if is_last_known_advisor else other_user,
+                prescriber_organization=prescriber_organization,
+            )
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        params = {"tunnel": "standalone", "from_url": from_url}
+        start_url = reverse("job_seekers_views:get_or_create_start", query=params)
+        client.get(start_url)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+        check_user_nir_or_email_url = reverse(
+            f"job_seekers_views:{'check_nir_for_sender' if check_nir else 'search_by_email_for_sender'}",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+        if check_nir:
+            data = {"nir": job_seeker.jobseeker_profile.nir, "confirm": 1}
+        else:
+            data = {"email": job_seeker.email, "confirm": 1}
+        response = client.post(check_user_nir_or_email_url, data=data)
+
+        # Check last known advisor of job seeker
+        # ----------------------------------------------------------------------
+        last_assignment = job_seeker.last_assignment
+        if in_list:
+            # User was already the last known advisor of the job seeker,
+            if is_last_known_advisor:
+                assert last_assignment.professional == existing_assignment.professional
+                assert last_assignment.prescriber_organization == existing_assignment.prescriber_organization
+                assert last_assignment.company == existing_assignment.company
+                assert last_assignment.last_action_kind == existing_assignment.last_action_kind
+                assert last_assignment.updated_at == existing_assignment.updated_at
+                assertMessages(
+                    response,
+                    [
+                        messages.Message(
+                            messages.INFO,
+                            "Vous êtes déjà le dernier accompagnateur connu "
+                            f"de {job_seeker.get_inverted_full_name()}.",
+                        )
+                    ],
+                )
+            else:
+                assert last_assignment.professional == user
+                assert last_assignment.prescriber_organization == prescriber_organization
+                assert last_assignment.last_action_kind == ActionKind.SELF_ASSIGN
+                assertMessages(
+                    response,
+                    [
+                        messages.Message(
+                            messages.SUCCESS,
+                            "Accompagnateur mis à jour||Vous êtes désormais "
+                            f"le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}.",
+                        )
+                    ],
+                )
+        else:
+            assert last_assignment.professional == user
+            assert last_assignment.prescriber_organization == prescriber_organization
+            assert last_assignment.last_action_kind == ActionKind.SELF_ASSIGN
+            assertRedirects(response, reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.SUCCESS,
+                        "Accompagnateur mis à jour||Vous êtes désormais "
+                        f"le dernier accompagnateur connu de {job_seeker.get_inverted_full_name()}.",
+                    )
+                ],
+            )
+
     @freeze_time("2024-08-30")
     @pytest.mark.parametrize("case", ["not_in_list", "in_list_user", "in_list_organization", "in_list_application"])
     def test_standalone_creation_as_prescriber_existing_nir(self, client, snapshot, case):
@@ -501,13 +602,6 @@ class TestStandaloneCreateAsPrescriber:
                     professional=user,
                     updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
                 )
-                next_url = reverse(
-                    "search:employers_results",
-                    query={
-                        "job_seeker_public_id": existing_job_seeker.public_id,
-                        "city": existing_job_seeker.city_slug,
-                    },
-                )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
@@ -517,23 +611,9 @@ class TestStandaloneCreateAsPrescriber:
                     prescriber_organization=prescriber_organization,
                     updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
                 )
-                next_url = reverse(
-                    "search:employers_results",
-                    query={
-                        "job_seeker_public_id": existing_job_seeker.public_id,
-                        "city": existing_job_seeker.city_slug,
-                    },
-                )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
-                next_url = reverse(
-                    "search:employers_results",
-                    query={
-                        "job_seeker_public_id": existing_job_seeker.public_id,
-                        "city": existing_job_seeker.city_slug,
-                    },
-                )
                 JobApplicationFactory(
                     sent_by_prescriber_alone=True,
                     job_seeker=existing_job_seeker,
@@ -553,10 +633,6 @@ class TestStandaloneCreateAsPrescriber:
                     prescriber_organization=other_organization,
                     updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
                 )
-                next_url = reverse(
-                    "job_seekers_views:details",
-                    kwargs={"public_id": existing_job_seeker.public_id},
-                )
         existing_job_seeker.save()
         existing_job_seeker.jobseeker_profile.save()
         existing_assignment = JobSeekerAssignment.objects.get()
@@ -571,6 +647,7 @@ class TestStandaloneCreateAsPrescriber:
         check_nir_url = reverse(
             "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": existing_job_seeker.public_id})
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
@@ -614,13 +691,6 @@ class TestStandaloneCreateAsPrescriber:
                     professional=user,
                     updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
                 )
-                next_url = reverse(
-                    "search:employers_results",
-                    query={
-                        "job_seeker_public_id": existing_job_seeker.public_id,
-                        "city": existing_job_seeker.city_slug,
-                    },
-                )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
@@ -630,23 +700,9 @@ class TestStandaloneCreateAsPrescriber:
                     prescriber_organization=prescriber_organization,
                     updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
                 )
-                next_url = reverse(
-                    "search:employers_results",
-                    query={
-                        "job_seeker_public_id": existing_job_seeker.public_id,
-                        "city": existing_job_seeker.city_slug,
-                    },
-                )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
-                next_url = reverse(
-                    "search:employers_results",
-                    query={
-                        "job_seeker_public_id": existing_job_seeker.public_id,
-                        "city": existing_job_seeker.city_slug,
-                    },
-                )
                 JobApplicationFactory(
                     sent_by_prescriber_alone=True,
                     job_seeker=existing_job_seeker,
@@ -666,10 +722,6 @@ class TestStandaloneCreateAsPrescriber:
                     prescriber_organization=other_organization,
                     updated_at=timezone.now() - datetime.timedelta(days=1),  # used to check that it is not updated
                 )
-                next_url = reverse(
-                    "job_seekers_views:details",
-                    kwargs={"public_id": existing_job_seeker.public_id},
-                )
         existing_job_seeker.save()
         existing_job_seeker.jobseeker_profile.save()
         existing_assignment = JobSeekerAssignment.objects.get()
@@ -684,6 +736,7 @@ class TestStandaloneCreateAsPrescriber:
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
+        next_url = reverse("job_seekers_views:details", kwargs={"public_id": existing_job_seeker.public_id})
 
         # Step determine the job seeker with an email (skipping the NIR)
         # ----------------------------------------------------------------------
@@ -943,8 +996,9 @@ class TestStandaloneCreateAsPrescriber:
             [
                 messages.Message(
                     messages.SUCCESS,
-                    f"Le compte du candidat {new_job_seeker.get_inverted_full_name()} a "
-                    "bien été créé et ajouté à votre liste de candidats.",
+                    f"Usager ajouté||Le compte de {new_job_seeker.get_inverted_full_name()} a "
+                    "été créé et ajouté à votre liste d'accompagnements.<br>"
+                    "Vous êtes désigné comme son dernier accompagnateur connu.",
                 )
             ],
         )
