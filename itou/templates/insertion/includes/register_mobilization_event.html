@@ -1,0 +1,25 @@
+{# djlint:off #}
+<script nonce="{{ csp_nonce }}">
+    /* JS to POST a mobilization event (a.k.a. iMER, intention de mise en relation)
+       when clicking some buttons or links */
+    htmx.onLoad(function() {
+        const MOBILIZATION_KIND_SELECTOR = "data-emplois-mobilization-kind";
+        const trackedLinks = document.querySelectorAll(`[${MOBILIZATION_KIND_SELECTOR}]`);
+        Array.from(trackedLinks).forEach(function(link) {
+            link.addEventListener("click", function(event) {
+                const kind = event.target.getAttribute(MOBILIZATION_KIND_SELECTOR);
+
+                const body = new FormData();
+                body.set("kind", kind);
+                body.set("structure_uid", "{{ structure_uid|default:"" }}");
+                body.set("service_uid", "{{ service_uid|default:"" }}");
+                body.set("csrfmiddlewaretoken", "{{ csrf_token }}");
+                fetch("{% url "insertion_views:register_mobilization_event" %}", {
+                    method: "POST",
+                    body,
+                });
+            });
+        });
+    });
+</script>
+{# djlint:on #}

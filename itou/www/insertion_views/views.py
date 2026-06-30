@@ -4,9 +4,10 @@ import logging
 from data_inclusion.schema.v1.thematiques import Categorie
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -14,9 +15,11 @@ from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from itoutils.django.decoupage_administratif.admin_division_parsing import get_division_label
+from rest_framework import status
 
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
+from itou.insertion.enums import MobilizationEventKind
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import (
     get_missing_orientation_beneficiary_field_labels,
@@ -153,6 +156,49 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "formatted_categories": self.format_categories(),
             }
         )
+
+
+@login_not_required
+@require_POST
+def register_mobilization_event(request):
+    if request.user.is_authenticated and not (request.from_employer or request.from_prescriber):
+        raise PermissionDenied()
+
+    if not (kind := request.POST.get("kind")) or kind not in MobilizationEventKind.values:
+        return JsonResponse({"message": "missing or bad kind"}, status=status.HTTP_400_BAD_REQUEST)
+    if service_uid := request.POST.get("service_uid"):
+        service = get_object_or_404(insertion_models.Service.objects.select_related("structure"), uid=service_uid)
+        structure = service.structure
+    elif structure_uid := request.POST.get("structure_uid"):
+        service = None
+        structure = get_object_or_404(insertion_models.Structure, uid=structure_uid)
+    else:
+        return JsonResponse({"message": "missing structure_uid"}, status=status.HTTP_400_BAD_REQUEST)
+
+    organization = (
+        request.current_organization if request.user.is_authenticated and request.user.is_professional else None
+    )
+
+    try:
+        insertion_models.MobilizationEvent.objects.create_mobilization_event(
+            session_key=request.session.session_key,
+            kind=kind,
+            user=request.user,
+            organization=organization,
+            structure=structure,
+            service=service,
+        )
+    except Exception:
+        logger.warning(
+            "Unable to register mobilization event for user=%s, structure=%s, service=%s, kind=%s",
+            request.user.pk,
+            structure.uid,
+            service.uid if service else None,
+            kind,
+        )
+        return JsonResponse({"message": "server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return JsonResponse({"message": "ok"})
 
 
 class OrientationStep(enum.StrEnum):

@@ -8,6 +8,7 @@ app_name = "insertion_views"
 urlpatterns = [
     path("structures/<str:structure_uid>/", views.StructureCardView.as_view(), name="structure_card"),
     path("services/<str:service_uid>/", views.ServiceDetailView.as_view(), name="service_detail"),
+    path("register-mobilization-event/", views.register_mobilization_event, name="register_mobilization_event"),
     path(
         "orientations/<str:service_uid>/start/",
         views.start_orientation,
