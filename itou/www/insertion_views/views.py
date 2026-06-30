@@ -195,6 +195,7 @@ def register_mobilization_event(request):
             organization=organization,
             structure=structure,
             service=service,
+            service_external_link=request.POST.get("service_external_link", ""),
         )
     except Exception:
         logger.warning(
@@ -445,6 +446,7 @@ class OrientationWizardView(WizardView):
                 )
                 return self.render_to_response(self.get_context_data(**kwargs))
 
+            # TODO: update MobilizationEvent with the Orientation object
             logger.info(
                 "orientation wizard submitted user=%s service_uid=%s job_seeker=%s",
                 request.user.pk,

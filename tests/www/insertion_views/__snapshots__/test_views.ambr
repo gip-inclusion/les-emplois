@@ -29,7 +29,7 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
                                           Orienter un bénéficiaire
                                       </span>
@@ -174,7 +174,7 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-uid/start/">
                                       <span>
                                           Orienter un bénéficiaire
                                       </span>
@@ -352,7 +352,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-uid/start/">
                   <span>
                       Orienter un bénéficiaire
                   </span>
@@ -410,7 +410,7 @@
                           </h2>
                           <div class="form-row align-items-center gx-3">
                               <div class="form-group col-12 col-lg-auto">
-                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
+                                  <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-service-full-uid/start/">
                                       <span>
                                           Orienter un bénéficiaire
                                       </span>
@@ -616,7 +616,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
                   <span>
                       Test link
                   </span>

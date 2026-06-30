@@ -482,7 +482,9 @@ class Service(GeolocatedAddressMixin, models.Model):
 
 
 class MobilizationEventManager(models.Manager):
-    def create_mobilization_event(self, *, session_key, kind, user, organization, structure, service=None):
+    def create_mobilization_event(
+        self, *, session_key, kind, user, organization, structure, service=None, service_external_link=""
+    ):
         # The provided organization can be a prescriber organization, a company,
         # or None if the user is not authenticated
         prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
@@ -500,6 +502,7 @@ class MobilizationEventManager(models.Manager):
             company=company,
             structure=structure,
             service=service,
+            service_external_link=service_external_link,
         ).save()
 
 

@@ -7,17 +7,37 @@
         const trackedLinks = document.querySelectorAll(`[${MOBILIZATION_KIND_SELECTOR}]`);
         Array.from(trackedLinks).forEach(function(link) {
             link.addEventListener("click", function(event) {
-                const kind = event.target.getAttribute(MOBILIZATION_KIND_SELECTOR);
+                /* The target clicked may be a child (eg. a <span> in a <a>) */
+                const el = event.target.closest(`[${MOBILIZATION_KIND_SELECTOR}]`)
+                if (!el) return; // This should not happen
+
+                const kind = el.getAttribute(MOBILIZATION_KIND_SELECTOR);
+                const externalLink = el.getAttribute("data-emplois-mobilization-external-link");
+
+                const href = el.getAttribute("href"); // can be null
+                const linkOpensInCurrentTab = href && el.getAttribute("target") !== "_blank";
+                if (linkOpensInCurrentTab) {
+                    /* If opening a link in the current tab, preventDefault to let the XHR finish */
+                    event.preventDefault();
+                }
+                function navigate() {
+                    if (linkOpensInCurrentTab) {
+                        window.location.href = href;
+                    }
+                }
 
                 const body = new FormData();
                 body.set("kind", kind);
                 body.set("structure_uid", "{{ structure_uid|default:"" }}");
                 body.set("service_uid", "{{ service_uid|default:"" }}");
+                if (externalLink) {
+                    body.set("service_external_link", externalLink);
+                }
                 body.set("csrfmiddlewaretoken", "{{ csrf_token }}");
                 fetch("{% url "insertion_views:register_mobilization_event" %}", {
                     method: "POST",
                     body,
-                });
+                }).then(navigate).catch(navigate);
             });
         });
     });
