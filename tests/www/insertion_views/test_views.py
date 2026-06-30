@@ -520,7 +520,7 @@ class TestServices:
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertNotContains(response, "contact@example.com")
 
     def test_detail_with_source_link(self, client):
@@ -864,10 +864,14 @@ class TestServices:
 
 @pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
 @pytest.mark.parametrize(
-    "kind, with_service",
-    [(MobilizationEventKind.STRUCTURE_CONTACT, False), (MobilizationEventKind.SERVICE_CONTACT, True)],
+    "kind, with_service, service_external_link",
+    [
+        (MobilizationEventKind.STRUCTURE_CONTACT, False, ""),
+        (MobilizationEventKind.SERVICE_CONTACT, True, ""),
+        (MobilizationEventKind.SERVICE_EXT_LINK, True, "https://site.fake"),
+    ],
 )
-def test_register_mobilization_event(client, user_factory, kind, with_service):
+def test_register_mobilization_event(client, user_factory, kind, with_service, service_external_link):
     structure = StructureFactory()
     service = ServiceFactory(structure=structure) if with_service else None
 
@@ -879,12 +883,21 @@ def test_register_mobilization_event(client, user_factory, kind, with_service):
         # Init session for anonymous user -- TODO: tweak client.force_login to allow force_login(AnonymoutUser())
         client.get(reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid}))
 
-    data = {"kind": kind, "structure_uid": structure.uid, "service_uid": service.uid if with_service else ""}
+    data = {
+        "kind": kind,
+        "structure_uid": structure.uid,
+        "service_uid": service.uid if with_service else "",
+        "service_external_link": service_external_link,
+    }
     response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
     assert response.content == b'{"message": "ok"}'
 
     assert MobilizationEvent.objects.filter(
-        user=user if user_factory else None, kind=kind, structure=structure, service=service
+        user=user if user_factory else None,
+        kind=kind,
+        structure=structure,
+        service=service,
+        service_external_link=service_external_link,
     ).exists()
 
 
