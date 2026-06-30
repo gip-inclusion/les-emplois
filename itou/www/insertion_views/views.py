@@ -194,6 +194,7 @@ def register_mobilization_event(request):
             organization=organization,
             structure=structure,
             service=service,
+            service_external_link=request.POST.get("service_external_link", ""),
         )
     except Exception:
         logger.warning(

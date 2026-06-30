@@ -73,7 +73,8 @@ class TestStructures:
         )
         assertContains(
             response,
-            f'xhr.send("kind=" + kind + "&structure_uid={structure.uid}&service_uid=");',
+            f'data = "kind=" + kind + "&structure_uid={structure.uid}&service_uid=";',
+
         )
 
     def test_card_view_non_dora_source_has_no_canonical(self, client):
@@ -219,7 +220,7 @@ class TestServices:
             data-matomo-option="voir-coordonnees-contact">
         Voir les coordonnées de contact du service
     </button>"""
-    DISPLAY_SERVICE_CONTACT_JS = 'xhr.send("kind=" + kind + "&structure_uid=&service_uid=%s");'
+    DISPLAY_SERVICE_CONTACT_JS = 'data = "kind=" + kind + "&structure_uid=&service_uid=%s";'
     FORMS_TO_FILL = "Documents à compléter"
 
     def get_service_url(self, service):
@@ -521,7 +522,7 @@ class TestServices:
         response = client.get(service_url)
         assertContains(response, f'href="{self.LOGIN_URL}?next={service_url}"')
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
+        assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertNotContains(response, "contact@example.com")
 
     def test_detail_with_source_link(self, client):

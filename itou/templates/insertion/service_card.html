@@ -42,7 +42,10 @@
                             {% endif %}
                             {% if service.is_orientable_with_form %}
                                 {% if can_orient_towards_insertion_service %}
-                                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="{{ start_orientation_url }}" {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
+                                    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                                       data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_ORIENTATION }}"
+                                       href="{{ start_orientation_url }}"
+                                       {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>
                                         {% if request.GET.job_seeker_public_id %}
                                             Orienter le bénéficiaire
                                         {% else %}
@@ -62,6 +65,8 @@
                                 {% endif %}
                             {% else %}
                                 <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                                   data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_EXT_LINK }}"
+                                   data-emplois-mobilization-external-link="{{ service.mobilization_modes_professionals_external_form_link }}"
                                    rel="noopener"
                                    target="_blank"
                                    href="{{ service.mobilization_modes_professionals_external_form_link }}"
@@ -399,11 +404,9 @@
 {% endblock %}
 
 {% block script %}
-    {% if can_view_modal %}
-        {{ block.super }}
-        {% csrf_token %}
-        <script nonce="{{ csp_nonce }}">
-            {% include "insertion/includes/register_mobilization_event.js" with service_uid=service.uid only %}
-        </script>
-    {% endif %}
+    {{ block.super }}
+    {% csrf_token %}
+    <script nonce="{{ csp_nonce }}">
+        {% include "insertion/includes/register_mobilization_event.js" with service_uid=service.uid only %}
+    </script>
 {% endblock %}
