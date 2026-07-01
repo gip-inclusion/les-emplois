@@ -1216,6 +1216,11 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                     "bénéficiaire du RSA."
                 ),
             ),
+            models.CheckConstraint(
+                condition=Q(asp_uid__regex=r"^[0-9a-f]{30}$"),
+                name="jobseekerprofile_asp_uid_format",
+                violation_error_message="L'ID unique envoyé à l'ASP doit être composé de 30 caractères hexadécimaux.",
+            ),
             models.UniqueConstraint(
                 "nir",
                 name="jobseekerprofile_unique_nir_if_not_empty",
@@ -1281,6 +1286,11 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         self.set_old_values()
+
+    def validate_constraints(self, exclude=None):
+        if not self.asp_uid:
+            exclude = set(exclude or []) | {"asp_uid"}
+        super().validate_constraints(exclude=exclude)
 
     @staticmethod
     def clean_pole_emploi_fields(cleaned_data):

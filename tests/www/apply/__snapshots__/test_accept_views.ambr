@@ -4034,6 +4034,7 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'JobSeekerProfile.validate_constraints[users/models.py]',
           'ContractInfosForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractInfosForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -4041,6 +4042,7 @@
       }),
       dict({
         'origin': list([
+          'JobSeekerProfile.validate_constraints[users/models.py]',
           'ContractInfosForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractInfosForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -4053,6 +4055,7 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'JobSeekerProfile.validate_constraints[users/models.py]',
           'ContractInfosForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractInfosForAcceptView.get[www/apply/views/common.py]',
         ]),
