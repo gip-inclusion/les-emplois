@@ -16,11 +16,14 @@ from django.views.generic.edit import FormView
 from itoutils.django.decoupage_administratif.admin_division_parsing import get_division_label
 
 from itou.insertion import models as insertion_models
+from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.opening_hours import format_osm_hours
-from itou.insertion.utils import get_missing_orientation_beneficiary_field_labels, get_orientation_jwt
+from itou.insertion.utils import (
+    get_missing_orientation_beneficiary_field_labels,
+    get_orient_for_job_seeker_context,
+)
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.users.perms import can_prefill_orientation_on_dora
 from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -49,7 +52,9 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
             insertion_models.Structure.objects.select_related("source").prefetch_related(
                 Prefetch(
                     "services",
-                    queryset=insertion_models.Service.objects.order_by("name").select_related("kind"),
+                    queryset=insertion_models.Service.objects.order_by("name")
+                    .select_related("kind")
+                    .prefetch_related("receptions"),
                 ),
             ),
             uid=structure_uid,
@@ -78,9 +83,11 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         services = list(self.structure.services.all())
-        for service in services:
-            service.perimeter = get_division_label(service.eligibility_zones) or "France entière"
-
+        for service, perimeter in zip(
+            services,
+            bulk_load_division_labels([service.eligibility_zones for service in services]),
+        ):
+            service.perimeter = perimeter or "France entière"
         return super().get_context_data(**kwargs) | {
             "structure": self.structure,
             "matomo_custom_title": "Fiche structure d’insertion",
@@ -127,28 +134,25 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         return formatted_categories
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["formatted_opening_hours"] = format_osm_hours(self.object.opening_hours)
-        context["back_url"] = get_safe_url(
-            self.request,
-            "back_url",
-            fallback_url=reverse("search:services_home"),
+        return (
+            super().get_context_data(**kwargs)
+            | get_orient_for_job_seeker_context(self.request)
+            | {
+                "formatted_opening_hours": format_osm_hours(self.object.opening_hours),
+                "back_url": get_safe_url(self.request, "back_url", fallback_url=reverse("search:services_home")),
+                "matomo_custom_title": "Fiche de la service d'insértion",
+                "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
+                "credential_documents": self.object.generate_credential_documents_info(),
+                "show_mobilization_section": self.object.has_mobilization_modes(),
+                "professionals_has_autre": any(
+                    m.value == "autre" for m in self.object.mobilization_modes_professionals.all()
+                ),
+                "beneficiaries_has_autre": any(
+                    m.value == "autre" for m in self.object.mobilization_modes_beneficiaries.all()
+                ),
+                "formatted_categories": self.format_categories(),
+            }
         )
-        context["matomo_custom_title"] = "Fiche de la service d'insértion"
-        context["orientation_jwt"] = (
-            get_orientation_jwt(self.request) if can_prefill_orientation_on_dora(self.request) else None
-        )
-        context["geographic_perimeter"] = get_division_label(self.object.eligibility_zones) or "France entière"
-        context["credential_documents"] = self.object.generate_credential_documents_info()
-        context["show_mobilization_section"] = self.object.has_mobilization_modes()
-        context["professionals_has_autre"] = any(
-            m.value == "autre" for m in self.object.mobilization_modes_professionals.all()
-        )
-        context["beneficiaries_has_autre"] = any(
-            m.value == "autre" for m in self.object.mobilization_modes_beneficiaries.all()
-        )
-        context["formatted_categories"] = self.format_categories()
-        return context
 
 
 class OrientationStep(enum.StrEnum):
@@ -335,6 +339,12 @@ class OrientationWizardView(WizardView):
             referent_data = self.wizard_session.get(OrientationStep.REFERENT)
             payload = {
                 "di_service_id": self.service.uid,
+                "di_service_name": self.service.name,
+                "di_structure_name": self.service.structure.name,
+                "di_service_address_line": self.service.address_on_one_line or "à distance",
+                "di_contact_name": self.service.contact_full_name,
+                "di_contact_phone": self.service.contact_phone,
+                "di_contact_email": self.service.contact_email,
                 "beneficiary_first_name": self.job_seeker.first_name,
                 "beneficiary_last_name": self.job_seeker.last_name,
                 "beneficiary_email": self.job_seeker.email,
@@ -422,6 +432,7 @@ class OrientationWizardView(WizardView):
             "matomo_custom_title": matomo_titles[self.step],
             "show_orientation_disclaimer": not self.wizard_session.get("disclaimer_dismissed", False),
             "orientation_session_uuid": self.wizard_session.name,
+            "exit_url": get_orient_for_job_seeker_context(self.request)["exit_url"],
         }
 
 

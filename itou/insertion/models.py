@@ -430,6 +430,20 @@ class Service(GeolocatedAddressMixin, models.Model):
     def is_dora(self):
         return self.source.value == "dora"
 
+    @property
+    def prerequisites(self) -> list[str]:
+        if self.is_dora:
+            return [*self.access_conditions_dora, *self.credentials]
+        return [line for line in self.access_conditions_di.split("\\n") if line]
+
+    @property
+    def has_prerequisites(self) -> bool:
+        return bool(self.prerequisites)
+
+    @property
+    def has_orientation_action(self):
+        return self.is_orientable_with_form or bool(self.mobilization_modes_professionals_external_form_link)
+
     def has_mobilization_modes(self):
         return (not self.is_dora and bool(self.mobilizations.all())) or (
             self.is_dora
@@ -456,3 +470,19 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     def __str__(self):
         return self.uid
+
+    @property
+    def reception_location_label(self):
+        reception_values = {reception.value for reception in self.receptions.all()}
+        if (
+            data_inclusion_v1.ModeAccueil.A_DISTANCE.value in reception_values
+            and data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value not in reception_values
+        ):
+            return "à distance"
+        if self.city:
+            return self.city
+        return None
+
+    @property
+    def is_local(self):
+        return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM

@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -50,6 +51,7 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         fee=fee,
         fee_details="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location",
         access_conditions_dora=["Résident QPV / ZFRR"],
+        credentials=["Pièce d'identité", "Justificatif de domicile"],
     )
     service.publics.add(public)
 
@@ -231,6 +233,27 @@ def test_session_isolation_between_users(client):
     assert response.status_code == 404
 
 
+def test_orientation_wizard_shows_banner_and_generic_title(client):
+    prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+    job_seeker = JobSeekerFactory(first_name="Jane", last_name="Doe")
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.get(conformity_url)
+    assertContains(response, "Vous orientez actuellement")
+    assertContains(response, "vers un service")
+    assertContains(response, "DOE Jane")
+    assertContains(response, "<h1>Orienter vers un service d'insertion</h1>", html=True)
+
+
 def test_conformity_step_blocks_when_beneficiary_info_is_incomplete(client, snapshot):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(first_name="", last_name="DUPONT", phone="0606060606", email="test@example.org")
@@ -323,12 +346,31 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
     assert get_session_name(client.session, OrientationWizardView.expected_session_kind) == session_uuid
 
 
-def test_documents_step_normalizes_beneficiary_phone_for_dora(client, mocker):
+@pytest.mark.parametrize(
+    "service_kwargs,expected_di_service_address_line",
+    [
+        (
+            {
+                "address_line_1": "12 rue des terreaux",
+                "address_line_2": "Bât. B",
+                "post_code": "38110",
+                "city": "La Tour du Pin",
+            },
+            "12 rue des terreaux, Bât. B, 38110 La Tour du Pin",
+        ),
+        ({}, "À distance"),
+    ],
+)
+def test_documents_step_normalizes_beneficiary_phone_for_dora(
+    client, mocker, service_kwargs, expected_di_service_address_line
+):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(phone="+33601901570")
     service = ServiceFactory(
         is_orientable_with_form=True,
+        contact_email="contact@example.org",
         structure__name="Structure orientation wizard",
+        **service_kwargs,
     )
     start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
 
@@ -372,3 +414,66 @@ def test_documents_step_normalizes_beneficiary_phone_for_dora(client, mocker):
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload["beneficiary_phone"] == "0601901570"
+    assert payload["di_contact_email"] == "contact@example.org"
+    assert payload["di_service_address_line"] == expected_di_service_address_line
+
+
+def test_conformity_step_allows_missing_beneficiary_phone(client):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory(
+        first_name="Jean",
+        last_name="Dupont",
+        phone="",
+        email="test@example.org",
+    )
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.post(conformity_url, {"confirms_conditions": "on"})
+    referent_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.REFERENT},
+    )
+    assertRedirects(response, referent_url, fetch_redirect_response=False)
+
+
+def test_orientation_banner_quitter_ignores_back_url(client):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory()
+    service = ServiceFactory(is_orientable_with_form=True)
+    service_detail_url = (
+        reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+        + f"?job_seeker_public_id={job_seeker.public_id}&back_url=/search/services/results"
+    )
+
+    client.force_login(prescriber)
+    response = client.get(service_detail_url)
+    quit_link = parse_response_to_soup(response, 'a[aria-label="Quitter la procédure"]')
+    assert quit_link["href"] == reverse("job_seekers_views:list")
+
+
+def test_orientation_wizard_banner_quitter_goes_to_job_seekers_list(client):
+    prescriber = PrescriberFactory(membership=True)
+    job_seeker = JobSeekerFactory()
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+
+    response = client.get(conformity_url)
+    quit_link = parse_response_to_soup(response, 'a[aria-label="Quitter la procédure"]')
+    assert quit_link["href"] == reverse("job_seekers_views:list")

@@ -682,7 +682,13 @@ class TestProcessViews:
 
     def test_details_for_unauthorized_prescriber(self, client):
         """As an unauthorized prescriber I cannot access personal information of arbitrary job seekers"""
-        prescriber = PrescriberFactory(phone="0612345678", email="prescriber@mailinator.com", membership=True)
+        # Pin the organization SIRET: it is rendered (as digits) in the support-form URL, and a random
+        # one occasionally contains the job seeker post code below, flakily tripping the assertions.
+        prescriber = PrescriberFactory(
+            phone="0612345678",
+            email="prescriber@mailinator.com",
+            membership__organization__siret="11122233300001",
+        )
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             job_seeker__first_name="Supersecretname",

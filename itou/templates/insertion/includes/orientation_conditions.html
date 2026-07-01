@@ -1,17 +1,14 @@
 {% load components %}
 {% load django_bootstrap5 %}
-{% load str_filters %}
 
-<h2 class="h3">Conditions et critères requis</h2>
+<h2 class="h3">Critères et conditions d'accès</h2>
 
 {% if service.fee %}
     {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
         {% fragment as fee_alert_content %}
-            <p class="mb-0">
+            <p class="mb-0 h-100 d-flex align-items-center">
                 Frais à la charge de l'usager : {{ service.fee.label }}
-                {% if service.fee_details %}
-                    <i class="ri-information-line ri-xl text-info" aria-label="{{ service.fee_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.fee_details }}" role="button" tabindex="0"></i>
-                {% endif %}
+                {% if service.fee_details %}({{ service.fee_details }}){% endif %}
             </p>
         {% endfragment %}
     {% endcomponent_alert %}
@@ -20,23 +17,10 @@
 {% if service.publics.exists %}
     <p class="fw-bold mb-2">Publics concernés par ce service</p>
     <ul class="mb-3 mb-md-4">
-        {% for public in service.publics.all %}
-            <li>{{ public.label }}</li>
-        {% endfor %}
+        {% for public in service.publics.all %}<li>{{ public.label }}</li>{% endfor %}
     </ul>
 {% endif %}
 
-{% if service.is_dora and service.access_conditions_dora or not service.is_dora and service.access_conditions_di %}
-    <p class="fw-bold mb-2">Critères de condition d'accès</p>
-    <ul class="mb-3 mb-md-4">
-        {% if service.is_dora %}
-            {% for condition in service.access_conditions_dora %}<li>{{ condition }}</li>{% endfor %}
-        {% else %}
-            {% for condition in service.access_conditions_di|split_literal_newlines %}
-                <li>{{ condition }}</li>
-            {% endfor %}
-        {% endif %}
-    </ul>
-{% endif %}
+{% include "insertion/includes/orientation_credentials_list.html" with service=service show_section_heading=True show_heading=True show_recovery_note=False only %}
 
 {% bootstrap_field form.confirms_conditions wrapper_class="form-group form-group-required-check" %}

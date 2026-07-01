@@ -75,14 +75,6 @@ class DataInclusionApiClient:
 
         return response
 
-    def search_services(self, **params) -> list[dict]:
-        response = self._request("/search/services", params)
-        try:
-            return [r["service"] for r in response.json()["items"]]
-        except KeyError as exc:
-            logger.info("data.inclusion result error params=%r error=%s", params, exc)
-            raise DataInclusionApiException()
-
     def services(self, **params) -> DataInclusionApiPaginatedResponse:
         return DataInclusionApiPaginatedResponse(**self._request("/services", params).json())
 

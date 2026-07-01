@@ -111,13 +111,13 @@
                           </div>
                           <hr class="my-3"/>
                           <h2 class="h3">
-                              Conditions et critères requis
+                              Critères et conditions d'accès
                           </h2>
                           <div class="form-group form-group-required-check form-group-required">
                               <div class="form-check">
                                   <input checked="" class="form-check-input is-valid" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que l'usager remplit au moins une condition et un critère requis.
+                                      Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
                                   </label>
                               </div>
                           </div>
@@ -153,7 +153,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-incomplete-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-incomplete-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -166,7 +166,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-incomplete-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-incomplete-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -201,7 +201,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -214,7 +214,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/confirmation/%3Fjob_seeker_public_id%3D7614fc4b-aef9-4694-ab17-12324300180a">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/confirmation/%3Fjob_seeker_public_id%3D7614fc4b-aef9-4694-ab17-12324300180a" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -301,7 +301,7 @@
                           </div>
                           <hr class="my-3"/>
                           <h2 class="h3">
-                              Conditions et critères requis
+                              Critères et conditions d'accès
                           </h2>
                           <div class="alert alert-info mb-3 mb-md-4" role="status">
                               <div class="row">
@@ -310,10 +310,9 @@
                                       </i>
                                   </div>
                                   <div class="col">
-                                      <p class="mb-0">
+                                      <p class="mb-0 h-100 d-flex align-items-center">
                                           Frais à la charge de l'usager : 20€
-                                          <i aria-label="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location" class="ri-information-line ri-xl text-info" data-bs-title="adhésion annuelle de 10€ à la MJC Champ Libre + frais de location" data-bs-toggle="tooltip" role="button" tabindex="0">
-                                          </i>
+                  (adhésion annuelle de 10€ à la MJC Champ Libre + frais de location)
                                       </p>
                                   </div>
                               </div>
@@ -327,18 +326,24 @@
                               </li>
                           </ul>
                           <p class="fw-bold mb-2">
-                              Critères de condition d'accès
+                              Pré-requis et justificatifs
                           </p>
                           <ul class="mb-3 mb-md-4">
                               <li>
                                   Résident QPV / ZFRR
+                              </li>
+                              <li>
+                                  Pièce d'identité
+                              </li>
+                              <li>
+                                  Justificatif de domicile
                               </li>
                           </ul>
                           <div class="form-group form-group-required-check form-group-required">
                               <div class="form-check">
                                   <input class="form-check-input" id="id_confirms_conditions" name="confirms_conditions" required="" type="checkbox"/>
                                   <label class="form-check-label" for="id_confirms_conditions">
-                                      Je confirme que l'usager remplit au moins une condition et un critère requis.
+                                      Je confirme que l'usager fait partie des publics concernés et que les pré-requis sont respectés. Je dispose des justificatifs qui me seront demandés à l'étape 3.
                                   </label>
                               </div>
                           </div>
@@ -374,7 +379,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -387,7 +392,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/confirm/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -441,6 +446,39 @@
                                   </p>
                               </div>
                           </div>
+                          <h3 class="h4">
+                              Pré-requis et justificatifs
+                          </h3>
+                          <p>
+                              (A récupérer auprès de l'usager)
+                          </p>
+                          <ul class="mb-3 mb-md-4">
+                              <li>
+                                  Résident QPV / ZFRR
+                              </li>
+                              <li>
+                                  Pièce d'identité
+                              </li>
+                              <li>
+                                  Justificatif de domicile
+                              </li>
+                          </ul>
+                          <div class="form-group">
+                              <label class="visually-hidden" for="id_credentials_proof_files">
+                                  Pré-requis et justificatifs
+                              </label>
+                              <div class="c-multi-file-input">
+                                  <input accept=".doc,.docx,.pdf,.png,.jpeg,.jpg,.odt,.xls,.xlsx,.ods" class="form-control" id="id_credentials_proof_files" multiple="" name="credentials_proof_files" type="file"/>
+                                  <div class="mt-1 mb-2">
+                                      <p class="small text-nuance-06 mb-0">
+                                          Taille maximale : 5 Mo
+                                          <br/>
+                                          Formats supportés : doc, docx, pdf, png, jpeg, jpg, odt, xls, xlsx, ods
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                          <hr class="my-3"/>
                           <div class="form-group form-group-required">
                               <div class="form-check">
                                   <input class="form-check-input" id="id_gdpr_consent" name="gdpr_consent" required="" type="checkbox"/>
@@ -488,7 +526,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -501,7 +539,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/submit/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/submit/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -633,7 +671,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -646,7 +684,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/fill/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/[UUID of session]/create/fill/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>
@@ -725,7 +763,7 @@
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                   <div class="c-box c-box--organization mb-3 mb-md-4">
                       <button aria-controls="collapseOrientationService-test-orientation-wizard-uid" aria-expanded="false" class="c-box--organization__summary w-100" data-bs-target="#collapseOrientationService-test-orientation-wizard-uid" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-community-line">
+                          <i aria-hidden="true" class="ri-hand-heart-line">
                           </i>
                           <div>
                               <span class="d-block h3">
@@ -738,7 +776,7 @@
                           <p class="mb-0">
                               Structure orientation wizard
                           </p>
-                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/job-seeker/">
+                          <a class="btn btn-secondary btn-block mt-4" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="voir-fiche-structure" href="/insertion/structures/test-structure-orientation-wizard-uid/?back_url=/insertion/orientations/test-orientation-wizard-uid/job-seeker/" rel="noopener noreferrer" target="_blank">
                               Voir la fiche structure
                           </a>
                       </div>

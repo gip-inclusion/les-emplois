@@ -2,12 +2,19 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.urls import reverse
+from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
+from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertTemplateUsed
 
 from itou.insertion.models import SOURCE_DORA_VALUE, GenericReferenceItemKind, GenericReferenceItemSource
-from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory, StructureFactory
-from tests.users.factories import PrescriberFactory
+from tests.insertion.factories import (
+    GenericReferenceItemFactory,
+    InPersonReceptionFactory,
+    RemoteReceptionFactory,
+    ServiceFactory,
+    StructureFactory,
+)
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -101,8 +108,8 @@ class TestStructures:
             services.append(service)
 
         with patch(
-            "itou.www.insertion_views.views.get_division_label",
-            side_effect=["Perimeter 1", "Perimeter 2", "Perimeter 3"],
+            "itou.www.insertion_views.views.bulk_load_division_labels",
+            return_value=["Perimeter 1", "Perimeter 2", "Perimeter 3"],
         ):
             response = client.get(self.get_structure_url(structure))
 
@@ -119,6 +126,58 @@ class TestStructures:
         expected_href = f"{service_url}?back_url={structure_url}%23structure-services"
 
         assertContains(response, f'href="{expected_href}"')
+
+    def test_card_view_loads_service_perimeters_without_n_plus_one(self, client):
+        Region.objects.create(code="53", name="Bretagne")
+        for code, name in [("29", "Finistère"), ("56", "Morbihan"), ("35", "Ille-et-Vilaine")]:
+            Department.objects.create(code=code, name=name, region="53")
+
+        structure = StructureFactory()
+        for code in ("29", "56", "35"):
+            ServiceFactory(structure=structure, eligibility_zones=[code])
+
+        with assertNumQueries(
+            1  # structure + source
+            + 1  # services prefetch
+            + 1  # service receptions prefetch
+            + 1  # departments bulk (eligibility_zones)
+            + 1  # cities bulk (eligibility_zones)
+            + 1  # epcis bulk (eligibility_zones)
+        ):
+            response = client.get(self.get_structure_url(structure))
+
+        assert response.status_code == 200
+        perimeters = [service.perimeter for service in response.context["services"]]
+        assert perimeters == ["Finistère", "Morbihan", "Ille-et-Vilaine"]
+        assertContains(response, "Périmètre : Finistère")
+        assertContains(response, "Périmètre : Morbihan")
+        assertContains(response, "Périmètre : Ille-et-Vilaine")
+
+    def test_card_view_services_display_reception_location(self, client):
+        structure = StructureFactory()
+        ServiceFactory(
+            structure=structure,
+            name="Service Poitiers",
+            city="Poitiers",
+            receptions=[InPersonReceptionFactory()],
+        )
+        ServiceFactory(
+            structure=structure,
+            name="Service Loudun",
+            city="Loudun",
+            receptions=[InPersonReceptionFactory()],
+        )
+        ServiceFactory(
+            structure=structure,
+            name="Service à distance",
+            receptions=[RemoteReceptionFactory()],
+        )
+
+        response = client.get(self.get_structure_url(structure))
+
+        assertContains(response, "Lieu d'accueil : Poitiers")
+        assertContains(response, "Lieu d'accueil : Loudun")
+        assertContains(response, "Lieu d'accueil : à distance")
 
 
 class TestServices:
@@ -267,6 +326,24 @@ class TestServices:
         assertContains(response, f'href="{test_link}"')
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
+    def test_detail_with_external_orientation_link_without_text(self, client):
+        user = PrescriberFactory(membership=True)
+        external_link = "https://test.example.com"
+        service = ServiceFactory(
+            uid="test-external-no-text-uid",
+            name="Service avec lien externe sans intitulé",
+            updated_on="2025-01-15",
+            is_orientable_with_form=False,
+            mobilization_modes_professionals_external_form_link=external_link,
+            mobilization_modes_professionals_external_form_link_text="",
+            structure__uid="test-structure-external-no-text-uid",
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, f'href="{external_link}"')
+
     def test_detail_orientable_with_external_link_prefers_wizard(self, client):
         user = PrescriberFactory(membership=True)
         external_link = "https://test.example.com"
@@ -299,6 +376,25 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
+
+    def test_detail_orientable_and_job_seeker_authenticated(self, client):
+        user = JobSeekerFactory()
+        service = ServiceFactory(
+            uid="test-orientable-job-seeker-uid",
+            updated_on="2025-01-15",
+            is_orientable_with_form=True,
+            structure__uid="test-structure-orientable-job-seeker-uid",
+            structure__updated_on="2025-01-15",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(
+            response,
+            reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}),
+        )
+        assertNotContains(response, "c-box--action")
+        assertNotContains(response, "Informations de contact non renseignées")
 
     def test_detail_orientable_and_user_not_authenticated(self, client):
         service = ServiceFactory(
@@ -334,6 +430,7 @@ class TestServices:
         service = ServiceFactory(
             uid="test-no-contact-uid",
             updated_on="2025-01-15",
+            is_orientable_with_form=False,
             contact_full_name="",
             contact_email="",
             contact_phone="",
@@ -343,6 +440,7 @@ class TestServices:
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Voir les coordonnées de contact du service")
+        assertContains(response, "Informations de contact non renseignées")
 
     def test_detail_contact_button_shown_when_authenticated(self, client):
         user = PrescriberFactory(membership=True)

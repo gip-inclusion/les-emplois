@@ -2,9 +2,11 @@ import pytest
 from django.test import RequestFactory
 
 from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
 from itou.companies.perms import can_create_antenna
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider
-from itou.users.perms import can_prefill_orientation_on_dora
+from itou.users.perms import can_orient_towards_insertion_service
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -60,10 +62,10 @@ def make_labor_inspector():
     "user_factory,expected",
     (
         pytest.param(make_jobseeker, False, id="job_seeker"),
-        pytest.param(make_employer, False, id="employer"),
+        pytest.param(make_employer, True, id="employer"),
         pytest.param(
             lambda: make_prescriber(organization__authorized=False),
-            False,
+            True,
             id="orienteur",
         ),
         pytest.param(
@@ -76,7 +78,7 @@ def make_labor_inspector():
                 user__identity_provider=IdentityProvider.DJANGO,
                 organization__authorized=True,
             ),
-            False,
+            True,
             id="prescriber_authorized_identity_provider_django",
         ),
         pytest.param(
@@ -84,17 +86,22 @@ def make_labor_inspector():
                 organization__authorized=True,
                 organization__siret=None,
             ),
-            False,
+            True,
             id="prescriber_authorized_no_siret",
         ),
         pytest.param(make_labor_inspector, False, id="labor_inspector"),
     ),
 )
-def test_can_prefill_orientation_on_dora(user_factory, expected):
+def test_can_orient_towards_insertion_service(user_factory, expected):
     request_factory = RequestFactory()
     request = request_factory.get("/")
     request.user, structure = user_factory()
+    request.from_prescriber = False
+    request.from_employer = False
     if structure:
         request.current_organization = structure
-        request.from_authorized_prescriber = getattr(structure, "is_authorized", False)
-    assert can_prefill_orientation_on_dora(request) is expected
+        if isinstance(structure, PrescriberOrganization):
+            request.from_prescriber = True
+        elif isinstance(structure, Company):
+            request.from_employer = True
+    assert can_orient_towards_insertion_service(request) is expected
