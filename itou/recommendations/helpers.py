@@ -29,7 +29,7 @@ def get_user_data(ft_id):
         return None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Address:
     address_line_1: str
     address_line_2: str
@@ -49,7 +49,7 @@ class Address:
         return ", ".join([field for field in fields if field])
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class AdministrativeData:
     title: str
     first_name: str
@@ -62,7 +62,7 @@ class AdministrativeData:
     # TODO: Add in_zrr / partially_in_zrr
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Status:
     """Data structure user status in FT : for how long he is registered"""
 
@@ -72,7 +72,7 @@ class Status:
     detld: bool
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Criterion:
     brsa: bool
     boe: bool
@@ -93,7 +93,7 @@ class Criterion:
     currently_employed: bool
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Author:
     """Data structure for diagnosis authors with timestamp"""
 
@@ -112,7 +112,7 @@ class Author:
         )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class CapacityToAct:
     """Data structure for "pouvoirAgir" objects from Diagnostic Usager - dossier agrégé"""
 
@@ -120,7 +120,7 @@ class CapacityToAct:
     author: Author
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Need:
     """Data structure for "besoin" objects from Diagnostic Usager - dossier agrégé"""
 
@@ -137,7 +137,7 @@ class Need:
         )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Constraint:
     """Data structure for "contrainte" objects from Diagnostic Usager - dossier agrégé"""
 
@@ -146,7 +146,7 @@ class Constraint:
     # but we chose not to use them for now (too much information to display)
 
     label: str
-    details: list[str]
+    details: tuple[str, ...]
     author: Author
     impact: str
     high_priority: bool
@@ -156,34 +156,34 @@ class Constraint:
         return cls(
             label=data["libelle"],
             impact=data.get("impact", ""),  # This field is missing in one of the examples from the doc.
-            details=[o["libelle"] for o in data["objectifs"] + data["situations"]],
+            details=tuple(o["libelle"] for o in data["objectifs"] + data["situations"]),
             author=Author.from_agent(agent, data["dateExploration"]),
             high_priority=data["estPrioritaire"],
         )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class Diagnosis:
     """Data structure for the user "besoinsParDiagnostic" from Diagnostic Usager - dossier agrégé"""
 
     name: str
     author: Author
     high_priority: bool
-    needs: list[Need]
+    needs: tuple[Need, ...]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class ConsolidatedFile:
     """Data structure for the user consolidated file data from Diagnostic Usager - dossier agrégé"""
 
     capacity_to_act: CapacityToAct
     digital_autonomy_need: Need
     digital_autonomy_constraint: Constraint
-    constraints: list[Constraint]
-    diagnoses: list[Diagnosis]
+    constraints: tuple[Constraint, ...]
+    diagnoses: tuple[Diagnosis, ...]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, slots=True)
 class UserData:
     """Data structure for the user complete parsed data"""
 
@@ -201,18 +201,18 @@ def fetch_and_parse_user_data(ft_id):
         raw_administrative_data = pe_client.informations_administratives_usager(token)
         if not raw_administrative_data:
             raise ValueError(f"Missing administrative data for id={ft_id}")
-        administrative_data = AdministrativeData(
-            first_name=raw_administrative_data["etatCivil"]["prenom"],
-            last_name=raw_administrative_data["etatCivil"]["nom"],
-            birthdate=datetime.date.fromisoformat(raw_administrative_data["etatCivil"]["dateNaissance"]),
-            title=raw_administrative_data["etatCivil"]["civilite"],
-        )
+        administrative_data = {
+            "first_name": raw_administrative_data["etatCivil"]["prenom"],
+            "last_name": raw_administrative_data["etatCivil"]["nom"],
+            "birthdate": datetime.date.fromisoformat(raw_administrative_data["etatCivil"]["dateNaissance"]),
+            "title": raw_administrative_data["etatCivil"]["civilite"],
+        }
         if phones := raw_administrative_data["telephones"]:
-            administrative_data.phone = phones[0]["numeroTelephone"]
+            administrative_data["phone"] = phones[0]["numeroTelephone"]
         if emails := raw_administrative_data["emails"]:
-            administrative_data.email = emails[0]["adresseEmail"]
+            administrative_data["email"] = emails[0]["adresseEmail"]
         if addresses := raw_administrative_data["adresses"]:
-            administrative_data.address = Address(
+            administrative_data["address"] = Address(
                 address_line_1=addresses[0]["numeroTypeLibelleVoie"],
                 address_line_2=addresses[0]["complementAdresse"],
                 post_code=addresses[0]["codePostal"],
@@ -220,7 +220,8 @@ def fetch_and_parse_user_data(ft_id):
                 insee_code=addresses[0]["codeInseeCommune"],
             )
             if addresses[0]["indicateurResidentQPV"] == "QP":
-                administrative_data.is_in_qpv = True
+                administrative_data["is_in_qpv"] = True
+        administrative_data = AdministrativeData(**administrative_data)
 
         # Fetch FT status
         raw_status = pe_client.statut_usager(token)
@@ -273,12 +274,6 @@ def fetch_and_parse_user_data(ft_id):
         diagnoses = []
         for raw_diagnosis in raw_consolidated_file["besoinsParDiagnostic"]:
             if raw_diagnosis["diagnostic"]["statut"] == "EN_COURS":
-                needs = [
-                    Need.from_dict(data=raw_need)
-                    for raw_needs in raw_diagnosis["thematiquesBesoins"]
-                    for raw_need in raw_needs["besoins"]
-                    if raw_need["valeur"] != "NON_EXPLORE"
-                ]
                 diagnoses.append(
                     Diagnosis(
                         author=Author.from_agent(
@@ -287,7 +282,12 @@ def fetch_and_parse_user_data(ft_id):
                         ),
                         name=raw_diagnosis["diagnostic"]["nomMetier"],
                         high_priority=raw_diagnosis["diagnostic"]["estPrioritaire"],
-                        needs=needs,
+                        needs=tuple(
+                            Need.from_dict(data=raw_need)
+                            for raw_needs in raw_diagnosis["thematiquesBesoins"]
+                            for raw_need in raw_needs["besoins"]
+                            if raw_need["valeur"] != "NON_EXPLORE"
+                        ),
                     )
                 )
 
@@ -295,8 +295,8 @@ def fetch_and_parse_user_data(ft_id):
             capacity_to_act=capacity_to_act,
             digital_autonomy_need=digital_autonomy_need,
             digital_autonomy_constraint=digital_autonomy_constraint,
-            constraints=constraints,
-            diagnoses=diagnoses,
+            constraints=tuple(constraints),
+            diagnoses=tuple(diagnoses),
         )
 
     # Regroup everything
