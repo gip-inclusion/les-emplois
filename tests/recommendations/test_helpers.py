@@ -105,7 +105,7 @@ class TestFetchAndParseUserData:
                     },
                     "label": "Possible perte de confiance",
                 },
-                "constraints": [
+                "constraints": (
                     {
                         "author": {
                             "first_name": "Fernande",
@@ -113,7 +113,7 @@ class TestFetchAndParseUserData:
                             "organization": "CDG Alpes Haute Provence",
                             "timestamp": datetime.datetime(2021, 5, 17, 14, 47, 11, tzinfo=datetime.UTC),
                         },
-                        "details": [
+                        "details": (
                             "Faire un point complet sur sa mobilité",
                             "Accéder à un véhicule",
                             "Entretenir ou réparer son véhicule",
@@ -123,13 +123,13 @@ class TestFetchAndParseUserData:
                             "Aucun moyen de transport à disposition",
                             "Dépendant des transports en communs",
                             "Permis non valide / suspension de permis",
-                        ],
+                        ),
                         "high_priority": True,
                         "impact": "FAIBLE",
                         "label": "Développer sa mobilité",
                     },
-                ],
-                "diagnoses": [
+                ),
+                "diagnoses": (
                     {
                         "author": {
                             "first_name": "Fernande",
@@ -139,7 +139,7 @@ class TestFetchAndParseUserData:
                         },
                         "high_priority": False,
                         "name": "Boulanger",
-                        "needs": [
+                        "needs": (
                             {
                                 "author": {
                                     "first_name": "Fernande",
@@ -160,9 +160,9 @@ class TestFetchAndParseUserData:
                                 "label": "Confirmer son choix de métier",
                                 "value": "POINT_FORT",
                             },
-                        ],
+                        ),
                     },
-                ],
+                ),
                 "digital_autonomy_constraint": {
                     "author": {
                         "first_name": "Fernande",
@@ -170,7 +170,7 @@ class TestFetchAndParseUserData:
                         "organization": "CDG Alpes Haute Provence",
                         "timestamp": datetime.datetime(2021, 5, 17, 14, 47, 11, tzinfo=datetime.UTC),
                     },
-                    "details": [
+                    "details": (
                         "Acquérir un équipement",
                         "Accéder à  une connexion internet",
                         "Maîtriser les fondamentaux du numérique",
@@ -186,7 +186,7 @@ class TestFetchAndParseUserData:
                         "Absence de mobilité pour accéder à un espace numérique",
                         "Difficulté à réaliser des démarches administratives en ligne",
                         "En difficulté sur le numérique (résultat Pix emploi <50%)",
-                    ],
+                    ),
                     "high_priority": True,
                     "impact": "FAIBLE",
                     "label": "Accéder au numérique et en maîtriser les fondamentaux",
