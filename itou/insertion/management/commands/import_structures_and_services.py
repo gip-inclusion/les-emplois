@@ -613,10 +613,12 @@ class Command(BaseCommand):
             .values_list("uid", flat=True)
         )
 
-        structures_without_email = Structure.objects.filter(email="").values_list("uid", flat=True)
+        di_structures_without_email = (
+            Structure.objects.exclude(source__value="dora").filter(email="").values_list("uid", flat=True)
+        )
 
         all_disabled_structures = (
-            non_orientable_structures | set(blacklisted_structures) | set(structures_without_email)
+            non_orientable_structures | set(blacklisted_structures) | set(di_structures_without_email)
         )
 
         updated_services = Service.objects.filter(

@@ -219,7 +219,58 @@
       "structure_id": "dora--blacklisted-siren-structure",
       "id": "dora--blacklisted-service",
       "nom": "Blacklisted Siren service",
-      "description": "This service should not be orientable with a from.",
+      "description": "This service should not be orientable with a form.",
+      "lien_source": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee",
+      "date_maj": "2026-02-13",
+      "type": "formation",
+      "thematiques": [
+        "choisir-un-metier--connaitre-les-opportunites-demploi",
+        "preparer-sa-candidature--valoriser-ses-competences",
+        "choisir-un-metier--identifier-ses-points-forts-et-ses-competences",
+        "choisir-un-metier--confirmer-son-choix-de-metier",
+        "choisir-un-metier--decouvrir-un-metier-ou-un-secteur-dactivite",
+        "trouver-un-emploi--repondre-a-des-offres-demploi"
+      ],
+      "frais": "gratuit",
+      "frais_precisions": null,
+      "publics": null,
+      "publics_precisions": null,
+      "conditions_acces": null,
+      "commune": null,
+      "code_postal": null,
+      "code_insee": null,
+      "adresse": null,
+      "complement_adresse": null,
+      "longitude": null,
+      "latitude": null,
+      "telephone": null,
+      "courriel": "contact.if@example.com",
+      "modes_accueil": [
+        "a-distance"
+      ],
+      "zone_eligibilite": [
+        "france"
+      ],
+      "contact_nom_prenom": null,
+      "lien_mobilisation": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee/orienter",
+      "modes_mobilisation": [
+        "utiliser-lien-mobilisation"
+      ],
+      "mobilisable_par": [
+        "professionnels",
+        "usagers"
+      ],
+      "mobilisation_precisions": "https://immersion-facile.beta.gouv.fr/?mtm_campaign=ReferencementIFDORA https://immersion-facile.beta.gouv.fr/?mtm_campaign=ReferencementIFDORA",
+      "volume_horaire_hebdomadaire": null,
+      "nombre_semaines": null,
+      "horaires_accueil": null
+    },
+    {
+      "source": "dora",
+      "structure_id": "dora--allowed-structure-without-email",
+      "id": "dora--allowed-service-structure-no-email",
+      "nom": "Allowed service with structure without email",
+      "description": "This service should be orientable with a form.",
       "lien_source": "https://dora.inclusion.gouv.fr/services/plateforme-de-linclu-immersion-facilitee",
       "date_maj": "2026-02-13",
       "type": "formation",
@@ -266,8 +317,8 @@
       "horaires_accueil": null
     }
   ],
-  "total": 6,
+  "total": 7,
   "page": 1,
-  "size": 6,
+  "size": 7,
   "pages": 1
 }
