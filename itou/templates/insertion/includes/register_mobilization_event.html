@@ -1,3 +1,6 @@
+{% load enums %}
+{% enums "insertion" "MobilizationEventKind" as MobilizationEventKind %}
+
 {# djlint:off #}
 <script nonce="{{ csp_nonce }}">
     /* JS to POST a mobilization event (a.k.a. iMER, intention de mise en relation)
@@ -12,7 +15,20 @@
                 if (!el) return; // This should not happen
 
                 const kind = el.getAttribute(MOBILIZATION_KIND_SELECTOR);
-                const externalLink = el.getAttribute("data-emplois-mobilization-external-link");
+                let externalLink = "";
+                if (kind === "{{ MobilizationEventKind.SERVICE_EXT_LINK }}") {
+                    if (el.hasAttribute("href")) {
+                        // either `el` is the button Orienter (towards an external page), it has an href:
+                        externalLink = el.getAttribute("href");
+
+                    } else if (event.target.hasAttribute("href")) {
+                        // `el` is the "Mes démarches" div, and the user clicked on a link (event.target)
+                        externalLink = event.target.getAttribute("href");
+                    } else {
+                        // the user clicked somewhere on the div, do nothing
+                        return;
+                    }
+                }
 
                 const href = el.getAttribute("href"); // can be null
                 const linkOpensInCurrentTab = href && el.getAttribute("target") !== "_blank";
