@@ -109,10 +109,32 @@
       "horaires_accueil": "Mo-Fr 09:00-12:00,14:00-17:00",
       "accessibilite_lieu": null,
       "reseaux_porteurs": null
+    },
+    {
+      "source": "dora",
+      "id": "dora--allowed-structure-without-email",
+      "nom": "Allowed structure",
+      "date_maj": "2024-02-02",
+      "description": "The services of this structure should not be orientable with a from.",
+      "lien_source": "https://test.com",
+      "siret": "12345678901234",
+      "commune": "Paris",
+      "code_postal": "75010",
+      "code_insee": "75056",
+      "adresse": "6 Boulevard Saint-Denis",
+      "complement_adresse": null,
+      "longitude": 2.35511,
+      "latitude": 48.869364,
+      "telephone": null,
+      "courriel": "",
+      "site_web": "https://inclusion.gouv.fr/",
+      "horaires_accueil": "Mo-Fr 09:00-12:00,14:00-17:00",
+      "accessibilite_lieu": null,
+      "reseaux_porteurs": null
     }
   ],
-  "total": 5,
+  "total": 6,
   "page": 1,
-  "size": 5,
+  "size": 6,
   "pages": 1
 }
