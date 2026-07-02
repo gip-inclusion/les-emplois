@@ -1215,6 +1215,10 @@ class TestAssessmentContractsDetails:
         ) == snapshot(name="contract detail side box with refused allowance, missing reason, common tab")
 
         response = client.get(details_justification_url)
+        assertContains(
+            response,
+            "Le motif et le commentaire de refus sont réservés à la DDETS/DREETS et ne sont pas transmis au GEIQ.",
+        )
         assert pretty_indented(
             parse_response_to_soup(response, selector="div.s-section__row > div.s-section__col.order-1 > div.c-box")
         ) == snapshot(name="contract detail side box with refused allowance, missing reason, justification tab")

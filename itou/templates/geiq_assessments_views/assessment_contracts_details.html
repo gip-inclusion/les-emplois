@@ -72,6 +72,15 @@
                 </div>
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>{{ active_tab.label }}</h2>
+                    {% if request.from_institution and active_tab == AssessmentContractDetailsTab.ALLOWANCE_REFUSAL_JUSTIFICATION %}
+                        {% component_alert content=refusal_confidentiality_notice variant="info" icon=False extra_classes="mb-3 mb-md-4" %}
+                            {% fragment as refusal_confidentiality_notice %}
+                                <p class="mb-0">
+                                    Le motif et le commentaire de refus sont réservés à la DDETS/DREETS et ne sont pas transmis au GEIQ.
+                                </p>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    {% endif %}
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
