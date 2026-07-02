@@ -705,3 +705,19 @@ class TestServices:
         service.mobilization_modes_beneficiaries.add(mode_presentiel)
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Ce texte beneficiaire ne doit pas apparaitre")
+
+    def test_change_name_of_via_formulaire_dora_mobilization_mode(self, client):
+        dora_form_mobilization_mode = GenericReferenceItemFactory(
+            source=GenericReferenceItemSource.DORA,
+            kind=GenericReferenceItemKind.MOBILIZATION_PROFESSIONAL,
+            value="formulaire-dora",
+            label="Via le formulaire DORA",
+        )
+
+        service = ServiceFactory(source__value="dora")
+
+        service.mobilization_modes_professionals.add(dora_form_mobilization_mode)
+
+        response = client.get(self.get_service_url(service))
+        assertNotContains(response, "Via le formulaire DORA")
+        assertContains(response, "Via le formulaire (bouton “Orienter votre bénéficiaire”)")
