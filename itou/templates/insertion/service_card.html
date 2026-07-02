@@ -245,7 +245,15 @@
                                     <h3 class="h4">Pour les professionnels de l'accompagnement</h3>
                                     <ul class="mb-0">
                                         {% for mode in service.mobilization_modes_professionals.all %}
-                                            {% if mode.value != "autre" %}<li>{{ mode.label }}</li>{% endif %}
+                                            {% if mode.value != "autre" %}
+                                                <li>
+                                                    {% if mode.value == "formulaire-dora" %}
+                                                        Via le formulaire (bouton “Orienter votre bénéficiaire”)
+                                                    {% else %}
+                                                        {{ mode.label }}
+                                                    {% endif %}
+                                                </li>
+                                            {% endif %}
                                         {% endfor %}
                                         {% if service.mobilization_modes_professionals_external_form_link %}
                                             <li>
@@ -278,9 +286,7 @@
                                 {% endif %}
                             {% else %}
                                 <ul class="mb-0">
-                                    {% for mobilization in service.mobilizations.all %}
-                                        <li>{{ mobilization.label }}</li>
-                                    {% endfor %}
+                                    {% for mobilization in service.mobilizations.all %}<li>{{ mobilization.label }}</li>{% endfor %}
                                 </ul>
                                 {% if service.mobilizations_details %}
                                     <p class="mt-3 mb-0">{{ service.mobilizations_details }}</p>
@@ -295,7 +301,9 @@
                             <h2 class="h3">Pré-requis et justificatifs</h2>
                             <ul class="mb-0">
                                 {% if service.is_dora %}
-                                    {% for condition in service.access_conditions_dora %}<li>{{ condition }}</li>{% endfor %}
+                                    {% for condition in service.access_conditions_dora %}
+                                        <li>{{ condition }}</li>
+                                    {% endfor %}
                                     {% for document in service.credentials %}
                                         <li>{{ document }}</li>
                                     {% endfor %}
