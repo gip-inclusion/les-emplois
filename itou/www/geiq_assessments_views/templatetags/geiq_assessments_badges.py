@@ -2,6 +2,7 @@ from django import template
 from django.utils.html import format_html
 
 from itou.geiq_assessments.enums import AssessmentState
+from itou.utils.numbers import round_number
 from itou.utils.templatetags.format_filters import formatfloat_with_unit
 
 
@@ -40,6 +41,9 @@ def state_for_geiq(assessment, *, extra_classes="badge-sm"):
 def grant_percentage_badge(assessment, *, extra_classes="badge-sm"):
     if assessment.convention_amount:
         grant_percentage = 100 * assessment.granted_amount / assessment.convention_amount
+        # Round to 2 decimals to avoid displaying "80,0 %" when
+        # grant_percentage is 80.0002
+        grant_percentage = round_number(grant_percentage)
         if grant_percentage == 100:
             state_classes = "bg-success-lighter text-success"
         else:
