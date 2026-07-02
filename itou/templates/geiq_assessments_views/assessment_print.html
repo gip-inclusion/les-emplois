@@ -87,7 +87,7 @@
                 <div class="d-flex gap-2">
                     <dt class="flex-grow-1">Montant conventionné (convention initiale + avenants)</dt>
                     <dd>
-                        <strong>{{ assessment.convention_amount|format_int_euros }}</strong>
+                        <strong>{{ assessment.convention_amount|format_decimal_euros }}</strong>
                     </dd>
                 </div>
             </dl>
@@ -99,25 +99,25 @@
                 <div class="d-flex gap-2">
                     <dt class="flex-grow-1">Montant total accordé</dt>
                     <dd>
-                        <strong>{{ assessment.granted_amount|format_int_euros }}</strong>
+                        <strong>{{ assessment.granted_amount|format_decimal_euros }}</strong>
                     </dd>
                 </div>
                 <div class="d-flex gap-2">
                     <dt class="flex-grow-1">Premier versement déjà réalisé</dt>
                     <dd>
-                        <strong>{{ assessment.advance_amount|default:'-'|format_int_euros }}</strong>
+                        <strong>{{ assessment.advance_amount|default:'-'|format_decimal_euros }}</strong>
                     </dd>
                 </div>
                 <div class="d-flex gap-2">
                     <dt class="flex-grow-1">Deuxième versement à prévoir</dt>
                     <dd>
-                        <strong>{{ balance_amount|default:'-'|format_int_euros }}</strong>
+                        <strong>{{ balance_amount|format_decimal_euros }}</strong>
                     </dd>
                 </div>
                 <div class="d-flex gap-2">
                     <dt class="flex-grow-1">Ordre de reversement</dt>
                     <dd>
-                        <strong>{{ refund_amount|default:'-'|format_int_euros }}</strong>
+                        <strong>{{ refund_amount|format_decimal_euros }}</strong>
                     </dd>
                 </div>
                 {% if assessment.legal_commitment_number %}

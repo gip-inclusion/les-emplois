@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 from django.db.models import Exists, OuterRef, Q
 from django.forms import CheckboxSelectMultiple, widgets
@@ -10,7 +12,7 @@ from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, 
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
-from itou.utils.templatetags.format_filters import format_int_euros, format_siret
+from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.types import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -182,19 +184,23 @@ class ReviewForm(forms.ModelForm):
             "review_comment": "Commentaire",
         }
 
-    advance_amount = forms.CharField(
+    advance_amount = forms.DecimalField(
         label="Premier versement déjà réalisé",
-        widget=forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+"}),
+        min_value=Decimal(0),
+        localize=True,
     )
-    convention_amount = forms.CharField(
+    convention_amount = forms.DecimalField(
         label="Montant conventionné (convention initiale + avenants)",
-        widget=forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+"}),
+        min_value=Decimal(0),
+        localize=True,
     )
-    granted_amount = forms.CharField(
+    granted_amount = forms.DecimalField(
         label="Montant total accordé",
-        widget=forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+"}),
+        min_value=Decimal(0),
+        localize=True,
     )
 
+    # These are CharField because they include the currency symbol.
     balance_amount = forms.CharField(label="Deuxième versement à prévoir", required=False, disabled=True)
     refund_amount = forms.CharField(label="Ordre de reversement", required=False, disabled=True)
 
@@ -221,24 +227,25 @@ class ReviewForm(forms.ModelForm):
         if instance.reviewed_at:
             for field in self.fields.values():
                 field.disabled = True
-            for field in ["advance_amount", "convention_amount", "granted_amount"]:
-                self.initial[field] = format_int_euros(getattr(instance, field))
 
-    def _clean_int_amount(self, field):
-        amount = self.cleaned_data[field].replace(" ", "")
+    def _clean_amount(self, field):
+        amount = self.cleaned_data[field]
         try:
-            return int(amount)
+            to_decimal = Decimal(amount)
         except ValueError:
-            raise forms.ValidationError("Vous devez renseigner un nombre entier")
+            raise forms.ValidationError("Vous devez renseigner un montant")
+        if to_decimal < 0:
+            raise forms.ValidationError("Vous devez renseigner un montant positif ou nul")
+        return to_decimal
 
     def clean_advance_amount(self):
-        return self._clean_int_amount("advance_amount")
+        return self._clean_amount("advance_amount")
 
     def clean_convention_amount(self):
-        return self._clean_int_amount("convention_amount")
+        return self._clean_amount("convention_amount")
 
     def clean_granted_amount(self):
-        return self._clean_int_amount("granted_amount")
+        return self._clean_amount("granted_amount")
 
     def clean(self):
         super().clean()

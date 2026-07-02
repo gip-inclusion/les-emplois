@@ -1964,3 +1964,22 @@ def test_bulk_add_support_remark_to_objs(remark_model, obj_factory):
     assert mixed_remarks[fresh_obj.pk].remark == "Third"
     # The untouched object's remark is unchanged
     assert get_remarks_for([new_objs[1]])[new_objs[1].pk].remark == "First\nSecond"
+
+
+class TestFormatDecimalEuros:
+    @pytest.mark.parametrize(
+        "amount,expected",
+        [
+            (decimal.Decimal(1), "1,00 €"),
+            (decimal.Decimal(1_000), "1 000,00 €"),
+            (decimal.Decimal("1.23"), "1,23 €"),
+            (decimal.Decimal(0), "0,00 €"),
+            (None, "-"),
+        ],
+    )
+    def test_basics(self, amount, expected):
+        assert format_filters.format_decimal_euros(amount) == expected
+
+    def test_custom_default(self):
+        default = "[zero]"
+        assert format_filters.format_decimal_euros(None, default) == default

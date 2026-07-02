@@ -173,9 +173,9 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
     )
     # Institution actions
     review_comment = models.TextField("commentaire accompagnant la décision", blank=True)
-    convention_amount = models.PositiveIntegerField("montant conventionné", default=0)
-    granted_amount = models.PositiveIntegerField("montant total accordé", default=0)
-    advance_amount = models.PositiveIntegerField("montant déjà versé", default=0)
+    convention_amount = models.DecimalField("montant conventionné", default=0, decimal_places=2, max_digits=10)
+    granted_amount = models.DecimalField("montant total accordé", default=0, decimal_places=2, max_digits=10)
+    advance_amount = models.DecimalField("montant déjà versé", default=0, decimal_places=2, max_digits=10)
     geiq_responsible_person = models.CharField("nom du responsable GEIQ", db_default="")
     institution_responsible_person = models.CharField("nom du responsable DDETS ou DREETS", db_default="")
     legal_commitment_number = models.CharField("numéro d’engagement juridique", db_default="")
@@ -372,6 +372,15 @@ class Assessment(xwf_models.WorkflowEnabled, models.Model):
                 f"pas {AssessmentState.FINAL_REVIEWED.label}.",
                 condition=(models.Q(final_reviewed_at=None) & ~models.Q(state=AssessmentState.FINAL_REVIEWED))
                 | (models.Q(final_reviewed_at__isnull=False, state=AssessmentState.FINAL_REVIEWED)),
+            ),
+            models.CheckConstraint(
+                name="geiq_assessment_amounts_are_zero_positive_or_null",
+                violation_error_message="Les montants doivent être positifs.",
+                condition=(
+                    (models.Q(convention_amount=None) | models.Q(convention_amount__gte=0))
+                    & (models.Q(granted_amount=None) | models.Q(granted_amount__gte=0))
+                    & (models.Q(advance_amount=None) | models.Q(advance_amount__gte=0))
+                ),
             ),
         ]
 

@@ -1783,7 +1783,7 @@
                                   <ul class="list-unstyled">
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Montant total accordé</span>
-                                          <strong>20 000 €</strong>
+                                          <strong>20 000,00 €</strong>
                                       </li>
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Taux de réalisation</span>
@@ -1796,12 +1796,12 @@
                                       </li>
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Premier versement déjà réalisé</span>
-                                          <strong>80 000 €</strong>
+                                          <strong>80 000,00 €</strong>
                                       </li>
                                       <li class="d-flex gap-2">
                                           
                                               <span class="flex-grow-1">Ordre de reversement</span>
-                                              <strong>60 000 €</strong>
+                                              <strong>60 000,00 €</strong>
                                           
                                       </li>
                                       <li aria-hidden="true">
@@ -1827,7 +1827,7 @@
                                   <ul class="list-unstyled">
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Montant conventionné (convention initiale + avenants)</span>
-                                          <strong>100 000 €</strong>
+                                          <strong>100 000,00 €</strong>
                                       </li>
                                   </ul>
                               </div>
@@ -1921,7 +1921,7 @@
                                   <ul class="list-unstyled">
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Montant total accordé</span>
-                                          <strong>80 000 €</strong>
+                                          <strong>80 000,00 €</strong>
                                       </li>
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Taux de réalisation</span>
@@ -1934,12 +1934,12 @@
                                       </li>
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Premier versement déjà réalisé</span>
-                                          <strong>20 000 €</strong>
+                                          <strong>20 000,00 €</strong>
                                       </li>
                                       <li class="d-flex gap-2">
                                           
                                               <span class="flex-grow-1">Deuxième versement accordé</span>
-                                              <strong>60 000 €</strong>
+                                              <strong>60 000,00 €</strong>
                                           
                                       </li>
                                       <li aria-hidden="true">
@@ -1965,7 +1965,7 @@
                                   <ul class="list-unstyled">
                                       <li class="d-flex gap-2">
                                           <span class="flex-grow-1">Montant conventionné (convention initiale + avenants)</span>
-                                          <strong>100 000 €</strong>
+                                          <strong>100 000,00 €</strong>
                                       </li>
                                   </ul>
                               </div>

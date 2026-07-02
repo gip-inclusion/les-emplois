@@ -182,7 +182,7 @@
                                             <span class="flex-grow-1">Montant conventionné (convention initiale + avenant)</span>
                                             <strong>
                                                 {% if assessment.decision_validated_at %}
-                                                    {{ assessment.convention_amount|format_int_euros }}
+                                                    {{ assessment.convention_amount|format_decimal_euros }}
                                                 {% else %}
                                                     - €
                                                 {% endif %}
@@ -192,7 +192,7 @@
                                             <span class="flex-grow-1">Montant total accordé</span>
                                             <strong>
                                                 {% if assessment.decision_validated_at %}
-                                                    {{ assessment.granted_amount|format_int_euros }}
+                                                    {{ assessment.granted_amount|format_decimal_euros }}
                                                 {% else %}
                                                     - €
                                                 {% endif %}
@@ -324,14 +324,14 @@
                     </div>
                     <div class="modal-body">
                         <p>
-                            La validation entraînera l’envoi d'un email au GEIQ indiquant le montant accordé : {{ assessment.granted_amount|format_int_euros }}.
+                            La validation entraînera l’envoi d'un email au GEIQ indiquant le montant accordé : {{ assessment.granted_amount|format_decimal_euros }}.
                             <br>
                             {% if assessment.granted_amount > assessment.advance_amount %}
-                                Cette décision implique la mise en place d’un prochain versement de {{ abs_balance_amount|format_int_euros }} au GEIQ, conformément aux modalités habituelles.
+                                Cette décision implique la mise en place d’un prochain versement de {{ abs_balance_amount|format_decimal_euros }} au GEIQ, conformément aux modalités habituelles.
                             {% elif assessment.granted_amount == assessment.advance_amount %}
                                 Cette décision n'entraîne aucun versement complémentaire, la totalité ayant déjà été réglée lors du premier versement.
                             {% else %}
-                                Cette décision implique la mise en place d’un ordre de reversement de {{ abs_balance_amount|format_int_euros }} adressé au GEIQ, conformément aux modalités habituelles.
+                                Cette décision implique la mise en place d’un ordre de reversement de {{ abs_balance_amount|format_decimal_euros }} adressé au GEIQ, conformément aux modalités habituelles.
                             {% endif %}
                         </p>
                         <p class="mb-0">
