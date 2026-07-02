@@ -2,12 +2,14 @@
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
 
+import decimal
 import io
 import re
 from textwrap import wrap
 
 from django import template
 from django.template.defaultfilters import floatformat, stringfilter
+from django.utils import formats
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 
@@ -107,6 +109,21 @@ def format_int_euros(number):
         return "-"
     number_str = f"{number:_}".replace("_", " ")
     return f"{number_str} €"
+
+
+@register.filter(is_safe=True)
+def format_decimal_euros(amount: decimal.Decimal | None, default="-"):
+    if amount is None:
+        return default
+    return mark_safe(
+        formats.number_format(
+            amount,
+            2,
+            use_l10n=True,
+            force_grouping=True,
+        )
+        + " €"
+    )
 
 
 @register.filter

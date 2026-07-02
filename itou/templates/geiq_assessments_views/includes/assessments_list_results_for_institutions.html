@@ -69,14 +69,14 @@
                             </td>
                             <td class="text-end">
                                 {% if assessment.can_view_amounts %}
-                                    {{ assessment.granted_amount|format_int_euros }}
+                                    {{ assessment.granted_amount|format_decimal_euros }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td class="text-end">
                                 {% if assessment.can_view_amounts %}
-                                    {{ assessment.convention_amount|format_int_euros }}
+                                    {{ assessment.convention_amount|format_decimal_euros }}
                                 {% else %}
                                     -
                                 {% endif %}

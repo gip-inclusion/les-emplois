@@ -27,7 +27,7 @@
                                 <ul class="list-unstyled">
                                     <li class="d-flex gap-2">
                                         <span class="flex-grow-1">Montant total accordé</span>
-                                        <strong>{{ assessment.granted_amount|format_int_euros }}</strong>
+                                        <strong>{{ assessment.granted_amount|format_decimal_euros }}</strong>
                                     </li>
                                     <li class="d-flex gap-2">
                                         <span class="flex-grow-1">Taux de réalisation</span>
@@ -42,15 +42,15 @@
                                     </li>
                                     <li class="d-flex gap-2">
                                         <span class="flex-grow-1">Premier versement déjà réalisé</span>
-                                        <strong>{{ assessment.advance_amount|format_int_euros }}</strong>
+                                        <strong>{{ assessment.advance_amount|format_decimal_euros }}</strong>
                                     </li>
                                     <li class="d-flex gap-2">
                                         {% if assessment.granted_amount >= assessment.advance_amount %}
                                             <span class="flex-grow-1">Deuxième versement accordé</span>
-                                            <strong>{{ abs_balance_amount|format_int_euros }}</strong>
+                                            <strong>{{ abs_balance_amount|format_decimal_euros }}</strong>
                                         {% else %}
                                             <span class="flex-grow-1">Ordre de reversement</span>
-                                            <strong>{{ abs_balance_amount|format_int_euros }}</strong>
+                                            <strong>{{ abs_balance_amount|format_decimal_euros }}</strong>
                                         {% endif %}
                                     </li>
                                     <li aria-hidden="true">
@@ -76,7 +76,7 @@
                                 <ul class="list-unstyled">
                                     <li class="d-flex gap-2">
                                         <span class="flex-grow-1">Montant conventionné (convention initiale + avenants)</span>
-                                        <strong>{{ assessment.convention_amount|format_int_euros }}</strong>
+                                        <strong>{{ assessment.convention_amount|format_decimal_euros }}</strong>
                                     </li>
                                 </ul>
                             </div>

@@ -66,9 +66,9 @@
   IMPORTANT : Cette information est communiquée à titre indicatif à la suite du contrôle effectué. La décision concernant le montant total accordé reste soumise à validation financière.
   Seule la décision officielle émise par la DDETS 29 pourra confirmer de manière définitive le montant accordé.
   
-  Montant total accordé : 80 000 €
-  Montant du premier versement déjà réalisé : 50 000 €
-  Montant du deuxième versement prévu : 30 000 €
+  Montant total accordé : 80 000,00 €
+  Montant du premier versement déjà réalisé : 50 000,00 €
+  Montant du deuxième versement prévu : 30 000,00 €
   
   Commentaire:
   Bravo !
@@ -826,7 +826,7 @@
                                           Montant conventionné (convention initiale + avenant)
                                       </span>
                                       <strong>
-                                          100 000 €
+                                          100 000,00 €
                                       </strong>
                                   </li>
                                   <li class="d-flex gap-2">
@@ -834,7 +834,7 @@
                                           Montant total accordé
                                       </span>
                                       <strong>
-                                          80 000 €
+                                          80 000,00 €
                                       </strong>
                                   </li>
                               </ul>
@@ -1179,7 +1179,7 @@
                                           Montant conventionné (convention initiale + avenant)
                                       </span>
                                       <strong>
-                                          100 000 €
+                                          100 000,00 €
                                       </strong>
                                   </li>
                                   <li class="d-flex gap-2">
@@ -1187,7 +1187,7 @@
                                           Montant total accordé
                                       </span>
                                       <strong>
-                                          80 000 €
+                                          80 000,00 €
                                       </strong>
                                   </li>
                               </ul>
@@ -1894,7 +1894,7 @@
                                           Montant conventionné (convention initiale + avenant)
                                       </span>
                                       <strong>
-                                          100 000 €
+                                          100 000,00 €
                                       </strong>
                                   </li>
                                   <li class="d-flex gap-2">
@@ -1902,7 +1902,7 @@
                                           Montant total accordé
                                       </span>
                                       <strong>
-                                          80 000 €
+                                          80 000,00 €
                                       </strong>
                                   </li>
                               </ul>
@@ -2407,7 +2407,7 @@
                                   <label class="form-label" for="id_convention_amount">
                                       Montant conventionné (convention initiale + avenants)
                                   </label>
-                                  <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
+                                  <input class="form-control" disabled="" id="id_convention_amount" name="convention_amount" required="" type="text" value="100000,00"/>
                               </div>
                           </fieldset>
                           <hr class="my-4"/>
@@ -2419,13 +2419,13 @@
                                   <label class="form-label" for="id_granted_amount">
                                       Montant total accordé
                                   </label>
-                                  <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
+                                  <input class="form-control" disabled="" id="id_granted_amount" name="granted_amount" required="" type="text" value="80000,00"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_advance_amount">
                                       Premier versement déjà réalisé
                                   </label>
-                                  <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
+                                  <input class="form-control" disabled="" id="id_advance_amount" name="advance_amount" required="" type="text" value="50000,00"/>
                               </div>
                               <div class="form-group">
                                   <label class="form-label" for="id_balance_amount">
@@ -2598,7 +2598,7 @@
                                   <label class="form-label" for="id_convention_amount">
                                       Montant conventionné (convention initiale + avenants)
                                   </label>
-                                  <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
+                                  <input class="form-control" disabled="" id="id_convention_amount" name="convention_amount" required="" type="text" value="100000,00"/>
                               </div>
                           </fieldset>
                           <hr class="my-4"/>
@@ -2610,13 +2610,13 @@
                                   <label class="form-label" for="id_granted_amount">
                                       Montant total accordé
                                   </label>
-                                  <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
+                                  <input class="form-control" disabled="" id="id_granted_amount" name="granted_amount" required="" type="text" value="80000,00"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_advance_amount">
                                       Premier versement déjà réalisé
                                   </label>
-                                  <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
+                                  <input class="form-control" disabled="" id="id_advance_amount" name="advance_amount" required="" type="text" value="50000,00"/>
                               </div>
                               <div class="form-group">
                                   <label class="form-label" for="id_balance_amount">
@@ -2818,7 +2818,7 @@
                       </dt>
                       <dd>
                           <strong>
-                              100 000 €
+                              100 000,00 €
                           </strong>
                       </dd>
                   </div>
@@ -2835,7 +2835,7 @@
                       </dt>
                       <dd>
                           <strong>
-                              80 000 €
+                              80 000,00 €
                           </strong>
                       </dd>
                   </div>
@@ -2845,7 +2845,7 @@
                       </dt>
                       <dd>
                           <strong>
-                              50 000 €
+                              50 000,00 €
                           </strong>
                       </dd>
                   </div>
@@ -2855,7 +2855,7 @@
                       </dt>
                       <dd>
                           <strong>
-                              30 000 €
+                              30 000,00 €
                           </strong>
                       </dd>
                   </div>
@@ -3029,7 +3029,7 @@
                                   <label class="form-label" for="id_convention_amount">
                                       Montant conventionné (convention initiale + avenants)
                                   </label>
-                                  <input class="form-control" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                                  <input class="form-control" id="id_convention_amount" name="convention_amount" required="" type="text" value="0,00"/>
                               </div>
                           </fieldset>
                           <hr class="my-4"/>
@@ -3041,13 +3041,13 @@
                                   <label class="form-label" for="id_granted_amount">
                                       Montant total accordé
                                   </label>
-                                  <input class="form-control" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                                  <input class="form-control" id="id_granted_amount" name="granted_amount" required="" type="text" value="0,00"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_advance_amount">
                                       Premier versement déjà réalisé
                                   </label>
-                                  <input class="form-control" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                                  <input class="form-control" id="id_advance_amount" name="advance_amount" required="" type="text" value="0,00"/>
                               </div>
                               <div class="form-group">
                                   <label class="form-label" for="id_balance_amount">
@@ -4786,10 +4786,10 @@
                                           -
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,00 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,00 €
                                       </td>
                                       <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
@@ -4910,10 +4910,10 @@
                                           -
                                       </td>
                                       <td class="text-end">
-                                          90 000 €
+                                          90 000,00 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,00 €
                                       </td>
                                       <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
@@ -4951,10 +4951,10 @@
                                           -
                                       </td>
                                       <td class="text-end">
-                                          80 000 €
+                                          80 000,00 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,00 €
                                       </td>
                                       <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
@@ -5251,10 +5251,10 @@
                                           3 256 €
                                       </td>
                                       <td class="text-end">
-                                          80 000 €
+                                          80 000,34 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,12 €
                                       </td>
                                       <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
@@ -5448,10 +5448,10 @@
                                           2 442 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,00 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,00 €
                                       </td>
                                       <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
@@ -5561,10 +5561,10 @@
                                           3 256 €
                                       </td>
                                       <td class="text-end">
-                                          80 000 €
+                                          80 000,34 €
                                       </td>
                                       <td class="text-end">
-                                          100 000 €
+                                          100 000,12 €
                                       </td>
                                       <td class="text-end">
                                           <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">

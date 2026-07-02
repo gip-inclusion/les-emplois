@@ -154,7 +154,8 @@
             if (trimmedStr.slice(-1) === "€") {
                 trimmedStr = trimmedStr.slice(0, -1).trim()
             }
-            return parseInt(trimmedStr)
+            trimmedStr = trimmedStr.replaceAll(",", ".")
+            return parseFloat(trimmedStr)
         }
 
         function computeBalance() {
@@ -165,7 +166,6 @@
                 const formatter = new Intl.NumberFormat("fr-FR", {
                     style: "currency",
                     currency: "EUR",
-                    maximumFractionDigits: 0,
                 })
                 if (balance >= 0) {
                     balanceAmountInput.value = formatter.format(balance)

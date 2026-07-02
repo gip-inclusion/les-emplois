@@ -1293,10 +1293,12 @@ def assessment_print(request, pk, template_name="geiq_assessments_views/assessme
         ),
         # Balance and refund amounts are originally live-calculated directly in the form when reviewing the assessment.
         # Following calculations must give the same results as the inline script from `assessment_review.html`.
-        "balance_amount": max(0, assessment.granted_amount - assessment.advance_amount),
+        "balance_amount": assessment.granted_amount - assessment.advance_amount
+        if assessment.granted_amount > assessment.advance_amount
+        else None,  # `None` to show up as "-", not "0,00 €"
         "refund_amount": assessment.advance_amount - assessment.granted_amount
         if assessment.advance_amount > assessment.granted_amount
-        else 0,
+        else None,
     }
 
     return render(request, template_name, context)

@@ -1,4 +1,5 @@
 import datetime
+import decimal
 import random
 import uuid
 
@@ -125,9 +126,9 @@ class TestListAssessmentsView:
             submitted_by=geiq_membership.user,
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
             decision_validated_at=timezone.now() + datetime.timedelta(hours=5),
-            convention_amount=100_001,
-            advance_amount=50_001,
-            granted_amount=100_001,
+            convention_amount=decimal.Decimal(100_001),
+            advance_amount=decimal.Decimal(50_001),
+            granted_amount=decimal.Decimal(100_001),
         )
         reviewed = AssessmentFactory(
             id=uuid.UUID("22222222-0d2c-4f29-ba5b-a27ffb8ecc84"),
@@ -143,9 +144,9 @@ class TestListAssessmentsView:
             reviewed_by=ddets_membership.user,
             reviewed_by_institution=ddets_membership.institution,
             review_comment="Bravo !",
-            convention_amount=100_000,
-            advance_amount=50_000,
-            granted_amount=100_000,
+            convention_amount=decimal.Decimal(100_000),
+            advance_amount=decimal.Decimal(50_000),
+            granted_amount=decimal.Decimal(100_000),
         )
         final_reviewed = AssessmentFactory(
             id=uuid.UUID("33333333-0d2c-4f29-ba5b-a27ffb8ecc84"),
@@ -164,9 +165,9 @@ class TestListAssessmentsView:
             final_reviewed_at=timezone.now() + datetime.timedelta(hours=6),
             final_reviewed_by=membership.user,
             final_reviewed_by_institution=membership.institution,
-            convention_amount=100_000,
-            advance_amount=50_000,
-            granted_amount=80_000,
+            convention_amount=decimal.Decimal(100_000.12),
+            advance_amount=decimal.Decimal(50_000.23),
+            granted_amount=decimal.Decimal(80_000.34),
         )
 
         for idx, assessment in enumerate([new, submitted, reviewed, final_reviewed]):
@@ -1638,18 +1639,16 @@ class TestAssessmentReviewView:
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments review form"
         )
-        response = client.post(
-            url,
-            data={
-                "convention_amount": "10000",
-                "advance_amount": "50000",
-                "granted_amount": "80000",
-                "review_comment": "",
-                "geiq_responsible_person": " ",  # field will be stripped
-                "institution_responsible_person": " ",  # field will be stripped
-                "legal_commitment_number": " ",  # field will be stripped
-            },
-        )
+        data = {
+            "convention_amount": "1",
+            "advance_amount": "50000,18",
+            "granted_amount": "80000.16",
+            "review_comment": "",
+            "geiq_responsible_person": " ",  # field will be stripped
+            "institution_responsible_person": " ",  # field will be stripped
+            "legal_commitment_number": " ",  # field will be stripped
+        }
+        response = client.post(url, data=data)
         assertContains(response, "Ce champ est obligatoire.")
         assertContains(response, "Le montant total accordé ne peut être supérieur au montant conventionné.")
         assertContains(response, "Le montant du premier versement ne peut être supérieur au montant conventionné.")
@@ -1663,26 +1662,24 @@ class TestAssessmentReviewView:
         }
 
         with freeze_time(timezone.now() + datetime.timedelta(hours=5)):
-            response = client.post(
-                url,
-                data={
-                    "convention_amount": "100000",
-                    "advance_amount": "50000",
-                    "granted_amount": "80000",
+            data.update(
+                {
+                    "convention_amount": "100000.23",
                     "review_comment": "Bravo !",
                     "geiq_responsible_person": "M. GEIQ",
                     "institution_responsible_person": "Mme. DREETS",
                     "legal_commitment_number": "L3G4L",
-                },
+                }
             )
+            response = client.post(url, data=data)
         assertRedirects(
             response, reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
         )
         assessment.refresh_from_db()
         assert assessment.decision_validated_at is not None
-        assert assessment.convention_amount == 100_000
-        assert assessment.advance_amount == 50_000
-        assert assessment.granted_amount == 80_000
+        assert assessment.convention_amount == decimal.Decimal("100_000.23")
+        assert assessment.advance_amount == decimal.Decimal("50_000.18")
+        assert assessment.granted_amount == decimal.Decimal("80_000.16")
         assert assessment.review_comment == "Bravo !"
 
         # The printable version must not be accessible at this stage as the assessment has not been finally reviewed.
