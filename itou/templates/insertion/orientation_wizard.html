@@ -70,7 +70,28 @@
                                 {% endcomponent_alert %}
                                 {% include "insertion/includes/orientation_beneficiary_contact.html" with job_seeker=job_seeker can_edit_personal_information=can_edit_personal_information can_view_personal_information=can_view_personal_information request=request only %}
                                 <hr class="my-3">
-                                {% include "insertion/includes/orientation_conditions.html" with service=service form=form only %}
+                                <h2 class="h3">Critères et conditions d'accès</h2>
+                                {% if service.fee %}
+                                    {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
+                                        {% fragment as fee_alert_content %}
+                                            <p class="mb-0 h-100 d-flex align-items-center">
+                                                {# djlint: off #}
+                                                Frais à la charge de l'usager : {% if service.fee.value == "payant" %}Payant.{% if service.fee_details %} {{ service.fee_details|capfirst }}{% endif %}{% else %} {{ service.fee.label }}{% endif %}
+                                                {# djlint: on #}
+                                            </p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% endif %}
+                                {% if service.publics.exists %}
+                                    <p class="fw-bold mb-2">Publics concernés par ce service</p>
+                                    <ul class="mb-3 mb-md-4">
+                                        {% for public in service.publics.all %}
+                                            <li>{{ public.label }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% include "insertion/includes/orientation_credentials_list.html" with service=service show_section_heading=True show_heading=True show_recovery_note=False only %}
+                                {% bootstrap_field form.confirms_conditions wrapper_class="form-group form-group-required-check" %}
                                 {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields matomo_category="orientation" matomo_action="submit" matomo_name=matomo_event_name %}
                             </form>
                         </div>
