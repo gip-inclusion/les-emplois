@@ -8,6 +8,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.insertion.models import GenericReferenceItemKind
 from itou.utils.apis.dora import DoraAPIException
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
@@ -416,6 +417,95 @@ def test_documents_step_normalizes_beneficiary_phone_for_dora(
     assert payload["beneficiary_phone"] == "0601901570"
     assert payload["di_contact_email"] == "contact@example.org"
     assert payload["di_service_address_line"] == expected_di_service_address_line
+
+
+def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_is_null(mocker):
+    job_seeker = mocker.Mock(
+        phone=None,
+        first_name="Jean",
+        last_name="Dupont",
+        email="test@example.org",
+        public_id="job-seeker-id",
+        jobseeker_profile=mocker.Mock(pole_emploi_id=None),
+    )
+    view = OrientationWizardView()
+    view.step = OrientationStep.DOCUMENTS
+    view.job_seeker = job_seeker
+    view.service = mocker.Mock(
+        uid="service-uid",
+        name="Service",
+        address_on_one_line=None,
+        contact_email="contact@example.org",
+    )
+    view.wizard_session = mocker.Mock()
+    view.wizard_session.get.return_value = {
+        "referent_first_name": "Jean",
+        "referent_last_name": "Dupont",
+        "referent_email": "jean@example.com",
+        "referent_phone": "0612345678",
+    }
+    view.form = mocker.Mock(is_valid=mocker.Mock(return_value=True), cleaned_data={"gdpr_consent": True})
+    view.find_step_with_invalid_data_until_step = mocker.Mock(return_value=None)
+    view.dora_client = mocker.Mock()
+
+    request = mocker.Mock()
+    request.user.pk = 1
+    request.current_organization = None
+    mocker.patch("itou.www.insertion_views.views.reverse", return_value="/confirmation")
+
+    view.post(request)
+
+    payload, _ = view.dora_client.create_orientation.call_args.args
+    assert payload["beneficiary_phone"] == ""
+
+
+def test_orientation_wizard_happy_path_as_employer(client, mocker):
+    organization = CompanyFactory()
+    user = CompanyMembershipFactory(company=organization).user
+    job_seeker = JobSeekerFactory(
+        first_name="Jean",
+        last_name="Dupont",
+        email="usager@example.org",
+        phone="",
+    )
+    JobSeekerAssignmentFactory(professional=user, company=organization, job_seeker=job_seeker)
+    service = ServiceFactory(is_orientable_with_form=True, structure__name="Structure orientation employeur")
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(user)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+    referent_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.REFERENT},
+    )
+    documents_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.DOCUMENTS},
+    )
+
+    client.post(conformity_url, {"confirms_conditions": "on"})
+    client.post(
+        referent_url,
+        {
+            "referent_last_name": "Dupont",
+            "referent_first_name": "Jean",
+            "referent_phone": "0612345678",
+            "referent_email": "jean@example.com",
+        },
+    )
+
+    mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    client.post(documents_url, {"gdpr_consent": "on"})
+
+    payload, _ = mock_dora.return_value.create_orientation.call_args.args
+    assert payload["beneficiary_phone"] == ""
+    assert payload["emplois_data"]["structure_id"] == str(organization.uid)
 
 
 def test_conformity_step_allows_missing_beneficiary_phone(client):
