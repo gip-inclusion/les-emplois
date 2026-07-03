@@ -1,3 +1,5 @@
+{% load matomo %}
+
 <div class="row">
     <div class="col-12">
         <hr class="mb-3">
@@ -15,7 +17,7 @@
                 </a>
             </div>
             <div class="form-group col col-lg-auto order-2 order-lg-3">
-                <button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">
+                <button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante" {% if matomo_name %}{% matomo_event "orientation" "submit" matomo_name %}{% endif %}>
                     <span>{{ primary_label }}</span>
                 </button>
             </div>

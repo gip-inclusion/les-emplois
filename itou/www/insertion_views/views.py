@@ -427,6 +427,8 @@ class OrientationWizardView(WizardView):
             "credential_documents": self.service.generate_credential_documents_info(),
             "OrientationStep": OrientationStep,
             "matomo_custom_title": matomo_titles[self.step],
+            "matomo_custom_url": f"orientations/<uuid:session_uuid>/create/{self.step}/",
+            "matomo_event_name": f"orientation-{self.step}-submit",
             "show_orientation_disclaimer": not self.wizard_session.get("disclaimer_dismissed", False),
             "orientation_session_uuid": self.wizard_session.name,
             "exit_url": get_orient_for_job_seeker_context(self.request)["exit_url"],
