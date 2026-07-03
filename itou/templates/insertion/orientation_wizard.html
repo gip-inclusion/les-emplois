@@ -71,7 +71,7 @@
                                 {% include "insertion/includes/orientation_beneficiary_contact.html" with job_seeker=job_seeker can_edit_personal_information=can_edit_personal_information can_view_personal_information=can_view_personal_information request=request only %}
                                 <hr class="my-3">
                                 {% include "insertion/includes/orientation_conditions.html" with service=service form=form only %}
-                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields %}
+                                {% itou_buttons_form reset_url=reset_url primary_label="Suivant" primary_disabled=missing_beneficiary_fields matomo_category="orientation" matomo_action="submit" matomo_name=matomo_event_name %}
                             </form>
                         </div>
 
@@ -96,7 +96,7 @@
                                     <legend>Motif de l'orientation (facultatif)</legend>
                                     {% bootstrap_field form.orientation_reason %}
                                 </fieldset>
-                                {% include "insertion/includes/orientation_wizard_form_buttons.html" with reset_url=reset_url prev_url=wizard_steps.prev primary_label="Suivant" only %}
+                                {% include "insertion/includes/orientation_wizard_form_buttons.html" with reset_url=reset_url prev_url=wizard_steps.prev primary_label="Suivant" matomo_name=matomo_event_name only %}
                             </form>
                         </div>
 
@@ -157,7 +157,7 @@
                                 {% endif %}
 
                                 {% bootstrap_field form.gdpr_consent %}
-                                {% include "insertion/includes/orientation_wizard_form_buttons.html" with reset_url=reset_url prev_url=wizard_steps.prev primary_label="Suivant" only %}
+                                {% include "insertion/includes/orientation_wizard_form_buttons.html" with reset_url=reset_url prev_url=wizard_steps.prev primary_label="Suivant" matomo_name=matomo_event_name only %}
                             </form>
                         </div>
                     {% endif %}
