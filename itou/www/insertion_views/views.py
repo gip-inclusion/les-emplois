@@ -343,7 +343,7 @@ class OrientationWizardView(WizardView):
                 "beneficiary_first_name": self.job_seeker.first_name,
                 "beneficiary_last_name": self.job_seeker.last_name,
                 "beneficiary_email": self.job_seeker.email,
-                "beneficiary_phone": normalize_phone_number(self.job_seeker.phone),
+                "beneficiary_phone": normalize_phone_number(self.job_seeker.phone or "") or "",
                 "referent_first_name": referent_data["referent_first_name"],
                 "referent_last_name": referent_data["referent_last_name"],
                 "referent_email": referent_data["referent_email"],
