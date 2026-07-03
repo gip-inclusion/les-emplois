@@ -508,6 +508,24 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
     assert payload["emplois_data"]["structure_id"] == str(organization.uid)
 
 
+def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(client):
+    company = CompanyFactory()
+    employer = CompanyMembershipFactory(company=company).user
+    coworker = CompanyMembershipFactory(company=company).user
+    job_seeker = JobSeekerFactory(first_name="Jean", last_name="Dupont")
+    JobSeekerAssignmentFactory(professional=coworker, company=company, job_seeker=job_seeker)
+    service = ServiceFactory(is_orientable_with_form=True)
+    select_job_seeker_url = reverse(
+        "insertion_views:orientation_select_job_seeker",
+        kwargs={"service_uid": service.uid},
+    )
+
+    client.force_login(employer)
+    response = client.get(select_job_seeker_url)
+
+    assertContains(response, job_seeker.get_inverted_full_name())
+
+
 def test_conformity_step_allows_missing_beneficiary_phone(client):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(

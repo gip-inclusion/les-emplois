@@ -31,7 +31,11 @@ class OrientationSelectJobSeekerForm(forms.Form):
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        job_seekers_ids = User.objects.assigned_job_seeker_ids(request.user, request.current_organization)
+        job_seekers_ids = User.objects.assigned_job_seeker_ids(
+            request.user,
+            request.current_organization,
+            from_all_coworkers=request.from_employer,
+        )
         job_seeker_qs = (
             User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
