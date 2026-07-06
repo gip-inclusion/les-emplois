@@ -49,7 +49,7 @@ def get_access_token():
 def etablissement_get_or_error(siret):
     """
     Return a tuple (etablissement, error) where error is None on success.
-    https://www.sirene.fr/static-resources/htm/siret_unitaire_variables_reponse.html
+    https://portail-api.insee.fr/catalog/api/2ba0e549-5587-3ef1-9082-99cd865de66f/doc
     """
 
     access_token = get_access_token()
