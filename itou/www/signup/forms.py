@@ -241,7 +241,8 @@ class CheckAlreadyExistsForm(forms.Form):
         help_text=mark_safe(
             "Le numéro SIRET contient <b>14 chiffres</b>. "
             "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site "
-            '<a href="https://sirene.fr/" rel="noopener" target="_blank" class="has-external-link">sirene.fr</a>'
+            '<a href="https://annuaire-entreprises.data.gouv.fr/" rel="noopener" '
+            'target="_blank" class="has-external-link">annuaire-entreprises.data.gouv.fr</a>'
         ),
     )
     department = forms.ChoiceField(
