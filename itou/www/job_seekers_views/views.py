@@ -1580,16 +1580,7 @@ def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode)
 
     job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
 
-    professional_is_advisor = (
-        request.user.is_professional
-        and JobSeekerAssignment.objects.assigned_to(request.user, request.current_organization)
-        .filter(job_seeker=job_seeker)
-        .exists()
-    )
-    user_is_target_jobseeker = request.user.pk == job_seeker.pk
-
-    # Only return if the user is the job seeker themselves or a professional acting as an advisor for the job seeker
-    if professional_is_advisor or user_is_target_jobseeker:
+    if can_view_last_advisor_contact_info(request, job_seeker):
         last_advisor, _ = job_seeker.last_advisor_with_org
         return render(request, template_name, {"last_advisor": last_advisor})
 
