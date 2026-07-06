@@ -2,7 +2,25 @@
 {% load str_filters %}
 
 <div id="last-known-advisor-{{ job_seeker.public_id }}" class="c-box mb-3 mb-md-4">
-    <h3>Dernier accompagnateur connu</h3>
+    <div class="row mb-3">
+        <div class="col-12 col-sm">
+            <h3 class="mb-0">Dernier accompagnateur connu</h3>
+        </div>
+        <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+            {% if request.user.is_professional and not is_last_known_advisor %}
+                <form method="post" action="{% url "job_seekers_views:assign_oneself_as_advisor" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary">
+                        {% if is_advisor %}
+                            Me désigner dernier accompagnateur connu
+                        {% else %}
+                            M'ajouter en tant qu'accompagnateur
+                        {% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
     {% if job_seeker.last_advisor_with_org.0 %}
         <form id="display-contact-info-form">
             {% csrf_token %}{# Used by htmx posts #}

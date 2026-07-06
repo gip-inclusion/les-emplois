@@ -131,7 +131,7 @@
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
 
                             {# Last known advisor ------------------------------------------------------------------------- #}
-                            {% include "job_seekers_views/includes/last_known_advisor.html" with job_seeker=job_application.job_seeker can_view_personal_information=can_view_personal_information can_view_last_advisor_contact_info=can_view_last_advisor_contact_info request=request csrf_token=csrf_token only %}
+                            {% include "job_seekers_views/includes/last_known_advisor.html" with job_seeker=job_application.job_seeker is_last_known_advisor=is_last_known_advisor is_advisor=is_advisor can_view_personal_information=can_view_personal_information can_view_last_advisor_contact_info=can_view_last_advisor_contact_info request=request csrf_token=csrf_token only %}
                         </div>
                         <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
                             {% block sidebar %}

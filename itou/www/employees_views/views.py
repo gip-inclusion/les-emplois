@@ -13,7 +13,7 @@ from itou.approvals.models import (
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerAssignment, User
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_edit_personal_information, can_view_last_advisor_contact_info
@@ -107,6 +107,16 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
 
         eligibility_diagnosis = job_application and job_application.get_eligibility_diagnosis()
 
+        professional, organization = self.request.user, self.request.current_organization
+        is_last_known_advisor = (professional, organization) == self.object.last_advisor_with_org
+
+        is_advisor = (
+            is_last_known_advisor
+            or JobSeekerAssignment.objects.assigned_to(professional, organization)
+            .filter(job_seeker=self.object)
+            .exists()
+        )
+
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.object)
         context["can_view_last_advisor_contact_info"] = can_view_last_advisor_contact_info(self.request, self.object)
@@ -116,6 +126,8 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
         context["eligibility_diagnosis"] = eligibility_diagnosis
         context["expired_eligibility_diagnosis"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
+        context["is_last_known_advisor"] = is_last_known_advisor
+        context["is_advisor"] = is_advisor
 
         context["immersion_search_url"] = immersion_search_url(self.object)
         context["immersion_convention_url"] = immersion_convention_url()
