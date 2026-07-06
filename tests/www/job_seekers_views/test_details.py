@@ -606,7 +606,6 @@ def test_update_iae_eligibility_buttons(client):
 
 @freeze_time("2026-06-30")
 def test_display_last_known_advisor(client, snapshot):
-    assignment_created_at = timezone.now() - datetime.timedelta(days=30)
     prescriber_organization = PrescriberOrganizationFactory(for_snapshot=True)
     prescriber = PrescriberMembershipFactory(
         user__public_id="788bc466-3747-4cdb-aafc-80c888d6b69d",
@@ -617,17 +616,49 @@ def test_display_last_known_advisor(client, snapshot):
         organization=prescriber_organization,
     ).user
     job_seeker = JobSeekerFactory(for_snapshot=True)
-    JobSeekerAssignmentFactory(
+    last_assignment = JobSeekerAssignmentFactory(
         job_seeker=job_seeker,
-        professional=prescriber,
-        prescriber_organization=prescriber_organization,
-        created_at=assignment_created_at,
+        professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
+        professional__first_name="Marie",
+        professional__last_name="Laforêt",
+        professional__email="marie.laforet@test.local",
+        professional__phone="0707070707",
+        created_at=timezone.now() - datetime.timedelta(days=7),
+        updated_at=timezone.now() - datetime.timedelta(days=7),
     )
+    last_advisor = last_assignment.professional
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
     client.force_login(prescriber)
-    response = client.get(url)
 
+    response = client.get(url)
+    assertContains(response, "M'ajouter en tant qu'accompagnateur")
+    assertContains(response, last_advisor.get_full_name())
+    assertContains(response, last_assignment.created_at.strftime("%d/%m/%Y"))
+
+    prescriber_assignment = JobSeekerAssignmentFactory(
+        job_seeker=job_seeker,
+        professional=prescriber,
+        prescriber_organization=prescriber_organization,
+        created_at=last_assignment.created_at - datetime.timedelta(days=7),
+        updated_at=last_assignment.updated_at - datetime.timedelta(days=7),
+    )
+
+    response = client.get(url)
+    assertContains(response, "Me désigner dernier accompagnateur connu")
+    assertContains(response, last_advisor.get_full_name())
+    assertContains(response, last_assignment.created_at.strftime("%d/%m/%Y"))
+
+    prescriber_assignment.created_at = timezone.now()
+    prescriber_assignment.updated_at = timezone.now()
+    prescriber_assignment.save(update_fields=["created_at", "updated_at"])
+
+    response = client.get(url)
+    assertNotContains(response, "M'ajouter en tant qu'accompagnateur")
+    assertNotContains(response, "Me désigner dernier accompagnateur connu")
+    assertContains(response, prescriber.get_full_name())
+    assertContains(response, prescriber_organization.name)
+    assertContains(response, prescriber_assignment.created_at.strftime("%d/%m/%Y"))
     content = parse_response_to_soup(response, selector=f"#last-known-advisor-{job_seeker.public_id}")
     assert pretty_indented(content) == snapshot
 

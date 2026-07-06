@@ -16,7 +16,7 @@
 # ---
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 33,
+    'num_queries': 34,
     'queries': list([
       dict({
         'origin': list([
@@ -1033,6 +1033,46 @@
       }),
       dict({
         'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" = %s
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -1596,30 +1636,6 @@
           FROM "prescribers_prescriberorganization"
           WHERE "prescribers_prescriberorganization"."id" = %s
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'IncludeNode[employees/detail.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[employees/detail.html]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerassignment"."id",
-                 "users_jobseekerassignment"."created_at",
-                 "users_jobseekerassignment"."updated_at",
-                 "users_jobseekerassignment"."job_seeker_id",
-                 "users_jobseekerassignment"."professional_id",
-                 "users_jobseekerassignment"."prescriber_organization_id",
-                 "users_jobseekerassignment"."company_id",
-                 "users_jobseekerassignment"."last_action_kind",
-                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
-          FROM "users_jobseekerassignment"
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({

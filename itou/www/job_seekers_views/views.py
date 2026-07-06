@@ -196,6 +196,16 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
                     sent_job_applications.append(job_app)
 
         has_external_applications = any(not a.user_can_see_details for a in job_applications)
+
+        professional, organization = self.request.user, self.request.current_organization
+        is_last_known_advisor = (professional, organization) == self.object.last_advisor_with_org
+        is_advisor = (
+            is_last_known_advisor
+            or JobSeekerAssignment.objects.assigned_to(professional, organization)
+            .filter(job_seeker=self.object)
+            .exists()
+        )
+
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
@@ -213,6 +223,8 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
             "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
+            "is_last_known_advisor": is_last_known_advisor,
+            "is_advisor": is_advisor,
         }
 
     def get_job_applications(self, can_see_external):

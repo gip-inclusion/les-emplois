@@ -30,6 +30,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title
+from itou.users.models import JobSeekerAssignment
 from itou.utils.auth import check_request
 from itou.utils.perms.utils import (
     can_edit_personal_information,
@@ -119,6 +120,8 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        "is_last_known_advisor": False,
+        "is_advisor": False,
     }
 
     return render(request, template_name, context)
@@ -230,6 +233,15 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         job_application.created_at < timezone.now() - APPLICATIONS_VISIBILITY_FOR_EMPLOYERS
     )
 
+    professional, organization = request.user, request.current_organization
+    is_last_known_advisor = (professional, organization) == job_application.job_seeker.last_advisor_with_org
+    is_advisor = (
+        is_last_known_advisor
+        or JobSeekerAssignment.objects.assigned_to(professional, organization)
+        .filter(job_seeker=job_application.job_seeker)
+        .exists()
+    )
+
     context = (
         {
             "can_be_cancelled": can_be_cancelled,
@@ -258,6 +270,8 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             ),
             "matomo_custom_title": "Candidature",
             "job_application_sender_left_org": job_application_sender_left_org(job_application),
+            "is_last_known_advisor": is_last_known_advisor,
+            "is_advisor": is_advisor,
         }
         | get_siae_actions_context(request, job_application)
     )
@@ -390,6 +404,15 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         refused_by = None
         refusal_contact_email = ""
 
+    professional, organization = request.user, request.current_organization
+    is_last_known_advisor = (professional, organization) == job_application.job_seeker.last_advisor_with_org
+    is_advisor = (
+        is_last_known_advisor
+        or JobSeekerAssignment.objects.assigned_to(professional, organization)
+        .filter(job_seeker=job_application.job_seeker)
+        .exists()
+    )
+
     context = {
         "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
         "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
@@ -407,6 +430,8 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "refusal_contact_email": refusal_contact_email,
         "with_job_seeker_detail_url": True,
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        "is_last_known_advisor": is_last_known_advisor,
+        "is_advisor": is_advisor,
     }
 
     return render(request, template_name, context)

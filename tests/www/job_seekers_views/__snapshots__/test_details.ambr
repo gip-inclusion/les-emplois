@@ -483,9 +483,21 @@
                                           </div>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -763,9 +775,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1007,9 +1031,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1351,9 +1387,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1375,9 +1423,15 @@
 # name: test_display_last_known_advisor
   '''
   <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <h3>
-          Dernier accompagnateur connu
-      </h3>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Dernier accompagnateur connu
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+          </div>
+      </div>
       <form id="display-contact-info-form">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
       </form>
@@ -1415,7 +1469,7 @@
                       Accompagnateur depuis le
                   </small>
                   <strong>
-                      31/05/2026
+                      30/06/2026
                   </strong>
               </li>
               <li>
@@ -1457,9 +1511,21 @@
 # name: test_display_last_known_advisor_contact_info
   '''
   <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <h3>
-          Dernier accompagnateur connu
-      </h3>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Dernier accompagnateur connu
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+              <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-outline-primary" type="submit">
+                      Me désigner dernier accompagnateur connu
+                  </button>
+              </form>
+          </div>
+      </div>
       <form id="display-contact-info-form">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
       </form>
@@ -1536,9 +1602,15 @@
 # name: test_display_last_known_advisor_contact_info_as_job_seeker
   '''
   <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <h3>
-          Dernier accompagnateur connu
-      </h3>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Dernier accompagnateur connu
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+          </div>
+      </div>
       <form id="display-contact-info-form">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
       </form>
@@ -1817,7 +1889,7 @@
 # ---
 # name: test_job_application_tab[SQL queries]
   dict({
-    'num_queries': 22,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -2736,6 +2808,119 @@
       }),
       dict({
         'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -2957,7 +3142,7 @@
 # ---
 # name: test_job_application_tab_as_siae[SQL queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -3809,6 +3994,126 @@
       }),
       dict({
         'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."fields_history",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "companies_company"
+          WHERE "companies_company"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -4110,7 +4415,7 @@
 # ---
 # name: test_job_application_tab_shows_external_application_to_authorized_prescriber[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -5029,6 +5334,119 @@
       }),
       dict({
         'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -5412,9 +5830,21 @@
                                           </div>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -5711,9 +6141,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -5943,9 +6385,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6230,9 +6684,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6529,9 +6995,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6761,9 +7239,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -6998,9 +7488,21 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <button class="btn btn-outline-primary" type="submit">
+                                                          M'ajouter en tant qu'accompagnateur
+                                                      </button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                           <div class="fs-sm" id="card-no-referent">
                                               <i>
                                                   L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -7082,7 +7584,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -7951,7 +8453,28 @@
       }),
       dict({
         'origin': list([
-          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -7970,26 +8493,21 @@
       }),
       dict({
         'origin': list([
-          'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
+          'can_view_last_advisor_contact_info[utils/perms/utils.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
-          SELECT "users_jobseekerassignment"."id",
-                 "users_jobseekerassignment"."created_at",
-                 "users_jobseekerassignment"."updated_at",
-                 "users_jobseekerassignment"."job_seeker_id",
-                 "users_jobseekerassignment"."professional_id",
-                 "users_jobseekerassignment"."prescriber_organization_id",
-                 "users_jobseekerassignment"."company_id",
-                 "users_jobseekerassignment"."last_action_kind",
-                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          SELECT %s AS "a"
           FROM "users_jobseekerassignment"
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" IS NULL
+                      AND "users_jobseekerassignment"."prescriber_organization_id" = %s
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
         ''',
       }),
       dict({
@@ -8355,9 +8873,15 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                          <h3>
-                                              Dernier accompagnateur connu
-                                          </h3>
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Dernier accompagnateur connu
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              </div>
+                                          </div>
                                           <form id="display-contact-info-form">
                                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                           </form>
@@ -9377,6 +9901,119 @@
       }),
       dict({
         'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.last_advisor_with_org[users/models.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
@@ -9443,125 +10080,6 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerassignment"."id",
-                 "users_jobseekerassignment"."created_at",
-                 "users_jobseekerassignment"."updated_at",
-                 "users_jobseekerassignment"."job_seeker_id",
-                 "users_jobseekerassignment"."professional_id",
-                 "users_jobseekerassignment"."prescriber_organization_id",
-                 "users_jobseekerassignment"."company_id",
-                 "users_jobseekerassignment"."last_action_kind",
-                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
-          FROM "users_jobseekerassignment"
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.last_advisor_with_org[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id",
-                 "users_user"."password",
-                 "users_user"."last_login",
-                 "users_user"."is_superuser",
-                 "users_user"."username",
-                 "users_user"."first_name",
-                 "users_user"."last_name",
-                 "users_user"."is_staff",
-                 "users_user"."is_active",
-                 "users_user"."date_joined",
-                 "users_user"."fields_history",
-                 "users_user"."address_line_1",
-                 "users_user"."address_line_2",
-                 "users_user"."post_code",
-                 "users_user"."city",
-                 "users_user"."department",
-                 "users_user"."coords",
-                 "users_user"."geocoding_score",
-                 "users_user"."geocoding_updated_at",
-                 "users_user"."ban_api_resolved_address",
-                 "users_user"."insee_city_id",
-                 "users_user"."title",
-                 "users_user"."full_name_search_vector",
-                 "users_user"."email",
-                 "users_user"."phone",
-                 "users_user"."kind",
-                 "users_user"."identity_provider",
-                 "users_user"."has_completed_welcoming_tour",
-                 "users_user"."created_by_id",
-                 "users_user"."external_data_source_history",
-                 "users_user"."last_checked_at",
-                 "users_user"."terms_accepted_at",
-                 "users_user"."public_id",
-                 "users_user"."address_filled_at",
-                 "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
-          FROM "users_user"
-          WHERE "users_user"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.last_advisor_with_org[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescriberorganization"."id",
-                 "prescribers_prescriberorganization"."address_line_1",
-                 "prescribers_prescriberorganization"."address_line_2",
-                 "prescribers_prescriberorganization"."post_code",
-                 "prescribers_prescriberorganization"."city",
-                 "prescribers_prescriberorganization"."department",
-                 "prescribers_prescriberorganization"."coords",
-                 "prescribers_prescriberorganization"."geocoding_score",
-                 "prescribers_prescriberorganization"."geocoding_updated_at",
-                 "prescribers_prescriberorganization"."ban_api_resolved_address",
-                 "prescribers_prescriberorganization"."insee_city_id",
-                 "prescribers_prescriberorganization"."name",
-                 "prescribers_prescriberorganization"."created_at",
-                 "prescribers_prescriberorganization"."updated_at",
-                 "prescribers_prescriberorganization"."uid",
-                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                 "prescribers_prescriberorganization"."automatic_geocoding_update",
-                 "prescribers_prescriberorganization"."siret",
-                 "prescribers_prescriberorganization"."kind",
-                 "prescribers_prescriberorganization"."is_brsa",
-                 "prescribers_prescriberorganization"."phone",
-                 "prescribers_prescriberorganization"."email",
-                 "prescribers_prescriberorganization"."website",
-                 "prescribers_prescriberorganization"."description",
-                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                 "prescribers_prescriberorganization"."created_by_id",
-                 "prescribers_prescriberorganization"."authorization_status",
-                 "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
-          FROM "prescribers_prescriberorganization"
-          WHERE "prescribers_prescriberorganization"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({

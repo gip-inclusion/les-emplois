@@ -412,9 +412,21 @@
                                   </ul>
                               </div>
                               <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <h3>
-                                      Dernier accompagnateur connu
-                                  </h3>
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Dernier accompagnateur connu
+                                          </h3>
+                                      </div>
+                                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                          <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/11111111-1111-1111-1111-111111111111/siae/details" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn btn-outline-primary" type="submit">
+                                                  M'ajouter en tant qu'accompagnateur
+                                              </button>
+                                          </form>
+                                      </div>
+                                  </div>
                                   <div class="fs-sm" id="card-no-referent">
                                       <i>
                                           L’accompagnateur de DOE Jane n’est pas connu de nos services
@@ -1240,7 +1252,7 @@
 # ---
 # name: test_display_in_sidebar_and_tab
   dict({
-    'num_queries': 27,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -2472,6 +2484,46 @@
       }),
       dict({
         'origin': list([
+          'User.last_assignment[users/models.py]',
+          'User.last_advisor_with_org[users/models.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."professional_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."company_id",
+                 "users_jobseekerassignment"."last_action_kind",
+                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_jobseekerassignment"
+          WHERE ((("users_jobseekerassignment"."company_id" IS NULL
+                   AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                   AND "users_jobseekerassignment"."professional_id" = %s)
+                  OR ("users_jobseekerassignment"."company_id" = %s
+                      AND "users_jobseekerassignment"."prescriber_organization_id" IS NULL
+                      AND "users_jobseekerassignment"."professional_id" = %s))
+                 AND "users_jobseekerassignment"."job_seeker_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'can_view_last_advisor_contact_info[utils/perms/utils.py]',
           'details_for_company[www/apply/views/process_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
@@ -2610,33 +2662,6 @@
                                                                      %s,
                                                                      %s))
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
-          'IfNode[job_seekers_views/includes/last_known_advisor.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerassignment"."id",
-                 "users_jobseekerassignment"."created_at",
-                 "users_jobseekerassignment"."updated_at",
-                 "users_jobseekerassignment"."job_seeker_id",
-                 "users_jobseekerassignment"."professional_id",
-                 "users_jobseekerassignment"."prescriber_organization_id",
-                 "users_jobseekerassignment"."company_id",
-                 "users_jobseekerassignment"."last_action_kind",
-                 "users_jobseekerassignment"."assigned_to_unknown_advisor"
-          FROM "users_jobseekerassignment"
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
-          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({
