@@ -132,6 +132,37 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
     assertRedirects(response, confirmation_url, fetch_redirect_response=False)
     mock_dora.return_value.create_orientation.assert_called_once()
 
+    payload, _ = mock_dora.return_value.create_orientation.call_args.args
+    assert payload == {
+        "di_service_id": service.uid,
+        "di_service_name": service.name,
+        "di_service_address_line": "à distance",
+        "di_contact_email": service.contact_email,
+        "di_contact_name": service.contact_full_name,
+        "di_contact_phone": service.contact_phone,
+        "di_structure_name": service.structure.name,
+        "beneficiary_first_name": job_seeker.first_name,
+        "beneficiary_last_name": job_seeker.last_name,
+        "beneficiary_email": job_seeker.email,
+        "beneficiary_phone": "0607080910",
+        "referent_first_name": "Jean",
+        "referent_last_name": "Dupont",
+        "referent_email": "jean@example.com",
+        "referent_phone": "0612345678",
+        "data_protection_commitment": True,
+        "emplois_data": {
+            "beneficiary_id": "7614fc4b-aef9-4694-ab17-12324300180a",
+            "structure_id": "0260ad4f-2008-48bd-88cc-b41c0211e219",
+            "structure_name": "Pres. Org.",
+            "prescriber_id": "03580247-b036-4578-bf9d-f92c9c2f68cd",
+            "prescriber_email": "pierre.dupont@test.local",
+            "prescriber_first_name": "Pierre",
+            "prescriber_last_name": "Dupont",
+            "prescriber_phone": "0612345678",
+            "structure_siret": "01234567891010",
+        },
+    }
+
     response = client.get(confirmation_url)
     assert pretty_indented(parse_response_to_soup(response, "#main .s-section")) == snapshot(name="confirmation")
 
@@ -359,7 +390,7 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
             },
             "12 rue des terreaux, Bât. B, 38110 La Tour du Pin",
         ),
-        ({}, "À distance"),
+        ({}, "à distance"),
     ],
 )
 def test_documents_step_normalizes_beneficiary_phone_for_dora(

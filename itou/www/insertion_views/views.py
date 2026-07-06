@@ -340,6 +340,11 @@ class OrientationWizardView(WizardView):
             payload = {
                 "di_service_id": self.service.uid,
                 "di_service_name": self.service.name,
+                "di_service_address_line": self.service.address_on_one_line or "à distance",
+                "di_contact_email": self.service.contact_email,
+                "di_contact_name": self.service.contact_full_name,
+                "di_contact_phone": self.service.contact_phone,
+                "di_structure_name": self.service.structure.name,
                 "beneficiary_first_name": self.job_seeker.first_name,
                 "beneficiary_last_name": self.job_seeker.last_name,
                 "beneficiary_email": self.job_seeker.email,
@@ -349,8 +354,6 @@ class OrientationWizardView(WizardView):
                 "referent_email": referent_data["referent_email"],
                 "referent_phone": referent_data["referent_phone"],
                 "data_protection_commitment": cleaned["gdpr_consent"],
-                "di_service_address_line": self.service.address_on_one_line or "À distance",
-                "di_contact_email": self.service.contact_email,
             }
             if orientation_reason := referent_data.get("orientation_reason"):
                 payload["orientation_reasons"] = orientation_reason
