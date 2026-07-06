@@ -100,6 +100,7 @@ def get_permissions_dict():
         gps_models.FollowUpGroup: PERMS_DELETE,
         gps_models.FollowUpGroupMembership: PERMS_DELETE,
         insertion_models.GenericReferenceItem: PERMS_READ,
+        insertion_models.MobilizationEvent: PERMS_READ,
         insertion_models.Service: PERMS_READ,
         insertion_models.Structure: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
