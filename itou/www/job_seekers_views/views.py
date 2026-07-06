@@ -407,6 +407,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             or can_orient_towards_insertion_service(request)
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
+        professional, organization = request.user, request.current_organization
+        job_seeker.user_is_last_known_advisor = (professional, organization) == job_seeker.last_advisor_with_org
+        job_seeker.user_is_advisor = request.user.pk in job_seeker.advisors
 
     context = {
         "back_url": get_safe_url(request, "back_url"),

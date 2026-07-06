@@ -101,6 +101,16 @@
                                                 Orienter vers un service d’insertion
                                             </a>
                                         {% endif %}
+                                        {% if not job_seeker.user_is_last_known_advisor %}
+                                            <form method="post" action="{% url "job_seekers_views:assign_oneself_as_advisor" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                                                {% csrf_token %}
+                                                {% if job_seeker.user_is_advisor %}
+                                                    <button type="submit" class="dropdown-item">Me désigner dernier accompagnateur connu</button>
+                                                {% else %}
+                                                    <button type="submit" class="dropdown-item">M'ajouter en tant qu'accompagnateur</button>
+                                                {% endif %}
+                                            </form>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
                             </td>
