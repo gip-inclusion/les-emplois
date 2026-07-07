@@ -2638,9 +2638,9 @@ stack-data==0.6.3 \
     --hash=sha256:836a778de4fec4dcd1dcd89ed8abff8a221f58308462e1c4aa2a3cf30148f0b9 \
     --hash=sha256:d5558e0c25a4cb0853cddad3d77da9891a08cb85dd9f9f91b9f8cd66e511e695
     # via ipython
-syrupy==5.3.4 \
-    --hash=sha256:10f192655a2d42473ad5772653e64b281f6823fe5e30458d92f8ca8e882884c1 \
-    --hash=sha256:409348aa20afc4b7dab7c965331de0cd79ab46977877fb189014ce9294e947e5
+syrupy==5.5.1 \
+    --hash=sha256:835f316acad500717942988afbfb6893e21976d31710cc2701bd69f39299941a \
+    --hash=sha256:9270b9772e43dde8081a94507e6ea16ce6ef13c979a65bae7b9d43f7adcdd368
     # via
     #   -r test.txt
     #   itoutils
