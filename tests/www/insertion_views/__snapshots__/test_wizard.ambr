@@ -329,13 +329,19 @@
                           </p>
                           <ul class="mb-3 mb-md-4">
                               <li>
-                                  Résident QPV / ZFRR
+                                  <p>
+                                      Résident QPV / ZFRR
+                                  </p>
                               </li>
                               <li>
-                                  Pièce d'identité
+                                  <p>
+                                      Pièce d'identité
+                                  </p>
                               </li>
                               <li>
-                                  Justificatif de domicile
+                                  <p>
+                                      Justificatif de domicile
+                                  </p>
                               </li>
                           </ul>
                           <div class="form-group form-group-required-check form-group-required">
@@ -453,13 +459,19 @@
                           </p>
                           <ul class="mb-3 mb-md-4">
                               <li>
-                                  Résident QPV / ZFRR
+                                  <p>
+                                      Résident QPV / ZFRR
+                                  </p>
                               </li>
                               <li>
-                                  Pièce d'identité
+                                  <p>
+                                      Pièce d'identité
+                                  </p>
                               </li>
                               <li>
-                                  Justificatif de domicile
+                                  <p>
+                                      Justificatif de domicile
+                                  </p>
                               </li>
                           </ul>
                           <div class="form-group">
