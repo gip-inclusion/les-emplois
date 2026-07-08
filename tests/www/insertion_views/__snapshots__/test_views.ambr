@@ -126,13 +126,19 @@
                           </h2>
                           <ul class="mb-0">
                               <li>
-                                  Avoir plus de 18 ans
+                                  <p>
+                                      Avoir plus de 18 ans
+                                  </p>
                               </li>
                               <li>
-                                  Résider en France
+                                  <p>
+                                      Résider en France
+                                  </p>
                               </li>
                               <li>
-                                  Pièce d'identité en cours de validité
+                                  <p>
+                                      Pièce d'identité en cours de validité
+                                  </p>
                               </li>
                           </ul>
                       </div>
@@ -271,10 +277,14 @@
                           </h2>
                           <ul class="mb-0">
                               <li>
-                                  Être orienté par un prescripteur
+                                  <p>
+                                      Être orienté par un prescripteur
+                                  </p>
                               </li>
                               <li>
-                                  Avoir 18 ans
+                                  <p>
+                                      Avoir 18 ans
+                                  </p>
                               </li>
                           </ul>
                       </div>
@@ -596,7 +606,9 @@
                           </h2>
                           <ul class="mb-0">
                               <li>
-                                  Être orienté par un prescripteur.
+                                  <p>
+                                      Être orienté par un prescripteur.
+                                  </p>
                               </li>
                           </ul>
                       </div>

@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load enums %}
 {% load format_filters %}
+{% load markdownify %}
 {% load matomo %}
 {% load str_filters %}
 {% load url_add_query %}
@@ -245,7 +246,6 @@
                     {% if service.description %}
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">Description du service</h2>
-                            {% load markdownify %}
                             {% if service.description|wordcount > 30 %}
                                 <div class="collapse show has-no-transition" id="collapse-description">
                                     <div class="mb-0">{{ service.description|markdownify|truncatewords_html:30 }}</div>
@@ -324,9 +324,7 @@
                                 {% endif %}
                             {% else %}
                                 <ul class="mb-0">
-                                    {% for mobilization in service.mobilizations.all %}
-                                        <li>{{ mobilization.label }}</li>
-                                    {% endfor %}
+                                    {% for mobilization in service.mobilizations.all %}<li>{{ mobilization.label }}</li>{% endfor %}
                                 </ul>
                                 {% if service.mobilizations_details %}
                                     <p class="mt-3 mb-0">{{ service.mobilizations_details }}</p>
@@ -339,7 +337,9 @@
                         <div class="c-box mb-3 mb-md-4">
                             <h2 class="h3">Pré-requis et justificatifs</h2>
                             <ul class="mb-0">
-                                {% for prerequisite in service.prerequisites %}<li>{{ prerequisite }}</li>{% endfor %}
+                                {% for prerequisite in service.prerequisites %}
+                                    <li>{{ prerequisite|markdownify }}</li>
+                                {% endfor %}
                             </ul>
                         </div>
                     {% endif %}
