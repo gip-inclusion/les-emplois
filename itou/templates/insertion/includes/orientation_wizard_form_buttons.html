@@ -17,7 +17,7 @@
                 </a>
             </div>
             <div class="form-group col col-lg-auto order-2 order-lg-3">
-                <button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante" {% if matomo_name %}{% matomo_event "orientation" "submit" matomo_name %}{% endif %}>
+                <button type="submit" class="btn btn-block btn-primary js-prevent-multiple-submit" aria-label="Passer à l’étape suivante" {% if matomo_name %}{% matomo_event "orientation" "submit" matomo_name %}{% endif %}>
                     <span>{{ primary_label }}</span>
                 </button>
             </div>
