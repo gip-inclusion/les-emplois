@@ -895,10 +895,7 @@ def test_display_reminder_banner_not_updated_jobs_for_employer(client):
     Appellation.objects.create(code="I13042", name="Doer", rome=rome)
 
     # Spontaneous application recently updated
-    company = CompanyWith2MembershipsFactory(
-        spontaneous_applications_open_since=RECENT_DATE,
-        kind=CompanyKind.GEIQ,  # FIXME: temporary pin on GEIQ as SIAEs have another banner temporarily
-    )
+    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=RECENT_DATE)
     client.force_login(company.members.first())
     response = client.get(reverse("dashboard:index"))
     assertNotContains(
@@ -918,10 +915,7 @@ def test_display_reminder_banner_not_updated_jobs_for_employer(client):
     )
 
     # Recently updated job application
-    company = CompanyWith2MembershipsFactory(
-        spontaneous_applications_open_since=None,
-        kind=CompanyKind.GEIQ,  # FIXME: temporary pin on GEIQ as SIAEs have another banner temporarily
-    )
+    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=None)
     job_description = JobDescriptionFactory(
         company=company, created_at=RECENT_DATE, last_employer_update_at=RECENT_DATE
     )
