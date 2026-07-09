@@ -40,7 +40,7 @@ endif
 venv: $(VIRTUAL_ENV)
 
 buckets: $(VIRTUAL_ENV)
-	python manage.py configure_bucket
+	python manage.py configure_buckets
 
 PIP_COMPILE_FLAGS := --directory requirements/ --no-strip-extras --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VIRTUAL_ENV)
