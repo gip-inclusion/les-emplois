@@ -628,3 +628,20 @@ def test_create_fc_user_with_already_existing_fc_email_fails():
     )
     with pytest.raises(MultipleSubSameEmailException):
         fc_user_data.create_or_update_user()
+
+
+def test_sector_identifier(client, settings):
+    settings.ALLOWED_HOSTS = ["emplois.inclusion.beta.gouv.fr", "plateforme.inclusion.gouv.fr"]
+    response = client.get(
+        reverse("france_connect:sector_identifier"),
+        headers={"Host": "plateforme.inclusion.gouv.fr"},
+        secure=True,
+    )
+    assert response.content == (
+        b"["
+        b'"https://emplois.inclusion.beta.gouv.fr/franceconnect/callback", '
+        b'"https://emplois.inclusion.beta.gouv.fr/franceconnect/logout_callback", '
+        b'"https://plateforme.inclusion.gouv.fr/franceconnect/callback", '
+        b'"https://plateforme.inclusion.gouv.fr/franceconnect/logout_callback"'
+        b"]"
+    )

@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlunsplit
 
 import httpx
 import jwt
@@ -258,3 +259,26 @@ def france_connect_logout_callback(request):
             f"Merci de vérifier que vous êtes bien déconnecté de {IdentityProvider.FRANCE_CONNECT.label}.",
         )
     return HttpResponseRedirect(reverse("search:employers_home"))
+
+
+@login_not_required
+def sector_identifier(request):
+    # Always serve this view under the emplois.inclusion.beta.gouv.fr domain.
+    #
+    # The original redirect_uri had domain emplois.inclusion.beta.gouv.fr, it
+    # is thus the Sector Identifier.
+    #
+    # https://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes:
+    # > When a sector_identifier_uri is provided, the host component of that URL
+    # > is used as the Sector Identifier for the pairwise identifier calculation.
+    urls = [
+        # > The value of the sector_identifier_uri MUST be a URL using the
+        # > https scheme […]
+        urlunsplit(("https", domain, path, "", ""))
+        for domain in settings.ALLOWED_HOSTS
+        for path in [
+            reverse("france_connect:callback"),
+            reverse("france_connect:logout_callback"),
+        ]
+    ]
+    return JsonResponse(urls, safe=False)
