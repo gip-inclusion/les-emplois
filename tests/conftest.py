@@ -208,7 +208,7 @@ def temporary_bucket_name_fixture():
 @pytest.fixture(name="temporary_bucket_setup", scope="session")
 def temporary_bucket_setup_fixture(temporary_bucket_name):
     with override_settings(AWS_STORAGE_BUCKET_NAME=temporary_bucket_name):
-        call_command("configure_bucket")
+        call_command("configure_buckets")
     yield temporary_bucket_name
     client = s3_client()
     with contextlib.suppress(NoObjectsInBucket):
