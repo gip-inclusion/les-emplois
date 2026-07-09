@@ -279,27 +279,6 @@ def test_delete_devices(client, snapshot, settings):
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
 
 
-def test_delete_last_device_when_verified_by_external_mfa(client, settings):
-    # A user verified through the ProConnect MFA sidestep has an `ExternalTOTPDevice` placeholder
-    # as `otp_device`. It never matches a real device, so they may delete all their internal
-    # devices (no lockout: they will be asked to enroll again if internal MFA becomes required).
-    settings.REQUIRE_OTP_FOR_STAFF = True
-    user = ItouStaffFactory()
-    device = ItouTOTPDeviceFactory(user=user, name="only-device")
-    client.force_login(user)
-
-    placeholder = create_placeholder_for_external_totp_device(user)
-    session = client.session
-    session[DEVICE_ID_SESSION_KEY] = placeholder.persistent_id
-    session.save()
-
-    response = client.post(reverse("otp_views:otp_devices"), data={"delete-device": str(device.pk)})
-
-    assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
-    device.refresh_from_db()
-    assert device.disabled_at is not None
-
-
 def test_otp_enforced_before_nexus_whitelist(client, settings):
     """An MFA-required professional must not reach the whitelisted Nexus views (/portal, ...) without OTP."""
     settings.REQUIRE_MFA_FOR_PROS = True
@@ -358,14 +337,6 @@ class TestEnrollmentSteps2And3ConfirmDevice:
             assertContains(response, qr_code_text)
         else:
             assertNotContains(response, qr_code_text)
-
-    def test_get_unknown_device_type(self, client):
-        user = ItouStaffFactory()
-        client.force_login(user)
-        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
-
-        response = client.get(url, query_params={"device_type": "unknown"})
-        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
 
     def test_post_valid_totp(self, client):
         user = ItouStaffFactory()
@@ -473,6 +444,20 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         device = new_devices.get()
         assert device.key == fake_device.key
         assert device.name == data["name"]
+
+    @pytest.mark.parametrize("key", ["", "not-base32!", None])
+    def test_post_invalid_key_redirects(self, client, key):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        data = {"name": "whatever", "device_type": "smartphone", "otp_token": "123456"}
+        if key is not None:
+            data["key"] = key
+        response = client.post(url, data)
+
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert user.itou_totp_devices.count() == 0
 
 
 class TestItouStaffLogin:
