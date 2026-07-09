@@ -164,6 +164,20 @@ def test_delete_last_device_when_verified_by_external_mfa(client, settings):
     assert device.disabled_at is not None
 
 
+def test_delete_device_with_malformed_id_returns_404(client, caplog):
+    """A manipulated `delete-device` value that is not a valid UUID must yield a clean 404."""
+    user = ItouStaffFactory()
+    client.force_login(user)
+
+    response = client.post(reverse("otp_views:otp_devices"), data={"delete-device": "not-a-uuid"})
+
+    assert response.status_code == 404
+    assert (
+        f"Manipulated request for user {user.id}: delete-device value 'not-a-uuid' is not a valid UUID"
+        in caplog.messages
+    )
+
+
 def test_otp_enforced_before_nexus_whitelist(client, settings):
     """An MFA-required professional must not reach the whitelisted Nexus views (/portal, ...) without OTP."""
     settings.REQUIRE_MFA_FOR_PROS = True
@@ -216,13 +230,34 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         else:
             assertNotContains(response, qr_code_text)
 
-    def test_get_unknown_device_type(self, client):
+    def test_get_unknown_device_type(self, client, caplog):
         user = ItouStaffFactory()
         client.force_login(user)
         url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
 
         response = client.get(url, query_params={"device_type": "unknown"})
         assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert f"Manipulated request for user {user.id}: unknown device_type 'unknown'" in caplog.messages
+
+    def test_post_missing_key(self, client, caplog):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        response = client.post(url, data={"device_type": "smartphone"})
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert f"Manipulated request for user {user.id}: missing key during device confirmation" in caplog.messages
+
+    def test_post_invalid_base32_key(self, client, caplog):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        response = client.post(url, data={"device_type": "smartphone", "key": "not-valid-base32!"})
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert (
+            f"Manipulated request for user {user.id}: key 'not-valid-base32!' is not valid base32" in caplog.messages
+        )
 
     def test_post_valid_totp(self, client):
         user = ItouStaffFactory()
@@ -304,6 +339,20 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         device = new_devices.get()
         assert device.key == fake_device.key
         assert device.name == data["name"]
+
+    @pytest.mark.parametrize("key", ["", "not-base32!", None])
+    def test_post_invalid_key_redirects(self, client, key):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        data = {"name": "whatever", "device_type": "smartphone", "otp_token": "123456"}
+        if key is not None:
+            data["key"] = key
+        response = client.post(url, data)
+
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert user.itou_totp_devices.count() == 0
 
 
 class TestItouStaffLogin:
