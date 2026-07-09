@@ -41,7 +41,9 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
     devices = get_user_devices(request.user)
     if request.method == "POST":
         if device_id := request.POST.get("delete-device"):
-            device = get_object_or_404(ItouTOTPDevice.objects.filter(user=request.user), pk=device_id)
+            device = get_object_or_404(
+                ItouTOTPDevice.objects.filter(user=request.user, disabled_at=None), pk=device_id
+            )
             if device != request.user.otp_device:
                 messages.success(request, "L’appareil a été supprimé.")
                 # Soft delete for auditing purposes (see the command `purge_disabled_otp_devices`)
@@ -87,12 +89,17 @@ def enrollment_step_2_and_3_confirm_device(
         # should not happen, unless user manipulates the request
         return HttpResponseRedirect(previous_step_url)
 
-    device = ItouTOTPDevice(
-        user=request.user,
-        key=binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
-        if request.POST
-        else generate_otp_key(),
-    )
+    if request.POST:
+        if not request.POST.get("key"):
+            return HttpResponseRedirect(previous_step_url)
+        try:
+            key = binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
+        except (KeyError, binascii.Error):
+            return HttpResponseRedirect(previous_step_url)
+    else:
+        key = generate_otp_key()
+
+    device = ItouTOTPDevice(user=request.user, key=key)
 
     backup_code = None
     post_save_url = None
