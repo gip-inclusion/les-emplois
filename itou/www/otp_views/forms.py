@@ -1,7 +1,7 @@
 from base64 import b32encode
 
 from django import forms
-from django.utils.html import mark_safe
+from django.utils.safestring import mark_safe
 
 from itou.otp.utils import get_user_devices
 from itou.www.otp_views.enums import DeviceType
@@ -18,7 +18,7 @@ class ConfirmTOTPDeviceForm(forms.Form):
 
     otp_token.widget.attrs.update(
         {
-            "max_length": 6,
+            "maxlength": 6,
             "autocomplete": "one-time-code",
         }
     )
@@ -84,7 +84,7 @@ class VerifyOTPForm(forms.Form):
 
     otp_token.widget.attrs.update(
         {
-            "max_length": 6,
+            "maxlength": 6,
             "autocomplete": "one-time-code",
             "autofocus": True,
         }
