@@ -10,4 +10,5 @@ urlpatterns = [
     path("callback", views.france_connect_callback, name="callback"),
     path("logout", views.france_connect_logout, name="logout"),
     path("logout_callback", views.france_connect_logout_callback, name="logout_callback"),
+    path("sector_identifier", views.sector_identifier, name="sector_identifier"),
 ]
