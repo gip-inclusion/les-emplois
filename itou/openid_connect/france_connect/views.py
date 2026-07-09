@@ -238,7 +238,23 @@ def france_connect_logout(request):
     params = {
         "id_token_hint": id_token,
         "state": FranceConnectState.save_state(),
-        "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
+        "post_logout_redirect_uri": get_absolute_url(
+            reverse("france_connect:logout_callback"),
+            host=request.get_host(),
+        ),
     }
     complete_url = f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)
+
+
+@login_not_required
+def france_connect_logout_callback(request):
+    state = request.GET.get("state")
+    state = FranceConnectState.get_from_state(state)
+    if state is None or not state.is_valid():
+        messages.error(
+            request,
+            "Une erreur technique est survenue. "
+            f"Merci de vérifier que vous êtes bien déconnecté de {IdentityProvider.FRANCE_CONNECT.label}.",
+        )
+    return HttpResponseRedirect(reverse("search:employers_home"))
