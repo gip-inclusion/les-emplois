@@ -93,6 +93,8 @@ def load_placeholder_for_external_totp_device(persistent_id):
 
 
 class ExternalTOTPDevice:
+    """This placeholder is a session-only marker: verification already happened on ProConnect's side."""
+
     def __init__(self, user_id: int):
         self.user_id = user_id
 

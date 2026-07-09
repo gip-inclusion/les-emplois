@@ -19,7 +19,7 @@ from pytest_django.asserts import (
 )
 
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
-from itou.otp.utils import create_otp_backup_code
+from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory
@@ -132,12 +132,36 @@ def test_delete_devices(client, snapshot, settings):
             ],
         )
 
-        # The user removes his other device
+        # The user removes his other device: it is soft-deleted (temporary kept for auditing)
         response = client.post(url, data={"delete-device": str(device_2.pk)})
-        assertQuerySetEqual(ItouTOTPDevice.objects.all(), [device_1])
+        assertQuerySetEqual(ItouTOTPDevice.objects.all(), [device_1, device_2], ordered=False)
+        assertQuerySetEqual(ItouTOTPDevice.objects.filter(disabled_at=None), [device_1])
+        device_2.refresh_from_db()
+        assert device_2.disabled_at is not None
         assertContains(response, device_1.name)
         assertNotContains(response, device_2.name)
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
+
+
+def test_delete_last_device_when_verified_by_external_mfa(client, settings):
+    # A user verified through the ProConnect MFA sidestep has an `ExternalTOTPDevice` placeholder
+    # as `otp_device`. It never matches a real device, so they may delete all their internal
+    # devices (no lockout: they will be asked to enroll again if internal MFA becomes required).
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory()
+    device = ItouTOTPDeviceFactory(user=user, name="only-device")
+    client.force_login(user)
+
+    placeholder = create_placeholder_for_external_totp_device(user)
+    session = client.session
+    session[DEVICE_ID_SESSION_KEY] = placeholder.persistent_id
+    session.save()
+
+    response = client.post(reverse("otp_views:otp_devices"), data={"delete-device": str(device.pk)})
+
+    assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
+    device.refresh_from_db()
+    assert device.disabled_at is not None
 
 
 def test_otp_enforced_before_nexus_whitelist(client, settings):
@@ -424,6 +448,34 @@ class TestItouStaffLogin:
         assert device.disabled_at is not None
         [email] = mailoutbox
         assert "Utilisation d'un code de récupération" in email.subject
+
+    def test_login_with_backup_code_preserves_existing_disabled_at(self, client, settings):
+        # Logging in with a backup code soft-deletes the user's *active* TOTP
+        # devices, but must not overwrite the `disabled_at` of devices that were
+        # already disabled earlier (see `purge_disabled_otp_devices`)
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+
+        with freeze_time("2025-01-01") as frozen_time:
+            old_disabled_device = ItouTOTPDeviceFactory(user=user, name="old")
+            old_disabled_device.disabled_at = timezone.now()
+            old_disabled_device.save()
+            already_disabled_at = old_disabled_device.disabled_at
+
+            frozen_time.move_to("2026-07-09")
+            active_device = ItouTOTPDeviceFactory(user=user, name="active")
+            backup_code = create_otp_backup_code(user)
+
+            client.force_login(user)
+            response = client.post(reverse("otp_views:login_with_backup_code"), data={"code": backup_code})
+            assertRedirects(response, reverse("otp_views:enrollment_step_0_intro") + "?after_recovery=1")
+
+        active_device.refresh_from_db()
+        old_disabled_device.refresh_from_db()
+        # The active device is soft-deleted at login time
+        assert active_device.disabled_at == datetime.datetime(2026, 7, 9, tzinfo=datetime.UTC)
+        # The already-disabled device keeps its original timestamp
+        assert old_disabled_device.disabled_at == already_disabled_at
 
     def test_login_otp_not_required(self, client):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
