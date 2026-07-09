@@ -140,6 +140,18 @@ def test_delete_devices(client, snapshot, settings):
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
 
 
+def test_otp_enforced_before_nexus_whitelist(client, settings):
+    """An MFA-required professional must not reach the whitelisted Nexus views (/portal, ...) without OTP."""
+    settings.REQUIRE_MFA_FOR_PROS = True
+    user = EmployerFactory(membership=True)
+    company = user.company_set.get()
+    settings.REQUIRE_MFA_ON_COMPANY_IDS = {company.id}
+    client.force_login(user)
+
+    response = client.get(reverse("nexus:homepage"))
+    assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"), fetch_redirect_response=False)
+
+
 def test_enrollment_step_0_intro(client):
     user = ItouStaffFactory()
 

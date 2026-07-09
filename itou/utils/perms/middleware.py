@@ -183,6 +183,20 @@ class ItouCurrentOrganizationMiddleware:
         if not user.is_authenticated and request.path.startswith("/admin"):
             return HttpResponseRedirect(reverse("account_login", query={REDIRECT_FIELD_NAME: request.get_full_path()}))
 
+        # Enforce internal OTP before the Nexus whitelist below, otherwise
+        # MFA-required professionals could reach the whitelisted views unverified
+        if require_otp(user):
+            logger.info("Requiring internal OTP for user %d", user.id)
+            login_verify_otp_url = reverse("otp_views:verify_otp")
+            login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
+            if get_user_devices(user):
+                if request.path not in (login_verify_otp_url, login_with_backup_code_url):
+                    return HttpResponseRedirect(
+                        add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
+                    )
+            elif not request.path.startswith("/otp/enrollment"):
+                return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
+
         # Nexus : Whitelist for Nexus views
         # FIXME: Remove once we merge prescribers and employers
         if (
@@ -196,18 +210,6 @@ class ItouCurrentOrganizationMiddleware:
             )
         ):
             return self.get_response(request)
-
-        if require_otp(user):
-            logger.info("Requiring internal OTP for user %d", user.id)
-            login_verify_otp_url = reverse("otp_views:verify_otp")
-            login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
-            if get_user_devices(user):
-                if request.path not in (login_verify_otp_url, login_with_backup_code_url):
-                    return HttpResponseRedirect(
-                        add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
-                    )
-            elif not request.path.startswith("/otp/enrollment"):
-                return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
