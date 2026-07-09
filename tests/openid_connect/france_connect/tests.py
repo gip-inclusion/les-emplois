@@ -19,6 +19,7 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
@@ -545,7 +546,7 @@ class TestFranceConnect:
         urlparts = urlparts._replace(query=query.urlencode())
         assert urllib.parse.urlunsplit(urlparts) == (
             f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
-            "post_logout_redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2Femployers"
+            "post_logout_redirect_uri=http%3A%2F%2Ftestserver%2Ffranceconnect%2Flogout_callback"
         )
 
     @respx.mock
@@ -574,11 +575,28 @@ class TestFranceConnect:
         query = QueryDict(query)
         assert set(query.keys()) == {"id_token_hint", "post_logout_redirect_uri", "state"}
         assert query["id_token_hint"] == id_token
-        assert query["post_logout_redirect_uri"] == "http://testserver/search/employers"
+        assert query["post_logout_redirect_uri"] == "http://testserver/franceconnect/logout_callback"
         state = query["state"]
-        fc_state = FranceConnectState.get_from_state(state)
-        assert fc_state.is_valid() is True
         assert not auth.get_user(client).is_authenticated
+
+        response = client.get(reverse("france_connect:logout_callback"), {"state": state})
+        assertRedirects(response, reverse("search:employers_home"), fetch_redirect_response=False)
+
+    @pytest.mark.parametrize("state", (None, "invalid"))
+    def test_logout_callback_invalid(self, client, state):
+        url = reverse("france_connect:logout_callback")
+        response = client.get(add_url_params(url, {"state": state}))
+        assertRedirects(response, reverse("search:employers_home"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une erreur technique est survenue. "
+                    "Merci de vérifier que vous êtes bien déconnecté de FranceConnect.",
+                ),
+            ],
+        )
 
 
 @pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.PE_CONNECT])

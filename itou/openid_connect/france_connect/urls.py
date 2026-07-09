@@ -9,4 +9,5 @@ urlpatterns = [
     path("authorize", views.france_connect_authorize, name="authorize"),
     path("callback", views.france_connect_callback, name="callback"),
     path("logout", views.france_connect_logout, name="logout"),
+    path("logout_callback", views.france_connect_logout_callback, name="logout_callback"),
 ]
