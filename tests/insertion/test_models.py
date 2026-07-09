@@ -1,7 +1,7 @@
 import random
 
 import pytest
-from allauth.account.adapter import AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
 from django.db import IntegrityError, transaction
 
