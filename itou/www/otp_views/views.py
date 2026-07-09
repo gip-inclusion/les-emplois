@@ -160,7 +160,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         context = {"form": LoginWithBackupCodeForm(static_device=None)}
         messages.warning(
             request,
-            "Il semble que vous n’ayiez pas de code de récupération. Veuillez contacter le support.",
+            "Il semble que vous n’ayez pas de code de récupération. Veuillez contacter le support.",
         )
         return render(request, template_name, context)
 
