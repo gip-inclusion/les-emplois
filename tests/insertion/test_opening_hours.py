@@ -87,3 +87,58 @@ def test_complex_case():
     assert result["entries"][3] == {"comment": None, "hours": "8h30 à 12h00", "label": "Jeudi"}
     assert result["entries"][4] == {"comment": "Sans rendez-vous", "hours": "10h00 à 11h00", "label": "Vendredi"}
     assert result["has_ph_off"] is True
+
+
+def test_comma_separated_rules_with_closed():
+    result = format_osm_hours(
+        "Mo 09:00-21:00 open, Tu 09:00-21:00 open, We 09:00-21:00 open, "
+        "Th 09:00-21:00 open, Fr 09:00-21:00 open, Sa 09:00-21:00 open, "
+        "Su closed; PH closed"
+    )
+    assert result is not None
+    assert result["has_ph_off"] is True
+    labels = [e["label"] for e in result["entries"]]
+    assert labels == ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+    for entry in result["entries"]:
+        assert entry["hours"] == "9h00 à 21h00"
+
+
+def test_open_without_times():
+    result = format_osm_hours(
+        "Mo 08:30-12:00,13:30-18:00 open, Tu 08:30-12:00,13:30-18:00 open, "
+        "We 08:30-12:00,13:30-18:00 open, Th 13:30-18:00 open, Fr 13:30-18:00 open, "
+        "Sa open, Su open; Aug closed"
+    )
+    assert result is not None
+    labels = [e["label"] for e in result["entries"]]
+    assert labels == ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+    hours = {e["label"]: e["hours"] for e in result["entries"]}
+    assert hours["Lundi"] == "8h30 à 12h00 - 13h30 à 18h00"
+    assert hours["Jeudi"] == "13h30 à 18h00"
+    assert hours["Samedi"] == "ouvert"
+    assert hours["Dimanche"] == "ouvert"
+    assert result["comments"] == ["Fermé en août"]
+
+
+def test_month_off_comments():
+    result = format_osm_hours("Mo-Fr 09:00-17:00; Jul-Aug off")
+    assert result is not None
+    assert result["comments"] == ["Fermé de juillet à août"]
+
+    result = format_osm_hours("Mo-Fr 09:00-17:00; Jan,Feb off")
+    assert result is not None
+    assert result["comments"] == ["Fermé en janvier, février"]
+
+
+def test_date_range_off_comments():
+    result = format_osm_hours("Mo-Fr 07:30-18:30 open; Aug closed; Dec 25-Jan 1 closed")
+    assert result is not None
+    assert result["comments"] == ["Fermé en août", "Fermé du 25 décembre au 1er janvier"]
+
+    result = format_osm_hours("Mo-Fr 09:00-17:00; Dec 20-31 off")
+    assert result is not None
+    assert result["comments"] == ["Fermé du 20 au 31 décembre"]
+
+    result = format_osm_hours("Mo-Fr 09:00-17:00; Dec 25 off")
+    assert result is not None
+    assert result["comments"] == ["Fermé le 25 décembre"]

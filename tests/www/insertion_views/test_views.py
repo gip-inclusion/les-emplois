@@ -241,6 +241,28 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assert response.status_code == 200
 
+    def test_detail_opening_hours_with_comments(self, client):
+        service = ServiceFactory(
+            uid="test-service-uid",
+            name="Mon service de test",
+            updated_on="2025-01-15",
+            source__value="other",
+            source__label="Other",
+            opening_hours="Mo-Fr 07:45-18:30 open; Sa open; Aug closed; Dec 25-Jan 1 closed",
+            structure__uid="test-structure-uid",
+            structure__name="Ma structure de test",
+            structure__updated_on="2025-01-15",
+        )
+        response = client.get(self.get_service_url(service))
+        assert response.status_code == 200
+        formatted_opening_hours = response.context["formatted_opening_hours"]
+        hours = {e["label"]: e["hours"] for e in formatted_opening_hours["entries"]}
+        assert hours["Lundi"] == "7h45 à 18h30"
+        assert hours["Samedi"] == "ouvert"
+        assert formatted_opening_hours["comments"] == ["Fermé en août", "Fermé du 25 décembre au 1er janvier"]
+        assertContains(response, "Fermé en août.")
+        assertContains(response, "Fermé du 25 décembre au 1er janvier.")
+
     def test_detail_basic_dora(self, client, snapshot):
         user = PrescriberFactory(membership=True)
         service = ServiceFactory(
