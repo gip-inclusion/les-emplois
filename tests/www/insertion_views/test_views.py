@@ -3,8 +3,8 @@ from functools import partial
 from unittest.mock import patch
 
 import pytest
-from allauth.account.adapter import AnonymousUser
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
