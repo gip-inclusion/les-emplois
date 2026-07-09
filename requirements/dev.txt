@@ -537,9 +537,9 @@ cryptography==49.0.0 \
     #   django-fernet-encrypted-fields
     #   jwcrypto
     #   paramiko
-cssbeautifier==2.0.1 \
-    --hash=sha256:ed3bd34a1db4649a49278e69090343ec61c741d4bbfc0b8d0c3e071cc7278cc6 \
-    --hash=sha256:f6102c0589c85be3c1a016cee76ee3661ee4bd5da88d48a5f8708bfaf663ae26
+cssbeautifier==2.0.3 \
+    --hash=sha256:14650d9c8a47adcb80a7697a866a3921fe0332ef74a92e1039d09086aa0c5001 \
+    --hash=sha256:2c2fd129342561029de86b1744efa231c9fafe26023dbc988a1deb0ca0f5c845
     # via
     #   -r test.txt
     #   djlint
