@@ -44,7 +44,9 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
             device = get_object_or_404(ItouTOTPDevice.objects.filter(user=request.user), pk=device_id)
             if device != request.user.otp_device:
                 messages.success(request, "L’appareil a été supprimé.")
-                device.delete()
+                # Soft delete for auditing purposes (see the command `purge_disabled_otp_devices`)
+                device.disabled_at = timezone.now()
+                device.save(update_fields=["disabled_at"])
                 devices = get_user_devices(request.user)
             else:
                 messages.error(request, "Impossible de supprimer l’appareil qui a été utilisé pour se connecter.")
@@ -186,7 +188,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         # done by `ItouStaticDevice.verify_token` (called by the
         # form). However, we need to delete all other TOTP devices,
         # since the user seems to have lost them.
-        ItouTOTPDevice.objects.filter(user=request.user).update(disabled_at=timezone.now())
+        ItouTOTPDevice.objects.filter(user=request.user, disabled_at=None).update(disabled_at=timezone.now())
         ItouStaticDevice.objects.filter(user=request.user).delete()
 
         notify_backup_code_has_been_used(request.user)
