@@ -32,7 +32,7 @@ class ConfirmTOTPDeviceForm(forms.Form):
             {"placeholder": "Téléphone pro" if device_type == DeviceType.SMARTPHONE else "Ordinateur pro"}
         )
         self.fields["otp_token"].label = mark_safe(
-            "Une fois le service ajouté, un code à 6 chiffres s'affiche automatiquement "
+            "Une fois le service ajouté, un code à 6 chiffres s’affiche automatiquement "
             + (
                 "dans votre application."
                 if device_type == DeviceType.SMARTPHONE
