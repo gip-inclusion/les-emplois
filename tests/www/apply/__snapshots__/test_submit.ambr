@@ -2785,7 +2785,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_job_seeker[queries - step 1]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -3242,6 +3242,26 @@
       }),
       dict({
         'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -3318,7 +3338,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_job_seeker[queries - step 2]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -3709,6 +3729,26 @@
       }),
       dict({
         'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -3740,7 +3780,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_job_seeker[queries - step 3]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -4177,6 +4217,26 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
       }),
       dict({
         'origin': list([
@@ -6019,7 +6079,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -6476,6 +6536,26 @@
       }),
       dict({
         'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -6552,7 +6632,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -6943,6 +7023,26 @@
       }),
       dict({
         'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -6974,7 +7074,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -7411,6 +7511,26 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          WHERE (NOT ("companies_company"."kind" IN (%s,
+                                                     %s))
+                 AND "companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
       }),
       dict({
         'origin': list([
