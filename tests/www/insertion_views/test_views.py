@@ -159,8 +159,8 @@ class TestStructures:
             Department.objects.create(code=code, name=name, region="53")
 
         structure = StructureFactory()
-        for code in ("29", "56", "35"):
-            ServiceFactory(structure=structure, eligibility_zones=[code])
+        for name, code in [("Service A", "29"), ("Service B", "56"), ("Service C", "35")]:
+            ServiceFactory(structure=structure, name=name, eligibility_zones=[code])
 
         with assertNumQueries(
             1  # structure + source
