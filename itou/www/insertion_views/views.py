@@ -27,6 +27,7 @@ from itou.insertion.utils import (
 )
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.users.perms import can_register_mobilization_event
 from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -169,7 +170,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
 @login_not_required
 @require_POST
 def register_mobilization_event(request):
-    if request.user.is_authenticated and not (request.from_employer or request.from_prescriber):
+    if not can_register_mobilization_event(request):
         raise PermissionDenied()
 
     if not (kind := request.POST.get("kind")) or kind not in MobilizationEventKind.values:
