@@ -1,10 +1,14 @@
+import logging
 from base64 import b32encode
 
 from django import forms
 from django.utils.safestring import mark_safe
 
-from itou.otp.utils import get_user_devices
+from itou.otp.utils import verify_token_for_user
 from itou.www.otp_views.enums import DeviceType
+
+
+logger = logging.getLogger(__name__)
 
 
 class ConfirmTOTPDeviceForm(forms.Form):
@@ -97,12 +101,11 @@ class VerifyOTPForm(forms.Form):
     def clean_otp_token(self):
         otp_token = self.cleaned_data.get("otp_token")
 
-        device = next(
-            (d for d in get_user_devices(self.user) if d.verify_token(otp_token)),
-            None,
-        )
+        device = verify_token_for_user(self.user, otp_token)
         if device is None:
+            logger.info("User %s failed 2FA verification", self.user.id)
             raise forms.ValidationError("Le code de validation unique (OTP) n’est pas correct.")
-        self.user.otp_device = device
 
+        self.user.otp_device = device
+        logger.info("User %s authenticated with 2FA", self.user.id)
         return otp_token

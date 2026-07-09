@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 
 from itou.companies.models import CompanyMembership
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
@@ -15,6 +16,49 @@ def get_user_devices(user):
         ItouTOTPDevice.objects.filter(user=user, disabled_at=None),
         key=lambda device: device.name,
     )
+
+
+def verify_token_for_user(user, otp_token):
+    """Return the user's device that validates `otp_token`, or None.
+
+    django_otp's `verify_token` increments the per-device throttle counter of
+    every device it fails on. Since we cannot know upfront which device produced
+    the code, we try each one. But a correct code would then penalise every
+    device tried before the match. We roll back that collateral increment on
+    those earlier devices, preserving their genuine prior failures.
+
+    Devices are locked with `select_for_update()` so a concurrent verification
+    attempt cannot interleave with the throttle read/rollback (lost update).
+    """
+    with transaction.atomic():
+        devices = (
+            ItouTOTPDevice.objects.filter(user=user, disabled_at=None)
+            .select_for_update()
+            .order_by("name")  # deterministic lock order
+        )
+        tried = []
+        for device in devices:
+            snapshot = (device.throttling_failure_count, device.throttling_failure_timestamp)
+            if device.verify_token(otp_token):
+                _rollback_collateral_throttling(tried)
+                return device
+            tried.append((device, snapshot))
+        return None
+
+
+def _rollback_collateral_throttling(tried):
+    """Undo the single throttle increment each earlier (failed) device got, in one
+    `bulk_update`. Already-throttled devices short-circuit in `verify_is_allowed`
+    without an increment, so they are skipped (unchanged count → nothing to write).
+    """
+    to_restore = []
+    for device, (prev_count, prev_timestamp) in tried:
+        if device.throttling_failure_count != prev_count:
+            device.throttling_failure_count = prev_count
+            device.throttling_failure_timestamp = prev_timestamp
+            to_restore.append(device)
+    if to_restore:
+        ItouTOTPDevice.objects.bulk_update(to_restore, ["throttling_failure_count", "throttling_failure_timestamp"])
 
 
 def create_otp_backup_code(user) -> str:

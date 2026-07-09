@@ -1,4 +1,5 @@
 import datetime
+import logging
 from functools import partial
 from unittest import mock
 
@@ -426,6 +427,39 @@ class TestItouStaffLogin:
         device.save()
         response = client.post(next_url, data=post_data)
         assertRedirects(response, admin_url)
+
+    def test_verify_with_wrong_token_throttles_every_device(self, client, settings, caplog):
+        # `VerifyOTPForm` tries every enrolled device, so a single wrong code counts against each of them
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True)
+        device_1 = ItouTOTPDeviceFactory(name="1", user=user)
+        device_2 = ItouTOTPDeviceFactory(name="2", user=user)
+        client.force_login(user)
+        verify_otp_url = reverse("otp_views:verify_otp")
+
+        with caplog.at_level(logging.INFO):
+            response = client.post(verify_otp_url, data={"otp_token": "000000"})
+        assert response.context["form"].errors == {
+            "otp_token": ["Le code de validation unique (OTP) n’est pas correct."]
+        }
+        assert f"User {user.id} failed 2FA verification" in caplog.messages
+        for device in (device_1, device_2):
+            device.refresh_from_db()
+            assert device.throttling_failure_count == 1
+
+    def test_verify_with_valid_token_logs_success(self, client, settings, caplog):
+        # Throttle-rollback behaviour is tested in tests/otp/test_utils.py, here we
+        # cover the view wiring: a valid code verifies the user and logs the success
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True)
+        device = ItouTOTPDeviceFactory(name="1", user=user)
+        client.force_login(user)
+        verify_otp_url = reverse("otp_views:verify_otp")
+
+        with caplog.at_level(logging.INFO):
+            response = client.post(verify_otp_url, data={"otp_token": TOTP(device.bin_key).token()})
+        assert response.status_code == 302
+        assert f"User {user.id} authenticated with 2FA" in caplog.messages
 
     def test_login_with_backup_code(self, client, settings, mailoutbox):
         settings.REQUIRE_OTP_FOR_STAFF = True
