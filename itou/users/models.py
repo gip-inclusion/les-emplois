@@ -1216,6 +1216,11 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                     "bénéficiaire du RSA."
                 ),
             ),
+            models.CheckConstraint(
+                condition=Q(asp_uid__regex=r"^[0-9a-f]{30}$"),
+                name="jobseekerprofile_asp_uid_format",
+                violation_error_message="L'ID unique envoyé à l'ASP doit être composé de 30 caractères hexadécimaux.",
+            ),
             models.UniqueConstraint(
                 "nir",
                 name="jobseekerprofile_unique_nir_if_not_empty",
