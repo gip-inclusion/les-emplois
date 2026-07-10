@@ -974,9 +974,9 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django,django-testing]==26.5.18.0 \
-    --hash=sha256:1727b3347bd02790773d1d35f72951eb8af7c24dd066086bf0bfb743d19f2d43 \
-    --hash=sha256:855ad34c391a6b14091fcf3834c78b6e7ae6593f90d40670edb3227c8ada1bf9
+itoutils[django,django-testing]==26.7.9.0 \
+    --hash=sha256:3f3bd3b8afd12144a38f6bb4dcab7213c1e0cbc33c6c363a4eb08fa082422e48 \
+    --hash=sha256:52b720eb33baca9256a713e47356e6659ee1c7ba91db56a3662fc7e9eb65f971
     # via -r test.txt
 jedi==0.20.0 \
     --hash=sha256:7bdd9c2634f56713299976f4cbd59cb3fa92165cc5e05ea811fb253480728b67 \
