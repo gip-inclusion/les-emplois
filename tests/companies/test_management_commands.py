@@ -17,6 +17,7 @@ from tests.approvals.factories import ProlongationRequestFactory
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
+from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -231,6 +232,21 @@ class TestMoveCompanyData:
 
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.siae == company_to
+
+    def test_move_geiq_assessments(self):
+        company_from = companies_factories.CompanyFactory(kind=CompanyKind.GEIQ)
+        company_to = companies_factories.CompanyFactory(kind=CompanyKind.GEIQ)
+        assessment = AssessmentFactory(companies=[company_from])
+
+        management.call_command(
+            "move_company_data",
+            from_id=company_from.pk,
+            to_id=company_to.pk,
+            wet_run=True,
+        )
+
+        assessment.refresh_from_db()
+        assertQuerySetEqual(assessment.companies.all(), [company_to])
 
 
 def test_update_companies_job_app_score(caplog):

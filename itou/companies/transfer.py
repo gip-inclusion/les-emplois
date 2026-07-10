@@ -9,6 +9,7 @@ from itou.companies import enums, models
 from itou.companies.enums import CompanySource
 from itou.eligibility import models as eligibility_models
 from itou.employee_record.models import EmployeeRecord
+from itou.geiq_assessments import models as geiq_assessments_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.siae_evaluations import models as siae_evaluations_models
@@ -20,6 +21,7 @@ class TransferField(TextChoices):
     IAE_DIAG_CREATED = "iae_diag_created", "Diagnostics IAE créés"
     GEIQ_DIAG_CREATED = "geiq_diag_created", "Diagnostics GEIQ créés"
     EVALUATED_SIAES = "evaluated_siaes", "Contrôles a posteriori IAE"
+    GEIQ_ASSESSMENTS = "geiq_assessments", "Bilans d'exécution GEIQ"
     JOB_APPLICATIONS_SENT = "job_applications_sent", "Candidatures envoyées"
     JOB_APPLICATIONS_RECEIVED = "job_applications_received", "Candidatures reçues"
     JOB_APPLICATIONS_TRANSFERRED = "job_applications_transferred", "Candidatures transférées"
@@ -57,6 +59,11 @@ TRANSFER_SPECS = {
         "related_model": siae_evaluations_models.EvaluatedSiae,
         "related_model_field": "siae",
         "iae_only": True,
+    },
+    TransferField.GEIQ_ASSESSMENTS: {
+        "related_model": geiq_assessments_models.Assessment.companies.through,
+        "related_model_field": "company",
+        "geiq_only": True,
     },
     TransferField.JOB_APPLICATIONS_SENT: {
         "related_model": job_applications_models.JobApplication,
