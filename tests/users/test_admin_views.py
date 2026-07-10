@@ -163,6 +163,7 @@ class TestTransferUserData:
     def test_transfer_data(self, admin_client, snapshot):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = job_application.approval
+        # FIXME: add orientation
 
         from_user = job_application.job_seeker
         to_user = JobSeekerFactory()

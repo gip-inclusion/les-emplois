@@ -275,6 +275,7 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
     "geiq_eligibility_diagnoses",  # GEIQEligibilityDiagnosis.job_seeker
     "job_applications",  # JobApplication.job_seeker
     "job_seeker_assignments",  # JobSeekerAssignment.job_seeker
+    "orientations",  # Orientation.beneficiary
 }
 
 
@@ -658,6 +659,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                     False,
                 ),
                 sent_applications_inline,
+                # FIXME: add sent orientations
             ],
             "is_job_seeker": [
                 ConditionalInline(lambda user: user.eligibility_diagnoses.all(), EligibilityDiagnosisInline, False),
@@ -666,6 +668,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 ),
                 ConditionalInline(lambda user: user.approvals.all(), ApprovalInline, False),
                 ConditionalInline(lambda user: user.job_applications.all(), JobApplicationInline, True),
+                # FIXME: add orientations
             ],
         }
         for check, related_fields in conditional_inlines.items():

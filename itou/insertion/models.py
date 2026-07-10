@@ -1,20 +1,25 @@
 import logging
 
 from data_inclusion.schema import v1 as data_inclusion_v1
+from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
+from django.core.files.storage import storages
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
 
 from itou.companies.models import Company
 from itou.insertion.enums import (
+    BeneficiaryContactPreference,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEventKind,
+    OrientationStatus,
 )
+from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.storage.s3 import generate_dora_storage_url
@@ -564,3 +569,155 @@ class MobilizationEvent(models.Model):
                 | (~models.Q(kind=MobilizationEventKind.SERVICE_EXT_LINK) & models.Q(service_external_link="")),
             ),
         ]
+
+
+class Orientation(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False)
+
+    beneficiary = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="bénéficiaire",
+        on_delete=models.RESTRICT,
+        related_name="orientations",
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="émetteur",
+        on_delete=models.RESTRICT,
+        related_name="orientations_sent",
+    )
+    sender_kind = models.CharField(
+        verbose_name="type de l'émetteur",
+        choices=SenderKind.choices,
+    )
+    sender_prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="organisation prescriptrice émettrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        related_name="orientations_sent",
+    )
+    sender_company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise émettrice",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        related_name="orientations_sent",
+    )
+    service = models.ForeignKey(
+        Service,
+        verbose_name="service d'insertion",
+        # FIXME: import_structures_and_services may delete services and would fail.
+        # Define what we want to do (archive? drop orientations?) and update the script if necessary.
+        on_delete=models.RESTRICT,
+        related_name="orientations",
+    )
+
+    # Not collected by the current orientation wizard; required for the detail page.
+    # Populated later via wizard extensions.
+    beneficiary_contact_preferences = ArrayField(
+        models.CharField(max_length=10, choices=BeneficiaryContactPreference.choices),
+        verbose_name="préférences de contact du bénéficiaire",
+        default=list,
+        blank=True,
+    )
+    beneficiary_other_contact_method = models.CharField(
+        verbose_name="autre méthode de contact du bénéficiaire",
+        max_length=280,
+        blank=True,
+    )
+    beneficiary_availability = models.DateField(
+        verbose_name="disponibilité du bénéficiaire",
+        null=True,
+        blank=True,
+    )
+    requirements = ArrayField(
+        models.CharField(max_length=480),
+        verbose_name="critères",
+        default=list,
+        blank=True,
+    )
+    situation = ArrayField(
+        models.CharField(max_length=480),
+        verbose_name="situation",
+        default=list,
+        blank=True,
+    )
+    situation_other = models.CharField(
+        verbose_name="situation - autre",
+        max_length=480,
+        blank=True,
+    )
+
+    referent_last_name = models.CharField(verbose_name="nom du référent", max_length=140)
+    referent_first_name = models.CharField(verbose_name="prénom du référent", max_length=140)
+    referent_phone = models.CharField(verbose_name="téléphone du référent", max_length=10, blank=True)
+    referent_email = models.EmailField(verbose_name="e-mail du référent")
+    orientation_reasons = models.TextField(verbose_name="motif de l'orientation", blank=True)
+
+    status = models.CharField(
+        verbose_name="statut",
+        max_length=20,
+        choices=OrientationStatus.choices,
+        default=OrientationStatus.PENDING,
+    )
+    processing_date = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
+    duration_weekly_hours = models.PositiveIntegerField(
+        verbose_name="nombre d'heures par semaine",
+        null=True,
+        blank=True,
+    )
+    duration_weeks = models.PositiveIntegerField(
+        verbose_name="nombre de semaines",
+        null=True,
+        blank=True,
+    )
+
+    data_protection_commitment = models.BooleanField(
+        verbose_name="engagement RGPD accompagnateur",
+        default=False,
+    )
+
+    attachments = ArrayField(
+        models.CharField(max_length=1024),
+        verbose_name="documents joints",
+        blank=True,
+        default=list,
+    )
+
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    class Meta:
+        verbose_name = "orientation"
+        verbose_name_plural = "orientations"
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        sender_kind=SenderKind.PRESCRIBER,
+                        sender_prescriber_organization__isnull=False,
+                        sender_company__isnull=True,
+                    )
+                    | Q(
+                        sender_kind=SenderKind.EMPLOYER,
+                        sender_company__isnull=False,
+                        sender_prescriber_organization__isnull=True,
+                    )
+                ),
+                name="orientation_sender_organization_consistent",
+            ),
+        ]
+
+    def __str__(self):
+        return str(self.id)
+
+    @property
+    def sender_organization(self):
+        return self.sender_prescriber_organization or self.sender_company
+
+    @property
+    def attachments_details(self):
+        return [{"name": attachment, "url": storages["dora"].url(attachment)} for attachment in self.attachments]

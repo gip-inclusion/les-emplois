@@ -5,15 +5,17 @@ import factory
 import factory.fuzzy
 from django.utils import timezone
 
-from itou.insertion.enums import MobilizationEventKind
+from itou.insertion.enums import MobilizationEventKind, OrientationStatus
 from itou.insertion.models import (
     GenericReferenceItem,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEvent,
+    Orientation,
     Service,
     Structure,
 )
+from itou.job_applications.enums import SenderKind
 
 
 IN_PERSON_RECEPTION_VALUE = "en-presentiel"
@@ -109,3 +111,22 @@ class MobilizationEventFactory(factory.django.DjangoModelFactory):
     session_key = factory.LazyFunction(lambda: str(uuid.uuid4()).replace("-", ""))
     kind = MobilizationEventKind.STRUCTURE_CONTACT
     structure = factory.SubFactory(StructureFactory)
+
+
+class OrientationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Orientation
+
+    id = factory.LazyFunction(uuid.uuid4)  # Expected in Dora response
+    beneficiary = factory.SubFactory("tests.users.factories.JobSeekerFactory")
+    sender = factory.SubFactory("tests.users.factories.PrescriberFactory")
+    sender_kind = SenderKind.PRESCRIBER
+    sender_prescriber_organization = factory.SubFactory("tests.prescribers.factories.PrescriberOrganizationFactory")
+    sender_company = None
+    service = factory.SubFactory(ServiceFactory)
+    referent_first_name = factory.Faker("first_name", locale="fr_FR")
+    referent_last_name = factory.Faker("last_name", locale="fr_FR")
+    referent_email = factory.Faker("email")
+    referent_phone = "0142030405"
+    data_protection_commitment = True
+    status = OrientationStatus.PENDING

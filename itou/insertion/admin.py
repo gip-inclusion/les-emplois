@@ -1,8 +1,16 @@
+import uuid
+
 from django.contrib import admin
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 
-from itou.insertion.models import GenericReferenceItem, MobilizationEvent, Service, Structure
+from itou.insertion.models import (
+    GenericReferenceItem,
+    MobilizationEvent,
+    Orientation,
+    Service,
+    Structure,
+)
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 
 
@@ -179,3 +187,103 @@ class MobilizationEventAdmin(InsertionAdmin):
     @admin.display(description="entreprise")
     def company_link(self, obj):
         return get_admin_view_link(obj.company, content=obj.company.name)
+
+
+@admin.register(Orientation)
+class OrientationAdmin(InsertionAdmin):
+    list_display = [
+        "pk",
+        "status",
+        "beneficiary",
+        "service",
+        "sender_organization_display",
+        "created_at",
+    ]
+    list_filter = ["status", "sender_kind", "created_at"]
+    list_select_related = [
+        "beneficiary",
+        "sender",
+        "sender_prescriber_organization",
+        "sender_company",
+        "service",
+        "service__structure",
+    ]
+    ordering = ["-created_at"]
+    fieldsets = [
+        (
+            "Orientation",
+            {
+                "fields": [
+                    "status",
+                    "beneficiary",
+                    "service",
+                    "duration_weekly_hours",
+                    "duration_weeks",
+                    "data_protection_commitment",
+                ]
+            },
+        ),
+        (
+            "Origine",
+            {
+                "fields": [
+                    "sender",
+                    "sender_kind",
+                    "sender_company",
+                    "sender_prescriber_organization",
+                ]
+            },
+        ),
+        (
+            "Bénéficiaire",
+            {
+                "fields": [
+                    "beneficiary_contact_preferences",
+                    "beneficiary_other_contact_method",
+                    "beneficiary_availability",
+                    "requirements",
+                    "situation",
+                    "situation_other",
+                ]
+            },
+        ),
+        (
+            "Référent",
+            {
+                "fields": [
+                    "referent_first_name",
+                    "referent_last_name",
+                    "referent_email",
+                    "referent_phone",
+                    "orientation_reasons",
+                ]
+            },
+        ),
+        (
+            "Audit",
+            {
+                "fields": [
+                    "processing_date",
+                    "created_at",
+                    "updated_at",
+                ]
+            },
+        ),
+    ]
+
+    def get_search_fields(self, request):
+        search_fields = []
+        search_term = request.GET.get("q", "").strip()
+        try:
+            uuid.UUID(search_term)
+        except (TypeError, ValueError):
+            pass
+        else:
+            search_fields.append("pk__exact")
+
+        return search_fields or ["status__startswith"]
+
+    @admin.display(description="structure émettrice")
+    def sender_organization_display(self, obj):
+        organization = obj.sender_organization
+        return organization.name if organization else "—"

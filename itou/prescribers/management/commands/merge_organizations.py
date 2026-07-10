@@ -36,6 +36,7 @@ def _model_sanity_check():
         "jobapplication",
         "members",
         "memberships",
+        "orientations_sent",
         "organization_assignments",
         "prolongation",
         "prolongationrequest",

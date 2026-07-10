@@ -132,6 +132,16 @@
       'model': 'gps.FollowUpGroupMembership',
     }),
     dict({
+      'field': 'beneficiary',
+      'hidden': False,
+      'model': 'insertion.Orientation',
+    }),
+    dict({
+      'field': 'sender',
+      'hidden': False,
+      'model': 'insertion.Orientation',
+    }),
+    dict({
       'field': 'updated_by',
       'hidden': False,
       'model': 'institutions.InstitutionMembership',
