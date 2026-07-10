@@ -11,3 +11,13 @@ class OldJobDescriptionDeactivationNotification(EmailNotification, ProfessionalN
     category = NotificationCategory.JOB_DESCRIPTION
     subject_template = "companies/email/old_job_description_deactivated_subject.txt"
     body_template = "companies/email/old_job_description_deactivated_body.txt"
+
+
+@notifications_registry.register
+class SpontaneousJobApplicationsDeactivationNotification(EmailNotification, ProfessionalNotification):
+    """Notification sent to the members of a company when spontaneous applications are deactivated"""
+
+    name = "Désactivation des candidatures spontanées"
+    category = NotificationCategory.JOB_APPLICATION
+    subject_template = "companies/email/spontaneous_jobapps_deactivated_subject.txt"
+    body_template = "companies/email/spontaneous_jobapps_deactivated_body.txt"
