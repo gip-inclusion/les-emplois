@@ -54,12 +54,6 @@ class Command(BaseCommand):
             required=True,
         )
         parser.add_argument(
-            "--ignore-siae-evaluations",
-            action=argparse.BooleanOptionalAction,
-            default=False,
-            help="Set to True to move company data despite the <FROM> company having an SIAE evaluation.",
-        )
-        parser.add_argument(
             "--preserve-to-company-data",
             action=argparse.BooleanOptionalAction,
             default=False,
@@ -85,7 +79,6 @@ class Command(BaseCommand):
         from_id,
         to_id,
         *,
-        ignore_siae_evaluations,
         only_job_applications,
         preserve_to_company_data,
         allow_asp_to_user_created_transfer,
@@ -165,7 +158,6 @@ class Command(BaseCommand):
                     to_company,
                     fields_to_transfer,
                     disable_from_company=disable_from_company,
-                    ignore_siae_evaluations=ignore_siae_evaluations,
                     allow_asp_to_user_created_transfer=allow_asp_to_user_created_transfer,
                 )
                 for section, section_changes in reporter.changes.items():

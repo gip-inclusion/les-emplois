@@ -16,7 +16,6 @@ from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline
 from itou.companies import enums, models, transfer
 from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanySource
-from itou.siae_evaluations.models import EvaluatedSiae
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
     ItouGISMixin,
@@ -355,70 +354,56 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                         )
                     )
 
-            siae_evaluations = EvaluatedSiae.objects.filter(siae=from_company).exists()
             form = CompanyChooseFieldsToTransfer(
                 fields_choices=sorted(fields_choices, key=lambda field: field[1]),
-                siae_evaluations=siae_evaluations,
                 data=request.POST or None,
             )
             if request.POST and form.is_valid():
-                if siae_evaluations and not form.cleaned_data["ignore_siae_evaluations"]:
-                    messages.error(
-                        request,
-                        (
-                            f"Impossible de transférer les objets de l'entreprise ID={from_company.pk}: "
-                            "il y a un contrôle a posteriori lié. Vérifiez avec l'équipe support."
-                        ),
+                fields_to_transfer = form.cleaned_data["fields_to_transfer"]
+                disable_from_company = form.cleaned_data["disable_from_company"]
+                try:
+                    reporter = transfer.transfer_company_data(
+                        from_company,
+                        to_company,
+                        fields_to_transfer=fields_to_transfer,
+                        disable_from_company=disable_from_company,
                     )
+                except transfer.TransferError as e:
+                    messages.error(request, e.args[0])
                 else:
-                    fields_to_transfer = form.cleaned_data["fields_to_transfer"]
-                    disable_from_company = form.cleaned_data["disable_from_company"]
-                    ignore_siae_evaluations = form.cleaned_data.get("ignore_siae_evaluations", False)
-                    try:
-                        reporter = transfer.transfer_company_data(
-                            from_company,
-                            to_company,
-                            fields_to_transfer=fields_to_transfer,
-                            disable_from_company=disable_from_company,
-                            ignore_siae_evaluations=ignore_siae_evaluations,
-                        )
-                    except transfer.TransferError as e:
-                        messages.error(request, e.args[0])
-                    else:
-                        summary_lines = [
-                            "-" * 20,
-                            f"Transfert du {timezone.now():%Y-%m-%d %H:%M:%S} effectué par {request.user} ",
-                            f"de l'entreprise {from_company.pk} vers {to_company.pk}:",
-                        ]
-                        for report_field, items in reporter.changes.items():
-                            if items:
-                                summary_lines.extend([f"- {report_field.label}:"] + [f"  * {item}" for item in items])
-                        summary_lines += ["-" * 20]
-                        summary_text = "\n".join(summary_lines)
-                        bulk_add_support_remark_to_objs([from_company, to_company], summary_text)
-                        message = format_html(
-                            "Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}.",
-                            from_company=from_company,
-                            to_company=to_company,
-                        )
-                        messages.info(request, message)
-                        logger.info(
-                            "staff user=%d transferred company=%d to company=%d with fields_to_transfer=%s, "
-                            "disable_from_company=%s, ignore_siae_evaluations=%s",
-                            request.user.pk,
-                            from_company.pk,
-                            to_company.pk,
-                            fields_to_transfer,
-                            disable_from_company,
-                            ignore_siae_evaluations,
-                        )
+                    summary_lines = [
+                        "-" * 20,
+                        f"Transfert du {timezone.now():%Y-%m-%d %H:%M:%S} effectué par {request.user} ",
+                        f"de l'entreprise {from_company.pk} vers {to_company.pk}:",
+                    ]
+                    for report_field, items in reporter.changes.items():
+                        if items:
+                            summary_lines.extend([f"- {report_field.label}:"] + [f"  * {item}" for item in items])
+                    summary_lines += ["-" * 20]
+                    summary_text = "\n".join(summary_lines)
+                    bulk_add_support_remark_to_objs([from_company, to_company], summary_text)
+                    message = format_html(
+                        "Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}.",
+                        from_company=from_company,
+                        to_company=to_company,
+                    )
+                    messages.info(request, message)
+                    logger.info(
+                        "staff user=%d transferred company=%d to company=%d with fields_to_transfer=%s, "
+                        "disable_from_company=%s",
+                        request.user.pk,
+                        from_company.pk,
+                        to_company.pk,
+                        fields_to_transfer,
+                        disable_from_company,
+                    )
 
-                        return redirect(
-                            reverse(
-                                "admin:companies_company_change",
-                                kwargs={"object_id": from_company.pk},
-                            )
+                    return redirect(
+                        reverse(
+                            "admin:companies_company_change",
+                            kwargs={"object_id": from_company.pk},
                         )
+                    )
         title = f"Transfert des données de '{from_company}' [{from_company.kind}]"
         if to_company:
             title += f" vers '{to_company}' [{to_company.kind}]"
