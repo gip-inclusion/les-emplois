@@ -334,10 +334,10 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     assert company_3.coords.y == 42.42
 
 
-def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog):
+def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog, settings):
     create_test_romes_and_appellations(("N1101",))
     old_job_description_1 = companies_factories.JobDescriptionFactory(
-        last_employer_update_at=timezone.now() - datetime.timedelta(days=90),
+        last_employer_update_at=timezone.now() - settings.DEACTIVATION_DELAY,
         company__with_membership=True,
         company__for_snapshot=True,
         for_snapshot=True,
@@ -360,7 +360,7 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
         source_kind=JobSource.PE_API,
     )
     recently_updated_job_description = companies_factories.JobDescriptionFactory(
-        last_employer_update_at=timezone.now() - datetime.timedelta(days=89),
+        last_employer_update_at=timezone.now() - settings.DEACTIVATION_DELAY + datetime.timedelta(days=1),
         location=None,
     )
     assert JobDescription.objects.active().count() == 4
@@ -385,10 +385,10 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
     assert mail.body == snapshot(name="email body")
 
 
-def test_deactivate_old_job_description_batch_size(mocker, caplog):
+def test_deactivate_old_job_description_batch_size(mocker, caplog, settings):
     create_test_romes_and_appellations(("N1101",))
     companies_factories.JobDescriptionFactory.create_batch(
-        3, last_employer_update_at=timezone.now() - datetime.timedelta(days=90)
+        3, last_employer_update_at=timezone.now() - settings.DEACTIVATION_DELAY
     )
     assert JobDescription.objects.active().count() == 3
     mocker.patch("itou.companies.management.commands.deactivate_old_job_descriptions.BATCH_SIZE", 1)
