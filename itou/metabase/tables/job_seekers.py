@@ -37,6 +37,17 @@ def get_user_age_in_years(user):
     return None
 
 
+def get_user_signup_kind(user):
+    creator = user.created_by
+    if creator is None:
+        return "autonome"
+    if creator.is_professional:
+        return "par professionnel"
+    if creator.is_staff:
+        return "par administrateur"
+    raise ValueError("Unexpected job seeker creator kind")
+
+
 def get_latest_diagnosis(job_seeker):
     return job_seeker.last_eligibility_diagnosis[0] if job_seeker.last_eligibility_diagnosis else None
 
@@ -197,6 +208,12 @@ def get_table():
             },
             {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
             get_column_from_field(get_model_field(User, "date_joined"), name="date_inscription", field_type="date"),
+            {
+                "name": "type_inscription",
+                "type": "varchar",
+                "comment": "Type inscription du candidat",
+                "fn": get_user_signup_kind,
+            },
             {
                 "name": "pe_connect",
                 "type": "boolean",
