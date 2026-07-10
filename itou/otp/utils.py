@@ -36,13 +36,10 @@ def notify_backup_code_has_been_used(user):
     email.send()
 
 
-def require_otp(user):
-    if not user.is_authenticated:
-        return False
-
-    if user.is_verified():  # user has already authenticated with MFA
-        return False
-
+def user_is_concerned_by_otp(user):
+    """Whether 2FA applies to this user, regardless of whether they have already
+    verified in the current session (unlike `require_otp`, which short-circuits on
+    `is_verified()`). Assumes an authenticated itou user."""
     if settings.REQUIRE_OTP_FOR_STAFF and user.is_itou_staff:
         return True
 
@@ -50,6 +47,16 @@ def require_otp(user):
         return True
 
     return False
+
+
+def require_otp(user):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_verified():  # user has already authenticated with MFA
+        return False
+
+    return user_is_concerned_by_otp(user)
 
 
 def _require_otp_for_pro(user):

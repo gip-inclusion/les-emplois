@@ -1,3 +1,4 @@
+{% load otp %}
 <ul class="list-unstyled">
     <li class="dropdown-item">
         <div class="d-flex align-items-center">
@@ -31,7 +32,8 @@
             <a class="dropdown-item" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
         </li>
     {% endif %}
-    {% if user.is_staff %}
+    {% show_otp_configuration user as show_otp_config %}
+    {% if show_otp_config %}
         <li>
             <a class="dropdown-item text-primary" href="{% url 'otp_views:otp_devices' %}">Configuration OTP</a>
         </li>
