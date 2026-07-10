@@ -141,5 +141,7 @@
             }
         }
     </script>
-    {% include "insertion/includes/register_mobilization_event.html" with structure_uid=structure.uid csp_nonce=csp_nonce csrf_token=csrf_token only %}
+    {% if can_register_mobilization_event %}
+        {% include "insertion/includes/register_mobilization_event.html" with structure_uid=structure.uid csp_nonce=csp_nonce csrf_token=csrf_token only %}
+    {% endif %}
 {% endblock %}

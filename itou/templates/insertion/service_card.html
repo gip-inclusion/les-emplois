@@ -421,5 +421,7 @@
 
 {% block script %}
     {{ block.super }}
-    {% include "insertion/includes/register_mobilization_event.html" with service_uid=service.uid csp_nonce=csp_nonce csrf_token=csrf_token only %}
+    {% if can_register_mobilization_event %}
+        {% include "insertion/includes/register_mobilization_event.html" with service_uid=service.uid csp_nonce=csp_nonce csrf_token=csrf_token only %}
+    {% endif %}
 {% endblock %}

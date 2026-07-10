@@ -102,6 +102,7 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
             ),
             "services": services,
             "formatted_opening_hours": self.format_opening_hours(),
+            "can_register_mobilization_event": can_register_mobilization_event(self.request),
         }
 
 
@@ -163,6 +164,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 ),
                 "formatted_categories": self.format_categories(),
                 "can_view_modal": can_view_modal,
+                "can_register_mobilization_event": can_register_mobilization_event(self.request),
             }
         )
 

@@ -24,7 +24,13 @@ from tests.insertion.factories import (
     ServiceFactory,
     StructureFactory,
 )
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -213,6 +219,34 @@ class TestStructures:
 
         response = client.get(self.get_structure_url(structure))
         assertContains(response, reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+
+    @pytest.mark.parametrize(
+        "user_factory,assertion",
+        [
+            (None, assertContains),
+            (JobSeekerFactory, assertNotContains),
+            (partial(PrescriberFactory, membership=True), assertContains),
+            (partial(EmployerFactory, membership=True), assertContains),
+            (partial(LaborInspectorFactory, membership=True), assertNotContains),
+            (ItouStaffFactory, assertNotContains),
+        ],
+    )
+    def test_card_view_register_mobilization_event_per_user_kind(self, client, user_factory, assertion):
+        structure = StructureFactory(
+            name="Structure test",
+            description="Description de test",
+            source=GenericReferenceItemFactory(
+                source=GenericReferenceItemSource.DATA_INCLUSION,
+                kind=GenericReferenceItemKind.SOURCE,
+                value=SOURCE_DORA_VALUE,
+            ),
+            source_link=f"{settings.DORA_WWW_BASE_URL}/structures/structure-test",
+        )
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.get(self.get_structure_url(structure))
+
+        assertion(response, f'body.set("structure_uid", "{structure.uid}");')
 
 
 class TestServices:
@@ -889,6 +923,28 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertNotContains(response, "Via le formulaire DORA")
         assertContains(response, "Via le formulaire (bouton “Orienter votre bénéficiaire”)")
+
+    @pytest.mark.parametrize(
+        "user_factory,assertion",
+        [
+            (None, assertContains),
+            (JobSeekerFactory, assertNotContains),
+            (partial(PrescriberFactory, membership=True), assertContains),
+            (partial(EmployerFactory, membership=True), assertContains),
+            (partial(LaborInspectorFactory, membership=True), assertNotContains),
+            (ItouStaffFactory, assertNotContains),
+        ],
+    )
+    def test_card_view_register_mobilization_event_per_user_kind(self, client, user_factory, assertion):
+        service = ServiceFactory(
+            contact_email="contact@example.com",
+            contact_is_public=True,
+        )
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.get(self.get_service_url(service))
+
+        assertion(response, f'body.set("service_uid", "{service.uid}");')
 
 
 @pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
