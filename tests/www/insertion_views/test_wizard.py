@@ -616,3 +616,24 @@ def test_orientation_wizard_banner_quitter_goes_to_job_seekers_list(client):
     response = client.get(conformity_url)
     quit_link = parse_response_to_soup(response, 'a[aria-label="Quitter la procédure"]')
     assert quit_link["href"] == reverse("job_seekers_views:list")
+
+
+def test_no_error_when_special_chars_in_uid(client):
+    """Check that reset url and redirection to orientation_select_job_seeker have encoded uids"""
+    prescriber = PrescriberFactory(membership=True)
+    service = ServiceFactory(
+        is_orientable_with_form=True,
+        structure__name="Structure orientation wizard",
+        uid="fredo--97416_13643-activités / ateliers",  # real case
+    )
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+    select_job_seeker_url = reverse(
+        "insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid}
+    )
+    service_url = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    response = client.get(start_url)
+    assertRedirects(response, select_job_seeker_url, fetch_redirect_response=False)
+    response = client.get(select_job_seeker_url)
+    assertContains(response, service_url)  # reset button

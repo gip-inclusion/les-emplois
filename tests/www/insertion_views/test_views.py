@@ -207,6 +207,13 @@ class TestStructures:
         assertContains(response, "Lieu d'accueil : Loudun")
         assertContains(response, "Lieu d'accueil : à distance")
 
+    def test_no_error_when_special_chars_in_uid(self, client):
+        structure = StructureFactory()
+        service = ServiceFactory(structure=structure, uid="fredo--97416_13643-activités / ateliers")  # real case
+
+        response = client.get(self.get_structure_url(structure))
+        assertContains(response, reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+
 
 class TestServices:
     LOGIN_URL = reverse("login:existing_user")

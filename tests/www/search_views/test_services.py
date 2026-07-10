@@ -149,3 +149,12 @@ class TestSearchServices:
             client.get(self.URL, {"city": vannes.slug, "category": CATEGORY, "reception": REMOTE_RECEPTION_VALUE})
         )
         assertSoupEqual(simulated_page, fresh_page)
+
+    def test_no_error_when_special_chars_in_uid(self, client):
+        vannes = create_city_vannes()
+        service = ServiceFactory(
+            coordinates=vannes.coords, city="Vannes", uid="fredo--97416_13643-activités / ateliers"
+        )  # real case
+
+        response = client.get(self.URL, {"city": vannes.slug, "category": CATEGORY})
+        assertContains(response, reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))

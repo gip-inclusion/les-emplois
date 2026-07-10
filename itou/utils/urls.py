@@ -1,4 +1,4 @@
-from urllib.parse import SplitResult, urlsplit
+from urllib.parse import SplitResult, quote, unquote, urlsplit
 
 from django.conf import settings
 from django.http import QueryDict
@@ -88,6 +88,20 @@ class SiretConverter:
 
     def to_url(self, value):
         return f"{value}"
+
+
+class EncodedUidConverter:
+    """
+    URL-encoded UID (handles slashes and other reserved characters).
+    """
+
+    regex = r"[^/]+"
+
+    def to_python(self, value: str) -> str:
+        return unquote(value)
+
+    def to_url(self, value: str) -> str:
+        return quote(value, safe="")
 
 
 def get_tally_form_url(form_id, **kwargs):
