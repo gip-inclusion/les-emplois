@@ -37,6 +37,7 @@ from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.insertion.models import MobilizationEvent
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
@@ -58,6 +59,7 @@ from itou.metabase.tables import (
     job_descriptions,
     job_seekers,
     memberships,
+    mobilization_events,
     organizations,
     prolongation_requests,
     prolongations,
@@ -123,6 +125,7 @@ class Command(BaseCommand):
             "memberships": self.populate_memberships,
             "gps_groups": self.populate_gps_groups,
             "gps_memberships": self.populate_gps_memberships,
+            "mobilization_events": self.populate_mobilization_events,
         }
 
     def add_arguments(self, parser):
@@ -661,6 +664,12 @@ class Command(BaseCommand):
             )
         )
         metabase_db.populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
+
+    def populate_mobilization_events(self):
+        queryset = MobilizationEvent.objects.all().select_related("structure", "service", "structure__source")
+        metabase_db.populate_table(
+            mobilization_events.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois"
+        )
 
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),

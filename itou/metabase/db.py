@@ -20,8 +20,8 @@ from itou.metabase.utils import convert_boolean_to_int, convert_datetime_to_loca
 logger = logging.getLogger(__name__)
 
 
-def get_connection():
-    return psycopg.connect(
+def get_connection(schema):
+    connection = psycopg.connect(
         host=settings.PILOTAGE_DATASTORE_DB_HOST,
         port=settings.PILOTAGE_DATASTORE_DB_PORT,
         dbname=settings.PILOTAGE_DATASTORE_DB_DATABASE,
@@ -32,6 +32,11 @@ def get_connection():
         keepalives_interval=5,
         keepalives_count=5,
     )
+    if schema:
+        with connection.cursor() as cur:
+            cur.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(schema)))
+            cur.execute(sql.SQL("SET SEARCH_PATH to {}").format(sql.Identifier(schema)))
+    return connection
 
 
 def get_new_table_name(table_name):
@@ -42,7 +47,7 @@ def get_old_table_name(table_name):
     return f"z_old_{table_name}"
 
 
-def rename_table_atomically(from_table_name, to_table_name):
+def rename_table_atomically(from_table_name, to_table_name, schema=None):
     """
     Rename from_table_name to to_table_name.
     Most of the time, we replace an existing table, so we will first rename
@@ -52,7 +57,7 @@ def rename_table_atomically(from_table_name, to_table_name):
     are deleted as well, they will be rebuilt by the next run of the airflow DAG `dbt_daily`.
     """
 
-    with get_connection() as conn, conn.cursor() as cur:
+    with get_connection(schema=schema) as conn, conn.cursor() as cur:
         # CASCADE will drop airflow staging views (e.g. stg_structures) as well.
         cur.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(sql.Identifier(get_old_table_name(to_table_name)))
@@ -75,9 +80,9 @@ def rename_table_atomically(from_table_name, to_table_name):
         )
 
 
-def create_table(table_name: str, columns: list[str, str], reset=False):
+def create_table(table_name: str, columns: list[str, str], schema=None, reset=False):
     """Create table from columns names and types"""
-    with get_connection() as conn, conn.cursor() as cursor:
+    with get_connection(schema=schema) as conn, conn.cursor() as cursor:
         if reset:
             cursor.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name)))
         create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
@@ -89,7 +94,7 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
         cursor.execute(create_table_query)
 
 
-def populate_table(table, batch_size, querysets=None):
+def populate_table(table, batch_size, querysets=None, schema=None):
     """
     About commits: a single final commit freezes the itou-metabase-db temporarily, making
     our GUI unable to connect to the db during this commit.
@@ -133,9 +138,9 @@ def populate_table(table, batch_size, querysets=None):
     logger.info("Injecting %i rows with %i columns into %r", total_rows, len(table.columns), table_name)
 
     new_table_name = get_new_table_name(table_name)
-    create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True)
+    create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True, schema=schema)
 
-    with get_connection() as conn, conn.cursor() as cur:
+    with get_connection(schema=schema) as conn, conn.cursor() as cur:
 
         def inject_chunk(table_columns, chunk, new_table_name):
             rows = [[c["fn"](row) for c in table_columns] for row in chunk]
@@ -186,5 +191,5 @@ def populate_table(table, batch_size, querysets=None):
             # Trigger garbage collection to optimize memory use.
             gc.collect()
 
-    rename_table_atomically(new_table_name, table_name)
+    rename_table_atomically(new_table_name, table_name, schema=schema)
     logger.info("%r created in %0.2f seconds", table_name, time.perf_counter() - start_time)
