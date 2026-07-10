@@ -15,11 +15,12 @@ from itou.companies.models import JobDescription, SiaeACIConvergencePHC
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
+from itou.insertion.enums import MobilizationEventKind
 from itou.job_applications.enums import JobApplicationState
-from itou.metabase.tables import gps
+from itou.metabase.tables import gps, mobilization_events
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityProvider
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider
 from itou.utils.db import dictfetchall
 from itou.utils.types import InclusiveDateRange
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -33,6 +34,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geo.factories import create_qpv
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.insertion.factories import MobilizationEventFactory, ServiceFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -1218,6 +1220,86 @@ def test_populate_organizations(snapshot):
             "date_dernière_connexion": None,
             "active": 0,
             "brsa": second_organisation.is_brsa,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+    ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+def test_populate_mobilization_events(snapshot):
+    company_membership = CompanyMembershipFactory()
+    prescriber_membership = PrescriberMembershipFactory()
+
+    structure_mobilization_event = MobilizationEventFactory(user=None, kind=MobilizationEventKind.STRUCTURE_CONTACT)
+    service_mobilization_event = MobilizationEventFactory(
+        user=prescriber_membership.user,
+        prescriber_organization=prescriber_membership.organization,
+        service=ServiceFactory(),
+        kind=MobilizationEventKind.SERVICE_CONTACT,
+    )
+    ext_orientation_mobilization_event = MobilizationEventFactory(
+        user=company_membership.user,
+        company=company_membership.company,
+        service=ServiceFactory(),
+        kind=MobilizationEventKind.SERVICE_EXT_LINK,
+        service_external_link="https://orientation.fake",
+    )
+
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="mobilization_events")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {mobilization_events.TABLE.name} ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": structure_mobilization_event.pk,
+            "date": structure_mobilization_event.created_at,
+            "user_session": structure_mobilization_event.session_key,
+            "user_kind": "emplois_anonymous",
+            "user_id": None,
+            "user_prescriber_organization_id": None,
+            "user_company_id": None,
+            "kind": MobilizationEventKind.STRUCTURE_CONTACT.value,
+            "structure_id": structure_mobilization_event.structure.uid,
+            "service_id": None,
+            "source": structure_mobilization_event.structure.source.value,
+            "external_link": "",
+            "orientation_id": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": service_mobilization_event.pk,
+            "date": service_mobilization_event.created_at,
+            "user_session": service_mobilization_event.session_key,
+            "user_kind": "emplois_" + KIND_PRESCRIBER,
+            "user_id": service_mobilization_event.user_id,
+            "user_prescriber_organization_id": service_mobilization_event.prescriber_organization_id,
+            "user_company_id": None,
+            "kind": MobilizationEventKind.SERVICE_CONTACT.value,
+            "structure_id": service_mobilization_event.structure.uid,
+            "service_id": service_mobilization_event.service.uid,
+            "source": service_mobilization_event.structure.source.value,
+            "external_link": "",
+            "orientation_id": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": ext_orientation_mobilization_event.pk,
+            "date": ext_orientation_mobilization_event.created_at,
+            "user_session": ext_orientation_mobilization_event.session_key,
+            "user_kind": "emplois_" + KIND_EMPLOYER,
+            "user_id": ext_orientation_mobilization_event.user_id,
+            "user_prescriber_organization_id": None,
+            "user_company_id": ext_orientation_mobilization_event.company_id,
+            "kind": MobilizationEventKind.SERVICE_EXT_LINK.value,
+            "structure_id": ext_orientation_mobilization_event.structure.uid,
+            "service_id": ext_orientation_mobilization_event.service.uid,
+            "source": ext_orientation_mobilization_event.structure.source.value,
+            "external_link": "https://orientation.fake",
+            "orientation_id": None,
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]
