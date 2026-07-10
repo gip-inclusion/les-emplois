@@ -913,5 +913,5 @@ def _read_id_list(relative_path: str) -> set:
 REQUIRE_MFA_ON_COMPANY_IDS = _read_id_list("otp/data/mfa_required_companies.csv")
 REQUIRE_MFA_ON_ORGANIZATION_IDS = _read_id_list("otp/data/mfa_required_organizations.csv")
 
-# Delay until job descriptions are deactivated
+# Delay until job descriptions or spontaneous job applications are deactivated
 DEACTIVATION_DELAY = datetime.timedelta(days=90)

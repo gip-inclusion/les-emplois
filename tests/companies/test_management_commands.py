@@ -403,3 +403,52 @@ def test_deactivate_old_job_description_batch_size(mocker, caplog, settings):
     management.call_command("deactivate_old_job_descriptions")
     assert JobDescription.objects.active().count() == 1
     assert [record.message for record in caplog.records if record.levelname == "ERROR"] == []
+
+
+def test_deactivate_spontaneous_jobapps(snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog, settings):
+    company = companies_factories.CompanyWith2MembershipsFactory(
+        name="Black Mesa",
+        kind=CompanyKind.EI,
+        spontaneous_applications_open_since=timezone.now() - settings.DEACTIVATION_DELAY,
+    )
+    # Inactive memberships or users should not receive the mail
+    companies_factories.CompanyMembershipFactory(company=company, is_admin=False, is_active=False)
+    companies_factories.CompanyMembershipFactory(company=company, is_admin=False, user__is_active=False)
+
+    with assertSnapshotQueries(snapshot(name="SQL")):
+        with django_capture_on_commit_callbacks(execute=True):
+            management.call_command("deactivate_spontaneous_jobapps")
+
+    company.refresh_from_db()
+    assert company.spontaneous_applications_open_since is None
+    assert not company.is_open_to_spontaneous_applications
+
+    assert caplog.messages[:-1] == ["Deactivated spontaneous job applications for 1 Companies"]
+    assert len(mailoutbox) == 2
+
+    assert set(sum((mail.to for mail in mailoutbox), [])) == set(
+        company.memberships.values_list("user__email", flat=True)
+    )
+    mail = next(mail for mail in mailoutbox if mail.to == [company.members.first().email])
+    assert mail.subject == snapshot(name="email subject")
+    assert mail.body == snapshot(name="email body")
+
+
+def test_deactivate_spontaneous_jobapps_batch_size(mocker, caplog, settings):
+    companies_factories.CompanyMembershipFactory.create_batch(
+        3,
+        company__spontaneous_applications_open_since=timezone.now() - settings.DEACTIVATION_DELAY,
+    )
+    assert Company.objects.filter(spontaneous_applications_open_since__isnull=False).count() == 3
+    mocker.patch("itou.companies.management.commands.deactivate_spontaneous_jobapps.BATCH_SIZE", 1)
+
+    management.call_command("deactivate_spontaneous_jobapps")
+    assert Company.objects.filter(spontaneous_applications_open_since__isnull=False).count() == 2
+    assert [record.message for record in caplog.records if record.levelname == "ERROR"] == [
+        "Too many Companies to deactivate spontaneous job applications for: 2",
+    ]
+
+    caplog.clear()
+    management.call_command("deactivate_spontaneous_jobapps")
+    assert Company.objects.filter(spontaneous_applications_open_since__isnull=False).count() == 1
+    assert [record.message for record in caplog.records if record.levelname == "ERROR"] == []
