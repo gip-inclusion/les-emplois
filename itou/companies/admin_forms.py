@@ -37,11 +37,3 @@ class SelectTargetCompanyForm(forms.Form):
 
 class CompanyChooseFieldsToTransfer(ChooseFieldsToTransfer):
     disable_from_company = forms.BooleanField(label="Désactiver l’entreprise source", required=False, initial=True)
-
-    def __init__(self, *args, fields_choices, siae_evaluations, **kwargs):
-        super().__init__(*args, fields_choices=fields_choices, **kwargs)
-        if siae_evaluations:
-            self.fields["ignore_siae_evaluations"] = forms.BooleanField(
-                label="Ignorer la présence d'un contrôle a posteriori.",
-                required=True,
-            )

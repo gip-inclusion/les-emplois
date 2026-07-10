@@ -391,8 +391,7 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert (
             f"staff user={get_user(admin_client).pk} transferred company={from_company.pk} to company={to_company.pk}"
-            " with fields_to_transfer=['job_applications_received'], disable_from_company=False,"
-            " ignore_siae_evaluations=False" in caplog.messages
+            " with fields_to_transfer=['job_applications_received'], disable_from_company=False" in caplog.messages
         )
 
     @freeze_time("2023-08-31 12:34:56")
