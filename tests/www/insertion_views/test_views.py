@@ -176,7 +176,7 @@ class TestStructures:
 
         assert response.status_code == 200
         perimeters = [service.perimeter for service in response.context["services"]]
-        assert sorted(perimeters) == ["Finistère", "Ille-et-Vilaine", "Morbihan"]
+        assert perimeters == ["Finistère", "Morbihan", "Ille-et-Vilaine"]
         assertContains(response, "Périmètre : Finistère")
         assertContains(response, "Périmètre : Morbihan")
         assertContains(response, "Périmètre : Ille-et-Vilaine")
