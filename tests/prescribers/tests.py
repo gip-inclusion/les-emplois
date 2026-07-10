@@ -374,6 +374,8 @@ class TestPrescriberOrganizationModel:
             from_prescriber=True, author_prescriber_organization=organization_1
         )
 
+        # FIXME: add orientation
+
         count_job_applications = job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 2
         assert count_job_applications == 2

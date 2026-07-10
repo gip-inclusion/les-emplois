@@ -132,6 +132,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "jobapplicationtransitionlog",  # JobApplicationTransitionLog.user
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
         "logentry",  # django.contrib.admin.models.LogEntry.user
+        "orientations_sent",  # Orientation.sender
         "prescriber_org_invitations",  # PrescriberWithOrgInvitation.sender
         "prescribermembership",  # PrescriberMembership.user
         "prescriberorganization",  # PrescriberOrganization.members
