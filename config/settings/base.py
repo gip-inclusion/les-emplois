@@ -729,7 +729,6 @@ SECURE_CSP = {
         "https://pilotage.inclusion.beta.gouv.fr",
     ],
     "frame-src": [
-        "https://app.livestorm.co",  # Upcoming events from the homepage
         # For stats/pilotage views
         "https://tally.so",
         "https://stats.inclusion.beta.gouv.fr",

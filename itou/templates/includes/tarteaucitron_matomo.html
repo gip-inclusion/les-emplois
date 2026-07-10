@@ -62,35 +62,6 @@
     {% endif %}
     /* beautify ignore:end */
 
-    // livestorm
-    tarteaucitron.services.livestorm = {
-        "key": "livestorm",
-        "type": "video",
-        "name": "Livestorm",
-        "uri": "https://livestorm.co/fr/politique-confidentialite",
-        "needConsent": true,
-        "cookies": [],
-        "js": function() {
-            "use strict";
-            tarteaucitron.fallback(['js-tac-livestorm'], function(x) {
-                var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
-                    height = tarteaucitron.fixSelfXSS(x.getAttribute("height") || '365'),
-                    url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
-                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
-            });
-        },
-        "fallback": function() {
-            "use strict";
-            var id = 'livestorm';
-            tarteaucitron.fallback(['js-tac-livestorm'], function(elem) {
-                elem.style.width = elem.getAttribute('width');
-                elem.style.height = "265px";
-                return tarteaucitron.engage(id);
-            });
-        }
-    };
-    (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
-
     // tally
     tarteaucitron.services.tally = {
         "key": "tally",
