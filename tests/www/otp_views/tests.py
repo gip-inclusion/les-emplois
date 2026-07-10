@@ -62,6 +62,42 @@ def test_permissions(client, factory, expected_status):
     assert response.status_code == expected_status
 
 
+class TestConfigurationOtpMenuLink:
+    """The "Configuration OTP" item in the "Mon espace" dropdown is shown to every user
+    concerned by 2FA (`user_is_concerned_by_otp`), not only to staff."""
+
+    OTP_CONFIG_MARKUP = ">Configuration OTP</a>"
+
+    def _get_dashboard(self, client, user, verified=False):
+        client.force_login(user)
+        if verified:
+            # Mark the session verified so the OTP middleware does not redirect a concerned
+            # user to enrollment: the menu link must still show for a verified concerned user.
+            attach_device_to_user_session(client, ItouTOTPDeviceFactory(user=user))
+        return client.get(reverse("dashboard:index"), follow=True)
+
+    def test_hidden_for_job_seeker(self, client):
+        response = self._get_dashboard(client, JobSeekerFactory(with_address=True))
+        assertNotContains(response, self.OTP_CONFIG_MARKUP)
+
+    @pytest.mark.parametrize("is_concerned", [True, False])
+    def test_professional_depends_on_allowlist(self, client, settings, is_concerned):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = EmployerFactory(membership=True)
+        if is_concerned:
+            settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
+        response = self._get_dashboard(client, user, verified=is_concerned)
+        if is_concerned:
+            assertContains(response, self.OTP_CONFIG_MARKUP)
+        else:
+            assertNotContains(response, self.OTP_CONFIG_MARKUP)
+
+    def test_visible_for_staff(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        response = self._get_dashboard(client, ItouStaffFactory(), verified=True)
+        assertContains(response, self.OTP_CONFIG_MARKUP)
+
+
 @freeze_time("2025-03-11 05:18:56")
 def test_device_list(client, snapshot):
     user = ItouStaffFactory()
