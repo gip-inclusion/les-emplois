@@ -34,6 +34,7 @@
   "45 3 * * * $ROOT/clevercloud/run_management_command.sh migrate_resume_to_private --wet-run",
   "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
   "30 4 * * * $ROOT/clevercloud/run_management_command.sh redact_zendesk_attachments",
+  "45 4 * * * $ROOT/clevercloud/run_management_command.sh deactivate_spontaneous_jobapps",
   "0 5 * * * $ROOT/clevercloud/run_management_command.sh deactivate_old_job_descriptions",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
   "45 5 * * * $ROOT/clevercloud/run_management_command.sh migrate_resume_to_private --wet-run",
