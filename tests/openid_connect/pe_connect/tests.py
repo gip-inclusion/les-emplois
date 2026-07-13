@@ -40,12 +40,16 @@ def mock_oauth_dance(
     client,
     expected_route="dashboard:index",
     user_info=None,
+    timeout=False,
 ):
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
-    user_info = user_info or PEAMU_USERINFO
-    respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
+    if timeout:
+        respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
+    else:
+        user_info = user_info or PEAMU_USERINFO
+        respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
     fake_api_data = {
         "dateDeNaissance": "2000-01-01T00:00:00Z",
@@ -399,14 +403,7 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_unavailable_endpoint_user_info(self, client):
-        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
-        respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
-        respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
-
-        state = PoleEmploiConnectState.save_state()
-        url = reverse("pe_connect:callback")
-        response = client.get(url, data={"code": "123", "state": state}, follow=True)
-        assertRedirects(response, reverse("account_login"))
+        response = mock_oauth_dance(client, timeout=True, expected_route="account_login")
         assertMessages(
             response,
             [
