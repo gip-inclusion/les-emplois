@@ -56,9 +56,6 @@ def _encode_id_token(id_token_data):
     )
 
 
-ID_TOKEN_ENCODED = _encode_id_token(ID_TOKEN_DATA)
-
-
 # Make sure to use respx_mock fixture or @respx.mock decorator on tests using this helper.
 def mock_oauth_dance(
     client,

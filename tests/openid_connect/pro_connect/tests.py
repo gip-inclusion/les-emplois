@@ -4,9 +4,7 @@ from operator import itemgetter
 from unittest import mock
 from urllib.parse import quote, urlencode
 
-import httpx
 import pytest
-import respx
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.auth.models import AnonymousUser
@@ -43,7 +41,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationFactory
-from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA, ID_TOKEN_ENCODED
+from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
@@ -300,14 +298,6 @@ class TestProConnectAuthorizeView:
 
 class TestProConnectCallbackView:
     def test_callback_invalid_state(self, client, pro_connect):
-        token_json = {
-            "access_token": "access_token",
-            "token_type": "Bearer",
-            "expires_in": 60,
-            "id_token": ID_TOKEN_ENCODED,
-        }
-        respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
-
         url = reverse("pro_connect:callback")
         response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302

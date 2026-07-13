@@ -231,6 +231,11 @@ def pro_connect_callback(request):
         )
         return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
 
+    # Check if state is valid and session exists
+    pro_connect_state = ProConnectState.get_from_state(state)
+    if pro_connect_state is None or not pro_connect_state.is_valid():
+        return _redirect_to_login_page_on_error(request=request)
+
     # Get access token now to have more data in sentry
     token_data, error_redirection = _get_token(request, code)
     if error_redirection:
@@ -238,11 +243,6 @@ def pro_connect_callback(request):
     access_token = token_data.get("access_token")
     if not access_token:
         return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
-
-    # Check if state is valid and session exists
-    pro_connect_state = ProConnectState.get_from_state(state)
-    if pro_connect_state is None or not pro_connect_state.is_valid():
-        return _redirect_to_login_page_on_error(request=request)
 
     # Decode id_token and check nonce
     try:
