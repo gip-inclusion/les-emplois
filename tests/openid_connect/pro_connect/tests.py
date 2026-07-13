@@ -374,30 +374,22 @@ class TestProConnectCallbackView:
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
         user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.JOB_SEEKER)
 
-        expected_redirect_url = reverse(
-            "pro_connect:logout",
-            query={
-                "redirect_url": reverse("search:employers_home"),
-                "token": ID_TOKEN_ENCODED,
-            },
-        )
-
-        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_failure=True)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_failure=True)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_failure=True)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-        pro_connect.mock_oauth_dance(client, expected_redirect_url=expected_redirect_url)
+        pro_connect.mock_oauth_dance(client, expected_failure=True)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
@@ -406,16 +398,7 @@ class TestProConnectCallbackView:
         pc_user_data = ProConnectUserData.from_user_info(pro_connect.oidc_userinfo)
 
         user = JobSeekerFactory(username=pc_user_data.username, email=pc_user_data.email)
-        response = pro_connect.mock_oauth_dance(
-            client,
-            expected_redirect_url=reverse(
-                "pro_connect:logout",
-                query={
-                    "redirect_url": reverse("search:employers_home"),
-                    "token": ID_TOKEN_ENCODED,
-                },
-            ),
-        )
+        response = pro_connect.mock_oauth_dance(client, expected_failure=True)
         response = client.get(reverse("search:employers_home"))
         assertContains(response, "existe déjà avec cette adresse e-mail")
         assertContains(response, "pour devenir professionnel sur la plateforme")
@@ -430,16 +413,7 @@ class TestProConnectCallbackView:
             kind=UserKind.PROFESSIONAL,
             is_active=False,
         )
-        response = pro_connect.mock_oauth_dance(
-            client,
-            expected_redirect_url=reverse(
-                "pro_connect:logout",
-                query={
-                    "redirect_url": reverse("search:employers_home"),
-                    "token": ID_TOKEN_ENCODED,
-                },
-            ),
-        )
+        response = pro_connect.mock_oauth_dance(client, expected_failure=True)
         assertMessages(
             response,
             [
