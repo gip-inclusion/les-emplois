@@ -111,6 +111,16 @@ def ft_connect_callback(request):
 
     token_data = response.json()
 
+    # check nonce in response payload
+    # https://francetravail.io/produits-partages/documentation/utilisation-api-france-travail/authorization-code-flow
+    nonce = token_data.get("nonce")
+    if nonce is None or nonce != pe_state.nonce:
+        error_msg = (
+            "Le paramètre « nonce » fourni par PôleEmploiConnect et nécessaire à votre authentification "
+            "n’est pas valide."
+        )
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
+
     if not token_data or "access_token" not in token_data:
         error_msg = (
             f"Aucun champ « access_token » dans la réponse {IdentityProvider.FT_CONNECT.label}, "

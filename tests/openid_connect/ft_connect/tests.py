@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.http import QueryDict
 from django.test import override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import crypto, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
@@ -43,8 +43,16 @@ def mock_oauth_dance(
     expected_route="dashboard:index",
     user_info=None,
     userinfo_timeout=False,
+    matching_nonces=True,
 ):
-    token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+    nonce = crypto.get_random_string(length=12)
+    token_json = {
+        "access_token": "7890123",
+        "token_type": "Bearer",
+        "expires_in": 60,
+        "id_token": "123456",
+        "nonce": nonce,
+    }
     respx.post(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     if userinfo_timeout:
@@ -67,8 +75,10 @@ def mock_oauth_dance(
     ]:
         respx.get(f"{settings.API_ESD['BASE_URL']}/{api}").mock(return_value=httpx.Response(200, json=fake_api_data))
 
-    state = FranceTravailConnectState.save_state()
-    url = reverse("ft_connect:callback")
+    state = FranceTravailConnectState.save_state(
+        nonce=nonce if matching_nonces else crypto.get_random_string(length=12)
+    )
+    url = reverse("pe_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
@@ -273,6 +283,22 @@ class TestPoleEmploiConnect:
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.birthdate == datetime.date(2001, 1, 1)
+
+    @respx.mock
+    def test_callback_mismatched_nonce(self, client):
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance(client, expected_route="account_login", matching_nonces=False)
+        assert User.objects.count() == 0
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Le paramètre « nonce » fourni par PôleEmploiConnect et nécessaire à votre authentification "
+                    "n’est pas valide.",
+                )
+            ],
+        )
 
     @respx.mock
     def test_callback_no_email(self, client):
