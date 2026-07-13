@@ -396,7 +396,7 @@ def test_deactivate_old_job_description_batch_size(mocker, caplog, settings):
     management.call_command("deactivate_old_job_descriptions")
     assert JobDescription.objects.active().count() == 2
     assert [record.message for record in caplog.records if record.levelname == "ERROR"] == [
-        "Too many old JobDescriptions to deactivate"
+        "Too many old JobDescriptions to deactivate: 2"
     ]
 
     caplog.clear()
