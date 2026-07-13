@@ -198,7 +198,6 @@ def pe_connect_callback(request):
     login(request, user)
     # Keep token_data["id_token"] to logout from PEAMU
     request.session[constants.PE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
-    request.session[constants.PE_CONNECT_SESSION_STATE] = state
     request.session.modified = True
 
     next_url = reverse("dashboard:index")
