@@ -84,7 +84,6 @@ def mock_oauth_dance(
     }
     authorize_params = {k: v for k, v in authorize_params.items() if v}
 
-    # Calling this view is mandatory to start a new session.
     authorize_url = f"{reverse('pro_connect:authorize')}?{urlencode(authorize_params)}"
     response = client.get(authorize_url)
     assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)

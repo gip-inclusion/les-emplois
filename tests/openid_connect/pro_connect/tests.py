@@ -9,7 +9,6 @@ import pytest
 import respx
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages import Message
 from django.core import signing
 from django.core.exceptions import ValidationError
@@ -35,13 +34,12 @@ from itou.openid_connect.pro_connect.models import (
     ProConnectState,
     ProConnectUserData,
 )
-from itou.openid_connect.pro_connect.views import ProConnectSession
 from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
-from itou.utils.urls import get_absolute_url
+from itou.utils.urls import get_absolute_url, get_url_param_value
 from tests.job_applications.factories import JobApplicationFactory
 from tests.openid_connect.pro_connect.testing import ID_TOKEN_DATA, ID_TOKEN_ENCODED
 from tests.otp.factories import ItouTOTPDeviceFactory
@@ -53,7 +51,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.testing import accept_legal_terms, get_request
+from tests.utils.testing import accept_legal_terms
 
 
 class TestProConnectModel:
@@ -268,7 +266,7 @@ class TestProConnectAuthorizeView:
         url = pro_connect.authorize_url
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
-        pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
+        pc_state = ProConnectState.get_from_state(get_url_param_value(response.url, "state"))
         assert pc_state.nonce is not None
         assert f"nonce={pc_state.nonce}" in response.url
 
@@ -276,7 +274,7 @@ class TestProConnectAuthorizeView:
         url = f"{pro_connect.authorize_url}?register=true"
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
-        pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
+        pc_state = ProConnectState.get_from_state(get_url_param_value(response.url, "state"))
         assert pc_state.nonce is not None
         assert f"nonce={pc_state.nonce}" in response.url
 
@@ -286,7 +284,7 @@ class TestProConnectAuthorizeView:
         url = f"{pro_connect.authorize_url}?{urlencode(params)}"
         response = client.get(url, follow=False)
         assert f"login_hint={quote(email)}" in response.url
-        pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
+        pc_state = ProConnectState.get_from_state(get_url_param_value(response.url, "state"))
         assert pc_state.data["user_email"] == email
         assert pc_state.nonce is not None
         assert f"nonce={pc_state.nonce}" in response.url
@@ -575,23 +573,6 @@ class TestProConnectCallbackView:
         assert User.objects.count() == 0
         assert get_user(client).is_authenticated is False
         assert "ProConnect id_token nonce mismatch" in caplog.messages
-
-
-class TestProConnectSession:
-    def test_start_session(self, subtests):
-        pc_session = ProConnectSession()
-        assert pc_session.key == constants.PRO_CONNECT_SESSION_KEY
-
-        expected_keys = ["token", "state"]
-        pc_session_dict = dataclasses.asdict(pc_session)
-        for key in expected_keys:
-            with subtests.test(key):
-                assert key in pc_session_dict.keys()
-                assert pc_session_dict[key] is None
-
-        request = get_request(AnonymousUser())
-        pc_session.bind_to_request(request)
-        assert request.session.get(constants.PRO_CONNECT_SESSION_KEY)
 
 
 class TestProConnectLogin:
