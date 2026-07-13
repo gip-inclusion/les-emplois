@@ -8,12 +8,13 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import crypto, timezone
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.pro_connect import constants
 from itou.users.enums import IdentityProvider
+from itou.utils.urls import get_url_param_value
 from tests.utils.testing import reload_module
 
 
@@ -70,6 +71,7 @@ def mock_oauth_dance(
     oidc_userinfo=None,
     id_token_data=None,
     expected_failure=False,  # login flow failed, redirect to logout
+    matching_nonces=True,
 ):
     user_info = oidc_userinfo or OIDC_USERINFO.copy()
 
@@ -87,7 +89,11 @@ def mock_oauth_dance(
     response = client.get(authorize_url)
     assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
 
+    state = get_url_param_value(response.url, "state")
+    nonce = get_url_param_value(response.url, "nonce") if matching_nonces else crypto.get_random_string(length=12)
+
     id_token_data = id_token_data or deepcopy(ID_TOKEN_DATA)
+    id_token_data["nonce"] = nonce
     id_token = _encode_id_token(id_token_data)
     token_json = {
         "access_token": "access_token",
@@ -104,7 +110,6 @@ def mock_oauth_dance(
     user_info_jwt = jwt.encode(payload=user_info, key=constants.PRO_CONNECT_CLIENT_SECRET, algorithm="HS256")
     respx.get(constants.PRO_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, content=user_info_jwt))
 
-    state = client.session[constants.PRO_CONNECT_SESSION_KEY]["state"]
     url = reverse("pro_connect:callback")
     response = client.get(url, data={"code": "123", "state": state})
     # If a expected_redirect_url was provided, check it redirects there

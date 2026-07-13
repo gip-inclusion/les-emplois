@@ -566,6 +566,16 @@ class TestProConnectCallbackView:
             ],
         )
 
+    def test_callback_mismatched_nonce(self, client, pro_connect, caplog):
+        pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=reverse("search:employers_home"),
+            matching_nonces=False,
+        )
+        assert User.objects.count() == 0
+        assert get_user(client).is_authenticated is False
+        assert "ProConnect id_token nonce mismatch" in caplog.messages
+
 
 class TestProConnectSession:
     def test_start_session(self, subtests):
@@ -716,7 +726,7 @@ class TestProConnectLogout:
             add_url_params(
                 constants.PRO_CONNECT_ENDPOINT_LOGOUT,
                 {
-                    "id_token_hint": ID_TOKEN_ENCODED,
+                    "id_token_hint": pro_connect.id_token,
                     "state": signed_state,
                     "post_logout_redirect_uri": post_logout_redirect_uri,
                 },
@@ -741,7 +751,7 @@ class TestProConnectLogout:
             add_url_params(
                 constants.PRO_CONNECT_ENDPOINT_LOGOUT,
                 {
-                    "id_token_hint": ID_TOKEN_ENCODED,
+                    "id_token_hint": pro_connect.id_token,
                     "state": signed_state,
                     "post_logout_redirect_uri": post_logout_redirect_uri,
                 },
