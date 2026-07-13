@@ -243,6 +243,15 @@ def pro_connect_callback(request):
     pro_connect_state = ProConnectState.get_from_state(state)
     if pro_connect_state is None or not pro_connect_state.is_valid():
         return _redirect_to_login_page_on_error(request=request)
+
+    # Decode id_token and check nonce
+    try:
+        id_token_data = _decode_token(token_data["id_token"])
+    except jwt.InvalidTokenError:
+        return _redirect_to_login_page_on_error(error_msg="ProConnect unable to decode id_token ", request=request)
+    if id_token_data.get("nonce") != pro_connect_state.nonce:
+        return _redirect_to_login_page_on_error(error_msg="ProConnect id_token nonce mismatch", request=request)
+
     pc_session = ProConnectSession(state=state, token=token_data["id_token"])
     pc_session.bind_to_request(request)
 
@@ -353,7 +362,6 @@ def pro_connect_callback(request):
     amr = ()
     idp_id = None
     try:
-        id_token_data = _decode_token(token_data["id_token"])
         amr = id_token_data.get("amr", ())
         idp_id = user_data.get("idp_id", "")
         ProConnectAuthentication.objects.create(
