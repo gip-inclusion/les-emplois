@@ -56,16 +56,6 @@ class ProConnectStateData:
     channel: str = None
 
 
-@dataclasses.dataclass
-class ProConnectSession:
-    key: str = constants.PRO_CONNECT_SESSION_KEY
-    token: str = None
-    state: str = None
-
-    def bind_to_request(self, request):
-        request.session[self.key] = dataclasses.asdict(self)
-
-
 def _redirect_to_login_page_on_error(error_msg=None, request=None):
     if request:
         messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
@@ -153,9 +143,6 @@ def pro_connect_authorize(request):
         pc_data.user_email = user_email
 
     data = _generate_pro_params_from_session(dataclasses.asdict(pc_data))
-    # Store the state in session to allow the user to use resume registration view
-    pc_session = ProConnectSession(state=data["state"])
-    pc_session.bind_to_request(request)
 
     base_url = constants.PRO_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
@@ -252,8 +239,7 @@ def pro_connect_callback(request):
     if id_token_data.get("nonce") != pro_connect_state.nonce:
         return _redirect_to_login_page_on_error(error_msg="ProConnect id_token nonce mismatch", request=request)
 
-    pc_session = ProConnectSession(state=state, token=token_data["id_token"])
-    pc_session.bind_to_request(request)
+    request.session[constants.PRO_CONNECT_SESSION_KEY] = {"token": token_data["id_token"]}
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
