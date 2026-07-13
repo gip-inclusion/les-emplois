@@ -39,5 +39,5 @@ class Command(BaseCommand):
                 ).send()
         self.logger.info(f"Deactivated {deactivated_nb} JobDescriptions")
         # More than one day delay
-        if old_job_descriptions_qs.count() > BATCH_SIZE:
-            self.logger.error("Too many old JobDescriptions to deactivate")
+        if (count := old_job_descriptions_qs.count()) > BATCH_SIZE:
+            self.logger.error(f"Too many old JobDescriptions to deactivate: {count}")
