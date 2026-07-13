@@ -120,13 +120,13 @@ def mock_oauth_dance(
             },
         )
     assertRedirects(response, expected, fetch_redirect_response=False)
-    return response
+    return response, id_token
 
 
-def assert_and_mock_forced_logout(client, response, expected_redirect_url=reverse("search:employers_home")):
+def assert_and_mock_forced_logout(client, response, id_token, expected_redirect_url=reverse("search:employers_home")):
     expected_logout_url = add_url_params(
         reverse("pro_connect:logout"),
-        {"redirect_url": expected_redirect_url, "token": ID_TOKEN_ENCODED},
+        {"redirect_url": expected_redirect_url, "token": id_token},
     )
     assertRedirects(response, expected_logout_url, fetch_redirect_response=False)
     response = client.get(response.url)
@@ -146,6 +146,7 @@ class pro_connect_setup:
     oidc_userinfo_with_safir = OIDC_USERINFO_FT_WITH_SAFIR
     identity_provider = IdentityProvider.PRO_CONNECT
     session_key = constants.PRO_CONNECT_SESSION_KEY
+    id_token = None  # Set when calling mock_oauth_dance and used in assert_and_mock_forced_logout
 
     def __init__(self):
         self.context_managers = [override_settings(**TEST_SETTINGS), reload_module(constants)]
@@ -171,7 +172,10 @@ class pro_connect_setup:
         return reverse("pro_connect:logout")
 
     def mock_oauth_dance(self, *args, **kwargs):
-        return mock_oauth_dance(*args, **kwargs)
+        response, id_token = mock_oauth_dance(*args, **kwargs)
+        self.id_token = id_token
+        return response
 
-    def assert_and_mock_forced_logout(sefl, *args, **kwargs):
-        return assert_and_mock_forced_logout(*args, **kwargs)
+    def assert_and_mock_forced_logout(self, *args, **kwargs):
+        assert self.id_token
+        return assert_and_mock_forced_logout(*args, id_token=self.id_token, **kwargs)
