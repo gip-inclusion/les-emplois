@@ -69,9 +69,9 @@ def mock_oauth_dance(
     channel=None,
     oidc_userinfo=None,
     id_token_data=None,
+    expected_failure=False,  # login flow failed, redirect to logout
 ):
     user_info = oidc_userinfo or OIDC_USERINFO.copy()
-    id_token_data = id_token_data or deepcopy(ID_TOKEN_DATA)
 
     # Authorize params depend on user kind.
     authorize_params = {
@@ -87,11 +87,13 @@ def mock_oauth_dance(
     response = client.get(authorize_url)
     assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
 
+    id_token_data = id_token_data or deepcopy(ID_TOKEN_DATA)
+    id_token = _encode_id_token(id_token_data)
     token_json = {
         "access_token": "access_token",
         "token_type": "Bearer",
         "expires_in": 60,
-        "id_token": _encode_id_token(id_token_data),
+        "id_token": id_token,
     }
     respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
@@ -108,6 +110,15 @@ def mock_oauth_dance(
     # If a expected_redirect_url was provided, check it redirects there
     # If not, the default redirection is next_url if provided, or welcoming_tour for new users
     expected = expected_redirect_url or next_url or reverse("welcoming_tour:index")
+    if expected_failure:
+        assert expected_redirect_url is None, "No expected_redirect_url when expecting a failure"
+        expected = reverse(
+            "pro_connect:logout",
+            query={
+                "redirect_url": previous_url or reverse("search:employers_home"),
+                "token": id_token,
+            },
+        )
     assertRedirects(response, expected, fetch_redirect_response=False)
     return response
 

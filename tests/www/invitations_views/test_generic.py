@@ -8,7 +8,6 @@ from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils.html import escape
 from freezegun import freeze_time
-from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -26,7 +25,6 @@ from tests.invitations.factories import (
     LaborInspectorInvitationFactory,
     PrescriberWithOrgInvitationFactory,
 )
-from tests.openid_connect.pro_connect.testing import ID_TOKEN_ENCODED
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -595,13 +593,7 @@ class ProConnectSignupTestAcceptInvitation:
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(
-                pro_connect.logout_url,
-                {
-                    "redirect_url": previous_url,
-                    "token": ID_TOKEN_ENCODED,
-                },
-            ),
+            expected_failure=True,
         )
         # After logout, the SSO redirects to previous_url (see redirect_url param in expected_redirect_url)
         response = client.get(previous_url, follow=True)
