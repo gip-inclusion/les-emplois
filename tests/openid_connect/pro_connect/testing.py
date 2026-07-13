@@ -9,7 +9,6 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.functional import classproperty
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -134,8 +133,6 @@ def assert_and_mock_forced_logout(client, response, expected_redirect_url=revers
 class pro_connect_setup:
     oidc_userinfo = OIDC_USERINFO
     oidc_userinfo_with_safir = OIDC_USERINFO_FT_WITH_SAFIR
-    mock_oauth_dance = mock_oauth_dance
-    assert_and_mock_forced_logout = assert_and_mock_forced_logout
     identity_provider = IdentityProvider.PRO_CONNECT
     session_key = constants.PRO_CONNECT_SESSION_KEY
 
@@ -145,19 +142,25 @@ class pro_connect_setup:
     def __enter__(self):
         for context_manager in self.context_managers:
             context_manager.__enter__()
+        return self
 
     def __exit__(self, *args, **kwargs):
         for context_manager in self.context_managers:
             context_manager.__exit__(*args, **kwargs)
 
-    @classmethod
-    def assertContainsButton(cls, response):
+    def assertContainsButton(self, response):
         assertContains(response, 'class="proconnect-button"')
 
-    @classproperty
-    def authorize_url(cls):
+    @property
+    def authorize_url(self):
         return reverse("pro_connect:authorize")
 
-    @classproperty
-    def logout_url(cls):
+    @property
+    def logout_url(self):
         return reverse("pro_connect:logout")
+
+    def mock_oauth_dance(self, *args, **kwargs):
+        return mock_oauth_dance(*args, **kwargs)
+
+    def assert_and_mock_forced_logout(sefl, *args, **kwargs):
+        return assert_and_mock_forced_logout(*args, **kwargs)
