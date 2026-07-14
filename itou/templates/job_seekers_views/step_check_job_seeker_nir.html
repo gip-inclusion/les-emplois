@@ -96,11 +96,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
-                            {# djlint:off #}
                             <p>
                                 <b>Le numéro {{ form.nir.value|format_nir }} est associé au compte de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}.</b>
                             </p>
-                            {# djlint:on #}
                             <p>
                                 {% if is_gps|default:False %}
                                     Si ce n'est pas le bénéficiaire que vous souhaitez suivre, cliquez sur « Suivre un autre bénéficiaire » afin de modifier le numéro de sécurité sociale.

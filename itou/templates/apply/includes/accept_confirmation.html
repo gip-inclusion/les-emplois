@@ -12,9 +12,7 @@
             <small>Entreprise</small>
             <span>
                 <strong>{{ to_company.display_name }}</strong>
-                {# djlint: off #}
                 ({{ to_company.kind }}{% if to_company.city %} à {{ to_company.city|title }}{% endif %})
-                {# djlint: on #}
             </span>
         </li>
         {% if form_accept.is_geiq %}

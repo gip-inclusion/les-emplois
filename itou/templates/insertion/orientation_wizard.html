@@ -75,9 +75,7 @@
                                     {% component_alert content=fee_alert_content variant="info" extra_classes="mb-3 mb-md-4" %}
                                         {% fragment as fee_alert_content %}
                                             <p class="mb-0 h-100 d-flex align-items-center">
-                                                {# djlint: off #}
                                                 Frais à la charge de l'usager : {% if service.fee.value == "payant" %}Payant.{% if service.fee_details %} {{ service.fee_details|capfirst }}{% endif %}{% else %} {{ service.fee.label }}{% endif %}
-                                                {# djlint: on #}
                                             </p>
                                         {% endfragment %}
                                     {% endcomponent_alert %}

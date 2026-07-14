@@ -36,7 +36,8 @@
         <link rel="stylesheet" href="{% static "vendor/easymde/easymde.min.css" %}">
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
         <link rel="stylesheet" href="{% static "css/itou.css" %}">
-        {% block canonical %}{% endblock %}
+        {% block canonical %}
+        {% endblock %}
     </head>
     <body class="{% if user.is_authenticated %}l-authenticated {% endif %}{% block body_class %}{% endblock %}">
         <noscript>
@@ -88,8 +89,7 @@
                 <div class="s-title-02__container container">
                     <div class="s-title-02__row row">
                         <div class="s-title-02__col col-12">
-                            {% block title_navinfo %}
-                            {% endblock %}
+                            {% block title_navinfo %}{% endblock %}
                             {% block title_content %}{% endblock %}
                             {% block title_messages %}
                                 {% bootstrap_messages %}

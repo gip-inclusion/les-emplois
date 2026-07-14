@@ -6,9 +6,11 @@
                     <h3 class="mb-3 mb-lg-4">Découvrez l'offre d'insertion disponible sur votre territoire</h3>
                     <div class="row">
                         <div class="col-12">
-                            {# djlint:off #}
-                            <iframe src="{{ di_base_url }}/widget/?token={{ di_widget_token }}&code_commune={{ code_insee }}&score_qualite_minimum=0.9&size=3&display_form=False&exclure_doublons=True" class="w-100" style="min-height: 390px;"></iframe>
-                            {# djlint:on #}
+                            {# djlint:off H021 #}
+                            <iframe src="{{ di_base_url }}/widget/?token={{ di_widget_token }}&code_commune={{ code_insee }}&score_qualite_minimum=0.9&size=3&display_form=False&exclure_doublons=True"
+                                    class="w-100"
+                                    style="min-height: 390px"></iframe>
+                            {# djlint:on H021 #}
                         </div>
                     </div>
                 </div>
