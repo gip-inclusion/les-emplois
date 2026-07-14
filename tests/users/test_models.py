@@ -554,8 +554,8 @@ class TestModel:
         assert nir_profile.nir
         nir_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         with pytest.raises(
-            ValidationError,
-            match="Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR.",
+            IntegrityError,
+            match=".*jobseekerprofile_lack_of_nir_reason_or_nir.*",
         ):
             nir_profile.save()
 
