@@ -46,11 +46,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
-                            {# djlint:off #}
                             <p>
                                 <b>L'adresse {{ form.email.value }} est associée au compte de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}.</b>
                             </p>
-                            {# djlint:on #}
                             <p>
                                 {% if is_gps|default:False %}
                                     L'identité du candidat est une information clé pour la structure.

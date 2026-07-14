@@ -169,14 +169,14 @@
                                             <i class="ri-information-line ri-xl text-info" aria-label="{{ service.publics_details }}" data-bs-toggle="tooltip" data-bs-title="{{ service.publics_details }}" role="button" tabindex="0"></i>
                                         {% endif %}
                                     </small>
-                                    <strong>{# djlint: off #}{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}{# djlint: on #}</strong>
+                                    <strong>{% for public in service.publics.all %}{{ public.label }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
                                 </li>
                             {% endif %}
 
                             {% if service.receptions.exists %}
                                 <li>
                                     <small>Lieu d'accueil</small>
-                                    <strong>{# djlint: off #}{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if service.address_on_one_line %} — {{ service.address_on_one_line }}{% endif %}{# djlint: on #}</strong>
+                                    <strong>{% for reception in service.receptions.all %}{{ reception.label }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if service.address_on_one_line %} — {{ service.address_on_one_line }}{% endif %}</strong>
                                 </li>
                             {% endif %}
 
