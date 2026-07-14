@@ -791,11 +791,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                         assign_user_as_job_seeker_last_advisor(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
-                try:
-                    job_seeker.jobseeker_profile.nir = nir
-                    job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-                    job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
-                except ValidationError:
+                if JobSeekerProfile.objects.filter(nir=nir).exclude(pk=job_seeker.jobseeker_profile.pk).exists():
                     msg = format_html(
                         "Le<b> numéro de sécurité sociale</b> renseigné ({}) est "
                         "déjà utilisé par un autre candidat sur la Plateforme.<br>"
@@ -806,6 +802,9 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     messages.warning(request, msg)
                     logger.exception("step_job_seeker: error when saving job_seeker=%s", job_seeker)
                 else:
+                    job_seeker.jobseeker_profile.nir = nir
+                    job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+                    job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
                     if self.is_gps:
                         gps_utils.add_beneficiary(request, job_seeker, created=True)
                     if self.standalone_creation:
@@ -1081,6 +1080,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                         self.profile.user.get_inverted_full_name(),
                     )
                     messages.success(request, message, extra_tags="toast")
+                self.profile.validate_constraints()  # Detect inconsistencies (like duplicate NIR)
                 self.profile.save()
                 # TODO(ewen): add tunnel information when we have it in self.tunnel
                 logger.info("user=%s created job_seeker=%s", self.sender.pk, user.pk)
