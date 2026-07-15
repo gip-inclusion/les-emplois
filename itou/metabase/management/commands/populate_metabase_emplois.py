@@ -455,7 +455,7 @@ class Command(BaseCommand):
         )
         job_seekers_table = job_seekers.get_table()
 
-        metabase_db.populate_table(job_seekers_table, batch_size=20_000, querysets=[queryset])
+        metabase_db.populate_table(job_seekers_table, batch_size=10_000, querysets=[queryset])
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
