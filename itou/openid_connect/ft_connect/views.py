@@ -52,12 +52,12 @@ def pe_connect_authorize(request):
         "response_type": "code",
         "client_id": settings.API_ESD["KEY"],
         "redirect_uri": redirect_uri,
-        "scope": constants.PE_CONNECT_SCOPES,
+        "scope": constants.FRANCETRAVAIL_CONNECT_SCOPES,
         "state": state,
         "nonce": nonce,
         "realm": "/individu",  # PEAMU specificity
     }
-    url = constants.PE_CONNECT_ENDPOINT_AUTHORIZE
+    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
@@ -91,7 +91,7 @@ def pe_connect_callback(request):
         "redirect_uri": redirect_uri,
     }
 
-    url = add_url_params(constants.PE_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
+    url = add_url_params(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
     try:
         response = httpx.post(url, data=data, timeout=5)
         response.raise_for_status()
@@ -114,7 +114,7 @@ def pe_connect_callback(request):
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    url = constants.PE_CONNECT_ENDPOINT_USERINFO
+    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_USERINFO
 
     try:
         response = httpx.get(
@@ -197,7 +197,7 @@ def pe_connect_callback(request):
 
     login(request, user)
     # Keep token_data["id_token"] to logout from PEAMU
-    request.session[constants.PE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
+    request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session.modified = True
 
     next_url = reverse("dashboard:index")
@@ -220,6 +220,6 @@ def pe_connect_logout(request):
         "id_token_hint": id_token,
         "redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
     }
-    url = constants.PE_CONNECT_ENDPOINT_LOGOUT
+    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)

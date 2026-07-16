@@ -300,7 +300,7 @@ class TestExistingUserLogin:
 
     @override_settings(
         FRANCE_CONNECT_BASE_URL="http://localhost:8080",
-        PEAMU_AUTH_BASE_URL="http://localhost:8080",
+        FRANCETRAVAIL_CONNECT_AUTH_BASE_URL="http://localhost:8080",
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
     def test_login(self, client, snapshot, subtests):
@@ -353,7 +353,7 @@ class TestExistingUserLogin:
 
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
-        PEAMU_AUTH_BASE_URL=None,
+        FRANCETRAVAIL_CONNECT_AUTH_BASE_URL=None,
         PRO_CONNECT_BASE_URL=None,
     )
     def test_login_disabled_provider(self, client, snapshot, subtests):

@@ -499,14 +499,8 @@ API_ESD = {
     "RECOMMENDATIONS_SECRET": os.getenv("API_ESD_RECOMMENDATIONS_SECRET"),
 }
 
-# PE Connect aka PEAMU - technically one of ESD's APIs.
-# PEAM stands for Pôle emploi Access Management.
-# Technically there are two PEAM distinct systems:
-# - PEAM "Entreprise", PEAM-E or PEAME for short.
-# - PEAM "Utilisateur", PEAM-U or PEAMU for short.
-# To avoid confusion between the two when contacting ESD support,
-# we get the habit to always explicitely state that we are using PEAM*U*.
-PEAMU_AUTH_BASE_URL = os.getenv("PEAMU_AUTH_BASE_URL")
+# France Travail Connect - technically one of ESD's APIs.
+FRANCETRAVAIL_CONNECT_AUTH_BASE_URL = os.getenv("FRANCETRAVAIL_CONNECT_AUTH_BASE_URL")
 
 # France Connect https://partenaires.franceconnect.gouv.fr/
 FRANCE_CONNECT_BASE_URL = os.getenv("FRANCE_CONNECT_BASE_URL")
