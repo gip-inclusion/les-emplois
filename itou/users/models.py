@@ -642,8 +642,8 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         inside `external_data_source_history`. It can look like:
         Since we only append data, they should all be chronologically sorted
         [
-            {"field_name": "first_name", "source": "FRANCE_CONNECT", "created_at": "…", "value": "Jean-Michel"},
-            {"field_name": "birth_date", "source": "PE_CONNECT", "created_at": "…", "value": "…"},
+            {"field_name": "first_name", "source": "FC", "created_at": "…", "value": "Jean-Michel"},
+            {"field_name": "birth_date", "source": "PC", "created_at": "…", "value": "…"},
             …
 
         """
