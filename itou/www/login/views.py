@@ -124,7 +124,7 @@ class ExistingUserLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView
             "back_url": get_safe_url(self.request, "back_url", reverse("account_login")),
             "login_provider": self.user.identity_provider,
             "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
-            "show_peamu": bool(settings.FRANCETRAVAIL_CONNECT_AUTH_BASE_URL),
+            "show_ft_connect": bool(settings.FRANCETRAVAIL_CONNECT_AUTH_BASE_URL),
             "redirect_field_value": self.next_url,
             "pro_connect_url": self._get_pro_connect_url(),
             "uses_pro_connect": self.user.is_professional,

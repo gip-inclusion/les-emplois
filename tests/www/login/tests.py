@@ -22,7 +22,7 @@ from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance as fc_mock_oauth_dance
 from tests.openid_connect.ft_connect.tests import (
-    PEAMU_USERINFO,
+    FT_CONNECT_USERINFO,
     TEST_SETTINGS,
     mock_oauth_dance as pe_mock_oauth_dance,
 )
@@ -208,9 +208,9 @@ class TestJobSeekerLoginFailures:
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
         """
-        JobSeekerFactory(email=PEAMU_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
+        JobSeekerFactory(email=FT_CONNECT_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
         JobSeekerFactory(
-            username=PEAMU_USERINFO["sub"],
+            username=FT_CONNECT_USERINFO["sub"],
             email="seconde@email.com",
             identity_provider=IdentityProvider.PE_CONNECT,
         )

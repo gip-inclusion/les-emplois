@@ -170,7 +170,7 @@ class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["show_france_connect"] = bool(settings.FRANCE_CONNECT_BASE_URL)
-        context["show_peamu"] = bool(settings.FRANCETRAVAIL_CONNECT_AUTH_BASE_URL)
+        context["show_ft_connect"] = bool(settings.FRANCETRAVAIL_CONNECT_AUTH_BASE_URL)
         return context
 
     def get_form_kwargs(self):

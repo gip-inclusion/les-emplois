@@ -43,7 +43,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
 
 @login_not_required
 def pe_connect_authorize(request):
-    # The redirect_uri should be defined in the PEAMU settings to be allowed
+    # The redirect_uri should be defined in the France Travail Connect settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(12)
@@ -55,7 +55,7 @@ def pe_connect_authorize(request):
         "scope": constants.FRANCETRAVAIL_CONNECT_SCOPES,
         "state": state,
         "nonce": nonce,
-        "realm": "/individu",  # PEAMU specificity
+        "realm": "/individu",  # France Travail Connect specificity
     }
     url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
@@ -196,7 +196,7 @@ def pe_connect_callback(request):
         huey_import_user_pe_data(user, access_token, triggers_context=triggers_context)
 
     login(request, user)
-    # Keep token_data["id_token"] to logout from PEAMU
+    # Keep token_data["id_token"] to logout from France Travail Connect
     request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session.modified = True
 
