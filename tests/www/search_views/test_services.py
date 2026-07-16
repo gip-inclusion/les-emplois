@@ -27,7 +27,7 @@ class TestSearchServices:
 
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:services_home"))
-        assertContains(response, "Rechercher un service d'insertion")
+        assertContains(response, "Rechercher un emploi inclusif")
 
     def test_home_connected(self, client):
         client.force_login(EmployerFactory())

@@ -67,27 +67,6 @@ class NavGroup:
 
 # This is quite verbose, and having a registry of entries helps with testing.
 NAV_ENTRIES = {
-    # Anonymous users
-    "anonymous-search-employers": NavItem(
-        label="Rechercher un emploi inclusif",
-        target=reverse("search:employers_home"),
-        active_view_names=[
-            "search:employers_home",
-            "search:employers_results",
-            "search:job_descriptions_results",
-        ],
-    ),
-    "anonymous-search-prescribers": NavItem(
-        label="Rechercher un accompagnement",
-        target=reverse("search:prescribers_home"),
-        active_view_names=["search:prescribers_home", "search:prescribers_results"],
-    ),
-    "anonymous-search-services": NavItem(
-        label="Rechercher un service d'insertion",
-        target=reverse("search:services_home"),
-        active_view_names=["search:services_home", "search:services_results"],
-        is_beta=True,
-    ),
     # Logged in users.
     "home": NavItem(
         label="Accueil",
@@ -410,22 +389,3 @@ def nav(request):
     except Exception as e:
         silently_report_exception(e)
     return {"menu_items": menu_items}
-
-
-@register.inclusion_tag("utils/templatetags/nav_anonymous.html")
-def nav_anonymous(request, *, mobile):
-    menu_items = [
-        NAV_ENTRIES["anonymous-search-employers"],
-        NAV_ENTRIES["anonymous-search-prescribers"],
-        NAV_ENTRIES["anonymous-search-services"],
-    ]
-    try:
-        if request.resolver_match:
-            for item in menu_items:
-                item.active = is_active(request, item)
-    except Exception as e:
-        silently_report_exception(e)
-    return {
-        "menu_items": menu_items,
-        "mobile": mobile,
-    }

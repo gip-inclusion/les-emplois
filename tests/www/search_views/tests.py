@@ -607,12 +607,7 @@ class TestSearchCompany:
 class TestSearchPrescriber:
     def test_home_anonymous(self, client):
         response = client.get(reverse("search:prescribers_home"))
-        assertContains(response, "Rechercher un accompagnement")
-        assertContains(
-            response,
-            "Pour obtenir un emploi inclusif, accéder à une aide et effectuer des démarches, "
-            "le renfort d’un accompagnateur est souvent essentiel.",
-        )
+        assertContains(response, "Rechercher un emploi inclusif")
 
     def test_home_connected(self, client):
         client.force_login(random_user_kind_factory())

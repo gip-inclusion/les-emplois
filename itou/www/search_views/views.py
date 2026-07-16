@@ -326,7 +326,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
 
 @login_not_required
 @readonly_view
-def search_prescribers_home(request, template_name="search/prescribers_search_home.html"):
+def search_prescribers_home(request, template_name="search/siaes_search_home.html"):
     """
     The search home page has a different design from the results page.
     """
@@ -387,7 +387,7 @@ def search_prescribers_results(request, template_name="search/prescribers_search
 
 @login_not_required
 @readonly_view
-def search_services_home(request, template_name="search/services/home.html"):
+def search_services_home(request, template_name="search/siaes_search_home.html"):
     """
     The search home page has a different design from the results page.
     """
