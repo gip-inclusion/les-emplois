@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_TOKEN
-from itou.openid_connect.ft_connect.constants import PE_CONNECT_SESSION_TOKEN
+from itou.openid_connect.ft_connect.constants import FRANCETRAVAIL_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.utils.urls import get_absolute_url, get_safe_url
 
@@ -73,7 +73,7 @@ class UserAdapter(DefaultAccountAdapter):
             fc_base_logout_url = reverse("france_connect:logout")
             return f"{fc_base_logout_url}?{urlencode(params)}"
         # PE Connect
-        pe_token = request.session.get(PE_CONNECT_SESSION_TOKEN)
+        pe_token = request.session.get(FRANCETRAVAIL_CONNECT_SESSION_TOKEN)
         if pe_token:
             params = {"id_token": pe_token}
             pe_base_logout_url = reverse("ft_connect:logout")

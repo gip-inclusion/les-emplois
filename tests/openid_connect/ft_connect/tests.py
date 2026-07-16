@@ -44,10 +44,10 @@ def mock_oauth_dance(
     user_info=None,
 ):
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
-    respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+    respx.post(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     user_info = user_info or PEAMU_USERINFO
-    respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
+    respx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
     fake_api_data = {
         "dateDeNaissance": "2000-01-01T00:00:00Z",
@@ -69,7 +69,7 @@ def mock_oauth_dance(
 
 
 TEST_SETTINGS = {
-    "PEAMU_AUTH_BASE_URL": "https://peamu.auth.fake.url",
+    "FRANCETRAVAIL_CONNECT_AUTH_BASE_URL": "https://peamu.auth.fake.url",
     "API_ESD": {
         "BASE_URL": "https://some.auth.domain",
         "AUTH_BASE_URL_PARTENAIRE": "https://some-authentication-domain.fr",
@@ -120,7 +120,7 @@ class TestPoleEmploiConnect:
     def test_authorize(self, client):
         url = reverse("ft_connect:authorize")
         response = client.get(url, follow=False)
-        assert response.url.startswith(constants.PE_CONNECT_ENDPOINT_AUTHORIZE)
+        assert response.url.startswith(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_AUTHORIZE)
         pec_state = FranceTravailConnectState.objects.last()
         assert f"state={pec_state.state}" in response.url
         assert pec_state.nonce is not None
@@ -391,7 +391,7 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_unavailable_endpoint_token(self, client):
-        respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(side_effect=httpx.ConnectTimeout("Timeout"))
+        respx.post(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN).mock(side_effect=httpx.ConnectTimeout("Timeout"))
 
         state = FranceTravailConnectState.save_state()
         url = reverse("ft_connect:callback")
@@ -410,8 +410,10 @@ class TestPoleEmploiConnect:
     @respx.mock
     def test_callback_redirect_on_unavailable_endpoint_user_info(self, client):
         token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
-        respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
-        respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
+        respx.post(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN).mock(
+            return_value=httpx.Response(200, json=token_json)
+        )
+        respx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
 
         state = FranceTravailConnectState.save_state()
         url = reverse("ft_connect:callback")
@@ -440,7 +442,7 @@ class TestPoleEmploiConnect:
         url = reverse("ft_connect:logout")
         response = client.get(url, data={"id_token": "123"})
         expected_url = (
-            f"{constants.PE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
+            f"{constants.FRANCETRAVAIL_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
             "redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2Femployers"
         )
         assertRedirects(response, expected_url, fetch_redirect_response=False)
@@ -456,7 +458,7 @@ class TestPoleEmploiConnect:
         assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
-        assert client.session.get(constants.PE_CONNECT_SESSION_TOKEN)
+        assert client.session.get(constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN)
 
         response = client.post(logout_url)
         expected_redirection = reverse("ft_connect:logout")
