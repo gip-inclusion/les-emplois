@@ -674,7 +674,7 @@ class TestEditUserInfoView:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
     @freeze_time("2023-03-10")
-    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT])
+    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])
     def test_edit_sso(self, client, identity_provider):
         user = JobSeekerFactory(
             identity_provider=identity_provider,

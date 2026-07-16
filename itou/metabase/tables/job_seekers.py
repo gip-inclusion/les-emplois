@@ -218,7 +218,7 @@ def get_table():
                 "name": "pe_connect",
                 "type": "boolean",
                 "comment": "Le candidat utilise FT Connect",
-                "fn": lambda o: o.identity_provider == IdentityProvider.PE_CONNECT,
+                "fn": lambda o: o.identity_provider == IdentityProvider.FT_CONNECT,
             },
             {
                 "name": "pe_inscrit",

@@ -321,7 +321,7 @@ class TestModel:
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         assert user.has_sso_provider
 
-        user = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
+        user = JobSeekerFactory(identity_provider=IdentityProvider.FT_CONNECT)
         assert user.has_sso_provider
 
         user = PrescriberFactory()

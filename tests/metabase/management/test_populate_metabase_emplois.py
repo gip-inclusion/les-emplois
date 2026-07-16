@@ -203,7 +203,7 @@ def test_populate_job_seekers(snapshot):
     #  - in QPV
     user_1 = JobSeekerFactory(
         created_by=PrescriberFactory(),
-        identity_provider=IdentityProvider.PE_CONNECT,
+        identity_provider=IdentityProvider.FT_CONNECT,
         jobseeker_profile__pole_emploi_id="",
         last_login=timezone.now(),
         first_login=timezone.now(),

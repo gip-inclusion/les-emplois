@@ -32,7 +32,7 @@ from tests.utils.testing import get_request
     [
         (ItouStaffFactory, IdentityProvider.DJANGO, False),
         (JobSeekerFactory, IdentityProvider.DJANGO, False),
-        (JobSeekerFactory, IdentityProvider.PE_CONNECT, False),
+        (JobSeekerFactory, IdentityProvider.FT_CONNECT, False),
         (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
         (partial(PrescriberFactory, membership=True), IdentityProvider.DJANGO, True),
         (partial(PrescriberFactory, membership=True), IdentityProvider.PRO_CONNECT, False),

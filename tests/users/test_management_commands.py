@@ -532,7 +532,7 @@ class TestCommandSendUsersToBrevo:
             first_name="Valery",
             last_name="Vanda",
             email="valery.vanda@mailinator.com",
-            identity_provider=IdentityProvider.PE_CONNECT,
+            identity_provider=IdentityProvider.FT_CONNECT,
             with_ban_geoloc_address=True,
         )
         not_primary = JobSeekerFactory()

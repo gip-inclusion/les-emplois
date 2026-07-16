@@ -212,7 +212,7 @@ class TestJobSeekerLoginFailures:
         JobSeekerFactory(
             username=FT_CONNECT_USERINFO["sub"],
             email="seconde@email.com",
-            identity_provider=IdentityProvider.PE_CONNECT,
+            identity_provider=IdentityProvider.FT_CONNECT,
         )
 
         # Temporary NIR is not stored with user information.
@@ -255,7 +255,7 @@ class TestExistingUserLogin:
             ),
             (
                 "PE",
-                random_user_kind_factory(identity_provider=IdentityProvider.PE_CONNECT, email="pe@mailinator.com"),
+                random_user_kind_factory(identity_provider=IdentityProvider.FT_CONNECT, email="pe@mailinator.com"),
             ),
             (
                 "FC",
