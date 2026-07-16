@@ -1,4 +1,5 @@
 # Delete target on error.
+# Ignoreme.
 # https://www.gnu.org/software/make/manual/html_node/Errors.html#Errors
 # > This is almost always what you want make to do, but it is not historical
 # > practice; so for compatibility, you must explicitly request it
