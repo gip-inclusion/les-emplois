@@ -142,7 +142,7 @@ class TestPoleEmploiConnect:
         assert user.last_name == FT_CONNECT_USERINFO["family_name"]
         assert user.first_name == FT_CONNECT_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "PEC"
-        assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == Title.MME
 
@@ -152,7 +152,7 @@ class TestPoleEmploiConnect:
             user, created = ft_connect_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
-        assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.identity_provider == IdentityProvider.FT_CONNECT
 
     def test_create_user_with_already_existing_ft_connect_id(self):
         """
@@ -163,7 +163,7 @@ class TestPoleEmploiConnect:
         JobSeekerFactory(
             username=ft_connect_user_data.username,
             last_name="will_be_forgotten",
-            identity_provider=IdentityProvider.PE_CONNECT,
+            identity_provider=IdentityProvider.FT_CONNECT,
             title=Title.M,
         )
         with triggers.fake_context():
@@ -172,7 +172,7 @@ class TestPoleEmploiConnect:
         assert user.last_name == FT_CONNECT_USERINFO["family_name"]
         assert user.first_name == FT_CONNECT_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "PEC"
-        assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.title == Title.MME
 
     def test_create_user_with_already_existing_ft_connect_id_but_from_other_sso(self):
@@ -205,7 +205,7 @@ class TestPoleEmploiConnect:
     def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FT_CONNECT_USERINFO["sub"],
-            identity_provider=IdentityProvider.PE_CONNECT,
+            identity_provider=IdentityProvider.FT_CONNECT,
             born_in_france=True,
             title=Title.M,
         )
@@ -222,7 +222,7 @@ class TestPoleEmploiConnect:
         assert user.first_name == job_seeker.first_name
         assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
         assert user.external_data_source_history[0]["source"] == "PEC"
-        assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == Title.M
         assert (
@@ -255,7 +255,7 @@ class TestPoleEmploiConnect:
         assert user.last_name == FT_CONNECT_USERINFO["family_name"]
         assert user.username == FT_CONNECT_USERINFO["sub"]
         assert user.has_sso_provider
-        assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.jobseeker_profile.nir == ""
         assert user.jobseeker_profile.birthdate == datetime.date(2000, 1, 1)
 
@@ -325,7 +325,7 @@ class TestPoleEmploiConnect:
             email=ft_connect_user_data.email,
             kind=UserKind.JOB_SEEKER,
             is_active=False,
-            identity_provider=IdentityProvider.PE_CONNECT,
+            identity_provider=IdentityProvider.FT_CONNECT,
         )
         response = mock_oauth_dance(client, expected_route="account_login")
         assertMessages(
@@ -369,7 +369,7 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
         ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
         user = JobSeekerFactory(
-            username="another_sub", email=ft_connect_user_data.email, identity_provider=IdentityProvider.PE_CONNECT
+            username="another_sub", email=ft_connect_user_data.email, identity_provider=IdentityProvider.FT_CONNECT
         )
 
         # Test redirection and modal content
@@ -500,7 +500,7 @@ def test_create_ft_connect_user_with_already_existing_ft_connect_email_fails():
     JobSeekerFactory(
         username="another_username",
         email=ft_connect_user_data.email,
-        identity_provider=IdentityProvider.PE_CONNECT,
+        identity_provider=IdentityProvider.FT_CONNECT,
     )
     with pytest.raises(MultipleSubSameEmailException):
         ft_connect_user_data.create_or_update_user()

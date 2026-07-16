@@ -370,7 +370,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                 condition=(
                     models.Q(identity_provider=IdentityProvider.DJANGO)
                     | models.Q(identity_provider=IdentityProvider.FRANCE_CONNECT, kind=UserKind.JOB_SEEKER)
-                    | models.Q(identity_provider=IdentityProvider.PE_CONNECT, kind=UserKind.JOB_SEEKER)
+                    | models.Q(identity_provider=IdentityProvider.FT_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind=UserKind.PROFESSIONAL)
                 ),
             ),

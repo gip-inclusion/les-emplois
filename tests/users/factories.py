@@ -446,7 +446,7 @@ def random_user_kind_factory(**kwargs):
                     functools.partial(EmployerFactory, membership=True),
                 ]
             )
-        elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT]:
+        elif identity_provider in [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT]:
             factory = JobSeekerFactory
     if factory is None:
         factory = random.choice(
