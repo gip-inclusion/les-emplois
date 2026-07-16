@@ -28,6 +28,7 @@ from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.insertion.factories import OrientationFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.job_applications import factories as job_applications_factories
 from tests.prescribers.factories import (
@@ -374,7 +375,9 @@ class TestPrescriberOrganizationModel:
             from_prescriber=True, author_prescriber_organization=organization_1
         )
 
-        # FIXME: add orientation
+        orientation = OrientationFactory(
+            sender=job_application_1.sender, sender_prescriber_organization=organization_1
+        )
 
         count_job_applications = job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 2
@@ -382,12 +385,15 @@ class TestPrescriberOrganizationModel:
         call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
         assert count_job_applications == job_applications_models.JobApplication.objects.count()
         geiq_diagnosis.refresh_from_db()
+        orientation.refresh_from_db()
         if wet_run:
             assert PrescriberOrganization.objects.count() == 1
             assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
+            assert orientation.sender_prescriber_organization_id == organization_2.pk
         else:
             assert PrescriberOrganization.objects.count() == 2
             assert geiq_diagnosis.author_prescriber_organization_id == organization_1.pk
+            assert orientation.sender_prescriber_organization_id == organization_1.pk
 
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_merge_two_organizations_with_assignments(self, wet_run):
