@@ -203,7 +203,7 @@ class TestJobSeekerLoginFailures:
     @respx.mock
     @override_settings(**TEST_SETTINGS)
     @reload_module(pe_constants)
-    def test_conflict_on_email_change_in_pe_connect(self, client):
+    def test_conflict_on_email_change_in_ft_connect(self, client):
         """
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
