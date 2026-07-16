@@ -211,7 +211,7 @@
       <div class="mt-4 text-center">
           <form action="/pe_connect/authorize" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-              <input alt="Se connecter avec votre compte France Travail" data-matomo-action="clic" data-matomo-category="inscription-candidat" data-matomo-event="true" data-matomo-option="se-connecter-avec-pe" src="/static/img/peamu_btn.svg" type="image"/>
+              <input alt="Se connecter avec votre compte France Travail" data-matomo-action="clic" data-matomo-category="inscription-candidat" data-matomo-event="true" data-matomo-option="se-connecter-avec-pe" src="/static/img/ft_connect_btn.svg" type="image"/>
           </form>
       </div>
   </div>
