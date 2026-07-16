@@ -5,6 +5,7 @@ from itoutils.django.commands import dry_runnable
 
 from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
+from itou.insertion import models as insertion_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.prescribers import models as prescribers_models
@@ -116,6 +117,9 @@ def organization_merge_into(from_id, to_id):
     )
     logger.info("| GEIQ Diagnoses: %s", geiq_diagnoses.count())
 
+    orientations = insertion_models.Orientation.objects.filter(sender_prescriber_organization_id=from_id)
+    logger.info("| Orientations: %s", orientations.count())
+
     # Don't move invitations for existing members
     # The goal is to keep information about the original information
     invitations = invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).exclude(
@@ -148,6 +152,7 @@ def organization_merge_into(from_id, to_id):
     members.update(organization_id=to_id)
     diagnoses.update(author_prescriber_organization_id=to_id)
     geiq_diagnoses.update(author_prescriber_organization_id=to_id)
+    orientations.update(sender_prescriber_organization_id=to_id)
     invitations.update(organization_id=to_id)
     prolongations.update(prescriber_organization_id=to_id)
     prolongation_requests.update(prescriber_organization_id=to_id)
