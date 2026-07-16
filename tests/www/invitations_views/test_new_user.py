@@ -12,4 +12,4 @@ class TestNewUser:
                 kwargs={"invitation_type": "invalid", "invitation_id": uuid.uuid4()},
             )
         )
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:home"))
