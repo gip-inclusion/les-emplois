@@ -903,7 +903,7 @@ class TestEditJobSeekerInfo:
         for attr in profile_fields:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
-    def test_pe_connect_empty_title_is_editable(self, client, mocker):
+    def test_ft_connect_empty_title_is_editable(self, client, mocker):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
