@@ -12,11 +12,11 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
-from itou.external_data.apis import pe_connect
+from itou.external_data.apis import ft_connect
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
+from itou.openid_connect.ft_connect import constants
+from itou.openid_connect.ft_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
-from itou.openid_connect.pe_connect import constants
-from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
@@ -54,13 +54,13 @@ def mock_oauth_dance(
         "beneficiairePrestationSolidarite": True,
     }
     for api in [
-        pe_connect.ESD_COORDS_API,
-        pe_connect.ESD_BIRTHDATE_API,
+        ft_connect.ESD_COORDS_API,
+        ft_connect.ESD_BIRTHDATE_API,
     ]:
         respx.get(f"{settings.API_ESD['BASE_URL']}/{api}").mock(return_value=httpx.Response(200, json=fake_api_data))
 
     state = PoleEmploiConnectState.save_state()
-    url = reverse("pe_connect:callback")
+    url = reverse("ft_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
@@ -116,7 +116,7 @@ class TestPoleEmploiConnect:
             assert not PoleEmploiConnectState.get_from_state(state).is_valid()
 
     def test_authorize(self, client):
-        url = reverse("pe_connect:authorize")
+        url = reverse("ft_connect:authorize")
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PE_CONNECT_ENDPOINT_AUTHORIZE)
         pec_state = PoleEmploiConnectState.objects.last()
@@ -219,17 +219,17 @@ class TestPoleEmploiConnect:
         )
 
     def test_callback_no_code(self, client):
-        url = reverse("pe_connect:callback")
+        url = reverse("ft_connect:callback")
         response = client.get(url)
         assert response.status_code == 302
 
     def test_callback_no_state(self, client):
-        url = reverse("pe_connect:callback")
+        url = reverse("ft_connect:callback")
         response = client.get(url, data={"code": "123"})
         assert response.status_code == 302
 
     def test_callback_invalid_state(self, client):
-        url = reverse("pe_connect:callback")
+        url = reverse("ft_connect:callback")
         response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302
 
@@ -260,7 +260,7 @@ class TestPoleEmploiConnect:
     def test_callback_no_email(self, client):
         user_info = PEAMU_USERINFO.copy()
         del user_info["email"]
-        mock_oauth_dance(client, user_info=user_info, expected_route="pe_connect:no_email")
+        mock_oauth_dance(client, user_info=user_info, expected_route="ft_connect:no_email")
         assert not User.objects.exists()
 
     @respx.mock
@@ -292,7 +292,7 @@ class TestPoleEmploiConnect:
 
         url = reverse("signup:job_seeker_credentials")
         response = client.get(url)
-        auth_url = reverse("pe_connect:authorize")
+        auth_url = reverse("ft_connect:authorize")
         assertContains(response, auth_url)
 
         # New created job seeker has no title and is redirected to complete its infos
@@ -384,7 +384,7 @@ class TestPoleEmploiConnect:
         respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(side_effect=httpx.ConnectTimeout("Timeout"))
 
         state = PoleEmploiConnectState.save_state()
-        url = reverse("pe_connect:callback")
+        url = reverse("ft_connect:callback")
         response = client.get(url, data={"code": "123", "state": state}, follow=True)
         assertRedirects(response, reverse("account_login"))
         assertMessages(
@@ -404,7 +404,7 @@ class TestPoleEmploiConnect:
         respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
 
         state = PoleEmploiConnectState.save_state()
-        url = reverse("pe_connect:callback")
+        url = reverse("ft_connect:callback")
         response = client.get(url, data={"code": "123", "state": state}, follow=True)
         assertRedirects(response, reverse("account_login"))
         assertMessages(
@@ -421,13 +421,13 @@ class TestPoleEmploiConnect:
         )
 
     def test_logout_no_id_token(self, client):
-        url = reverse("pe_connect:logout")
+        url = reverse("ft_connect:logout")
         response = client.get(url + "?")
         assert response.status_code == 400
         assert response.json()["message"] == "Le paramètre « id_token » est manquant."
 
     def test_logout(self, client):
-        url = reverse("pe_connect:logout")
+        url = reverse("ft_connect:logout")
         response = client.get(url, data={"id_token": "123"})
         expected_url = (
             f"{constants.PE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
@@ -449,7 +449,7 @@ class TestPoleEmploiConnect:
         assert client.session.get(constants.PE_CONNECT_SESSION_TOKEN)
 
         response = client.post(logout_url)
-        expected_redirection = reverse("pe_connect:logout")
+        expected_redirection = reverse("ft_connect:logout")
         # For simplicity, exclude GET params. They are tested elsewhere anyway..
         assert response.url.startswith(expected_redirection)
 

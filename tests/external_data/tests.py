@@ -5,8 +5,8 @@ import pytest
 import respx
 from django.conf import settings
 
-import itou.external_data.apis.pe_connect as pec
-from itou.external_data.apis.pe_connect import import_user_pe_data
+import itou.external_data.apis.ft_connect as pec
+from itou.external_data.apis.ft_connect import import_user_pe_data
 from itou.utils import triggers
 from tests.users.factories import JobSeekerFactory
 

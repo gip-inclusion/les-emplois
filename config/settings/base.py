@@ -92,7 +92,7 @@ INSTALLED_APPS = [
     "itou.eligibility",
     "itou.openid_connect",
     "itou.openid_connect.france_connect",
-    "itou.openid_connect.pe_connect",
+    "itou.openid_connect.ft_connect",
     "itou.openid_connect.pro_connect",
     "itou.otp",
     "itou.invitations",

@@ -16,6 +16,8 @@ from itoutils.urls import add_url_params
 
 from itou.external_data.tasks import huey_import_user_pe_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
+from itou.openid_connect.ft_connect import constants
+from itou.openid_connect.ft_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.openid_connect.models import (
     EmailInUseException,
     InactiveUserException,
@@ -23,8 +25,6 @@ from itou.openid_connect.models import (
     MultipleSubSameEmailException,
     MultipleUsersFoundException,
 )
-from itou.openid_connect.pe_connect import constants
-from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.openid_connect.utils import init_user_nir_from_session
 from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants, triggers
@@ -45,7 +45,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
 def pe_connect_authorize(request):
     # The redirect_uri should be defined in the PEAMU settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
-    redirect_uri = get_absolute_url(reverse("pe_connect:callback"))
+    redirect_uri = get_absolute_url(reverse("ft_connect:callback"))
     nonce = crypto.get_random_string(12)
     state = PoleEmploiConnectState.save_state(nonce=nonce)
     data = {
@@ -81,7 +81,7 @@ def pe_connect_callback(request):
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    redirect_uri = get_absolute_url(reverse("pe_connect:callback"))
+    redirect_uri = get_absolute_url(reverse("ft_connect:callback"))
 
     data = {
         "client_id": settings.API_ESD["KEY"],
@@ -151,7 +151,7 @@ def pe_connect_callback(request):
         pe_user_data = PoleEmploiConnectUserData.from_user_info(user_data)
     except KeyError as e:
         if "email" in e.args:
-            return HttpResponseRedirect(reverse("pe_connect:no_email"))
+            return HttpResponseRedirect(reverse("ft_connect:no_email"))
         messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec France Travail.")
         return HttpResponseRedirect(reverse("search:employers_home"))
 

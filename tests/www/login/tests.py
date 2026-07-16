@@ -14,14 +14,14 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
-from itou.openid_connect.pe_connect import constants as pe_constants
+from itou.openid_connect.ft_connect import constants as pe_constants
 from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance as fc_mock_oauth_dance
-from tests.openid_connect.pe_connect.tests import (
+from tests.openid_connect.ft_connect.tests import (
     PEAMU_USERINFO,
     TEST_SETTINGS,
     mock_oauth_dance as pe_mock_oauth_dance,
