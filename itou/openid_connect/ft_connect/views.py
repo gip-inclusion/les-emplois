@@ -161,14 +161,14 @@ def pe_connect_callback(request):
     except InactiveUserException as e:
         logger.info("FT Connect login attempt with inactive user: %s", e.user)
         return _redirect_to_job_seeker_login_on_error(
-            e.format_message_html(IdentityProvider.PE_CONNECT), request=request
+            e.format_message_html(IdentityProvider.FT_CONNECT), request=request
         )
     except InvalidKindException:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         return HttpResponseRedirect(reverse("account_login"))
     except MultipleSubSameEmailException as e:
         return _redirect_to_job_seeker_login_on_error(
-            e.format_message_html(IdentityProvider.PE_CONNECT), request=request
+            e.format_message_html(IdentityProvider.FT_CONNECT), request=request
         )
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
@@ -185,7 +185,7 @@ def pe_connect_callback(request):
         )
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(
-            request, e.user, IdentityProvider.PE_CONNECT.label
+            request, e.user, IdentityProvider.FT_CONNECT.label
         )
 
     init_user_nir_from_session(request, user)

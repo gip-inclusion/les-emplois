@@ -492,7 +492,7 @@ class TestFranceConnect:
     def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
         # EmailInUseException raised by the email conflict
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.FT_CONNECT, for_snapshot=True)
 
         # Test redirection and modal content
         response = mock_oauth_dance(client, expected_route="signup:choose_user_kind")
@@ -599,7 +599,7 @@ class TestFranceConnect:
         )
 
 
-@pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.PE_CONNECT])
+@pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.FT_CONNECT])
 def test_create_fc_user_with_already_existing_email_fails(identity_provider):
     """
     In OIDC, SSO provider + username represents unicity.

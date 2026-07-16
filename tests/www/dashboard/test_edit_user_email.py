@@ -78,7 +78,7 @@ class TestChangeEmailView:
             assert new_address.email == new_email
             assert new_address.verified
 
-    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT])
+    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])
     def test_update_email_forbidden(self, client, identity_provider):
         url = reverse("dashboard:edit_user_email")
 
