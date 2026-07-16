@@ -205,7 +205,7 @@ def pe_connect_callback(request):
 
 
 @login_not_required
-def pe_connect_no_email(request, template_name="account/peamu_no_email.html"):
+def pe_connect_no_email(request, template_name="account/ft_connect_no_email.html"):
     return render(request, template_name)
 
 
