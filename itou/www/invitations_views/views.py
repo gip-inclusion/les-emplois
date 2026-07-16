@@ -43,7 +43,7 @@ MAX_PENDING_INVITATION = 50
 def new_user(request, invitation_type, invitation_id):
     if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
         messages.error(request, "Ce lien n'est plus valide.")
-        return redirect(reverse("search:employers_home"))
+        return redirect(reverse("search:home"))
     invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_class, pk=invitation_id)
 
@@ -97,7 +97,7 @@ def new_user(request, invitation_type, invitation_id):
 def join(request, invitation_type, invitation_id):
     if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
         messages.error(request, "Ce lien n'est plus valide.")
-        return redirect(reverse("search:employers_home"))
+        return redirect(reverse("search:home"))
     invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_class, pk=invitation_id)
     handle_invitation(invitation, request)
