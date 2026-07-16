@@ -6,55 +6,22 @@
 {% block body_class %}p-home{% endblock %}
 
 {% block content %}
-
     {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Rechercher un emploi inclusif" url_search="search:employers_results" template_form_name="search/includes/siaes_search_form.html" %}
+    <iframe id="iframe-plateforme-accueil" src="https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud/" sandbox="allow-scripts"></iframe>
+{% endblock %}
 
-    <section class="s-article-figure-01 s-article-figure-01--ltr">
-        <div class="s-article-figure-01__container container container-max-lg">
-            <div class="s-article-figure-01__row row">
-                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
-                    <figure class="w-50 w-md-100">
-                        <img src="{% static "img/home/illustration-01.png" %}" class="img-fluid img-fitcover" width="411" height="291" alt="">
-                    </figure>
-                </div>
-                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
-                    <article>
-                        <h2 class="h1 text-tertiary">
-                            Qu’est-ce que l’inclusion
-                            <br class="d-none d-lg-inline">
-                            dans l’emploi&nbsp;?
-                        </h2>
-                        <p>
-                            L’inclusion dans l'emploi est un projet de société gouvernemental qui permet aux personnes les plus fragiles de bénéficier de l’accès à l’emploi et à la formation pour s’insérer dans la société par le travail.
-                        </p>
-                        <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" class="btn btn-outline-primary w-100 w-md-auto mb-3 mt-4 has-external-link" target="_blank">En savoir plus</a>
-                    </article>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="s-article-figure-01">
-        <div class="s-article-figure-01__container container container-max-lg">
-            <div class="s-article-figure-01__row row">
-                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
-                    <figure class="w-50 w-md-100">
-                        <img src="{% static "img/home/illustration-02.png" %}" loading="lazy" class="img-fluid img-fitcover" width="411" height="291" alt="">
-                    </figure>
-                </div>
-                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
-                    <article>
-                        <h2 class="h1 text-tertiary">Nos missions</h2>
-                        <p>
-                            Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs inclusifs (SIAE, GEIQ et facilitateurs de clauses sociales) et les accompagnants (orienteurs et prescripteurs habilités).
-                        </p>
-                        <p>
-                            Il offre aux utilisateurs un outil numérique mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.
-                        </p>
-                    </article>
-                </div>
-            </div>
-        </div>
-    </section>
-
+{% block script %}
+    <script nonce="{{ csp_nonce }}">
+        (function() {
+            "use strict";
+            const frame = document.getElementById("iframe-plateforme-accueil");
+            window.addEventListener("message", function(event) {
+                var data = event.data;
+                if (!data || data.source !== "plateforme-accueil" || data.type !== "resize" || frame.contentWindow !== event.source) {
+                    return;
+                }
+                frame.style.height = data.height + "px";
+            });
+        })();
+    </script>
 {% endblock %}

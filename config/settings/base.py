@@ -726,6 +726,7 @@ SECURE_CSP = {
         "data:",  # Because of tarteaucitron.js
     ],
     "frame-ancestors": [
+        CSP.SELF,
         "https://pilotage.inclusion.beta.gouv.fr",
     ],
     "frame-src": [
@@ -735,6 +736,8 @@ SECURE_CSP = {
         "https://pilotage.inclusion.beta.gouv.fr",
         "https://inclusion.beta.gouv.fr",
         "https://api.data.inclusion.gouv.fr",
+        # Homepage
+        "https://novarw2u9ckv-plateforme-accueil.functions.fnc.fr-par.scw.cloud",
         "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
         "data:",  # For downloading Metabase questions as PNG on Firefox etc
     ],
