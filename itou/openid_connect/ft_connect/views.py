@@ -42,7 +42,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
 
 
 @login_not_required
-def pe_connect_authorize(request):
+def ft_connect_authorize(request):
     # The redirect_uri should be defined in the France Travail Connect settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
@@ -66,7 +66,7 @@ def pe_connect_authorize(request):
 @login_not_required
 @http_methods(db_write=["GET"])
 @with_triggers_context(methods=["GET"])
-def pe_connect_callback(request):
+def ft_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
         error_msg = "PôleEmploiConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
@@ -205,12 +205,12 @@ def pe_connect_callback(request):
 
 
 @login_not_required
-def pe_connect_no_email(request, template_name="account/ft_connect_no_email.html"):
+def ft_connect_no_email(request, template_name="account/ft_connect_no_email.html"):
     return render(request, template_name)
 
 
 @login_not_required
-def pe_connect_logout(request):
+def ft_connect_logout(request):
     id_token = request.GET.get("id_token")
 
     if not id_token:
