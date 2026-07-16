@@ -27,7 +27,7 @@ from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
 
 
-PEAMU_USERINFO = {
+FT_CONNECT_USERINFO = {
     "given_name": "Angela Claire Louise",
     "family_name": "DUBOIS",
     "gender": "female",
@@ -46,7 +46,7 @@ def mock_oauth_dance(
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
-    user_info = user_info or PEAMU_USERINFO
+    user_info = user_info or FT_CONNECT_USERINFO
     respx.get(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
     fake_api_data = {
@@ -69,7 +69,7 @@ def mock_oauth_dance(
 
 
 TEST_SETTINGS = {
-    "FRANCETRAVAIL_CONNECT_AUTH_BASE_URL": "https://peamu.auth.fake.url",
+    "FRANCETRAVAIL_CONNECT_AUTH_BASE_URL": "https://ft_connect.auth.fake.url",
     "API_ESD": {
         "BASE_URL": "https://some.auth.domain",
         "AUTH_BASE_URL_PARTENAIRE": "https://some-authentication-domain.fr",
@@ -131,78 +131,80 @@ class TestPoleEmploiConnect:
 
     def test_create_user(self):
         """
-        Nominal scenario: there is no user with the PEAMU id or PEAMU email
+        Nominal scenario: there is no user with the France Travail Connect id or France Travail Connect email
         that is sent, so we create one
         """
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
-        assert not User.objects.filter(username=peamu_user_data.username).exists()
-        assert not User.objects.filter(email=peamu_user_data.email).exists()
-        user, created = peamu_user_data.create_or_update_user()
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
+        assert not User.objects.filter(username=ft_connect_user_data.username).exists()
+        assert not User.objects.filter(email=ft_connect_user_data.email).exists()
+        user, created = ft_connect_user_data.create_or_update_user()
         assert created
-        assert user.last_name == PEAMU_USERINFO["family_name"]
-        assert user.first_name == PEAMU_USERINFO["given_name"]
+        assert user.last_name == FT_CONNECT_USERINFO["family_name"]
+        assert user.first_name == FT_CONNECT_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "PEC"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == Title.MME
 
         # Update user
-        peamu_user_data.last_name = "DUPUIS"
+        ft_connect_user_data.last_name = "DUPUIS"
         with triggers.fake_context():
-            user, created = peamu_user_data.create_or_update_user()
+            user, created = ft_connect_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
 
-    def test_create_user_with_already_existing_peamu_id(self):
+    def test_create_user_with_already_existing_ft_connect_id(self):
         """
-        If there already is an existing user with this PEAMU id, we do not create it again,
+        If there already is an existing user with this France Travail Connect id, we do not create it again,
         we use it and we update it
         """
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
         JobSeekerFactory(
-            username=peamu_user_data.username,
+            username=ft_connect_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.PE_CONNECT,
             title=Title.M,
         )
         with triggers.fake_context():
-            user, created = peamu_user_data.create_or_update_user()
+            user, created = ft_connect_user_data.create_or_update_user()
         assert not created
-        assert user.last_name == PEAMU_USERINFO["family_name"]
-        assert user.first_name == PEAMU_USERINFO["given_name"]
+        assert user.last_name == FT_CONNECT_USERINFO["family_name"]
+        assert user.first_name == FT_CONNECT_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "PEC"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.title == Title.MME
 
-    def test_create_user_with_already_existing_peamu_id_but_from_other_sso(self):
+    def test_create_user_with_already_existing_ft_connect_id_but_from_other_sso(self):
         """
-        If there already is an existing user with this PEAMU id, but it comes from another SSO.
+        If there already is an existing user with this France Travail Connect id, but it comes from another SSO.
         The email is also different, so it will crash while trying to create a new user.
         """
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
         JobSeekerFactory(
-            username=peamu_user_data.username,
+            username=ft_connect_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             email="random@email.com",
         )
         with pytest.raises(ValidationError):
-            peamu_user_data.create_or_update_user()
+            ft_connect_user_data.create_or_update_user()
 
     def test_create_or_update_user_raise_invalid_kind_exception(self):
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
 
-        user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=UserKind.PROFESSIONAL)
+        user = UserFactory(
+            username=ft_connect_user_data.username, email=ft_connect_user_data.email, kind=UserKind.PROFESSIONAL
+        )
 
         with pytest.raises(InvalidKindException):
-            peamu_user_data.create_or_update_user()
+            ft_connect_user_data.create_or_update_user()
 
         user.delete()
 
     def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
-            username=PEAMU_USERINFO["sub"],
+            username=FT_CONNECT_USERINFO["sub"],
             identity_provider=IdentityProvider.PE_CONNECT,
             born_in_france=True,
             title=Title.M,
@@ -212,9 +214,9 @@ class TestPoleEmploiConnect:
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
         with triggers.fake_context():
-            user, created = peamu_user_data.create_or_update_user()
+            user, created = ft_connect_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
         assert user.first_name == job_seeker.first_name
@@ -248,10 +250,10 @@ class TestPoleEmploiConnect:
         # New created job seeker has no title and is redirected to complete its infos
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user = User.objects.get()
-        assert user.email == PEAMU_USERINFO["email"]
-        assert user.first_name == PEAMU_USERINFO["given_name"]
-        assert user.last_name == PEAMU_USERINFO["family_name"]
-        assert user.username == PEAMU_USERINFO["sub"]
+        assert user.email == FT_CONNECT_USERINFO["email"]
+        assert user.first_name == FT_CONNECT_USERINFO["given_name"]
+        assert user.last_name == FT_CONNECT_USERINFO["family_name"]
+        assert user.username == FT_CONNECT_USERINFO["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.jobseeker_profile.nir == ""
@@ -268,14 +270,14 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_no_email(self, client):
-        user_info = PEAMU_USERINFO.copy()
+        user_info = FT_CONNECT_USERINFO.copy()
         del user_info["email"]
         mock_oauth_dance(client, user_info=user_info, expected_route="ft_connect:no_email")
         assert not User.objects.exists()
 
     @respx.mock
     def test_callback_other_missing_data(self, client):
-        user_info = PEAMU_USERINFO.copy()
+        user_info = FT_CONNECT_USERINFO.copy()
         del user_info["given_name"]
         mock_oauth_dance(client, user_info=user_info, expected_route="search:employers_home")
         assert not User.objects.exists()
@@ -308,7 +310,7 @@ class TestPoleEmploiConnect:
         # New created job seeker has no title and is redirected to complete its infos
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user = User.objects.get()
-        assert user.email == PEAMU_USERINFO["email"]
+        assert user.email == FT_CONNECT_USERINFO["email"]
         assert user.jobseeker_profile.nir == nir
 
         # The session key has been removed
@@ -316,11 +318,11 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_inactive_user_exception(self, client):
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
 
         user = UserFactory(
-            username=peamu_user_data.username,
-            email=peamu_user_data.email,
+            username=ft_connect_user_data.username,
+            email=ft_connect_user_data.email,
             kind=UserKind.JOB_SEEKER,
             is_active=False,
             identity_provider=IdentityProvider.PE_CONNECT,
@@ -343,18 +345,20 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
 
-        user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=UserKind.PROFESSIONAL)
+        user = UserFactory(
+            username=ft_connect_user_data.username, email=ft_connect_user_data.email, kind=UserKind.PROFESSIONAL
+        )
         mock_oauth_dance(client, expected_route="account_login")
         user.delete()
 
     @respx.mock
     def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
         # EmailInUseException raised by the email conflict
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
         JobSeekerFactory(
-            email=peamu_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT, for_snapshot=True
+            email=ft_connect_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT, for_snapshot=True
         )
 
         # Test redirection and modal content
@@ -363,9 +367,9 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
-        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+        ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
         user = JobSeekerFactory(
-            username="another_sub", email=peamu_user_data.email, identity_provider=IdentityProvider.PE_CONNECT
+            username="another_sub", email=ft_connect_user_data.email, identity_provider=IdentityProvider.PE_CONNECT
         )
 
         # Test redirection and modal content
@@ -379,7 +383,7 @@ class TestPoleEmploiConnect:
         assertMessages(response, [])
         user.refresh_from_db()
         assert user.allow_next_sso_sub_update is False
-        assert user.username == peamu_user_data.username
+        assert user.username == ft_connect_user_data.username
 
         # If we allow the update again, but the sub does change, we still disable allow_next_sso_sub_update
         user.allow_next_sso_sub_update = True
@@ -448,7 +452,7 @@ class TestPoleEmploiConnect:
         assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @respx.mock
-    def test_django_account_logout_from_peamu(self, client):
+    def test_django_account_logout_from_ft_connect(self, client):
         """
         When a FranceTravail Connect user wants to log out from his local account,
         he should be logged out too from FranceTravail Connect.
@@ -472,31 +476,31 @@ class TestPoleEmploiConnect:
 
 
 @pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.FRANCE_CONNECT])
-def test_create_peamu_user_with_already_existing_email_fails(identity_provider):
+def test_create_ft_connect_user_with_already_existing_email_fails(identity_provider):
     """
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.
     """
-    peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+    ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
     JobSeekerFactory(
         username="another_username",
-        email=peamu_user_data.email,
+        email=ft_connect_user_data.email,
         identity_provider=identity_provider,
     )
     with pytest.raises(EmailInUseException):
-        peamu_user_data.create_or_update_user()
+        ft_connect_user_data.create_or_update_user()
 
 
-def test_create_peamu_user_with_already_existing_peamu_email_fails():
+def test_create_ft_connect_user_with_already_existing_ft_connect_email_fails():
     """
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.
     """
-    peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
+    ft_connect_user_data = FranceTravailConnectUserData.from_user_info(FT_CONNECT_USERINFO)
     JobSeekerFactory(
         username="another_username",
-        email=peamu_user_data.email,
+        email=ft_connect_user_data.email,
         identity_provider=IdentityProvider.PE_CONNECT,
     )
     with pytest.raises(MultipleSubSameEmailException):
-        peamu_user_data.create_or_update_user()
+        ft_connect_user_data.create_or_update_user()
