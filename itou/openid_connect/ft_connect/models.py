@@ -6,7 +6,8 @@ from itou.users.enums import IdentityProvider, UserKind
 
 
 class PoleEmploiConnectState(OIDConnectState):
-    pass
+    class Meta:
+        db_table = "pe_connect_poleemploiconnectstate"
 
 
 @dataclasses.dataclass

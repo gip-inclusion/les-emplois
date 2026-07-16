@@ -1,9 +1,9 @@
 from django.urls import path
 
-from itou.openid_connect.pe_connect import views
+from itou.openid_connect.ft_connect import views
 
 
-app_name = "pe_connect"
+app_name = "ft_connect"
 
 urlpatterns = [
     path("authorize", views.pe_connect_authorize, name="authorize"),
