@@ -8381,6 +8381,472 @@
     ]),
   })
 # ---
+# name: test_populate_references
+  dict({
+    'num_queries': 35,
+    'queries': list([
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "jobs_rome"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_new_codes_rome"',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_codes_rome" ("code_rome" varchar,"description_code_rome" varchar,"date_mise_à_jour_metabase" date)',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_codes_rome"."code_rome" IS \'code ROME\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_codes_rome"."description_code_rome" IS \'nom\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_codes_rome"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "jobs_rome"."updated_at",
+                 "jobs_rome"."code",
+                 "jobs_rome"."name"
+          FROM "jobs_rome"
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          COPY "z_new_codes_rome" ("code_rome",
+                                   "description_code_rome",
+                                   "date_mise_à_jour_metabase")
+          FROM STDIN WITH (FORMAT BINARY)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_codes_rome" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE IF EXISTS "codes_rome" RENAME TO "z_old_codes_rome"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE "z_new_codes_rome" RENAME TO "codes_rome"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_codes_rome" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "cities_city"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_new_communes"',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_communes" ("nom" varchar,"code_insee" varchar,"latitude" double precision,"longitude" double precision,"statut_zrr" varchar,"date_mise_à_jour_metabase" date)',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_communes"."nom" IS \'ville\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_communes"."code_insee" IS \'code INSEE\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_communes"."latitude" IS \'Latitude\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_communes"."longitude" IS \'Longitude\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_communes"."statut_zrr" IS \'Statut ZRR\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_communes"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
+          FROM "cities_city"
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_insee_code_to_zrr_status_map[metabase/tables/utils.py]',
+          'get_zrr_status_for_insee_code[metabase/tables/utils.py]',
+          '<lambda>[metabase/tables/insee_codes.py]',
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "geo_zrr"."id",
+                 "geo_zrr"."insee_code",
+                 "geo_zrr"."status"
+          FROM "geo_zrr"
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          COPY "z_new_communes" ("nom",
+                                 "code_insee",
+                                 "latitude",
+                                 "longitude",
+                                 "statut_zrr",
+                                 "date_mise_à_jour_metabase")
+          FROM STDIN WITH (FORMAT BINARY)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_communes" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE IF EXISTS "communes" RENAME TO "z_old_communes"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE "z_new_communes" RENAME TO "communes"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_communes" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_new_departements"',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_departements" ("code_departement" text,"nom_departement" text,"nom_region" text)',
+      }),
+      dict({
+        'origin': list([
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          COPY "z_new_departements" ("code_departement",
+                                     "nom_departement",
+                                     "nom_region")
+          FROM STDIN WITH (FORMAT BINARY)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_departements" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE IF EXISTS "departements" RENAME TO "z_old_departements"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'ALTER TABLE "z_new_departements" RENAME TO "departements"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'store_df[metabase/dataframes.py]',
+          'Command.populate_references[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_departements" CASCADE',
+      }),
+    ]),
+  })
+# ---
 # name: test_populate_suspensions
   dict({
     'num_queries': 17,

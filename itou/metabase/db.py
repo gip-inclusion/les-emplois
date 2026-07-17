@@ -20,7 +20,7 @@ from itou.metabase.utils import convert_boolean_to_int, convert_datetime_to_loca
 logger = logging.getLogger(__name__)
 
 
-def get_connection(schema):
+def get_connection(schema=None):
     connection = psycopg.connect(
         host=settings.PILOTAGE_DATASTORE_DB_HOST,
         port=settings.PILOTAGE_DATASTORE_DB_PORT,

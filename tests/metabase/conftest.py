@@ -29,7 +29,11 @@ def pilotage_datastore_db_fixture(mocker):
         def __exit__(self, exc_type, exc_val, exc_tb):
             pass
 
-    mocker.patch("itou.metabase.db.get_connection", return_value=FakePsycopgConnection())
+    mocker.patch(
+        "itou.metabase.db.get_connection",
+        return_value=FakePsycopgConnection(),
+        autospec=True,
+    )
 
 
 @pytest.fixture(autouse=True)

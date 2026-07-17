@@ -1,4 +1,5 @@
 import datetime
+import urllib
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -9,6 +10,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 
 from itou.approvals.enums import Origin
+from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription, SiaeACIConvergencePHC
@@ -17,6 +19,7 @@ from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrati
 from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import MobilizationEventKind
 from itou.job_applications.enums import JobApplicationState
+from itou.jobs.models import Rome
 from itou.metabase.tables import gps, mobilization_events
 from itou.metabase.tables.utils import hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -50,6 +53,57 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+
+
+@freeze_time("2023-03-10")
+@pytest.mark.django_db(transaction=True)
+def test_populate_all(respx_mock, settings):
+    """Check the command runs correctly"""
+    settings.AIRFLOW_BASE_URL = "https://airflow"
+    respx_mock.post(urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"))
+    management.call_command("populate_metabase_emplois", mode="all")
+
+
+@freeze_time("2023-03-10")
+@pytest.mark.django_db(transaction=True)
+def test_populate_references(snapshot):
+    date_maj = timezone.localdate()
+    rome = Rome.objects.create(code="M1805", name="")
+    city = City.objects.create(
+        name="Geispolsheim",
+        slug="geispolsheim-67",
+        department="67",
+        coords=Point(7.644817, 48.515883),
+        post_codes=["67118"],
+        code_insee="67152",
+    )
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="references")
+
+    with connection.cursor() as cursor:
+        rome = Rome.objects.get()
+        cursor.execute("SELECT * FROM codes_rome")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                "M1805",
+                rome.name,
+                date_maj,
+            ),
+        ]
+
+        cursor.execute("SELECT * FROM communes")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                city.name,
+                city.code_insee,
+                city.latitude,
+                city.longitude,
+                "Statut ZRR inconnu",
+                date_maj,
+            ),
+        ]
 
 
 @freeze_time("2023-03-10")
