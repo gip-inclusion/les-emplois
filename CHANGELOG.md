@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 2026-07-06
+
+### Ajouté
+
+- [Interface : Afficher le dernier accompagnateur connu au lieu du référent GPS](https://github.com/gip-inclusion/les-emplois/pull/8307)
+- [Interface : Ajouter un usager à la liste d'accompagnements](https://github.com/gip-inclusion/les-emplois/pull/8306)
+- [SPS - Prescripteur : Carte pour visualiser les solutions recommandées](https://github.com/gip-inclusion/les-emplois/pull/8278)
+
+### Modifié
+
+- [GEIQ : Permettre la saisie de montants à décimales dans la décision (contrôle de service fait)](https://github.com/gip-inclusion/les-emplois/pull/8357)
+
 ## 2026-06-29
 
 ### Ajouté
