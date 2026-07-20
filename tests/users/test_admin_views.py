@@ -80,6 +80,8 @@ def test_no_email_sent(client):
             "approvals-TOTAL_FORMS": "0",
             "job_applications-INITIAL_FORMS": "0",
             "job_applications-TOTAL_FORMS": "0",
+            "orientations-INITIAL_FORMS": "0",
+            "orientations-TOTAL_FORMS": "0",
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "0",
             "_save": "Save",
