@@ -18,7 +18,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
+from itou.www.apply.views.list_views import JobApplicationOrder
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
@@ -96,7 +96,7 @@ class TestProcessListSiae:
 
         client.force_login(employer)
         with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
-            response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
+            response = client.get(reverse("apply:list_for_siae"))
 
         total_applications = len(response.context["job_applications_page"].object_list)
 
@@ -162,7 +162,7 @@ class TestProcessListSiae:
         )
 
         with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
-            response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.TABLE})
+            response = client.get(reverse("apply:list_for_siae"))
         assert len(response.context["job_applications_page"].object_list) == 3
 
     def test_list_for_siae_show_criteria(self, client):
@@ -268,11 +268,8 @@ class TestProcessListSiae:
             with subtests.test(kind=kind.label):
                 company.kind = kind
                 company.save(update_fields=("kind", "updated_at"))
-                response = client.get(
-                    reverse("apply:list_for_siae"), data={"display": JobApplicationsDisplayKind.LIST}
-                )
+                response = client.get(reverse("apply:list_for_siae"))
                 if expect_to_see_criteria[kind]:
-                    assertContains(response, TITLE, html=True)
                     assertContains(response, CRITERION, html=True)
                 else:
                     assertNotContains(response, TITLE, html=True)
@@ -760,30 +757,6 @@ class TestProcessListSiae:
         assertContains(response, f'hx-get="{url}"')
 
 
-def test_list_display_kind(client):
-    company = CompanyFactory(with_membership=True)
-    employer = company.members.first()
-    JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
-    client.force_login(employer)
-    url = reverse("apply:list_for_siae")
-
-    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures'
-    LIST_VIEW_MARKER = '<div class="c-box--results__header">'
-
-    for display_param, expected_marker in [
-        ({}, TABLE_VIEW_MARKER),
-        ({"display": "invalid"}, TABLE_VIEW_MARKER),
-        ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
-        ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
-    ]:
-        response = client.get(url, display_param)
-        for marker in (LIST_VIEW_MARKER, TABLE_VIEW_MARKER):
-            if marker == expected_marker:
-                assertContains(response, marker)
-            else:
-                assertNotContains(response, marker)
-
-
 @pytest.mark.parametrize("filter_state", JobApplicationWorkflow.states)
 def test_list_for_siae_message_when_company_got_no_new_nor_processing_nor_postponed_application(client, filter_state):
     company = CompanyFactory(with_membership=True)
@@ -834,7 +807,7 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
     for kind in set(CompanyKind) - {CompanyKind.EA, CompanyKind.EATT}:
         company = CompanyFactory(with_membership=True, kind=kind)
         client.force_login(company.members.get())
-        response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
+        response = client.get(reverse("apply:list_for_siae"))
         assert response.status_code == 200
         filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
         # GEIQ and non IAE kind do not have a filter on approval and eligibility.
@@ -847,7 +820,7 @@ def test_archived(client):
     active = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
     archived = JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company, archived_at=timezone.now())
     archived_badge_html = """\
-    <span class="badge rounded-pill badge-sm mb-1 bg-light text-primary"
+    <span class="badge rounded-pill badge-sm bg-light text-primary"
           aria-label="candidature archivée"
           data-bs-toggle="tooltip"
           data-bs-placement="top"
@@ -858,23 +831,23 @@ def test_archived(client):
 
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
+    response = client.get(url)
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": ""})
+    response = client.get(url, data={"archived": ""})
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": "archived"})
+    response = client.get(url, data={"archived": "archived"})
     assertNotContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": "all"})
+    response = client.get(url, data={"archived": "all"})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": "invalid"})
+    response = client.get(url, data={"archived": "invalid"})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
@@ -920,21 +893,6 @@ def test_list_for_siae_htmx_filters(client):
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
 
-    # Switch display kind
-    [display_input] = page.find_all(id="display-kind")
-    display_input["value"] = JobApplicationsDisplayKind.TABLE.value
-
-    response = client.get(
-        url,
-        {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE},
-        headers={"HX-Request": "true"},
-    )
-    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
-
-    response = client.get(url, {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE})
-    fresh_page = parse_response_to_soup(response, selector="#main")
-    assertSoupEqual(page, fresh_page)
-
 
 def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
     company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
@@ -969,7 +927,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
         with subtests.test(kind=kind.label):
             company.kind = kind
             company.save(update_fields=("kind", "updated_at"))
-            response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.TABLE})
+            response = client.get(reverse("apply:list_for_siae"))
             if expect_to_see_criteria[kind]:
                 assertContains(response, TITLE, html=True)
                 assertContains(response, CRITERION, html=True)
@@ -984,14 +942,9 @@ def test_list_snapshot(client, snapshot):
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
 
-    for display_param in [
-        {},
-        {"display": JobApplicationsDisplayKind.LIST},
-        {"display": JobApplicationsDisplayKind.TABLE},
-    ]:
-        response = client.get(url, display_param)
-        page = parse_response_to_soup(response, selector="#job-applications-section")
-        assert pretty_indented(page) == snapshot(name="empty")
+    response = client.get(url)
+    page = parse_response_to_soup(response, selector="#job-applications-section")
+    assert pretty_indented(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {"job_seeker": job_seeker, "to_company": company}
@@ -1021,33 +974,7 @@ def test_list_snapshot(client, snapshot):
         ),
     ]
 
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/siae/details",
-                        "/apply/[PK of JobApplication]/siae/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
-
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    response = client.get(url)
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -1084,7 +1011,7 @@ def test_list_snapshot(client, snapshot):
             )
         ),
     )
-    assert pretty_indented(page) == snapshot(name="applications table")
+    assert pretty_indented(page) == snapshot(name="applications")
 
 
 @freeze_time("2026-02-01")
@@ -1200,27 +1127,11 @@ def test_list_for_siae_exports_download_by_month(client):
     assert "spreadsheetml" in response.get("Content-Type")
 
 
-@pytest.mark.parametrize(
-    "job_app_kwargs",
-    [
-        pytest.param({"with_approval": True}, id="with_approval"),
-        pytest.param({"with_iae_eligibility_diagnosis": True}, id="with_eligibility_diag"),
-        pytest.param({"to_company__subject_to_iae_rules": True}, id="no_eligibility_diag"),
-    ],
-)
-def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
-    job_application = JobApplicationFactory(sent_by_prescriber_alone=True, **job_app_kwargs)
-    client.force_login(job_application.to_company.members.get())
-    response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
-    badge = parse_response_to_soup(response, selector=".c-box--results__summary span.badge")
-    assert pretty_indented(badge) == snapshot
-
-
 def test_reset_filter_button_snapshot(client, snapshot):
     job_application = JobApplicationFactory(sent_by_prescriber_alone=True)
     client.force_login(job_application.to_company.members.get())
 
-    filter_params = {"states": [job_application.state], "display": JobApplicationsDisplayKind.LIST}
+    filter_params = {"states": [job_application.state]}
     response = client.get(reverse("apply:list_for_siae"), filter_params)
 
     assert pretty_indented(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
@@ -1230,7 +1141,6 @@ def test_reset_filter_button_snapshot(client, snapshot):
         name="off-canvas buttons in list view"
     )
 
-    filter_params["display"] = JobApplicationsDisplayKind.TABLE
     filter_params["order"] = JobApplicationOrder.CREATED_AT_ASC
     response = client.get(reverse("apply:list_for_siae"), filter_params)
 
@@ -1263,7 +1173,7 @@ def test_list_for_siae_select_applications_htmx(client):
         3, sent_by_prescriber_alone=True, to_company=company, state=JobApplicationState.NEW
     )
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table"})
+    table_url = reverse("apply:list_for_siae")
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(response, selector="#main")
@@ -1343,7 +1253,7 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
     assert not unarchivable_app.can_be_archived
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1459,9 +1369,7 @@ def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
     )
 
     client.force_login(employer)
-    table_url = reverse(
-        "apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01", "archived": "archived"}
-    )
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01", "archived": "archived"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1573,7 +1481,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     assert not untransferable_app.transfer.is_available()
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1701,7 +1609,7 @@ def test_list_for_siae_select_applications_batch_add_to_pool(client, snapshot):
     assert not unaddable_app.add_to_pool.is_available()
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1815,7 +1723,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     assert not unpostponable_app.postpone.is_available()
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1935,7 +1843,7 @@ def test_list_for_siae_select_applications_batch_process(client, snapshot):
     assert not unprocessable_app.process.is_available()
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -2047,7 +1955,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     assert not unrefusable_app.refuse.is_available()
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -2158,7 +2066,7 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot, compan
     assert not unacceptable_app.accept.is_available()
 
     client.force_login(employer)
-    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -2248,7 +2156,6 @@ def test_order(client, subtests):
 
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
-    query_params = {"display": JobApplicationsDisplayKind.TABLE}
 
     expected_order = {
         "created_at": [zorro_application, alice_first_application, alice_second_application],
@@ -2256,19 +2163,19 @@ def test_order(client, subtests):
     }
 
     with subtests.test(order="<missing_value>"):
-        response = client.get(url, query_params)
+        response = client.get(url)
         assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
 
     with subtests.test(order="<invalid_value>"):
-        response = client.get(url, query_params | {"order": "invalid_value"})
+        response = client.get(url, {"order": "invalid_value"})
         assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
 
     for order, applications in expected_order.items():
         with subtests.test(order=order):
-            response = client.get(url, query_params | {"order": order})
+            response = client.get(url, {"order": order})
             assert response.context["job_applications_page"].object_list == applications
 
-            response = client.get(url, query_params | {"order": f"-{order}"})
+            response = client.get(url, {"order": f"-{order}"})
             assert response.context["job_applications_page"].object_list == list(reversed(applications))
 
 
@@ -2279,8 +2186,7 @@ def test_htmx_order(client):
 
     JobApplicationFactory.create_batch(2, sent_by_prescriber_alone=True, to_company=company)
     client.force_login(employer)
-    query_params = {"display": JobApplicationsDisplayKind.TABLE}
-    response = client.get(url, query_params)
+    response = client.get(url)
 
     assertContains(response, "2 résultats")
     simulated_page = parse_response_to_soup(response)
@@ -2294,9 +2200,9 @@ def test_htmx_order(client):
     [order_input] = simulated_page.find_all(id=ORDER_ID)
     # Simulate click on button
     order_input["value"] = CREATED_AT_ASC
-    response = client.get(url, query_params | {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
+    response = client.get(url, {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
     update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
-    response = client.get(url, query_params | {"order": CREATED_AT_ASC})
+    response = client.get(url, {"order": CREATED_AT_ASC})
     assertContains(response, "2 résultats")
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)
@@ -2403,7 +2309,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     ]
 
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    response = client.get(url)
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
