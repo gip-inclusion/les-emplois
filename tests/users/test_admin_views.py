@@ -19,6 +19,7 @@ from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.insertion.factories import OrientationFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -163,10 +164,11 @@ class TestTransferUserData:
     def test_transfer_data(self, admin_client, snapshot):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
         approval = job_application.approval
-        # FIXME: add orientation
 
         from_user = job_application.job_seeker
         to_user = JobSeekerFactory()
+
+        orientation = OrientationFactory(beneficiary=from_user)
 
         transfer_url_1 = reverse("admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk})
         transfer_url_2 = reverse(
@@ -186,14 +188,19 @@ class TestTransferUserData:
         assertContains(response, "Choisissez les objets à transférer")
         assertContains(response, str(job_application))
         assertContains(response, str(approval))
+        assertContains(response, str(orientation))
 
-        response = admin_client.post(transfer_url_2, data={"fields_to_transfer": ["job_applications", "approvals"]})
+        response = admin_client.post(
+            transfer_url_2, data={"fields_to_transfer": ["job_applications", "approvals", "orientations"]}
+        )
         assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": from_user.pk}))
 
         job_application.refresh_from_db()
         approval.refresh_from_db()
+        orientation.refresh_from_db()
         assert job_application.job_seeker == to_user
         assert approval.user == to_user
+        assert orientation.beneficiary == to_user
         assertMessages(
             response,
             [
@@ -227,6 +234,7 @@ class TestTransferUserData:
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "- CANDIDATURES" in remark
         assert "- PASS IAE" in remark
+        assert "- ORIENTATIONS" in remark
 
     @pytest.mark.parametrize(
         "factory",
