@@ -396,15 +396,15 @@ class TestItouStaffLogin:
         static_device.save()
         correct_code_data = {"code": backup_code}
         response = client.post(login_with_backup_code_url, data=correct_code_data)
-        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"))
+        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro") + "?after_recovery=1")
         assertMessages(
             response,
             [
                 messages.Message(
                     messages.SUCCESS,
-                    "Vous avez été identifié grâce à votre code de récupération. "
-                    "Vos appareils précedemment enregistrés ont été supprimés. "
-                    "Vous devez à nouveau enregistrer un appareil.",
+                    "Code de récupération validé. Votre identité a été vérifiée. "
+                    "Vous pouvez maintenant reconfigurer votre double authentification",
+                    extra_tags=["toast"],
                 )
             ],
         )

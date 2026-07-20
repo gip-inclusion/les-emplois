@@ -14,29 +14,77 @@
 {% endblock %}
 
 {% block title_extra %}
-    {% component_alert title=title content=content variant="warning" %}
-        {% fragment as title %}
-            Pour continuer, la sécurisation de votre compte est nécéssaire.
-        {% endfragment %}
-        {% fragment as content %}
-            <p class="mb-0">
-                Pour garantir la sécurité des données des personnes
-                accompagnées, la double authentification est obligatoire sur la
-                plateforme Les emplois de l’inclusion.
-                <br>
-                Configurez-la pour accéder à votre espace.
-            </p>
-        {% endfragment %}
-    {% endcomponent_alert %}
+    {% if after_recovery %}
+        {% component_alert title=title content=content variant="warning" %}
+            {% fragment as title %}
+                Votre code de récupération n’est plus valable, supprimez-le.
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Il a été utilisé et ne peut plus servir. Si vous l’avez noté quelque part (document, gestionnaire de mots de passe, papier…), supprimez-le dès maintenant pour éviter toute confusion future.
+                    <br>
+                    À l’issue de cette configuration, un nouveau code de récupération vous sera généré. Conservez-le soigneusement, il remplacera définitivement l’ancien.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% else %}
+        {% component_alert title=title content=content variant="warning" %}
+            {% fragment as title %}
+                Pour continuer, la sécurisation de votre compte est nécéssaire.
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Pour garantir la sécurité des données des personnes
+                    accompagnées, la double authentification est obligatoire sur la
+                    plateforme Les emplois de l’inclusion.
+                    <br>
+                    Configurez-la pour accéder à votre espace.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
 {% endblock %}
 
 
 {% block content %}
+    {% if after_recovery %}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        {% component_alert title=title content=content variant="info" %}
+                            {% fragment as title %}
+                                Les appareils suivants ont été retirés de votre compte :
+                            {% endfragment %}
+                            {% fragment as content %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for device in disabled_devices %}
+                                        <li>
+                                            <strike>{{ device.name }}</strike>
+                                            <span class="badge badge-sm bg-tertiary rounded-pill">retiré</span>
+                                            <br>
+                                            Dernière utilisation le {{ device.last_used_at|date:"d F Y à H\hi"|default:'<i class="text-disabled">jamais</i>' }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endfragment %}
+                        {% endcomponent_alert %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
-                    <h2 class="h3">Comment configurer la double authentification ?</h2>
+                    <h2 class="h3">
+                        {% if after_recovery %}
+                            Reconfigurez votre double authentification
+                        {% else %}
+                            Comment configurer la double authentification ?
+                        {% endif %}
+                    </h2>
                     <p>Nous vous guidons étape par étape, comptez environ 5 minutes.</p>
                 </div>
             </div>
