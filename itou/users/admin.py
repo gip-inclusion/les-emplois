@@ -29,6 +29,7 @@ from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
 from itou.gps.models import FollowUpGroupMembership
+from itou.insertion.models import Orientation
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -198,6 +199,35 @@ class SentJobApplicationInline(JobApplicationInline):
     readonly_fields = fields
     verbose_name = "candidature envoyée"
     verbose_name_plural = "candidatures envoyées"
+
+    @admin.display(description="candidat")
+    def job_seeker_link(self, obj):
+        return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
+
+
+class OrientationInline(ReadonlyMixin, ItouTabularInline):
+    model = Orientation
+    fk_name = "beneficiary"
+    extra = 0
+    fields = ("pk_link", "created_at", "sender_kind", "service_link", "status")
+    readonly_fields = fields
+    list_select_related = ("service", "beneficiary")
+
+    @admin.display(description="PK")
+    def pk_link(self, obj):
+        return get_admin_view_link(obj)
+
+    @admin.display(description="service d'insertion")
+    def service_link(self, obj):
+        return get_admin_view_link(obj.service, content=obj.service.name)
+
+
+class SentOrientationInline(OrientationInline):
+    fk_name = "sender"
+    fields = ("pk_link", "created_at", "job_seeker_link", "service_link", "status")
+    readonly_fields = fields
+    verbose_name = "orientation envoyée"
+    verbose_name_plural = "orientations envoyées"
 
     @admin.display(description="candidat")
     def job_seeker_link(self, obj):
@@ -659,7 +689,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                     False,
                 ),
                 sent_applications_inline,
-                # FIXME: add sent orientations
+                ConditionalInline(lambda user: user.orientations_sent.all(), SentOrientationInline, True),
             ],
             "is_job_seeker": [
                 ConditionalInline(lambda user: user.eligibility_diagnoses.all(), EligibilityDiagnosisInline, False),
@@ -668,7 +698,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 ),
                 ConditionalInline(lambda user: user.approvals.all(), ApprovalInline, False),
                 ConditionalInline(lambda user: user.job_applications.all(), JobApplicationInline, True),
-                # FIXME: add orientations
+                ConditionalInline(lambda user: user.orientations.all(), OrientationInline, True),
             ],
         }
         for check, related_fields in conditional_inlines.items():
