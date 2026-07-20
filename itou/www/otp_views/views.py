@@ -46,7 +46,16 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
 
 @check_user_for_otp
 def enrollment_step_0_intro(request, template_name="otp_views/enrollment_step_0_intro.html"):
-    context = {"next_step_url": reverse("otp_views:enrollment_step_1_choose_device_type")}
+    after_recovery = "after_recovery" in request.GET
+    if after_recovery:
+        disabled_devices = ItouTOTPDevice.objects.filter(user=request.user, disabled_at__isnull=False)
+    else:
+        disabled_devices = ()  # ignored by template
+    context = {
+        "after_recovery": after_recovery,
+        "disabled_devices": disabled_devices,
+        "next_step_url": reverse("otp_views:enrollment_step_1_choose_device_type"),
+    }
     return render(request, template_name, context)
 
 
@@ -163,9 +172,9 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         logger.info("User %s authenticated with 2FA backup code", request.user.id)
         messages.success(
             request,
-            "Vous avez été identifié grâce à votre code de récupération. "
-            "Vos appareils précedemment enregistrés ont été supprimés. "
-            "Vous devez à nouveau enregistrer un appareil.",
+            "Code de récupération validé. Votre identité a été vérifiée. "
+            "Vous pouvez maintenant reconfigurer votre double authentification",
+            extra_tags=["toast"],
         )
 
         # No need to delete the ItouStaticToken, it's already been
@@ -182,7 +191,14 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
 
         # Now that the user does not have any usable device anymore,
         # they must enroll again.
-        return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
+        return HttpResponseRedirect(
+            reverse(
+                "otp_views:enrollment_step_0_intro",
+                query={
+                    "after_recovery": "1",
+                },
+            )
+        )
 
     context = {"form": form}
     return render(request, template_name, context)
