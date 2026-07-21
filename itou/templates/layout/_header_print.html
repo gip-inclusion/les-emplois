@@ -7,7 +7,8 @@
                 <img src="{% static_theme_images 'logo-republique-francaise.svg' %}" height="70" alt="République Française">
             </div>
             <div class="col d-flex align-items-center">
-                <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="60" alt="Les emplois de l'inclusion">
+                {# TODO(branding): logo à basculer (logo-plateforme-inclusion) au flip du nom #}
+                <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="60" alt="{% brand %}">
             </div>
             <div class="col-auto d-flex align-items-center fs-sm d-none d-print-inline-flex">Imprimé le {% now "d F Y" %}</div>
         </div>

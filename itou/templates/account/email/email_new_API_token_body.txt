@@ -4,7 +4,7 @@
 
 Bonjour {{ user.get_full_name }},
 
-Nous vous informons qu'un nouveau token API vient d'être généré sur votre compte des Emplois de l’inclusion.
+Nous vous informons qu'un nouveau token API vient d'être généré sur votre compte {% brand "de" %}.
 
 Détails de l’opération :
 • Date et heure : {{ token_created_at }}

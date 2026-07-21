@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 {% load static %}
 
-{% block title %}Bienvenue sur les emplois de l'inclusion ! {{ block.super }}{% endblock %}
+{% block title %}Bienvenue sur {% brand %} ! {{ block.super }}{% endblock %}
 
 {% block content %}
     <section class="s-section">
@@ -18,7 +18,7 @@
                         <div class="carousel-inner pb-5">
                             <div class="carousel-item active">
                                 <div class="d-block w-100 text-center">
-                                    <h1 class="h1-hero-c1">Bienvenue sur les emplois de l'inclusion !</h1>
+                                    <h1 class="h1-hero-c1">Bienvenue sur {% brand %} !</h1>
                                     <figure class="mx-auto mb-3 w-sm-33">
                                         <img src="{% static 'img/welcoming_tour/employeur_1.svg' %}" loading="lazy" class="img-fitcover img-fluid" alt="">
                                     </figure>
@@ -41,7 +41,7 @@
                                         <img src="{% static 'img/welcoming_tour/employeur_2.svg' %}" loading="lazy" class="img-fitcover img-fluid" alt="">
                                     </figure>
                                     <p class="lead mb-5">
-                                        Grâce aux emplois de l'inclusion, disposez d’une plus large diffusion de vos offres
+                                        Grâce {% brand "à" %}, disposez d’une plus large diffusion de vos offres
                                         <br class="d-none d-md-inline">
                                         auprès des candidats à l’insertion de votre région.
                                         <br>
