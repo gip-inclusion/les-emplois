@@ -8,6 +8,7 @@ from itou.users.enums import UserKind
 class Service(models.TextChoices):
     DATA_INCLUSION = "data-inclusion", "Data inclusion"
     DORA = "dora", "Dora"
+    # Label left untokenized: it is part of ServiceToken.service choices, so changing it needs a migration.
     EMPLOIS = "les-emplois", "les emplois de l’inclusion"
     MARCHE = "le-marche", "Le marché de l’inclusion"
     MON_RECAP = "mon-recap", "Mon Récap"
