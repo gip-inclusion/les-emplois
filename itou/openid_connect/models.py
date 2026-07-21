@@ -15,6 +15,7 @@ from itou.users.enums import (
     UserKind,
 )
 from itou.users.models import User
+from itou.utils.brand import product_name
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 
 
@@ -50,10 +51,11 @@ class InactiveUserException(Exception):
 
     def format_message_html(self, identity_provider):
         return format_html(
-            "La connexion via {} a fonctionné mais le compte lié sur les Emplois de l’inclusion est désactivé. "
+            "La connexion via {} a fonctionné mais le compte lié sur {} est désactivé. "
             "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
             '<a href="{}">ce lien</a> et en leur fournissant l’identifiant public de ce compte : {}.',
             identity_provider.label,
+            product_name(),
             ITOU_HELP_CENTER_URL,
             self.user.public_id,
         )

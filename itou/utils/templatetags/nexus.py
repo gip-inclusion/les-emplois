@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from itou.nexus.enums import Service
+from itou.utils.brand import product_name
 from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.matomo import matomo_event
 from itou.utils.templatetags.url_add_query import autologin_proconnect
@@ -21,9 +22,9 @@ def get_template_context(context, service):
     }
     services_context = {
         Service.EMPLOIS: {
-            "name": "Les Emplois de l’inclusion",
+            "name": product_name(),
             "description": "Le service de recrutement et de gestion des PASS IAE.",
-            "logo": "logo-emploi-inclusion-mono.svg",
+            "logo": "logo-emploi-inclusion-mono.svg",  # TODO(branding): logo à basculer au flip du nom
             "etoile": "nexus/nx-forme-etoile-emplois.png",
             "items_short": [
                 "Publiez vos recrutements",
@@ -253,8 +254,8 @@ def new_service(context, service):
 def get_services_context():
     return {
         Service.EMPLOIS: {
-            "name": "Les Emplois de l’inclusion",
-            "logo": "logo-emploi-inclusion.svg",
+            "name": product_name(),
+            "logo": "logo-emploi-inclusion.svg",  # TODO(branding): logo à basculer au flip du nom
             "one_click_activation": False,
         },
         Service.DORA: {
