@@ -49,5 +49,6 @@ addopts = [
 ]
 markers = [
     "no_django_db: mark tests that should not be marked with django_db.",
+    "slow: slow tests that are skipped unless pytest is run with `--runslow`",
     "snapshot: automic mark added to tests using snapshots",
 ]
