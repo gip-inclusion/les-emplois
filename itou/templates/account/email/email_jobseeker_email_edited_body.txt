@@ -10,7 +10,7 @@
 {% block body %}
 Bonjour {{ user.get_full_name }},
 
-Votre adresse e-mail a été mise à jour sur les Emplois de l’inclusion par la structure {{ organization }}.
+Votre adresse e-mail a été mise à jour sur {% brand %} par la structure {{ organization }}.
 - Ancienne adresse e-mail: {{ old_email_address|default_if_none:"Non renseignée" }}
 - Nouvelle adresse e-mail: {{ user.email }}
 
