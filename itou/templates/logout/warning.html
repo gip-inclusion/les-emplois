@@ -21,9 +21,7 @@
                 </div>
                 <div class="s-section__col col-12 col-lg-10 bg-lg-white">
                     {% if warning == LogoutWarning.FT_NO_FT_ORGANIZATION %}
-                        <p>
-                            En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.
-                        </p>
+                        <p>En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter {% brand "à" %}.</p>
                         <p>Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.</p>
                     {% elif warning == LogoutWarning.NO_ORGANIZATION %}
                         <p>

@@ -1,6 +1,6 @@
 Bonjour,
 
-Vous recevez cet e-mail parce que vous, ou quelqu’un d’autre, avez demandé à réinitialiser le mot de passe associé à votre compte sur les emplois de l’inclusion ({{ base_url }}).
+Vous recevez cet e-mail parce que vous, ou quelqu’un d’autre, avez demandé à réinitialiser le mot de passe associé à votre compte sur {% brand %} ({{ base_url }}).
 
 Toutefois, nous n’avons trouvé aucun compte utilisateur associé à votre adresse e-mail.
 
@@ -8,11 +8,11 @@ Si vous n’avez fait aucune demande de nouveau mot de passe, vous pouvez ignore
 
 Si vous avez fait cette demande de nouveau mot de passe :
 
-- Assurez-vous que vous n’aviez pas créé votre compte sur les emplois de l’inclusion depuis une autre adresse e-mail.
+- Assurez-vous que vous n’aviez pas créé votre compte sur {% brand %} depuis une autre adresse e-mail.
 - Vous pouvez créer un nouveau compte en utilisant le lien ci-dessous :
 
 {{ signup_url }}
 
 Cordialement,
 
-L’équipe des emplois de l’inclusion
+L’équipe {% brand "de" %}

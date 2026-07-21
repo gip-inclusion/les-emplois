@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-Candidature acceptée et votre avis sur les emplois de l'inclusion
+Candidature acceptée et votre avis sur {% brand %}
 {% endblock %}

@@ -4,7 +4,7 @@ Bonjour,
 
 En tant qu’administrateur de l’organisation {{ structure.name }}, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
 
-RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : {{ members_url }}
+RDV sur votre espace {% brand "de" %} à la rubrique “Gérer les collaborateurs” : {{ members_url }}
 
 Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
 

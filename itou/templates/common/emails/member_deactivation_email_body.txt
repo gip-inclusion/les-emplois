@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion
+Un administrateur vous a retiré d'une structure sur {% brand %}
 
 Organisation :
 
@@ -11,6 +11,6 @@ Organisation :
 - Email de contact : {{ structure.email }}
 {% endif %}
 
-Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.
+Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur {% brand %}.
 
 {% endblock body %}

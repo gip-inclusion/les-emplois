@@ -3,7 +3,7 @@
 {% block body %}
 Bonjour,
 
-La structure `{{ assessment.label_geiq_name }}` a transmis son bilan d’exécution sur le site des Emplois de l’inclusion.
+La structure `{{ assessment.label_geiq_name }}` a transmis son bilan d’exécution sur le site {% brand "de" %}.
 
 Références du dossier :
 

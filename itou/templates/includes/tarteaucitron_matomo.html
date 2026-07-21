@@ -111,7 +111,7 @@
         {% else %}
             /* defaults to a stripped version (no suffix) of the page title. */
 
-            const title = document.title.replace(/- Les emplois de l'inclusion/g,'').trim();
+            const title = document.title.replace(/- {% brand %}/g,'').trim();
             window._paq.push(['setDocumentTitle', title]);
         {% endif %}
         /* beautify ignore:end */
