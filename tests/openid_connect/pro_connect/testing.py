@@ -1,11 +1,10 @@
 from copy import deepcopy
-from urllib.parse import parse_qs, urlencode, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse, urlsplit
 
 import httpx
 import jwt
 import respx
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import crypto, timezone
@@ -135,9 +134,10 @@ def assert_and_mock_forced_logout(client, response, id_token, expected_redirect_
     query_params = parse_qs(urlparse(response.url).query)
     post_logout_redirect_uri = query_params["post_logout_redirect_uri"][0]
     state = query_params["state"][0]
-    local_url = post_logout_redirect_uri.split(settings.ITOU_FQDN)[1]
-    assert local_url == reverse("pro_connect:logout_callback")
-    response = client.get(add_url_params(local_url, {"state": state}))
+    urlparts = urlsplit(post_logout_redirect_uri)
+    assert urlparts.path == reverse("pro_connect:logout_callback")
+    assert urlparts.netloc == "testserver"
+    response = client.get(add_url_params(urlparts.path, {"state": state}))
     assertRedirects(response, expected_redirect_url)
     return response
 

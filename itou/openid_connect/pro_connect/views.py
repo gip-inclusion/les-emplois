@@ -64,8 +64,8 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
     return HttpResponseRedirect(reverse("search:employers_home"))
 
 
-def _generate_pro_params_from_session(pc_data):
-    redirect_uri = get_absolute_url(reverse("pro_connect:callback"))
+def _generate_pro_params_from_session(pc_data, host):
+    redirect_uri = get_absolute_url(reverse("pro_connect:callback"), host=host)
     nonce = crypto.get_random_string(length=12)
     state = ProConnectState.save_state(data=pc_data, nonce=nonce)
     data = {
@@ -142,7 +142,7 @@ def pro_connect_authorize(request):
     if user_email := request.GET.get("user_email"):
         pc_data.user_email = user_email
 
-    data = _generate_pro_params_from_session(dataclasses.asdict(pc_data))
+    data = _generate_pro_params_from_session(dataclasses.asdict(pc_data), request.get_host())
 
     base_url = constants.PRO_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
@@ -150,7 +150,7 @@ def pro_connect_authorize(request):
 
 def _get_token(request, code):
     # Retrieve token from ProConnect
-    token_redirect_uri = get_absolute_url(reverse("pro_connect:callback"))
+    token_redirect_uri = get_absolute_url(reverse("pro_connect:callback"), host=request.get_host())
     data = {
         "client_id": constants.PRO_CONNECT_CLIENT_ID,
         "client_secret": constants.PRO_CONNECT_CLIENT_SECRET,
@@ -402,7 +402,7 @@ def pro_connect_logout(request):
     params = {
         "id_token_hint": token,
         "state": logout_state,
-        "post_logout_redirect_uri": get_absolute_url(post_logout_redirect_url),
+        "post_logout_redirect_uri": get_absolute_url(post_logout_redirect_url, host=request.get_host()),
     }
     complete_url = add_url_params(constants.PRO_CONNECT_ENDPOINT_LOGOUT, params)
     return HttpResponseRedirect(complete_url)

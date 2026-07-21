@@ -1,4 +1,5 @@
 import datetime
+import urllib.parse
 
 import httpx
 import pytest
@@ -6,6 +7,7 @@ import respx
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
+from django.http import QueryDict
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -123,6 +125,9 @@ class TestPoleEmploiConnect:
         assert f"state={pec_state.state}" in response.url
         assert pec_state.nonce is not None
         assert f"nonce={pec_state.nonce}" in response.url
+        urlparts = urllib.parse.urlsplit(response.url)
+        query = QueryDict(urlparts.query)
+        assert query["redirect_uri"] == "http://testserver/pe_connect/callback"
 
     def test_create_user(self):
         """
@@ -431,7 +436,7 @@ class TestPoleEmploiConnect:
         response = client.get(url, data={"id_token": "123"})
         expected_url = (
             f"{constants.PE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
-            "redirect_uri=http%3A%2F%2Flocalhost:8000%2Fsearch%2Femployers"
+            "redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2Femployers"
         )
         assertRedirects(response, expected_url, fetch_redirect_response=False)
 

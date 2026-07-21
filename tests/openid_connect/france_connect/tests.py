@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import random
 import time
+import urllib.parse
 import uuid
 
 import httpx
@@ -14,6 +15,7 @@ from cryptography.utils import int_to_bytes
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
+from django.http import QueryDict
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -155,6 +157,9 @@ class TestFranceConnect:
         assert f"state={fc_state.state}" in response.url
         assert fc_state.nonce is not None
         assert f"nonce={fc_state.nonce}" in response.url
+        urlparts = urllib.parse.urlsplit(response.url)
+        query = QueryDict(urlparts.query)
+        assert query["redirect_uri"] == "http://testserver/franceconnect/callback"
 
     def test_create_django_user(self):
         """
@@ -533,7 +538,7 @@ class TestFranceConnect:
         response = client.get(url, data={"id_token": "123", "state": "some_state"})
         expected_url = (
             f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&state=some_state&"
-            "post_logout_redirect_uri=http%3A%2F%2Flocalhost:8000%2Fsearch%2Femployers"
+            "post_logout_redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2Femployers"
         )
         assertRedirects(response, expected_url, fetch_redirect_response=False)
 
