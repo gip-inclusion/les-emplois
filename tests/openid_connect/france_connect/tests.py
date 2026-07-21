@@ -535,12 +535,18 @@ class TestFranceConnect:
 
     def test_logout(self, client):
         url = reverse("france_connect:logout")
-        response = client.get(url, data={"id_token": "123", "state": "some_state"})
-        expected_url = (
-            f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&state=some_state&"
+        response = client.get(url, data={"id_token": "123"})
+        assert response.status_code == 302
+        urlparts = urllib.parse.urlsplit(response.url)
+        query = QueryDict(urlparts.query, mutable=True)
+        [state] = query.pop("state")
+        fc_state = FranceConnectState.get_from_state(state)
+        assert fc_state.is_valid() is True
+        urlparts = urlparts._replace(query=query.urlencode())
+        assert urllib.parse.urlunsplit(urlparts) == (
+            f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&"
             "post_logout_redirect_uri=http%3A%2F%2Ftestserver%2Fsearch%2Femployers"
         )
-        assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @respx.mock
     def test_django_account_logout_from_fc(self, client):
@@ -554,6 +560,7 @@ class TestFranceConnect:
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
         assert client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)
+        id_token = client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)
 
         response = client.post(logout_url)
         expected_redirection = reverse("france_connect:logout")
@@ -561,8 +568,16 @@ class TestFranceConnect:
         assert response.url.startswith(expected_redirection)
 
         response = client.get(response.url)
-        # The following redirection is tested in self.test_logout_with_redirection
         assert response.status_code == 302
+        scheme, netloc, path, query, *_ = urllib.parse.urlsplit(response.url)
+        assert f"{scheme}://{netloc}{path}" == constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
+        query = QueryDict(query)
+        assert set(query.keys()) == {"id_token_hint", "post_logout_redirect_uri", "state"}
+        assert query["id_token_hint"] == id_token
+        assert query["post_logout_redirect_uri"] == "http://testserver/search/employers"
+        state = query["state"]
+        fc_state = FranceConnectState.get_from_state(state)
+        assert fc_state.is_valid() is True
         assert not auth.get_user(client).is_authenticated
 
 
