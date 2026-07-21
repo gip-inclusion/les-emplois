@@ -1,15 +1,15 @@
 {% extends "layout/base.html" %}
 
-{% block title %}API Les emplois de l’inclusion{% endblock %}
+{% block title %}API {% brand %}{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 p-3">
-                    <h1 class="h1-hero-c1">API Les emplois de l’inclusion</h1>
+                    <h1 class="h1-hero-c1">API {% brand %}</h1>
                     <p class="lead">
-                        L'API des <a href="{% url 'home:hp' %}" aria-label="Vers les emplois de l'inclusion">emplois de l'inclusion</a> met à disposition des données de la plateforme.
+                        L'API de <a href="{% url 'home:hp' %}" aria-label="Vers {% brand %}">{% brand %}</a> met à disposition des données de la plateforme.
                     </p>
                     <p>Cette API est encore en construction et est appelée à évoluer.</p>
                     <p class="text-muted">Version: 1</p>

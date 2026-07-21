@@ -34,7 +34,10 @@
                         <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
                             {% if Service.EMPLOIS in activated_services %}
                                 <div class="col mb-3 mb-md-4">
-                                    {% component_box_nexus_activated_service name="Les Emplois de l’inclusion" logo="logo-emploi-inclusion-mono.svg" url=emplois_url aria_label="Accéder aux Emplois de l’inclusion" service=Service.EMPLOIS %}
+                                    {% brand as brand_name %}
+                                    {% brand "à" as brand_a %}
+                                    {# TODO(branding): logo à basculer (logo-plateforme-inclusion) au flip du nom #}
+                                    {% component_box_nexus_activated_service name=brand_name logo="logo-emploi-inclusion-mono.svg" url=emplois_url aria_label="Accéder "|add:brand_a service=Service.EMPLOIS %}
                                     {% endcomponent_box_nexus_activated_service %}
                                 </div>
                             {% endif %}

@@ -26,5 +26,5 @@ De votre côté, n’hésitez pas à prendre contact avec notre partenaire, l’
 Pour être rappelé par un conseiller : https://cloud.info.afpa.fr/afpa-plateforme-emploi-et-inclusion
 {% endif %}
 
-Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur {% brand %}.
 {% endblock body %}

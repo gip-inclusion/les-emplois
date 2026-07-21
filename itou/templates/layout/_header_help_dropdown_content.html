@@ -39,6 +39,6 @@
         </li>
     {% endif %}
     <li>
-        <a href="{% url 'announcements:news' %}" class="dropdown-item" aria-label="Les nouveautés du site des emplois de l'inclusion" {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
+        <a href="{% url 'announcements:news' %}" class="dropdown-item" aria-label="Les nouveautés du site {% brand "de" %}" {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
     </li>
 </ul>

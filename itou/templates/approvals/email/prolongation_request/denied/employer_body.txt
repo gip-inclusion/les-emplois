@@ -25,5 +25,5 @@ Actions envisagées par le prescripteur :
 {% endif %}
 {% endif %}
 
-Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur {% brand %}.
 {% endblock body %}

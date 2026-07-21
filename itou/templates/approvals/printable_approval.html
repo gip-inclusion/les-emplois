@@ -37,7 +37,7 @@
             <span class="d-block fw-bold">Références à rappeler :</span>
             <ul class="list-unstyled">
                 <li class="d-block">PASS IAE n° {{ approval.number|format_approval_number }}</li>
-                <li class="d-block">délivré par les emplois de l'inclusion</li>
+                <li class="d-block">délivré par {% brand %}</li>
                 <li class="d-block">Date de début : {{ approval.start_at|date:"d/m/Y" }}</li>
                 {% if approval.user.jobseeker_profile.pole_emploi_id %}
                     <li class="d-block">Identifiant France Travail : {{ approval.user.jobseeker_profile.pole_emploi_id }}</li>
@@ -60,6 +60,7 @@
                     Au vu de
                 {% endif %}
                 la situation sociale et professionnelle de {{ approval.user.get_inverted_full_name }}
+                {# TODO(branding): accord verbal avec la marque — réécrire la phrase avant le flip du nom #}
                 et de votre promesse d'embauche, les emplois de l'inclusion vous délivrent
                 un PASS IAE pour un parcours d'insertion par l'activité économique,
                 conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.

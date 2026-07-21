@@ -12,7 +12,7 @@ Délai de carence non respecté, ce candidat a déjà bénéficié d'un parcours
 
 Vous avez la possibilité de contacter un prescripteur habilité pour exposer la situation de votre candidat.
 
-Si le prescripteur habilité est favorable à une dérogation de son délai de carence, il doit vous transmettre la candidature de {{ job_application.job_seeker.get_inverted_full_name }} via les emplois de l'inclusion. Vous pourrez ensuite demander l'obtention d'un PASS IAE.
+Si le prescripteur habilité est favorable à une dérogation de son délai de carence, il doit vous transmettre la candidature de {{ job_application.job_seeker.get_inverted_full_name }} via {% brand %}. Vous pourrez ensuite demander l'obtention d'un PASS IAE.
 
 Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :
 {{ search_url }}
