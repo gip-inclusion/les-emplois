@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 import itou
 import itou.api.changelog
 from config.sentry import sentry_init
+from itou.utils.brand import product_name
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
 
@@ -196,7 +197,10 @@ TEMPLATES = [
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
             ],
-            "builtins": ["slippers.templatetags.slippers"],
+            "builtins": [
+                "itou.utils.templatetags.branding",
+                "slippers.templatetags.slippers",
+            ],
         },
     }
 ]
@@ -604,7 +608,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "API - Les emplois de l'inclusion",
+    "TITLE": f"API - {product_name()}",
     "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**\n\n" + itou.api.changelog.CHANGELOG,
     "VERSION": "1.0.0",
     "ENUM_NAME_OVERRIDES": {
@@ -861,7 +865,7 @@ SERIALIZATION_MODULES = {
 
 # OTP
 # ------------------------------------------------------------------------------
-OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
+OTP_TOTP_ISSUER = f"{product_name()} ({ITOU_ENVIRONMENT})"
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 REQUIRE_MFA_FOR_PROS = os.getenv("REQUIRE_MFA_FOR_PROS", "False") == "True"
 OTP_DEVICES_GRACE_PERIOD_BEFORE_DELETION = datetime.timedelta(
