@@ -41,10 +41,11 @@ def get_safe_url(request, param_name=None, fallback_url=None, url=None):
     return fallback_url
 
 
-def get_absolute_url(path=""):
+def get_absolute_url(path="", host=None):
+    host = host or settings.ITOU_FQDN
     if path.startswith("/"):
         path = path[1:]
-    return f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/{path}"
+    return f"{settings.ITOU_PROTOCOL}://{host}/{path}"
 
 
 def get_external_link_markup(url, text):

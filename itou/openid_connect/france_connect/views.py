@@ -49,7 +49,7 @@ def get_es256_key():
 def france_connect_authorize(request):
     # The redirect_uri should be defined in the FC settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/franceconnect/callback"
-    redirect_uri = get_absolute_url(reverse("france_connect:callback"))
+    redirect_uri = get_absolute_url(reverse("france_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(32)
     state = FranceConnectState.save_state(nonce=nonce)
     data = {
@@ -107,7 +107,7 @@ def france_connect_callback(request):
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    redirect_uri = get_absolute_url(reverse("france_connect:callback"))
+    redirect_uri = get_absolute_url(reverse("france_connect:callback"), host=request.get_host())
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "client_secret": settings.FRANCE_CONNECT_CLIENT_SECRET,
@@ -241,7 +241,7 @@ def france_connect_logout(request):
     params = {
         "id_token_hint": id_token,
         "state": state,
-        "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home")),
+        "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
     }
     complete_url = f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)

@@ -688,7 +688,7 @@ class TestProConnectLogout:
         pro_connect.mock_oauth_dance(client)
         logout_response = client.post(reverse("account_logout"))
         response = client.get(logout_response.url)
-        post_logout_redirect_uri = get_absolute_url(reverse("pro_connect:logout_callback"))
+        post_logout_redirect_uri = get_absolute_url(reverse("pro_connect:logout_callback"), host="testserver")
         state = ProConnectState.objects.get(used_at=None).state
         signed_state = signing.Signer().sign(state)
 
@@ -713,7 +713,7 @@ class TestProConnectLogout:
         logout_response = client.post(reverse("account_logout"), {"redirect_url": expected_redirection})
 
         response = client.get(logout_response.url)
-        post_logout_redirect_uri = get_absolute_url(reverse("pro_connect:logout_callback"))
+        post_logout_redirect_uri = get_absolute_url(reverse("pro_connect:logout_callback"), host="testserver")
         state = ProConnectState.objects.get(used_at=None).state
         signed_state = signing.Signer().sign(state)
 

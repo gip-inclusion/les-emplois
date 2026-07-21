@@ -45,7 +45,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
 def pe_connect_authorize(request):
     # The redirect_uri should be defined in the PEAMU settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
-    redirect_uri = get_absolute_url(reverse("ft_connect:callback"))
+    redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(12)
     state = PoleEmploiConnectState.save_state(nonce=nonce)
     data = {
@@ -81,7 +81,7 @@ def pe_connect_callback(request):
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    redirect_uri = get_absolute_url(reverse("ft_connect:callback"))
+    redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
 
     data = {
         "client_id": settings.API_ESD["KEY"],
@@ -218,7 +218,7 @@ def pe_connect_logout(request):
 
     params = {
         "id_token_hint": id_token,
-        "redirect_uri": get_absolute_url(reverse("search:employers_home")),
+        "redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
     }
     url = constants.PE_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
