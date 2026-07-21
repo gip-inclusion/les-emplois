@@ -1,5 +1,8 @@
 import pytest
+from django.test import TestCase
 
+from itou.asp.constants import ASP_COMMUNES_AS_COUNTRIES
+from itou.asp.models import Commune
 from itou.asp.utils import guess_birth_place_from_nir
 
 
@@ -33,3 +36,25 @@ def test_guess_birth_place_from_nir(nir, expected_city, expected_country):
         assert country is None
     else:
         assert country.name == expected_country
+
+
+@pytest.mark.slow  # loading fixtures takes ~30 seconds
+class TestAspCommunesAsCountries(TestCase):
+    fixtures = ["itou/asp/fixtures/asp_INSEE_communes.json"]
+
+    def test_consistency(self):
+        from_communes = set(Commune.objects.values_list("name", flat=True))
+        from_constant = set(ASP_COMMUNES_AS_COUNTRIES)
+        diff = from_constant - from_communes
+        # The following diff is inevitable: these "countries" do not
+        # have a corresponding commune. Hopefully, nobody was born
+        # there.
+        assert diff == {
+            "ARCHIPEL DES CROZET",
+            "ARCHIPEL DES KERGUELEN",
+            "ILE DE CLIPPERTON",
+            "ILE-DES-PINS (L')",
+            "ILES EPARSES DE L'OCEAN INDIEN",
+            "ILES SAINT-PAUL ET NOUVELLE-AMSTERDAM",
+            "LA TERRE-ADELIE",
+        }
