@@ -596,7 +596,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
 
 class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
-    NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
+    NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur Les emplois de l’inclusion !"
     ADDRESS_COULD_NOT_BE_AUTO_CHECKED = "L'adresse du salarié n'a pu être vérifiée automatiquement."
     ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR = (
         "Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié."
