@@ -221,7 +221,6 @@ def france_connect_callback(request):
     login(request, user)
     # Keep token_data["id_token"] to logout from FC
     request.session[constants.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
-    request.session[constants.FRANCE_CONNECT_SESSION_STATE] = state
     request.session.modified = True
 
     next_url = reverse("dashboard:index")
@@ -233,14 +232,12 @@ def france_connect_logout(request):
     # The user can be authentified on FC w/o a session on itou.
     # https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service#sign_out
     id_token = request.GET.get("id_token")
-    state = request.GET.get("state", "")
-
     if not id_token:
         return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
 
     params = {
         "id_token_hint": id_token,
-        "state": state,
+        "state": FranceConnectState.save_state(),
         "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
     }
     complete_url = f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"

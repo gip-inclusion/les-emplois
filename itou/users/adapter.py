@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
+from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.ft_connect.constants import PE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.utils.urls import get_absolute_url, get_safe_url
@@ -68,9 +68,8 @@ class UserAdapter(DefaultAccountAdapter):
                 return f"{pro_connect_base_logout_url}?{urlencode(params)}"
         # FranceConnect
         fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
-        fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
         if fc_token:
-            params = {"id_token": fc_token, "state": fc_state}
+            params = {"id_token": fc_token}
             fc_base_logout_url = reverse("france_connect:logout")
             return f"{fc_base_logout_url}?{urlencode(params)}"
         # PE Connect
