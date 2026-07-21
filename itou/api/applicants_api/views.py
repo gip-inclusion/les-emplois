@@ -11,6 +11,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.brand import product_name
 from itou.utils.readonly import ReadonlyViewMixin
 
 
@@ -77,7 +78,7 @@ ApplicantsView.__doc__ = f"""\
 Cette API retourne la liste de tous les demandeurs d'emploi liés aux candidatures reçues par
 la ou les structure(s) sélectionnée(s).
 
-Les candidats sont triés par date de création dans la base des emplois de l'inclusion,
+Les candidats sont triés par date de création dans la base {product_name("de")},
 du plus récent au plus ancien.
 
 **Note** : la clé `lien_cv` est dépréciée et associée à une valeur vide. Elle est conservée pour
