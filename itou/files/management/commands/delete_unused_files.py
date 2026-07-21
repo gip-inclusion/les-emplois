@@ -16,6 +16,8 @@ from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 # Also Wait a bit before deleting a orphan File since it might have ben created outside an atomic transation
 CLEANING_DELAY = datetime.timedelta(days=1)
 
+MAX_FILES_CLEANUP = 50_000
+
 
 class Command(BaseCommand):
     ATOMIC_HANDLE = False
@@ -71,6 +73,18 @@ class Command(BaseCommand):
                         known_keys.remove(key)
                 else:
                     temporary_files_nb += 1
+                if removed_files_nb >= MAX_FILES_CLEANUP:
+                    self.logger.warning(
+                        (
+                            "Stopped bucket cleaning after reaching MAX_FILES_CLEANUP: "
+                            "found unknown=%d and temporary=%d files in the bucket, removed=%d files"
+                        ),
+                        unknown_files_nb,
+                        temporary_files_nb,
+                        removed_files_nb,
+                    )
+                    return
+
         self.logger.info(
             "Completed bucket cleaning: found unknown=%d and temporary=%d files in the bucket, removed=%d files",
             unknown_files_nb,
