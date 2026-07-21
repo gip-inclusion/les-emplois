@@ -69,7 +69,7 @@ class TestSearchServices:
             self.URL, {"city": vannes.slug, "category": CATEGORY, "reception": ServiceSearchForm.RECEPTION_ALL_VALUE}
         )
         assertContains(response, "2 résultats")
-        expected_title = f"Services d'insertion « {CATEGORY.label} » autour de {vannes} - Les emplois de l'inclusion"
+        expected_title = f"Services d'insertion « {CATEGORY.label} » autour de {vannes} - Les emplois de l’inclusion"
         assertContains(response, f"<title>{expected_title}</title>", html=True, count=1)
         assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot()
 
