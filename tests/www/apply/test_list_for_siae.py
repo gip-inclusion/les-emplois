@@ -2504,7 +2504,12 @@ class TestAutocomplete:
             job_seeker__last_name="Brown",
         )
         JobApplicationFactory(
-            sent_by_prescriber_alone=True, to_company=company, sender__first_name="John", sender__last_name="Smith"
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            sender__first_name="John",
+            sender__last_name="Smith",
+            job_seeker__first_name="Manny",
+            job_seeker__last_name="Calavera",
         )
         client.force_login(employer)
 
