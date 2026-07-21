@@ -325,7 +325,7 @@ class TestSearchCompany:
     def test_has_no_active_members(self, client):
         create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
         no_hiring_str = (
-            "Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, "
+            "Cet employeur n'est actuellement pas inscrit sur le site des Emplois de l’inclusion, "
             "vous ne pouvez pas déposer de candidature en ligne"
         )
         city = create_city_saint_andre()
@@ -633,7 +633,7 @@ class TestSearchPrescriber:
 
         assertContains(
             response,
-            "<title>Prescripteurs habilités à 15 km du centre de Guérande (44) - Les emplois de l'inclusion</title>",
+            "<title>Prescripteurs habilités à 15 km du centre de Guérande (44) - Les emplois de l’inclusion</title>",
             html=True,
             count=1,
         )
@@ -653,7 +653,7 @@ class TestSearchPrescriber:
         response = client.get(url)
         assertContains(
             response,
-            "<title>Rechercher des prescripteurs habilités - Les emplois de l'inclusion</title>",
+            "<title>Rechercher des prescripteurs habilités - Les emplois de l’inclusion</title>",
             html=True,
             count=1,
         )

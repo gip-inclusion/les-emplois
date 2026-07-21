@@ -39,7 +39,7 @@ def test_api_token_view_for_company_admin(client, mailoutbox):
         [messages.Message(messages.SUCCESS, "Votre nouveau token a été créé avec succès.", extra_tags="toast")],
     )
     [email] = mailoutbox
-    assert email.subject.endswith("Génération d’un nouveau token d’API sur les Emplois de l'inclusion")
+    assert email.subject.endswith("Génération d’un nouveau token d’API sur Les emplois de l’inclusion")
     assert user_ip_address in email.body
 
     # Check multi-posts
@@ -99,7 +99,7 @@ def test_api_token_view_regenerate(client, mailoutbox):
     assertContains(response, token.key)
     assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
     [email] = mailoutbox
-    assert email.subject.endswith("Génération d’un nouveau token d’API sur les Emplois de l'inclusion")
+    assert email.subject.endswith("Génération d’un nouveau token d’API sur Les emplois de l’inclusion")
 
     response = client.post(API_TOKEN_URL, {"action": "regenerate"})
     # Previous token has been deleted
@@ -108,7 +108,7 @@ def test_api_token_view_regenerate(client, mailoutbox):
     new_token = Token.objects.filter(user=employer).get()
     assert len(mailoutbox) == 2
     new_email = mailoutbox[-1]
-    assert new_email.subject.endswith("Génération d’un nouveau token d’API sur les Emplois de l'inclusion")
+    assert new_email.subject.endswith("Génération d’un nouveau token d’API sur Les emplois de l’inclusion")
     assertContains(response, new_token.key)
     assertContains(response, "Il est indispensable de le copier afin de le sauvegarder")
     assertMessages(

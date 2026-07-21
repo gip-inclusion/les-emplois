@@ -24,7 +24,7 @@
   - Motif de prolongation : 50 ans et plus
   - Fiche bilan : http://localhost:8000/approvals/prolongation/request/666/report-file/
   
-  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
+  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur Les emplois de l’inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
   
   Précisions en cas de refus :
   
@@ -45,7 +45,7 @@
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -83,7 +83,7 @@
   - Motif de prolongation : 50 ans et plus
   - Fiche bilan : http://localhost:8000/approvals/prolongation/request/666/report-file/
   
-  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
+  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur Les emplois de l’inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
   
   Précisions en cas de refus :
   
@@ -104,7 +104,7 @@
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -135,11 +135,11 @@
   
   - Précisions : [proposed_actions_explanation]
   
-  Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+  Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur Les emplois de l’inclusion.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -171,11 +171,11 @@
   De votre côté, n’hésitez pas à prendre contact avec notre partenaire, l’Afpa, l’organisme de référence pour la formation en France. Ils pourront vous conseiller et trouver avec vous la formation dont vous avez peut-être besoin pour trouver rapidement un emploi.
   Pour être rappelé par un conseiller : https://cloud.info.afpa.fr/afpa-plateforme-emploi-et-inclusion
   
-  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur Les emplois de l’inclusion.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -201,11 +201,11 @@
   
   - Précisions : [proposed_actions_explanation]
   
-  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur Les emplois de l’inclusion.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -222,11 +222,11 @@
   Numéro : 99999 99 99999
   Bénéficiaire : DOE Jane
   
-  Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+  Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur Les emplois de l’inclusion.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -241,11 +241,11 @@
   
   L’organisation Pres. Org. a accepté la prolongation du PASS IAE.
   
-  Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur Les emplois de l’inclusion.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---

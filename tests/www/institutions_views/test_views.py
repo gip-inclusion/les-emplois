@@ -183,7 +183,7 @@ class TestMembers:
         # User must have been notified of deactivation (we're human after all)
         [email] = mailoutbox
         assert f"[TEST] [Désactivation] Vous n'êtes plus membre de {institution.display_name}" == email.subject
-        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert "Un administrateur vous a retiré d'une structure sur Les emplois de l’inclusion" in email.body
         assert email.to == [guest_membership.user.email]
         assert email.body == snapshot
         received_invitation.refresh_from_db()
@@ -267,7 +267,7 @@ class TestMembers:
         ) in caplog.messages
         [email] = mailoutbox
         assert f"[TEST] [Désactivation] Vous n'êtes plus membre de {institution.display_name}" == email.subject
-        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert "Un administrateur vous a retiré d'une structure sur Les emplois de l’inclusion" in email.body
         assert email.to == [other_admin_membership.user.email]
         invitation.refresh_from_db()
         assert invitation.has_expired is True
