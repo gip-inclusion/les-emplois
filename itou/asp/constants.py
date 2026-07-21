@@ -10,6 +10,14 @@
 #       .order_by("name")
 #       .values_list("name", "code")
 #   )
+#
+# ... with the following adaptations:
+# [1] Some countries have a dash in their name (e.g. "FATU-HIVA")
+#     while the corresponding communes do not ("FATU HIVA").
+#
+# WARNING: if you update `ASP_COMMUNES_AS_COUNTRIES`, you must run
+# `pytest tests/asp/test_utils.py --runslow` to check consistency.
+#
 ASP_COMMUNES_AS_COUNTRIES = {
     "ALO": "611",
     "ANAA": "711",
@@ -18,7 +26,7 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "ARUE": "712",
     "ARUTUA": "713",
     "BELEP": "801",
-    "BORA-BORA": "714",
+    "BORA BORA": "714",  # [1]
     "BOULOUPARI": "802",
     "BOURAIL": "803",
     "CANALA": "804",
@@ -27,20 +35,20 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "FAKARAVA": "716",
     "FANGATAU": "717",
     "FARINO": "806",
-    "FATU-HIVA": "718",
+    "FATU HIVA": "718",  # [1]
     "GAMBIER": "719",
     "HAO": "720",
     "HIENGHENE": "807",
     "HIKUERU": "721",
     "HITIAA O TE RA": "722",
-    "HIVA-OA": "723",
+    "HIVA OA": "723",  # [1]
     "HOUAILOU": "808",
     "HUAHINE": "724",
     "ILE DE CLIPPERTON": "901",
     "ILE-DES-PINS (L')": "809",
     "ILES EPARSES DE L'OCEAN INDIEN": "415",
     "ILES SAINT-PAUL ET NOUVELLE-AMSTERDAM": "411",
-    "KAALA-GOMEN": "810",
+    "KAALA GOMEN": "810",  # [1]
     "KONE": "811",
     "KOUAOUA": "833",
     "KOUMAC": "812",
@@ -53,11 +61,11 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "MARE": "815",
     "MAUPITI": "728",
     "MOINDOU": "816",
-    "MONT-DORE (LE)": "817",
-    "MOOREA-MAIAO": "729",
+    "MONT DORE": "817",  # [1]
+    "MOOREA MAIAO": "729",  # [1]
     "NAPUKA": "730",
     "NOUMEA": "818",
-    "NUKU-HIVA": "731",
+    "NUKU HIVA": "731",  # [1]
     "NUKUTAVAKE": "732",
     "OUEGOA": "819",
     "OUVEA": "820",
@@ -84,8 +92,8 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "SIGAVE": "612",
     "TAHAA": "745",
     "TAHUATA": "746",
-    "TAIARAPU-EST": "747",
-    "TAIARAPU-OUEST": "748",
+    "TAIARAPU EST": "747",  # [1]
+    "TAIARAPU OUEST": "748",  # [1]
     "TAKAROA": "749",
     "TAPUTAPUATEA": "750",
     "TATAKOTO": "751",
@@ -95,8 +103,8 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "TUBUAI": "753",
     "TUMARAA": "754",
     "TUREIA": "755",
-    "UA-HUKA": "756",
-    "UA-POU": "757",
+    "UA HUKA": "756",  # [1]
+    "UA POU": "757",  # [1]
     "UTUROA": "758",
     "UVEA": "613",
     "VOH": "831",
