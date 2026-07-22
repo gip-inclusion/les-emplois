@@ -36,6 +36,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.models import Company
+from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
@@ -487,6 +488,18 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     @property
     def is_professional(self):
         return self.kind == UserKind.PROFESSIONAL
+
+    @property
+    def show_upcoming_mfa_activation_banner(self):
+        if not (settings.REQUIRE_MFA_FOR_PROS and self.is_professional):
+            return False
+        # Do not show if user already authenticaed with internal or external MFA.
+        if self.is_verified():
+            return False
+        # Do not show if user has already enrolled a device: we may be
+        # displaying the "Verify OTP" form, no need to show the
+        # banner there.
+        return not ItouTOTPDevice.objects.filter(user=self, disabled_at=None).exists()
 
     @property
     def is_itou_staff(self):
