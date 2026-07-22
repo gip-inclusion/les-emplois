@@ -197,7 +197,7 @@ def test_populate_job_seekers(snapshot):
     #  - no job application
     #  - created by prescriber
     #  - no coords for QPV
-    #  - uses PE_CONNECT
+    #  - uses FT_CONNECT
     #  - has no PE number
     #  - logged_in recently
     #  - in QPV
