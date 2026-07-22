@@ -26,7 +26,7 @@
 {% block title_extra %}
     <div class="c-search mt-3 mt-md-4">
         <div class="c-search__bar">
-            <form hx-boost="true" hx-push-url="true" hx-indicator="#services-search-results" id="top_search_form">
+            <form hx-boost="true" hx-push-url="true" hx-include="#filters_form" hx-indicator="#services-search-results" id="top_search_form">
                 {% if job_seeker.public_id %}
                     <input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">
                 {% endif %}
@@ -55,7 +55,8 @@
                               hx-target="#services-search-results"
                               hx-swap="outerHTML"
                               hx-push-url="true"
-                              hx-disinherit="*">
+                              hx-disinherit="*"
+                              id="filters_form">
                             <div class="btn-dropdown-filter-group my-3 my-md-4">
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.thematics only %}
                                 {% include "includes/btn_dropdown_filter/radio.html" with field=form.reception only %}
