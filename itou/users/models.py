@@ -1501,6 +1501,10 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                     ):
                         blocked_fields.discard("birth_country")
                         blocked_fields.discard("birth_place")
+
+                    # Block edition of the pole emploi id if not empty
+                    if self.pole_emploi_id:
+                        blocked_fields.add("pole_emploi_id")
         return blocked_fields
 
 
