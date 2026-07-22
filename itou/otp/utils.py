@@ -100,6 +100,11 @@ def _require_otp_for_pro(user):
     assert user.is_professional
     if not settings.REQUIRE_MFA_FOR_PROS:
         return False
+    # We tested the enrollment flow on some users who were not yet in
+    # the targeted batches that we check below. If they have enrolled
+    # a device, we should require them to use it.
+    if ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists():
+        return True
     org_ids = set(
         PrescriberMembership.objects.active().filter(user_id=user.id).values_list("organization_id", flat=True)
     )

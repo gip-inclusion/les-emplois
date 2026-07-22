@@ -124,3 +124,10 @@ class TestRequireOtpForPro:
 
         settings.REQUIRE_MFA_ON_COMPANY_IDS = {company.id}
         assert _require_otp_for_pro(user)
+
+    def test_require_otp_if_user_has_already_enrolled(self, settings):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = EmployerFactory(membership=True)
+        assert not _require_otp_for_pro(user)
+        ItouTOTPDeviceFactory(user=user)
+        assert _require_otp_for_pro(user)
