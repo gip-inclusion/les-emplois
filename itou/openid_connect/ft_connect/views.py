@@ -69,15 +69,18 @@ def ft_connect_authorize(request):
 def ft_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
-        error_msg = "PôleEmploiConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
+        error_msg = (
+            f"{IdentityProvider.FT_CONNECT.label} n’a pas transmis le paramètre « code » "
+            "nécessaire à votre authentification."
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
     pe_state = FranceTravailConnectState.get_from_state(state)
     if not pe_state or not pe_state.is_valid():
         error_msg = (
-            "Le paramètre « state » fourni par PôleEmploiConnect et nécessaire à votre authentification "
-            "n’est pas valide."
+            f"Le paramètre « state » fourni par {IdentityProvider.FT_CONNECT.label} et nécessaire à votre "
+            "authentification n’est pas valide."
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
@@ -101,13 +104,18 @@ def ft_connect_callback(request):
             )
     except httpx.HTTPError:
         logger.error("FT Connect token request failed", exc_info=True)
-        error_msg = "Impossible d'obtenir le jeton de PôleEmploiConnect. Réessayez dans quelques minutes."
+        error_msg = (
+            f"Impossible d'obtenir le jeton de {IdentityProvider.FT_CONNECT.label}. Réessayez dans quelques minutes."
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     token_data = response.json()
 
     if not token_data or "access_token" not in token_data:
-        error_msg = "Aucun champ « access_token » dans la réponse PôleEmploiConnect, impossible de vous authentifier"
+        error_msg = (
+            f"Aucun champ « access_token » dans la réponse {IdentityProvider.FT_CONNECT.label}, "
+            "impossible de vous authentifier"
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     access_token = token_data["access_token"]
@@ -131,7 +139,8 @@ def ft_connect_callback(request):
     except httpx.HTTPError:
         logger.error("FT Connect user info request failed", exc_info=True)
         error_msg = (
-            "Impossible d'obtenir les informations utilisateur de PôleEmploiConnect. Réessayez dans quelques minutes."
+            f"Impossible d'obtenir les informations utilisateur de {IdentityProvider.FT_CONNECT.label}. "
+            "Réessayez dans quelques minutes."
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
@@ -142,8 +151,11 @@ def ft_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if "sub" not in user_data:
-        # 'sub' is the unique identifier from PôleEmploiConnect, we need that to match a user later on
-        error_msg = "Le paramètre « sub » n'a pas été retourné par PôleEmploiConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
+        # 'sub' is the unique identifier from {IdentityProvider.FT_CONNECT}, we need that to match a user later on
+        error_msg = (
+            f"Le paramètre « sub » n'a pas été retourné par {IdentityProvider.FT_CONNECT.label}. "
+            "Il est nécessaire pour identifier un utilisateur."
+        )
         logger.error(error_msg, exc_info=True)
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
