@@ -625,6 +625,7 @@ class TestEditUserInfoView:
             born_in_france=True,
             jobseeker_profile__birthdate=date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__pole_emploi_id="1234567A",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -665,13 +666,14 @@ class TestEditUserInfoView:
                 "city": "Saint-Malo",
                 "lack_of_nir": False,
                 "nir": job_seeker.jobseeker_profile.nir,
+                "pole_emploi_id": "9876543Z",
             },
         )
         assertRedirects(response, reverse("dashboard:index"))
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country"]:
+        for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
     @freeze_time("2023-03-10")

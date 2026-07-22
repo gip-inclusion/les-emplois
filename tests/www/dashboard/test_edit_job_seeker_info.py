@@ -818,6 +818,7 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__title=Title.M,
             eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
             eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
+            eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id="1234567A",
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
@@ -850,6 +851,7 @@ class TestEditJobSeekerInfo:
             "birth_place": (
                 Commune.objects.filter(start_date__lte=new_birthdate, end_date__gte=new_birthdate).first().pk
             ),
+            "pole_emploi_id": "9876543Z",
             **self.address_form_fields,
         }
 
@@ -863,7 +865,7 @@ class TestEditJobSeekerInfo:
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country"]:
+        for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
     @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])
