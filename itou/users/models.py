@@ -232,7 +232,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     The User model has a "companion" model in the `external_data` app,
     for third-party APIs data import concerns (class `JobSeekerExternalData`).
 
-    At the moment, only users (job seekers) connected via PE Connect
+    At the moment, only users (job seekers) connected via FT Connect
     have external data stored.
 
     More details in `itou.external_data.models` module
