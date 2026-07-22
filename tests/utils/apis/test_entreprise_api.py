@@ -6,9 +6,15 @@ import httpx
 import pytest
 import respx
 from django.conf import settings
+from django.core.cache import caches
+from freezegun import freeze_time
 
 from itou.utils.apis import api_entreprise
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
+from itou.utils.mocks.api_entreprise import (
+    ETABLISSEMENT_API_RESULT_MOCK,
+    INSEE_API_RESULT_MOCK,
+    generate_insee_access_token,
+)
 
 
 class TestINSEEApi:
@@ -52,6 +58,42 @@ class TestINSEEApi:
         assert access_token is None
         assert "Failed to retrieve an access token" in caplog.records[0].message
         assert caplog.records[0].exc_info[0] is json.JSONDecodeError
+
+    def test_password_expiry(self, mocker, respx_mock):
+        access_token = generate_insee_access_token({"pwdChangedTime": "20260901102354Z"})
+        respx_mock.post(f"{settings.API_INSEE_AUTH_URL}/token").respond(200, json={"access_token": access_token})
+        slack_mock = mocker.patch("itou.utils.apis.api_entreprise.send_slack_message")
+        cache = caches["failsafe"]
+
+        with freeze_time() as frozen_time:
+            frozen_time.move_to("2026-09-11")
+            api_entreprise.get_access_token()
+            assert slack_mock.mock_calls == []
+            cache.delete(api_entreprise.INSEE_EXPIRY_ALREADY_NOTIFIED_CACHE_KEY)
+
+            # 16 days before the expiry date
+            frozen_time.move_to("2026-11-14")
+            api_entreprise.get_access_token()
+            assert slack_mock.mock_calls == []
+            cache.delete(api_entreprise.INSEE_EXPIRY_ALREADY_NOTIFIED_CACHE_KEY)
+
+            # 15 days before the expiry date
+            frozen_time.move_to("2026-11-15")
+            api_entreprise.get_access_token()
+            assert slack_mock.mock_calls == [
+                mocker.call(
+                    "Le mot de passe INSEE va expirer le 2026-11-30, merci de le modifier sur "
+                    "https://portail-api.insee.fr et de le changer dans les settings (API_INSEE_PASSWORD)"
+                )
+            ]
+            slack_mock.reset_mock()
+
+            # call again in the next following 24h
+            frozen_time.move_to("2026-11-15 01:00:00")
+            api_entreprise.get_access_token()
+            assert slack_mock.mock_calls == []
+
+            # We cannot check the cache duration since it's handled in redis
 
 
 class TestApiEntreprise:

@@ -1,14 +1,40 @@
+import datetime
 import json
 import logging
 from dataclasses import dataclass
 
 import httpx
+import jwt
 from django.conf import settings
+from django.core.cache import caches
+from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
+from itou.utils.slack import send_slack_message
 
 
 logger = logging.getLogger(__name__)
+
+INSEE_EXPIRY_ALREADY_NOTIFIED_CACHE_KEY = "INSEE_EXPIRY_ALREADY_NOTIFIED"
+
+
+def check_and_warn_password_renewal(access_token):
+    cache = caches["failsafe"]
+    if cache.get(INSEE_EXPIRY_ALREADY_NOTIFIED_CACHE_KEY):
+        return
+    # The documentation does not explain where to retrieve the public key required to check the jwt signature
+    token_content = jwt.decode(access_token, options={"verify_signature": False})
+    password_changed_date = timezone.localdate(
+        datetime.datetime.strptime(token_content["pwdChangedTime"], "%Y%m%d%H%M%S%z")
+    )
+    expiry_date = password_changed_date + datetime.timedelta(days=90)
+    if timezone.localdate() >= expiry_date - datetime.timedelta(days=15):
+        send_slack_message(
+            f"Le mot de passe INSEE va expirer le {expiry_date}, "
+            "merci de le modifier sur https://portail-api.insee.fr et "
+            "de le changer dans les settings (API_INSEE_PASSWORD)",
+        )
+    cache.set(INSEE_EXPIRY_ALREADY_NOTIFIED_CACHE_KEY, True, timeout=60 * 60 * 24)  # Skip for one day
 
 
 @dataclass
@@ -43,6 +69,7 @@ def get_access_token():
         logger.exception("Failed to retrieve an access token")
         return None
     else:
+        check_and_warn_password_renewal(access_token)
         return access_token
 
 

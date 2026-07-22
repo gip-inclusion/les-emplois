@@ -1,9 +1,16 @@
-import uuid
+import jwt
+
+
+def generate_insee_access_token(payload=None):
+    payload = payload or {
+        "pwdChangedTime": "20500101000000Z",  # There are other fields, but it's the only one we use
+    }
+    return jwt.encode(payload, key="x" * 64, algorithm="HS256")
 
 
 # Result for a call to: https://api.insee.fr/token
 INSEE_API_RESULT_MOCK = {
-    "access_token": str(uuid.uuid4()),
+    "access_token": generate_insee_access_token(),
 }
 
 # Result for a call to: https://api.insee.fr/entreprises/sirene/V3/siret/26570134200148?masquerValeursNulles=true
