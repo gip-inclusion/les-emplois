@@ -345,8 +345,15 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         response = client.get(self.url)
         assertContains(
             response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
+            "Certaines données sont verrouillées : Identité certifiée",
+            count=1,
+        )
+        assertContains(
+            response,
+            (
+                "Vous ne pouvez pas modifier les données d'identité de cet usager car son profil "
+                "est désormais lié à une certification des services de l'État."
+            ),
             count=1,
         )
         response = client.post(

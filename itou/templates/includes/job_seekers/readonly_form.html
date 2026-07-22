@@ -1,10 +1,16 @@
-{% load support %}
+{% load components %}
 
 {% if form.readonly_pii_fields %}
-    <p class="mb-4">
-        Certains champs ne sont plus modifiables car ils sont certifiés par un
-        système d’information de l’État. Si toutefois vous observez une erreur,
-        merci de
-        <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="has-external-link" aria-label="contactez l’assistance (ouverture dans un nouvel onglet)">contacter l’assistance</a>.
-    </p>
+    {% component_alert variant="info" title=title content=content %}
+        {% fragment as title %}
+            {{ request.user.is_job_seeker|yesno:"Certaines de vos données sont verrouillées,Certaines données sont verrouillées : Identité certifiée" }}
+        {% endfragment %}
+        {% fragment as content %}
+            {% if request.user.is_job_seeker %}
+                Certaines de vos données personnelles ne sont pas modifiables car votre identité a été officiellement certifiée par les services de l'État.
+            {% else %}
+                Vous ne pouvez pas modifier les données d'identité de cet usager car son profil est désormais lié à une certification des services de l'État.
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_alert %}
 {% endif %}
