@@ -1,5 +1,5 @@
 from copy import deepcopy
-from urllib.parse import parse_qs, urlencode, urlparse, urlsplit
+from urllib.parse import urlencode
 
 import httpx
 import jwt
@@ -130,14 +130,20 @@ def assert_and_mock_forced_logout(client, response, id_token, expected_redirect_
     )
     assertRedirects(response, expected_logout_url, fetch_redirect_response=False)
     response = client.get(response.url)
-    assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_LOGOUT)
-    query_params = parse_qs(urlparse(response.url).query)
-    post_logout_redirect_uri = query_params["post_logout_redirect_uri"][0]
-    state = query_params["state"][0]
-    urlparts = urlsplit(post_logout_redirect_uri)
-    assert urlparts.path == reverse("pro_connect:logout_callback")
-    assert urlparts.netloc == "testserver"
-    response = client.get(add_url_params(urlparts.path, {"state": state}))
+    assert response.status_code == 302
+
+    state = get_url_param_value(response.url, "state")
+    post_logout_redirect_uri = f"http://testserver{reverse('pro_connect:logout_callback')}"
+    assert response.url == add_url_params(
+        constants.PRO_CONNECT_ENDPOINT_LOGOUT,
+        {
+            "id_token_hint": id_token,
+            "state": state,
+            "post_logout_redirect_uri": post_logout_redirect_uri,
+        },
+    )
+
+    response = client.get(add_url_params(post_logout_redirect_uri, {"state": state}))
     assertRedirects(response, expected_redirect_url)
     return response
 
