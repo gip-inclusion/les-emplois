@@ -268,7 +268,6 @@ class AnswerForm(forms.Form):
         label="Réponse",
         widget=forms.Textarea(),
         help_text="Votre réponse sera visible par le candidat et le prescripteur",
-        required=False,
         strip=True,
     )
 

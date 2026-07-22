@@ -1608,7 +1608,7 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 200
 
-        post_data = {"answer": ""}
+        post_data = {"answer": "On vous rappellera."}
         response = client.post(url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
@@ -1691,6 +1691,25 @@ class TestProcessViews:
         assert mail_to_other_employer.to == [job_application.sender.email]
         assert mail_to_other_employer.subject == snapshot(name="postpone_email_to_proxy_subject")
         assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
+
+    def test_postpone_missing_answer(self, client):
+        company = CompanyFactory(with_membership=True)
+        job_application = JobApplicationFactory(
+            sent_by_prescriber_alone=True,
+            to_company=company,
+            state=JobApplicationState.PROCESSING,
+            answer="",
+        )
+        client.force_login(company.members.first())
+
+        url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
+        response = client.post(url, data={"answer": ""})
+
+        assert response.status_code == 200
+        assert response.context["form"].has_error("answer")
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationState.PROCESSING
+        assert job_application.answer == ""
 
     @pytest.mark.parametrize(
         "eligibility_trait,expected_msg",
