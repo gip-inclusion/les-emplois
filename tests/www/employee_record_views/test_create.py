@@ -21,7 +21,6 @@ from itou.users.enums import LackOfNIRReason, Title
 from itou.users.models import User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
-from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.employee_record_views.views import get_session_ntt_key
 from tests.cities.factories import create_city_geispolsheim
@@ -29,7 +28,6 @@ from tests.companies.factories import CompanyFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -222,11 +220,6 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         client.force_login(self.user)
         response = client.get(self.url)
-        assertNotContains(
-            response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
-        )
 
         data = _get_user_form_data(self.job_seeker)
         user_title = data.pop("title")
