@@ -260,7 +260,7 @@ class TestEditJobSeekerInfo:
         assert email.to == [job_seeker.email]
         assert len(email.bcc) == 0
         # Subject
-        assert "Vos données personnelles ont été mises à jour sur les Emplois de l'inclusion" in email.subject
+        assert "Vos données personnelles ont été mises à jour sur Les emplois de l’inclusion" in email.subject
         # Body
         assert job_seeker.get_full_name() in email.body
         assert job_application.to_company.name in email.body
@@ -275,7 +275,7 @@ class TestEditJobSeekerInfo:
         assert email.to == [job_seeker.email, old_email_address]
         assert len(email.bcc) == 0
         # Subject
-        assert "Votre adresse e-mail a été mise à jour sur les Emplois de l'inclusion" in email.subject
+        assert "Votre adresse e-mail a été mise à jour sur Les emplois de l’inclusion" in email.subject
         # Body
         assert job_seeker.get_full_name() in email.body
         assert job_application.to_company.name in email.body

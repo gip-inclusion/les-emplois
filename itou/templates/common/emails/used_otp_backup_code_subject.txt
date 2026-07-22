@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-Utilisation d'un code de récupération sur votre compte des Emplois de l’inclusion
+Utilisation d'un code de récupération sur votre compte {% brand "de" %}
 {% endblock %}

@@ -37,6 +37,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.brand import product_name
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_absolute_url, get_safe_url, get_zendesk_form_url
 from itou.utils.views import with_triggers_context
@@ -312,8 +313,9 @@ def pro_connect_callback(request):
             format_html(
                 "Vous n'avez pas encore de compte avec cette adresse e-mail. "
                 "Pour utiliser ce service, merci de vous créer un compte sur "
-                "<a href='{}'>les emplois de l’inclusion</a>",
+                "<a href='{}'>{}</a>",
                 reverse("signup:choose_user_kind"),
+                product_name(),
             ),
         )
         return HttpResponseRedirect(pro_connect_state.data["previous_url"])

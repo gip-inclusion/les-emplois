@@ -104,6 +104,7 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, gener
 
     @extend_schema(operation_id="list")
     def get(self, request, *args, **kwargs):
+        # TODO(branding): nom en dur dans la description OpenAPI — à basculer manuellement au flip du nom
         """
         # Liste des embauches réalisées en GEIQ
 

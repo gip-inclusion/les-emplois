@@ -30,7 +30,7 @@ Afin de nous aider à évaluer la performance de notre service, accepteriez-vous
 
 Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ prescriber_survey_link }}
 
-Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
+Merci de votre participation et à très bientôt sur {% brand %} !
 {% endif %}
 
 {% endblock body %}

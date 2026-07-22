@@ -6,7 +6,7 @@ Nous vous informons que la réception des candidatures spontanées pour la struc
 
 Si vous souhaitez continuer à recevoir des candidatures spontanées, vous pouvez réactiver cette fonctionnalité depuis votre espace :
 
-Structure > Métiers et recrutements sur les Emplois de l’inclusion
+Structure > Métiers et recrutements sur {% brand %}
 
 Si vous ne recrutez plus actuellement, aucune action de votre part n’est nécessaire.
 

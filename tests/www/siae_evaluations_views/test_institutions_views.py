@@ -2506,7 +2506,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "---\n"
             "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
+            "Les emplois de l’inclusion\n"
             "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == "RDV le lundi 8 à 15h à la DDETS"
@@ -3396,7 +3396,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "---\n"
             "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
+            "Les emplois de l’inclusion\n"
             "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""

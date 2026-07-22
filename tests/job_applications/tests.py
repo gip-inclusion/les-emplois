@@ -1365,7 +1365,7 @@ class TestJobApplicationNotifications:
         assert len(email.to) == 1
         assert len(email.bcc) == 0
         # Subject.
-        assert "Candidature acceptée et votre avis sur les emplois de l'inclusion" in email.subject
+        assert "Candidature acceptée et votre avis sur Les emplois de l’inclusion" in email.subject
         # Body.
         assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
         assertion(job_application.job_seeker.get_inverted_full_name(), email.body)
@@ -1572,8 +1572,8 @@ class TestJobApplicationNotifications:
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
         assert (
-            f"[TEST] PASS IAE pour {job_application.job_seeker.get_inverted_full_name()} et avis sur les emplois "
-            "de l'inclusion" == email.subject
+            f"[TEST] PASS IAE pour {job_application.job_seeker.get_inverted_full_name()} et avis sur Les emplois "
+            "de l’inclusion" == email.subject
         )
         assert "PASS IAE" in email.body
 
@@ -1729,7 +1729,7 @@ class TestJobApplicationNotifications:
 
 class TestJobApplicationWorkflow:
     SENT_PASS_EMAIL_SUBJECT = "PASS IAE pour"
-    ACCEPT_EMAIL_SUBJECT_PROXY = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
+    ACCEPT_EMAIL_SUBJECT_PROXY = "Candidature acceptée et votre avis sur Les emplois de l’inclusion"
     ACCEPT_EMAIL_SUBJECT_JOB_SEEKER = "Candidature acceptée"
 
     @pytest.fixture(autouse=True)

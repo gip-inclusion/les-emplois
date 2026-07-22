@@ -39,7 +39,7 @@
                     </div>
                     {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-5" %}
                         {% fragment as c_info__summary %}
-                            Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion
+                            Rappel de l’adresse du salarié renseignée sur {% brand %}
                         {% endfragment %}
                         {% fragment as c_info__detail %}
                             {% if address_filled %}
@@ -49,7 +49,7 @@
                                     <li>{{ job_seeker.post_code }} {{ job_seeker.city }}</li>
                                 </ul>
                             {% else %}
-                                <p class="mb-0">Aucune adresse n'a été saisie sur les emplois de l'inclusion !</p>
+                                <p class="mb-0">Aucune adresse n'a été saisie sur {% brand %} !</p>
                             {% endif %}
                         {% endfragment %}
                     {% endcomponent_info %}

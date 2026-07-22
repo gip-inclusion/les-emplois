@@ -12,7 +12,7 @@ Les SIAE disposent d’un délai de 6 semaines pour transmettre les justificatif
 
 Les DDETS disposent d’un délai supplémentaire pour contrôler les justificatifs.
 
-Vous trouverez le calendrier de la campagne de contrôle a posteriori dans votre espace des emplois de l’inclusion.
+Vous trouverez le calendrier de la campagne de contrôle a posteriori dans votre espace {% brand "de" %}.
 
 Comment ça marche ?
 

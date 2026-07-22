@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Un nouvel utilisateur souhaite rejoindre votre structure sur les emplois de l'inclusion !
+Un nouvel utilisateur souhaite rejoindre votre structure sur {% brand %} !
 
 Organisation :
 

@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur les emplois de l'inclusion !
+Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur {% brand %} !
 
 *Organisation* :
 

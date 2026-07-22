@@ -3,7 +3,7 @@
   '''
   Bonjour John DOE
   
-  Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation ACME Inc. (EI) sur les emplois de l’inclusion.
+  Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation ACME Inc. (EI) sur Les emplois de l’inclusion.
   
   Ce statut vous permet d’avoir accès à certaines fonctionnalités, la liste complète est disponible ici : https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409.
   
@@ -11,7 +11,7 @@
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -185,7 +185,7 @@
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
@@ -194,7 +194,7 @@
 # ---
 # name: TestUserMembershipDeactivation.test_deactivate_user
   '''
-  Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion
+  Un administrateur vous a retiré d'une structure sur Les emplois de l’inclusion
   
   Organisation :
   
@@ -203,11 +203,11 @@
   
   - Email de contact : petitspaniers@mailinator.com
   
-  Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.
+  Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur Les emplois de l’inclusion.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
-  Les emplois de l'inclusion
+  Les emplois de l’inclusion
   http://localhost:8000/
   '''
 # ---
