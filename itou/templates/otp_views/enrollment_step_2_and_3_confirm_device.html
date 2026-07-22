@@ -3,7 +3,9 @@
 {% load components %}
 {% load django_bootstrap5 %}
 
-{% block global_messages %}{% endblock %}
+{% block global_messages %}
+    {% include "includes/demo_accounts.html" %}
+{% endblock %}
 
 {% block title %}Sécurisez votre accès {{ block.super }}{% endblock %}
 
