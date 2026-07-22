@@ -152,7 +152,11 @@ def postpone(request):
 
     if not form.is_valid():
         # This is unlikely since the form is quite simple and the answer field is required
-        messages.error(request, "Les candidatures n’ont pas pu être mises en attente.")
+        messages.error(
+            request,
+            "Les candidatures n’ont pas pu être mises en attente : le commentaire est obligatoire.",
+            extra_tags="toast",
+        )
         logger.error(
             "user=%s tried to batch postponed %s applications but the form wasn't valid",
             request.user.pk,
