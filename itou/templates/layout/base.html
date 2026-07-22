@@ -66,6 +66,14 @@
         <div class="global-messages-container">
             {% block global_messages %}
                 {% include "includes/demo_accounts.html" %}
+                {% if request.user and request.user.show_upcoming_mfa_activation_banner %}
+                    {% component_alert_global content=content variant="danger" %}
+                        {% fragment as content %}
+                            Sécurité du compte : anticipez dès maintenant, la double authentification sera bientôt obligatoire.
+                            <a href="{% url "otp_views:enrollment_step_0_intro" %}">Configurer</a>.
+                        {% endfragment %}
+                    {% endcomponent_alert_global %}
+                {% endif %}
                 {% if request.from_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
                     {% component_alert_global content=content variant="info" extra_id="deactivation-job-banner" %}
                         {% fragment as content %}
