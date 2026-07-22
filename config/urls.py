@@ -62,7 +62,7 @@ urlpatterns = [
     # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
-    # FranceTravail Connect URLs.
+    # France Travail Connect URLs.
     path("pe_connect/", include("itou.openid_connect.ft_connect.urls")),
     # FranceConnect URLs.
     path("franceconnect/", include("itou.openid_connect.france_connect.urls")),

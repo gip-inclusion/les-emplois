@@ -72,7 +72,7 @@ class UserAdapter(DefaultAccountAdapter):
             params = {"id_token": fc_token}
             fc_base_logout_url = reverse("france_connect:logout")
             return f"{fc_base_logout_url}?{urlencode(params)}"
-        # PE Connect
+        # France Travail Connect
         pe_token = request.session.get(FRANCETRAVAIL_CONNECT_SESSION_TOKEN)
         if pe_token:
             params = {"id_token": pe_token}

@@ -22,7 +22,7 @@ class SSOReadonlyMixin:
         if self.instance.has_sso_provider:
             # When users log in with a SSO, the fields populated by the provider should be
             # disabled (that’s a requirement on FranceConnect’s side). A field left empty by
-            # the SSO (e.g. the 'title', not provided by PE Connect) must stay editable:
+            # the SSO (e.g. the 'title', not provided by FT Connect) must stay editable:
             # a disabled + required + empty field makes the form impossible to submit.
 
             # We use "the field has an initial value" as a proxy for "the provider supplied it".

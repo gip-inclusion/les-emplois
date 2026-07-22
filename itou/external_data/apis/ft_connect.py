@@ -10,7 +10,7 @@ from django.utils.dateparse import parse_datetime
 from itou.utils import triggers
 
 
-# PE Connect API data retrieval tools
+# FT Connect API data retrieval tools
 ESD_COORDS_API = "peconnect-coordonnees/v1/coordonnees"
 ESD_BIRTHDATE_API = "peconnect-datenaissance/v1/etat-civil"
 
@@ -91,7 +91,7 @@ def import_user_pe_data(
     triggers_context=None,
 ):
     """
-    Import external user data via PE Connect
+    Import external user data via FT Connect
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
     """
 

@@ -390,7 +390,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     A number starting with `ASP_ITOU_PREFIX` means it has been created by Itou.
 
-    Otherwise, it was previously created by Pôle emploi (and initially found
+    Otherwise, it was previously created by France Travail (and initially found
     in `PoleEmploiApproval`) and re-issued by Itou as a PASS IAE.
     """
 

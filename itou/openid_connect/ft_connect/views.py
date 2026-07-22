@@ -100,7 +100,7 @@ def pe_connect_callback(request):
                 f"Unexpected status code: {response.status_code}", request=response._request, response=response
             )
     except httpx.HTTPError:
-        logger.error("PE Connect token request failed", exc_info=True)
+        logger.error("FT Connect token request failed", exc_info=True)
         error_msg = "Impossible d'obtenir le jeton de PôleEmploiConnect. Réessayez dans quelques minutes."
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
@@ -129,7 +129,7 @@ def pe_connect_callback(request):
                 f"Unexpected status code: {response.status_code}", request=response._request, response=response
             )
     except httpx.HTTPError:
-        logger.error("PE Connect user info request failed", exc_info=True)
+        logger.error("FT Connect user info request failed", exc_info=True)
         error_msg = (
             "Impossible d'obtenir les informations utilisateur de PôleEmploiConnect. Réessayez dans quelques minutes."
         )
@@ -159,7 +159,7 @@ def pe_connect_callback(request):
         # At this step, we can update the user's fields in DB and create a session if required
         user, _ = pe_user_data.create_or_update_user()
     except InactiveUserException as e:
-        logger.info("PE Connect login attempt with inactive user: %s", e.user)
+        logger.info("FT Connect login attempt with inactive user: %s", e.user)
         return _redirect_to_job_seeker_login_on_error(
             e.format_message_html(IdentityProvider.PE_CONNECT), request=request
         )
