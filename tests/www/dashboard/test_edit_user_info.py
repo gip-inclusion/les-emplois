@@ -643,8 +643,15 @@ class TestEditUserInfoView:
         response = client.get(url)
         assertContains(
             response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
+            "Certaines données d’identité sont verrouillées",
+            count=1,
+        )
+        assertContains(
+            response,
+            (
+                "Certaines de vos données personnelles ne sont pas modifiables car "
+                "votre identité a été officiellement certifiée par les services de l'État."
+            ),
             count=1,
         )
         birthdate = date(1978, 12, 1)

@@ -824,6 +824,21 @@ class TestEditJobSeekerInfo:
         job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
 
         client.force_login(selected_criteria.eligibility_diagnosis.author)
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id})
+        response = client.get(url)
+        assertContains(
+            response,
+            "Certaines données d’identité sont verrouillées",
+            count=1,
+        )
+        assertContains(
+            response,
+            (
+                "Vous ne pouvez pas modifier les données d'identité de cet usager car son profil "
+                "est désormais lié à une certification par les services de l'État."
+            ),
+            count=1,
+        )
         new_birthdate = datetime.date(1978, 12, 20)
         post_data = {
             "title": "M",
@@ -838,18 +853,12 @@ class TestEditJobSeekerInfo:
             **self.address_form_fields,
         }
 
-        response = client.post(
-            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            data=post_data | {"preview": 1},
-        )
+        response = client.post(url, data=post_data | {"preview": 1})
         assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
             name="modal"
         )
 
-        response = client.post(
-            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            data=post_data | {"confirm": 1},
-        )
+        response = client.post(url, data=post_data | {"confirm": 1})
         assertRedirects(response, reverse("dashboard:index"))
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
