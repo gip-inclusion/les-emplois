@@ -72,9 +72,7 @@ def has_required_info(job_seeker):
     for field in profile_required_fields:
         if not getattr(profile, field):
             return False
-    if not (profile.birth_name or job_seeker.last_name):
-        return False
-    return True
+    return bool(profile.birth_name or job_seeker.last_name)
 
 
 def certify_criteria(criteria, client, job_seeker):
