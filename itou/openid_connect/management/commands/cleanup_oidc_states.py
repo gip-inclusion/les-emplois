@@ -1,7 +1,7 @@
 from django.template.defaultfilters import pluralize
 
 from itou.openid_connect.france_connect.models import FranceConnectState
-from itou.openid_connect.ft_connect.models import PoleEmploiConnectState
+from itou.openid_connect.ft_connect.models import FranceTravailConnectState
 from itou.openid_connect.pro_connect.models import ProConnectState
 from itou.utils.command import BaseCommand
 
@@ -13,6 +13,6 @@ class Command(BaseCommand):
     AUTO_TRIGGER_CONTEXT = False
 
     def handle(self, *args, **kwargs):
-        for model in (FranceConnectState, PoleEmploiConnectState, ProConnectState):
+        for model in (FranceConnectState, FranceTravailConnectState, ProConnectState):
             count, _ = model.objects.cleanup()
             self.logger.info(f"Deleted {count} obsolete {model.__name__}{pluralize(count)}")
