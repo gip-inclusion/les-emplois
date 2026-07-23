@@ -476,6 +476,19 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
+    def with_job_seeker_last_name_for_display(self):
+        # Must be kept in sync with `User.annotate_with_last_name_for_display()`.
+        return self.annotate(
+            job_seeker_last_name_for_display=Case(
+                When(
+                    job_seeker__last_name="",
+                    then=F("job_seeker__jobseeker_profile__birth_name"),
+                ),
+                default=F("job_seeker__last_name"),
+                output_field=models.CharField(),
+            )
+        )
+
     # Employee record querysets
     def eligible_as_employee_record(self, siae):
         """

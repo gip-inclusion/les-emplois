@@ -209,6 +209,24 @@ class ItouCurrentOrganizationMiddleware:
             elif not request.path.startswith("/otp/enrollment"):
                 return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
+        # Force job seekers to provide birth name (new field).
+        if user.is_authenticated and user.is_job_seeker:
+            if global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY not in request.session:
+                # The following line makes an extra SQL query to fetch
+                # the birth name. Cache its presence (until it's set
+                # by the user in `www.dashboard.vews.edit_user_info`).
+                request.session[global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY] = bool(
+                    user.jobseeker_profile.birth_name
+                )
+            has_birth_name = request.session[global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY]
+            edit_user_info_url = reverse("dashboard:edit_user_info")
+            # FIXME (dbaty): If the user is POSTing a form just after
+            # this line is deployed, we don't want them to be
+            # redirected and lose lose their form data.
+            # Remove `not request.POST` once this line has been deployed on prod.
+            if not has_birth_name and request.path != edit_user_info_url and not request.POST:
+                return HttpResponseRedirect(edit_user_info_url)
+
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 

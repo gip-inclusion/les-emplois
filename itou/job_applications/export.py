@@ -135,7 +135,7 @@ def _serialize_job_application(job_application, request):
 
     return [
         _resolve_title(job_seeker.title, job_seeker.jobseeker_profile.nir) if can_view_personal_information else "",
-        str_filters.mask_unless(job_seeker.last_name, predicate=can_view_personal_information),
+        str_filters.mask_unless(job_seeker.get_last_name_for_display(), predicate=can_view_personal_information),
         str_filters.mask_unless(job_seeker.first_name, predicate=can_view_personal_information),
         job_seeker.email if can_view_personal_information else "",
         job_seeker.phone if can_view_personal_information else "",

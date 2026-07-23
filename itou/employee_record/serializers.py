@@ -53,7 +53,8 @@ class _PersonSerializer(serializers.Serializer):
         return None
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_application.job_seeker.last_name).upper()
+        job_seeker = obj.job_application.job_seeker
+        return unidecode(job_seeker.get_last_name_for_display()).upper()
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
         # ASP limits first names to 30 chars

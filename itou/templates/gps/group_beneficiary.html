@@ -24,7 +24,11 @@
                         <div class="list-data-group">
                             <ul class="list-data">
                                 <li>
-                                    <small>Nom</small>
+                                    <small>Nom de naissance</small>
+                                    <strong>{{ group.beneficiary.jobseeker_profile.birth_name|upper|mask_unless:can_view_personal_information }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nom d’usage</small>
                                     <strong>{{ group.beneficiary.last_name|upper|mask_unless:can_view_personal_information }}</strong>
                                 </li>
                                 <li>

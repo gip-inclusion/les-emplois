@@ -48,7 +48,7 @@ class Command(BaseCommand, XlsxExportMixin):
                 str(job_seeker.pk),
                 job_seeker.jobseeker_profile.ft_gps_id or "",
                 job_seeker.first_name.capitalize(),
-                job_seeker.last_name.upper(),
+                job_seeker.get_last_name_for_display().upper(),
                 job_seeker.jobseeker_profile.nir,
                 job_seeker.jobseeker_profile.pole_emploi_id,
                 job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y")

@@ -313,6 +313,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
         if not search_fields:
             search_fields.append("user__email")
             if "@" not in search_term:
+                search_fields.append("user__jobseeker_profile__birth_name__unaccent")
                 search_fields.append("user__first_name__unaccent")
                 search_fields.append("user__last_name__unaccent")
         return search_fields
@@ -745,6 +746,7 @@ class CancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
         "number",
         "start_at",
         "end_at",
+        "user_birth_name",
         "user_last_name",
         "user_first_name",
         "user_nir",
@@ -754,6 +756,7 @@ class CancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
     search_fields = (
         "number",
         "user_first_name__unaccent",
+        "user_birth_name__unaccent",
         "user_last_name__unaccent",
         "user_nir",
         "origin_siae_siret",

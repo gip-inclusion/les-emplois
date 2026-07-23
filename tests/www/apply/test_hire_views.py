@@ -382,6 +382,7 @@ class TestDirectHireFullProcess:
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
+            jobseeker_profile__birth_name="Schumann",
             jobseeker_profile__nir="178122978200508",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             jobseeker_profile__education_level=EducationLevel.BAC_LEVEL,
@@ -491,6 +492,7 @@ class TestDirectHireFullProcess:
             "title": "MME",  # inconsistent title
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "birthdate": birthdate,
             "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
             "birth_country": Country.FRANCE_ID,
@@ -504,6 +506,7 @@ class TestDirectHireFullProcess:
             "title": "M",
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
@@ -520,6 +523,7 @@ class TestDirectHireFullProcess:
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
+            "birth_name": dummy_job_seeker.jobseeker_profile.birth_name,
             "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
@@ -527,6 +531,7 @@ class TestDirectHireFullProcess:
             "birth_country": birth_country_id,
         }
         response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birth_name"] = post_data.pop("birth_name")
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1243,6 +1248,7 @@ class TestCheckJobSeekerInformationsForHire:
                     "last_name": "",
                     "email": None,
                     "phone": "",
+                    "jobseeker_profile__birth_name": "",
                     "jobseeker_profile__birthdate": None,
                     "jobseeker_profile__nir": "",
                     "jobseeker_profile__lack_of_nir_reason": LackOfNIRReason.NO_NIR,

@@ -190,10 +190,12 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 context["closed_campaigns"].append(campaign)
     elif request.user.is_job_seeker:
         # Force job seekers to complete their profile.
-        required_attributes = ["title", "first_name", "last_name", "address_line_1", "post_code", "city"]
+        required_attributes = ["title", "first_name", "address_line_1", "post_code", "city"]
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
+        if not request.user.jobseeker_profile.birth_name:
+            return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
         iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(request.user)
         geiq_eligibility_diagnosis = (
@@ -340,6 +342,8 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
     if request.method == "POST" and form.is_valid():
         form.save()
+        if global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY in request.session:
+            del request.session[global_constants.ITOU_SESSION_HAS_BIRTH_NAME_KEY]
         messages.success(request, "Les informations de votre profil ont bien été mises à jour.", extra_tags="toast")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
