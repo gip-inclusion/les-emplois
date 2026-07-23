@@ -684,6 +684,7 @@
                  "insertion_structure"."phone",
                  "insertion_structure"."opening_hours",
                  "insertion_structure"."updated_on",
+                 "insertion_structure"."is_active",
                  "insertion_structure"."created_at",
                  "insertion_structure"."updated_at",
                  "insertion_genericreferenceitem"."id",
@@ -696,7 +697,8 @@
                  "insertion_genericreferenceitem"."updated_at"
           FROM "insertion_structure"
           INNER JOIN "insertion_genericreferenceitem" ON ("insertion_structure"."source_id" = "insertion_genericreferenceitem"."id")
-          WHERE "insertion_structure"."uid" = %s
+          WHERE ("insertion_structure"."is_active"
+                 AND "insertion_structure"."uid" = %s)
           LIMIT 21
         ''',
       }),
@@ -747,6 +749,7 @@
                  "insertion_service"."average_orientation_response_delay_days",
                  "insertion_service"."dora_synced_at",
                  "insertion_service"."updated_on",
+                 "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
                  "insertion_genericreferenceitem"."id",
@@ -759,7 +762,8 @@
                  "insertion_genericreferenceitem"."updated_at"
           FROM "insertion_service"
           LEFT OUTER JOIN "insertion_genericreferenceitem" ON ("insertion_service"."kind_id" = "insertion_genericreferenceitem"."id")
-          WHERE "insertion_service"."structure_id" IN (%s)
+          WHERE ("insertion_service"."is_active"
+                 AND "insertion_service"."structure_id" IN (%s))
           ORDER BY "insertion_service"."name" ASC
         ''',
       }),

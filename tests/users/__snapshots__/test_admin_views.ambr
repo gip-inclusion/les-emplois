@@ -658,6 +658,7 @@
                  "insertion_service"."average_orientation_response_delay_days",
                  "insertion_service"."dora_synced_at",
                  "insertion_service"."updated_on",
+                 "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at"
           FROM "insertion_orientation"

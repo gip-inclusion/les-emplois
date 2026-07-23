@@ -358,12 +358,13 @@ class Command(BaseCommand):
         self.logger.info("Importing structures")
 
         differ = diff.CollectionDiffer(
-            Structure.objects.all(),
+            Structure.include_inactive.all(),
             DataInclusionApiItemsIterator(client.structures, page_size=1000, params={"sources": sources}),
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
         )
+        removed_uids = []
         for diff_item in differ:
             self.logger.info(diff_item.label())
 
@@ -379,7 +380,10 @@ class Command(BaseCommand):
                     diff_item.current_item, diff_item.comparative_item, is_creation=False
                 )
             elif diff_item.kind is diff.DiffItemKind.REMOVED:
-                diff_item.current_item.delete()
+                removed_uids.append(diff_item.key[0])
+
+        Structure.include_inactive.filter(is_active=True, uid__in=removed_uids).update(is_active=False)
+        Structure.include_inactive.filter(is_active=False).exclude(uid__in=removed_uids).update(is_active=True)
 
         self.logger.info(differ.summary_label())
 
@@ -574,15 +578,16 @@ class Command(BaseCommand):
     def import_services(self, di_client, dora_client, sources):
         self.logger.info("Importing services")
         dora_services = {"dora--" + item["id"]: item for item in DoraApiItemsIterator(dora_client.emplois_services)}
-        structures = Structure.objects.only("uid").in_bulk(field_name="uid")
+        structures = Structure.include_inactive.only("uid").in_bulk(field_name="uid")
 
         differ = diff.CollectionDiffer(
-            Service.objects.all(),
+            Service.include_inactive.all(),
             DataInclusionApiItemsIterator(di_client.services, page_size=1000, params={"sources": sources}),
             (["uid"], ["id"]),
             watched_data={"updated_on": "date_maj"},
             comparative_data_converters={"date_maj": datetime.date.fromisoformat},
         )
+        removed_uids = []
         for diff_item in differ:
             self.logger.info(diff_item.label())
 
@@ -601,7 +606,10 @@ class Command(BaseCommand):
                     structures,
                 )
             elif diff_item.kind is diff.DiffItemKind.REMOVED:
-                diff_item.current_item.delete()
+                removed_uids.append(diff_item.key[0])
+
+        Service.include_inactive.filter(is_active=True, uid__in=removed_uids).update(is_active=False)
+        Service.include_inactive.filter(is_active=False).exclude(uid__in=removed_uids).update(is_active=True)
 
         self.logger.info(differ.summary_label())
 
