@@ -6800,7 +6800,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_imer_v0" ("id" integer,"date" timestamp WITH TIME ZONE,
-                                                                                              "user_session" varchar,"user_kind" varchar,"user_id" integer,"user_prescriber_organization_id" integer,"user_company_id" integer,"structure_id" varchar,"kind" varchar,"service_id" varchar,"source" varchar,"external_link" varchar,"orientation_id" integer,"date_mise_à_jour_metabase" date)
+                                                                                              "user_session" varchar,"user_kind" varchar,"user_id" integer,"user_prescriber_organization_id" integer,"user_company_id" integer,"structure_id" varchar,"kind" varchar,"service_id" varchar,"source" varchar,"external_link" varchar,"orientation_id" varchar,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -6976,6 +6976,7 @@
                  "insertion_mobilizationevent"."service_id",
                  "insertion_mobilizationevent"."structure_id",
                  "insertion_mobilizationevent"."service_external_link",
+                 "insertion_mobilizationevent"."orientation_id",
                  "insertion_mobilizationevent"."created_at",
                  "insertion_service"."id",
                  "insertion_service"."address_line_1",

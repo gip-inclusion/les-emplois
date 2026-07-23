@@ -1,16 +1,18 @@
+from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.insertion.models import GenericReferenceItemKind, Orientation
+from itou.insertion.models import GenericReferenceItemKind, MobilizationEvent, MobilizationEventKind, Orientation
 from itou.job_applications.enums import SenderKind
 from itou.utils.apis.dora import DoraAPIException
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
+from tests.insertion.factories import GenericReferenceItemFactory, MobilizationEventFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
@@ -576,6 +578,70 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
     assert orientation.sender_company == organization
     assert orientation.sender_prescriber_organization is None
     assert orientation.attachments == []
+
+
+def test_orientation_wizard_links_latest_unlinked_mobilization_event(client, mocker):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    prescriber = membership.user
+    organization = membership.organization
+    job_seeker = JobSeekerFactory(first_name="Jean", last_name="Dupont", email="usager@example.org")
+    JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
+    service = ServiceFactory(is_orientable_with_form=True)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+
+    client.force_login(prescriber)
+    client.get(start_url + f"?job_seeker_public_id={job_seeker.public_id}")
+    session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)
+    conformity_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
+    )
+    referent_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.REFERENT},
+    )
+    documents_url = reverse(
+        "insertion_views:orientation_steps",
+        kwargs={"session_uuid": session_uuid, "step": OrientationStep.DOCUMENTS},
+    )
+    client.post(conformity_url, {"confirms_conditions": "on"})
+    client.post(
+        referent_url,
+        {
+            "referent_last_name": "Dupont",
+            "referent_first_name": "Jean",
+            "referent_phone": "0612345678",
+            "referent_email": "jean@example.com",
+        },
+    )
+
+    session_key = client.session.session_key
+    event_kwargs = {
+        "kind": MobilizationEventKind.SERVICE_ORIENTATION,
+        "session_key": session_key,
+        "user": prescriber,
+        "prescriber_organization": organization,
+    }
+    older_event = MobilizationEventFactory(service=service, structure=service.structure, **event_kwargs)
+    MobilizationEvent.objects.filter(pk=older_event.pk).update(created_at=timezone.now() - timedelta(hours=1))
+    latest_event = MobilizationEventFactory(service=service, structure=service.structure, **event_kwargs)
+    # An iMER for another service must not be linked.
+    other_service = ServiceFactory(is_orientable_with_form=True)
+    other_event = MobilizationEventFactory(service=other_service, structure=other_service.structure, **event_kwargs)
+
+    mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    mock_dora.return_value.create_orientation.return_value = {
+        "emplois_sync_uid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    }
+    client.post(documents_url, {"gdpr_consent": "on"})
+
+    orientation = Orientation.objects.get()
+    latest_event.refresh_from_db()
+    older_event.refresh_from_db()
+    other_event.refresh_from_db()
+    assert latest_event.orientation == orientation
+    assert older_event.orientation is None
+    assert other_event.orientation is None
 
 
 def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(client):

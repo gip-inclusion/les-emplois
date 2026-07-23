@@ -534,6 +534,14 @@ class MobilizationEvent(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name="+")
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE, related_name="+")
     service_external_link = models.CharField(verbose_name="lien externe", blank=True)
+    orientation = models.ForeignKey(
+        "Orientation",
+        verbose_name="orientation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mobilization_events",
+    )
     created_at = models.DateTimeField(verbose_name="date de création", auto_now=True)
 
     objects = MobilizationEventManager()

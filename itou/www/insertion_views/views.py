@@ -459,8 +459,6 @@ class OrientationWizardView(WizardView):
 
             self.save_orientation(orientation_response, referent_data=referent_data, cleaned=cleaned)
 
-            # TODO: update MobilizationEvent with the Orientation object
-
             confirmation_url = reverse(
                 "insertion_views:orientation_confirmation",
                 kwargs={"service_uid": self.service.uid},
@@ -491,7 +489,7 @@ class OrientationWizardView(WizardView):
             sender_company = None
 
         try:
-            insertion_models.Orientation.objects.create(
+            orientation = insertion_models.Orientation.objects.create(
                 id=orientation_response["emplois_sync_uid"],
                 beneficiary=self.job_seeker,
                 sender=request.user,
@@ -514,6 +512,33 @@ class OrientationWizardView(WizardView):
                 request.user.pk,
                 self.service.uid,
                 self.job_seeker.public_id,
+            )
+            return
+
+        self.link_mobilization_event(orientation)
+
+    def link_mobilization_event(self, orientation):
+        request = self.request
+        try:
+            event = (
+                insertion_models.MobilizationEvent.objects.filter(
+                    kind=MobilizationEventKind.SERVICE_ORIENTATION,
+                    session_key=request.session.session_key,
+                    service=self.service,
+                    user=request.user,
+                    orientation__isnull=True,
+                )
+                .order_by("-created_at")
+                .first()
+            )
+            if event is not None:
+                insertion_models.MobilizationEvent.objects.filter(pk=event.pk).update(orientation=orientation)
+        except Exception:
+            logger.exception(
+                "orientation wizard mobilization_link_failed emplois_sync_uid=%s user=%s service_uid=%s",
+                orientation.pk,
+                request.user.pk,
+                self.service.uid,
             )
 
     def get_context_data(self, **kwargs):
