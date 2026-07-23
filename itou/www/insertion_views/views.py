@@ -486,7 +486,21 @@ class OrientationWizardView(WizardView):
             # otherwise issue a redundant UPDATE probe before the INSERT.
             orientation.save(force_insert=True)
 
-            # TODO: update MobilizationEvent with the Orientation object
+            # Link the originating iMER to the created Orientation.
+            event = (
+                insertion_models.MobilizationEvent.objects.filter(
+                    kind=MobilizationEventKind.SERVICE_ORIENTATION,
+                    session_key=request.session.session_key,
+                    service=self.service,
+                    user=request.user,
+                    orientation__isnull=True,
+                )
+                .order_by("-created_at")
+                .first()
+            )
+            if event is not None:
+                event.orientation = orientation
+                event.save(update_fields=["orientation"])
 
             confirmation_url = reverse(
                 "insertion_views:orientation_confirmation",
