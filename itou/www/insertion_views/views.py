@@ -485,7 +485,18 @@ class OrientationWizardView(WizardView):
             # force_insert: the primary key (emplois_sync_uid) is set by hand, so save() would
             # otherwise issue a redundant UPDATE probe before the INSERT.
             orientation.save(force_insert=True)
-            self.link_mobilization_event(orientation)
+            try:
+                orientation.link_mobilization_event(
+                    session_key=request.session.session_key,
+                    user=request.user,
+                )
+            except Exception:
+                logger.exception(
+                    "orientation wizard mobilization_link_failed emplois_sync_uid=%s user=%s service_uid=%s",
+                    orientation.pk,
+                    request.user.pk,
+                    self.service.uid,
+                )
 
             confirmation_url = reverse(
                 "insertion_views:orientation_confirmation",
@@ -504,30 +515,6 @@ class OrientationWizardView(WizardView):
                 self.job_seeker.public_id,
             )
         return super().post(request, *args, **kwargs)
-
-    def link_mobilization_event(self, orientation):
-        request = self.request
-        try:
-            event = (
-                insertion_models.MobilizationEvent.objects.filter(
-                    kind=MobilizationEventKind.SERVICE_ORIENTATION,
-                    session_key=request.session.session_key,
-                    service=self.service,
-                    user=request.user,
-                    orientation__isnull=True,
-                )
-                .order_by("-created_at")
-                .first()
-            )
-            if event is not None:
-                insertion_models.MobilizationEvent.objects.filter(pk=event.pk).update(orientation=orientation)
-        except Exception:
-            logger.exception(
-                "orientation wizard mobilization_link_failed emplois_sync_uid=%s user=%s service_uid=%s",
-                orientation.pk,
-                request.user.pk,
-                self.service.uid,
-            )
 
     def get_context_data(self, **kwargs):
         matomo_titles = {

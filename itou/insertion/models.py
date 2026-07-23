@@ -726,6 +726,21 @@ class Orientation(models.Model):
     def from_data(cls, service, beneficiary, sender, **kwargs):
         return cls(service=service, beneficiary=beneficiary, sender=sender, **kwargs)
 
+    def link_mobilization_event(self, *, session_key, user):
+        event = (
+            MobilizationEvent.objects.filter(
+                kind=MobilizationEventKind.SERVICE_ORIENTATION,
+                session_key=session_key,
+                service=self.service,
+                user=user,
+                orientation__isnull=True,
+            )
+            .order_by("-created_at")
+            .first()
+        )
+        if event is not None:
+            MobilizationEvent.objects.filter(pk=event.pk).update(orientation=self)
+
     @property
     def sender_organization(self):
         return self.sender_prescriber_organization or self.sender_company
