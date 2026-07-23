@@ -62,10 +62,7 @@
                                             <td class="text-end w-50px">
                                                 <button class="btn btn-sm btn-link {% if user.otp_device == device %}disabled{% endif %}"
                                                         type="button"
-                                                        {% if user.otp_device == device %}data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter."{% endif %}
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#delete_{{ device.pk }}_modal"
-                                                        aria-label="Supprimer l’appareil {{ device.name }}">
+                                                        {% if user.otp_device == device %}data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter."{% else %}data-bs-toggle="modal" data-bs-target="#delete_{{ device.pk }}_modal" aria-label="Supprimer l’appareil {{ device.name }}"{% endif %}>
                                                     <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
                                                 </button>
                                             </td>

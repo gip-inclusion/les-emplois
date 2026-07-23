@@ -38,7 +38,7 @@
                             {{ evaluated_siae|capfirst }} n’a pas soumis de justificatifs avant la fin de la
                             campagne « {{ evaluated_siae.evaluation_campaign.name }} », <b>le résultat du contrôle
                             est négatif</b>.
-                        {% endif %}
+                    {% endif %}
                     {% elif accepted_by_default %}
                         {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
                         validé avant la fin de la phase amiable, <b>le résultat du contrôle est positif</b>.
