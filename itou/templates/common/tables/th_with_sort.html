@@ -2,7 +2,5 @@
     <button type="button"
             data-emplois-setter-target="#id_order"
             data-emplois-setter-value="{% if order == ascending_value %}{{ ascending_value.opposite }}{% else %}{{ ascending_value }}{% endif %}"
-            {{ extra_button_attributes|default:"" }}>
-        {{ name }}
-    </button>
+            {{ extra_button_attributes|default:"" }}>{{ name }}</button>
 </th>
