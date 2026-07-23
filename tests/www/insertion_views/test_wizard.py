@@ -5,7 +5,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.insertion.models import GenericReferenceItemKind
+from itou.insertion.models import GenericReferenceItemKind, Orientation
+from itou.job_applications.enums import SenderKind
 from itou.utils.apis.dora import DoraAPIException
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -115,7 +116,12 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
         parse_response_to_soup(response, "#main .s-section", replace_in_attr=replace_session_uuid)
     ) == snapshot(name="documents")
 
+    emplois_sync_uid = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
     mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    mock_dora.return_value.create_orientation.return_value = {
+        "emplois_sync_uid": emplois_sync_uid,
+        "beneficiary_attachments": ["orientations/attachments/doc.pdf", "orientations/attachments/proof.pdf"],
+    }
     response = client.post(
         documents_url,
         {
@@ -131,6 +137,24 @@ def test_orientation_wizard_happy_path(client, snapshot, mocker):
     )
     assertRedirects(response, confirmation_url, fetch_redirect_response=False)
     mock_dora.return_value.create_orientation.assert_called_once()
+
+    orientation = Orientation.objects.get()
+    assert str(orientation.id) == emplois_sync_uid
+    assert orientation.beneficiary == job_seeker
+    assert orientation.sender == prescriber
+    assert orientation.sender_kind == SenderKind.PRESCRIBER
+    assert orientation.sender_prescriber_organization == prescriber.prescribermembership_set.get().organization
+    assert orientation.sender_company is None
+    assert orientation.service == service
+    assert orientation.referent_first_name == "Jean"
+    assert orientation.referent_last_name == "Dupont"
+    assert orientation.referent_email == "jean@example.com"
+    assert orientation.referent_phone == "0612345678"
+    assert orientation.data_protection_commitment is True
+    assert orientation.attachments == [
+        "orientations/attachments/doc.pdf",
+        "orientations/attachments/proof.pdf",
+    ]
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload == {
@@ -376,6 +400,7 @@ def test_documents_step_redirects_to_error_page_when_orientation_submission_fail
     assert response.status_code == 200
     assertContains(response, "problème technique")
     assert get_session_name(client.session, OrientationWizardView.expected_session_kind) == session_uuid
+    assert not Orientation.objects.exists()
 
 
 @pytest.mark.parametrize(
@@ -434,6 +459,9 @@ def test_documents_step_normalizes_beneficiary_phone_for_dora(
     )
 
     mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    mock_dora.return_value.create_orientation.return_value = {
+        "emplois_sync_uid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    }
 
     client.post(
         documents_url,
@@ -478,6 +506,7 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     view.form = mocker.Mock(is_valid=mocker.Mock(return_value=True), cleaned_data={"gdpr_consent": True})
     view.find_step_with_invalid_data_until_step = mocker.Mock(return_value=None)
     view.dora_client = mocker.Mock()
+    view.save_orientation = mocker.Mock()
 
     request = mocker.Mock()
     request.user.pk = 1
@@ -531,12 +560,22 @@ def test_orientation_wizard_happy_path_as_employer(client, mocker):
         },
     )
 
+    emplois_sync_uid = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
     mock_dora = mocker.patch("itou.www.insertion_views.views.DoraAPIClient")
+    mock_dora.return_value.create_orientation.return_value = {"emplois_sync_uid": emplois_sync_uid}
     client.post(documents_url, {"gdpr_consent": "on"})
 
     payload, _ = mock_dora.return_value.create_orientation.call_args.args
     assert payload["beneficiary_phone"] == ""
     assert payload["emplois_data"]["structure_id"] == str(organization.uid)
+
+    orientation = Orientation.objects.get()
+    assert str(orientation.id) == emplois_sync_uid
+    assert orientation.sender == user
+    assert orientation.sender_kind == SenderKind.EMPLOYER
+    assert orientation.sender_company == organization
+    assert orientation.sender_prescriber_organization is None
+    assert orientation.attachments == []
 
 
 def test_orientation_select_job_seeker_lists_company_beneficiaries_for_employer(client):
