@@ -77,6 +77,11 @@ class GeolocatedAddressMixin(models.Model):
         abstract = True
 
 
+class StructureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class GenericReferenceItem(models.Model):
     source = models.CharField(choices=GenericReferenceItemSource.choices)
     kind = models.CharField(verbose_name="type", choices=GenericReferenceItemKind.choices)
@@ -148,12 +153,18 @@ class Structure(GeolocatedAddressMixin, models.Model):
 
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
 
+    is_active = models.BooleanField(verbose_name="actif", default=True)
+
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    objects = StructureManager()
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "structure d'insertion"
         verbose_name_plural = "structures d'insertion"
+        base_manager_name = "all_objects"
 
     def __str__(self):
         return self.uid
@@ -232,6 +243,11 @@ class ServiceQuerySet(models.QuerySet):
             .filter(eligibility_filter)
             .order_by("-is_in_person", "distance", "pk")
         )
+
+
+class ServiceManager(models.Manager.from_queryset(ServiceQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 
 
 class Service(GeolocatedAddressMixin, models.Model):
@@ -421,6 +437,8 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     updated_on = models.DateField(verbose_name="date de modification data·inclusion")
 
+    is_active = models.BooleanField(verbose_name="actif", default=True)
+
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
@@ -460,11 +478,13 @@ class Service(GeolocatedAddressMixin, models.Model):
             (form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.credentials_documents
         ]
 
-    objects = ServiceQuerySet.as_manager()
+    objects = ServiceManager()
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "service d'insertion"
         verbose_name_plural = "services d'insertion"
+        base_manager_name = "all_objects"
 
     def __str__(self):
         return self.uid
