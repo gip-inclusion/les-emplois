@@ -11,10 +11,8 @@ def test_with_last_name_for_display():
     user2 = JobSeekerFactory(last_name="4", jobseeker_profile__birth_name="2")
     ja2 = JobApplicationFactory(sent_by_job_seeker=True, job_seeker=user2)
 
-    applications = (
-        JobApplication.objects.with_job_seeker_last_name_for_display()
-        .order_by("job_seeker_last_name_for_display")
-        .all()
+    applications = JobApplication.objects.with_job_seeker_last_name_for_display().order_by(
+        "job_seeker_last_name_for_display"
     )
 
     assertQuerySetEqual(applications, [ja1, ja2])
