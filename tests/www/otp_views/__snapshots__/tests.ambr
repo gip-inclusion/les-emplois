@@ -136,7 +136,7 @@
                                       11 mars 2025 06:20
                                   </td>
                                   <td class="text-end w-50px">
-                                      <button aria-label="Supprimer l’appareil authenticator" class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-target="#delete_[PK of device_1]_modal" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
+                                      <button aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
                                           <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
                                           </i>
                                       </button>
@@ -235,7 +235,7 @@
                                       11 mars 2025 06:18
                                   </td>
                                   <td class="text-end w-50px">
-                                      <button aria-label="Supprimer l’appareil Mon appareil" class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-target="#delete_[PK of device]_modal" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
+                                      <button aria-label="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
                                           <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
                                           </i>
                                       </button>
