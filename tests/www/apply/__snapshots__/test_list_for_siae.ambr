@@ -8243,11 +8243,11 @@
               </div>
               <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
                   <div class="modal-body">
-                      <div class="form-group">
+                      <div class="form-group form-group-required">
                           <label class="form-label" for="id_answer">
                               Commentaire à envoyer au candidat
                           </label>
-                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" required="" rows="10"></textarea>
                           <div class="form-text" id="id_answer_helptext">
                               Votre réponse sera visible par le candidat et le prescripteur
                           </div>
@@ -8284,11 +8284,11 @@
               </div>
               <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
                   <div class="modal-body">
-                      <div class="form-group">
+                      <div class="form-group form-group-required">
                           <label class="form-label" for="id_answer">
                               Commentaire à envoyer aux 2 candidats
                           </label>
-                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" required="" rows="10"></textarea>
                           <div class="form-text" id="id_answer_helptext">
                               Votre réponse sera visible par le candidat et le prescripteur
                           </div>
