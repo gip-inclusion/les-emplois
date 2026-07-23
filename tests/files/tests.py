@@ -105,6 +105,21 @@ def test_copy(pdf_file):
         assert old.read() == new.read()
 
 
+@pytest.mark.empty_temporary_bucket_expected
+@pytest.mark.usefixtures("temporary_bucket")
+def test_delete_unused_files_no_files(caplog):
+    call_command("delete_unused_files")
+    assert caplog.messages[:-1] == [
+        "Starting unused file removal",
+        "Deleted 0 orphans files from database",
+        "Checking existing files: 0 files in database",
+        "Completed bucket cleaning: found unknown=0 and temporary=0 files in the bucket, removed=0 files",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.delete_unused_files succeeded in"
+    )
+
+
 @pytest.mark.usefixtures("temporary_bucket")
 def test_delete_unused_files_from_database(caplog):
     old_orphan = FileFactory()
