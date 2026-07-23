@@ -1,0 +1,90 @@
+[
+  {
+    "fields": {
+      "first_name": "Camille",
+      "france_travail_id": "10000000017",
+      "last_name": "Lefebvre",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "first_name": "Nadia",
+      "france_travail_id": "10000000018",
+      "last_name": "Benali",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "first_name": "Lucas",
+      "france_travail_id": "10000000019",
+      "last_name": "Moreau",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "first_name": "Sophie",
+      "france_travail_id": "10000000020",
+      "last_name": "Garnier",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "first_name": "Mehdi",
+      "france_travail_id": "10000000021",
+      "last_name": "Dubois",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "first_name": "Émilie",
+      "france_travail_id": "10000000022",
+      "last_name": "Rousseau",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "first_name": "Thomas",
+      "france_travail_id": "10000000047",
+      "last_name": "Fontaine",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "first_name": "Aïcha",
+      "france_travail_id": "10000000008",
+      "last_name": "Traoré",
+      "organization_safir": "12345",
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr"
+    },
+    "model": "recommendations.beneficiary",
+    "pk": 8
+  }
+]
