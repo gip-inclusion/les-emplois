@@ -542,7 +542,7 @@ class MobilizationEvent(models.Model):
         blank=True,
         related_name="mobilization_events",
     )
-    created_at = models.DateTimeField(verbose_name="date de création", auto_now=True)
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
 
     objects = MobilizationEventManager()
 
@@ -739,7 +739,8 @@ class Orientation(models.Model):
             .first()
         )
         if event is not None:
-            MobilizationEvent.objects.filter(pk=event.pk).update(orientation=self)
+            event.orientation = self
+            event.save(update_fields=["orientation"])
 
     @property
     def sender_organization(self):
