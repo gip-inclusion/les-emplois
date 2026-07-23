@@ -31,10 +31,10 @@ def test_create_orientation_posts_multipart_with_attachments(dora_client):
     }
 
     with respx.mock(base_url=f"{DORA_BASE_URL}/api/emplois/") as respx_mock:
-        route = respx_mock.post("/orientations/").respond(201, json={"id": "orientation-1"})
+        route = respx_mock.post("/orientations/").respond(201, json={"emplois_sync_uid": "orientation-1"})
         response = dora_client.create_orientation(payload, [("doc.pdf", io.BytesIO(b"file-content"))])
 
-    assert response == {"id": "orientation-1"}
+    assert response == {"emplois_sync_uid": "orientation-1"}
     assert route.called
     request = route.calls.last.request
     assert request.headers["content-type"].startswith("multipart/form-data")
@@ -51,10 +51,10 @@ def test_create_orientation_without_attachments_sends_json_data_field(dora_clien
     payload = {"di_service_id": "soliguide--svc-1"}
 
     with respx.mock(base_url=f"{DORA_BASE_URL}/api/emplois/") as respx_mock:
-        route = respx_mock.post("/orientations/").respond(201, json={"id": "orientation-1"})
+        route = respx_mock.post("/orientations/").respond(201, json={"emplois_sync_uid": "orientation-1"})
         response = dora_client.create_orientation(payload)
 
-    assert response == {"id": "orientation-1"}
+    assert response == {"emplois_sync_uid": "orientation-1"}
     request = route.calls.last.request
     assert request.headers["content-type"].startswith("application/x-www-form-urlencoded")
     assert b"data=" in request.content
