@@ -113,8 +113,8 @@
                     {% if job_application.diagoriente_invite_sent_at %}
                         <small>Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le {{ job_application.diagoriente_invite_sent_at|date:"d/m/Y" }}</small>
                     {% endif %}
-                </li>
-            {% endif %}
+                {% endif %}
+            </li>
         {% endif %}
     {% endif %}
 </ul>
