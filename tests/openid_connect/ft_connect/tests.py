@@ -141,7 +141,7 @@ class TestPoleEmploiConnect:
         assert created
         assert user.last_name == FT_CONNECT_USERINFO["family_name"]
         assert user.first_name == FT_CONNECT_USERINFO["given_name"]
-        assert user.external_data_source_history[0]["source"] == "PEC"
+        assert user.external_data_source_history[0]["source"] == "FTC"
         assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == Title.MME
@@ -171,7 +171,7 @@ class TestPoleEmploiConnect:
         assert not created
         assert user.last_name == FT_CONNECT_USERINFO["family_name"]
         assert user.first_name == FT_CONNECT_USERINFO["given_name"]
-        assert user.external_data_source_history[0]["source"] == "PEC"
+        assert user.external_data_source_history[0]["source"] == "FTC"
         assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.title == Title.MME
 
@@ -221,7 +221,7 @@ class TestPoleEmploiConnect:
         assert user.last_name == job_seeker.last_name
         assert user.first_name == job_seeker.first_name
         assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
-        assert user.external_data_source_history[0]["source"] == "PEC"
+        assert user.external_data_source_history[0]["source"] == "FTC"
         assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == Title.M
