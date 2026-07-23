@@ -469,7 +469,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         # example).
         last_name = self.last_name
         if not last_name and self.is_job_seeker and self.jobseeker_profile.birth_name:
-            last_name = self.jobseeker_profile.birth_name
+            return self.jobseeker_profile.birth_name
         return last_name
 
     def get_full_name(self):
