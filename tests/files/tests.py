@@ -209,6 +209,8 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
         "Starting unused file removal",
         "Deleted 0 orphans files from database",
         "Checking existing files: 2 files in database",
+        "Found 3 keys to remove from S3.",
+        "Deleting 3 keys from S3.",
         "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=3 files",
         f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
     ]
