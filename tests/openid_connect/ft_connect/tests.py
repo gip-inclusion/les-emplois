@@ -17,7 +17,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertRedirect
 from itou.external_data.apis import ft_connect
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.ft_connect import constants
-from itou.openid_connect.ft_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
+from itou.openid_connect.ft_connect.models import FranceTravailConnectState, FranceTravailConnectUserData
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.models import User
@@ -61,7 +61,7 @@ def mock_oauth_dance(
     ]:
         respx.get(f"{settings.API_ESD['BASE_URL']}/{api}").mock(return_value=httpx.Response(200, json=fake_api_data))
 
-    state = PoleEmploiConnectState.save_state()
+    state = FranceTravailConnectState.save_state()
     url = reverse("ft_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
@@ -87,9 +87,9 @@ class TestPoleEmploiConnect:
                 yield
 
     def test_state_delete(self):
-        state = PoleEmploiConnectState.objects.create(state="foo")
+        state = FranceTravailConnectState.objects.create(state="foo")
 
-        PoleEmploiConnectState.objects.cleanup()
+        FranceTravailConnectState.objects.cleanup()
 
         state.refresh_from_db()
         assert state is not None
@@ -98,30 +98,30 @@ class TestPoleEmploiConnect:
         state.created_at = timezone.now() - OIDC_STATE_CLEANUP * 2
         state.save()
 
-        PoleEmploiConnectState.objects.cleanup()
+        FranceTravailConnectState.objects.cleanup()
 
-        with pytest.raises(PoleEmploiConnectState.DoesNotExist):
+        with pytest.raises(FranceTravailConnectState.DoesNotExist):
             state.refresh_from_db()
 
     def test_state_verification(self):
-        state = PoleEmploiConnectState.save_state()
-        assert PoleEmploiConnectState.get_from_state(state).is_valid()
+        state = FranceTravailConnectState.save_state()
+        assert FranceTravailConnectState.get_from_state(state).is_valid()
 
     def test_state_is_valid(self):
         with freeze_time("2022-09-13 12:00:01"):
-            state = PoleEmploiConnectState.save_state()
+            state = FranceTravailConnectState.save_state()
             assert isinstance(state, str)
-            assert PoleEmploiConnectState.get_from_state(state).is_valid()
+            assert FranceTravailConnectState.get_from_state(state).is_valid()
 
-            state = PoleEmploiConnectState.save_state()
+            state = FranceTravailConnectState.save_state()
         with freeze_time("2022-10-13 12:00:01"):
-            assert not PoleEmploiConnectState.get_from_state(state).is_valid()
+            assert not FranceTravailConnectState.get_from_state(state).is_valid()
 
     def test_authorize(self, client):
         url = reverse("ft_connect:authorize")
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PE_CONNECT_ENDPOINT_AUTHORIZE)
-        pec_state = PoleEmploiConnectState.objects.last()
+        pec_state = FranceTravailConnectState.objects.last()
         assert f"state={pec_state.state}" in response.url
         assert pec_state.nonce is not None
         assert f"nonce={pec_state.nonce}" in response.url
@@ -134,7 +134,7 @@ class TestPoleEmploiConnect:
         Nominal scenario: there is no user with the PEAMU id or PEAMU email
         that is sent, so we create one
         """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
         assert not User.objects.filter(username=peamu_user_data.username).exists()
         assert not User.objects.filter(email=peamu_user_data.email).exists()
         user, created = peamu_user_data.create_or_update_user()
@@ -159,7 +159,7 @@ class TestPoleEmploiConnect:
         If there already is an existing user with this PEAMU id, we do not create it again,
         we use it and we update it
         """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
         JobSeekerFactory(
             username=peamu_user_data.username,
             last_name="will_be_forgotten",
@@ -180,7 +180,7 @@ class TestPoleEmploiConnect:
         If there already is an existing user with this PEAMU id, but it comes from another SSO.
         The email is also different, so it will crash while trying to create a new user.
         """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
         JobSeekerFactory(
             username=peamu_user_data.username,
             last_name="will_be_forgotten",
@@ -191,7 +191,7 @@ class TestPoleEmploiConnect:
             peamu_user_data.create_or_update_user()
 
     def test_create_or_update_user_raise_invalid_kind_exception(self):
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
 
         user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=UserKind.PROFESSIONAL)
 
@@ -212,7 +212,7 @@ class TestPoleEmploiConnect:
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
         with triggers.fake_context():
             user, created = peamu_user_data.create_or_update_user()
         assert created is False
@@ -316,7 +316,7 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_inactive_user_exception(self, client):
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
 
         user = UserFactory(
             username=peamu_user_data.username,
@@ -343,7 +343,7 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
 
         user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=UserKind.PROFESSIONAL)
         mock_oauth_dance(client, expected_route="account_login")
@@ -352,7 +352,7 @@ class TestPoleEmploiConnect:
     @respx.mock
     def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
         # EmailInUseException raised by the email conflict
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
         JobSeekerFactory(
             email=peamu_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT, for_snapshot=True
         )
@@ -363,7 +363,7 @@ class TestPoleEmploiConnect:
 
     @respx.mock
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
         user = JobSeekerFactory(
             username="another_sub", email=peamu_user_data.email, identity_provider=IdentityProvider.PE_CONNECT
         )
@@ -393,7 +393,7 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_unavailable_endpoint_token(self, client):
         respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(side_effect=httpx.ConnectTimeout("Timeout"))
 
-        state = PoleEmploiConnectState.save_state()
+        state = FranceTravailConnectState.save_state()
         url = reverse("ft_connect:callback")
         response = client.get(url, data={"code": "123", "state": state}, follow=True)
         assertRedirects(response, reverse("account_login"))
@@ -413,7 +413,7 @@ class TestPoleEmploiConnect:
         respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
         respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
 
-        state = PoleEmploiConnectState.save_state()
+        state = FranceTravailConnectState.save_state()
         url = reverse("ft_connect:callback")
         response = client.get(url, data={"code": "123", "state": state}, follow=True)
         assertRedirects(response, reverse("account_login"))
@@ -475,7 +475,7 @@ def test_create_peamu_user_with_already_existing_email_fails(identity_provider):
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.
     """
-    peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+    peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
     JobSeekerFactory(
         username="another_username",
         email=peamu_user_data.email,
@@ -490,7 +490,7 @@ def test_create_peamu_user_with_already_existing_peamu_email_fails():
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.
     """
-    peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+    peamu_user_data = FranceTravailConnectUserData.from_user_info(PEAMU_USERINFO)
     JobSeekerFactory(
         username="another_username",
         email=peamu_user_data.email,
