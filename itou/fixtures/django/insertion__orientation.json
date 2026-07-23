@@ -1,0 +1,62 @@
+[
+  {
+    "fields": {
+      "attachments": "[\"staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/attestation_rsa.pdf\",\"staging/#orientations/Lu9BIUvx6idprXo6QjpYyHi4QsmcXTdS/piece_identite.pdf\"]",
+      "beneficiary": 2,
+      "beneficiary_availability": "2026-07-25",
+      "beneficiary_contact_preferences": "[\"REFERENT\"]",
+      "beneficiary_other_contact_method": "",
+      "created_at": "2026-07-23T09:16:26.117Z",
+      "data_protection_commitment": true,
+      "duration_weekly_hours": 2,
+      "duration_weeks": 12,
+      "orientation_reasons": "Cela débloquerait grandement le bénéficiaire.",
+      "processing_date": null,
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr",
+      "referent_first_name": "André",
+      "referent_last_name": "Dufour",
+      "referent_phone": "0201020304",
+      "requirements": "[]",
+      "sender": 3,
+      "sender_company": null,
+      "sender_kind": "prescriber",
+      "sender_prescriber_organization": 115,
+      "service": 1,
+      "situation": "[]",
+      "situation_other": "",
+      "status": "VALIDÉE"
+    },
+    "model": "insertion.orientation",
+    "pk": "9ff499ce-0ad6-498b-bceb-f16774b40d3c"
+  },
+  {
+    "fields": {
+      "attachments": "[\"staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf\",\"staging/#orientations/Lu9BIUvx6idprXo6QjpYyHi4QsmcXTdS/attestation_france_travail.pdf\"]",
+      "beneficiary": 8,
+      "beneficiary_availability": "2026-07-31",
+      "beneficiary_contact_preferences": "[\"EMAIL\", \"TELEPHONE\", \"AUTRE\"]",
+      "beneficiary_other_contact_method": "courrier postal",
+      "created_at": "2026-07-23T09:29:26.117Z",
+      "data_protection_commitment": true,
+      "duration_weekly_hours": 10,
+      "duration_weeks": 3,
+      "orientation_reasons": "Cela débloquerait grandement le bénéficiaire.",
+      "processing_date": null,
+      "referent_email": "demo.emplois+prescripteur@inclusion.gouv.fr",
+      "referent_first_name": "André",
+      "referent_last_name": "Dufour",
+      "referent_phone": "0201020304",
+      "requirements": "[]",
+      "sender": 3,
+      "sender_company": null,
+      "sender_kind": "prescriber",
+      "sender_prescriber_organization": 115,
+      "service": 14,
+      "situation": "[]",
+      "situation_other": "",
+      "status": "OUVERTE"
+    },
+    "model": "insertion.orientation",
+    "pk": "b70298e5-3c03-45e7-b978-08157a198275"
+  }
+]
