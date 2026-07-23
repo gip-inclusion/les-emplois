@@ -60,7 +60,7 @@ class Command(BaseCommand):
         known_keys = set(File.objects.values_list("key", flat=True))
         self.logger.info("Checking existing files: %d files in database", len(known_keys))
         for page in page_iterator:
-            obj_summaries = page["Contents"]
+            obj_summaries = page.get("Contents", [])
             for obj_summary in obj_summaries:
                 key = obj_summary["Key"]
                 if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
