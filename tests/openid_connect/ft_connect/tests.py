@@ -19,7 +19,7 @@ from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.ft_connect import constants
 from itou.openid_connect.ft_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
@@ -144,6 +144,7 @@ class TestPoleEmploiConnect:
         assert user.external_data_source_history[0]["source"] == "PEC"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
+        assert user.title == Title.MME
 
         # Update user
         peamu_user_data.last_name = "DUPUIS"
@@ -163,6 +164,7 @@ class TestPoleEmploiConnect:
             username=peamu_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.PE_CONNECT,
+            title=Title.M,
         )
         with triggers.fake_context():
             user, created = peamu_user_data.create_or_update_user()
@@ -171,6 +173,7 @@ class TestPoleEmploiConnect:
         assert user.first_name == PEAMU_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "PEC"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.title == Title.MME
 
     def test_create_user_with_already_existing_peamu_id_but_from_other_sso(self):
         """
@@ -202,6 +205,7 @@ class TestPoleEmploiConnect:
             username=PEAMU_USERINFO["sub"],
             identity_provider=IdentityProvider.PE_CONNECT,
             born_in_france=True,
+            title=Title.M,
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -218,8 +222,9 @@ class TestPoleEmploiConnect:
         assert user.external_data_source_history[0]["source"] == "PEC"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
+        assert user.title == Title.M
         assert (
-            f"Not updating fields first_name, last_name on job seeker pk={job_seeker.pk} "
+            f"Not updating fields first_name, last_name, title on job seeker pk={job_seeker.pk} "
             "because their identity has been certified." in caplog.messages
         )
 
