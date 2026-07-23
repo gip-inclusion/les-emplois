@@ -17,7 +17,7 @@ from itoutils.urls import add_url_params
 from itou.external_data.tasks import huey_import_user_pe_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.ft_connect import constants
-from itou.openid_connect.ft_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
+from itou.openid_connect.ft_connect.models import FranceTravailConnectState, FranceTravailConnectUserData
 from itou.openid_connect.models import (
     EmailInUseException,
     InactiveUserException,
@@ -47,7 +47,7 @@ def pe_connect_authorize(request):
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(12)
-    state = PoleEmploiConnectState.save_state(nonce=nonce)
+    state = FranceTravailConnectState.save_state(nonce=nonce)
     data = {
         "response_type": "code",
         "client_id": settings.API_ESD["KEY"],
@@ -73,7 +73,7 @@ def pe_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
-    pe_state = PoleEmploiConnectState.get_from_state(state)
+    pe_state = FranceTravailConnectState.get_from_state(state)
     if not pe_state or not pe_state.is_valid():
         error_msg = (
             "Le paramètre « state » fourni par PôleEmploiConnect et nécessaire à votre authentification "
@@ -148,7 +148,7 @@ def pe_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
-        pe_user_data = PoleEmploiConnectUserData.from_user_info(user_data)
+        pe_user_data = FranceTravailConnectUserData.from_user_info(user_data)
     except KeyError as e:
         if "email" in e.args:
             return HttpResponseRedirect(reverse("ft_connect:no_email"))
