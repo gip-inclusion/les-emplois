@@ -508,7 +508,8 @@ def test_orientation_wizard_sends_empty_beneficiary_phone_when_job_seeker_phone_
     view.form = mocker.Mock(is_valid=mocker.Mock(return_value=True), cleaned_data={"gdpr_consent": True})
     view.find_step_with_invalid_data_until_step = mocker.Mock(return_value=None)
     view.dora_client = mocker.Mock()
-    view.save_orientation = mocker.Mock()
+    view.dora_client.create_orientation.return_value = {"emplois_sync_uid": "job-seeker-uid"}
+    mocker.patch("itou.www.insertion_views.views.insertion_models.Orientation.from_data")
 
     request = mocker.Mock()
     request.user.pk = 1

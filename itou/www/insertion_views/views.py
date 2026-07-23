@@ -457,7 +457,35 @@ class OrientationWizardView(WizardView):
                 self.job_seeker.public_id,
             )
 
-            self.save_orientation(orientation_response, referent_data=referent_data, cleaned=cleaned)
+            if request.from_employer:
+                sender_kind = SenderKind.EMPLOYER
+                sender_prescriber_organization = None
+                sender_company = request.current_organization
+            else:
+                sender_kind = SenderKind.PRESCRIBER
+                sender_prescriber_organization = request.current_organization
+                sender_company = None
+
+            orientation = insertion_models.Orientation.from_data(
+                service=self.service,
+                beneficiary=self.job_seeker,
+                sender=request.user,
+                id=orientation_response["emplois_sync_uid"],
+                sender_kind=sender_kind,
+                sender_prescriber_organization=sender_prescriber_organization,
+                sender_company=sender_company,
+                referent_last_name=referent_data["referent_last_name"],
+                referent_first_name=referent_data["referent_first_name"],
+                referent_phone=referent_data["referent_phone"],
+                referent_email=referent_data["referent_email"],
+                orientation_reasons=referent_data.get("orientation_reason") or "",
+                data_protection_commitment=cleaned["gdpr_consent"],
+                attachments=orientation_response.get("beneficiary_attachments") or [],
+            )
+            # force_insert: the primary key (emplois_sync_uid) is set by hand, so save() would
+            # otherwise issue a redundant UPDATE probe before the INSERT.
+            orientation.save(force_insert=True)
+            self.link_mobilization_event(orientation)
 
             confirmation_url = reverse(
                 "insertion_views:orientation_confirmation",
@@ -476,46 +504,6 @@ class OrientationWizardView(WizardView):
                 self.job_seeker.public_id,
             )
         return super().post(request, *args, **kwargs)
-
-    def save_orientation(self, orientation_response, *, referent_data, cleaned):
-        request = self.request
-        if request.from_employer:
-            sender_kind = SenderKind.EMPLOYER
-            sender_company = request.current_organization
-            sender_prescriber_organization = None
-        else:
-            sender_kind = SenderKind.PRESCRIBER
-            sender_prescriber_organization = request.current_organization
-            sender_company = None
-
-        try:
-            orientation = insertion_models.Orientation.objects.create(
-                id=orientation_response["emplois_sync_uid"],
-                beneficiary=self.job_seeker,
-                sender=request.user,
-                sender_kind=sender_kind,
-                sender_prescriber_organization=sender_prescriber_organization,
-                sender_company=sender_company,
-                service=self.service,
-                referent_last_name=referent_data["referent_last_name"],
-                referent_first_name=referent_data["referent_first_name"],
-                referent_phone=referent_data["referent_phone"],
-                referent_email=referent_data["referent_email"],
-                orientation_reasons=referent_data.get("orientation_reason") or "",
-                data_protection_commitment=cleaned["gdpr_consent"],
-                attachments=orientation_response.get("beneficiary_attachments") or [],
-            )
-        except Exception:
-            logger.exception(
-                "orientation wizard local_save_failed emplois_sync_uid=%s user=%s service_uid=%s job_seeker=%s",
-                orientation_response.get("emplois_sync_uid"),
-                request.user.pk,
-                self.service.uid,
-                self.job_seeker.public_id,
-            )
-            return
-
-        self.link_mobilization_event(orientation)
 
     def link_mobilization_event(self, orientation):
         request = self.request

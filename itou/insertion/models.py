@@ -722,6 +722,10 @@ class Orientation(models.Model):
     def __str__(self):
         return str(self.id)
 
+    @classmethod
+    def from_data(cls, service, beneficiary, sender, **kwargs):
+        return cls(service=service, beneficiary=beneficiary, sender=sender, **kwargs)
+
     @property
     def sender_organization(self):
         return self.sender_prescriber_organization or self.sender_company
