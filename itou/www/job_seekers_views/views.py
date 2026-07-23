@@ -10,7 +10,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, DateTimeField, Exists, F, IntegerField, OuterRef, Q, Subquery, Value
-from django.db.models.functions import Coalesce, Concat, Lower
+from django.db.models.functions import Coalesce, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -548,7 +548,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     queryset = (
         queryset.annotate_with_last_name_for_display()
         .annotate(
-            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
+            full_name=Lower("last_name_for_display"),
             job_applications_nb=Coalesce(subquery_count, 0),
             last_action_at=subquery_last_action_at,
             valid_eligibility_diagnosis=subquery_diagnosis,

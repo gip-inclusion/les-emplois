@@ -110,9 +110,7 @@ class _API_PersonSerializer(serializers.Serializer):
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         job_seeker = obj.job_application.job_seeker
-        profile = job_seeker.jobseeker_profile
-        last_name = job_seeker.last_name or profile.birth_name
-        return unidecode(last_name).upper()
+        return unidecode(job_seeker.get_last_name_for_display()).upper()
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_application.job_seeker.first_name).upper()
