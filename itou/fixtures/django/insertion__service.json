@@ -2,7 +2,7 @@
   {
     "fields": {
       "access_conditions_di": "Avoir un enfant scolarise dans l etablissement ou se deroule le dispositif ou dans un etablissement proche.\nJours et horaires des ateliers : Mardi : 9h-11h ou 18h - 20h en alternance",
-      "access_conditions_dora": "[]",
+      "access_conditions_dora": "[\"Etre accompagné par France Travail\", \"Personne non imposable\"]",
       "address_line_1": "14 Rue de Badonviller",
       "address_line_2": "",
       "average_orientation_response_delay_days": null,
@@ -923,5 +923,71 @@
     },
     "model": "insertion.service",
     "pk": 13
+  },
+  {
+    "fields": {
+      "access_conditions_di": "",
+      "access_conditions_dora": "[\"Etre accompagné par France Travail\", \"Personne non imposable\"]",
+      "address_line_1": "AV DE LA PREM DIV FRANC LIBRE",
+      "address_line_2": "",
+      "average_orientation_response_delay_days": null,
+      "city": "Arles",
+      "contact_email": "perm-num@cci.fake",
+      "contact_full_name": "",
+      "contact_is_public": true,
+      "contact_phone": "+0011111363",
+      "coordinates": "SRID=4326;POINT (4.662042 43.800196)",
+      "created_at": "2026-06-15T09:17:54.328Z",
+      "credentials": "[\"Attestation d'inscription France Travail\", \"Pièce d'identite en cours de validité\"]",
+      "credentials_documents": "[]",
+      "credentials_online_form": "",
+      "description": "***Objectifs de la permanence*** :\n- Appréhender positivement les enjeux du numérique pour votre entreprise\n\n- Faire un état des lieux de vos pratiques et usages numériques\n- Identifier les actions à mener pour votre entreprise\n- Sous forme d'entretien individuel de 45 minutes pouvant se dérouler en présentiel ou en distanciel.",
+      "description_short": "Afin de mieux accompagner les entreprises dans leur transformation digitale, la CCI met en place des permanences numériques. En tant que chef d’entreprise, ces RDV permettent un accès simple et rapide à l’information, des réponses à vos questions.",
+      "dora_synced_at": null,
+      "eligibility_zones": "[\"13200\"]",
+      "fee": 1,
+      "fee_details": "",
+      "funding_labels": [],
+      "insee_city": 4297,
+      "is_orientable_with_form": true,
+      "kind": 133,
+      "mobilization_modes_beneficiaries": [],
+      "mobilization_modes_beneficiaries_external_form_link": "",
+      "mobilization_modes_beneficiaries_external_form_link_text": "",
+      "mobilization_modes_beneficiaries_other": "",
+      "mobilization_modes_professionals": [],
+      "mobilization_modes_professionals_external_form_link": "",
+      "mobilization_modes_professionals_external_form_link_text": "",
+      "mobilization_modes_professionals_other": "",
+      "mobilization_publics": [
+        7,
+        8
+      ],
+      "mobilizations": [
+        3,
+        5
+      ],
+      "mobilizations_details": "",
+      "name": "Premiers contacts",
+      "opening_hours": "",
+      "opening_hours_text": "",
+      "post_code": "13200",
+      "publics": [],
+      "publics_details": "Âge minimum : 0 Âge maximum : 120",
+      "receptions": [
+        132
+      ],
+      "source": 231,
+      "source_link": "https://dora.inclusion.gouv.fr/services/chambre-de-commerce--perm-num",
+      "structure": 4,
+      "thematics": [
+        143,
+        144
+      ],
+      "uid": "dora--bf5f59c5-28c5-4565-b553-5b0253b55d87",
+      "updated_on": "2025-09-15"
+    },
+    "model": "insertion.service",
+    "pk": 14
   }
 ]

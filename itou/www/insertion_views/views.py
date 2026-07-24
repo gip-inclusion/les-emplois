@@ -8,7 +8,7 @@ from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -518,3 +518,21 @@ def dismiss_orientation_disclaimer(request, session_uuid):
             ),
         )
     )
+
+
+def orientation_details(request, orientation_id):
+    template_name = "insertion/orientations/details.html"
+
+    orientation = get_object_or_404(
+        insertion_models.Orientation.objects.select_related("beneficiary", "service"),
+        id=orientation_id,
+        sender=request.user,
+    )
+
+    context = {
+        "orientation": orientation,
+        "can_view_personal_information": can_view_personal_information(request, orientation.beneficiary),
+        "back_url": get_safe_url(request, "back_url"),
+    }
+
+    return render(request, template_name, context)

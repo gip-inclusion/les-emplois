@@ -15,11 +15,12 @@ from django.utils.safestring import mark_safe
 from freezegun import freeze_time
 from pytest_django.asserts import assertHTMLEqual
 
+from itou.insertion.enums import OrientationStatus
 from itou.insertion.models import GenericReferenceItemKind
 from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.templatetags.badges import criterion_certification_badge
+from itou.utils.templatetags.badges import criterion_certification_badge, orientation_state_badge
 from itou.utils.templatetags.demo_accounts import (
     employers_accounts_tag,
     job_seekers_accounts_tag,
@@ -30,7 +31,7 @@ from itou.utils.templatetags.nav import NAV_ENTRIES
 from itou.utils.templatetags.str_filters import urlize_new_tab
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory
+from tests.insertion.factories import GenericReferenceItemFactory, OrientationFactory, ServiceFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.testing import pretty_indented
 from tests.www.eligibility_views.utils import (
@@ -426,3 +427,12 @@ class TestUrlizeNewTab:
         result = urlize_new_tab("See https://example.com and https://other.com")
         assert result.count('target="_blank"') == 2
         assert result.count('rel="noopener noreferrer"') == 2
+
+
+def test_orientation_state_badge(subtests, snapshot):
+    for status in OrientationStatus.values:
+        with subtests.test(status):
+            orientation = OrientationFactory(status=status)
+            assert str(orientation_state_badge(orientation)).replace(
+                str(orientation.id), "[PK of Orientation]"
+            ) == snapshot(name=status)

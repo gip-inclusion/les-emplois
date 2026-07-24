@@ -1,0 +1,185 @@
+{% extends "layout/base.html" %}
+{% load badges %}
+{% load components %}
+{% load format_filters %}
+{% load markdownify %}
+{% load matomo %}
+{% load str_filters %}
+
+{% block title %}
+    Demande d’orientation : {{ orientation.service.name }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info|default:"" %}
+        {% fragment as c_navinfo__info %}
+            Mise à jour le {{ orientation.updated_at|date:"d/m/Y" }}
+        {% endfragment %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>
+                {{ orientation.service.name }}
+                {% orientation_state_badge orientation extra_classes="badge-base" %}
+            </h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a href="{% url "insertion_views:service_detail" service_uid=orientation.service.uid %}?back_url={{ request.get_full_path|urlencode }}"
+               class="btn btn-lg btn-secondary"
+               {% matomo_event "orientation-detail" "clic" "voir-service" %}>
+                <span>Accéder au détail du service</span>
+            </a>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <p>Demande d’orientation ???</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+    {% block actions %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    {# Beneficiary info #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <div class="row mb-3">
+                            <div class="col-12 col-sm">
+                                <h2 class="h3">Usager</h2>
+                            </div>
+                            {% if can_view_personal_information %}
+                                <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                    <a href="{% url "job_seekers_views:details" public_id=orientation.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                       class="btn btn-ico btn-outline-primary"
+                                       aria-label="Accéder à la fiche usager de {{ orientation.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }}">
+                                        <span>Accéder à la fiche usager</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <ul class="list-data mb-3">
+                            <li>
+                                <small>Prénom</small>
+                                <strong>{{ orientation.beneficiary.first_name|title|mask_unless:can_view_personal_information }}</strong>
+                            </li>
+                            <li>
+                                <small>Nom</small>
+                                <strong>{{ orientation.beneficiary.last_name|upper|mask_unless:can_view_personal_information }}</strong>
+                            </li>
+                            {% if can_view_personal_information %}
+                                <li>
+                                    <small>Adresse e-mail</small>
+                                    {{ orientation.beneficiary.email|default:""|strong_or_disabled_non_filled }}
+                                </li>
+                                <li>
+                                    <small>Téléphone</small>
+                                    {{ orientation.beneficiary.phone|default:""|strong_or_disabled_non_filled }}
+                                </li>
+                            {% endif %}
+                            <li>
+                                <small>Contact privilégié</small>
+                                {{ orientation.beneficiary_contact_preferences_display|capfirst }}
+                            </li>
+                            {% if orientation.beneficiary_availability %}
+                                <li>
+                                    <small>Disponibilité</small>
+                                    Disponible à partir du {{ orientation.beneficiary_availability|date:"d F Y" }}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    {# Prerequisites #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2 class="h3">Conditions et critères requis</h2>
+                        <ul class="mb-0">
+                            {% for prerequisite in orientation.service.prerequisites %}
+                                <li>{{ prerequisite|markdownify }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    {# Orientation reasons #}
+                    {% if orientation.orientation_reasons %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Motifs de l’orientation</h2>
+                            <p class="mb-0 fst-italic">{{ orientation.orientation_reasons }}</p>
+                        </div>
+                    {% endif %}
+
+                    {# Attachments #}
+                    {% if orientation.attachments|length %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Pièces jointes</h2>
+                            <ul class="mb-0 list-unstyled">
+                                {% for document_name, document_url in orientation.attachments_details %}
+                                    <li>
+                                        <a href="{{ document_url }}" class="has-downloadable-file" target="_blank" rel="noopener noreferrer">{{ document_name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {# Duration #}
+                    {% if orientation.duration_weekly_hours %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Durée de la prestation</h2>
+                            <ul class="list-data mb-3">
+                                {% if orientation.duration_weeks and orientation.duration_weekly_hours %}
+                                    <li>
+                                        <small>Volume total</small>
+                                        <strong>{{ orientation.duration_total }} h</strong>
+                                    </li>
+                                {% endif %}
+                                <li>
+                                    <small>Par semaine</small>
+                                    <strong>{{ orientation.duration_weekly_hours }} h</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# Sidebar #}
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    <div class="c-box c-box--organization mb-3 mb-md-4">
+                        <span class="c-box--organization__summary">
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                            <span class="d-block h3">{{ orientation.service.structure.name }}</span>
+                        </span>
+                    </div>
+                    {% if orientation.service.contact_full_name or orientation.service.contact_email or orientation.service.contact_phone %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Contact</h2>
+                            <ul class="fs-sm list-unstyled mb-0">
+                                {% if orientation.service.contact_full_name %}
+                                    <li>
+                                        <i class="ri-user-line me-2" aria-hidden="true"></i>
+                                        <span>{{ orientation.service.contact_full_name }}</span>
+                                    </li>
+                                {% endif %}
+                                {% if orientation.service.contact_email %}
+                                    <li>
+                                        <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
+                                        <a href="mailto:{{ orientation.service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ orientation.service.contact_email }}</a>
+                                    </li>
+                                {% endif %}
+                                {% if orientation.service.contact_phone %}
+                                    <li>
+                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                        {{ orientation.service.contact_phone|format_phone }}
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

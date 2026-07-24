@@ -6,7 +6,6 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
-from django.core.files.storage import storages
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
@@ -720,4 +719,24 @@ class Orientation(models.Model):
 
     @property
     def attachments_details(self):
-        return [{"name": attachment, "url": storages["dora"].url(attachment)} for attachment in self.attachments]
+        return [(form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.attachments]
+
+    @property
+    def beneficiary_contact_preferences_display(self):
+        choices = [
+            BeneficiaryContactPreference(preference).label
+            for preference in self.beneficiary_contact_preferences
+            if preference != BeneficiaryContactPreference.OTHER.value
+        ]
+        if (
+            BeneficiaryContactPreference.OTHER.value in self.beneficiary_contact_preferences
+            and self.beneficiary_other_contact_method
+        ):
+            choices.append(f"{BeneficiaryContactPreference.OTHER.label} ({self.beneficiary_other_contact_method})")
+        return ", ".join(choices)
+
+    @property
+    def duration_total(self) -> int | None:
+        if not self.duration_weeks or not self.duration_weekly_hours:
+            return
+        return self.duration_weekly_hours * self.duration_weeks

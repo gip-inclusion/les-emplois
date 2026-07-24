@@ -629,3 +629,21 @@
   
   '''
 # ---
+# name: test_orientation_state_badge[EXPIRÉE]
+  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-emploi-light">Expirée</span>'
+# ---
+# name: test_orientation_state_badge[MODÉRATION_EN_COURS]
+  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03">En cours de modération</span>'
+# ---
+# name: test_orientation_state_badge[MODÉRATION_REJETÉE]
+  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger">Rejetée par la modération</span>'
+# ---
+# name: test_orientation_state_badge[OUVERTE]
+  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info">En cours de traitement</span>'
+# ---
+# name: test_orientation_state_badge[REFUSÉE]
+  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger">Refusée</span>'
+# ---
+# name: test_orientation_state_badge[VALIDÉE]
+  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success">Validée</span>'
+# ---
