@@ -1,4 +1,6 @@
+import datetime
 import json
+import uuid
 from functools import partial
 from unittest.mock import patch
 
@@ -6,24 +8,31 @@ import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
+from freezegun import freeze_time
 from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertTemplateUsed
 
-from itou.insertion.enums import MobilizationEventKind
+from itou.companies.models import CompanyMembership
+from itou.insertion.enums import BeneficiaryContactPreference, MobilizationEventKind, OrientationStatus
 from itou.insertion.models import (
     SOURCE_DORA_VALUE,
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEvent,
 )
+from itou.job_applications.enums import SenderKind
+from itou.prescribers.models import PrescriberMembership
+from tests.companies.factories import CompanyMembershipFactory
 from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
+    OrientationFactory,
     RemoteReceptionFactory,
     ServiceFactory,
     StructureFactory,
 )
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -945,6 +954,277 @@ class TestServices:
         response = client.get(self.get_service_url(service))
 
         assertion(response, f'body.set("service_uid", "{service.uid}");')
+
+
+class TestOrientationDetails:
+    def get_orientation_url(self, orientation):
+        return reverse("insertion_views:orientation_details", kwargs={"orientation_id": orientation.id})
+
+    def get_job_seeker_details_url(self, job_seeker):
+        return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    @freeze_time("2026-07-24")
+    def test_detail_basic_dora(self, client, snapshot):
+        service = ServiceFactory(
+            uid="source--service",
+            name="S’hair vice",
+            updated_on="2025-01-15",
+            source__value="dora",
+            source__label="Dora",
+            source_link="https://domain.fake/services/test-service-uid",
+            # dora-only fields — should appear
+            access_conditions_dora=["Avoir plus de 18 ans", "Résider en France"],
+            credentials=["Pièce d'identité en cours de validité"],
+            # DI-only field — should NOT appear
+            access_conditions_di="Ne doit pas apparaître pour dora",
+            structure__name="Gonflable",
+            structure__uid="structure-uid",
+        )
+
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        user = membership.user
+        organization = membership.organization
+
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+
+        orientation = OrientationFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            beneficiary=beneficiary,
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+            service=service,
+        )
+
+        client.force_login(user)
+
+        with assertSnapshotQueries(snapshot(name="queries")):
+            response = client.get(self.get_orientation_url(orientation))
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="page")
+        assertContains(response, self.get_job_seeker_details_url(beneficiary))
+
+    @freeze_time("2026-07-24")
+    def test_detail_basic_not_dora(self, client, snapshot):
+        service = ServiceFactory(
+            uid="source--service",
+            name="S’hair vice",
+            updated_on="2025-01-15",
+            source__value="other",
+            source__label="Other",
+            # DI-only field — should appear
+            access_conditions_di="Être orienté par un prescripteur\\nAvoir 18 ans",
+            # dora-only fields — should NOT appear
+            access_conditions_dora=["Ne doit pas apparaître pour data·inclusion"],
+            credentials=["Ne doit pas apparaître pour data·inclusion"],
+            structure__name="Gonflable",
+            structure__uid="structure-uid",
+        )
+
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        user = membership.user
+        organization = membership.organization
+
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+
+        orientation = OrientationFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            beneficiary=beneficiary,
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+            service=service,
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="page")
+        assertContains(response, self.get_job_seeker_details_url(beneficiary))
+
+    @freeze_time("2026-07-24")
+    def test_detail_with_all_fields_dora(self, client, snapshot):
+        service = ServiceFactory(
+            uid="test-service-full-uid",
+            name="Service complet",
+            updated_on="2025-06-01",
+            source__value="dora",
+            access_conditions_dora=["Être orienté par un prescripteur."],
+            mobilizations_details="Contacter le service par téléphone.",
+            contact_email="contact@service.fr",
+            contact_phone="01 23 45 67 89",
+            structure__name="Structure complète",
+            structure__uid="structure-uid",
+        )
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+
+        for membership_factory in [
+            partial(PrescriberMembershipFactory, organization__authorized=True),
+            CompanyMembershipFactory,
+        ]:
+            # Output should be the same for prescribers and employers
+            membership = membership_factory()
+            user = membership.user
+            organization = membership.organization if isinstance(membership, PrescriberMembership) else None
+            company = membership.company if isinstance(membership, CompanyMembership) else None
+
+            orientation = OrientationFactory(
+                id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+                beneficiary=beneficiary,
+                sender=user,
+                sender_prescriber_organization=organization,
+                sender_company=company,
+                sender_kind=SenderKind.PRESCRIBER if organization else SenderKind.EMPLOYER,
+                service=service,
+                beneficiary_contact_preferences=[
+                    BeneficiaryContactPreference.EMAIL,
+                    BeneficiaryContactPreference.PHONE,
+                    BeneficiaryContactPreference.OTHER,
+                ],
+                beneficiary_other_contact_method="courrier postal",
+                beneficiary_availability=datetime.date(2026, 7, 31),
+                requirements=["NonAffiché"],
+                situation=["NonAffiché"],
+                situation_other="NonAffiché",
+                referent_last_name="NonAffiché",
+                referent_first_name="NonAffiché",
+                referent_email="NonAffiché",
+                referent_phone="NonAffiché",
+                orientation_reasons="Pour améliorer l’embauchabilité de cette bénéficiaire.",
+                status=OrientationStatus.ACCEPTED,
+                processing_date=datetime.datetime(2099, 12, 31, 23, 59, tzinfo=datetime.UTC),  # not displayed
+                duration_weekly_hours=5,
+                duration_weeks=8,
+                data_protection_commitment=False,  # not displayed
+                attachments=[
+                    "staging/#orientations/7d6dnkQ2E4bz7slKI5mKOnJG15PYQRtQ/cv.pdf",
+                ],
+            )
+
+            client.force_login(user)
+            response = client.get(self.get_orientation_url(orientation))
+
+            assert pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector="#main",
+                    replace_in_attr=[("href", orientation.attachments_details[0][1], "[computed URL of attachment]")],
+                )
+            ) == snapshot(name="page")
+            assertNotContains(response, "NonAffiché")
+
+            orientation.delete()
+
+    @pytest.mark.parametrize(
+        "user_factory,status_code",
+        [
+            (ItouStaffFactory, 403),
+            (JobSeekerFactory, 403),
+            (partial(LaborInspectorFactory, membership=True), 403),
+            (partial(PrescriberFactory, membership=True), 404),  # authorized but not in the the sender org
+            (partial(EmployerFactory, membership=True), 404),  # authorized but not in the sender org
+        ],
+    )
+    def test_no_access(self, client, user_factory, status_code):
+        orientation = OrientationFactory()
+        client.force_login(user_factory())
+        response = client.get(self.get_orientation_url(orientation))
+        assert response.status_code == status_code
+
+    def test_access_members_of_sender_prescriber_org(self, client):
+        membership = PrescriberMembershipFactory()
+        user = membership.user
+        organization = membership.organization
+        other_user = PrescriberMembershipFactory(organization=organization).user
+
+        orientation = OrientationFactory(
+            sender=other_user, sender_kind=SenderKind.PRESCRIBER, sender_prescriber_organization=organization
+        )
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+        assertContains(response, orientation.service.name)
+
+    def test_access_members_of_sender_company(self, client):
+        membership = CompanyMembershipFactory()
+        user = membership.user
+        company = membership.company
+        other_user = CompanyMembershipFactory(company=company).user
+
+        orientation = OrientationFactory(
+            sender=other_user,
+            sender_kind=SenderKind.EMPLOYER,
+            sender_prescriber_organization=None,
+            sender_company=company,
+        )
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+        assertContains(response, orientation.service.name)
+
+    def test_non_authorized_prescriber_cannot_see_pii(self, client):
+        service = ServiceFactory(
+            uid="test-service-uid",
+            name="Service complet",
+            source__value="dora",
+            access_conditions_dora=["Être orienté par un prescripteur."],
+            mobilizations_details="Contacter le service par téléphone.",
+        )
+
+        membership = PrescriberMembershipFactory()
+        user = membership.user
+        organization = membership.organization
+
+        beneficiary = JobSeekerFactory(
+            first_name="Marimprobable",
+            last_name="Astellrare",
+            email="marimprobable.astell@email.fake",
+            phone="0987654321",
+        )
+
+        orientation = OrientationFactory(
+            beneficiary=beneficiary,
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+            service=service,
+            orientation_reasons="Pour améliorer l’embauchabilité de cette bénéficiaire.",
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+
+        assertNotContains(response, beneficiary.first_name)
+        assertContains(response, "<strong>M…</strong>", html=True)
+        assertNotContains(response, beneficiary.last_name)
+        assertContains(response, "<strong>A…</strong>", html=True)
+        assertNotContains(response, beneficiary.email)
+        assertNotContains(response, beneficiary.phone)
+        assertNotContains(response, self.get_job_seeker_details_url(beneficiary))
+
+    @pytest.mark.parametrize("is_active, assertion", [(True, assertContains), (False, assertNotContains)])
+    def test_hide_service_link_if_inactive(self, client, is_active, assertion):
+        service = ServiceFactory(is_active=is_active)
+
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        user = membership.user
+        organization = membership.organization
+
+        orientation = OrientationFactory(
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+            service=service,
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_orientation_url(orientation))
+        service_url = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+        servce_button_markup = f"""<a href="{service_url}?back_url={self.get_orientation_url(orientation)}"
+                                      class="btn btn-lg btn-secondary" data-matomo-event="true"
+                                      data-matomo-category="orientation-detail" data-matomo-action="clic"
+                                      data-matomo-option="voir-service">
+                <span>Accéder au détail du service</span>
+            </a>"""
+        assertion(response, servce_button_markup, html=True)
 
 
 @pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])

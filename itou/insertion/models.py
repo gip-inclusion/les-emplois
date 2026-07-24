@@ -766,3 +766,9 @@ class Orientation(models.Model):
             else BeneficiaryContactPreference(preference).label
             for preference in self.beneficiary_contact_preferences
         )
+
+    @property
+    def duration_total(self) -> int | None:
+        if not self.duration_weeks or not self.duration_weekly_hours:
+            return
+        return self.duration_weekly_hours * self.duration_weeks
