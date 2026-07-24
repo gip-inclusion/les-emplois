@@ -77,7 +77,8 @@ class Command(BaseCommand):
             self.logger.info("Found %d keys to remove from S3.", len(to_remove))
             # https://docs.aws.amazon.com/boto3/latest/reference/services/s3/client/delete_objects.html
             # > The request can contain a list of up to 1,000 keys that you want to delete.
-            for batch in batched(to_remove, 1_000):
+            # But 1_000 ended up with a ReadTimeout: batches of 100 seem to be handled in ~40 seconds
+            for batch in batched(to_remove, 100):
                 self.logger.info("Deleting %d keys from S3.", len(batch))
                 response = client.delete_objects(
                     Bucket=settings.AWS_STORAGE_BUCKET_NAME,
