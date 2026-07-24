@@ -19,7 +19,7 @@ from pytest_django.asserts import (
 )
 
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
-from itou.otp.utils import create_otp_backup_code
+from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory
@@ -42,31 +42,106 @@ def attach_device_to_user_session(client, device):
     session.save()
 
 
-@pytest.mark.parametrize(
-    "factory,expected_status",
-    [
-        (JobSeekerFactory, 403),
-        (partial(EmployerFactory, membership=True), 200),
-        (partial(PrescriberFactory, membership=True), 200),
-        (partial(LaborInspectorFactory, membership=True), 200),
-        (ItouStaffFactory, 200),
-    ],
-)
-def test_permissions(client, factory, expected_status):
-    user = factory()
-    client.force_login(user)
-    response = client.get(reverse("otp_views:otp_devices"))
-    assert response.status_code == expected_status
+def attach_external_device_to_user_session(client, user):
+    # Mimic a ProConnect login through an identity provider that already implements MFA.
+    session = client.session
+    session[DEVICE_ID_SESSION_KEY] = create_placeholder_for_external_totp_device(user).persistent_id
+    session.save()
 
-    response = client.get(reverse("otp_views:enrollment_step_1_choose_device_type"))
-    assert response.status_code == expected_status
+
+OTP_URL_NAMES = [
+    "otp_devices",
+    "enrollment_step_0_intro",
+    "enrollment_step_1_choose_device_type",
+    "enrollment_step_2_and_3_confirm_device",
+    "verify_otp",
+    "login_with_backup_code",
+]
+ENROLLMENT_URL_NAMES = [
+    "enrollment_step_0_intro",
+    "enrollment_step_1_choose_device_type",
+]
+
+
+class TestPermissions:
+    """Pages of the OTP section are hidden (404) from users for whom our own 2FA is not
+    required: job seekers, users of an organization that is not in the allowlist, and users
+    whose identity provider already handled MFA for this session."""
+
+    @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
+    @pytest.mark.parametrize(
+        "factory",
+        [
+            JobSeekerFactory,
+            partial(EmployerFactory, membership=True),
+            partial(PrescriberFactory, membership=True),
+            partial(LaborInspectorFactory, membership=True),
+            ItouStaffFactory,
+        ],
+    )
+    def test_hidden_when_otp_is_not_required(self, client, factory, url_name, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = False
+        settings.REQUIRE_MFA_FOR_PROS = False
+        client.force_login(factory())
+        response = client.get(reverse(f"otp_views:{url_name}"))
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
+    def test_visible_for_a_concerned_user_with_a_device(self, client, settings, url_name):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+        client.force_login(user)
+        attach_device_to_user_session(client, ItouTOTPDeviceFactory(user=user))
+        response = client.get(reverse(f"otp_views:{url_name}"))
+        if url_name == "enrollment_step_2_and_3_confirm_device":
+            # without a `device_type` query param it redirects to step-1
+            assert response.status_code == 302
+        else:
+            assert response.status_code == 200
+
+    @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
+    def test_hidden_without_a_device_but_for_enrollment(self, client, settings, url_name):
+        # A concerned user without any enabled device is sent to enrollment by the middleware:
+        # the other pages have nothing to show
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+        device = ItouTOTPDeviceFactory(user=user)
+        client.force_login(user)
+        attach_device_to_user_session(client, device)  # avoid the middleware redirection
+        device.disabled_at = timezone.now()
+        device.save(update_fields=["disabled_at"])
+
+        response = client.get(reverse(f"otp_views:{url_name}"))
+        if url_name == "enrollment_step_2_and_3_confirm_device":
+            # without a `device_type` query param it redirects to step-1
+            assert response.status_code == 302
+        elif url_name in ENROLLMENT_URL_NAMES:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 404
+
+    @pytest.mark.parametrize("with_device", [True, False])
+    @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
+    def test_hidden_when_mfa_comes_from_identity_provider(self, client, settings, url_name, with_device):
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = EmployerFactory(membership=True)
+        settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
+        if with_device:
+            ItouTOTPDeviceFactory(user=user)  # shouldn't happen anyway
+        client.force_login(user)
+        attach_external_device_to_user_session(client, user)
+
+        response = client.get(reverse(f"otp_views:{url_name}"))
+        assert response.status_code == 404
 
 
 class TestConfigurationOtpMenuLink:
-    """The "Configuration OTP" item in the "Mon espace" dropdown is shown to every user
-    concerned by 2FA (`user_is_concerned_by_otp`), not only to staff."""
+    """The "Configuration 2FA" item in the "Mon espace" dropdown is shown to every user
+    concerned by 2FA (`user_is_concerned_by_otp`), not only to staff, provided they enrolled
+    at least one device of ours (users whose identity provider handles MFA have nothing to
+    configure here)."""
 
-    OTP_CONFIG_MARKUP = ">Configuration OTP</a>"
+    OTP_CONFIG_MARKUP = ">Configuration 2FA</a>"
 
     def _get_dashboard(self, client, user, verified=False):
         client.force_login(user)
@@ -97,9 +172,34 @@ class TestConfigurationOtpMenuLink:
         response = self._get_dashboard(client, ItouStaffFactory(), verified=True)
         assertContains(response, self.OTP_CONFIG_MARKUP)
 
+    def test_hidden_when_mfa_comes_from_identity_provider(self, client, settings):
+        # The user is concerned by 2FA but was verified by ProConnect: they never enroll
+        # a TOTP device on our side, so there is nothing to configure
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = EmployerFactory(membership=True)
+        settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
+        client.force_login(user)
+        attach_external_device_to_user_session(client, user)
+        response = client.get(reverse("dashboard:index"), follow=True)
+        assertNotContains(response, self.OTP_CONFIG_MARKUP)
+
+    def test_hidden_when_only_device_is_disabled(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+        device = ItouTOTPDeviceFactory(user=user)
+        client.force_login(user)
+        attach_device_to_user_session(client, device)
+        device.disabled_at = timezone.now()
+        device.save(update_fields=["disabled_at"])
+        response = client.get(reverse("dashboard:index"), follow=True)
+        assertNotContains(response, self.OTP_CONFIG_MARKUP)
+        # anyway, the user is redirected to enrollment by the middleware,
+        # they cannot reach the dashboard with a disabled device
+
 
 @freeze_time("2025-03-11 05:18:56")
-def test_device_list(client, snapshot):
+def test_device_list(client, snapshot, settings):
+    settings.REQUIRE_OTP_FOR_STAFF = True
     user = ItouStaffFactory()
     device = ItouTOTPDeviceFactory(user=user, name="Mon appareil")
 
@@ -176,7 +276,8 @@ def test_delete_devices(client, snapshot, settings):
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
 
 
-def test_enrollment_step_0_intro(client):
+def test_enrollment_step_0_intro(client, settings):
+    settings.REQUIRE_OTP_FOR_STAFF = True
     user = ItouStaffFactory()
 
     client.force_login(user)
@@ -185,7 +286,8 @@ def test_enrollment_step_0_intro(client):
     assertContains(response, "Nous vous guidons étape par étape")
 
 
-def test_enrollment_step_1_choose_device_type(client):
+def test_enrollment_step_1_choose_device_type(client, settings):
+    settings.REQUIRE_OTP_FOR_STAFF = True
     user = ItouStaffFactory()
 
     client.force_login(user)
@@ -195,6 +297,11 @@ def test_enrollment_step_1_choose_device_type(client):
 
 
 class TestEnrollmentSteps2And3ConfirmDevice:
+    @pytest.fixture(autouse=True)
+    def require_otp_for_staff(self, settings):
+        # Enrollment pages are only reachable when our own 2FA applies to the user
+        settings.REQUIRE_OTP_FOR_STAFF = True
+
     @pytest.mark.parametrize(
         "device_type,should_show_qr_code",
         (
@@ -280,6 +387,8 @@ class TestEnrollmentSteps2And3ConfirmDevice:
             name="existing",
             user=user,
         )
+        # The user already enrolled a device: they must be verified to add another one.
+        attach_device_to_user_session(client, existing_user_device)
         new_devices = user.itou_totp_devices.exclude(pk=existing_user_device.pk)
         fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
 
