@@ -1,6 +1,15 @@
+import pytest
 from django.utils import timezone
 
-from itou.otp.utils import _require_otp_for_pro, get_user_devices, user_is_concerned_by_otp
+from itou.otp.utils import (
+    _require_otp_for_pro,
+    create_placeholder_for_external_totp_device,
+    get_user_devices,
+    user_can_enroll_otp_device,
+    user_can_manage_otp_devices,
+    user_is_concerned_by_otp,
+    user_uses_external_mfa,
+)
 from tests.companies.factories import CompanyMembershipFactory
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -78,3 +87,48 @@ class TestUserIsConcernedByOtp:
         settings.REQUIRE_OTP_FOR_STAFF = True
         settings.REQUIRE_MFA_FOR_PROS = True
         assert not user_is_concerned_by_otp(JobSeekerFactory())
+
+
+class TestUserCanUseOtp:
+    """`user_can_enroll_otp_device` and `user_can_manage_otp_devices` gate both the OTP
+    section and its menu link."""
+
+    def test_not_concerned_by_otp(self, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = False
+        user = ItouStaffFactory()
+        ItouTOTPDeviceFactory(user=user)
+
+        assert not user_can_enroll_otp_device(user)
+        assert not user_can_manage_otp_devices(user)
+
+    def test_concerned_by_otp(self, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+
+        # Without a device, there is nothing to manage yet
+        assert user_can_enroll_otp_device(user)
+        assert not user_can_manage_otp_devices(user)
+
+        ItouTOTPDeviceFactory(user=user)
+        assert user_can_manage_otp_devices(user)
+
+    def test_disabled_device_is_ignored(self, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+        ItouTOTPDeviceFactory(user=user, disabled_at=timezone.now())
+
+        assert not user_can_manage_otp_devices(user)
+
+    @pytest.mark.parametrize("with_device", [True, False])
+    def test_mfa_handled_by_identity_provider(self, settings, with_device):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+        if with_device:
+            ItouTOTPDeviceFactory(user=user)
+        # Mimic `OtpMiddleware` for a session verified through ProConnect
+        user.otp_device = create_placeholder_for_external_totp_device(user)
+
+        assert user_uses_external_mfa(user)
+        # It would only confuse the user and our support team
+        assert not user_can_enroll_otp_device(user)
+        assert not user_can_manage_otp_devices(user)

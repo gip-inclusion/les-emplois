@@ -9,13 +9,20 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import default_key as generate_otp_key
 
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice
-from itou.otp.utils import create_otp_backup_code, get_user_devices, notify_backup_code_has_been_used
-from itou.utils.auth import check_user
+from itou.otp.utils import (
+    create_otp_backup_code,
+    get_user_devices,
+    notify_backup_code_has_been_used,
+    user_can_enroll_otp_device,
+    user_can_manage_otp_devices,
+)
+from itou.utils.auth import check_user_or_404
 from itou.utils.readonly import http_methods
 from itou.utils.urls import get_safe_url
 from itou.www.otp_views.enums import DeviceType
@@ -23,11 +30,13 @@ from itou.www.otp_views.forms import ConfirmTOTPDeviceForm, LoginWithBackupCodeF
 
 
 logger = logging.getLogger(__name__)
-check_user_for_otp = check_user(lambda user: user.is_staff or user.is_professional)
+
+check_user_can_enroll = check_user_or_404(user_can_enroll_otp_device)
+check_user_can_manage_devices = check_user_or_404(user_can_manage_otp_devices)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_user_for_otp
+@check_user_can_manage_devices
 def otp_devices(request, template_name="otp_views/otp_devices.html"):
     devices = get_user_devices(request.user)
     if request.method == "POST":
@@ -44,7 +53,7 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
     return render(request, template_name, context)
 
 
-@check_user_for_otp
+@check_user_can_enroll
 def enrollment_step_0_intro(request, template_name="otp_views/enrollment_step_0_intro.html"):
     after_recovery = "after_recovery" in request.GET
     if after_recovery:
@@ -59,14 +68,14 @@ def enrollment_step_0_intro(request, template_name="otp_views/enrollment_step_0_
     return render(request, template_name, context)
 
 
-@check_user_for_otp
+@check_user_can_enroll
 def enrollment_step_1_choose_device_type(request, template_name="otp_views/enrollment_step_1_choose_device_type.html"):
     context = {"next_step_url": reverse("otp_views:enrollment_step_2_and_3_confirm_device")}
     return render(request, template_name, context)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_user_for_otp
+@check_user_can_enroll
 def enrollment_step_2_and_3_confirm_device(
     request, template_name="otp_views/enrollment_step_2_and_3_confirm_device.html"
 ):
@@ -122,6 +131,7 @@ def enrollment_step_2_and_3_confirm_device(
     return render(request, template_name, context)
 
 
+@method_decorator(check_user_can_manage_devices, name="dispatch")
 class VerifyOTPView(FormView):
     template_name = "otp_views/verify_otp.html"
     form_class = VerifyOTPForm
@@ -142,15 +152,10 @@ class VerifyOTPView(FormView):
         return get_safe_url(self.request, REDIRECT_FIELD_NAME, reverse("dashboard:index"))
 
 
-@check_user_for_otp
+@check_user_can_manage_devices
 def login_with_backup_code(request, template_name="otp_views/login_with_backup_code.html"):
     static_device = ItouStaticDevice.objects.filter(user=request.user).first()
     if not static_device:
-        if not get_user_devices(request.user):
-            # Direct access to this route without any enrolled device.
-            # Reject by redirecting to dashboard, user will be
-            # redirected if an OTP is required.
-            return HttpResponseRedirect(reverse("dashboard:index"))
         # If user enrolled a device after June 2026, they must have a
         # static device (backup code). If they enrolled before (which
         # is the case for most staff users), they don't have a static

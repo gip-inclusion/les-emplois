@@ -82,6 +82,7 @@ from tests.institutions.factories import (
     InstitutionMembershipFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
+from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -1631,7 +1632,7 @@ def test_geiq_eligibility_badge(snapshot, is_eligible, for_job_seeker):
     assert badges.geiq_eligibility_badge(is_eligible=is_eligible, for_job_seeker=for_job_seeker) == snapshot
 
 
-def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):
+def test_active_announcement_campaign_context_processor(client, settings, empty_active_announcements_cache):
     AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 
     response = client.get(reverse("search:employers_results"))
@@ -1643,7 +1644,12 @@ def test_active_announcement_campaign_context_processor(client, empty_active_ann
     assert response.status_code == 200
     assert response.context["display_campaign_announce"] is True
 
-    client.force_login(ItouStaffFactory())
+    # The OTP verification page is only reachable by a user who must use our own 2FA
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    staff_user = ItouStaffFactory()
+    ItouTOTPDeviceFactory(user=staff_user)
+    client.force_login(staff_user)
+
     response = client.get(reverse("otp_views:verify_otp") + "?next=%2Fadmin%2F")
     assert response.status_code == 200
     assert response.context["display_campaign_announce"] is False
