@@ -12,12 +12,4 @@ urlpatterns = [
     path("invite_employer", views.InviteEmployerView.as_view(), name="invite_employer"),
     path("<str:invitation_type>/<uuid:invitation_id>/new_user", views.new_user, name="new_user"),
     path("<str:invitation_type>/<uuid:invitation_id>/join", views.join, name="join"),
-    # FIXME(alaurent) Remove after 2026/06/22
-    path("<uuid:invitation_id>/join_institution", views.join_institution, name="join_institution"),
-    path(
-        "<uuid:invitation_id>/join_prescriber_organization",
-        views.join_prescriber_organization,
-        name="join_prescriber_organization",
-    ),
-    path("<uuid:invitation_id>/join-company", views.join_company, name="join_company"),
 ]
