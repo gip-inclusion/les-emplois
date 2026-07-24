@@ -87,7 +87,7 @@ class _API_PersonSerializer(serializers.Serializer):
 
     civilite = serializers.ChoiceField(choices=Title.choices, source="job_application.job_seeker.title")
     nomUsage = serializers.SerializerMethodField()
-    nomNaissance = NullField()
+    nomNaissance = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.birth_name")
     prenom = serializers.SerializerMethodField()
     dateNaissance = serializers.DateField(
         format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
