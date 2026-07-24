@@ -46,7 +46,6 @@ from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.badges import job_application_state_badge
-from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from itou.www.apply.views.accept_views import ACCEPT_SESSION_KIND, initialize_accept_session
@@ -66,7 +65,6 @@ from tests.eligibility.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import get_session_name, parse_response_to_soup
@@ -343,11 +341,6 @@ class TestProcessAcceptViewsInWizard:
 
         # test how hiring_end_date is displayed
         response = client.get(next_url)
-        assertNotContains(
-            response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
-        )
         # test case hiring_end_at
         if hiring_end_at:
             assertContains(
@@ -480,11 +473,6 @@ class TestProcessAcceptViewsInWizard:
 
         # test how hiring_end_date is displayed
         response = client.get(next_url)
-        assertNotContains(
-            response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
-        )
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 

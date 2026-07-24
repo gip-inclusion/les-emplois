@@ -818,12 +818,28 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__title=Title.M,
             eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
             eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
+            eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id="1234567A",
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
         job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
 
         client.force_login(selected_criteria.eligibility_diagnosis.author)
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id})
+        response = client.get(url)
+        assertContains(
+            response,
+            "Certaines données d’identité sont verrouillées",
+            count=1,
+        )
+        assertContains(
+            response,
+            (
+                "Vous ne pouvez pas modifier les données d'identité de cet usager car son profil "
+                "est désormais lié à une certification par les services de l'État."
+            ),
+            count=1,
+        )
         new_birthdate = datetime.date(1978, 12, 20)
         post_data = {
             "title": "M",
@@ -835,21 +851,16 @@ class TestEditJobSeekerInfo:
             "birth_place": (
                 Commune.objects.filter(start_date__lte=new_birthdate, end_date__gte=new_birthdate).first().pk
             ),
+            "pole_emploi_id": "9876543Z",
             **self.address_form_fields,
         }
 
-        response = client.post(
-            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            data=post_data | {"preview": 1},
-        )
+        response = client.post(url, data=post_data | {"preview": 1})
         assert pretty_indented(parse_response_to_soup(response, selector="#ask_for_confirmation_modal")) == snapshot(
             name="modal"
         )
 
-        response = client.post(
-            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            data=post_data | {"confirm": 1},
-        )
+        response = client.post(url, data=post_data | {"confirm": 1})
         assertRedirects(response, reverse("dashboard:index"))
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
@@ -903,56 +914,31 @@ class TestEditJobSeekerInfo:
         for attr in profile_fields:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
-    def test_pe_connect_empty_title_is_editable(self, client, mocker):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
-        org = prescribers_factories.PrescriberOrganizationFactory()
-        member = prescribers_factories.PrescriberMembershipFactory(organization=org).user
-        birthdate = datetime.date(1978, 12, 1)
-        job_seeker = JobSeekerFactory(
-            identity_provider=IdentityProvider.PE_CONNECT,
-            title="",
-            created_by=member,
-            jobseeker_profile__nir="178121111111151",
-            jobseeker_profile__birthdate=birthdate,
-        )
+    @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT])
+    def test_edit_job_seeker_sso_alert(self, client, identity_provider):
+        ALERT_COMPONENT = {
+            IdentityProvider.FRANCE_CONNECT: (
+                "Ces informations proviennent du service partenaire avec lequel il s’est connecté (impots.gouv.fr, "
+                "Améli, La Poste, …). Invitez-le à effectuer les modifications directement sur le service "
+                "partenaire, elles seront automatiquement répercutées ici lors de sa prochaine connexion."
+            ),
+            IdentityProvider.PE_CONNECT: (
+                "Invitez-le à effectuer les modifications directement sur "
+                '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
+                'class="has-external-link">France Travail</a>. '
+                "Les changements seront automatiquement répercutés ici lors de sa prochaine connexion."
+            ),
+        }
 
-        client.force_login(member)
+        prescriber = prescribers_factories.PrescriberMembershipFactory(organization__authorized=True).user
+        job_seeker = JobSeekerFactory(identity_provider=identity_provider)
+
+        client.force_login(prescriber)
         url = reverse(
             "dashboard:edit_job_seeker_info",
             kwargs={"job_seeker_public_id": job_seeker.public_id},
         )
-
-        # The 'civilité' field, being empty, should NOT be disabled...
         response = client.get(url)
-        form = response.context["form"]
-        assert form["title"].field.disabled is False
-        # ... but the fields provided by the SSO stay disabled
-        for name in ["first_name", "last_name", "email", "birthdate"]:
-            assert form[name].field.disabled is True
 
-        # ... and submitting with a 'civilité' should succeed
-        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
-        response = client.post(
-            url,
-            {
-                "title": Title.M,
-                "first_name": job_seeker.first_name,
-                "last_name": job_seeker.last_name,
-                "email": job_seeker.email,
-                "birthdate": birthdate.isoformat(),
-                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
-                "birth_place": birth_place.pk,
-                "confirm": True,
-                **self.address_form_fields,
-            },
-        )
-        assertRedirects(response, reverse("dashboard:index"))
-        job_seeker.refresh_from_db()
-        assert job_seeker.title == Title.M
-
-        # Once filled in, the civilité is no longer empty -> it is now disabled
-        response = client.get(url)
-        assert response.context["form"]["title"].field.disabled is True
+        assertContains(response, f"Les informations d’identité de cet usager viennent de {identity_provider.label}")
+        assertContains(response, ALERT_COMPONENT[identity_provider])

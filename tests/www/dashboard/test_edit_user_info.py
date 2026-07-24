@@ -1,5 +1,6 @@
 import math
 from datetime import UTC, date, datetime
+from functools import partial
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -15,9 +16,7 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploi
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from itou.utils.urls import get_zendesk_form_url
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
@@ -76,11 +75,6 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
         with assertSnapshotQueries(snapshot):
             response = client.get(url)
-        assertNotContains(
-            response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
-        )
         # There's a specific view to edit the email so we don't show it here
         assertNotContains(response, self.EMAIL_LABEL)
         # Check that the NIR field is disabled
@@ -631,6 +625,7 @@ class TestEditUserInfoView:
             born_in_france=True,
             jobseeker_profile__birthdate=date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__pole_emploi_id="1234567A",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -642,8 +637,15 @@ class TestEditUserInfoView:
         response = client.get(url)
         assertContains(
             response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
+            "Certaines données d’identité sont verrouillées",
+            count=1,
+        )
+        assertContains(
+            response,
+            (
+                "Certaines de vos données personnelles ne sont pas modifiables car "
+                "votre identité a été officiellement certifiée par les services de l'État."
+            ),
             count=1,
         )
         birthdate = date(1978, 12, 1)
@@ -664,6 +666,7 @@ class TestEditUserInfoView:
                 "city": "Saint-Malo",
                 "lack_of_nir": False,
                 "nir": job_seeker.jobseeker_profile.nir,
+                "pole_emploi_id": "9876543Z",
             },
         )
         assertRedirects(response, reverse("dashboard:index"))
@@ -815,3 +818,46 @@ class TestEditUserInfoView:
         assert updated_user.first_name == original_user.first_name
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
+
+    @pytest.mark.parametrize(
+        "user_factory,identity_provider",
+        [
+            (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT),
+            (JobSeekerFactory, IdentityProvider.PE_CONNECT),
+            (partial(PrescriberFactory, membership=True), IdentityProvider.PRO_CONNECT),
+        ],
+        ids=[
+            "job_seeker_with_france_connect",
+            "job_seeker_with_ft_connect",
+            "professional_with_pro_connect",
+        ],
+    )
+    def test_edit_user_sso_alert(self, client, user_factory, identity_provider):
+        ALERT_COMPONENT = {
+            IdentityProvider.FRANCE_CONNECT: (
+                "Votre état civil est certifié par le service partenaire avec lequel vous vous êtes connecté "
+                "(impots.gouv.fr, Améli, La Poste, …). Effectuez les modifications directement sur le service "
+                "partenaire, elles seront automatiquement répercutées ici lors de votre prochaine connexion."
+            ),
+            IdentityProvider.PE_CONNECT: (
+                "Pour les modifier, rendez-vous directement sur "
+                '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
+                'class="has-external-link">France Travail</a>. '
+                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
+            ),
+            IdentityProvider.PRO_CONNECT: (
+                "Pour les modifier, rendez-vous directement sur "
+                '<a href="https://candidat.francetravail.fr/espacepersonnel/" '
+                'class="has-external-link">France Travail</a>. '
+                "Les changements seront automatiquement répercutés ici lors de votre prochaine connexion."
+            ),
+        }
+
+        user = user_factory(identity_provider=identity_provider)
+
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = client.get(url)
+
+        assertContains(response, f"Vos informations d’identité viennent de {identity_provider.label}")
+        assertContains(response, ALERT_COMPONENT[identity_provider])

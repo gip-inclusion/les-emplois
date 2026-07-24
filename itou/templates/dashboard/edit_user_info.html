@@ -18,6 +18,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    {% include "dashboard/includes/edit_job_seeker_sso_alert.html" with user=request.user viewing_self=True only %}
                     <div class="c-form">
                         <h2 class="h3">Informations personnelles</h2>
                         {% if request.user.is_job_seeker and not request.user.title %}
