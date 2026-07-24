@@ -16,6 +16,7 @@ from pytest_django.asserts import (
 
 from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import KIND_EMPLOYER
 from itou.users.models import User
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -641,7 +642,9 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
         invitation = EmployerInvitationFactory(company=company)
         user = EmployerFactory(email=invitation.email)
         client.force_login(user)
-        join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
+        join_url = reverse(
+            "invitations_views:join", kwargs={"invitation_type": KIND_EMPLOYER, "invitation_id": invitation.id}
+        )
         response = client.get(join_url, follow=True)
         assertContains(response, escape("Ce lien n'est plus valide."))
 
