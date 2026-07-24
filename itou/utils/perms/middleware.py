@@ -189,18 +189,9 @@ class ItouCurrentOrganizationMiddleware:
             elif not request.path.startswith("/otp/enrollment"):
                 return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
-        # Nexus : Whitelist for Nexus views
-        # FIXME: Remove once we merge prescribers and employers
-        if (
-            user.is_authenticated
-            and user.is_professional
-            and any(
-                [
-                    request.path.startswith("/portal"),
-                    request.path.startswith("/signup/siae/select"),
-                ]
-            )
-        ):
+        # FIXME: This will soon be removed along with Nexus views
+        # Nexus : Allow views without organization
+        if user.is_authenticated and user.is_professional and request.path.startswith("/portal"):
             return self.get_response(request)
 
         if logout_warning is not None:
