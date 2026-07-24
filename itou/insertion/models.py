@@ -534,7 +534,15 @@ class MobilizationEvent(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name="+")
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE, related_name="+")
     service_external_link = models.CharField(verbose_name="lien externe", blank=True)
-    created_at = models.DateTimeField(verbose_name="date de création", auto_now=True)
+    orientation = models.ForeignKey(
+        "Orientation",
+        verbose_name="orientation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mobilization_events",
+    )
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
 
     objects = MobilizationEventManager()
 
@@ -713,6 +721,26 @@ class Orientation(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    @classmethod
+    def from_data(cls, service, beneficiary, sender, **kwargs):
+        return cls(service=service, beneficiary=beneficiary, sender=sender, **kwargs)
+
+    def link_mobilization_event(self, *, session_key, user):
+        event = (
+            MobilizationEvent.objects.filter(
+                kind=MobilizationEventKind.SERVICE_ORIENTATION,
+                session_key=session_key,
+                service=self.service,
+                user=user,
+                orientation__isnull=True,
+            )
+            .order_by("-created_at")
+            .first()
+        )
+        if event is not None:
+            event.orientation = self
+            event.save(update_fields=["orientation"])
 
     @property
     def sender_organization(self):

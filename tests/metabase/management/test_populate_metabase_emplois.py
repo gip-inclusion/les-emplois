@@ -37,7 +37,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geo.factories import create_qpv
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.insertion.factories import MobilizationEventFactory, ServiceFactory
+from tests.insertion.factories import MobilizationEventFactory, OrientationFactory, ServiceFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -1299,6 +1299,14 @@ def test_populate_mobilization_events(snapshot):
         kind=MobilizationEventKind.SERVICE_EXT_LINK,
         service_external_link="https://orientation.fake",
     )
+    orientation = OrientationFactory()
+    orientation_mobilization_event = MobilizationEventFactory(
+        user=prescriber_membership.user,
+        prescriber_organization=prescriber_membership.organization,
+        service=orientation.service,
+        kind=MobilizationEventKind.SERVICE_ORIENTATION,
+        orientation=orientation,
+    )
 
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="mobilization_events")
@@ -1354,6 +1362,22 @@ def test_populate_mobilization_events(snapshot):
             "source": ext_orientation_mobilization_event.structure.source.value,
             "external_link": "https://orientation.fake",
             "orientation_id": None,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
+        },
+        {
+            "id": orientation_mobilization_event.pk,
+            "date": orientation_mobilization_event.created_at,
+            "user_session": orientation_mobilization_event.session_key,
+            "user_kind": "emplois_" + KIND_PRESCRIBER,
+            "user_id": orientation_mobilization_event.user_id,
+            "user_prescriber_organization_id": orientation_mobilization_event.prescriber_organization_id,
+            "user_company_id": None,
+            "kind": MobilizationEventKind.SERVICE_ORIENTATION.value,
+            "structure_id": orientation_mobilization_event.structure.uid,
+            "service_id": orientation_mobilization_event.service.uid,
+            "source": orientation_mobilization_event.structure.source.value,
+            "external_link": "",
+            "orientation_id": str(orientation.id),
             "date_mise_à_jour_metabase": datetime.date(2023, 2, 2),
         },
     ]

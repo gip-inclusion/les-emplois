@@ -99,8 +99,8 @@ class DoraAPIClient:
             raise DoraAPIException()
         orientation_response = response.json()
         logger.info(
-            "DORA create-orientation success di_service_id=%r orientation_id=%s",
+            "DORA create-orientation success di_service_id=%r emplois_sync_uid=%s",
             payload.get("di_service_id"),
-            orientation_response.get("id"),
+            orientation_response.get("emplois_sync_uid"),
         )
         return orientation_response

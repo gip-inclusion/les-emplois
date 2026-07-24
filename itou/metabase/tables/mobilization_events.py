@@ -47,9 +47,9 @@ TABLE.add_columns(
         get_column_from_field(get_model_field(MobilizationEvent, "service_external_link"), name="external_link"),
         {
             "name": "orientation_id",
-            "type": "integer",
+            "type": "varchar",
             "comment": "ID de l’éventuelle orientation",
-            "fn": lambda o: None,  # TODO(ewen): to update when orientations are saved in les emplois
+            "fn": lambda o: str(o.orientation_id) if o.orientation_id else None,
         },
     ]
 )

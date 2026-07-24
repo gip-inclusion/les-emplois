@@ -25,6 +25,7 @@ from itou.insertion.utils import (
     get_missing_orientation_beneficiary_field_labels,
     get_orient_for_job_seeker_context,
 )
+from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.users.perms import can_register_mobilization_event
@@ -434,7 +435,7 @@ class OrientationWizardView(WizardView):
                 payload["emplois_data"] = emplois_data
 
             try:
-                self.dora_client.create_orientation(payload, attachments)
+                orientation_response = self.dora_client.create_orientation(payload, attachments)
             except DoraAPIException:
                 logger.info(
                     "orientation wizard submission_failed reason=create_orientation "
@@ -449,13 +450,54 @@ class OrientationWizardView(WizardView):
                 )
                 return self.render_to_response(self.get_context_data(**kwargs))
 
-            # TODO: update MobilizationEvent with the Orientation object
             logger.info(
                 "orientation wizard submitted user=%s service_uid=%s job_seeker=%s",
                 request.user.pk,
                 self.service.uid,
                 self.job_seeker.public_id,
             )
+
+            if request.from_employer:
+                sender_kind = SenderKind.EMPLOYER
+                sender_prescriber_organization = None
+                sender_company = request.current_organization
+            else:
+                sender_kind = SenderKind.PRESCRIBER
+                sender_prescriber_organization = request.current_organization
+                sender_company = None
+
+            orientation = insertion_models.Orientation.from_data(
+                service=self.service,
+                beneficiary=self.job_seeker,
+                sender=request.user,
+                id=orientation_response["emplois_sync_uid"],
+                sender_kind=sender_kind,
+                sender_prescriber_organization=sender_prescriber_organization,
+                sender_company=sender_company,
+                referent_last_name=referent_data["referent_last_name"],
+                referent_first_name=referent_data["referent_first_name"],
+                referent_phone=referent_data["referent_phone"],
+                referent_email=referent_data["referent_email"],
+                orientation_reasons=referent_data.get("orientation_reason") or "",
+                data_protection_commitment=cleaned["gdpr_consent"],
+                attachments=orientation_response.get("beneficiary_attachments") or [],
+            )
+            # force_insert: the primary key (emplois_sync_uid) is set by hand, so save() would
+            # otherwise issue a redundant UPDATE probe before the INSERT.
+            orientation.save(force_insert=True)
+            try:
+                orientation.link_mobilization_event(
+                    session_key=request.session.session_key,
+                    user=request.user,
+                )
+            except Exception:
+                logger.exception(
+                    "orientation wizard mobilization_link_failed emplois_sync_uid=%s user=%s service_uid=%s",
+                    orientation.pk,
+                    request.user.pk,
+                    self.service.uid,
+                )
+
             confirmation_url = reverse(
                 "insertion_views:orientation_confirmation",
                 kwargs={"service_uid": self.service.uid},
