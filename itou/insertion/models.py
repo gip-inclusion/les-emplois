@@ -758,3 +758,12 @@ class Orientation(models.Model):
     @property
     def attachments_details(self):
         return [{"name": attachment, "url": storages["dora"].url(attachment)} for attachment in self.attachments]
+
+    @property
+    def beneficiary_contact_preferences_display(self):
+        return ", ".join(
+            f"{BeneficiaryContactPreference.OTHER.label} ({self.beneficiary_other_contact_method})"
+            if preference == BeneficiaryContactPreference.OTHER and self.beneficiary_other_contact_method
+            else BeneficiaryContactPreference(preference).label
+            for preference in self.beneficiary_contact_preferences
+        )
