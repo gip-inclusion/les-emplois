@@ -37,4 +37,5 @@ urlpatterns = [
         views.OrientationConfirmationView.as_view(),
         name="orientation_confirmation",
     ),
+    path("orientations/<uuid:orientation_id>/details/", views.orientation_details, name="orientation_details"),
 ]

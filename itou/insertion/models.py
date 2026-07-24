@@ -734,3 +734,9 @@ class Orientation(models.Model):
         ):
             choices.append(f"{BeneficiaryContactPreference.OTHER.label} ({self.beneficiary_other_contact_method})")
         return ", ".join(choices)
+
+    @property
+    def duration_total(self) -> int | None:
+        if not self.duration_weeks or not self.duration_weekly_hours:
+            return
+        return self.duration_weekly_hours * self.duration_weeks
