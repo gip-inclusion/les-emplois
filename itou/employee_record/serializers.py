@@ -26,7 +26,7 @@ class _PersonSerializer(serializers.Serializer):
 
     civilite = serializers.SerializerMethodField()  # Required
     nomUsage = serializers.SerializerMethodField()  # Required
-    nomNaissance = NullField()  # Optional
+    nomNaissance = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.birth_name")
     prenom = serializers.SerializerMethodField()  # Required
     dateNaissance = serializers.DateField(
         format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
