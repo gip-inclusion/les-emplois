@@ -171,7 +171,7 @@ class TestApplicantsAPI:
         assert [
             {
                 "civilite": dylan.title,
-                "nom": dylan.last_name,
+                "nom": dylan.get_last_name_for_display(),
                 "prenom": dylan.first_name,
                 "courriel": dylan.email,
                 "telephone": dylan.phone,
@@ -187,7 +187,7 @@ class TestApplicantsAPI:
             },
             {
                 "civilite": bob.title,
-                "nom": bob.last_name,
+                "nom": bob.get_last_name_for_display(),
                 "prenom": bob.first_name,
                 "courriel": bob.email,
                 "telephone": bob.phone,
@@ -246,7 +246,7 @@ class TestApplicantsAPI:
         ):
             assert {
                 "civilite": job_seeker.title,
-                "nom": job_seeker.last_name,
+                "nom": job_seeker.get_last_name_for_display(),
                 "prenom": job_seeker.first_name,
                 "courriel": job_seeker.email,
                 "telephone": job_seeker.phone,
