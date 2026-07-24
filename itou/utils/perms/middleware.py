@@ -175,9 +175,6 @@ class ItouCurrentOrganizationMiddleware:
             # Add request.path as next param ?
             return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 
-        # Log staff users in dedicated login page
-        if not user.is_authenticated and request.path.startswith("/admin"):
-            return HttpResponseRedirect(reverse("account_login", query={REDIRECT_FIELD_NAME: request.get_full_path()}))
 
         # Enforce internal OTP before the Nexus whitelist below, otherwise
         # MFA-required professionals could reach the whitelisted views unverified
