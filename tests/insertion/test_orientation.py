@@ -2,7 +2,7 @@ import pytest
 from django.conf import settings
 from django.db import IntegrityError
 
-from itou.insertion.enums import OrientationStatus
+from itou.insertion.enums import BeneficiaryContactPreference, OrientationStatus
 from itou.insertion.models import Orientation
 from itou.job_applications.enums import SenderKind
 from tests.companies.factories import CompanyFactory
@@ -65,3 +65,33 @@ def test_orientation_attachments(temporary_dora_bucket_name):
     for attachment_detail in orientation.attachments_details:
         assert settings.DORA_AWS_S3_ENDPOINT_URL in attachment_detail["url"]
         assert temporary_dora_bucket_name in attachment_detail["url"]
+
+
+@pytest.mark.parametrize(
+    "contact_preferences,other_contact_method,expected",
+    [
+        ([], "", ""),
+        (
+            [
+                BeneficiaryContactPreference.PHONE,
+                BeneficiaryContactPreference.EMAIL,
+                BeneficiaryContactPreference.REFERENT,
+            ],
+            "",
+            "téléphone, e-mail, via le conseiller référent",
+        ),
+        ([BeneficiaryContactPreference.EMAIL, BeneficiaryContactPreference.PHONE], "", "e-mail, téléphone"),
+        (
+            [BeneficiaryContactPreference.EMAIL, BeneficiaryContactPreference.OTHER],
+            "par pigeon voyageur",
+            "e-mail, autre (par pigeon voyageur)",
+        ),
+        ([BeneficiaryContactPreference.EMAIL], "par pigeon voyageur", "e-mail"),
+        ([BeneficiaryContactPreference.EMAIL, BeneficiaryContactPreference.OTHER], "", "e-mail"),
+    ],
+)
+def test_beneficiary_contact_preferences_display(contact_preferences, other_contact_method, expected):
+    orientation = OrientationFactory(
+        beneficiary_contact_preferences=contact_preferences, beneficiary_other_contact_method=other_contact_method
+    )
+    assert orientation.beneficiary_contact_preferences_display == expected

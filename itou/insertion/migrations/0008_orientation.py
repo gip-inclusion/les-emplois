@@ -43,10 +43,10 @@ class Migration(migrations.Migration):
                     django.contrib.postgres.fields.ArrayField(
                         base_field=models.CharField(
                             choices=[
-                                ("TELEPHONE", "Téléphone"),
-                                ("EMAIL", "E-mail"),
-                                ("REFERENT", "Via le conseiller référent"),
-                                ("AUTRE", "Autre"),
+                                ("TELEPHONE", "téléphone"),
+                                ("EMAIL", "e-mail"),
+                                ("REFERENT", "via le conseiller référent"),
+                                ("AUTRE", "autre"),
                             ],
                             max_length=10,
                         ),
@@ -119,7 +119,7 @@ class Migration(migrations.Migration):
                         choices=[
                             ("MODÉRATION_EN_COURS", "En cours de modération"),
                             ("MODÉRATION_REJETÉE", "Rejetée par la modération"),
-                            ("OUVERTE", "Ouverte / En cours de traitement"),
+                            ("OUVERTE", "En cours de traitement"),
                             ("VALIDÉE", "Validée"),
                             ("REFUSÉE", "Refusée"),
                             ("EXPIRÉE", "Expirée"),

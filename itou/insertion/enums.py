@@ -29,16 +29,16 @@ class MobilizationEventKind(models.TextChoices):
 
 
 class BeneficiaryContactPreference(models.TextChoices):
-    PHONE = "TELEPHONE", "Téléphone"
-    EMAIL = "EMAIL", "E-mail"
-    REFERENT = "REFERENT", "Via le conseiller référent"
-    OTHER = "AUTRE", "Autre"
+    PHONE = "TELEPHONE", "téléphone"
+    EMAIL = "EMAIL", "e-mail"
+    REFERENT = "REFERENT", "via le conseiller référent"
+    OTHER = "AUTRE", "autre"
 
 
 class OrientationStatus(models.TextChoices):
     MODERATION_PENDING = "MODÉRATION_EN_COURS", "En cours de modération"
     MODERATION_REJECTED = "MODÉRATION_REJETÉE", "Rejetée par la modération"
-    PENDING = "OUVERTE", "Ouverte / En cours de traitement"
+    PENDING = "OUVERTE", "En cours de traitement"
     ACCEPTED = "VALIDÉE", "Validée"
     REJECTED = "REFUSÉE", "Refusée"
     EXPIRED = "EXPIRÉE", "Expirée"
