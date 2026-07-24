@@ -360,6 +360,30 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         backup_token = ItouStaticToken.objects.get()
         assert backup_token.check_token("secret-backup-code")
 
+    def test_unverified_user_with_device_cannot_enroll_another(self, client):
+        # Security regression (2FA bypass): a user who knows the password (first factor) but has
+        # NOT passed 2FA must not be able to enroll a brand-new device and be silently verified by
+        # `otp_login()`. The OTP middleware redirects them to `verify_otp` before the view runs.
+        user = ItouStaffFactory()
+        existing_device = ItouTOTPDeviceFactory(user=user)
+        client.force_login(user)  # authenticated but NOT OTP-verified: no device attached to session
+
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+        fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
+        data = {
+            "name": "attacker device",
+            "device_type": "smartphone",
+            "key": "R7QKTGB4PXO3JLFQCRWFKB2VGNY6T4QR",
+            "otp_token": TOTP(fake_device.bin_key).token(),
+        }
+        response = client.post(url, data)
+
+        # Redirected to verification instead of enrolling the new device...
+        assertRedirects(response, add_url_params(reverse("otp_views:verify_otp"), {"next": url}))
+        # ...no new device was created and the session is still unverified.
+        assert user.itou_totp_devices.exclude(pk=existing_device.pk).count() == 0
+        assert DEVICE_ID_SESSION_KEY not in client.session
+
     def test_post_invalid_totp(self, client):
         user = ItouStaffFactory()
         client.force_login(user)
