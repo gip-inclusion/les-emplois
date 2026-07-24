@@ -19,7 +19,12 @@ from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWith2MembershipsFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    CompanyWith2MembershipsFactory,
+    ContractFactory,
+)
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -973,6 +978,165 @@ def test_filtered_by_approval_state(client, factory, url):
         job_seeker_expired_eligibility_expired_approval,
         job_seeker_expired_eligibility_valid_approval,
     ]
+
+
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_filtered_by_end_of_iae_journey(client, url):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    user = organization.members.first()
+    client.force_login(user)
+
+    today = datetime.date(2026, 1, 15)
+
+    def assigned_job_seeker(first_name):
+        return IAEEligibilityDiagnosisFactory(
+            from_prescriber=True,
+            author=user,
+            author_prescriber_organization=organization,
+            job_seeker__first_name=first_name,
+            job_seeker__last_name="Zorro",
+            with_job_seeker_assignment=True,
+        ).job_seeker
+
+    def add_soon_pass(job_seeker):
+        ApprovalFactory(
+            user=job_seeker,
+            start_at=today - datetime.timedelta(days=600),
+            end_at=today + datetime.timedelta(days=30),
+        )
+
+    def add_soon_contract(job_seeker):
+        ContractFactory(
+            job_seeker=job_seeker,
+            start_date=today - datetime.timedelta(days=200),
+            end_date=today + datetime.timedelta(days=20),
+        )
+
+    # Only a PASS IAE ending soon.
+    job_seeker_pass_only = assigned_job_seeker("pass only")
+    add_soon_pass(job_seeker_pass_only)
+
+    # Only an IAE contract ending soon.
+    job_seeker_contract_only = assigned_job_seeker("contract only")
+    add_soon_contract(job_seeker_contract_only)
+
+    # Both a PASS IAE and an IAE contract ending soon.
+    job_seeker_both = assigned_job_seeker("both ending soon")
+    add_soon_pass(job_seeker_both)
+    add_soon_contract(job_seeker_both)
+
+    # Neither ends soon.
+    job_seeker_neither = assigned_job_seeker("neither")
+    ApprovalFactory(
+        user=job_seeker_neither,
+        start_at=today - datetime.timedelta(days=100),
+        end_at=today + datetime.timedelta(days=200),
+    )
+
+    response = client.get(url, {"pass_iae_ending_soon": "on"})
+    assert set(response.context["page_obj"].object_list) == {job_seeker_pass_only, job_seeker_both}
+
+    response = client.get(url, {"contract_ending_soon": "on"})
+    assert set(response.context["page_obj"].object_list) == {job_seeker_contract_only, job_seeker_both}
+
+    # Both checked => AND: only the job seeker with both a soon PASS and a soon contract.
+    response = client.get(url, {"pass_iae_ending_soon": "on", "contract_ending_soon": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_both]
+
+
+@freeze_time("2026-01-15")
+def test_end_of_iae_journey_filter_edge_cases(client):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    user = organization.members.first()
+    client.force_login(user)
+    url = reverse("job_seekers_views:list")
+
+    today = datetime.date(2026, 1, 15)
+
+    def assigned_job_seeker(first_name):
+        return IAEEligibilityDiagnosisFactory(
+            from_prescriber=True,
+            author=user,
+            author_prescriber_organization=organization,
+            job_seeker__first_name=first_name,
+            job_seeker__last_name="Zorro",
+            with_job_seeker_assignment=True,
+        ).job_seeker
+
+    # PASS ending exactly on the 90-day boundary is included (range is inclusive).
+    job_seeker_pass_boundary = assigned_job_seeker("pass boundary")
+    ApprovalFactory(
+        user=job_seeker_pass_boundary,
+        start_at=today - datetime.timedelta(days=600),
+        end_at=today + datetime.timedelta(days=90),
+    )
+
+    # Contract ending exactly on the 30-day boundary is included.
+    job_seeker_contract_boundary = assigned_job_seeker("contract boundary")
+    ContractFactory(
+        job_seeker=job_seeker_contract_boundary,
+        start_date=today - datetime.timedelta(days=200),
+        end_date=today + datetime.timedelta(days=30),
+    )
+
+    # A contract without an end date (ongoing) is ignored.
+    job_seeker_contract_no_end = assigned_job_seeker("contract no end")
+    ContractFactory(
+        job_seeker=job_seeker_contract_no_end,
+        start_date=today - datetime.timedelta(days=100),
+        end_date=None,
+    )
+
+    # Several contracts: only the latest end date counts (an older one already ended).
+    job_seeker_multiple_contracts = assigned_job_seeker("multiple contracts")
+    ContractFactory(
+        job_seeker=job_seeker_multiple_contracts,
+        start_date=today - datetime.timedelta(days=400),
+        end_date=today - datetime.timedelta(days=200),
+    )
+    ContractFactory(
+        job_seeker=job_seeker_multiple_contracts,
+        start_date=today - datetime.timedelta(days=100),
+        end_date=today + datetime.timedelta(days=15),
+    )
+
+    response = client.get(url, {"pass_iae_ending_soon": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_pass_boundary]
+
+    response = client.get(url, {"contract_ending_soon": "on"})
+    assert set(response.context["page_obj"].object_list) == {
+        job_seeker_contract_boundary,
+        job_seeker_multiple_contracts,
+    }
+
+
+@freeze_time("2026-01-15")
+def test_end_of_iae_journey_filter_only_for_authorized_prescriber(client):
+    # A non-authorized prescriber neither sees the filter nor is affected by its query params.
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    user = organization.members.first()
+    client.force_login(user)
+    url = reverse("job_seekers_views:list")
+
+    today = datetime.date(2026, 1, 15)
+    job_seeker = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        author=user,
+        author_prescriber_organization=organization,
+        with_job_seeker_assignment=True,
+    ).job_seeker
+    # PASS ending far in the future: it would be filtered out if the filter applied.
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=today - datetime.timedelta(days=100),
+        end_at=today + datetime.timedelta(days=200),
+    )
+
+    assertNotContains(client.get(url), "Fin de parcours IAE à venir")
+
+    response = client.get(url, {"pass_iae_ending_soon": "on", "contract_ending_soon": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker]
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
