@@ -42,9 +42,9 @@ class ServicesInline(ReadonlyMixin, ItouTabularInline):
 
 @admin.register(Structure)
 class StructureAdmin(InsertionAdmin):
-    list_display = ["pk", "name", "siret", "source", "city", "services_count", "updated_at"]
+    list_display = ["pk", "name", "siret", "source", "city", "services_count", "is_active", "updated_at"]
     list_display_links = ["pk", "name"]
-    list_filter = ["source"]
+    list_filter = ["source", "is_active"]
     list_select_related = ["source"]
     show_full_result_count = False
     date_hierarchy = "updated_on"
@@ -60,17 +60,20 @@ class StructureAdmin(InsertionAdmin):
             {"fields": ["address_line_1", "address_line_2", "post_code", "city", "insee_city", "coordinates"]},
         ),
         ("Horaires", {"fields": ["opening_hours"]}),
+        ("État", {"fields": ["is_active"]}),
         ("Dates", {"fields": ["updated_on", "created_at", "updated_at"]}),
     ]
 
     def get_queryset(self, request):
         services_count = (
-            Service.objects.filter(structure=OuterRef("pk"))
+            Service.all_objects.filter(structure=OuterRef("pk"))
             .values("structure")
             .annotate(count=Count("pk"))
             .values("count")
         )
-        return super().get_queryset(request).annotate(_services_count=Coalesce(Subquery(services_count), 0))
+        return Structure.all_objects.select_related(*self.list_select_related).annotate(
+            _services_count=Coalesce(Subquery(services_count), 0)
+        )
 
     @admin.display(description="services", ordering="_services_count")
     def services_count(self, obj):
@@ -79,9 +82,9 @@ class StructureAdmin(InsertionAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(InsertionAdmin):
-    list_display = ["pk", "name", "structure_link", "source", "kind", "city", "updated_at"]
+    list_display = ["pk", "name", "structure_link", "source", "kind", "city", "is_active", "updated_at"]
     list_display_links = ["pk", "name"]
-    list_filter = ["source", "kind", "is_orientable_with_form", "contact_is_public"]
+    list_filter = ["source", "kind", "is_orientable_with_form", "contact_is_public", "is_active"]
     list_select_related = ["structure", "source", "kind"]
     show_full_result_count = False
     date_hierarchy = "updated_on"
@@ -134,8 +137,12 @@ class ServiceAdmin(InsertionAdmin):
         ("Contact", {"fields": ["contact_full_name", "contact_email", "contact_phone", "contact_is_public"]}),
         ("Horaires", {"fields": ["opening_hours", "opening_hours_text"]}),
         ("Orientation", {"fields": ["is_orientable_with_form", "average_orientation_response_delay_days"]}),
+        ("État", {"fields": ["is_active"]}),
         ("Dates", {"fields": ["dora_synced_at", "updated_on", "created_at", "updated_at"]}),
     ]
+
+    def get_queryset(self, request):
+        return Service.all_objects.select_related(*self.list_select_related)
 
     @admin.display(description="structure")
     def structure_link(self, obj):

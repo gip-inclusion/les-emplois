@@ -338,7 +338,7 @@
 # ---
 # name: test_full_import_wet_run[SQL queries]
   dict({
-    'num_queries': 72,
+    'num_queries': 74,
     'queries': list([
       dict({
         'origin': list([
@@ -746,9 +746,10 @@
                                              "phone",
                                              "opening_hours",
                                              "updated_on",
+                                             "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -779,9 +780,10 @@
                                              "phone",
                                              "opening_hours",
                                              "updated_on",
+                                             "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -812,9 +814,10 @@
                                              "phone",
                                              "opening_hours",
                                              "updated_on",
+                                             "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -845,9 +848,10 @@
                                              "phone",
                                              "opening_hours",
                                              "updated_on",
+                                             "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -920,9 +924,10 @@
                                              "phone",
                                              "opening_hours",
                                              "updated_on",
+                                             "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
         ''',
       }),
       dict({
@@ -953,9 +958,24 @@
                                              "phone",
                                              "opening_hours",
                                              "updated_on",
+                                             "is_active",
                                              "created_at",
                                              "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_structure"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.import_structures[insertion/management/commands/import_structures_and_services.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_structure"
+          SET "is_active" = %s
         ''',
       }),
       dict({
@@ -1094,9 +1114,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1151,9 +1172,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1208,9 +1230,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1584,9 +1607,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1751,9 +1775,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1808,9 +1833,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -1939,9 +1965,10 @@
                                            "average_orientation_response_delay_days",
                                            "dora_synced_at",
                                            "updated_on",
+                                           "is_active",
                                            "created_at",
                                            "updated_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar[], %s, %s, %s, %s, %s, %s, %s, %s::varchar[], %s::varchar(1024)[], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "insertion_service"."id"
         ''',
       }),
       dict({
@@ -2016,6 +2043,20 @@
                                                                 "genericreferenceitem_id")
           SELECT *
           FROM UNNEST((%s)::integer[], (%s)::integer[]) ON CONFLICT DO NOTHING
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.import_services[insertion/management/commands/import_structures_and_services.py]',
+          'Command.handle[insertion/management/commands/import_structures_and_services.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          UPDATE "insertion_service"
+          SET "is_active" = %s
         ''',
       }),
       dict({
@@ -2030,113 +2071,114 @@
         'sql': '''
           SELECT "insertion_structure"."uid" AS "uid"
           FROM "insertion_structure"
-          WHERE SUBSTRING("insertion_structure"."siret", %s, %s) IN (%s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s,
-                                                                     %s)
+          WHERE ("insertion_structure"."is_active"
+                 AND SUBSTRING("insertion_structure"."siret", %s, %s) IN (%s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -2153,7 +2195,8 @@
           SELECT "insertion_structure"."uid" AS "uid"
           FROM "insertion_structure"
           INNER JOIN "insertion_genericreferenceitem" ON ("insertion_structure"."source_id" = "insertion_genericreferenceitem"."id")
-          WHERE (NOT ("insertion_genericreferenceitem"."value" = %s)
+          WHERE ("insertion_structure"."is_active"
+                 AND NOT ("insertion_genericreferenceitem"."value" = %s)
                  AND "insertion_structure"."email" = %s)
           ORDER BY RANDOM() ASC
         ''',
@@ -2174,7 +2217,8 @@
               (SELECT U0."id"
                FROM "insertion_service" U0
                INNER JOIN "insertion_structure" U1 ON (U0."structure_id" = U1."id")
-               WHERE (U0."is_orientable_with_form"
+               WHERE (U0."is_active"
+                      AND U0."is_orientable_with_form"
                       AND U1."uid" IN (%s,
                                        %s,
                                        %s,

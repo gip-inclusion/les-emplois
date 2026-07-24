@@ -10,6 +10,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.insertion.models import GenericReferenceItem, GenericReferenceItemKind, Service, Structure
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiItemsIterator, DataInclusionApiPaginatedResponse
+from tests.insertion.factories import GenericReferenceItemFactory, ServiceFactory, StructureFactory
 
 
 @pytest.fixture(name="apis_mocks")
@@ -176,3 +177,37 @@ def test_data_inclusion_iterator_yields_every_item_across_pages():
     items = list(DataInclusionApiItemsIterator(lambda *, page, size: pages[page]))
 
     assert [item["id"] for item in items] == ["a", "b", "c"]
+
+
+def test_import_soft_deletes_structures_and_services_absent_from_api(apis_mocks):
+    source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="dora")
+    structure = StructureFactory(uid="extra-structure", source=source)
+    ServiceFactory(uid="extra-service", structure=structure, source=source)
+
+    call_command("import_structures_and_services", wet_run=True)
+
+    structure.refresh_from_db()
+    service = Service.all_objects.get(uid="extra-service")
+    assert structure.is_active is False
+    assert service.is_active is False
+    assert structure not in list(Structure.objects.all())
+    assert service not in list(Service.objects.all())
+    assert structure in list(Structure.all_objects.all())
+    assert service in list(Service.all_objects.all())
+
+
+def test_import_reactivates_reappearing_structures_and_services(apis_mocks):
+    source = GenericReferenceItemFactory(kind=GenericReferenceItemKind.SOURCE, value="mission-locale")
+    structure = StructureFactory(uid="mission-locale--with-mobilization-link", source=source)
+    service = ServiceFactory(uid="mission-locale--with-mobilization-link", structure=structure, source=source)
+    Structure.all_objects.filter(pk=structure.pk).update(is_active=False)
+    Service.all_objects.filter(pk=service.pk).update(is_active=False)
+
+    call_command("import_structures_and_services", wet_run=True)
+
+    structure.refresh_from_db()
+    service.refresh_from_db()
+    assert structure.is_active is True
+    assert service.is_active is True
+    assert structure in list(Structure.objects.all())
+    assert service in list(Service.objects.all())

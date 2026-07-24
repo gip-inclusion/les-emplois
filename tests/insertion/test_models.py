@@ -348,3 +348,28 @@ class TestMobilizationEvent:
         )
 
         assert not MobilizationEvent.objects.exists()
+
+
+class TestIsActiveManager:
+    def test_both_managers(self):
+        active = ServiceFactory()
+        inactive = ServiceFactory(is_active=False)
+
+        assert set(Service.objects.all()) == {active}
+        assert set(Service.all_objects.all()) == {active, inactive}
+
+    def test_structure_services_excludes_inactive(self):
+        structure = StructureFactory()
+        active = ServiceFactory(structure=structure)
+        ServiceFactory(structure=structure, is_active=False)
+
+        assert set(structure.services.all()) == {active}
+
+    def test_search_only_active_services(self):
+        vannes = create_city_vannes()
+        active = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        # inactive one
+        ServiceFactory(coordinates=vannes.coords, city="Vannes", is_active=False)
+
+        results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
+        assert list(results) == [active]
