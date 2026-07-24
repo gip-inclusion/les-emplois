@@ -14,7 +14,7 @@ from itou.insertion.models import (
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 
 
-class InsertionAdmin(ReadonlyMixin, ItouModelAdmin):
+class InsertionAdmin(ItouModelAdmin):
     show_facets = admin.ShowFacets.ALWAYS
 
     extra_readonly_fields = ()
@@ -136,6 +136,9 @@ class ServiceAdmin(InsertionAdmin):
         ("Orientation", {"fields": ["is_orientable_with_form", "average_orientation_response_delay_days"]}),
         ("Dates", {"fields": ["dora_synced_at", "updated_on", "created_at", "updated_at"]}),
     ]
+
+    def get_readonly_fields(self, request, obj=None):
+        return ["updated_at", "structure_link", "structure"]
 
     @admin.display(description="structure")
     def structure_link(self, obj):
@@ -270,6 +273,9 @@ class OrientationAdmin(InsertionAdmin):
             },
         ),
     ]
+
+    def get_readonly_fields(self, request, obj=None):
+        return ["updated_at"]
 
     def get_search_fields(self, request):
         search_fields = []
