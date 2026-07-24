@@ -63,7 +63,9 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
     # France Travail Connect URLs.
-    path("pe_connect/", include("itou.openid_connect.ft_connect.urls")),
+    path("ft_connect/", include("itou.openid_connect.ft_connect.urls")),
+    # Legacy, to remove in a few days
+    path("pe_connect/", include("itou.openid_connect.ft_connect.urls", namespace="pe_connect")),
     # FranceConnect URLs.
     path("franceconnect/", include("itou.openid_connect.france_connect.urls")),
     # ProConnect URLs.

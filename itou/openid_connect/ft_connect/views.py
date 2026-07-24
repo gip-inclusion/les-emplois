@@ -44,7 +44,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
 @login_not_required
 def ft_connect_authorize(request):
     # The redirect_uri should be defined in the France Travail Connect settings to be allowed
-    # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
+    # NB: the integration platform allows "http://127.0.0.1:8000/ft_connect/callback"
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(12)
     state = FranceTravailConnectState.save_state(nonce=nonce)

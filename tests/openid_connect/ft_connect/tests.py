@@ -127,7 +127,7 @@ class TestPoleEmploiConnect:
         assert f"nonce={pec_state.nonce}" in response.url
         urlparts = urllib.parse.urlsplit(response.url)
         query = QueryDict(urlparts.query)
-        assert query["redirect_uri"] == "http://testserver/pe_connect/callback"
+        assert query["redirect_uri"] == "http://testserver/ft_connect/callback"
 
     def test_create_user(self):
         """
