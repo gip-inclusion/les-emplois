@@ -1,0 +1,194 @@
+{% extends "layout/base.html" %}
+{% load badges %}
+{% load components %}
+{% load format_filters %}
+{% load markdownify %}
+{% load matomo %}
+{% load str_filters %}
+
+{% block title %}
+    Demande d’orientation : {{ orientation.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info|default:"" %}
+        {% fragment as c_navinfo__info %}
+            Mise à jour le {{ orientation.updated_at|date:"d/m/Y" }}
+        {% endfragment %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>
+                {{ orientation.service.name }}
+                {% orientation_state_badge orientation extra_classes="badge-base" %}
+            </h1>
+            <p>Demande d’orientation</p>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% if orientation.service.is_active %}
+                <a href="{% url "insertion_views:service_detail" service_uid=orientation.service.uid %}?back_url={{ request.get_full_path|urlencode }}"
+                   class="btn btn-lg btn-secondary"
+                   {% matomo_event "orientation-detail" "clic" "voir-service" %}>
+                    <span>Accéder au détail du service</span>
+                </a>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    {# Beneficiary info #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <div class="row mb-3">
+                            <div class="col-12 col-sm">
+                                <h2 class="h3{% if can_view_personal_information %} mb-0{% endif %}">Usager</h2>
+                            </div>
+                            {% if can_view_personal_information %}
+                                <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                    <a href="{% url "job_seekers_views:details" public_id=orientation.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                       class="btn btn-ico btn-outline-primary"
+                                       aria-label="Accéder à la fiche usager de {{ orientation.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }}">
+                                        <span>Accéder à la fiche usager</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <ul class="list-data">
+                            <li>
+                                <small>Prénom</small>
+                                <strong>{{ orientation.beneficiary.first_name|title|mask_unless:can_view_personal_information }}</strong>
+                            </li>
+                            <li>
+                                <small>Nom</small>
+                                <strong>{{ orientation.beneficiary.last_name|upper|mask_unless:can_view_personal_information }}</strong>
+                            </li>
+                            {% if can_view_personal_information %}
+                                <li>
+                                    <small>Adresse e-mail</small>
+                                    {{ orientation.beneficiary.email|default:""|strong_or_disabled_non_filled }}
+                                </li>
+                                <li>
+                                    <small>Téléphone</small>
+                                    {{ orientation.beneficiary.phone|default:""|strong_or_disabled_non_filled }}
+                                </li>
+                            {% endif %}
+                            {% if orientation.beneficiary_contact_preferences_display %}
+                                <li>
+                                    <small>Contact privilégié</small>
+                                    {{ orientation.beneficiary_contact_preferences_display|capfirst }}
+                                </li>
+                            {% endif %}
+                            {% if orientation.beneficiary_availability %}
+                                <li>
+                                    <small>Disponibilité</small>
+                                    Disponible à partir du {{ orientation.beneficiary_availability|date:"d F Y" }}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    {# Prerequisites #}
+                    {% if orientation.service.has_prerequisites %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Conditions et critères requis</h2>
+                            <ul class="mb-0">
+                                {% for prerequisite in orientation.service.prerequisites %}
+                                    {% if orientation.service.is_dora %}
+                                        <li>{{ prerequisite|markdownify:"inline" }}</li>
+                                    {% else %}
+                                        {# D·I service may have blocks tags such as lists #}
+                                        <li>{{ prerequisite|markdownify }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {# Orientation reasons #}
+                    {% if orientation.orientation_reasons %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Motifs de l’orientation</h2>
+                            <blockquote class="blockquote mb-0">
+                                {{ orientation.orientation_reasons }}
+                            </blockquote>
+                        </div>
+                    {% endif %}
+
+                    {# Attachments #}
+                    {% if orientation.attachments|length %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Pièces jointes</h2>
+                            <ul class="mb-0 list-unstyled">
+                                {% for document_name, document_url in orientation.attachments_details %}
+                                    <li class="mb-2">
+                                        <a class="btn-link btn-ico" href="{{ document_url }}" target="_blank" rel="noopener noreferrer">
+                                            <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                                            <span>{{ document_name }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {# Duration #}
+                    {% if orientation.duration_weekly_hours %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Durée de la prestation</h2>
+                            <ul class="list-data">
+                                {% if orientation.duration_total %}
+                                    <li>
+                                        <small>Volume total</small>
+                                        <strong>{{ orientation.duration_total }} h</strong>
+                                    </li>
+                                {% endif %}
+                                <li>
+                                    <small>Par semaine</small>
+                                    <strong>{{ orientation.duration_weekly_hours }} h</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# Sidebar #}
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    {% include "insertion/includes/orientation_service_info.html" with service=orientation.service request=request only %}
+
+                    {% if orientation.service.contact_full_name or orientation.service.contact_email or orientation.service.contact_phone %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Contact</h2>
+                            <ul class="fs-sm list-unstyled mb-0">
+                                {% if orientation.service.contact_full_name %}
+                                    <li>
+                                        <i class="ri-user-line me-2" aria-hidden="true"></i>
+                                        <span>{{ orientation.service.contact_full_name }}</span>
+                                    </li>
+                                {% endif %}
+                                {% if orientation.service.contact_email %}
+                                    <li>
+                                        <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
+                                        <a href="mailto:{{ orientation.service.contact_email }}" aria-label="Contact par mail" class="text-break">{{ orientation.service.contact_email }}</a>
+                                    </li>
+                                {% endif %}
+                                {% if orientation.service.contact_phone %}
+                                    <li>
+                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                        {{ orientation.service.contact_phone|format_phone }}
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

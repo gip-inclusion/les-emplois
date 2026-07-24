@@ -8,7 +8,7 @@ from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -17,6 +17,7 @@ from django.views.generic.edit import FormView
 from itoutils.django.decoupage_administratif.admin_division_parsing import get_division_label
 from rest_framework import status
 
+from itou.companies.models import Company
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.enums import MobilizationEventKind
@@ -26,11 +27,12 @@ from itou.insertion.utils import (
     get_orient_for_job_seeker_context,
 )
 from itou.job_applications.enums import SenderKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.users.perms import can_register_mobilization_event
 from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
-from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.phone import normalize_phone_number
 from itou.utils.readonly import ReadonlyViewMixin
@@ -564,3 +566,30 @@ def dismiss_orientation_disclaimer(request, session_uuid):
             ),
         )
     )
+
+
+@check_request(lambda request: request.from_employer or request.from_prescriber)
+def orientation_details(request, orientation_id):
+    template_name = "insertion/orientations/details.html"
+
+    sender_prescriber_organization = (
+        request.current_organization if isinstance(request.current_organization, PrescriberOrganization) else None
+    )
+    sender_company = request.current_organization if isinstance(request.current_organization, Company) else None
+    orientation = get_object_or_404(
+        insertion_models.Orientation.objects.select_related(
+            "beneficiary", "service", "service__structure", "service__source"
+        ),
+        id=orientation_id,
+        sender_prescriber_organization=sender_prescriber_organization,
+        sender_company=sender_company,
+    )
+
+    context = {
+        "orientation": orientation,
+        "can_view_personal_information": can_view_personal_information(request, orientation.beneficiary),
+        "back_url": get_safe_url(request, "back_url"),
+        "matomo_custom_title": "Détail d’une orientation",
+    }
+
+    return render(request, template_name, context)
