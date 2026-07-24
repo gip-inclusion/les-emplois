@@ -492,9 +492,9 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
         # Hiring in the past is *temporarily* possible for GEIQ
-        if hiring_start_at and hiring_start_at < timezone.localdate() and not self.is_geiq:
+        if hiring_start_at < timezone.localdate() and not self.is_geiq:
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_PAST))
-        elif hiring_start_at and hiring_start_at > timezone.localdate() + relativedelta(months=6):
+        elif hiring_start_at > timezone.localdate() + relativedelta(months=6):
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_FAR_FUTURE))
         elif (
             # Keep in sync with the JobApplication.accept() transition logic.
