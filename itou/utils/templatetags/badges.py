@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.approvals.enums import ApprovalStatus
+from itou.insertion.enums import OrientationStatus
 from itou.job_applications.enums import JobApplicationState
 
 
@@ -163,3 +164,23 @@ def criterion_certification_badge(selected_criterion, job_application):
     else:
         template = "eligibility/includes/badge_certification_in_progress.html"
     return get_template(template).render(context)
+
+
+@register.simple_tag
+def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
+    state_classes = {
+        OrientationStatus.MODERATION_PENDING: "bg-accent-03",
+        OrientationStatus.MODERATION_REJECTED: "bg-danger",
+        OrientationStatus.PENDING: "bg-info",
+        OrientationStatus.ACCEPTED: "bg-success",
+        OrientationStatus.REJECTED: "bg-danger",
+        OrientationStatus.EXPIRED: "bg-emploi-light",
+    }[orientation.status]
+    attrs = [
+        f'id="state_{orientation.pk}"',
+        f'class="badge rounded-pill text-nowrap {extra_classes} {state_classes}"',
+    ]
+    label = OrientationStatus(orientation.status).label
+
+    badge = f"<span {' '.join(attrs)}>{label}</span>"
+    return mark_safe(badge)
