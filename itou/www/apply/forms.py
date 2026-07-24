@@ -341,11 +341,10 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.is_geiq = company.kind == CompanyKind.GEIQ
         self.job_seeker = job_seeker
         attrs_min = {}
-        attrs_max = {}
         self._today = timezone.localdate()  # Make sure the form stays consistent around midnight
         if not self.is_geiq:
             attrs_min["min"] = self._today.isoformat()
-            attrs_max["max"] = (self._today + relativedelta(months=6)).isoformat()
+        attrs_max = {"max": self.get_far_future_date().isoformat()}
         self.fields["hiring_start_at"].required = True
         self.fields["hiring_start_at"].widget = DuetDatePickerWidget(attrs=attrs_min | attrs_max)
         self.fields["hiring_end_at"].widget = DuetDatePickerWidget(attrs=attrs_min)
@@ -488,13 +487,16 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         )
         self.fields["advisor"] = get_advisor_choice_field(current_user, job_seeker.get_inverted_full_name(), qs)
 
+    def get_far_future_date(self):
+        return self._today + relativedelta(months=6)
+
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
         # Hiring in the past is *temporarily* possible for GEIQ
         if hiring_start_at < self._today and not self.is_geiq:
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_PAST))
-        elif hiring_start_at > self._today + relativedelta(months=6):
+        elif hiring_start_at > self.get_far_future_date():
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_FAR_FUTURE))
         elif (
             # Keep in sync with the JobApplication.accept() transition logic.
