@@ -7,7 +7,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
     """Applicant serializer: job seeker field of a job application"""
 
     civilite = serializers.SerializerMethodField()
-    nom = serializers.CharField(source="last_name")
+    nom = serializers.SerializerMethodField()
     prenom = serializers.CharField(source="first_name")
     courriel = serializers.CharField(source="email")
     telephone = serializers.CharField(source="phone")
@@ -43,6 +43,9 @@ class ApplicantSerializer(serializers.ModelSerializer):
 
     def get_civilite(self, obj) -> str:
         return obj.title or "Non fournie"
+
+    def get_nom(self, obj) -> str:
+        return obj.get_last_name_for_display()
 
 
 class StringArrayField(serializers.ListField):
