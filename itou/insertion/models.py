@@ -6,7 +6,6 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
-from django.core.files.storage import storages
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
@@ -720,7 +719,7 @@ class Orientation(models.Model):
 
     @property
     def attachments_details(self):
-        return [{"name": attachment, "url": storages["dora"].url(attachment)} for attachment in self.attachments]
+        return [(form_key.split("/")[-1], generate_dora_storage_url(form_key)) for form_key in self.attachments]
 
     @property
     def beneficiary_contact_preferences_display(self):
