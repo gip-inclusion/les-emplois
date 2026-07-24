@@ -1,4 +1,5 @@
 import datetime
+import logging
 from functools import partial
 from unittest import mock
 
@@ -19,7 +20,7 @@ from pytest_django.asserts import (
 )
 
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice
-from itou.otp.utils import create_otp_backup_code
+from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device
 from itou.www.login.constants import ITOU_SESSION_LOGIN_EMAIL_KEY
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory
@@ -132,12 +133,62 @@ def test_delete_devices(client, snapshot, settings):
             ],
         )
 
-        # The user removes his other device
+        # The user removes his other device: it is soft-deleted (temporary kept for auditing)
         response = client.post(url, data={"delete-device": str(device_2.pk)})
-        assertQuerySetEqual(ItouTOTPDevice.objects.all(), [device_1])
+        assertQuerySetEqual(ItouTOTPDevice.objects.all(), [device_1, device_2], ordered=False)
+        assertQuerySetEqual(ItouTOTPDevice.objects.filter(disabled_at=None), [device_1])
+        device_2.refresh_from_db()
+        assert device_2.disabled_at is not None
         assertContains(response, device_1.name)
         assertNotContains(response, device_2.name)
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
+
+
+def test_delete_last_device_when_verified_by_external_mfa(client, settings):
+    # A user verified through the ProConnect MFA sidestep has an `ExternalTOTPDevice` placeholder
+    # as `otp_device`. It never matches a real device, so they may delete all their internal
+    # devices (no lockout: they will be asked to enroll again if internal MFA becomes required).
+    settings.REQUIRE_OTP_FOR_STAFF = True
+    user = ItouStaffFactory()
+    device = ItouTOTPDeviceFactory(user=user, name="only-device")
+    client.force_login(user)
+
+    placeholder = create_placeholder_for_external_totp_device(user)
+    session = client.session
+    session[DEVICE_ID_SESSION_KEY] = placeholder.persistent_id
+    session.save()
+
+    response = client.post(reverse("otp_views:otp_devices"), data={"delete-device": str(device.pk)})
+
+    assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
+    device.refresh_from_db()
+    assert device.disabled_at is not None
+
+
+def test_delete_device_with_malformed_id_returns_404(client, caplog):
+    """A manipulated `delete-device` value that is not a valid UUID must yield a clean 404."""
+    user = ItouStaffFactory()
+    client.force_login(user)
+
+    response = client.post(reverse("otp_views:otp_devices"), data={"delete-device": "not-a-uuid"})
+
+    assert response.status_code == 404
+    assert (
+        f"Manipulated request for user {user.id}: delete-device value 'not-a-uuid' is not a valid UUID"
+        in caplog.messages
+    )
+
+
+def test_otp_enforced_before_nexus_whitelist(client, settings):
+    """An MFA-required professional must not reach the whitelisted Nexus views (/portal, ...) without OTP."""
+    settings.REQUIRE_MFA_FOR_PROS = True
+    user = EmployerFactory(membership=True)
+    company = user.company_set.get()
+    settings.REQUIRE_MFA_ON_COMPANY_IDS = {company.id}
+    client.force_login(user)
+
+    response = client.get(reverse("nexus:homepage"))
+    assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"), fetch_redirect_response=False)
 
 
 def test_enrollment_step_0_intro(client):
@@ -180,13 +231,34 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         else:
             assertNotContains(response, qr_code_text)
 
-    def test_get_unknown_device_type(self, client):
+    def test_get_unknown_device_type(self, client, caplog):
         user = ItouStaffFactory()
         client.force_login(user)
         url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
 
         response = client.get(url, query_params={"device_type": "unknown"})
         assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert f"Manipulated request for user {user.id}: unknown device_type 'unknown'" in caplog.messages
+
+    def test_post_missing_key(self, client, caplog):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        response = client.post(url, data={"device_type": "smartphone"})
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert f"Manipulated request for user {user.id}: missing key during device confirmation" in caplog.messages
+
+    def test_post_invalid_base32_key(self, client, caplog):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        response = client.post(url, data={"device_type": "smartphone", "key": "not-valid-base32!"})
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert (
+            f"Manipulated request for user {user.id}: key 'not-valid-base32!' is not valid base32" in caplog.messages
+        )
 
     def test_post_valid_totp(self, client):
         user = ItouStaffFactory()
@@ -269,6 +341,20 @@ class TestEnrollmentSteps2And3ConfirmDevice:
         assert device.key == fake_device.key
         assert device.name == data["name"]
 
+    @pytest.mark.parametrize("key", ["", "not-base32!", None])
+    def test_post_invalid_key_redirects(self, client, key):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("otp_views:enrollment_step_2_and_3_confirm_device")
+
+        data = {"name": "whatever", "device_type": "smartphone", "otp_token": "123456"}
+        if key is not None:
+            data["key"] = key
+        response = client.post(url, data)
+
+        assertRedirects(response, reverse("otp_views:enrollment_step_1_choose_device_type"))
+        assert user.itou_totp_devices.count() == 0
+
 
 class TestItouStaffLogin:
     def test_login_with_totp(self, client, settings):
@@ -342,6 +428,39 @@ class TestItouStaffLogin:
         response = client.post(next_url, data=post_data)
         assertRedirects(response, admin_url)
 
+    def test_verify_with_wrong_token_throttles_every_device(self, client, settings, caplog):
+        # `VerifyOTPForm` tries every enrolled device, so a single wrong code counts against each of them
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True)
+        device_1 = ItouTOTPDeviceFactory(name="1", user=user)
+        device_2 = ItouTOTPDeviceFactory(name="2", user=user)
+        client.force_login(user)
+        verify_otp_url = reverse("otp_views:verify_otp")
+
+        with caplog.at_level(logging.INFO):
+            response = client.post(verify_otp_url, data={"otp_token": "000000"})
+        assert response.context["form"].errors == {
+            "otp_token": ["Le code de validation unique (OTP) n’est pas correct."]
+        }
+        assert f"User {user.id} failed 2FA verification" in caplog.messages
+        for device in (device_1, device_2):
+            device.refresh_from_db()
+            assert device.throttling_failure_count == 1
+
+    def test_verify_with_valid_token_logs_success(self, client, settings, caplog):
+        # Throttle-rollback behaviour is tested in tests/otp/test_utils.py, here we
+        # cover the view wiring: a valid code verifies the user and logs the success
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory(with_verified_email=True)
+        device = ItouTOTPDeviceFactory(name="1", user=user)
+        client.force_login(user)
+        verify_otp_url = reverse("otp_views:verify_otp")
+
+        with caplog.at_level(logging.INFO):
+            response = client.post(verify_otp_url, data={"otp_token": TOTP(device.bin_key).token()})
+        assert response.status_code == 302
+        assert f"User {user.id} authenticated with 2FA" in caplog.messages
+
     def test_login_with_backup_code(self, client, settings, mailoutbox):
         settings.REQUIRE_OTP_FOR_STAFF = True
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
@@ -412,6 +531,34 @@ class TestItouStaffLogin:
         assert device.disabled_at is not None
         [email] = mailoutbox
         assert "Utilisation d'un code de récupération" in email.subject
+
+    def test_login_with_backup_code_preserves_existing_disabled_at(self, client, settings):
+        # Logging in with a backup code soft-deletes the user's *active* TOTP
+        # devices, but must not overwrite the `disabled_at` of devices that were
+        # already disabled earlier (see `purge_disabled_otp_devices`)
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        user = ItouStaffFactory()
+
+        with freeze_time("2025-01-01") as frozen_time:
+            old_disabled_device = ItouTOTPDeviceFactory(user=user, name="old")
+            old_disabled_device.disabled_at = timezone.now()
+            old_disabled_device.save()
+            already_disabled_at = old_disabled_device.disabled_at
+
+            frozen_time.move_to("2026-07-09")
+            active_device = ItouTOTPDeviceFactory(user=user, name="active")
+            backup_code = create_otp_backup_code(user)
+
+            client.force_login(user)
+            response = client.post(reverse("otp_views:login_with_backup_code"), data={"code": backup_code})
+            assertRedirects(response, reverse("otp_views:enrollment_step_0_intro") + "?after_recovery=1")
+
+        active_device.refresh_from_db()
+        old_disabled_device.refresh_from_db()
+        # The active device is soft-deleted at login time
+        assert active_device.disabled_at == datetime.datetime(2026, 7, 9, tzinfo=datetime.UTC)
+        # The already-disabled device keeps its original timestamp
+        assert old_disabled_device.disabled_at == already_disabled_at
 
     def test_login_otp_not_required(self, client):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)

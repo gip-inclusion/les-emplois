@@ -348,7 +348,7 @@ def pro_connect_callback(request):
     amr = ()
     idp_id = None
     try:
-        amr = id_token_data.get("amr", ())
+        amr = id_token_data.get("amr") or ()
         idp_id = user_data.get("idp_id", "")
         ProConnectAuthentication.objects.create(
             user_public_id=user.public_id,

@@ -5,7 +5,8 @@ import logging
 import segno
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -32,10 +33,25 @@ def otp_devices(request, template_name="otp_views/otp_devices.html"):
     devices = get_user_devices(request.user)
     if request.method == "POST":
         if device_id := request.POST.get("delete-device"):
-            device = get_object_or_404(ItouTOTPDevice.objects.filter(user=request.user), pk=device_id)
-            if device != request.user.otp_device:
+            try:
+                device = get_object_or_404(
+                    ItouTOTPDevice.objects.filter(user=request.user, disabled_at=None), pk=device_id
+                )
+            except ValidationError:
+                logger.warning(
+                    "Manipulated request for user %s: delete-device value %r is not a valid UUID",
+                    request.user.id,
+                    device_id,
+                )
+                raise Http404
+            # Compare by `persistent_id`: the current device may be an `ExternalTOTPDevice`
+            # placeholder (ProConnect MFA sidestep), which is not an `ItouTOTPDevice` instance
+            current_device = request.user.otp_device
+            if current_device is None or device.persistent_id != current_device.persistent_id:
                 messages.success(request, "L’appareil a été supprimé.")
-                device.delete()
+                # Soft delete for auditing purposes (see the command `purge_disabled_otp_devices`)
+                device.disabled_at = timezone.now()
+                device.save(update_fields=["disabled_at"])
                 devices = get_user_devices(request.user)
             else:
                 messages.error(request, "Impossible de supprimer l’appareil qui a été utilisé pour se connecter.")
@@ -73,15 +89,31 @@ def enrollment_step_2_and_3_confirm_device(
     previous_step_url = reverse("otp_views:enrollment_step_1_choose_device_type")
     device_type = request.GET.get("device_type") or request.POST.get("device_type")
     if device_type not in DeviceType:
-        # should not happen, unless user manipulates the request
+        logger.warning(
+            "Manipulated request for user %s: unknown device_type %r",
+            request.user.id,
+            device_type,
+        )
         return HttpResponseRedirect(previous_step_url)
 
-    device = ItouTOTPDevice(
-        user=request.user,
-        key=binascii.hexlify(base64.b32decode(request.POST["key"].encode())).decode()
-        if request.POST
-        else generate_otp_key(),
-    )
+    if request.POST:
+        raw_key = request.POST.get("key")
+        if not raw_key:
+            logger.warning("Manipulated request for user %s: missing key during device confirmation", request.user.id)
+            return HttpResponseRedirect(previous_step_url)
+        try:
+            key = binascii.hexlify(base64.b32decode(raw_key.encode())).decode()
+        except (binascii.Error, ValueError):
+            logger.warning(
+                "Manipulated request for user %s: key %r is not valid base32",
+                request.user.id,
+                raw_key,
+            )
+            return HttpResponseRedirect(previous_step_url)
+    else:
+        key = generate_otp_key()
+
+    device = ItouTOTPDevice(user=request.user, key=key)
 
     backup_code = None
     post_save_url = None
@@ -160,7 +192,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         context = {"form": LoginWithBackupCodeForm(static_device=None)}
         messages.warning(
             request,
-            "Il semble que vous n’ayiez pas de code de récupération. Veuillez contacter le support.",
+            "Il semble que vous n’ayez pas de code de récupération. Veuillez contacter le support.",
         )
         return render(request, template_name, context)
 
@@ -181,7 +213,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         # done by `ItouStaticDevice.verify_token` (called by the
         # form). However, we need to delete all other TOTP devices,
         # since the user seems to have lost them.
-        ItouTOTPDevice.objects.filter(user=request.user).update(disabled_at=timezone.now())
+        ItouTOTPDevice.objects.filter(user=request.user, disabled_at=None).update(disabled_at=timezone.now())
         ItouStaticDevice.objects.filter(user=request.user).delete()
 
         notify_backup_code_has_been_used(request.user)

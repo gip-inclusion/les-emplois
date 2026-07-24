@@ -682,6 +682,25 @@ class TestProConnectLoginWithRequiredMfa:
         response = client.post(verify_otp_url, data={"otp_token": otp})
         assertRedirects(response, dashboard_url)
 
+    def test_mfa_with_null_amr_claim(self, client, settings, pro_connect):
+        # ProConnect may return an explicit `null` for the `amr` claim, this
+        # must not crash (`"mfa" in None`) and should fall through to internal MFA
+        settings.REQUIRE_MFA_FOR_PROS = True
+        user = PrescriberFactory(
+            email=pro_connect.oidc_userinfo["email"],
+            membership=True,
+            has_completed_welcoming_tour=True,
+        )
+        settings.REQUIRE_MFA_ON_ORGANIZATION_IDS = {user.prescriberorganization_set.first().id}
+
+        response = pro_connect.mock_oauth_dance(
+            client,
+            expected_redirect_url=reverse("dashboard:index"),
+            id_token_data=ID_TOKEN_DATA | {"amr": None},
+        )
+        response = client.get(response.url)
+        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"))
+
 
 class TestProConnectLogout:
     def test_simple_logout(self, client, pro_connect):

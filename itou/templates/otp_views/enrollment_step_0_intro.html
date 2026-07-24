@@ -1,7 +1,9 @@
 {% extends "layout/base.html" %}
 {% load components %}
 
-{% block global_messages %}{% endblock %}
+{% block global_messages %}
+    {% include "includes/demo_accounts.html" %}
+{% endblock %}
 
 {% block title %}Configuration 2FA {{ block.super }}{% endblock %}
 
@@ -21,9 +23,9 @@
             {% endfragment %}
             {% fragment as content %}
                 <p class="mb-0">
-                    Il a été utilisé et ne peut plus servir. Si vous l’avez noté quelque part (document, gestionnaire de mots de passe, papier…), supprimez-le dès maintenant pour éviter toute confusion future.
+                    Il a été utilisé et <strong>ne peut plus servir</strong>. Si vous l’avez noté quelque part (document, gestionnaire de mots de passe, papier…), <strong>supprimez-le dès maintenant</strong> pour éviter toute confusion future.
                     <br>
-                    À l’issue de cette configuration, un nouveau code de récupération vous sera généré. Conservez-le soigneusement, il remplacera définitivement l’ancien.
+                    À l’issue de cette configuration, <strong>un nouveau code de récupération vous sera généré</strong>. Conservez-le soigneusement, il remplacera définitivement l’ancien.
                 </p>
             {% endfragment %}
         {% endcomponent_alert %}
