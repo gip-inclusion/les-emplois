@@ -87,6 +87,9 @@ if os.getenv("DEBUG_SQL_SNAPSHOT"):
 FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
 
 REQUIRE_OTP_FOR_STAFF = False
+REQUIRE_MFA_FOR_PROS = False
+REQUIRE_MFA_ON_COMPANY_IDS = set()
+REQUIRE_MFA_ON_ORGANIZATION_IDS = set()
 
 BREVO_API_URL = "https://mailer.test.com"
 
