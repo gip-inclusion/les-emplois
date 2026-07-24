@@ -19,6 +19,7 @@ from itou.www.signup import views as signup_views
 register_converter(SiretConverter, "siret")
 
 urlpatterns = [
+    path("admin/login/", login_views.PreLoginView.as_view()),
     path("admin/", admin.site.urls),
     path("hijack/", include("itou.utils.hijack.urls")),
     # --------------------------------------------------------------------------------------
