@@ -155,7 +155,7 @@ class Command(BaseCommand):
             | Q(
                 identity_provider__in=[
                     IdentityProvider.FRANCE_CONNECT,
-                    IdentityProvider.PE_CONNECT,
+                    IdentityProvider.FT_CONNECT,
                 ]
             ),
             kind=UserKind.JOB_SEEKER,

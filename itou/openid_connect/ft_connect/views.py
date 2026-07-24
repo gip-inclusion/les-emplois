@@ -17,7 +17,7 @@ from itoutils.urls import add_url_params
 from itou.external_data.tasks import huey_import_user_pe_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.ft_connect import constants
-from itou.openid_connect.ft_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
+from itou.openid_connect.ft_connect.models import FranceTravailConnectState, FranceTravailConnectUserData
 from itou.openid_connect.models import (
     EmailInUseException,
     InactiveUserException,
@@ -42,22 +42,22 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
 
 
 @login_not_required
-def pe_connect_authorize(request):
-    # The redirect_uri should be defined in the PEAMU settings to be allowed
-    # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
+def ft_connect_authorize(request):
+    # The redirect_uri should be defined in the France Travail Connect settings to be allowed
+    # NB: the integration platform allows "http://127.0.0.1:8000/ft_connect/callback"
     redirect_uri = get_absolute_url(reverse("ft_connect:callback"), host=request.get_host())
     nonce = crypto.get_random_string(12)
-    state = PoleEmploiConnectState.save_state(nonce=nonce)
+    state = FranceTravailConnectState.save_state(nonce=nonce)
     data = {
         "response_type": "code",
         "client_id": settings.API_ESD["KEY"],
         "redirect_uri": redirect_uri,
-        "scope": constants.PE_CONNECT_SCOPES,
+        "scope": constants.FRANCETRAVAIL_CONNECT_SCOPES,
         "state": state,
         "nonce": nonce,
-        "realm": "/individu",  # PEAMU specificity
+        "realm": "/individu",  # France Travail Connect specificity
     }
-    url = constants.PE_CONNECT_ENDPOINT_AUTHORIZE
+    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
@@ -66,18 +66,21 @@ def pe_connect_authorize(request):
 @login_not_required
 @http_methods(db_write=["GET"])
 @with_triggers_context(methods=["GET"])
-def pe_connect_callback(request):
+def ft_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
-        error_msg = "PôleEmploiConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
+        error_msg = (
+            f"{IdentityProvider.FT_CONNECT.label} n’a pas transmis le paramètre « code » "
+            "nécessaire à votre authentification."
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
-    pe_state = PoleEmploiConnectState.get_from_state(state)
+    pe_state = FranceTravailConnectState.get_from_state(state)
     if not pe_state or not pe_state.is_valid():
         error_msg = (
-            "Le paramètre « state » fourni par PôleEmploiConnect et nécessaire à votre authentification "
-            "n’est pas valide."
+            f"Le paramètre « state » fourni par {IdentityProvider.FT_CONNECT.label} et nécessaire à votre "
+            "authentification n’est pas valide."
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
@@ -91,7 +94,7 @@ def pe_connect_callback(request):
         "redirect_uri": redirect_uri,
     }
 
-    url = add_url_params(constants.PE_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
+    url = add_url_params(constants.FRANCETRAVAIL_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
     try:
         response = httpx.post(url, data=data, timeout=5)
         response.raise_for_status()
@@ -100,21 +103,26 @@ def pe_connect_callback(request):
                 f"Unexpected status code: {response.status_code}", request=response._request, response=response
             )
     except httpx.HTTPError:
-        logger.error("PE Connect token request failed", exc_info=True)
-        error_msg = "Impossible d'obtenir le jeton de PôleEmploiConnect. Réessayez dans quelques minutes."
+        logger.error("FT Connect token request failed", exc_info=True)
+        error_msg = (
+            f"Impossible d'obtenir le jeton de {IdentityProvider.FT_CONNECT.label}. Réessayez dans quelques minutes."
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     token_data = response.json()
 
     if not token_data or "access_token" not in token_data:
-        error_msg = "Aucun champ « access_token » dans la réponse PôleEmploiConnect, impossible de vous authentifier"
+        error_msg = (
+            f"Aucun champ « access_token » dans la réponse {IdentityProvider.FT_CONNECT.label}, "
+            "impossible de vous authentifier"
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     access_token = token_data["access_token"]
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    url = constants.PE_CONNECT_ENDPOINT_USERINFO
+    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_USERINFO
 
     try:
         response = httpx.get(
@@ -129,9 +137,10 @@ def pe_connect_callback(request):
                 f"Unexpected status code: {response.status_code}", request=response._request, response=response
             )
     except httpx.HTTPError:
-        logger.error("PE Connect user info request failed", exc_info=True)
+        logger.error("FT Connect user info request failed", exc_info=True)
         error_msg = (
-            "Impossible d'obtenir les informations utilisateur de PôleEmploiConnect. Réessayez dans quelques minutes."
+            f"Impossible d'obtenir les informations utilisateur de {IdentityProvider.FT_CONNECT.label}. "
+            "Réessayez dans quelques minutes."
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
@@ -142,13 +151,16 @@ def pe_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if "sub" not in user_data:
-        # 'sub' is the unique identifier from PôleEmploiConnect, we need that to match a user later on
-        error_msg = "Le paramètre « sub » n'a pas été retourné par PôleEmploiConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
+        # 'sub' is the unique identifier from {IdentityProvider.FT_CONNECT}, we need that to match a user later on
+        error_msg = (
+            f"Le paramètre « sub » n'a pas été retourné par {IdentityProvider.FT_CONNECT.label}. "
+            "Il est nécessaire pour identifier un utilisateur."
+        )
         logger.error(error_msg, exc_info=True)
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
-        pe_user_data = PoleEmploiConnectUserData.from_user_info(user_data)
+        pe_user_data = FranceTravailConnectUserData.from_user_info(user_data)
     except KeyError as e:
         if "email" in e.args:
             return HttpResponseRedirect(reverse("ft_connect:no_email"))
@@ -159,16 +171,16 @@ def pe_connect_callback(request):
         # At this step, we can update the user's fields in DB and create a session if required
         user, _ = pe_user_data.create_or_update_user()
     except InactiveUserException as e:
-        logger.info("PE Connect login attempt with inactive user: %s", e.user)
+        logger.info("FT Connect login attempt with inactive user: %s", e.user)
         return _redirect_to_job_seeker_login_on_error(
-            e.format_message_html(IdentityProvider.PE_CONNECT), request=request
+            e.format_message_html(IdentityProvider.FT_CONNECT), request=request
         )
     except InvalidKindException:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         return HttpResponseRedirect(reverse("account_login"))
     except MultipleSubSameEmailException as e:
         return _redirect_to_job_seeker_login_on_error(
-            e.format_message_html(IdentityProvider.PE_CONNECT), request=request
+            e.format_message_html(IdentityProvider.FT_CONNECT), request=request
         )
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
@@ -185,7 +197,7 @@ def pe_connect_callback(request):
         )
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(
-            request, e.user, IdentityProvider.PE_CONNECT.label
+            request, e.user, IdentityProvider.FT_CONNECT.label
         )
 
     init_user_nir_from_session(request, user)
@@ -196,8 +208,8 @@ def pe_connect_callback(request):
         huey_import_user_pe_data(user, access_token, triggers_context=triggers_context)
 
     login(request, user)
-    # Keep token_data["id_token"] to logout from PEAMU
-    request.session[constants.PE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
+    # Keep token_data["id_token"] to logout from France Travail Connect
+    request.session[constants.FRANCETRAVAIL_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session.modified = True
 
     next_url = reverse("dashboard:index")
@@ -205,12 +217,12 @@ def pe_connect_callback(request):
 
 
 @login_not_required
-def pe_connect_no_email(request, template_name="account/peamu_no_email.html"):
+def ft_connect_no_email(request, template_name="account/ft_connect_no_email.html"):
     return render(request, template_name)
 
 
 @login_not_required
-def pe_connect_logout(request):
+def ft_connect_logout(request):
     id_token = request.GET.get("id_token")
 
     if not id_token:
@@ -220,6 +232,6 @@ def pe_connect_logout(request):
         "id_token_hint": id_token,
         "redirect_uri": get_absolute_url(reverse("search:employers_home"), host=request.get_host()),
     }
-    url = constants.PE_CONNECT_ENDPOINT_LOGOUT
+    url = constants.FRANCETRAVAIL_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)

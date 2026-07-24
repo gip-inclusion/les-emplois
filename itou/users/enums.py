@@ -28,13 +28,13 @@ class IdentityProvider(models.TextChoices):
     DJANGO = "DJANGO", "Django"
     FRANCE_CONNECT = "FC", "FranceConnect"
     PRO_CONNECT = "PC", "ProConnect"
-    PE_CONNECT = "PEC", "Pôle emploi Connect"
+    FT_CONNECT = "FTC", "France Travail Connect"
 
 
 IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
     IdentityProvider.DJANGO: tuple(UserKind.values),
     IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
-    IdentityProvider.PE_CONNECT: (UserKind.JOB_SEEKER,),
+    IdentityProvider.FT_CONNECT: (UserKind.JOB_SEEKER,),
     IdentityProvider.PRO_CONNECT: (UserKind.PROFESSIONAL,),
 }
 

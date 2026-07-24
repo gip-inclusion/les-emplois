@@ -38,13 +38,13 @@
                                     {% endfragment %}
                                 {% endcomponent_alert %}
                             {% endif %}
-                        {% elif login_provider == "PEC" %}
+                        {% elif login_provider == "FTC" %}
                             <p class="h4">Se connecter avec France Travail</p>
-                            {% if show_peamu %}
+                            {% if show_ft_connect %}
                                 <p>
                                     <strong>Votre adresse e-mail utilise une connexion via France Travail. Veuillez vous connecter en utilisant le bouton ci-dessous.</strong>
                                 </p>
-                                <div class="mt-4 text-center">{% include "signup/includes/peamu_button.html" %}</div>
+                                <div class="mt-4 text-center">{% include "signup/includes/ft_connect_button.html" %}</div>
                             {% else %}
                                 {% component_alert content=content variant="info" icon=False %}
                                     {% fragment as content %}

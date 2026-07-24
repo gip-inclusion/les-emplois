@@ -232,7 +232,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     The User model has a "companion" model in the `external_data` app,
     for third-party APIs data import concerns (class `JobSeekerExternalData`).
 
-    At the moment, only users (job seekers) connected via PE Connect
+    At the moment, only users (job seekers) connected via FT Connect
     have external data stored.
 
     More details in `itou.external_data.models` module
@@ -370,7 +370,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                 condition=(
                     models.Q(identity_provider=IdentityProvider.DJANGO)
                     | models.Q(identity_provider=IdentityProvider.FRANCE_CONNECT, kind=UserKind.JOB_SEEKER)
-                    | models.Q(identity_provider=IdentityProvider.PE_CONNECT, kind=UserKind.JOB_SEEKER)
+                    | models.Q(identity_provider=IdentityProvider.FT_CONNECT, kind=UserKind.JOB_SEEKER)
                     | models.Q(identity_provider=IdentityProvider.PRO_CONNECT, kind=UserKind.PROFESSIONAL)
                 ),
             ),
@@ -642,8 +642,8 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         inside `external_data_source_history`. It can look like:
         Since we only append data, they should all be chronologically sorted
         [
-            {"field_name": "first_name", "source": "FRANCE_CONNECT", "created_at": "…", "value": "Jean-Michel"},
-            {"field_name": "birth_date", "source": "PE_CONNECT", "created_at": "…", "value": "…"},
+            {"field_name": "first_name", "source": "FC", "created_at": "…", "value": "Jean-Michel"},
+            {"field_name": "birth_date", "source": "PC", "created_at": "…", "value": "…"},
             …
 
         """

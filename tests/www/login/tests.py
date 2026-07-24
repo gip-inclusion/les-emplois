@@ -22,7 +22,7 @@ from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance as fc_mock_oauth_dance
 from tests.openid_connect.ft_connect.tests import (
-    PEAMU_USERINFO,
+    FT_CONNECT_USERINFO,
     TEST_SETTINGS,
     mock_oauth_dance as pe_mock_oauth_dance,
 )
@@ -203,16 +203,16 @@ class TestJobSeekerLoginFailures:
     @respx.mock
     @override_settings(**TEST_SETTINGS)
     @reload_module(pe_constants)
-    def test_conflict_on_email_change_in_pe_connect(self, client):
+    def test_conflict_on_email_change_in_ft_connect(self, client):
         """
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
         """
-        JobSeekerFactory(email=PEAMU_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
+        JobSeekerFactory(email=FT_CONNECT_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
         JobSeekerFactory(
-            username=PEAMU_USERINFO["sub"],
+            username=FT_CONNECT_USERINFO["sub"],
             email="seconde@email.com",
-            identity_provider=IdentityProvider.PE_CONNECT,
+            identity_provider=IdentityProvider.FT_CONNECT,
         )
 
         # Temporary NIR is not stored with user information.
@@ -255,7 +255,7 @@ class TestExistingUserLogin:
             ),
             (
                 "PE",
-                random_user_kind_factory(identity_provider=IdentityProvider.PE_CONNECT, email="pe@mailinator.com"),
+                random_user_kind_factory(identity_provider=IdentityProvider.FT_CONNECT, email="pe@mailinator.com"),
             ),
             (
                 "FC",
@@ -300,7 +300,7 @@ class TestExistingUserLogin:
 
     @override_settings(
         FRANCE_CONNECT_BASE_URL="http://localhost:8080",
-        PEAMU_AUTH_BASE_URL="http://localhost:8080",
+        FRANCETRAVAIL_CONNECT_AUTH_BASE_URL="http://localhost:8080",
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
     def test_login(self, client, snapshot, subtests):
@@ -353,7 +353,7 @@ class TestExistingUserLogin:
 
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
-        PEAMU_AUTH_BASE_URL=None,
+        FRANCETRAVAIL_CONNECT_AUTH_BASE_URL=None,
         PRO_CONNECT_BASE_URL=None,
     )
     def test_login_disabled_provider(self, client, snapshot, subtests):
