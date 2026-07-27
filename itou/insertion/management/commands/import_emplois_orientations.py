@@ -46,8 +46,7 @@ class Command(BaseCommand):
         service_uids = set()
         for entry in entries:
             user_public_ids.add(entry["beneficiary_id"])
-            if entry["prescriber_id"]:
-                user_public_ids.add(entry["prescriber_id"])
+            user_public_ids.add(entry["prescriber_id"])
             org_uids.add(entry["structure_id"])
             service_uids.add(entry["service_id"])
 
@@ -69,7 +68,7 @@ class Command(BaseCommand):
             return None
 
         prescriber_id = entry["prescriber_id"]
-        sender = users.get(prescriber_id) if prescriber_id else None
+        sender = users.get(prescriber_id)
         if sender is None:
             self.logger.warning("Skipping orientation %s: unknown sender", sync_uid)
             return None
