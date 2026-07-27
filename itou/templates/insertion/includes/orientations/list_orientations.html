@@ -8,9 +8,13 @@
         <div class="text-center my-3 my-md-4">
             <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
             <p class="mt-3">
-                <strong>Aucune demande d’orientation pour le moment</strong>
+                <strong>
+                    {{ request.GET|yesno:"Aucun résultat avec les filtres actuels,Aucune demande d’orientation pour le moment" }}
+                </strong>
             </p>
-            <p class="mb-1 fst-italic">Vous trouverez ici les demandes émises par votre organisation.</p>
+            {% if not request.GET %}
+                <p class="mb-1 fst-italic">Vous trouverez ici les demandes émises par votre organisation.</p>
+            {% endif %}
         </div>
     {% else %}
         <div class="table-responsive mt-3 mt-md-4">
@@ -74,3 +78,9 @@
         {% include "includes/pagination.html" with page=orientations_page boost=True boost_target="#orientations-section" boost_indicator="#orientations-section" request=request only %}
     {% endif %}
 </section>
+
+{% if request.htmx %}
+    {% include "insertion/includes/orientations/list_counter.html" with orientations_page=orientations_page request=request only %}
+    {% include "insertion/includes/orientations/filters/list_reset_filters.html" with btn_dropdown_filter=True filters_counter=filters_counter request=request only %}
+    {% include "insertion/includes/orientations/filters/offcanvas_footer.html" with filters_counter=filters_counter request=request only %}
+{% endif %}

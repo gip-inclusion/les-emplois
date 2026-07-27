@@ -1,0 +1,15 @@
+{% load django_bootstrap5 %}
+
+<div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+    <div class="col-12">
+        <div>{% bootstrap_form_errors filters_form %}</div>
+        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+            {% include "insertion/includes/orientations/filters/status.html" with btn_dropdown_filter=True %}
+            <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
+                <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
+                <span>Tous les filtres <span id="all-filters-btn"></span></span>
+            </button>
+            {% include "insertion/includes/orientations/filters/list_reset_filters.html" with btn_dropdown_filter=True filters_counter=filters_counter request=request only %}
+        </div>
+    </div>
+</div>

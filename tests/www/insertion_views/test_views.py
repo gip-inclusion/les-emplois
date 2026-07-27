@@ -1,5 +1,6 @@
 import datetime
 import json
+import random
 import uuid
 from functools import partial
 from unittest.mock import patch
@@ -47,6 +48,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
 
@@ -1270,6 +1272,12 @@ class TestOrientationDetails:
 
 class TestOrientationsList:
     LIST_URL = reverse("insertion_views:orientations_list")
+    RESET_BTN_MARKUP = f"""
+    <a href="{LIST_URL}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser le filtre actif">
+        <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+        <span>Effacer tout</span>
+    </a>
+    """
 
     def test_list_display(self, client, snapshot):
         membership = PrescriberMembershipFactory(
@@ -1429,6 +1437,71 @@ class TestOrientationsList:
         response = client.get(self.LIST_URL)
         displayed_statuses = [orientation.status for orientation in response.context["orientations_page"].object_list]
         assert sorted(displayed_statuses) == sorted(OrientationStatus.values)
+
+    def test_no_results(self, client):
+        client.force_login(PrescriberFactory(membership=True))
+
+        response = client.get(self.LIST_URL)
+        assertContains(response, "Aucune demande d’orientation pour le moment")
+
+        response = client.get(self.LIST_URL, {"statuses": [OrientationStatus.PENDING]})
+        assertContains(response, "Aucun résultat avec les filtres actuels")
+
+    def test_htmx_filters(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+        status = random.choice(OrientationStatus.values)
+        OrientationFactory(sender=user, sender_prescriber_organization=organization, status=status)
+        client.force_login(user)
+
+        response = client.get(self.LIST_URL)
+        page = parse_response_to_soup(response, selector="#main")
+        assertNotContains(response, self.RESET_BTN_MARKUP, html=True)
+
+        # Simulate the data-emplois-sync-with and check both checkboxes.
+        status_checkboxes = page.find_all("input", attrs={"name": "statuses", "value": status})
+        assert len(status_checkboxes) == 2
+        for status_checkbox in status_checkboxes:
+            status_checkbox["checked"] = ""
+        response = client.get(self.LIST_URL, {"statuses": [status]}, headers={"HX-Request": "true"})
+        update_page_with_htmx(page, f"form[hx-get='{self.LIST_URL}']", response)
+
+        response = client.get(self.LIST_URL, {"statuses": [status]})
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
+
+        assertContains(response, self.RESET_BTN_MARKUP, html=True)
+
+    def test_statuses_filters(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+        pending_orientation = OrientationFactory(
+            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.PENDING
+        )
+        rejected_orientation = OrientationFactory(
+            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REJECTED
+        )
+        client.force_login(user)
+
+        response = client.get(self.LIST_URL, {"statuses": [OrientationStatus.ACCEPTED.value]})
+        assert response.context["orientations_page"].object_list == []
+
+        response = client.get(self.LIST_URL, {"statuses": [OrientationStatus.PENDING.value]})
+        assert response.context["orientations_page"].object_list == [pending_orientation]
+
+        response = client.get(
+            self.LIST_URL, {"statuses": [OrientationStatus.PENDING.value, OrientationStatus.REJECTED.value]}
+        )
+        assert set(response.context["orientations_page"].object_list) == {pending_orientation, rejected_orientation}
+
+        response = client.get(self.LIST_URL, {"statuses": OrientationStatus.values})
+        assert set(response.context["orientations_page"].object_list) == {pending_orientation, rejected_orientation}
+
+        response = client.get(self.LIST_URL, {"statuses": ["INVALID"]})
+        assert set(response.context["orientations_page"].object_list) == {pending_orientation, rejected_orientation}
+        assertContains(response, "Sélectionnez un choix valide. INVALID n’en fait pas partie.")
 
 
 class TestRegisterMobilizationEvent:

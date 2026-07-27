@@ -1,6 +1,6 @@
 {% load str_filters %}
 
-<p class="mb-0" id="orientations-list-count">
+<p class="mb-0" id="orientations-list-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% with orientations_page.paginator.count as counter %}
         {{ counter }} résultat{{ counter|pluralizefr }}
     {% endwith %}
