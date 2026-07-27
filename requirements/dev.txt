@@ -767,9 +767,9 @@ factory-boy==3.3.3 \
     --hash=sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc \
     --hash=sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03
     # via -r test.txt
-faker==40.31.0 \
-    --hash=sha256:af163a937aec99dca5abaeb94dd5008c51c26c6e9af1a26c8db4b3c4e7ca4403 \
-    --hash=sha256:bedc97c292a48a6a1bbe471a9076d7395a196421ede1cedde99d5719f6b91027
+faker==40.36.0 \
+    --hash=sha256:754048c76c03afa7de83eee8f4bcee3cf668cbb7d995f54a4e9678db7f110308 \
+    --hash=sha256:82b9497d9cfe017048075bcf969298a74b1b6e39f5e4dad1211085d1133f7b62
     # via
     #   -r test.txt
     #   factory-boy
