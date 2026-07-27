@@ -73,6 +73,7 @@ class Command(BaseCommand):
         certified_profiles = []
         identity_certifications = []
         swapped_users = []
+        swapped_profiles = []
 
         def certify_user(user, id_certifie):
             user.jobseeker_profile.pe_obfuscated_nir = id_certifie
@@ -104,17 +105,22 @@ class Command(BaseCommand):
                         )
                     else:
                         self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
-                        user.last_name, user.first_name = user.first_name, user.last_name
+                        user.jobseeker_profile.birth_name, user.first_name = (
+                            user.first_name,
+                            user.jobseeker_profile.birth_name,
+                        )
                         certify_user(user, response2)
                         swapped_users.append(user)
+                        swapped_profiles.append(user.jobseeker_profile)
                 else:
                     certify_user(user, response)
 
         self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
         JobSeekerProfile.objects.bulk_update(
-            certified_profiles,
+            certified_profiles + swapped_profiles,
             [
+                "birth_name",
                 "pe_obfuscated_nir",
                 "pe_last_certification_attempt_at",
             ],
@@ -132,5 +138,5 @@ class Command(BaseCommand):
         )
         self.logger.info("count=%d users could not be certified.", len(not_certified))
 
-        User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
+        User.objects.bulk_update(swapped_users, ["first_name"], batch_size=1000)
         self.logger.info("count=%d users have been swapped", len(swapped_users))
