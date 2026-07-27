@@ -74,6 +74,9 @@ class DoraAPIClient:
     def emplois_services(self, **params):
         return DoraApiPaginatedResponse(**self._request("/services/", params).json())
 
+    def orientation_statuses(self, **params):
+        return DoraApiPaginatedResponse(**self._request("/orientations/status/", params).json())
+
     def disabled_dora_form_di_structures(self, **params):
         return {
             r["source"] + "--" + r["structure_id"]

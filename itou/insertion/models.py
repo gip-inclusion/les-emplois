@@ -717,6 +717,11 @@ class Orientation(models.Model):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+    dora_status_updated_at = models.DateTimeField(
+        verbose_name="date de mise à jour du statut côté DORA",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name = "orientation"
