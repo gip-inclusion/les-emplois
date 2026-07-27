@@ -126,8 +126,6 @@ class Command(BaseCommand):
 
     @dry_runnable
     def handle(self, *args, file, wet_run, **options):
-        self.wet_run = wet_run
-
         with open(file, encoding="utf-8") as f:
             entries = json.load(f)
 
