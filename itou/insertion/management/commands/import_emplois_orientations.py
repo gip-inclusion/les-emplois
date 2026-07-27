@@ -84,10 +84,11 @@ class Command(BaseCommand):
         structure_id = entry["structure_id"]
         if prescriber_organization := prescriber_organizations.get(structure_id):
             sender_kind = SenderKind.PRESCRIBER
+            sender_prescriber_organization = prescriber_organization
             sender_company = None
         elif company := companies.get(structure_id):
             sender_kind = SenderKind.EMPLOYER
-            prescriber_organization = None
+            sender_prescriber_organization = None
             sender_company = company
         else:
             self.logger.warning("Skipping orientation %s: unknown organization %s", sync_uid, structure_id)
@@ -98,7 +99,7 @@ class Command(BaseCommand):
             beneficiary=beneficiary,
             sender=sender,
             sender_kind=sender_kind,
-            sender_prescriber_organization=prescriber_organization,
+            sender_prescriber_organization=sender_prescriber_organization,
             sender_company=sender_company,
             service=service,
             beneficiary_contact_preferences=entry["beneficiary_contact_preferences"],
