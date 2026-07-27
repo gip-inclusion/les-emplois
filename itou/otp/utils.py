@@ -36,13 +36,10 @@ def notify_backup_code_has_been_used(user):
     email.send()
 
 
-def require_otp(user):
-    if not user.is_authenticated:
-        return False
-
-    if user.is_verified():  # user has already authenticated with MFA
-        return False
-
+def user_is_concerned_by_otp(user):
+    """Whether 2FA applies to this user, regardless of whether they have already
+    verified in the current session (unlike `require_otp`, which short-circuits on
+    `is_verified()`). Assumes an authenticated itou user."""
     if settings.REQUIRE_OTP_FOR_STAFF and user.is_itou_staff:
         return True
 
@@ -52,10 +49,45 @@ def require_otp(user):
     return False
 
 
+def user_uses_external_mfa(user):
+    """Whether the current session was verified by the identity provider's own MFA.
+
+    See `create_placeholder_for_external_totp_device()`.
+    Only meaningful for the request user after OTPMiddleware.
+    """
+    return isinstance(getattr(user, "otp_device", None), ExternalTOTPDevice)
+
+
+def user_can_enroll_otp_device(user):
+    """Whether our own 2FA applies to this user and the identity provider does not already
+    handle it: enrolling a device is useful."""
+    return user_is_concerned_by_otp(user) and not user_uses_external_mfa(user)
+
+
+def user_can_manage_otp_devices(user):
+    """Same as `user_can_enroll_otp_device`, plus at least one device to see, use or delete."""
+    return user_can_enroll_otp_device(user) and ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists()
+
+
+def require_otp(user):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_verified():  # user has already authenticated with MFA
+        return False
+
+    return user_is_concerned_by_otp(user)
+
+
 def _require_otp_for_pro(user):
     assert user.is_professional
     if not settings.REQUIRE_MFA_FOR_PROS:
         return False
+    # We tested the enrollment flow on some users who were not yet in
+    # the targeted batches that we check below. If they have enrolled
+    # a device, we should require them to use it.
+    if ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists():
+        return True
     org_ids = set(
         PrescriberMembership.objects.active().filter(user_id=user.id).values_list("organization_id", flat=True)
     )
