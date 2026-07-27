@@ -1,0 +1,39 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}Orientations émises {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>Orientations</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a href="{% url "search:services_results" %}" class="btn btn-lg btn-ico btn-primary">
+                <i aria-hidden="true" class="ri-add-line ri-lg"></i>
+                <span>Orienter un usager</span>
+            </a>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        <div class="flex-md-grow-1">
+                            {% include "insertion/includes/orientations/list_counter.html" with orientations_page=orientations_page only %}
+                        </div>
+                    </div>
+                    {% include "insertion/includes/orientations/list_orientations.html" with orientations_page=orientations_page request=request csrf_token=csrf_token only %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+{% endblock %}
