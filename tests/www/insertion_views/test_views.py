@@ -7,11 +7,18 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
 from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertTemplateUsed
+from pytest_django.asserts import (
+    assertContains,
+    assertNotContains,
+    assertNumQueries,
+    assertQuerySetEqual,
+    assertTemplateUsed,
+)
 
 from itou.companies.models import CompanyMembership
 from itou.insertion.enums import BeneficiaryContactPreference, MobilizationEventKind, OrientationStatus
@@ -40,7 +47,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
 
 class TestStructures:
@@ -1259,6 +1266,169 @@ class TestOrientationDetails:
                 <span>Accéder au détail du service</span>
             </a>"""
         assertion(response, servce_button_markup, html=True)
+
+
+class TestOrientationsList:
+    LIST_URL = reverse("insertion_views:orientations_list")
+
+    def test_list_display(self, client, snapshot):
+        membership = PrescriberMembershipFactory(
+            organization__authorized=True, user__first_name="André", user__last_name="Dufour"
+        )
+        organization = membership.organization
+        user = membership.user
+        other_user = PrescriberFactory(
+            first_name="Daphnée", last_name="Delavigne", membership__organization=organization
+        )
+
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        other_beneficiary = JobSeekerFactory(first_name="Mary", last_name="Astell")
+
+        client.force_login(user)
+        response = client.get(self.LIST_URL)
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="empty page")
+
+        with freeze_time(datetime.datetime(2026, 1, 15, 1, 0, tzinfo=datetime.UTC)):
+            last_updated = OrientationFactory(
+                id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+                beneficiary=beneficiary,
+                sender=user,
+                sender_prescriber_organization=organization,
+                sender_kind=SenderKind.PRESCRIBER,
+                service=ServiceFactory(name="S’hair-vice", structure__name="Structure à cuire"),
+                created_at=datetime.datetime(2026, 1, 1, 0, 0, tzinfo=datetime.UTC),
+            )
+        with freeze_time(datetime.datetime(2026, 1, 15, 0, 0, tzinfo=datetime.UTC)):
+            first_updated = OrientationFactory(
+                id=uuid.UUID("00000000-1111-2222-3333-555555555555"),
+                beneficiary=other_beneficiary,
+                sender=other_user,
+                sender_prescriber_organization=organization,
+                sender_kind=SenderKind.PRESCRIBER,
+                service=ServiceFactory(name="Sers vis", structure__name="Structure gonflable"),
+                created_at=datetime.datetime(2026, 1, 1, 0, 0, tzinfo=datetime.UTC),
+                status=OrientationStatus.REJECTED,
+            )
+        client.force_login(user)
+
+        with assertSnapshotQueries(snapshot(name="queries")):
+            response = client.get(self.LIST_URL)
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="page")
+        assert response.context["orientations_page"].object_list == [last_updated, first_updated]
+
+    def test_non_authorized_prescriber_cannot_see_pii(self, client):
+        membership = PrescriberMembershipFactory()
+        user = membership.user
+        organization = membership.organization
+
+        beneficiary = JobSeekerFactory(
+            first_name="Marimprobable",
+            last_name="Astellrare",
+        )
+
+        OrientationFactory(
+            beneficiary=beneficiary,
+            sender=user,
+            sender_prescriber_organization=organization,
+            sender_kind=SenderKind.PRESCRIBER,
+        )
+
+        client.force_login(user)
+        response = client.get(self.LIST_URL)
+
+        assertNotContains(response, beneficiary.first_name)
+        assertNotContains(response, beneficiary.last_name)
+        assertContains(response, "A… M…", html=True)
+
+    @override_settings(PAGE_SIZE_DEFAULT=1)
+    def test_pagination(self, client):
+        membership = PrescriberMembershipFactory(
+            organization__authorized=True, user__first_name="André", user__last_name="Dufour"
+        )
+        organization = membership.organization
+        user = membership.user
+        OrientationFactory.create_batch(2, sender=user, sender_prescriber_organization=organization)
+        client.force_login(user)
+        response = client.get(self.LIST_URL)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (self.LIST_URL + "?page=1"), html=True)
+
+    @pytest.mark.parametrize(
+        "membership_factory",
+        [CompanyMembershipFactory, partial(PrescriberMembershipFactory, organization__authorized=True)],
+    )
+    def test_list_contains_only_org_orientations(self, membership_factory, client):
+        membership = membership_factory()
+        user = membership.user
+
+        prescriber_organization = None
+        company = None
+        other_prescriber_organization_same_user = None
+        other_company_same_user = None
+        other_prescriber_organization = None
+        other_company = None
+        if isinstance(membership, PrescriberMembership):
+            sender_kind = SenderKind.PRESCRIBER
+            prescriber_organization = membership.organization
+            other_prescriber_organization_same_user = membership_factory(user=user).organization
+            other_user_same_org = membership_factory(organization=prescriber_organization).user
+            other_membership = PrescriberMembershipFactory()
+            other_user = other_membership.user
+            other_prescriber_organization = other_membership.organization
+        elif isinstance(membership, CompanyMembership):
+            sender_kind = SenderKind.EMPLOYER
+            company = membership.company
+            other_company_same_user = membership_factory(user=user).company
+            other_user_same_org = membership_factory(company=company).user
+            other_membership = CompanyMembershipFactory()
+            other_user = other_membership.user
+            other_company = other_membership.company
+
+        # Orientation made by any user of current organization is displayed
+        displayed_orientations = [
+            OrientationFactory(
+                sender_kind=sender_kind,
+                sender=user,
+                sender_prescriber_organization=prescriber_organization,
+                sender_company=company,
+            ),
+            OrientationFactory(
+                sender_kind=sender_kind,
+                sender=other_user_same_org,
+                sender_prescriber_organization=prescriber_organization,
+                sender_company=company,
+            ),
+        ]
+
+        # Other orientations are not displayed
+        OrientationFactory(
+            sender_kind=sender_kind,
+            sender=user,
+            sender_prescriber_organization=other_prescriber_organization_same_user,
+            sender_company=other_company_same_user,
+        )
+        OrientationFactory(
+            sender_kind=sender_kind,
+            sender=other_user,
+            sender_prescriber_organization=other_prescriber_organization,
+            sender_company=other_company,
+        )
+
+        client.force_login(user)
+        response = client.get(self.LIST_URL)
+        assertQuerySetEqual(response.context["orientations_page"], displayed_orientations, ordered=False)
+
+    def test_list_contains_all_statuses(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+
+        for status in OrientationStatus:
+            OrientationFactory(sender=user, sender_prescriber_organization=organization, status=status)
+
+        client.force_login(user)
+        response = client.get(self.LIST_URL)
+        displayed_statuses = [orientation.status for orientation in response.context["orientations_page"].object_list]
+        assert sorted(displayed_statuses) == sorted(OrientationStatus.values)
 
 
 class TestRegisterMobilizationEvent:

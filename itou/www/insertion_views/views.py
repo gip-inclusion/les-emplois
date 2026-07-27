@@ -1,4 +1,5 @@
 import enum
+import functools
 import logging
 
 from data_inclusion.schema.v1.thematiques import Categorie
@@ -30,9 +31,14 @@ from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.users.perms import can_orient_towards_insertion_service, can_register_mobilization_event
+from itou.users.perms import (
+    add_user_can_view_personal_information,
+    can_orient_towards_insertion_service,
+    can_register_mobilization_event,
+)
 from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin, check_request
+from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.phone import normalize_phone_number
 from itou.utils.readonly import ReadonlyViewMixin
@@ -569,6 +575,36 @@ def dismiss_orientation_disclaimer(request, session_uuid):
                 kwargs={"session_uuid": session_uuid, "step": OrientationStep.CONFORMITY},
             ),
         )
+    )
+
+
+@check_request(can_orient_towards_insertion_service)
+def orientations_list(request):
+    template_name = "insertion/orientations/list.html"
+
+    organization_kwargs = (
+        {"sender_company": request.current_organization}
+        if request.from_employer
+        else {"sender_prescriber_organization": request.current_organization}
+    )
+
+    orientations = (
+        insertion_models.Orientation.objects.filter(**organization_kwargs)
+        .order_by("-updated_at")
+        .select_related("beneficiary", "sender", "service", "service__structure")
+    )
+
+    orientations_page = pager(orientations, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
+    add_user_can_view_personal_information(
+        orientations_page, functools.partial(can_view_personal_information, request), user_attr="beneficiary"
+    )
+
+    context = {
+        "orientations_page": orientations_page,
+    }
+
+    return render(
+        request, "insertion/includes/orientations/list_orientations.html" if request.htmx else template_name, context
     )
 
 

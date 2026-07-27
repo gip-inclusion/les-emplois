@@ -38,4 +38,5 @@ urlpatterns = [
         name="orientation_confirmation",
     ),
     path("orientations/<uuid:orientation_id>/", views.orientation_details, name="orientation_details"),
+    path("orientations/", views.orientations_list, name="orientations_list"),
 ]

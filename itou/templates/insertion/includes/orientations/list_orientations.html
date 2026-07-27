@@ -1,0 +1,76 @@
+{% load badges %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+<section aria-labelledby="orientations-list-count" id="orientations-section">
+    {% if not orientations_page %}
+        <div class="text-center my-3 my-md-4">
+            <img class="img-fluid" src="{% static 'img/illustration-card-no-result.png' %}" alt="" loading="lazy">
+            <p class="mt-3">
+                <strong>Aucune demande d’orientation pour le moment</strong>
+            </p>
+            <p class="mb-1 fst-italic">Vous trouverez ici les demandes émises par votre organisation.</p>
+        </div>
+    {% else %}
+        <div class="table-responsive mt-3 mt-md-4">
+            <table class="table table-hover table-sortable">
+                <thead>
+                    <tr>
+                        <th scope="col">Orientation de</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Émise le</th>
+                        <th scope="col">Mise à jour le</th>
+                        <th scope="col">Émetteur</th>
+                        <th scope="col">Service concerné</th>
+                        <th scope="col" class="text-end w-50px">
+                            <span class="visually-hidden">Actions possibles sur les orientations</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orientation in orientations_page %}
+                        {% url "insertion_views:orientation_details" orientation_id=orientation.id as details_url %}
+                        <tr class="align-top">
+                            <td>
+                                <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "orientation" "clic" "voir_orientation" %}>
+                                    {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}
+                                </a>
+                            </td>
+
+                            <td>{% orientation_state_badge orientation extra_classes="badge-sm" %}</td>
+
+                            <td>{{ orientation.created_at|date:"d/m/Y" }}</td>
+
+                            <td>{{ orientation.updated_at|date:"d/m/Y" }}</td>
+
+                            <td>
+                                <i class="ri-user-line me-1" aria-hidden="true"></i>
+                                {{ orientation.sender.get_inverted_full_name }}
+                            </td>
+
+                            <td>
+                                <span class="d-block">{{ orientation.service.name }}</span>
+                                <span class="d-block">
+                                    <i class="ri-community-line" aria-hidden="true"></i>
+                                {{ orientation.service.structure.name }}</span>
+                            </td>
+
+                            <td>
+                                <a class="btn btn-sm btn-link btn-ico-only"
+                                   href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-title="Voir l’orientation"
+                                   {% matomo_event "orientation" "clic" "voir_orientation" %}>
+                                    <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir l’orientation de {{ orientation.beneficiary.get_inverted_full_name|mask_unless:orientation.user_can_view_personal_information }}"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+        {% include "includes/pagination.html" with page=orientations_page boost=True boost_target="#orientations-section" boost_indicator="#orientations-section" request=request only %}
+    {% endif %}
+</section>
