@@ -107,94 +107,94 @@ class ItouCurrentOrganizationMiddleware:
     def __call__(self, request):
         user = request.user
 
-        logout_warning = None
         request.from_employer = False
         request.from_prescriber = False
         request.from_authorized_prescriber = False
         request.from_institution = False
-        if user.is_authenticated and user.is_professional:
-            company_memberships = get_active_company_memberships(user)
-            prescriber_memberships = get_active_prescriber_memberships(user)
-            institution_memberships = get_active_institution_memberships(user)
 
-            (
-                request.organizations,
-                request.current_organization,
-                request.is_current_organization_admin,
-            ) = extract_membership_infos_and_update_session(
-                company_memberships,
-                prescriber_memberships,
-                institution_memberships,
-                request.session,
-            )
+        if user.is_authenticated:
+            logout_warning = None
+            if user.is_professional:
+                company_memberships = get_active_company_memberships(user)
+                prescriber_memberships = get_active_prescriber_memberships(user)
+                institution_memberships = get_active_institution_memberships(user)
 
-            # FT users must have at least one FT organization
-            if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
-                m.organization.kind == PrescriberOrganizationKind.FT for m in prescriber_memberships
+                (
+                    request.organizations,
+                    request.current_organization,
+                    request.is_current_organization_admin,
+                ) = extract_membership_infos_and_update_session(
+                    company_memberships,
+                    prescriber_memberships,
+                    institution_memberships,
+                    request.session,
+                )
+
+                # FT users must have at least one FT organization
+                if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
+                    m.organization.kind == PrescriberOrganizationKind.FT for m in prescriber_memberships
+                ):
+                    logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
+                elif not request.current_organization:
+                    logout_warning = LogoutWarning.NO_ORGANIZATION
+
+                else:
+                    if isinstance(request.current_organization, PrescriberOrganization):
+                        request.from_prescriber = True
+                        if request.current_organization.is_authorized:
+                            request.from_authorized_prescriber = True
+                    elif isinstance(request.current_organization, Company):
+                        request.from_employer = True
+                    elif isinstance(request.current_organization, Institution):
+                        request.from_institution = True
+
+            skip_middleware_conditions = [
+                request.path.startswith("/login/"),
+                request.path.startswith("/logout/"),  # Logout warning page for pros with no organization
+                request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
+                # Allow to access both steps of accepting an invitation to join an organization
+                request.path.startswith("/signup/"),  # professional about to join an organization/company
+                request.path in [reverse("account_login"), reverse("account_logout")],
+                request.path.startswith("/hijack/release"),  # Allow to release hijack
+                request.path.startswith("/api"),  # APIs should handle those errors
+                request.path.startswith("/legal/terms/"),
+            ]
+            if any(skip_middleware_conditions):
+                return self.get_response(request)
+
+            # Force ProConnect
+            if (
+                user.identity_provider != IdentityProvider.PRO_CONNECT
+                and (request.from_employer or request.from_prescriber)
+                and not request.path.startswith(
+                    "/dashboard/activate-pro-connect-account"
+                )  # Allow to access ProConnect activation view
+                and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
+                and settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
             ):
-                logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
-            elif not request.current_organization:
-                logout_warning = LogoutWarning.NO_ORGANIZATION
+                # Add request.path as next param ?
+                return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 
-            else:
-                if isinstance(request.current_organization, PrescriberOrganization):
-                    request.from_prescriber = True
-                    if request.current_organization.is_authorized:
-                        request.from_authorized_prescriber = True
-                elif isinstance(request.current_organization, Company):
-                    request.from_employer = True
-                elif isinstance(request.current_organization, Institution):
-                    request.from_institution = True
+            # Enforce internal OTP before the Nexus whitelist below, otherwise
+            # MFA-required professionals could reach the whitelisted views unverified
+            if require_otp(user):
+                logger.info("Requiring internal OTP for user %d", user.id)
+                login_verify_otp_url = reverse("otp_views:verify_otp")
+                login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
+                if get_user_devices(user):
+                    if request.path not in (login_verify_otp_url, login_with_backup_code_url):
+                        return HttpResponseRedirect(
+                            add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
+                        )
+                elif not request.path.startswith("/otp/enrollment"):
+                    return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
 
-        skip_middleware_conditions = [
-            request.path.startswith("/login/"),
-            request.path.startswith("/logout/"),  # Logout warning page for pros with no organization
-            request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
-            # Allow to access both steps of accepting an invitation to join an organization
-            request.path.startswith("/signup/"),  # professional about to join an organization/company
-            request.path in [reverse("account_login"), reverse("account_logout")],
-            request.path.startswith("/hijack/release"),  # Allow to release hijack
-            request.path.startswith("/api"),  # APIs should handle those errors
-            request.path.startswith("/legal/terms/"),
-        ]
-        if any(skip_middleware_conditions):
-            return self.get_response(request)
+            # FIXME: This will soon be removed along with Nexus views
+            # Nexus : Allow views without organization
+            if user.is_professional and request.path.startswith("/portal"):
+                return self.get_response(request)
 
-        # Force ProConnect
-        if (
-            user.is_authenticated
-            and user.identity_provider != IdentityProvider.PRO_CONNECT
-            and (request.from_employer or request.from_prescriber)
-            and not request.path.startswith(
-                "/dashboard/activate-pro-connect-account"
-            )  # Allow to access ProConnect activation view
-            and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
-            and settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
-        ):
-            # Add request.path as next param ?
-            return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
-
-
-        # Enforce internal OTP before the Nexus whitelist below, otherwise
-        # MFA-required professionals could reach the whitelisted views unverified
-        if require_otp(user):
-            logger.info("Requiring internal OTP for user %d", user.id)
-            login_verify_otp_url = reverse("otp_views:verify_otp")
-            login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
-            if get_user_devices(user):
-                if request.path not in (login_verify_otp_url, login_with_backup_code_url):
-                    return HttpResponseRedirect(
-                        add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
-                    )
-            elif not request.path.startswith("/otp/enrollment"):
-                return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
-
-        # FIXME: This will soon be removed along with Nexus views
-        # Nexus : Allow views without organization
-        if user.is_authenticated and user.is_professional and request.path.startswith("/portal"):
-            return self.get_response(request)
-
-        if logout_warning is not None:
-            return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
+            if logout_warning is not None:
+                return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 
         return self.get_response(request)
