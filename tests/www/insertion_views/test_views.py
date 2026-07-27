@@ -1261,113 +1261,111 @@ class TestOrientationDetails:
         assertion(response, servce_button_markup, html=True)
 
 
-@pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
-@pytest.mark.parametrize(
-    "kind, with_service, service_external_link",
-    [
-        (MobilizationEventKind.STRUCTURE_CONTACT, False, ""),
-        (MobilizationEventKind.SERVICE_CONTACT, True, ""),
-        (MobilizationEventKind.SERVICE_EXT_LINK, True, "https://site.fake"),
-    ],
-)
-def test_register_mobilization_event(client, user_factory, kind, with_service, service_external_link):
-    structure = StructureFactory()
-    service = ServiceFactory(structure=structure) if with_service else None
+class TestRegisterMobilizationEvent:
+    @pytest.mark.parametrize("user_factory", [None, partial(PrescriberFactory, membership=True)])
+    @pytest.mark.parametrize(
+        "kind, with_service, service_external_link",
+        [
+            (MobilizationEventKind.STRUCTURE_CONTACT, False, ""),
+            (MobilizationEventKind.SERVICE_CONTACT, True, ""),
+            (MobilizationEventKind.SERVICE_EXT_LINK, True, "https://site.fake"),
+        ],
+    )
+    def test_register_mobilization_event(self, client, user_factory, kind, with_service, service_external_link):
+        structure = StructureFactory()
+        service = ServiceFactory(structure=structure) if with_service else None
 
-    if user_factory:
+        if user_factory:
+            user = user_factory()
+            client.force_login(user)
+        else:
+            user = AnonymousUser()
+            # Init session for anonymous user -- TODO: tweak client.force_login to allow force_login(AnonymousUser())
+            client.get(reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid}))
+
+        data = {
+            "kind": kind,
+            "structure_uid": structure.uid,
+            "service_uid": service.uid if with_service else "",
+            "service_external_link": service_external_link,
+        }
+        response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
+        assert response.content == b'{"message": "ok"}'
+
+        assert MobilizationEvent.objects.filter(
+            user=user if user_factory else None,
+            kind=kind,
+            structure=structure,
+            service=service,
+            service_external_link=service_external_link,
+        ).exists()
+
+    @pytest.mark.parametrize(
+        "user_factory",
+        [ItouStaffFactory, JobSeekerFactory, partial(LaborInspectorFactory, membership=True)],
+    )
+    def test_register_mobilization_event_bad_user(self, client, user_factory):
+        structure = StructureFactory()
         user = user_factory()
         client.force_login(user)
-    else:
-        user = AnonymousUser()
-        # Init session for anonymous user -- TODO: tweak client.force_login to allow force_login(AnonymoutUser())
-        client.get(reverse("insertion_views:structure_card", kwargs={"structure_uid": structure.uid}))
 
-    data = {
-        "kind": kind,
-        "structure_uid": structure.uid,
-        "service_uid": service.uid if with_service else "",
-        "service_external_link": service_external_link,
-    }
-    response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
-    assert response.content == b'{"message": "ok"}'
+        data = {"kind": MobilizationEventKind.STRUCTURE_CONTACT, "structure_uid": structure.uid, "service_uid": ""}
+        response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
 
-    assert MobilizationEvent.objects.filter(
-        user=user if user_factory else None,
-        kind=kind,
-        structure=structure,
-        service=service,
-        service_external_link=service_external_link,
-    ).exists()
+        assert response.status_code == 403
+        assert not MobilizationEvent.objects.exists()
 
+    @pytest.mark.parametrize(
+        "kind,message,status_code,expected_exists",
+        [
+            (MobilizationEventKind.STRUCTURE_CONTACT.value, "", 200, True),
+            ("", "missing or bad kind", 400, False),
+            ("wrong_kind", "missing or bad kind", 400, False),
+            (MobilizationEventKind.SERVICE_CONTACT.value, "", 500, False),
+        ],
+        ids=["good kind", "missing kind", "bad kind", "inconsistent kind (no service)"],
+    )
+    def test_register_mobilization_event_kind(self, client, kind, message, status_code, expected_exists):
+        structure = StructureFactory()
+        user = PrescriberFactory(membership=True)
+        client.force_login(user)
 
-@pytest.mark.parametrize(
-    "user_factory",
-    [ItouStaffFactory, JobSeekerFactory, partial(LaborInspectorFactory, membership=True)],
-)
-def test_register_mobilization_event_bad_user(client, user_factory):
-    structure = StructureFactory()
-    user = user_factory()
-    client.force_login(user)
+        data = {"kind": kind, "structure_uid": structure.uid, "service_uid": ""}
+        response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
 
-    data = {"kind": MobilizationEventKind.STRUCTURE_CONTACT, "structure_uid": structure.uid, "service_uid": ""}
-    response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
+        assert response.status_code == status_code
+        if message:
+            assert json.loads(response.content.decode()) == {"message": message}
+        assert MobilizationEvent.objects.exists() is expected_exists
 
-    assert response.status_code == 403
-    assert not MobilizationEvent.objects.exists()
+    @pytest.mark.parametrize(
+        "structure_uid,service_uid,message,status_code,expected_exists",
+        [
+            # No service_uid
+            ("structure-uid", "", "", 200, True),
+            ("", "", "missing structure_uid", 400, False),
+            ("inexisting-structure-uid", "", "", 404, False),
+            # With service_uid
+            ("structure-uid", "service-uid", "", 200, True),
+            ("inexisting-structure-uid", "service-uid", "", 200, True),
+            ("", "service-uid", "", 200, True),
+            ("structure-uid", "inexisting-service-uid", "", 404, False),
+        ],
+    )
+    def test_register_mobilization_event_structure_service(
+        self, client, structure_uid, service_uid, message, status_code, expected_exists
+    ):
+        structure = StructureFactory(uid="structure-uid")
+        ServiceFactory(uid="service-uid", structure=structure)
+        user = PrescriberFactory(membership=True)
+        client.force_login(user)
 
+        kind = MobilizationEventKind.SERVICE_CONTACT if service_uid else MobilizationEventKind.STRUCTURE_CONTACT
 
-@pytest.mark.parametrize(
-    "kind,message,status_code,expected_exists",
-    [
-        (MobilizationEventKind.STRUCTURE_CONTACT.value, "", 200, True),
-        ("", "missing or bad kind", 400, False),
-        ("wrong_kind", "missing or bad kind", 400, False),
-        (MobilizationEventKind.SERVICE_CONTACT.value, "", 500, False),
-    ],
-    ids=["good kind", "missing kind", "bad kind", "inconsistent kind (no service)"],
-)
-def test_register_mobilization_event_kind(client, kind, message, status_code, expected_exists):
-    structure = StructureFactory()
-    user = PrescriberFactory(membership=True)
-    client.force_login(user)
+        data = {"kind": kind, "structure_uid": structure_uid, "service_uid": service_uid}
+        response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
 
-    data = {"kind": kind, "structure_uid": structure.uid, "service_uid": ""}
-    response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
-
-    assert response.status_code == status_code
-    if message:
-        assert json.loads(response.content.decode()) == {"message": message}
-    assert MobilizationEvent.objects.exists() is expected_exists
-
-
-@pytest.mark.parametrize(
-    "structure_uid,service_uid,message,status_code,expected_exists",
-    [
-        # No service_uid
-        ("structure-uid", "", "", 200, True),
-        ("", "", "missing structure_uid", 400, False),
-        ("inexisting-structure-uid", "", "", 404, False),
-        # With service_uid
-        ("structure-uid", "service-uid", "", 200, True),
-        ("inexisting-structure-uid", "service-uid", "", 200, True),
-        ("", "service-uid", "", 200, True),
-        ("structure-uid", "inexisting-service-uid", "", 404, False),
-    ],
-)
-def test_register_mobilization_event_structure_service(
-    client, structure_uid, service_uid, message, status_code, expected_exists
-):
-    structure = StructureFactory(uid="structure-uid")
-    ServiceFactory(uid="service-uid", structure=structure)
-    user = PrescriberFactory(membership=True)
-    client.force_login(user)
-
-    kind = MobilizationEventKind.SERVICE_CONTACT if service_uid else MobilizationEventKind.STRUCTURE_CONTACT
-
-    data = {"kind": kind, "structure_uid": structure_uid, "service_uid": service_uid}
-    response = client.post(reverse("insertion_views:register_mobilization_event"), data=data)
-
-    assert response.status_code == status_code
-    if message:
-        assert json.loads(response.content.decode()) == {"message": message}
-    assert MobilizationEvent.objects.exists() is expected_exists
+        assert response.status_code == status_code
+        if message:
+            assert json.loads(response.content.decode()) == {"message": message}
+        assert MobilizationEvent.objects.exists() is expected_exists
