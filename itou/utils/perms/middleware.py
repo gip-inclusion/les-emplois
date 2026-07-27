@@ -146,15 +146,11 @@ class ItouCurrentOrganizationMiddleware:
                 elif isinstance(request.current_organization, Institution):
                     request.from_institution = True
 
-        # Accepting an invitation to join a group is a two-step process.
-        # - View one: account creation or login.
-        # - View two: user is added to the group.
-        # In view two, the user is authenticated but he does not belong to any group.
-        # This raises an error so we skip the middleware only in this case.
         skip_middleware_conditions = [
             request.path.startswith("/login/"),
-            request.path.startswith("/logout/"),
+            request.path.startswith("/logout/"),  # Logout warning page for pros with no organization
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
+            # Allow to access both steps of accepting an invitation to join an organization
             request.path.startswith("/signup/"),  # professional about to join an organization/company
             request.path.startswith("/pro_connect/"),  # logging in again in signup flows
             request.path in [reverse("account_login"), reverse("account_logout")],
