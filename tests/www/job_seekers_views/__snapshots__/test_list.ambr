@@ -1602,18 +1602,23 @@
               <th scope="col">
                   Situation IAE
               </th>
-              <th scope="col">
-                  Dernier accompagnateur connu
-              </th>
-              <th aria-sort="none" scope="col">
-                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="job_applications_nb" type="button">
-                      Nombre de candidatures
-                  </button>
-              </th>
               <th aria-sort="descending" scope="col">
                   <button data-emplois-setter-target="#id_order" data-emplois-setter-value="last_updated_at" type="button">
                       Dernière action
                   </button>
+              </th>
+              <th aria-sort="none" scope="col">
+                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="job_applications_nb" type="button">
+                      Nbr de candidatures
+                  </button>
+              </th>
+              <th aria-sort="none" scope="col">
+                  <button data-emplois-setter-target="#id_order" data-emplois-setter-value="advisors__len" type="button">
+                      Nbr d'accompagnateurs
+                  </button>
+              </th>
+              <th scope="col">
+                  Dernier accompagnateur connu
               </th>
               <th class="text-end w-100px" scope="col">
                   <span class="visually-hidden">
@@ -1639,13 +1644,16 @@
                   </div>
               </td>
               <td>
-                  DERAY Odile (Pres. Org.)
+                  30/08/2024
               </td>
               <td>
                   1
               </td>
               <td>
-                  30/08/2024
+                  1
+              </td>
+              <td>
+                  DERAY Odile (Pres. Org.)
               </td>
               <td class="text-end w-100px">
                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444">
@@ -1686,13 +1694,16 @@
                   </div>
               </td>
               <td>
-                  DERAY Odile (Pres. Org.)
+                  30/08/2024
               </td>
               <td>
                   1
               </td>
               <td>
-                  30/08/2024
+                  1
+              </td>
+              <td>
+                  DERAY Odile (Pres. Org.)
               </td>
               <td class="text-end w-100px">
                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
@@ -1736,13 +1747,16 @@
                   </div>
               </td>
               <td>
-                  Non précisé (ACME Inc.)
+                  28/08/2024
               </td>
               <td>
                   1
               </td>
               <td>
-                  28/08/2024
+                  2
+              </td>
+              <td>
+                  Non précisé (ACME Inc.)
               </td>
               <td class="text-end w-100px">
                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
@@ -1793,13 +1807,16 @@
                   </div>
               </td>
               <td>
-                  BIALÈS Patrick (Pres. Org.)
+                  28/08/2024
               </td>
               <td>
                   2
               </td>
               <td>
-                  28/08/2024
+                  2
+              </td>
+              <td>
+                  BIALÈS Patrick (Pres. Org.)
               </td>
               <td class="text-end w-100px">
                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
@@ -2789,13 +2806,16 @@
               </div>
           </td>
           <td>
-              Non précisé (Pres. Org.)
+              30/08/2024
           </td>
           <td>
               0
           </td>
           <td>
-              30/08/2024
+              1
+          </td>
+          <td>
+              Non précisé (Pres. Org.)
           </td>
           <td class="text-end w-100px">
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
@@ -2838,13 +2858,16 @@
               </div>
           </td>
           <td>
-              GRAVIER Emile (Pres. Org.)
+              29/08/2024
           </td>
           <td>
               0
           </td>
           <td>
-              29/08/2024
+              1
+          </td>
+          <td>
+              GRAVIER Emile (Pres. Org.)
           </td>
           <td class="text-end w-100px">
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
@@ -2881,13 +2904,16 @@
               </div>
           </td>
           <td>
-              Non précisé (ACME Inc.)
+              31/08/2022
           </td>
           <td>
               0
           </td>
           <td>
-              31/08/2022
+              2
+          </td>
+          <td>
+              Non précisé (ACME Inc.)
           </td>
           <td class="text-end w-100px">
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
