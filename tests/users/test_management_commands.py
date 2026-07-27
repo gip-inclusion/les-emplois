@@ -902,7 +902,8 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     user = JobSeekerFactory(
         pk=424243,
         first_name="Balthazar",
-        last_name="Durand",
+        last_name="KeepMeUnchanged",
+        jobseeker_profile__birth_name="Durand",
         jobseeker_profile__birthdate=datetime.date(1987, 6, 21),
         jobseeker_profile__nir="187062112345678",
     )
@@ -951,7 +952,9 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
 
     user.refresh_from_db()
     assert user.first_name == "Durand"
-    assert user.last_name == "Balthazar"
+    assert user.last_name == "KeepMeUnchanged"
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.birth_name == "Balthazar"
 
 
 def test_pe_certify_users_retry(caplog, snapshot):
