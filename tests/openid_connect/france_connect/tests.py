@@ -640,8 +640,6 @@ def test_sector_identifier(client, settings):
     assert response.content == (
         b"["
         b'"https://emplois.inclusion.beta.gouv.fr/franceconnect/callback", '
-        b'"https://emplois.inclusion.beta.gouv.fr/franceconnect/logout_callback", '
-        b'"https://plateforme.inclusion.gouv.fr/franceconnect/callback", '
-        b'"https://plateforme.inclusion.gouv.fr/franceconnect/logout_callback"'
+        b'"https://plateforme.inclusion.gouv.fr/franceconnect/callback"'
         b"]"
     )
