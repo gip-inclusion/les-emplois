@@ -18,6 +18,7 @@ from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis, GEIQSelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.users.perms import add_user_can_view_personal_information
 from itou.utils.auth import check_request, check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
@@ -68,11 +69,6 @@ class JobApplicationOrder(OrderEnum):
     JOB_SEEKER_FULL_NAME_DESC = "-job_seeker_full_name"
     CREATED_AT_ASC = "created_at"
     CREATED_AT_DESC = "-created_at"
-
-
-def _add_user_can_view_personal_information(job_applications, can_view):
-    for job_application in job_applications:
-        job_application.user_can_view_personal_information = can_view(job_application.job_seeker)
 
 
 def _add_pending_for_weeks(job_applications):
@@ -176,7 +172,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     _add_pending_for_weeks(job_applications_page)
 
     # The candidate has obviously access to its personal info
-    _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
+    add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
     context = {
         "job_applications_page": job_applications_page,
@@ -242,7 +238,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     _add_pending_for_weeks(job_applications_page)
-    _add_user_can_view_personal_information(
+    add_user_can_view_personal_information(
         job_applications_page, functools.partial(can_view_personal_information, request)
     )
     _add_administrative_criteria(job_applications_page)
@@ -348,7 +344,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     _add_pending_for_weeks(job_applications_page)
 
     # SIAE members have access to personal info
-    _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
+    add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
     iae_company = company.kind in CompanyKind.siae_kinds()
     if iae_company:
