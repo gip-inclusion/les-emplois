@@ -320,12 +320,8 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             "inverted_vae_contract",
         ]
         help_texts = {
-            # Make it clear to employers that `hiring_start_at` has an impact on the start of the
-            # "parcours IAE" and the payment of the "aide au poste".
             "hiring_start_at": (
-                "Au format JJ/MM/AAAA, par exemple {}. Il n'est pas possible d'antidater un contrat.".format(
-                    timezone.localdate().strftime("%d/%m/%Y")
-                )
+                "Au format JJ/MM/AAAA, par exemple {}.".format(timezone.localdate().strftime("%d/%m/%Y"))
             ),
             "hiring_end_at": "Au format JJ/MM/AAAA, par exemple {}.".format(
                 (timezone.localdate() + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)).strftime("%d/%m/%Y")
@@ -376,9 +372,6 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
             if initial is None or "planned_training_hours" not in initial:
                 self.initial["planned_training_hours"] = 0
-            self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple {}.".format(
-                self._today.strftime("%d/%m/%Y"),
-            )
             # Dynamic selection of qualification level
             self.fields["qualification_type"].widget.attrs.update(
                 {
@@ -425,17 +418,10 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                     "hx-target": "#geiq_contract_type_and_options_block",
                 },
             )
-        elif company.kind in CompanyKind.siae_kinds():
-            # Add specific details to help texts for IAE
-            self.fields["hiring_start_at"].help_text += (
-                " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
-                "la personne, cette date déclenche le début de son parcours."
-            )
-            self.fields["hiring_end_at"].help_text += (
-                " Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
-                "à faire dans l'extranet 2.0 de l'ASP. "
-                "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
-            )
+        elif company.is_subject_to_iae_rules:
+            self.fields[
+                "hiring_end_at"
+            ].help_text += " <b>Ne pas renseigner cette date dans le cadre d’un CDI Inclusion.</b>"
 
         # `hired_job` can't be used from model directly because of constrained choices
         # we must use a "simple" ChoiceField and update the value on cleaning
