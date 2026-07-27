@@ -1,8 +1,10 @@
 from django import forms
+from django.db.models import Q
 from django.forms import ValidationError
 from django_select2.forms import Select2Widget
 
 from itou.files.forms import ItouMultiFileField
+from itou.insertion.enums import OrientationStatus
 from itou.insertion.utils import get_missing_orientation_beneficiary_field_labels
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -146,3 +148,20 @@ class OrientationDocumentsForm(forms.Form):
             "données personnelles dans le cadre de cette orientation."
         ),
     )
+
+
+class OrientationsFilterForm(forms.Form):
+    statuses = forms.MultipleChoiceField(
+        required=False, choices=OrientationStatus, widget=forms.CheckboxSelectMultiple
+    )
+
+    def filter(self, queryset):
+        filters = []
+
+        if statuses := self.cleaned_data.get("statuses"):
+            filters.append(Q(status__in=statuses))
+
+        return queryset.filter(*filters)
+
+    def get_qs_filters_counter(self):
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)

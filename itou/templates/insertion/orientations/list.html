@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load static %}
 
 {% block title %}Orientations émises {{ block.super }}{% endblock %}
 
@@ -18,13 +19,15 @@
 {% endblock %}
 
 {% block content %}
+    {% include "insertion/includes/orientations/filters/offcanvas.html" with filters_form=filters_form filters_counter=filters_counter request=request only %}
     <section class="s-section">
         <div class="s-section__container container">
+            {% include "insertion/includes/orientations/filters/top_filters.html" with filters_form=filters_form filters_counter=filters_counter request=request only %}
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
                         <div class="flex-md-grow-1">
-                            {% include "insertion/includes/orientations/list_counter.html" with orientations_page=orientations_page only %}
+                            {% include "insertion/includes/orientations/list_counter.html" with orientations_page=orientations_page request=request only %}
                         </div>
                     </div>
                     {% include "insertion/includes/orientations/list_orientations.html" with orientations_page=orientations_page request=request csrf_token=csrf_token only %}
@@ -36,4 +39,6 @@
 
 {% block script %}
     {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}

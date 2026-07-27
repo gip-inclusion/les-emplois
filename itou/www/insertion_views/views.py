@@ -49,6 +49,7 @@ from itou.www.insertion_views.forms import (
     OrientationDocumentsForm,
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
+    OrientationsFilterForm,
 )
 from itou.www.utils.wizard import WizardView
 
@@ -594,6 +595,12 @@ def orientations_list(request):
         .select_related("beneficiary", "sender", "service", "service__structure")
     )
 
+    filters_form = OrientationsFilterForm(request.GET)
+    filters_counter = 0
+    if filters_form.is_valid():
+        orientations = filters_form.filter(orientations)
+        filters_counter = filters_form.get_qs_filters_counter()
+
     orientations_page = pager(orientations, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     add_user_can_view_personal_information(
         orientations_page, functools.partial(can_view_personal_information, request), user_attr="beneficiary"
@@ -601,6 +608,8 @@ def orientations_list(request):
 
     context = {
         "orientations_page": orientations_page,
+        "filters_form": filters_form,
+        "filters_counter": filters_counter,
     }
 
     return render(

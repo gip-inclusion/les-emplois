@@ -940,8 +940,163 @@
               </div>
           </div>
       </section>
+      <form hx-get="/insertion/orientations/" hx-indicator="#orientations-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#orientations-section" hx-trigger="change delay:.5s">
+          <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
+              <div class="offcanvas-header">
+                  <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </h4>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button">
+                  </button>
+              </div>
+              <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+                  <fieldset>
+                      <legend>
+                          <button aria-controls="collapse-statuses" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-statuses" data-bs-toggle="collapse" type="button">
+                              Statut
+                          </button>
+                      </legend>
+                      <div class="my-3 collapse" id="collapse-statuses">
+                          <ul>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_0" name="statuses" type="checkbox" value="OUVERTE"/>
+                                      <label class="form-check-label" for="id_statuses_0">
+                                          En cours de traitement
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                      <label class="form-check-label" for="id_statuses_1">
+                                          En cours de modération
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
+                                          Rejetée par la modération
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
+                                          Validée
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_4">
+                                          Expirée
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_5" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_5">
+                                          Refusée
+                                      </label>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </fieldset>
+              </div>
+              <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+                  <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+                      Voir
+                  </button>
+              </div>
+          </div>
+      </form>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+                  <div class="col-12">
+                      <div>
+                      </div>
+                      <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_0" id="id_statuses_0-top" name="statuses" type="checkbox" value="OUVERTE"/>
+                                          <label class="form-check-label" for="id_statuses_0-top">
+                                              En cours de traitement
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                          <label class="form-check-label" for="id_statuses_1-top">
+                                              En cours de modération
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
+                                              Rejetée par la modération
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
+                                              Validée
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
+                                              Expirée
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_5" id="id_statuses_5-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_5-top">
+                                              Refusée
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
+                              <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                              </i>
+                              <span>
+                                  Tous les filtres
+                                  <span id="all-filters-btn">
+                                  </span>
+                              </span>
+                          </button>
+                          <div class="ms-md-auto" id="apply-list-filter-counter">
+                          </div>
+                      </div>
+                  </div>
+              </div>
               <div class="s-section__row row">
                   <div class="col-12">
                       <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
@@ -1001,8 +1156,163 @@
               </div>
           </div>
       </section>
+      <form hx-get="/insertion/orientations/" hx-indicator="#orientations-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#orientations-section" hx-trigger="change delay:.5s">
+          <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
+              <div class="offcanvas-header">
+                  <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                      </i>
+                      <span>
+                          Filtrer
+                      </span>
+                  </h4>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button">
+                  </button>
+              </div>
+              <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+                  <fieldset>
+                      <legend>
+                          <button aria-controls="collapse-statuses" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-statuses" data-bs-toggle="collapse" type="button">
+                              Statut
+                          </button>
+                      </legend>
+                      <div class="my-3 collapse" id="collapse-statuses">
+                          <ul>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_0" name="statuses" type="checkbox" value="OUVERTE"/>
+                                      <label class="form-check-label" for="id_statuses_0">
+                                          En cours de traitement
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                      <label class="form-check-label" for="id_statuses_1">
+                                          En cours de modération
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
+                                          Rejetée par la modération
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
+                                          Validée
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_4">
+                                          Expirée
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_5" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_5">
+                                          Refusée
+                                      </label>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </fieldset>
+              </div>
+              <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+                  <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+                      Voir
+                  </button>
+              </div>
+          </div>
+      </form>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+                  <div class="col-12">
+                      <div>
+                      </div>
+                      <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                          <div class="dropdown">
+                              <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" type="button">
+                                  Statut
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_0" id="id_statuses_0-top" name="statuses" type="checkbox" value="OUVERTE"/>
+                                          <label class="form-check-label" for="id_statuses_0-top">
+                                              En cours de traitement
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                          <label class="form-check-label" for="id_statuses_1-top">
+                                              En cours de modération
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
+                                              Rejetée par la modération
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
+                                              Validée
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
+                                              Expirée
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_5" id="id_statuses_5-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_5-top">
+                                              Refusée
+                                          </label>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
+                              <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+                              </i>
+                              <span>
+                                  Tous les filtres
+                                  <span id="all-filters-btn">
+                                  </span>
+                              </span>
+                          </button>
+                          <div class="ms-md-auto" id="apply-list-filter-counter">
+                          </div>
+                      </div>
+                  </div>
+              </div>
               <div class="s-section__row row">
                   <div class="col-12">
                       <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
