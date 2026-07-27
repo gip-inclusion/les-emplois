@@ -114,6 +114,8 @@ class ItouCurrentOrganizationMiddleware:
 
         if user.is_authenticated:
             logout_warning = None
+
+            # Retrieve memberships and organizations
             if user.is_professional:
                 company_memberships = get_active_company_memberships(user)
                 prescriber_memberships = get_active_prescriber_memberships(user)
@@ -148,18 +150,42 @@ class ItouCurrentOrganizationMiddleware:
                     elif isinstance(request.current_organization, Institution):
                         request.from_institution = True
 
-            skip_middleware_conditions = [
+            # We now check 3 things about the user
+            # - do they need mfa ?
+            # - do they need to use ProConnect instead of Django to login ?
+            # - do they need an organization to access the service ?
+
+            skip_all_checks_conditions = [
                 request.path.startswith("/login/"),
                 request.path.startswith("/logout/"),  # Logout warning page for pros with no organization
+                request.path.startswith("/hijack/release"),  # Allow to release hijack
+                request.path.startswith("/api"),  # APIs should handle those errors
+                request.path in [reverse("account_login"), reverse("account_logout")],
+                request.path.startswith("/legal/terms/"),
+            ]
+            if any(skip_all_checks_conditions):
+                return self.get_response(request)
+
+            # Enforce MFA if needed:
+            if require_otp(user):
+                logger.info("Requiring internal OTP for user %d", user.id)
+                login_verify_otp_url = reverse("otp_views:verify_otp")
+                login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
+                if get_user_devices(user):
+                    if request.path not in (login_verify_otp_url, login_with_backup_code_url):
+                        return HttpResponseRedirect(
+                            add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
+                        )
+                elif not request.path.startswith("/otp/enrollment"):
+                    return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
+
+            # Allow access to signup and invitations view even without ProConnect or an active organization
+            skip_remaining_checks_conditions = [
                 request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
                 # Allow to access both steps of accepting an invitation to join an organization
                 request.path.startswith("/signup/"),  # professional about to join an organization/company
-                request.path in [reverse("account_login"), reverse("account_logout")],
-                request.path.startswith("/hijack/release"),  # Allow to release hijack
-                request.path.startswith("/api"),  # APIs should handle those errors
-                request.path.startswith("/legal/terms/"),
             ]
-            if any(skip_middleware_conditions):
+            if any(skip_remaining_checks_conditions):
                 return self.get_response(request)
 
             # Force ProConnect
@@ -175,25 +201,12 @@ class ItouCurrentOrganizationMiddleware:
                 # Add request.path as next param ?
                 return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 
-            # Enforce internal OTP before the Nexus whitelist below, otherwise
-            # MFA-required professionals could reach the whitelisted views unverified
-            if require_otp(user):
-                logger.info("Requiring internal OTP for user %d", user.id)
-                login_verify_otp_url = reverse("otp_views:verify_otp")
-                login_with_backup_code_url = reverse("otp_views:login_with_backup_code")
-                if get_user_devices(user):
-                    if request.path not in (login_verify_otp_url, login_with_backup_code_url):
-                        return HttpResponseRedirect(
-                            add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
-                        )
-                elif not request.path.startswith("/otp/enrollment"):
-                    return HttpResponseRedirect(reverse("otp_views:enrollment_step_0_intro"))
-
             # FIXME: This will soon be removed along with Nexus views
             # Nexus : Allow views without organization
             if user.is_professional and request.path.startswith("/portal"):
                 return self.get_response(request)
 
+            # Without an organization a pro cannot access the service
             if logout_warning is not None:
                 return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 
