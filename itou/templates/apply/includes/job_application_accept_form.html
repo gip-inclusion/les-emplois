@@ -31,6 +31,33 @@
         {% bootstrap_field form_accept.hiring_start_at wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
 
+        {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="contract_date_infos" extra_classes="mt-n1 mb-3" %}
+            {% fragment as c_info__summary %}
+                À propos de ces dates de contrat
+            {% endfragment %}
+            {% fragment as c_info__detail %}
+                <span>Concernant la date de début de contrat :</span>
+                <ul class="mb-3">
+                    {% if company.kind != CompanyKind.GEIQ %}
+                        <li>La date ne peut pas être antérieure à aujourd’hui et reste modifiable jusqu’à la veille de la date saisie.</li>
+                    {% else %}
+                        <li>La date est modifiable jusqu’à la veille de la date saisie.</li>
+                    {% endif %}
+                    {% if company.is_subject_to_iae_rules %}
+                        <li>En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours.</li>
+                    {% endif %}
+                </ul>
+                <span>Concernant la date prévisionnelle de fin de contrat :</span>
+                <ul>
+                    {% if company.can_use_employee_record %}
+                        <li>Cette date est indicative : elle n’a aucun impact sur les déclarations à faire dans l’extranet 2.0 de l'ASP.</li>
+                    {% else %}
+                        <li>Cette date n'est qu'indicative.</li>
+                    {% endif %}
+                </ul>
+            {% endfragment %}
+        {% endcomponent_info %}
+
         {# reloadable training and qualification for GEIQ #}
         {% if company.kind == CompanyKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_qualification_fields.html" %}

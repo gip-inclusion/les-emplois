@@ -319,7 +319,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         assert job_application.inverted_vae_contract
 
     def test_apply_with_past_hiring_date(self, client, faker):
-        CANNOT_BACKDATE_TEXT = "Il n'est pas possible d'antidater un contrat."
+        CANNOT_BACKDATE_TEXT = "La date ne peut pas être antérieure à aujourd’hui"
         # GEIQ can temporarily accept job applications with a past hiring date
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
 
@@ -394,17 +394,22 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         job_application.refresh_from_db()
         assert job_application.state == JobApplicationState.ACCEPTED
 
-    HELP_START_AT = (
-        "La date est modifiable jusqu'à la veille de la date saisie. "
-        "En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours."
-    )
-    HELP_END_AT = (
-        "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
-        "à faire dans l'extranet 2.0 de l'ASP. "
-        "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
-    )
-
     def test_specific_iae_mentions_in_accept_form(self, client):
+        MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_GEIQ = "La date est modifiable jusqu’à la veille de la date saisie."
+        MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_NON_GEIQ = (
+            "La date ne peut pas être antérieure à aujourd’hui "
+            "et reste modifiable jusqu’à la veille de la date saisie."
+        )
+        FIRST_APPROVAL_START_HELP = (
+            "En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours."
+        )
+        CDI_INCLUSION_WARNING = "Ne pas renseigner cette date dans le cadre d’un CDI Inclusion."
+        ONLY_INFORMATION_HELP = "Cette date n'est qu'indicative."
+        ONLY_INFORMATION_HELP_WITH_ASP = (
+            "Cette date est indicative : "
+            "elle n’a aucun impact sur les déclarations à faire dans l’extranet 2.0 de l'ASP."
+        )
+
         def _response(kind):
             job_application = JobApplicationFactory(
                 sent_by_prescriber_alone=True,
@@ -430,13 +435,27 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             return client.get(reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name}))
 
         for kind in CompanyKind.siae_kinds():
-            assertContains(_response(kind), self.HELP_START_AT)
-            assertContains(_response(kind), self.HELP_END_AT)
+            response = _response(kind)
+            assertContains(response, MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_NON_GEIQ)
+            assertNotContains(response, MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_GEIQ)
+            assertContains(response, FIRST_APPROVAL_START_HELP)
+            assertNotContains(response, ONLY_INFORMATION_HELP)
+            assertContains(response, ONLY_INFORMATION_HELP_WITH_ASP)
+            assertContains(response, CDI_INCLUSION_WARNING)
 
         # EA and EATT employers can no longer log in, so they're not covered here
         for kind in (CompanyKind.GEIQ, CompanyKind.OPCS):
-            assertNotContains(_response(kind), self.HELP_START_AT)
-            assertNotContains(_response(kind), self.HELP_END_AT)
+            response = _response(kind)
+            if kind == CompanyKind.GEIQ:
+                assertContains(response, MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_GEIQ)
+                assertNotContains(response, MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_NON_GEIQ)
+            else:
+                assertNotContains(response, MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_GEIQ)
+                assertContains(response, MODIFIABLE_UNTIL_THE_DAY_BEFORE_HELP_NON_GEIQ)
+            assertNotContains(response, FIRST_APPROVAL_START_HELP)
+            assertContains(response, ONLY_INFORMATION_HELP)
+            assertNotContains(response, ONLY_INFORMATION_HELP_WITH_ASP)
+            assertNotContains(response, CDI_INCLUSION_WARNING)
 
 
 class TestJobApplicationRefusalReasonForm:
