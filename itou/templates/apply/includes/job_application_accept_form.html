@@ -43,6 +43,7 @@
                     {% else %}
                         <li>La date est modifiable jusqu’à la veille de la date saisie.</li>
                     {% endif %}
+                    <li>Cette date doit être comprise dans les 6 prochains mois (avant le {{ form_accept.get_far_future_date|date:"d/m/Y" }}).</li>
                     {% if company.is_subject_to_iae_rules %}
                         <li>En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours.</li>
                     {% endif %}
