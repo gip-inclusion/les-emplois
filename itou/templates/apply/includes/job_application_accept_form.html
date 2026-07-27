@@ -31,7 +31,7 @@
         {% bootstrap_field form_accept.hiring_start_at wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
 
-        {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="contract_date_infos" extra_classes="mt-n1 mb-3" %}
+        {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="contract_date_infos" opened=form_accept.has_error_on_date extra_classes="mt-n1 mb-3" %}
             {% fragment as c_info__summary %}
                 À propos de ces dates de contrat
             {% endfragment %}
