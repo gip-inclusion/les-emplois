@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2026-07-13
+
+### Ajouté
+
+- [Insertion : Enregistrement des intentions de mise en relation (iMER)](https://github.com/gip-inclusion/les-emplois/pull/8323)
+- [Insertion : Orientation depuis les accompagnements](https://github.com/gip-inclusion/les-emplois/pull/8324)
+
+### Modifié
+
+- [Fiches salarié : Modification du champ `salarieLangueFrancaise` dans l'envoi à l'ASP + évolution correspondante dans notre API](https://github.com/gip-inclusion/les-emplois/pull/8309)
+- [GEIQ : Préciser que motif et le commentaire de refus ne sont pas transmis au GEIQ](https://github.com/gip-inclusion/les-emplois/pull/8361)
+- [Inscription : Corriger le lien vers la base Sirene dans l’aide du champ siret](https://github.com/gip-inclusion/les-emplois/pull/8380)
+- [Insertion : Gérer les UID de services avec le caractère `/`](https://github.com/gip-inclusion/les-emplois/pull/8388)
+- [Tableau de bord : Éviter que les structures se retrouvent sans administrateur](https://github.com/gip-inclusion/les-emplois/pull/8152)
+
 ## 2026-07-06
 
 ### Ajouté
