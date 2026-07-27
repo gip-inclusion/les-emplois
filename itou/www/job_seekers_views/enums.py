@@ -16,3 +16,5 @@ class JobSeekerOrder(OrderEnum):
     LAST_UPDATED_AT_DESC = "-last_updated_at"
     JOB_APPLICATIONS_NB_ASC = "job_applications_nb"
     JOB_APPLICATIONS_NB_DESC = "-job_applications_nb"
+    ADVISORS_NB_ASC = "advisors__len"
+    ADVISORS_NB_DESC = "-advisors__len"
