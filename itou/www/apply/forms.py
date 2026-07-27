@@ -494,6 +494,9 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         else:
             return hiring_start_at
 
+    def has_error_on_date(self):
+        return self.has_error("hiring_start_at") or self.has_error("hiring_end_at")
+
     def clean(self):
         super().clean()
         hiring_start_at = self.cleaned_data.get("hiring_start_at")
