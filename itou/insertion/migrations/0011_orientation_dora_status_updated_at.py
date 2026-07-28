@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("insertion", "0009_mobilizationevent_orientation"),
+        ("insertion", "0010_is_active"),
     ]
 
     operations = [
