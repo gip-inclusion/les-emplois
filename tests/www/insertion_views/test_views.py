@@ -1279,6 +1279,13 @@ class TestOrientationsList:
     </a>
     """
 
+    @staticmethod
+    def replace_attrs(soup, attrs, attrs_to_update):
+        nodes = soup.find_all(attrs=attrs)
+        for node in nodes:
+            node.attrs.update(attrs_to_update)
+        return soup
+
     def test_list_display(self, client, snapshot):
         membership = PrescriberMembershipFactory(
             organization__authorized=True, user__first_name="André", user__last_name="Dufour"
@@ -1321,7 +1328,15 @@ class TestOrientationsList:
 
         with assertSnapshotQueries(snapshot(name="queries")):
             response = client.get(self.LIST_URL)
-        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="page")
+        soup = parse_response_to_soup(response, selector="#main")
+        for structure in [last_updated.service.structure, first_updated.service.structure]:
+            soup = self.replace_attrs(
+                soup,
+                attrs={"name": "structures", "value": structure.pk},
+                attrs_to_update={"value": "[PK of Structure]"},
+            )
+
+        assert pretty_indented(soup) == snapshot(name="page")
         assert response.context["orientations_page"].object_list == [last_updated, first_updated]
 
     def test_non_authorized_prescriber_cannot_see_pii(self, client):
@@ -1501,6 +1516,60 @@ class TestOrientationsList:
 
         response = client.get(self.LIST_URL, {"statuses": ["INVALID"]})
         assert set(response.context["orientations_page"].object_list) == {pending_orientation, rejected_orientation}
+        assertContains(response, "Sélectionnez un choix valide. INVALID n’en fait pas partie.")
+
+        response = client.get(self.LIST_URL, {"statuses": ["INVALID"]})
+        assert set(response.context["orientations_page"].object_list) == set(
+            [pending_orientation, rejected_orientation]
+        )
+        assertContains(response, "Sélectionnez un choix valide. INVALID n’en fait pas partie.")
+
+    def test_structures_filters(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+        orientation_1 = OrientationFactory(sender=user, sender_prescriber_organization=organization)
+        structure_1 = orientation_1.service.structure
+        orientation_2 = OrientationFactory(sender=user, sender_prescriber_organization=organization)
+        structure_2 = orientation_2.service.structure
+        structure_3 = StructureFactory()
+        client.force_login(user)
+
+        response = client.get(self.LIST_URL, {"structures": [structure_1.id]})
+        assert response.context["orientations_page"].object_list == [orientation_1]
+
+        response = client.get(self.LIST_URL, {"structures": [structure_1.id, structure_2.id]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2}
+
+        response = client.get(self.LIST_URL, {"structures": []})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2}
+
+        response = client.get(self.LIST_URL, {"structures": [structure_3.pk]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2}
+        assertContains(response, f"Sélectionnez un choix valide. {structure_3.pk} n’en fait pas partie.")
+
+    def test_mishmash_filters(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+        orientation_1 = OrientationFactory(
+            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.PENDING
+        )
+        orientation_2 = OrientationFactory(
+            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REJECTED
+        )
+        client.force_login(user)
+
+        response = client.get(
+            self.LIST_URL,
+            {"statuses": [OrientationStatus.PENDING.value], "structures": [orientation_1.service.structure.id]},
+        )
+        assert response.context["orientations_page"].object_list == [orientation_1]
+
+        response = client.get(
+            self.LIST_URL, {"statuses": ["INVALID"], "structures": [orientation_1.service.structure.id]}
+        )
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2}
         assertContains(response, "Sélectionnez un choix valide. INVALID n’en fait pas partie.")
 
 

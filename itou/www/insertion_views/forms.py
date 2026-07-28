@@ -154,12 +154,25 @@ class OrientationsFilterForm(forms.Form):
     statuses = forms.MultipleChoiceField(
         required=False, choices=OrientationStatus, widget=forms.CheckboxSelectMultiple
     )
+    structures = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, orientations_qs, data, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
+        structures_choices = list(
+            set(orientations_qs.values_list("service__structure__id", "service__structure__name"))
+        )
+        structures_choices.sort(key=lambda c: c[1])
+
+        self.fields["structures"].choices = structures_choices
 
     def filter(self, queryset):
         filters = []
 
         if statuses := self.cleaned_data.get("statuses"):
             filters.append(Q(status__in=statuses))
+
+        if structures := self.cleaned_data.get("structures"):
+            filters.append(Q(service__structure__in=structures))
 
         return queryset.filter(*filters)
 
