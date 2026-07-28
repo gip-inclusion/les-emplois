@@ -920,9 +920,9 @@ httpx==0.28.1 \
     #   -r test.txt
     #   itoutils
     #   respx
-huey==3.3.0 \
-    --hash=sha256:a7b1581aaae5f70540faafcf3306d74fa138ec7bad520f81150bb70b224eaddf \
-    --hash=sha256:e0c2a1542e6c3acb894821cde895cf9dbf72e42deb25f55b2d44096aa30f8f24
+huey==3.1.1 \
+    --hash=sha256:156f30e90f0fae81ae2e004f2062e1b18ec9dcbc684564df63159ef546b13502 \
+    --hash=sha256:8773231c7bc7a40b9b9191d72cf1c6580bbf6742a4118c70dde6b5c2e7ccb7ce
     # via -r test.txt
 identify==2.6.19 \
     --hash=sha256:20e6a87f786f768c092a721ad107fc9df0eb89347be9396cadf3f4abbd1fb78a \
