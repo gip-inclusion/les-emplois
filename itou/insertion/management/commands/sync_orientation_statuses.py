@@ -57,10 +57,15 @@ class Command(BaseCommand):
 
         self.logger.info("Retrieved count=%d orientation statuses from DORA", len(statuses))
 
-        orientations = Orientation.objects.filter(id__in=statuses).only("id", *DoraStatus._fields)
+        orientations = list(Orientation.objects.filter(id__in=statuses).only("id", *DoraStatus._fields))
+        # Dora only knows the orientations we sent it: an unknown uid means both databases
+        # diverged, which has to be dealt with before syncing anything.
+        if unknown := statuses.keys() - {str(orientation.id) for orientation in orientations}:
+            raise RuntimeError(f"Unknown orientations from DORA: {', '.join(sorted(unknown))}")
+
         to_update = []
         for orientation in orientations:
-            dora_status = statuses.pop(str(orientation.id))
+            dora_status = statuses[str(orientation.id)]
             if dora_status == DoraStatus.from_orientation(orientation):
                 continue
             orientation.status = dora_status.status
@@ -70,10 +75,3 @@ class Command(BaseCommand):
 
         Orientation.objects.bulk_update(to_update, DoraStatus._fields)
         self.logger.info("Updated count=%d orientation statuses", len(to_update))
-
-        if statuses:
-            self.logger.warning(
-                "Ignored count=%d unknown orientations: %s",
-                len(statuses),
-                ", ".join(sorted(statuses)),
-            )

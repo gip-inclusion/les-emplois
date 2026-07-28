@@ -4,7 +4,6 @@ import pytest
 from django.core.management import call_command
 
 from itou.insertion.enums import OrientationStatus
-from itou.insertion.models import Orientation
 from tests.insertion.factories import OrientationFactory
 
 
@@ -122,8 +121,9 @@ def test_dry_run_does_not_persist(dora_settings, respx_mock):
     assert orientation.dora_status_updated_at is None
 
 
-def test_unknown_uid_is_skipped(dora_settings, respx_mock, caplog):
+def test_unknown_uid_crashes_without_updating_anything(dora_settings, respx_mock):
     unknown_uid = "00000000-0000-0000-0000-000000000000"
+    orientation = OrientationFactory(status=OrientationStatus.PENDING)
     respx_mock.get(DORA_STATUS_URL).respond(
         200,
         json=paginated(
@@ -133,12 +133,19 @@ def test_unknown_uid_is_skipped(dora_settings, respx_mock, caplog):
                     OrientationStatus.ACCEPTED,
                     processing_date="2026-07-20T10:00:00+00:00",
                     updated_at="2026-07-20T10:00:00+00:00",
-                )
+                ),
+                status_item(
+                    orientation.id,
+                    OrientationStatus.ACCEPTED,
+                    processing_date="2026-07-20T10:00:00+00:00",
+                    updated_at="2026-07-20T10:00:00+00:00",
+                ),
             ]
         ),
     )
 
-    call_command("sync_orientation_statuses", wet_run=True)
+    with pytest.raises(RuntimeError, match=f"Unknown orientations from DORA: {unknown_uid}"):
+        call_command("sync_orientation_statuses", wet_run=True)
 
-    assert unknown_uid in caplog.text
-    assert not Orientation.objects.exists()
+    orientation.refresh_from_db()
+    assert orientation.status == OrientationStatus.PENDING
