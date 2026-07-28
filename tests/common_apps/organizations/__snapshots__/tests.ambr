@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_member_kind_display[authorized prescriber org]
+  'prescripteur habilité'
+# ---
+# name: test_member_kind_display[company]
+  'employeur'
+# ---
+# name: test_member_kind_display[insitution]
+  'institutionnel'
+# ---
+# name: test_member_kind_display[prescriber org]
+  'orienteur'
+# ---
