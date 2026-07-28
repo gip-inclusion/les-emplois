@@ -43,9 +43,9 @@ class Command(BaseCommand):
 
     @dry_runnable
     def handle(self, *, wet_run, **options):
-        # Synchronisation incrémentale : on ne demande à DORA que les orientations dont le
-        # statut a évolué depuis la dernière mise à jour appliquée localement. La borne DORA
-        # est incluse ; re-traiter l'orientation limite est sans effet (mise à jour idempotente).
+        # Incremental sync: we only ask DORA for the orientations whose status changed since the
+        # last update applied locally. The bound is inclusive on DORA's side; processing the
+        # boundary orientation again is harmless since the update is idempotent.
         watermark = Orientation.objects.aggregate(m=Max("dora_status_updated_at"))["m"]
         params = {"updated_after": watermark.isoformat()} if watermark else {}
 
