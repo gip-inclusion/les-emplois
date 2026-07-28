@@ -248,5 +248,11 @@ TABLE.add_columns(
             "comment": "Présence d''un CV",
             "fn": lambda o: bool(o.resume_id),
         },
+        {
+            "name": "nombre_caracteres_message_candidature",
+            "type": "integer",
+            "comment": "Nombre de caractères du message de candidature, NULL si aucun message",
+            "fn": lambda o: len(o.message) or None,
+        },
     ]
 )

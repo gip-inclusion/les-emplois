@@ -557,6 +557,7 @@ def test_populate_job_applications(snapshot):
                 "",
                 ja.contract_type,
                 True,
+                len(ja.message),
                 datetime.date(2023, 2, 2),
             ),
         ]

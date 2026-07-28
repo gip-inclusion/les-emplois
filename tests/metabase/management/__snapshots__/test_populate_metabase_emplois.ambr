@@ -4109,7 +4109,7 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 42,
+    'num_queries': 44,
     'queries': list([
       dict({
         'origin': list([
@@ -4167,7 +4167,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_candidatures" ("id" UUID,
-                                                                "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"id_utilisateur_origine_candidature" integer,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"date_mise_à_jour_metabase" date)
+                                                                "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"id_utilisateur_origine_candidature" integer,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"nombre_caracteres_message_candidature" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -4531,6 +4531,17 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."nombre_caracteres_message_candidature" IS \'Nombre de caractères du message de candidature, NULL si aucun message\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
       }),
       dict({
@@ -4622,6 +4633,25 @@
       }),
       dict({
         'origin': list([
+          '<lambda>[metabase/tables/job_applications.py]',
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."message"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4663,6 +4693,7 @@
                                      "mode_attribution_pass_iae",
                                      "type_contrat",
                                      "présence_de_cv",
+                                     "nombre_caracteres_message_candidature",
                                      "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
