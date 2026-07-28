@@ -580,6 +580,7 @@
                  "insertion_orientation"."attachments",
                  "insertion_orientation"."created_at",
                  "insertion_orientation"."updated_at",
+                 "insertion_orientation"."dora_status_updated_at",
                  T3."id",
                  T3."password",
                  T3."last_login",
