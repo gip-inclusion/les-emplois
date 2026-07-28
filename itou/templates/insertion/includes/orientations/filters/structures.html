@@ -1,0 +1,28 @@
+{% if filters_form.structures.field.choices %}
+    {% if btn_dropdown_filter|default:False %}
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with label="Structure concernée" field=filters_form.structures id_suffix="-top" only %}
+    {% else %}
+        <fieldset>
+            <legend>
+                <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse-structures"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="collapse-structures">Structure concernée</button>
+            </legend>
+            <div class="my-3 collapse" id="collapse-structures">
+                <ul>
+                    {% for choice in filters_form.structures %}
+                        <li>
+                            <div class="form-check">
+                                <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
+                                <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </fieldset>
+    {% endif %}
+{% endif %}
