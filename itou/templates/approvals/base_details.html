@@ -27,6 +27,16 @@
                     <i class="ri-pass-expired-line fw-medium" aria-hidden="true"></i>
                     <span>Clôturer ce PASS IAE</span>
                 </a>
+            {% elif show_close_approval_button %}
+                <span class="d-inline-block"
+                      tabindex="0"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="La clôture du PASS IAE est possible uniquement si le PASS est suspendu depuis plus de 12 mois consécutifs, qu’aucune candidature n’est en cours sur les 2 derniers mois et qu’aucun contrat n’est en cours (selon les données de l’ASP).">
+                    <button type="button" class="btn btn-lg btn-danger btn-ico disabled" disabled>
+                        <i class="ri-pass-expired-line fw-medium" aria-hidden="true"></i>
+                        <span>Clôturer ce PASS IAE</span>
+                    </button>
+                </span>
             {% endif %}
             {% if is_employer_with_accepted_application %}
                 <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}" class="btn btn-lg btn-primary btn-ico" rel="noopener" target="_blank">
