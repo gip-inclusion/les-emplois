@@ -93,7 +93,11 @@
                                         <p class="fw-bold">
                                             Ratio sélectionné : <span id="showChosenPercentValue"></span> %
                                         </p>
-                                        <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-nowrap">{{ min }}%</span>
+                                            {{ form.chosen_percent }}
+                                            <span class="text-nowrap">{{ max }}%</span>
+                                        </div>
                                     </div>
 
                                     {% itou_buttons_form primary_label="Valider" secondary_url=back_url %}
