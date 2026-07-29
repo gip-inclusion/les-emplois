@@ -1,6 +1,5 @@
 import enum
 import logging
-import urllib.parse
 from datetime import timedelta
 
 from django.conf import settings
@@ -210,18 +209,10 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
         context["show_close_approval_button"] = self.request.from_employer and approval.is_in_progress
         context["approval_deletion_form_url"] = None
         if context["show_close_approval_button"] and can_close_approval(approval):
-            context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
-                {
-                    "siaeID": self.request.current_organization.pk,
-                    "nomSIAE": self.request.current_organization.display_name,
-                    "prenomemployeur": self.request.user.first_name,
-                    "nomemployeur": self.request.user.last_name,
-                    "emailemployeur": self.request.user.email,
-                    "userID": self.request.user.pk,
-                    "numPASS": approval.number_with_spaces,
-                    "prenomsalarie": approval.user.first_name,
-                    "nomsalarie": approval.user.last_name,
-                }
+            context["approval_deletion_form_url"] = reverse(
+                "approvals:close",
+                kwargs={"approval_id": approval.pk},
+                query={"back_url": self.request.get_full_path()},
             )
 
         return context
