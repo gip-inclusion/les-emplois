@@ -670,7 +670,15 @@ MARKDOWNIFY = {
             "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
             "PARSE_EMAIL": True,
         },
-    }
+    },
+    "inline": {
+        "WHITELIST_TAGS": ["a", "em", "strong", "br"],
+        "LINKIFY_TEXT": {
+            "PARSE_URLS": True,
+            "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
+            "PARSE_EMAIL": True,
+        },
+    },
 }
 # ASP SFTP connection
 # ------------------------------------------------------------------------------

@@ -345,7 +345,7 @@
                             <h2 class="h3">Pré-requis et justificatifs</h2>
                             <ul class="mb-0">
                                 {% for prerequisite in service.prerequisites %}
-                                    <li>{{ prerequisite|markdownify }}</li>
+                                    <li>{{ prerequisite|markdownify:"inline" }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
