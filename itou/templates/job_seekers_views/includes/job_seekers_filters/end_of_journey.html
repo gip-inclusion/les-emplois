@@ -1,0 +1,34 @@
+{% load django_bootstrap5 %}
+
+{% if btn_dropdown_filter|default:False %}
+    <div class="dropdown">
+        <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            Fin de parcours IAE à venir
+        </button>
+        <ul class="dropdown-menu">
+            <li>{% bootstrap_field filters_form.approval_ending_soon wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.contract_ending_soon wrapper_class="dropdown-item" %}</li>
+        </ul>
+    </div>
+{% else %}
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseEndOfJourney"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseEndOfJourney">Fin de parcours IAE à venir</button>
+        </legend>
+        <div class="my-3 collapse" id="collapseEndOfJourney">
+            <ul>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.approval_ending_soon wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.contract_ending_soon wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+{% endif %}

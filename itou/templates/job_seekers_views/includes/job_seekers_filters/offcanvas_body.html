@@ -1,5 +1,9 @@
 <div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form only %}
+    {% if request.from_authorized_prescriber %}
+        <hr>
+        {% include "job_seekers_views/includes/job_seekers_filters/end_of_journey.html" with filters_form=filters_form only %}
+    {% endif %}
     {% if list_organization %}
         <hr>
         {% include "job_seekers_views/includes/job_seekers_filters/organization_members.html" with filters_form=filters_form only %}
