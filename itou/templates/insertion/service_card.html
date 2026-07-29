@@ -345,7 +345,12 @@
                             <h2 class="h3">Pré-requis et justificatifs</h2>
                             <ul class="mb-0">
                                 {% for prerequisite in service.prerequisites %}
-                                    <li>{{ prerequisite|markdownify:"inline" }}</li>
+                                    {% if service.is_dora %}
+                                        <li>{{ prerequisite|markdownify:"inline" }}</li>
+                                    {% else %}
+                                        {# D·I service may have blocks tags such as lists #}
+                                        <li>{{ prerequisite|markdownify }}</li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
