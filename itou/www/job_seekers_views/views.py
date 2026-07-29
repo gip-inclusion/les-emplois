@@ -396,7 +396,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_UPDATED_AT_DESC
-    queryset = queryset.order_by(*order.order_by).select_related("jobseeker_profile").prefetch_related("approvals")
+    queryset = (
+        queryset.order_by(*order.order_by)
+        .select_related("jobseeker_profile")
+        .prefetch_related("approvals__suspension_set")
+    )
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
