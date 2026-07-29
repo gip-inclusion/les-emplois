@@ -1514,6 +1514,29 @@
       }),
       dict({
         'origin': list([
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'IfNode[job_seekers_views/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
@@ -1528,33 +1551,6 @@
           WHERE ("users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."organization_id" = %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_suspended[approvals/models.py]',
-          'Approval.state[approvals/models.py]',
-          'approval_state_badge[utils/templatetags/badges.py]',
-          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
-          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
-          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
-          'IncludeNode[job_seekers_views/includes/list_results.html]',
-          'ForNode[job_seekers_views/includes/list_results.html]',
-          'IfNode[job_seekers_views/includes/list_results.html]',
-          'IncludeNode[job_seekers_views/list.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/list.html]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-          'wrapper[utils/readonly.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "approvals_suspension"
-          WHERE ("approvals_suspension"."approval_id" = %s
-                 AND "approvals_suspension"."end_at" >= %s
-                 AND "approvals_suspension"."start_at" <= %s)
-          LIMIT 1
         ''',
       }),
       dict({
