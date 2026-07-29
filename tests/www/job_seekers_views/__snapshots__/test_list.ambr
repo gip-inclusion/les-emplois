@@ -103,8 +103,8 @@
                           <li>
                               <div class="dropdown-item">
                                   <div class="form-check">
-                                      <input class="form-check-input" data-emplois-sync-with="id_pass_iae_active" id="id_pass_iae_active-offcanvas" name="pass_iae_active" type="checkbox"/>
-                                      <label class="form-check-label" for="id_pass_iae_active-offcanvas">
+                                      <input class="form-check-input" data-emplois-sync-with="id_approval_active" id="id_approval_active-offcanvas" name="approval_active" type="checkbox"/>
+                                      <label class="form-check-label" for="id_approval_active-offcanvas">
                                           Valide
                                       </label>
                                   </div>
@@ -113,8 +113,8 @@
                           <li>
                               <div class="dropdown-item">
                                   <div class="form-check">
-                                      <input class="form-check-input" data-emplois-sync-with="id_pass_iae_expired" id="id_pass_iae_expired-offcanvas" name="pass_iae_expired" type="checkbox"/>
-                                      <label class="form-check-label" for="id_pass_iae_expired-offcanvas">
+                                      <input class="form-check-input" data-emplois-sync-with="id_approval_expired" id="id_approval_expired-offcanvas" name="approval_expired" type="checkbox"/>
+                                      <label class="form-check-label" for="id_approval_expired-offcanvas">
                                           Expiré
                                       </label>
                                   </div>
@@ -123,8 +123,8 @@
                           <li>
                               <div class="dropdown-item">
                                   <div class="form-check">
-                                      <input class="form-check-input" data-emplois-sync-with="id_no_pass_iae" id="id_no_pass_iae-offcanvas" name="no_pass_iae" type="checkbox"/>
-                                      <label class="form-check-label" for="id_no_pass_iae-offcanvas">
+                                      <input class="form-check-input" data-emplois-sync-with="id_no_approval" id="id_no_approval-offcanvas" name="no_approval" type="checkbox"/>
+                                      <label class="form-check-label" for="id_no_approval-offcanvas">
                                           Aucun
                                       </label>
                                   </div>
@@ -213,8 +213,8 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input is-valid" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_pass_iae_active">
+                                                  <input class="form-check-input is-valid" id="id_approval_active" name="approval_active" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_approval_active">
                                                       Valide
                                                   </label>
                                               </div>
@@ -223,8 +223,8 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input is-valid" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_pass_iae_expired">
+                                                  <input class="form-check-input is-valid" id="id_approval_expired" name="approval_expired" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_approval_expired">
                                                       Expiré
                                                   </label>
                                               </div>
@@ -233,8 +233,8 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input is-valid" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_no_pass_iae">
+                                                  <input class="form-check-input is-valid" id="id_no_approval" name="no_approval" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_no_approval">
                                                       Aucun
                                                   </label>
                                               </div>
@@ -425,8 +425,8 @@
                           <li>
                               <div class="dropdown-item">
                                   <div class="form-check">
-                                      <input class="form-check-input" data-emplois-sync-with="id_pass_iae_active" id="id_pass_iae_active-offcanvas" name="pass_iae_active" type="checkbox"/>
-                                      <label class="form-check-label" for="id_pass_iae_active-offcanvas">
+                                      <input class="form-check-input" data-emplois-sync-with="id_approval_active" id="id_approval_active-offcanvas" name="approval_active" type="checkbox"/>
+                                      <label class="form-check-label" for="id_approval_active-offcanvas">
                                           Valide
                                       </label>
                                   </div>
@@ -435,8 +435,8 @@
                           <li>
                               <div class="dropdown-item">
                                   <div class="form-check">
-                                      <input class="form-check-input" data-emplois-sync-with="id_pass_iae_expired" id="id_pass_iae_expired-offcanvas" name="pass_iae_expired" type="checkbox"/>
-                                      <label class="form-check-label" for="id_pass_iae_expired-offcanvas">
+                                      <input class="form-check-input" data-emplois-sync-with="id_approval_expired" id="id_approval_expired-offcanvas" name="approval_expired" type="checkbox"/>
+                                      <label class="form-check-label" for="id_approval_expired-offcanvas">
                                           Expiré
                                       </label>
                                   </div>
@@ -445,8 +445,8 @@
                           <li>
                               <div class="dropdown-item">
                                   <div class="form-check">
-                                      <input class="form-check-input" data-emplois-sync-with="id_no_pass_iae" id="id_no_pass_iae-offcanvas" name="no_pass_iae" type="checkbox"/>
-                                      <label class="form-check-label" for="id_no_pass_iae-offcanvas">
+                                      <input class="form-check-input" data-emplois-sync-with="id_no_approval" id="id_no_approval-offcanvas" name="no_approval" type="checkbox"/>
+                                      <label class="form-check-label" for="id_no_approval-offcanvas">
                                           Aucun
                                       </label>
                                   </div>
@@ -518,8 +518,8 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input is-valid" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_pass_iae_active">
+                                                  <input class="form-check-input is-valid" id="id_approval_active" name="approval_active" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_approval_active">
                                                       Valide
                                                   </label>
                                               </div>
@@ -528,8 +528,8 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input is-valid" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_pass_iae_expired">
+                                                  <input class="form-check-input is-valid" id="id_approval_expired" name="approval_expired" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_approval_expired">
                                                       Expiré
                                                   </label>
                                               </div>
@@ -538,8 +538,8 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input is-valid" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/>
-                                                  <label class="form-check-label" for="id_no_pass_iae">
+                                                  <input class="form-check-input is-valid" id="id_no_approval" name="no_approval" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_no_approval">
                                                       Aucun
                                                   </label>
                                               </div>

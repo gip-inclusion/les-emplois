@@ -1,6 +1,6 @@
 {% load django_bootstrap5 %}
 
-{% if filters_form.pass_iae_suspended %}
+{% if filters_form.approval_suspended %}
     <hr>
     <fieldset>
         <legend>
@@ -10,9 +10,9 @@
         </legend>
         <div class="my-3 collapse" id="collapsePassIAE">
             <ul>
-                <li>{% bootstrap_field filters_form.pass_iae_active wrapper_class="" %}</li>
-                <li>{% bootstrap_field filters_form.pass_iae_suspended wrapper_class="" %}</li>
-                <li>{% bootstrap_field filters_form.pass_iae_expired wrapper_class="" %}</li>
+                <li>{% bootstrap_field filters_form.approval_active wrapper_class="" %}</li>
+                <li>{% bootstrap_field filters_form.approval_suspended wrapper_class="" %}</li>
+                <li>{% bootstrap_field filters_form.approval_expired wrapper_class="" %}</li>
             </ul>
         </div>
     </fieldset>

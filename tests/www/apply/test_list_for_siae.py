@@ -481,7 +481,7 @@ class TestProcessListSiae:
         JobApplicationFactory(sent_by_prescriber_alone=True, to_company=company)
 
         # Without approval
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True})
+        response = client.get(reverse("apply:list_for_siae"), {"approval_active": True})
         assert len(response.context["job_applications_page"].object_list) == 0
 
         # With a job_application with an approval
@@ -493,15 +493,15 @@ class TestProcessListSiae:
             approval__start_at=yesterday,
             to_company=company,
         )
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True})
+        response = client.get(reverse("apply:list_for_siae"), {"approval_active": True})
         assert response.context["job_applications_page"].object_list == [job_application]
 
-        # Check that adding pass_iae_suspended does not hide the application
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True, "pass_iae_suspended": True})
+        # Check that adding approval_suspended does not hide the application
+        response = client.get(reverse("apply:list_for_siae"), {"approval_active": True, "approval_suspended": True})
         assert response.context["job_applications_page"].object_list == [job_application]
 
-        # But pass_iae_suspended alone does not show the application
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_suspended": True})
+        # But approval_suspended alone does not show the application
+        response = client.get(reverse("apply:list_for_siae"), {"approval_suspended": True})
         assert response.context["job_applications_page"].object_list == []
 
         # Now with a suspension
@@ -510,15 +510,15 @@ class TestProcessListSiae:
             start_at=yesterday,
             end_at=today + timezone.timedelta(days=2),
         )
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_suspended": True})
+        response = client.get(reverse("apply:list_for_siae"), {"approval_suspended": True})
         assert response.context["job_applications_page"].object_list == [job_application]
 
-        # Check that adding pass_iae_active does not hide the application
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True, "pass_iae_suspended": True})
+        # Check that adding approval_active does not hide the application
+        response = client.get(reverse("apply:list_for_siae"), {"approval_active": True, "approval_suspended": True})
         assert response.context["job_applications_page"].object_list == [job_application]
 
         # So far no approval was expired
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_expired": True})
+        response = client.get(reverse("apply:list_for_siae"), {"approval_expired": True})
         assert response.context["job_applications_page"].object_list == []
 
         jobapp_with_expired_pass = JobApplicationFactory(
@@ -531,8 +531,8 @@ class TestProcessListSiae:
             to_company=company,
         )
 
-        # The pass_iae_expired filter works as expected
-        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_expired": True})
+        # The approval_expired filter works as expected
+        response = client.get(reverse("apply:list_for_siae"), {"approval_expired": True})
         assert response.context["job_applications_page"].object_list == [jobapp_with_expired_pass]
 
     def test_list_for_siae_filtered_by_eligibility_state(self, client):
@@ -706,7 +706,7 @@ class TestProcessListSiae:
                     "end_date": timezone.localdate(job_app.created_at).strftime(date_format),
                     "sender_prescriber_organizations": [job_app.sender_prescriber_organization.id],
                     "senders": [job_app.sender.id],
-                    "pass_iae_active": True,
+                    "approval_active": True,
                     "eligibility_validated": True,
                     "criteria": [level1_criterion.pk],
                     "departments": ["37"],

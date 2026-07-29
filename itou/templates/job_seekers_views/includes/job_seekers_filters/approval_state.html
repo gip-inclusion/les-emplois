@@ -17,9 +17,9 @@
             <li>
                 <strong class="dropdown-header">PASS IAE</strong>
             </li>
-            <li>{% bootstrap_field filters_form.pass_iae_active wrapper_class="dropdown-item" %}</li>
-            <li>{% bootstrap_field filters_form.pass_iae_expired wrapper_class="dropdown-item" %}</li>
-            <li>{% bootstrap_field filters_form.no_pass_iae wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.approval_active wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.approval_expired wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.no_approval wrapper_class="dropdown-item" %}</li>
         </ul>
     </div>
 {% else %}
@@ -53,13 +53,13 @@
         <div class="my-3 collapse" id="collapseApproval">
             <ul>
                 <li>
-                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.pass_iae_active wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.approval_active wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
                 </li>
                 <li>
-                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.pass_iae_expired wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.approval_expired wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
                 </li>
                 <li>
-                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.no_pass_iae wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.no_approval wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
                 </li>
             </ul>
         </div>

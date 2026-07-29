@@ -952,22 +952,22 @@ def test_filtered_by_approval_state(client, factory, url):
         with_job_seeker_assignment=True,
     ).job_seeker
 
-    response = client.get(url, {"pass_iae_active": "on"})
+    response = client.get(url, {"approval_active": "on"})
     assert response.context["page_obj"].object_list == [job_seeker_expired_eligibility_valid_approval]
 
-    response = client.get(url, {"pass_iae_expired": "on"})
+    response = client.get(url, {"approval_expired": "on"})
     assert response.context["page_obj"].object_list == [job_seeker_expired_eligibility_expired_approval]
 
-    response = client.get(url, {"no_pass_iae": "on"})
+    response = client.get(url, {"no_approval": "on"})
     assert response.context["page_obj"].object_list == [job_seeker_valid_eligibility_no_approval]
 
-    response = client.get(url, {"pass_iae_expired": "on", "no_pass_iae": "on"})
+    response = client.get(url, {"approval_expired": "on", "no_approval": "on"})
     assert response.context["page_obj"].object_list == [
         job_seeker_valid_eligibility_no_approval,
         job_seeker_expired_eligibility_expired_approval,
     ]
 
-    response = client.get(url, {"pass_iae_active": "on", "pass_iae_expired": "on", "no_pass_iae": "on"})
+    response = client.get(url, {"approval_active": "on", "approval_expired": "on", "no_approval": "on"})
     assert response.context["page_obj"].object_list == [
         job_seeker_valid_eligibility_no_approval,
         job_seeker_expired_eligibility_expired_approval,

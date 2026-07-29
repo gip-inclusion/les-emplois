@@ -842,25 +842,25 @@ class FilterJobApplicationsForm(forms.Form):
         if states := data.get("states"):
             filters.append(Q(state__in=states))
 
-        pass_iae_key_to_filter = {
+        approval_key_to_filter = {
             # Simplification of CommonApprovalQuerySet.valid_lookup()
             # The date is not enough to know if an approval is valid or not
-            "pass_iae_active": Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False),
+            "approval_active": Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False),
             # This is NOT what we want but how things work currently:
-            # if you check pass_iae_active, the value of pass_iae_suspended is ignored
+            # if you check approval_active, the value of approval_suspended is ignored
             # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
-            "pass_iae_suspended": Q(has_suspended_approval=True),
-            "pass_iae_expired": Q(approval__end_at__lt=timezone.localdate()),
+            "approval_suspended": Q(has_suspended_approval=True),
+            "approval_expired": Q(approval__end_at__lt=timezone.localdate()),
         }
 
-        if any([data.get(key) for key in pass_iae_key_to_filter.keys()]):
-            if data.get("pass_iae_active") or data.get("pass_iae_suspended"):
+        if any([data.get(key) for key in approval_key_to_filter.keys()]):
+            if data.get("approval_active") or data.get("approval_suspended"):
                 queryset = queryset.with_has_suspended_approval()
-            pass_status_filter = Q()
-            for key, filter in pass_iae_key_to_filter.items():
+            approval_status_filter = Q()
+            for key, filter in approval_key_to_filter.items():
                 if data.get(key):
-                    pass_status_filter |= filter
-            filters.append(pass_status_filter)
+                    approval_status_filter |= filter
+            filters.append(approval_status_filter)
 
         if start_date := data.get("start_date"):
             filters.append(Q(created_at__gte=start_date))
@@ -934,9 +934,9 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             }
         ),
     )
-    pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
-    pass_iae_active = forms.BooleanField(label="Actif", required=False)
-    pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
+    approval_suspended = forms.BooleanField(label="Suspendu", required=False)
+    approval_active = forms.BooleanField(label="Actif", required=False)
+    approval_expired = forms.BooleanField(label="Expiré", required=False)
     criteria = forms.MultipleChoiceField(required=False, label="", widget=Select2MultipleWidget)
     eligibility_validated = forms.BooleanField(label="Valide", required=False)
     eligibility_pending = forms.BooleanField(label="À valider", required=False)
@@ -1097,9 +1097,9 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
             del self.fields["criteria"]
             del self.fields["eligibility_validated"]
             del self.fields["eligibility_pending"]
-            del self.fields["pass_iae_active"]
-            del self.fields["pass_iae_suspended"]
-            del self.fields["pass_iae_expired"]
+            del self.fields["approval_active"]
+            del self.fields["approval_suspended"]
+            del self.fields["approval_expired"]
 
         if not company.can_have_prior_action:
             # Drop "pré-embauche" state from filter for non-GEIQ companies
