@@ -60,6 +60,7 @@ from itou.utils.admin import (
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import is_france_travail_id_format
 from itou.utils.views import with_triggers_context
+from itou.www.apply.views.common import JobSeekerAndContractInfosNeededMixin
 
 
 logger = logging.getLogger(__name__)
@@ -482,7 +483,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             key = "job_seeker"
         elif obj.is_professional:
             key = "professional"
-        if key and (count := models.JobSeekerAssignment.objects.filter(**{key: obj}).count()):
+        if key and (count := models.JobSeekerAssignment.include_inactive.filter(**{key: obj}).count()):
             url = reverse("admin:users_jobseekerassignment_changelist", query={key: obj.pk})
             return format_html('<a href="{}">Liste des affectations candidat ({})</a>', url, count)
         return self.get_empty_value_display()
@@ -867,7 +868,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                             item.sender = to_user
                         if field.name == "job_seeker_assignments":
                             # Check and merge if to_user has an assignment with same professional and organization
-                            to_user_assignment = models.JobSeekerAssignment.objects.filter(
+                            to_user_assignment = models.JobSeekerAssignment.include_inactive.filter(
                                 job_seeker=to_user,
                                 professional=item.professional,
                                 prescriber_organization=item.prescriber_organization,
@@ -878,7 +879,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                                     assignment_to_delete=item, assignment_to_keep=to_user_assignment
                                 )
                             else:
-                                models.JobSeekerAssignment.objects.filter(pk=item.pk).update(job_seeker=to_user)
+                                models.JobSeekerAssignment.include_inactive.filter(pk=item.pk).update(
+                                    job_seeker=to_user
+                                )
                         else:
                             # Don't change assignment's updated_at field
                             item.save()
@@ -1285,6 +1288,13 @@ class JobSeekerAssignmentAdmin(ItouModelAdmin):
         "company",
     )
     ordering = ("-updated_at",)
+
+    def get_queryset(self, request):
+        queryset = self.model.include_inactive.all()
+        ordering = self.get_ordering(request)
+        if ordering:
+            queryset = queryset.order_by(*ordering)
+        return queryset
 
     @admin.display(description="candidat")
     def job_seeker_display(self, obj):

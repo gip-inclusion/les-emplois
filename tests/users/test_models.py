@@ -1027,6 +1027,21 @@ class TestLastAssignment:
         assert last_advisor == job_seeker_assignment_2.professional
         assert last_advisor_org == org_2
 
+    def test_inactive_advisor(self):
+        JobSeekerAssignmentFactory(professional__is_active=False)
+
+        assert JobSeekerAssignment.objects.count() == 0
+        assert JobSeekerAssignment.include_inactive.count() == 1
+
+    def test_dont_upsert_inactive_professional(self, caplog):
+        professional = PrescriberFactory(is_active=False)
+        job_seeker = JobSeekerFactory()
+
+        JobSeekerAssignment.objects.upsert_assignment(job_seeker, professional, None, random.choice(ActionKind.values))
+        assert JobSeekerAssignment.include_inactive.count() == 0
+
+        assert caplog.messages == [f"We should not try to add a JobSeekerAssignment on user={professional.pk}"]
+
 
 @pytest.mark.parametrize("initial_asp_uid", ("000000000000000000000000000000", ""))
 @override_settings(SECRET_KEY="test")

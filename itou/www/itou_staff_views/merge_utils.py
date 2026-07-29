@@ -145,7 +145,7 @@ def handle_job_seeker_assignment(model, from_user, to_user):
             moved_pks.append(from_user_assignment.pk)
             from_user_assignment.professional = to_user
 
-    JobSeekerAssignment.objects.filter(pk__in=moved_pks).update(professional=to_user)
+    JobSeekerAssignment.include_inactive.filter(pk__in=moved_pks).update(professional=to_user)
     base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.professional"
     if updated_pks:
         logger.info(f"{base_log} updated : {updated_pks}")

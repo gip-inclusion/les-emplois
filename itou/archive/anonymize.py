@@ -78,7 +78,7 @@ def anonymize_professionals_without_deletion(users):
     # No need to keep assignments from professionals without organization or company.
     # If a professional was anonymized without deletion just because of an assignment
     # like these, he will be deleted on the next command run.
-    JobSeekerAssignment.objects.filter(
+    JobSeekerAssignment.include_inactive.filter(
         professional_id__in=user_ids,
         prescriber_organization_id__isnull=True,
         company_id__isnull=True,

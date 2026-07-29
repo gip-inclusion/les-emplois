@@ -22,7 +22,7 @@ NIR_RE = re.compile(
 
 def merge_job_seeker_assignments(*, assignment_to_delete, assignment_to_keep):
     last_assignment = max([assignment_to_delete, assignment_to_keep], key=lambda a: a.updated_at)
-    JobSeekerAssignment.objects.filter(pk=assignment_to_keep.pk).update(
+    JobSeekerAssignment.include_inactive.filter(pk=assignment_to_keep.pk).update(
         created_at=min(assignment_to_delete.created_at, assignment_to_keep.created_at),
         updated_at=last_assignment.updated_at,
         last_action_kind=last_assignment.last_action_kind,

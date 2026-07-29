@@ -51,10 +51,10 @@ def _model_sanity_check():
 
 
 def _get_job_seeker_assignments(from_id, to_id):
-    from_org_assignments = users_models.JobSeekerAssignment.objects.filter(prescriber_organization_id=from_id)
+    from_org_assignments = users_models.JobSeekerAssignment.include_inactive.filter(prescriber_organization_id=from_id)
     to_org_assignments = {
         (assignment.job_seeker, assignment.professional): assignment
-        for assignment in users_models.JobSeekerAssignment.objects.filter(prescriber_organization_id=to_id)
+        for assignment in users_models.JobSeekerAssignment.include_inactive.filter(prescriber_organization_id=to_id)
     }
 
     assignments_to_update = []
@@ -156,8 +156,12 @@ def organization_merge_into(from_id, to_id):
     invitations.update(organization_id=to_id)
     prolongations.update(prescriber_organization_id=to_id)
     prolongation_requests.update(prescriber_organization_id=to_id)
-    _, deleted_assignments = users_models.JobSeekerAssignment.objects.filter(pk__in=assignments_ids_to_delete).delete()
-    users_models.JobSeekerAssignment.objects.bulk_update(assignments_to_update, fields=["prescriber_organization_id"])
+    _, deleted_assignments = users_models.JobSeekerAssignment.include_inactive.filter(
+        pk__in=assignments_ids_to_delete
+    ).delete()
+    users_models.JobSeekerAssignment.include_inactive.bulk_update(
+        assignments_to_update, fields=["prescriber_organization_id"]
+    )
     _, deleted_objs = from_organization.delete()
     logger.info("Deleted organization ID %s, deleted objects: %s", from_id, deleted_objs | deleted_assignments)
 

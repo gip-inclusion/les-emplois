@@ -1603,12 +1603,17 @@ class IdentityCertification(models.Model):
         ]
 
 
-class JobSeekerAssignmentManager(models.Manager):
+class JobSeekerAssignmentQueryset(models.QuerySet):
+    def active(self):
+        return self.filter(professional__is_active=True)
+
+
+class ActiveJobSeekerAssignmentManager(models.Manager.from_queryset(JobSeekerAssignmentQueryset)):
     def upsert_assignment(
         self, job_seeker, professional, organization, last_action_kind, assigned_to_unknown_advisor=False
     ):
         assert job_seeker.is_job_seeker
-        if not professional.is_professional:
+        if not professional.is_professional or not professional.is_active:
             # This should not happen but we don't want to block everything
             logger.error("We should not try to add a JobSeekerAssignment on user=%s", professional.pk)
             return
@@ -1644,7 +1649,10 @@ class JobSeekerAssignmentManager(models.Manager):
                     Q(professional=professional, prescriber_organization=prescriber_organization, company=company)
                 )
 
-        return JobSeekerAssignment.objects.filter(or_queries(filters))
+        return JobSeekerAssignment.objects.filter(or_queries(filters)).filter(ended_at=None)
+
+    def get_queryset(self):
+        return super().get_queryset().active()
 
 
 class JobSeekerAssignment(models.Model):
@@ -1693,7 +1701,8 @@ class JobSeekerAssignment(models.Model):
         default=False,
     )
 
-    objects = JobSeekerAssignmentManager()
+    objects = ActiveJobSeekerAssignmentManager()
+    include_inactive = JobSeekerAssignmentQueryset.as_manager()
 
     class Meta:
         verbose_name = "affectation candidat"
