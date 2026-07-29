@@ -431,7 +431,7 @@ def test_start_session_internal_transfer(client):
     client.force_login(employer)
 
     # This will set the session back url
-    list_url_with_params = reverse("apply:list_for_siae") + "?pass_iae_active=on"
+    list_url_with_params = reverse("apply:list_for_siae") + "?approval_active=on"
     client.get(
         reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         + f"?back_url={quote(list_url_with_params)}"

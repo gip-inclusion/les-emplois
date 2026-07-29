@@ -34,9 +34,9 @@ class FilterForm(forms.Form):
     eligibility_validated = forms.BooleanField(label="Valide", required=False)
     eligibility_pending = forms.BooleanField(label="À valider", required=False)
 
-    pass_iae_active = forms.BooleanField(label="Valide", required=False)
-    pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
-    no_pass_iae = forms.BooleanField(label="Aucun", required=False)
+    approval_active = forms.BooleanField(label="Valide", required=False)
+    approval_expired = forms.BooleanField(label="Expiré", required=False)
+    no_approval = forms.BooleanField(label="Aucun", required=False)
 
     is_stalled = forms.BooleanField(label="N’afficher que les usagers sans solution", required=False)
 
@@ -93,23 +93,23 @@ class FilterForm(forms.Form):
             queryset = queryset.eligibility_pending()
 
         # Approval (PASS IAE) status (all checkboxes checked = all cases, so do not filter out results)
-        pass_iae_filters = [
-            self.cleaned_data.get(key) for key in ("pass_iae_active", "pass_iae_expired", "no_pass_iae")
+        approval_filters = [
+            self.cleaned_data.get(key) for key in ("approval_active", "approval_expired", "no_approval")
         ]
-        if any(pass_iae_filters) and not all(pass_iae_filters):
+        if any(approval_filters) and not all(approval_filters):
             last_approval_end_at = Subquery(
                 Approval.objects.filter(user=OuterRef("pk")).order_by("-end_at").values("end_at")[:1]
             )
             queryset = queryset.annotate(last_approval_end_at=last_approval_end_at)
 
-            pass_status_filter = Q()
-            if self.cleaned_data.get("pass_iae_active"):
-                pass_status_filter |= Q(last_approval_end_at__gte=timezone.localdate())
-            if self.cleaned_data.get("pass_iae_expired"):
-                pass_status_filter |= Q(last_approval_end_at__lt=timezone.localdate())
-            if self.cleaned_data.get("no_pass_iae"):
-                pass_status_filter |= Q(last_approval_end_at__isnull=True)
-            filters.append(pass_status_filter)
+            approval_status_filter = Q()
+            if self.cleaned_data.get("approval_active"):
+                approval_status_filter |= Q(last_approval_end_at__gte=timezone.localdate())
+            if self.cleaned_data.get("approval_expired"):
+                approval_status_filter |= Q(last_approval_end_at__lt=timezone.localdate())
+            if self.cleaned_data.get("no_approval"):
+                approval_status_filter |= Q(last_approval_end_at__isnull=True)
+            filters.append(approval_status_filter)
 
         if self.cleaned_data.get("is_stalled"):
             queryset = queryset.filter(
