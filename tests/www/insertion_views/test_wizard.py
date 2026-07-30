@@ -268,6 +268,20 @@ def test_start_requires_login(client):
     assert "/accounts/login" in response.headers["Location"]
 
 
+@pytest.mark.parametrize("is_blacklisted, status_code", [(True, 404), (False, 302)])
+def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, status_code):
+    prescriber = PrescriberFactory(membership=True)
+    source_value = "source-name"
+    if is_blacklisted:
+        settings.NON_ORIENTABLE_DI_SOURCES = [source_value]
+    service = ServiceFactory(is_orientable_with_form=True, source__value=source_value)
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+    client.force_login(prescriber)
+
+    response = client.get(start_url)
+    assert response.status_code == status_code
+
+
 def test_session_isolation_between_users(client):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(phone="0606060606")
