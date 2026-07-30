@@ -1118,10 +1118,6 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
             queryset = queryset.filter(sender_company__id__in=sender_companies)
         return queryset
 
-    def _get_choices_for_job_seeker(self, users):
-        users = [(user.id, user_full_name) for user in users if (user_full_name := user.get_inverted_full_name())]
-        return sorted(users, key=lambda user: user[1])
-
 
 class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):
     """
