@@ -40,9 +40,12 @@ class OrientationSelectJobSeekerForm(forms.Form):
             User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
                 pk__in=job_seekers_ids,
-                # FIXME: will be fixed when last_name/first_name are enforced by a SQL constraint
-                last_name__isnull=False,
-                first_name__isnull=False,
+            )
+            .exclude(
+                # FIXME: will be fixed when last_name (soon: birth_name)
+                # and first_name are enforced by a SQL constraint
+                last_name="",
+                first_name="",
             )
             .select_related("jobseeker_profile")
             .order_by("last_name", "first_name")
