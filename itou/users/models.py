@@ -750,7 +750,14 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
     @cached_property
     def last_assignment(self):
-        assignments = self.job_seeker_assignments.all()
+        if "job_seeker_assignments" in getattr(self, "_prefetched_objects_cache", []):
+            # The data was already prefetched, hopefully with the related data (users, organizations)
+            # Filter in python to allow to easily prefetch in calling views
+            assignments = self.job_seeker_assignments.all()
+        else:
+            assignments = self.job_seeker_assignments.select_related(
+                "professional", "prescriber_organization", "company"
+            )
         if assignments:
             last_assignment = sorted(assignments, key=lambda j: j.updated_at, reverse=True)[0]
             return last_assignment
