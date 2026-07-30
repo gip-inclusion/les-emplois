@@ -953,6 +953,11 @@ class TestLastAssignment:
         job_seeker_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker)
         assert job_seeker.last_assignment == job_seeker_assignment
 
+    def test_inactive_assignment(self):
+        job_seeker = JobSeekerFactory()
+        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional__is_active=False)
+        assert job_seeker.last_assignment is None
+
     def test_no_last_advisor_with_org(self):
         job_seeker = JobSeekerFactory()
         assert job_seeker.last_assignment is None
