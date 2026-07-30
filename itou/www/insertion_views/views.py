@@ -405,7 +405,7 @@ class OrientationWizardView(WizardView):
                 "di_contact_phone": self.service.contact_phone,
                 "di_structure_name": self.service.structure.name,
                 "beneficiary_first_name": self.job_seeker.first_name,
-                "beneficiary_last_name": self.job_seeker.last_name,
+                "beneficiary_last_name": self.job_seeker.get_last_name_for_display(),
                 "beneficiary_email": self.job_seeker.email,
                 "beneficiary_phone": normalize_phone_number(self.job_seeker.phone or "") or "",
                 "referent_first_name": referent_data["referent_first_name"],
