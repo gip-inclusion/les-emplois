@@ -45,15 +45,15 @@ jobs:
         # https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4
         # The review name is also used as bucket name for S3 which has to be lowercase
         # https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-bucket-naming-rules.html
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63 | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=c1-review-DO_NOT_REMOVE" >> $GITHUB_ENV
 
     - name: 🏷 Set database addon name
       run:
-        echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
+        echo "REVIEW_APP_DB_NAME=c1_review_DO_NOT_REMOVE" >> $GITHUB_ENV
 
     - name: 🏷 Set deploy url
       run:
-        echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME}.cleverapps.io\"`" >> $GITHUB_ENV
+        echo "DEPLOY_URL=c1-review-vperron-recherche-service-via-candidats.cleverapps.io" >> $GITHUB_ENV
     # End of environment variables
 
     - name: 🧫 Create a review app on Clever Cloud
@@ -119,7 +119,7 @@ jobs:
 
     - name: 🏷 Set review app name
       run:
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63 | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=c1-review-DO_NOT_REMOVE" >> $GITHUB_ENV
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
@@ -127,7 +127,7 @@ jobs:
         tar -xvf $CLEVER_TAR_FILE
         echo "Clever CLI version: $($CLEVER_CLI version)"
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
+        $CLEVER_CLI link $REVIEW_APP_NAME --alias $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
     - name: ⏭ Skip fixtures
       run:
