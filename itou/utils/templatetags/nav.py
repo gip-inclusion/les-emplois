@@ -156,6 +156,15 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="candidatures",
     ),
+    "prescriber-orientations": NavItem(
+        label="Orientations",
+        icon="ri-service-line",
+        target=reverse("insertion_views:orientations_list"),
+        active_view_names=["insertion_views:orientations_list", "insertion_views:orientation_details"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="orientations-prescripteurs",
+    ),
     "prescriber-overview": NavItem(
         label="Présentation",
         target=reverse("prescribers_views:overview"),
@@ -198,6 +207,15 @@ NAV_ENTRIES = {
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
         matomo_event_option="candidatures-envoyees",
+    ),
+    "employer-orientations": NavItem(
+        label="Orientations",
+        icon="ri-service-line",
+        target=reverse("insertion_views:orientations_list"),
+        active_view_names=["insertion_views:orientations_list", "insertion_views:orientation_details"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="orientations-employeurs",
     ),
     "employer-assignments": NavItem(
         label="Accompagnements",
@@ -347,6 +365,7 @@ def nav(request):
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:
             menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
+            menu_items.append(NAV_ENTRIES["prescriber-orientations"])
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
             ]
@@ -375,6 +394,7 @@ def nav(request):
         elif request.from_employer and request.current_organization:
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
+            menu_items.append(NAV_ENTRIES["employer-orientations"])
             if request.current_organization.is_subject_to_iae_rules:
                 menu_items.append(NAV_ENTRIES["employer-assignments"])
                 employee_group_items = [NAV_ENTRIES["employer-approvals"]]
