@@ -41,7 +41,7 @@
                             {% if request.GET.job_seeker_public_id %}
                                 {% url_add_query start_orientation_url job_seeker_public_id=request.GET.job_seeker_public_id as start_orientation_url %}
                             {% endif %}
-                            {% if service.is_orientable_with_form %}
+                            {% if service.is_orientable_with_form and not service.from_non_orientable_di_source %}
                                 {% if can_orient_towards_insertion_service %}
                                     <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
                                        data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_ORIENTATION }}"

@@ -532,6 +532,40 @@ class TestServices:
         assertNotContains(response, self.ORIENT_BTN_LABEL)
         assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
+    def test_detail_non_orientable_di_sources(self, client, settings):
+        user = PrescriberFactory(membership=True)
+        blacklisted_source = "blacklisted-source"
+        settings.NON_ORIENTABLE_DI_SOURCES = [blacklisted_source]
+        service = ServiceFactory(
+            uid="test-orientable-uid",
+            name="Service non orientable",
+            updated_on="2025-01-15",
+            is_orientable_with_form=True,
+            source__value=blacklisted_source,
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertNotContains(response, self.ORIENT_BTN_LABEL)
+
+    def test_detail_non_orientable_di_sources_with_external_link(self, client, settings):
+        user = PrescriberFactory(membership=True)
+        blacklisted_source = "blacklisted-source"
+        settings.NON_ORIENTABLE_DI_SOURCES = [blacklisted_source]
+        external_link = "https://test.example.com"
+        service = ServiceFactory(
+            uid="test-orientable-uid",
+            name="Service non orientable",
+            updated_on="2025-01-15",
+            is_orientable_with_form=True,
+            mobilization_modes_professionals_external_form_link=external_link,
+            mobilization_modes_professionals_external_form_link_text="",
+            source__value=blacklisted_source,
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertContains(response, f'href="{external_link}"')
+
     def test_detail_contact_section_hidden_without_contact_info(self, client):
         user = PrescriberFactory(membership=True)
         service = ServiceFactory(

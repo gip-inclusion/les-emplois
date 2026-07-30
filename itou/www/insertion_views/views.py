@@ -224,7 +224,11 @@ class OrientationStep(enum.StrEnum):
 
 
 def start_orientation(request, service_uid):
-    service = get_object_or_404(insertion_models.Service, uid=service_uid, is_orientable_with_form=True)
+    service = get_object_or_404(
+        insertion_models.Service.objects.exclude(source__value__in=settings.NON_ORIENTABLE_DI_SOURCES),
+        uid=service_uid,
+        is_orientable_with_form=True,
+    )
     if not (job_seeker_public_id := request.GET.get("job_seeker_public_id")):
         logger.info(
             "orientation wizard start_without_job_seeker user=%s service_uid=%s",
