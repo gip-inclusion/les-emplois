@@ -753,9 +753,9 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         if "job_seeker_assignments" in getattr(self, "_prefetched_objects_cache", []):
             # The data was already prefetched, hopefully with the related data (users, organizations)
             # Filter in python to allow to easily prefetch in calling views
-            assignments = self.job_seeker_assignments.all()
+            assignments = list(filter(lambda obj: obj.professional.is_active, self.job_seeker_assignments.all()))
         else:
-            assignments = self.job_seeker_assignments.select_related(
+            assignments = self.job_seeker_assignments.filter(professional__is_active=True).select_related(
                 "professional", "prescriber_organization", "company"
             )
         if assignments:

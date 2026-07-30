@@ -2931,7 +2931,8 @@
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND T3."is_active")
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
@@ -4133,7 +4134,8 @@
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND T3."is_active")
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
@@ -5482,7 +5484,8 @@
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND T3."is_active")
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
@@ -8617,7 +8620,8 @@
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND T3."is_active")
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
@@ -10172,7 +10176,8 @@
           INNER JOIN "users_user" T3 ON ("users_jobseekerassignment"."professional_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_jobseekerassignment"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("users_jobseekerassignment"."company_id" = "companies_company"."id")
-          WHERE "users_jobseekerassignment"."job_seeker_id" = %s
+          WHERE ("users_jobseekerassignment"."job_seeker_id" = %s
+                 AND T3."is_active")
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
