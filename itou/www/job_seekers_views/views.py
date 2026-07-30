@@ -480,7 +480,9 @@ class GetOrCreateJobSeekerStartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.tunnel in ("sender", "gps", "standalone", "orientation"):
+        if self.tunnel == "orientation":
+            view_name = "job_seekers_views:search_by_email_for_sender"
+        elif self.tunnel in ("sender", "gps", "standalone"):
             view_name = "job_seekers_views:check_nir_for_sender"
         elif self.tunnel == "hire":
             view_name = "job_seekers_views:check_nir_for_hire"
@@ -827,6 +829,12 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         )
 
     def get_back_url(self):
+        if self.is_orientation:
+            service_uid = self.job_seeker_session.get("orientation", {}).get("service_uid")
+            return reverse(
+                "insertion_views:orientation_select_job_seeker",
+                kwargs={"service_uid": service_uid},
+            )
         view_name = (
             "job_seekers_views:check_nir_for_hire" if self.hire_process else "job_seekers_views:check_nir_for_sender"
         )

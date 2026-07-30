@@ -12,6 +12,7 @@ from itou.insertion.models import GenericReferenceItemKind, MobilizationEventKin
 from itou.job_applications.enums import SenderKind
 from itou.utils.apis.dora import DoraAPIException
 from itou.www.insertion_views.views import OrientationStep, OrientationWizardView
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.insertion.factories import GenericReferenceItemFactory, MobilizationEventFactory, ServiceFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -745,3 +746,29 @@ def test_no_error_when_special_chars_in_uid(client):
     assertRedirects(response, select_job_seeker_url, fetch_redirect_response=False)
     response = client.get(select_job_seeker_url)
     assertContains(response, service_url)  # reset button
+
+
+def test_orientation_create_job_seeker_starts_with_search_by_email(client):
+    prescriber = PrescriberFactory(membership=True)
+    service = ServiceFactory(is_orientable_with_form=True)
+    create_job_seeker_url = reverse(
+        "job_seekers_views:get_or_create_start",
+        query={
+            "tunnel": "orientation",
+            "from_url": reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}),
+            "service_uid": service.uid,
+        },
+    )
+
+    client.force_login(prescriber)
+    response = client.get(create_job_seeker_url)
+
+    job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
+    assertRedirects(
+        response,
+        reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        ),
+        fetch_redirect_response=False,
+    )
