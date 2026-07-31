@@ -1342,6 +1342,13 @@ class TestOrientationsList:
                 attrs_to_update={"value": "[PK of Beneficiary]"},
                 name="option",
             )
+        for sender in [last_updated.sender, first_updated.sender]:
+            soup = self.replace_attrs(
+                soup,
+                attrs={"value": sender.pk},
+                attrs_to_update={"value": "[PK of Sender]"},
+                name="option",
+            )
 
         assert pretty_indented(soup) == snapshot(name="page")
         assert response.context["orientations_page"].object_list == [last_updated, first_updated]
@@ -1551,6 +1558,71 @@ class TestOrientationsList:
         )
         assertContains(response, "Sélectionnez un choix valide. INVALID n’en fait pas partie.")
 
+    def test_senders_filters_for_prescribers(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+        other_user = PrescriberMembershipFactory(organization=organization).user
+        old_user = PrescriberMembershipFactory(organization=organization, is_active=False).user
+        unrelated_user = OrientationFactory().sender
+        orientation_1 = OrientationFactory(sender=user, sender_prescriber_organization=organization)
+        orientation_2 = OrientationFactory(sender=other_user, sender_prescriber_organization=organization)
+        orientation_3 = OrientationFactory(sender=old_user, sender_prescriber_organization=organization)
+        client.force_login(user)
+
+        response = client.get(self.LIST_URL, {"senders": [other_user.id]})
+        assert response.context["orientations_page"].object_list == [orientation_2]
+
+        response = client.get(self.LIST_URL, {"senders": [user.id, other_user.id, old_user.id]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2, orientation_3}
+
+        response = client.get(self.LIST_URL, {"senders": []})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2, orientation_3}
+
+        response = client.get(self.LIST_URL, {"senders": [unrelated_user.pk]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2, orientation_3}
+        assertContains(response, f"Sélectionnez un choix valide. {unrelated_user.pk} n’en fait pas partie.")
+
+    def test_senders_filters_for_employers(self, client):
+        membership = CompanyMembershipFactory()
+        company = membership.company
+        user = membership.user
+        other_user = CompanyMembershipFactory(company=company).user
+        old_user = CompanyMembershipFactory(company=company, is_active=False).user
+        unrelated_user = OrientationFactory().sender
+        orientation_1 = OrientationFactory(
+            sender=user,
+            sender_prescriber_organization=None,
+            sender_company=company,
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        orientation_2 = OrientationFactory(
+            sender=other_user,
+            sender_prescriber_organization=None,
+            sender_company=company,
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        orientation_3 = OrientationFactory(
+            sender=old_user,
+            sender_prescriber_organization=None,
+            sender_company=company,
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        client.force_login(user)
+
+        response = client.get(self.LIST_URL, {"senders": [other_user.id]})
+        assert response.context["orientations_page"].object_list == [orientation_2]
+
+        response = client.get(self.LIST_URL, {"senders": [user.id, other_user.id, old_user.id]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2, orientation_3}
+
+        response = client.get(self.LIST_URL, {"senders": []})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2, orientation_3}
+
+        response = client.get(self.LIST_URL, {"senders": [unrelated_user.pk]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_1, orientation_2, orientation_3}
+        assertContains(response, f"Sélectionnez un choix valide. {unrelated_user.pk} n’en fait pas partie.")
+
     def test_structures_filters(self, client):
         membership = PrescriberMembershipFactory(organization__authorized=True)
         organization = membership.organization
@@ -1579,8 +1651,9 @@ class TestOrientationsList:
         membership = PrescriberMembershipFactory(organization__authorized=True)
         organization = membership.organization
         user = membership.user
+        other_user = PrescriberMembershipFactory(organization=organization).user
         orientation_1 = OrientationFactory(
-            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.PENDING
+            sender=other_user, sender_prescriber_organization=organization, status=OrientationStatus.PENDING
         )
         orientation_2 = OrientationFactory(
             sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REJECTED
@@ -1593,6 +1666,7 @@ class TestOrientationsList:
                 "statuses": [OrientationStatus.PENDING.value],
                 "structures": [orientation_1.service.structure.id],
                 "beneficiary": orientation_1.beneficiary.pk,
+                "senders": [other_user.pk],
             },
         )
         assert response.context["orientations_page"].object_list == [orientation_1]

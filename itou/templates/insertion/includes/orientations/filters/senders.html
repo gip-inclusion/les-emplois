@@ -1,0 +1,14 @@
+{% load django_bootstrap5 %}
+
+{% if filters_form.senders.field.choices %}
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSenders" type="button" aria-expanded="false" aria-controls="collapseSenders">Émetteur</button>
+        </legend>
+        <div class="mt-3 collapse" id="collapseSenders">
+            {% if filters_form.senders %}
+                {% bootstrap_field filters_form.senders %}
+            {% endif %}
+        </div>
+    </fieldset>
+{% endif %}
