@@ -45,4 +45,6 @@
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+    <!-- Needed to use Select2MultipleWidget. -->
+    {{ filters_form.media.js }}
 {% endblock %}

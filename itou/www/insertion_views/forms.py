@@ -1,7 +1,7 @@
 from django import forms
 from django.db.models import Q
 from django.forms import ValidationError
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.files.forms import ItouMultiFileField
 from itou.insertion.enums import OrientationStatus
@@ -158,16 +158,17 @@ class OrientationsFilterForm(forms.Form):
     statuses = forms.MultipleChoiceField(
         required=False, choices=OrientationStatus, widget=forms.CheckboxSelectMultiple
     )
+    senders = forms.MultipleChoiceField(label="Nom de la personne", required=False, widget=Select2MultipleWidget)
     structures = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
 
     def __init__(self, orientations_qs, data, request, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
         self.fields["beneficiary"].choices = self._get_choices_for_beneficiary(orientations_qs, request)
+        self.fields["senders"].choices = self._get_choices_for_senders(orientations_qs, request.current_organization)
         structures_choices = list(
             set(orientations_qs.values_list("service__structure__id", "service__structure__name"))
         )
         structures_choices.sort(key=lambda c: c[1])
-
         self.fields["structures"].choices = structures_choices
 
     def _get_choices_for_beneficiary(self, orientations_qs, request):
@@ -186,6 +187,15 @@ class OrientationsFilterForm(forms.Form):
             if beneficiary.get_inverted_full_name()
         ]
 
+    def _get_choices_for_senders(self, orientations_qs, request_organization):
+        senders_ids = orientations_qs.values_list("sender", flat=True)
+        past_and_present_members = request_organization.members.filter(pk__in=senders_ids)
+
+        users = [
+            (user.id, user_full_name) for user in past_and_present_members if (user_full_name := user.get_full_name())
+        ]
+        return sorted(users, key=lambda user: user[1])
+
     def filter(self, queryset):
         filters = []
 
@@ -194,6 +204,10 @@ class OrientationsFilterForm(forms.Form):
 
         if statuses := self.cleaned_data.get("statuses"):
             filters.append(Q(status__in=statuses))
+
+        if senders := self.cleaned_data.get("senders"):
+            senders_filter = Q(sender__in=senders)
+            filters.append(senders_filter)
 
         if structures := self.cleaned_data.get("structures"):
             filters.append(Q(service__structure__in=structures))
