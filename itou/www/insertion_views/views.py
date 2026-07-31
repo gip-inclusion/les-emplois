@@ -595,7 +595,7 @@ def orientations_list(request):
         .select_related("beneficiary", "sender", "service", "service__structure")
     )
 
-    filters_form = OrientationsFilterForm(orientations, request.GET)
+    filters_form = OrientationsFilterForm(orientations, request.GET, request)
     filters_counter = 0
     if filters_form.is_valid():
         orientations = filters_form.filter(orientations)

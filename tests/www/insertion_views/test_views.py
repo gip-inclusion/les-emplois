@@ -1280,8 +1280,8 @@ class TestOrientationsList:
     """
 
     @staticmethod
-    def replace_attrs(soup, attrs, attrs_to_update):
-        nodes = soup.find_all(attrs=attrs)
+    def replace_attrs(soup, attrs, attrs_to_update, **find_all_kwargs):
+        nodes = soup.find_all(attrs=attrs, **find_all_kwargs)
         for node in nodes:
             node.attrs.update(attrs_to_update)
         return soup
@@ -1334,6 +1334,13 @@ class TestOrientationsList:
                 soup,
                 attrs={"name": "structures", "value": structure.pk},
                 attrs_to_update={"value": "[PK of Structure]"},
+            )
+        for beneficiary in [last_updated.beneficiary, first_updated.beneficiary]:
+            soup = self.replace_attrs(
+                soup,
+                attrs={"value": beneficiary.pk},
+                attrs_to_update={"value": "[PK of Beneficiary]"},
+                name="option",
             )
 
         assert pretty_indented(soup) == snapshot(name="page")
@@ -1488,6 +1495,26 @@ class TestOrientationsList:
 
         assertContains(response, self.RESET_BTN_MARKUP, html=True)
 
+    def test_beneficiary_filters(self, client):
+        membership = PrescriberMembershipFactory(organization__authorized=True)
+        organization = membership.organization
+        user = membership.user
+        orientation_jack = OrientationFactory(
+            sender=user, sender_prescriber_organization=organization, beneficiary__first_name="Jack"
+        )
+        jack = orientation_jack.beneficiary
+        orientation_mary = OrientationFactory(
+            sender=user, sender_prescriber_organization=organization, beneficiary__first_name="Mary"
+        )
+        client.force_login(user)
+
+        response = client.get(self.LIST_URL, {"beneficiary": jack.pk})
+        assert response.context["orientations_page"].object_list == [orientation_jack]
+
+        response = client.get(self.LIST_URL, {"beneficiary": ["INVALID"]})
+        assert set(response.context["orientations_page"].object_list) == {orientation_jack, orientation_mary}
+        assertContains(response, "Sélectionnez un choix valide. INVALID n’en fait pas partie.")
+
     def test_statuses_filters(self, client):
         membership = PrescriberMembershipFactory(organization__authorized=True)
         organization = membership.organization
@@ -1562,7 +1589,11 @@ class TestOrientationsList:
 
         response = client.get(
             self.LIST_URL,
-            {"statuses": [OrientationStatus.PENDING.value], "structures": [orientation_1.service.structure.id]},
+            {
+                "statuses": [OrientationStatus.PENDING.value],
+                "structures": [orientation_1.service.structure.id],
+                "beneficiary": orientation_1.beneficiary.pk,
+            },
         )
         assert response.context["orientations_page"].object_list == [orientation_1]
 

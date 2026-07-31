@@ -151,13 +151,18 @@ class OrientationDocumentsForm(forms.Form):
 
 
 class OrientationsFilterForm(forms.Form):
+    beneficiary = forms.ChoiceField(
+        required=False, label="Nom de l’usager", widget=Select2Widget(attrs={"data-placeholder": "Nom de l’usager"})
+    )
+
     statuses = forms.MultipleChoiceField(
         required=False, choices=OrientationStatus, widget=forms.CheckboxSelectMultiple
     )
     structures = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
 
-    def __init__(self, orientations_qs, data, *args, **kwargs):
+    def __init__(self, orientations_qs, data, request, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
+        self.fields["beneficiary"].choices = self._get_choices_for_beneficiary(orientations_qs, request)
         structures_choices = list(
             set(orientations_qs.values_list("service__structure__id", "service__structure__name"))
         )
@@ -165,8 +170,27 @@ class OrientationsFilterForm(forms.Form):
 
         self.fields["structures"].choices = structures_choices
 
+    def _get_choices_for_beneficiary(self, orientations_qs, request):
+        beneficiaries_qs = User.objects.filter(pk__in=orientations_qs.values("beneficiary")).order_by(
+            "last_name", "first_name"
+        )
+
+        return [
+            (
+                beneficiary.pk,
+                mask_unless(
+                    beneficiary.get_inverted_full_name(), predicate=can_view_personal_information(request, beneficiary)
+                ),
+            )
+            for beneficiary in beneficiaries_qs
+            if beneficiary.get_inverted_full_name()
+        ]
+
     def filter(self, queryset):
         filters = []
+
+        if beneficiary := self.cleaned_data.get("beneficiary"):
+            filters.append(Q(beneficiary=beneficiary))
 
         if statuses := self.cleaned_data.get("statuses"):
             filters.append(Q(status__in=statuses))
