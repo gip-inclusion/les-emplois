@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.approvals.utils import SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE, can_close_approval
+from itou.approvals.utils import can_close_approval
 from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import ContractFactory
@@ -16,12 +16,8 @@ TODAY = datetime.date(2024, 6, 1)
 
 
 def _make_long_suspension(approval, *, in_progress=True):
-    """Create a suspension whose duration strictly exceeds 12 months."""
-    # start_at is set so that (end_at - start_at) > SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE
-    # regardless of whether the suspension is still in progress or already ended.
-    start_at = TODAY - SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE - datetime.timedelta(days=2)
     end_at = TODAY if in_progress else TODAY - datetime.timedelta(days=1)
-    return SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at)
+    return SuspensionFactory(approval=approval, long_enough_to_close=True, end_at=end_at)
 
 
 @freeze_time(TODAY)

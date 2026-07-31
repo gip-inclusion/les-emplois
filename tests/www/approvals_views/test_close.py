@@ -11,14 +11,12 @@ from tests.companies.factories import CompanyMembershipFactory
 
 def _closable_approval(to_company):
     """An approval whose suspension makes it eligible for closure by *to_company*."""
-    duration = SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE + datetime.timedelta(days=2)
-    suspension_start_at = timezone.localdate() - duration
     approval = ApprovalFactory(
         with_jobapplication=True,
         with_jobapplication__to_company=to_company,
-        start_at=suspension_start_at - datetime.timedelta(days=1),
+        start_at=timezone.localdate() - SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE - datetime.timedelta(days=3),
     )
-    SuspensionFactory(approval=approval, start_at=suspension_start_at, end_at=timezone.localdate())
+    SuspensionFactory(approval=approval, long_enough_to_close=True, end_at=timezone.localdate())
     return approval
 
 
