@@ -1,4 +1,10 @@
-<form hx-get="{{ request.path }}" hx-trigger="change delay:.5s" hx-indicator="#orientations-section" hx-target="#orientations-section" hx-swap="outerHTML" hx-push-url="true">
+<form hx-get="{{ request.path }}"
+      hx-trigger="change delay:.5s, change from:#id_beneficiary"
+      hx-indicator="#orientations-section"
+      hx-target="#orientations-section"
+      hx-include="#id_beneficiary"
+      hx-swap="outerHTML"
+      hx-push-url="true">
     {% comment %}
     Do not reload the entire offcanvas with HTMX. Otherwise, STR:
     1. Select a filter from the top bar (one with btn_dropdown_filter=True)

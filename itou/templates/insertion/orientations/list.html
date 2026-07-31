@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}Orientations émises {{ block.super }}{% endblock %}
@@ -28,6 +29,9 @@
                     <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
                         <div class="flex-md-grow-1">
                             {% include "insertion/includes/orientations/list_counter.html" with orientations_page=orientations_page request=request only %}
+                        </div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">
+                            {% bootstrap_field filters_form.beneficiary wrapper_class="w-lg-400px" show_label=False %}
                         </div>
                     </div>
                     {% include "insertion/includes/orientations/list_orientations.html" with orientations_page=orientations_page request=request csrf_token=csrf_token only %}
