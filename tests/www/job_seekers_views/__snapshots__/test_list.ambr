@@ -1846,7 +1846,11 @@
                               AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                         ELSE "users_user"."last_name"
                     END AS "last_name_for_display",
-                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                    LOWER(CASE
+                              WHEN ("users_user"."kind" = %s
+                                    AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                              ELSE "users_user"."last_name"
+                          END) AS "full_name",
                     COALESCE(
                                (SELECT COUNT(U0."id") AS "count"
                                 FROM "job_applications_jobapplication" U0
@@ -1969,7 +1973,11 @@
                            AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                      ELSE "users_user"."last_name"
                  END AS "last_name_for_display",
-                 (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                 LOWER(CASE
+                           WHEN ("users_user"."kind" = %s
+                                 AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                           ELSE "users_user"."last_name"
+                       END) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "job_applications_jobapplication" U0
@@ -2813,7 +2821,11 @@
                               AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                         ELSE "users_user"."last_name"
                     END AS "last_name_for_display",
-                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                    LOWER(CASE
+                              WHEN ("users_user"."kind" = %s
+                                    AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                              ELSE "users_user"."last_name"
+                          END) AS "full_name",
                     COALESCE(
                                (SELECT COUNT(U0."id") AS "count"
                                 FROM "job_applications_jobapplication" U0
@@ -2938,7 +2950,11 @@
                            AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                      ELSE "users_user"."last_name"
                  END AS "last_name_for_display",
-                 (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                 LOWER(CASE
+                           WHEN ("users_user"."kind" = %s
+                                 AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                           ELSE "users_user"."last_name"
+                       END) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "job_applications_jobapplication" U0
@@ -3641,7 +3657,11 @@
                               AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                         ELSE "users_user"."last_name"
                     END AS "last_name_for_display",
-                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                    LOWER(CASE
+                              WHEN ("users_user"."kind" = %s
+                                    AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                              ELSE "users_user"."last_name"
+                          END) AS "full_name",
                     COALESCE(
                                (SELECT COUNT(U0."id") AS "count"
                                 FROM "job_applications_jobapplication" U0
@@ -3740,7 +3760,11 @@
                            AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                      ELSE "users_user"."last_name"
                  END AS "last_name_for_display",
-                 (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                 LOWER(CASE
+                           WHEN ("users_user"."kind" = %s
+                                 AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                           ELSE "users_user"."last_name"
+                       END) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "job_applications_jobapplication" U0
@@ -4729,7 +4753,11 @@
                               AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                         ELSE "users_user"."last_name"
                     END AS "last_name_for_display",
-                    (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                    LOWER(CASE
+                              WHEN ("users_user"."kind" = %s
+                                    AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                              ELSE "users_user"."last_name"
+                          END) AS "full_name",
                     COALESCE(
                                (SELECT COUNT(U0."id") AS "count"
                                 FROM "job_applications_jobapplication" U0
@@ -4826,7 +4854,11 @@
                            AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
                      ELSE "users_user"."last_name"
                  END AS "last_name_for_display",
-                 (COALESCE(LOWER("users_user"."last_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."first_name"), %s)), %s)) AS "full_name",
+                 LOWER(CASE
+                           WHEN ("users_user"."kind" = %s
+                                 AND "users_user"."last_name" = %s) THEN "users_jobseekerprofile"."birth_name"
+                           ELSE "users_user"."last_name"
+                       END) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "job_applications_jobapplication" U0
