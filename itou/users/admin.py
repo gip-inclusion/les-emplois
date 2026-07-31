@@ -9,6 +9,7 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
 from django.contrib.admin import models as admin_models
 from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.admin.utils import display_for_value
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
@@ -32,6 +33,8 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.insertion.models import Orientation
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
+from itou.otp.models import ItouTOTPDevice
+from itou.otp.utils import user_is_concerned_by_otp
 from itou.prescribers.models import PrescriberMembership
 from itou.users import models
 from itou.users.admin_forms import (
@@ -444,6 +447,25 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def jobseeker_profile_link(self, obj):
         return get_admin_view_link(obj.jobseeker_profile) if obj.is_job_seeker else None
 
+    @admin.display(description="2FA obligatoire")
+    def required_2fa(self, obj):
+        return display_for_value(
+            user_is_concerned_by_otp(obj),
+            empty_value_display="unused kwarg",
+            boolean=True,
+        )
+
+    @admin.display(description="appareils enrôlés pour la 2FA interne")
+    def internal_2fa_devices(self, obj):
+        count = ItouTOTPDevice.objects.filter(user=obj, disabled_at=None).count()
+        if not count:
+            return "aucun appareil actif"
+        url = reverse(
+            f"admin:{ItouTOTPDevice._meta.app_label}_{ItouTOTPDevice._meta.model_name}_changelist",
+            query={"user_id": obj.id},
+        )
+        return format_html('<a href="{url}">{count} appareil(s) actif(s)</a>', url=url, count=count)
+
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
         if obj.is_professional:
@@ -528,6 +550,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "first_login",
                 "terms_accepted_at",
                 "fields_history_formatted",
+                "required_2fa",
+                "internal_2fa_devices",
             ]
         )
         if not request.user.is_superuser:
@@ -583,6 +607,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                     "identity_provider",
                     "extended_kind",  # Add details to professional users
                     "jobseeker_profile_link",
+                    "required_2fa",
+                    "internal_2fa_devices",
                 )
             },
         )
