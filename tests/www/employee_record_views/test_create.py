@@ -1054,19 +1054,24 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         session = client.session
         session[get_session_ntt_key(self.job_application)] = valid_ntt
         session.save()
-        if nir == "classic" and self.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
-            new_nir = ("1" if self.job_seeker.title == Title.M else "2") + self.job_seeker.jobseeker_profile.nir[1:-2]
-            new_nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
-            self.job_seeker.jobseeker_profile.nir = new_nir
-            self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
-        elif nir == "7_or_8" and not self.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
-            new_nir = ("7" if self.job_seeker.title == Title.M else "8") + self.job_seeker.jobseeker_profile.nir[1:-2]
-            new_nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
-            self.job_seeker.jobseeker_profile.nir = new_nir
-            self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
-        elif nir == "no_nir":
-            self.job_seeker.jobseeker_profile.nir = ""
-            self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
+        with triggers.fake_context():
+            if nir == "classic" and self.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
+                new_nir = ("1" if self.job_seeker.title == Title.M else "2") + self.job_seeker.jobseeker_profile.nir[
+                    1:-2
+                ]
+                new_nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
+                self.job_seeker.jobseeker_profile.nir = new_nir
+                self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
+            elif nir == "7_or_8" and not self.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
+                new_nir = ("7" if self.job_seeker.title == Title.M else "8") + self.job_seeker.jobseeker_profile.nir[
+                    1:-2
+                ]
+                new_nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
+                self.job_seeker.jobseeker_profile.nir = new_nir
+                self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
+            elif nir == "no_nir":
+                self.job_seeker.jobseeker_profile.nir = ""
+                self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
 
         client.get(self.url)
 
@@ -1311,7 +1316,8 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
 
         # No NIR and NTT
         employee_record.job_application.job_seeker.jobseeker_profile.nir = ""
-        employee_record.job_application.job_seeker.jobseeker_profile.save()
+        with triggers.fake_context():
+            employee_record.job_application.job_seeker.jobseeker_profile.save()
         response = client.get(self.url)
         assertContains(response, NTT_MARKUP)
         assertContains(response, f"<strong>{employee_record.ntt}</strong>", html=True)
