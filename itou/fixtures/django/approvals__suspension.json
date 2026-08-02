@@ -1,0 +1,17 @@
+[
+    {
+        "model": "approvals.suspension",
+        "pk": 2,
+        "fields": {
+            "approval": 15,
+            "start_at": "2024-03-01",
+            "end_at": "2025-06-01",
+            "siae": 3852,
+            "reason": "SUSPENDED_CONTRACT",
+            "reason_explanation": "",
+            "created_at": "2024-03-01T09:00:00Z",
+            "created_by": null,
+            "updated_by": null
+        }
+    }
+]
