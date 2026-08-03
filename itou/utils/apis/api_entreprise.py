@@ -133,3 +133,34 @@ def etablissement_get_or_error(siret):
     )
 
     return etablissement, None
+
+
+def renew_password(new_password):
+    # Allow to renew the password through the API (it's the only way)
+    # See the API documentation
+    # https://portail-api.insee.fr/catalog/api/26d13266-689d-3fee-845d-c08e12b8f0dd/doc?page=a7e0ed84-020c-48bc-a0ed-84020c08bce2
+
+    access_token = get_access_token()
+    if not access_token:
+        return False, "Problème de connexion à la base Sirene. Essayez ultérieurement."
+
+    url = f"{settings.API_INSEE_SIRENE_URL}/renouvellement"
+    response = httpx.post(
+        url,
+        content=json.dumps(
+            {
+                "oldPassword": settings.API_INSEE_PASSWORD,
+                "newPassword": new_password,
+            }
+        ),
+        headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
+    )
+
+    if response.status_code == 200:
+        return True, None
+
+    if response.status_code == 400:
+        error = "Problème lors du renouvellement du mot de passe. \n" + response.content.decode()
+    else:
+        error = "Problème de connexion à la base Sirene. Essayez ultérieurement."
+    return False, error
