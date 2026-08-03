@@ -491,6 +491,8 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
 
     @property
     def show_upcoming_mfa_activation_banner(self):
+        if not settings.SHOW_UPCOMING_MFA_FOR_PROS_BANNER:
+            return False
         if not (settings.REQUIRE_MFA_FOR_PROS and self.is_professional):
             return False
         # Do not show if user already authenticaed with internal or external MFA.
