@@ -181,7 +181,6 @@
     {{ block.super }}
     {% if backup_code %}
         <script nonce="{{ csp_nonce }}">
-            console.log("machin");
             document.getElementById("confirmation-checkbox").addEventListener("change", (event) => {
                 const button = document.getElementById("end-button");
                 button.classList.toggle("disabled", !event.target.checked);
