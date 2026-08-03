@@ -188,7 +188,7 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
             request,
             "Code de récupération validé. Votre identité a été vérifiée. "
             "Vous pouvez maintenant reconfigurer votre double authentification",
-            extra_tags=["toast"],
+            extra_tags="toast",
         )
 
         # No need to delete the ItouStaticToken, it's already been
