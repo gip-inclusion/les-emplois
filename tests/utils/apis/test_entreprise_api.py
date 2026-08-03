@@ -1,12 +1,14 @@
 import copy
 import json
 import logging
+from io import StringIO
 
 import httpx
 import pytest
 import respx
 from django.conf import settings
 from django.core.cache import caches
+from django.core.management import call_command
 from freezegun import freeze_time
 
 from itou.utils.apis import api_entreprise
@@ -251,3 +253,17 @@ class TestApiEntreprise:
         assert etablissement.post_code is None
         assert etablissement.city is None
         assert etablissement.department is None
+
+    @respx.mock
+    def test_renew_password_command(self, settings):
+        settings.API_INSEE_USERNAME = "baz"
+        respx.post(f"{settings.API_INSEE_SIRENE_URL}/renouvellement").respond(200, json={})
+        out = StringIO()
+
+        call_command("renew_insee_api_password", stdout=out)
+
+        out.seek(0)
+        assert (
+            "Mot de passe modifié. Mettez-le à jour dans settings et dans le gestionnaire de mot de passe."
+            in out.read()
+        )
