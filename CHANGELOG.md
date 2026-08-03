@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## 2026-07-20
+
+### Ajouté
+
+- [Candidature : Désactivation des candidatures spontanées pour les employeurs n'ayant pas actualisé depuis > 90 jours](https://github.com/gip-inclusion/les-emplois/pull/8402)
+- [Interface : Permettre aux pros de se désigner dernier accompagnateur connu](https://github.com/gip-inclusion/les-emplois/pull/8376)
+- [Pilotage : Envoyer les intentions de mise en relation (iMER) au Metabase Emplois](https://github.com/gip-inclusion/les-emplois/pull/8393)
+
+### Modifié
+
+- [Statistiques : Remise en place du type du créateur d'un compte candidat](https://github.com/gip-inclusion/les-emplois/pull/8401)
+- [Sécurité : Vérification du paramètre nonce dans les connexions OIDC ProConnect](https://github.com/gip-inclusion/les-emplois/pull/8399)
+
 ## 2026-07-13
 
 ### Ajouté
