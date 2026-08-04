@@ -38,7 +38,7 @@ class SetChosenPercentForm(forms.ModelForm):
 
 
 class AdministrativeCriteriaEvaluationForm(AdministrativeCriteriaForm):
-    def __init__(self, siae, job_app_selected_administrative_criteria, **kwargs):
+    def __init__(self, siae, job_app_selected_administrative_criteria, certified_criteria_keys=None, **kwargs):
         administrative_criteria = [e.administrative_criteria for e in job_app_selected_administrative_criteria]
         super().__init__(
             is_authorized_prescriber=False,
@@ -46,6 +46,13 @@ class AdministrativeCriteriaEvaluationForm(AdministrativeCriteriaForm):
             administrative_criteria=administrative_criteria,
             **kwargs,
         )
+        # Checkboxes corresponding to certified criteria are disabled: user/SIAE can neither uncheck nor remove them.
+        # A disabled field keeps its initial value and is excluded from `changed_data`, so
+        # `EvaluatedJobApplication.save_selected_criteria` will not delete a certified criterion.
+        self.certified_criteria_keys = set(certified_criteria_keys or ())
+        for key in self.certified_criteria_keys:
+            self.fields[key].disabled = True
+            self.fields[key].initial = True
         self.num_level2_admin_criteria = ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[siae.kind]
 
 
