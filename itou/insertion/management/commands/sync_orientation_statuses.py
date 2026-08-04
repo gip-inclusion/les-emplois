@@ -14,14 +14,17 @@ class DoraStatus(NamedTuple):
     status: str
     processing_date: datetime.datetime | None  # the date on which the orientation was processed by DORA
     dora_status_updated_at: datetime.datetime  # the date of the last modification on DORA side, synchronization point
+    updated_at: datetime.datetime  # the date actually displayed in the interfaces
 
     @classmethod
     def from_api_item(cls, item):
         processing_date = item["processing_date"]
+        dora_status_updated_at = datetime.datetime.fromisoformat(item["updated_at"])
         return cls(
             status=item["status"],
             processing_date=datetime.datetime.fromisoformat(processing_date) if processing_date else None,
-            dora_status_updated_at=datetime.datetime.fromisoformat(item["updated_at"]),
+            dora_status_updated_at=dora_status_updated_at,
+            updated_at=dora_status_updated_at,
         )
 
     @classmethod
@@ -30,6 +33,7 @@ class DoraStatus(NamedTuple):
             status=orientation.status,
             processing_date=orientation.processing_date,
             dora_status_updated_at=orientation.dora_status_updated_at,
+            updated_at=orientation.updated_at,
         )
 
 
@@ -66,11 +70,20 @@ class Command(BaseCommand):
         to_update = []
         for orientation in orientations:
             dora_status = statuses[str(orientation.id)]
-            if dora_status == DoraStatus.from_orientation(orientation):
+            emplois_status = DoraStatus.from_orientation(orientation)
+            if dora_status == emplois_status:
+                continue
+            elif emplois_status.updated_at > dora_status.updated_at:
+                # This situation should not happen, we want to have only one source of truth.
+                # For now it is DORA from which we update the status, processing_date and updated_at.
+                # Later on, the orientations will be managed on Les Emplois and we don’t want to
+                # overwrite the data -- we’ll have to figure out data reconciliation.
+                self.logger.error("Trying to update orientation=%s with older DORA data", orientation.pk)
                 continue
             orientation.status = dora_status.status
             orientation.processing_date = dora_status.processing_date
             orientation.dora_status_updated_at = dora_status.dora_status_updated_at
+            orientation.updated_at = dora_status.updated_at
             to_update.append(orientation)
 
         Orientation.objects.bulk_update(to_update, DoraStatus._fields)

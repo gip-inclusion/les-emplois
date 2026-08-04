@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from django.core.management import call_command
+from freezegun import freeze_time
 
 from itou.insertion.enums import OrientationStatus
 from tests.insertion.factories import OrientationFactory
@@ -30,7 +31,8 @@ def dora_settings_fixture(settings):
 
 
 def test_updates_existing_orientation_status(dora_settings, respx_mock):
-    orientation = OrientationFactory(status=OrientationStatus.PENDING)
+    with freeze_time("2026-07-01"):
+        orientation = OrientationFactory(status=OrientationStatus.PENDING)
     respx_mock.get(DORA_STATUS_URL).respond(
         200,
         json=paginated(
@@ -51,13 +53,15 @@ def test_updates_existing_orientation_status(dora_settings, respx_mock):
     assert orientation.status == OrientationStatus.ACCEPTED
     assert orientation.processing_date == datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC)
     assert orientation.dora_status_updated_at == datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC)
+    assert orientation.updated_at == datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC)
 
 
 def test_null_processing_date_is_synced(dora_settings, respx_mock):
-    orientation = OrientationFactory(
-        status=OrientationStatus.PENDING,
-        processing_date=datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC),
-    )
+    with freeze_time("2026-01-01"):
+        orientation = OrientationFactory(
+            status=OrientationStatus.PENDING,
+            processing_date=datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC),
+        )
     respx_mock.get(DORA_STATUS_URL).respond(
         200,
         json=paginated(
@@ -77,6 +81,35 @@ def test_null_processing_date_is_synced(dora_settings, respx_mock):
     orientation.refresh_from_db()
     assert orientation.status == OrientationStatus.EXPIRED
     assert orientation.processing_date is None
+    assert orientation.updated_at == datetime.datetime(2026, 7, 20, 10, 0, tzinfo=datetime.UTC)
+
+
+def test_doesnt_update_more_recent_emplois(dora_settings, respx_mock, caplog):
+    more_recent_datetime = datetime.datetime(2026, 8, 1, tzinfo=datetime.UTC)
+    with freeze_time(more_recent_datetime):
+        orientation = OrientationFactory(status=OrientationStatus.PENDING)
+    respx_mock.get(DORA_STATUS_URL).respond(
+        200,
+        json=paginated(
+            [
+                status_item(
+                    orientation.id,
+                    OrientationStatus.ACCEPTED,
+                    processing_date="2026-07-20T09:30:00+00:00",
+                    updated_at="2026-07-20T09:30:00+00:00",
+                )
+            ]
+        ),
+    )
+
+    call_command("sync_orientation_statuses", wet_run=True)
+
+    orientation.refresh_from_db()
+    # Nothing changed
+    assert orientation.status == OrientationStatus.PENDING
+    assert orientation.dora_status_updated_at is None
+    assert orientation.updated_at == more_recent_datetime
+    assert f"Trying to update orientation={orientation.pk} with older DORA data" in caplog.messages
 
 
 def test_first_run_has_no_updated_after(dora_settings, respx_mock):
