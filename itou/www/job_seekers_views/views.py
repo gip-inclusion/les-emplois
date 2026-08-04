@@ -390,23 +390,8 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         ),
         output_field=IntegerField(),
     )
-    queryset = (
-        User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
-        .annotate(
-            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
-            job_applications_nb=Coalesce(subquery_count, 0),
-            last_updated_at=subquery_last_action_at,
-            valid_eligibility_diagnosis=subquery_diagnosis,
-            advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
-        )
-        .prefetch_related(
-            Prefetch(
-                "job_seeker_assignments",
-                queryset=JobSeekerAssignment.objects.select_related(
-                    "professional", "prescriber_organization", "company"
-                ).order_by("-updated_at"),
-            ),
-        )
+    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids).annotate(
+        advisors=ArrayAgg("job_seeker_assignments__professional", distinct=True),
     )
 
     form = FilterForm(
@@ -420,15 +405,30 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         queryset = form.filter(queryset)
         filters_counter = form.get_filters_counter()
 
+    queryset = (
+        queryset.annotate(
+            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
+            job_applications_nb=Coalesce(subquery_count, 0),
+            last_updated_at=subquery_last_action_at,
+            valid_eligibility_diagnosis=subquery_diagnosis,
+        )
+        .select_related("jobseeker_profile")
+        .prefetch_related(
+            "approvals__suspension_set",
+            Prefetch(
+                "job_seeker_assignments",
+                queryset=JobSeekerAssignment.objects.select_related(
+                    "professional", "prescriber_organization", "company"
+                ).order_by("-updated_at"),
+            ),
+        )
+    )
+
     try:
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.LAST_UPDATED_AT_DESC
-    queryset = (
-        queryset.order_by(*order.order_by)
-        .select_related("jobseeker_profile")
-        .prefetch_related("approvals__suspension_set")
-    )
+    queryset = queryset.order_by(*order.order_by)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_LARGE)
     for job_seeker in page_obj:
