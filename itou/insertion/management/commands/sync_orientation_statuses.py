@@ -12,8 +12,8 @@ from itou.utils.command import BaseCommand
 
 class DoraStatus(NamedTuple):
     status: str
-    processing_date: datetime.datetime | None  # date à laquelle l'orientation a été traitée côté Dora
-    dora_status_updated_at: datetime.datetime  # date de dernière modification côté DORA, borne de la synchro
+    processing_date: datetime.datetime | None  # the date on which the orientation was processed by DORA
+    dora_status_updated_at: datetime.datetime  # the date of the last modification on DORA side, synchronization point
 
     @classmethod
     def from_api_item(cls, item):
@@ -58,7 +58,7 @@ class Command(BaseCommand):
         self.logger.info("Retrieved count=%d orientation statuses from DORA", len(statuses))
 
         orientations = list(Orientation.objects.filter(id__in=statuses).only("id", *DoraStatus._fields))
-        # Dora only knows the orientations we sent it: an unknown uid means both databases
+        # DORA only knows the orientations we sent it: an unknown uid means both databases
         # diverged, which has to be dealt with before syncing anything.
         if unknown := statuses.keys() - {str(orientation.id) for orientation in orientations}:
             raise RuntimeError(f"Unknown orientations from DORA: {', '.join(sorted(unknown))}")
