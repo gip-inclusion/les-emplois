@@ -717,8 +717,8 @@ class TestInstitutionEvaluatedSiaeDetailView:
         "<b>le résultat du contrôle est négatif</b>."
     )
     certified_text = (
-        "Cette auto-prescription répond à un critère de niveau 1 certifié. "
-        "Aucun justificatif n’est demandé pour le moment."
+        "Les critères certifiés pour cette auto-prescription suffisent à justifier l’éligibilité du salarié. "
+        "Aucun justificatif complémentaire n’est demandé pour le moment."
     )
 
     @pytest.fixture(autouse=True)
