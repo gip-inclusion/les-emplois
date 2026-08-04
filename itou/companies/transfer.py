@@ -9,9 +9,10 @@ from itou.companies import enums, models
 from itou.companies.enums import CompanySource
 from itou.eligibility import models as eligibility_models
 from itou.employee_record.models import EmployeeRecord
+from itou.geiq_assessments import models as geiq_assessments_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
-from itou.siae_evaluations.models import EvaluatedSiae
+from itou.siae_evaluations import models as siae_evaluations_models
 from itou.users import models as users_models
 from itou.users.utils import merge_job_seeker_assignments
 
@@ -19,6 +20,8 @@ from itou.users.utils import merge_job_seeker_assignments
 class TransferField(TextChoices):
     IAE_DIAG_CREATED = "iae_diag_created", "Diagnostics IAE créés"
     GEIQ_DIAG_CREATED = "geiq_diag_created", "Diagnostics GEIQ créés"
+    EVALUATED_SIAES = "evaluated_siaes", "Contrôles a posteriori IAE"
+    GEIQ_ASSESSMENTS = "geiq_assessments", "Bilans d'exécution GEIQ"
     JOB_APPLICATIONS_SENT = "job_applications_sent", "Candidatures envoyées"
     JOB_APPLICATIONS_RECEIVED = "job_applications_received", "Candidatures reçues"
     JOB_APPLICATIONS_TRANSFERRED = "job_applications_transferred", "Candidatures transférées"
@@ -50,6 +53,16 @@ TRANSFER_SPECS = {
     TransferField.GEIQ_DIAG_CREATED: {
         "related_model": eligibility_models.GEIQEligibilityDiagnosis,
         "related_model_field": "author_geiq",
+        "geiq_only": True,
+    },
+    TransferField.EVALUATED_SIAES: {
+        "related_model": siae_evaluations_models.EvaluatedSiae,
+        "related_model_field": "siae",
+        "iae_only": True,
+    },
+    TransferField.GEIQ_ASSESSMENTS: {
+        "related_model": geiq_assessments_models.Assessment.companies.through,
+        "related_model_field": "company",
         "geiq_only": True,
     },
     TransferField.JOB_APPLICATIONS_SENT: {
@@ -169,15 +182,9 @@ def transfer_company_data(
     to_company,
     fields_to_transfer,
     disable_from_company=False,
-    ignore_siae_evaluations=False,
     allow_asp_to_user_created_transfer=False,
 ):
     assert from_company.pk != to_company.pk, "Cannot transfer from one company to itself"
-    if not ignore_siae_evaluations and EvaluatedSiae.objects.filter(siae=from_company).exists():
-        raise TransferError(
-            f"Impossible de transférer les objets de l'entreprise ID={from_company.pk}: il y a un contrôle "
-            "a posteriori lié. Vérifiez avec l'équipe support."
-        )
     if (
         not allow_asp_to_user_created_transfer
         and from_company.source == CompanySource.ASP

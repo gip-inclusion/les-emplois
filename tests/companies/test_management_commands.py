@@ -17,6 +17,7 @@ from tests.approvals.factories import ProlongationRequestFactory
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
+from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -105,25 +106,6 @@ class TestMoveCompanyData:
         # and its coords are erased
         company_1.refresh_from_db()
         assert company_1.is_searchable is False
-
-    def test_prevent_move_with_siae_evaluations(self, capsys):
-        company1 = EvaluatedSiaeFactory().siae
-        company2 = companies_factories.CompanyFactory()
-
-        management.call_command("move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True)
-        _stdout, stderr = capsys.readouterr()
-        assert stderr == (
-            f"Impossible de transférer les objets de l'entreprise ID={company1.pk}: "
-            "il y a un contrôle a posteriori lié. Vérifiez avec l'équipe support.\n"
-        )
-
-        management.call_command(
-            "move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True, ignore_siae_evaluations=True
-        )
-        stdout, stderr = capsys.readouterr()
-        assert stderr == ""
-        assert f"MOVE DATA OF company.id={company1.pk}" in stdout
-        assert f"INTO company.id={company2.pk}" in stdout
 
     def test_prevent_move_for_asp_to_user_created_companies(self, capsys):
         company1 = companies_factories.CompanyFactory(source=CompanySource.ASP)
@@ -235,6 +217,36 @@ class TestMoveCompanyData:
 
         job_application.refresh_from_db()
         assert job_application.transferred_from == company_to
+
+    def test_move_siae_evaluations(self):
+        evaluated_siae = EvaluatedSiaeFactory()
+        company_from = evaluated_siae.siae
+        company_to = companies_factories.CompanyFactory(subject_to_iae_rules=True)
+
+        management.call_command(
+            "move_company_data",
+            from_id=company_from.pk,
+            to_id=company_to.pk,
+            wet_run=True,
+        )
+
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.siae == company_to
+
+    def test_move_geiq_assessments(self):
+        company_from = companies_factories.CompanyFactory(kind=CompanyKind.GEIQ)
+        company_to = companies_factories.CompanyFactory(kind=CompanyKind.GEIQ)
+        assessment = AssessmentFactory(companies=[company_from])
+
+        management.call_command(
+            "move_company_data",
+            from_id=company_from.pk,
+            to_id=company_to.pk,
+            wet_run=True,
+        )
+
+        assessment.refresh_from_db()
+        assertQuerySetEqual(assessment.companies.all(), [company_to])
 
 
 def test_update_companies_job_app_score(caplog):
