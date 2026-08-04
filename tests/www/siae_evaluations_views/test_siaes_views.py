@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import (
     ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND,
     AdministrativeCriteriaKind,
@@ -967,6 +968,57 @@ class TestSiaeSelectCriteriaView:
         response = client.post(url)
         assert response.status_code == 403
 
+    def test_with_insufficient_certified_level_2_criteria(self, client):
+        # A single certified level 2 criterion is not enough to validate the auto-prescription so the form must remain
+        # reachable: the SIAE still has to provide proofs for some criteria. The certified criterion is shown with a
+        # `Certifié` badge, pre-checked, disabled and cannot be removed.
+        self.siae.kind = CompanyKind.AI  # AI requires 2 level 2 criteria.
+        self.siae.save(update_fields=["kind", "updated_at"])
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(
+            self.siae, self.user, level_1=False, level_2=True
+        )
+        eligibility_diagnosis = evaluated_job_application.job_application.eligibility_diagnosis
+        certified = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.TH)
+        EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=certified,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            uploaded_at=timezone.now(),
+            submitted_at=timezone.now(),
+            criteria_certified=True,
+        )
+        url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        client.force_login(self.user)
+
+        # The form is reachable (i.e. not 403) at that stage.
+        response = client.get(url)
+        assert response.status_code == 200
+        assert certified.key in response.context["certified_criteria_keys"]
+        assertContains(response, "Certifié")
+
+        certified_field = next(f for f in response.context["level_2_fields"] if f.name == certified.key)
+        assert certified_field.field.disabled is True
+        assert "checked" in certified_field.subwidgets[0].data["attrs"]
+
+        # A valid POST that does not re-check the certified criterion must not remove it as a disabled field keeps its
+        # initial value and is excluded from the form changed data.
+        other = (
+            eligibility_diagnosis.selected_administrative_criteria.exclude(administrative_criteria=certified)
+            .first()
+            .administrative_criteria
+        )
+        response = client.post(url, data={other.key: True})
+        assert response.status_code == 302
+        remaining = {
+            eval_criterion.administrative_criteria_id
+            for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
+        }
+        assert certified.pk in remaining
+        assert other.pk in remaining
+
 
 class TestSiaeUploadDocsView:
     def setup_method(self):
@@ -1475,8 +1527,8 @@ class TestSiaeEvaluatedSiaeDetailView:
         assertContains(
             response,
             (
-                "Cette auto-prescription répond à un critère de niveau 1 certifié. "
-                "Aucun justificatif n’est demandé pour le moment."
+                "Cette auto-prescription répond à un ou plusieurs critères certifiés, qui suffisent à justifier "
+                "l’éligibilité du salarié. Aucun justificatif complémentaire n’est demandé pour le moment."
             ),
             html=True,
             count=1,
