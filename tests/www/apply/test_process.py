@@ -1608,7 +1608,7 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 200
 
-        post_data = {"answer": ""}
+        post_data = {"answer": "On vous rappellera."}
         response = client.post(url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
