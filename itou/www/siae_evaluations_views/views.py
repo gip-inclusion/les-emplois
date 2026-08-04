@@ -148,6 +148,7 @@ def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evalua
             "evaluated_job_applications__job_application",
             "evaluated_job_applications__job_application__approval",
             "evaluated_job_applications__job_application__job_seeker",
+            "evaluated_job_applications__job_application__job_seeker__jobseeker_profile",
         ),
         pk=evaluated_siae_pk,
         **owner_data,
@@ -441,6 +442,7 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
                     "evaluated_job_application_sanction",
                     "job_application__approval",
                     "job_application__job_seeker",
+                    "job_application__job_seeker__jobseeker_profile",
                     "job_application__eligibility_diagnosis",
                 ).prefetch_related(
                     "evaluated_administrative_criteria",

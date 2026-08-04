@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Exists, OuterRef, Prefetch
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -439,9 +439,12 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
     if request.method == "POST" and form.is_valid():
         job_seeker = (
             User.objects.filter(
+                Q(last_name__iexact=form.cleaned_data["last_name"])
+                | Q(
+                    jobseeker_profile__birth_name__iexact=form.cleaned_data["last_name"],
+                ),
                 kind=UserKind.JOB_SEEKER,
                 first_name__iexact=form.cleaned_data["first_name"],
-                last_name__iexact=form.cleaned_data["last_name"],
                 email=form.cleaned_data["email"],
             )
             .select_related("jobseeker_profile")

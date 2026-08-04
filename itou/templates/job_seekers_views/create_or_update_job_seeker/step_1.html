@@ -18,6 +18,7 @@
         {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
         {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.birth_name %}
         {% bootstrap_field form.last_name %}
         {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
         {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}

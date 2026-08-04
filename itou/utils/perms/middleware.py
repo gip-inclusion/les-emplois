@@ -206,6 +206,17 @@ class ItouCurrentOrganizationMiddleware:
             if user.is_professional and request.path.startswith("/portal"):
                 return self.get_response(request)
 
+            # Force job seekers to provide birth name (new field).
+            if user.is_job_seeker:
+                if not user.jobseeker_profile.birth_name:  # extra SQL query here, it's accepted
+                    edit_user_info_url = reverse("dashboard:edit_user_info")
+                    # FIXME (dbaty): If the user is POSTing a form just
+                    # after this line is deployed, we don't want them to
+                    # be redirected and lose lose their form data.
+                    # Remove `and not request.POST` once this line has been deployed on prod.
+                    if request.path != edit_user_info_url and not request.POST:
+                        return HttpResponseRedirect(edit_user_info_url)
+
             # Without an organization a pro cannot access the service
             if logout_warning is not None:
                 return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))

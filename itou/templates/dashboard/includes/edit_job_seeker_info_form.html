@@ -15,11 +15,15 @@
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
     {% if form.pole_emploi_id_error %}{{ form.pole_emploi_id_error }}{% endif %}
 
+    {% if not form.instance.jobseeker_profile.birth_name %}
+        {% include "job_seekers_views/includes/warning_new_birth_name_field.html" %}
+    {% endif %}
     {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
     {% bootstrap_form_errors form type='non_fields' %}
     {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
     {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.birth_name %}
     {% bootstrap_field form.last_name %}
     {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
     {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}

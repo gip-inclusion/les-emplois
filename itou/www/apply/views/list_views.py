@@ -201,9 +201,15 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     except ValueError:
         order = JobApplicationOrder.CREATED_AT_DESC
 
-    job_applications = job_applications.annotate(
-        job_seeker_full_name=Concat(Lower("job_seeker__last_name"), Value(" "), Lower("job_seeker__first_name"))
-    ).order_by(*order.order_by)
+    job_applications = (
+        job_applications.with_job_seeker_last_name_for_display()
+        .annotate(
+            job_seeker_full_name=Concat(
+                Lower("job_seeker_last_name_for_display"), Value(" "), Lower("job_seeker__first_name")
+            )
+        )
+        .order_by(*order.order_by)
+    )
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     _add_pending_for_weeks(job_applications_page)
@@ -275,9 +281,15 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     except ValueError:
         order = JobApplicationOrder.CREATED_AT_DESC
 
-    job_applications = job_applications.annotate(
-        job_seeker_full_name=Concat(Lower("job_seeker__last_name"), Value(" "), Lower("job_seeker__first_name"))
-    ).order_by(*order.order_by)
+    job_applications = (
+        job_applications.with_job_seeker_last_name_for_display()
+        .annotate(
+            job_seeker_full_name=Concat(
+                Lower("job_seeker_last_name_for_display"), Value(" "), Lower("job_seeker__first_name")
+            )
+        )
+        .order_by(*order.order_by)
+    )
 
     if display_kind == JobApplicationsDisplayKind.LIST:
         job_applications = (

@@ -190,10 +190,12 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 context["closed_campaigns"].append(campaign)
     elif request.user.is_job_seeker:
         # Force job seekers to complete their profile.
-        required_attributes = ["title", "first_name", "last_name", "address_line_1", "post_code", "city"]
+        required_attributes = ["title", "first_name", "address_line_1", "post_code", "city"]
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
+        if not request.user.jobseeker_profile.birth_name:
+            return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
         iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(request.user)
         geiq_eligibility_diagnosis = (

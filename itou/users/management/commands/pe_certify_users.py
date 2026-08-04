@@ -42,11 +42,12 @@ class Command(BaseCommand):
             retry=tenacity.retry_if_exception_type(PoleEmploiRateLimitException),
         )
         def pe_check_user_details(user, client, *, swap=False):
+            birth_name = user.jobseeker_profile.birth_name or user.last_name
             return client.recherche_individu_certifie(
-                user.first_name if not swap else user.last_name,
-                user.last_name if not swap else user.first_name,
-                user.jobseeker_profile.birthdate,
-                user.jobseeker_profile.nir,
+                first_name=user.first_name if not swap else birth_name,
+                birth_name=birth_name if not swap else user.first_name,
+                birthdate=user.jobseeker_profile.birthdate,
+                nir=user.jobseeker_profile.nir,
             )
 
         active_job_seekers = (
@@ -61,7 +62,10 @@ class Command(BaseCommand):
         self.logger.info("about to resolve first_name and last_name for count=%d users", active_job_seekers.count())
 
         eligible_users = active_job_seekers.exclude(
-            Q(jobseeker_profile__nir="") | Q(jobseeker_profile__birthdate=None) | Q(first_name="") | Q(last_name="")
+            Q(jobseeker_profile__nir="")
+            | Q(jobseeker_profile__birthdate=None)
+            | Q(first_name="")
+            | Q(last_name="", jobseeker_profile__birth_name="")
         )
         self.logger.info("only count=%d users have the necessary data to be resolved", eligible_users.count())
 
@@ -69,6 +73,7 @@ class Command(BaseCommand):
         certified_profiles = []
         identity_certifications = []
         swapped_users = []
+        swapped_profiles = []
 
         def certify_user(user, id_certifie):
             user.jobseeker_profile.pe_obfuscated_nir = id_certifie
@@ -100,17 +105,22 @@ class Command(BaseCommand):
                         )
                     else:
                         self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
-                        user.last_name, user.first_name = user.first_name, user.last_name
+                        user.jobseeker_profile.birth_name, user.first_name = (
+                            user.first_name,
+                            user.jobseeker_profile.birth_name,
+                        )
                         certify_user(user, response2)
                         swapped_users.append(user)
+                        swapped_profiles.append(user.jobseeker_profile)
                 else:
                     certify_user(user, response)
 
         self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
         JobSeekerProfile.objects.bulk_update(
-            certified_profiles,
+            certified_profiles + swapped_profiles,
             [
+                "birth_name",
                 "pe_obfuscated_nir",
                 "pe_last_certification_attempt_at",
             ],
@@ -128,5 +138,5 @@ class Command(BaseCommand):
         )
         self.logger.info("count=%d users could not be certified.", len(not_certified))
 
-        User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
+        User.objects.bulk_update(swapped_users, ["first_name"], batch_size=1000)
         self.logger.info("count=%d users have been swapped", len(swapped_users))
