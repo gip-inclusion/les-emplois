@@ -194,7 +194,7 @@ class EvaluationCampaignAdmin(ItouModelAdmin):
                 "siae__convention",
             )
             .prefetch_related(
-                "evaluated_job_applications__evaluated_administrative_criteria",
+                "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria",
                 "siae__memberships__user",
             )
             .order_by("evaluation_campaign_id", "id")

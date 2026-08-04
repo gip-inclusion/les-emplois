@@ -315,7 +315,7 @@ class EvaluationCampaign(models.Model):
                     EvaluatedAdministrativeCriteria.objects.bulk_create(criteria)
 
             evaluated_siaes = EvaluatedSiae.objects.filter(pk__in=evaluated_siaes_pks).prefetch_related(
-                "evaluated_job_applications__evaluated_administrative_criteria"
+                "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"
             )
             emails = []
             for evaluated_siae in evaluated_siaes:
@@ -349,7 +349,7 @@ class EvaluationCampaign(models.Model):
         auto_validation = []
         for evaluated_siae in self.evaluated_siaes.select_related(
             "evaluation_campaign__institution", "siae"
-        ).prefetch_related("evaluated_job_applications__evaluated_administrative_criteria"):
+        ).prefetch_related("evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"):
             state = evaluated_siae.state
             email_factory = SIAEEmailFactory(evaluated_siae)
             if evaluated_siae.reviewed_at is not None:
@@ -417,7 +417,9 @@ class EvaluationCampaign(models.Model):
             evaluated_siaes = (
                 EvaluatedSiae.objects.filter(evaluation_campaign=self)
                 .filter(notified_at=None)
-                .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+                .prefetch_related(
+                    "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"
+                )
             )
             has_siae_to_notify = False
             siae_without_proofs = []
@@ -470,7 +472,7 @@ class EvaluationCampaign(models.Model):
             # add final_state to notified ones
             notified_evaluated_siaes = list(
                 EvaluatedSiae.objects.filter(evaluation_campaign=self, notified_at__isnull=False).prefetch_related(
-                    "evaluated_job_applications__evaluated_administrative_criteria"
+                    "evaluated_job_applications__evaluated_administrative_criteria__administrative_criteria"
                 )
             )
             for notified_evaluated_siae in notified_evaluated_siaes:
