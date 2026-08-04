@@ -19,18 +19,11 @@ class TestEmailAdmin:
             esp_response=success_response,
         )
         response = admin_client.get(reverse("admin:emails_email_change", kwargs={"object_id": email.pk}))
-        [message] = success_response["Messages"]
-        [status] = message["To"]
-        mailjet_url = reverse("admin:emails_email_mailjet", args=(status["MessageID"],))
+        message_id = success_response["messageId"]
+        brevo_url = reverse("admin:emails_email_brevo", args=(message_id,))
         assertContains(
             response,
-            f"""
-            <h3>To</h3>
-            <ul class="inline">
-                <li><a href="{mailjet_url}">you@test.local</a></li>
-            </ul>
-            """,
-            html=True,
+            f'<a href="{escape(brevo_url)}">{escape(message_id)}</a>',
             count=1,
         )
 
@@ -47,12 +40,9 @@ class TestEmailAdmin:
         assertContains(
             response,
             # JSON is escaped.
-            "<pre><code>[{&#x27;ErrorCode&#x27;: &#x27;send-0003&#x27;,\n"
-            "  &#x27;ErrorIdentifier&#x27;: &#x27;88b5ca9f-5f1f-42e7-a45e-9ecbad0c285e&#x27;,\n"
-            "  &#x27;ErrorMessage&#x27;: &#x27;At least &quot;HTMLPart&quot;, &quot;TextPart&quot; "
-            "or &quot;TemplateID&quot; must be provided.&#x27;,\n"
-            "  &#x27;ErrorRelatedTo&#x27;: [&#x27;HTMLPart&#x27;, &#x27;TextPart&#x27;],\n"
-            "  &#x27;StatusCode&#x27;: 400}]</code></pre>",
+            "<pre><code>{&#x27;code&#x27;: &#x27;invalid_parameter&#x27;, "
+            "&#x27;message&#x27;: &#x27;At least &quot;htmlContent&quot;, &quot;textContent&quot; "
+            "or &quot;templateId&quot; must be provided.&#x27;}</code></pre>",
             count=1,
         )
 
@@ -122,15 +112,17 @@ class TestEmailAdmin:
         assertNotContains(response, error_email_url)
         assertContains(response, email_th(success_email_url), count=1)
 
-    def test_view_mailjet_response(self, admin_client, respx_mock, mailjet_messagehistory_response, settings):
-        settings.ANYMAIL["MAILJET_API_KEY"] = "key"
-        settings.ANYMAIL["MAILJET_SECRET_KEY"] = "secret"
-        message_id = 2345
-        respx_mock.get(url=f"https://api.mailjet.com/v3/REST/messagehistory/{message_id}").mock(
+    def test_view_brevo_response(self, admin_client, respx_mock, brevo_events_response, settings, success_response):
+        settings.ANYMAIL["BREVO_API_KEY"] = "key"
+        message_id = success_response["messageId"]
+        respx_mock.get(
+            url="https://api.brevo.com/v3/smtp/statistics/events",
+            params={"messageId": message_id},
+        ).mock(
             return_value=Response(
                 status_code=200,
-                json=mailjet_messagehistory_response,
+                json=brevo_events_response,
             )
         )
-        response = admin_client.get(reverse("admin:emails_email_mailjet", args=(message_id,)))
-        assert response.json() == mailjet_messagehistory_response
+        response = admin_client.get(reverse("admin:emails_email_brevo", args=(message_id,)))
+        assert response.json() == brevo_events_response
