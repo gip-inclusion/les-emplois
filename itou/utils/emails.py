@@ -33,7 +33,7 @@ def get_email_text_template(template, context):
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
     subject_prefix = "" if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD else f"[{settings.ITOU_ENVIRONMENT}] "
-    # Mailjet max subject length is 255
+    # Keep subjects reasonably short for email clients / ESP constraints.
     subject = textwrap.shorten(
         subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."
     )

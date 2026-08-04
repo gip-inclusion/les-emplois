@@ -69,11 +69,12 @@ export CLEVER_SECRET=VOTRE_SECRET
 D’autres variables d’environnement permettent de configurer la connexion avec
 ProConnect, elles sont préfixées par `PRO_CONNECT_`.
 
-#### Mailjet
+#### Brevo
 
-#### `API_MAILJET_KEY_APP` & `API_MAILJET_SECRET_APP`
+#### `BREVO_API_KEY`
 
-Identifiants Mailjet de l’applicatif, utilisé lors de l’envoi d’emails.
+Identifiant Brevo de l’applicatif, utilisé pour l’envoi d’emails et la
+synchronisation des contacts marketing.
 
 ### `MATOMO_BASE_URL`
 
