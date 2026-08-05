@@ -1900,6 +1900,30 @@ class TestEvaluatedAdministrativeCriteriaModel:
                 evaluated_administrative_criteria.save(update_fields=["review_state"])
                 assert not evaluated_administrative_criteria.can_upload()
 
+    def test_can_upload_certified_criteria(self, subtests):
+        # A certified criterion is accepted when the campaign starts: the SIAE has no proof to transmit.
+        fake_now = timezone.now()
+
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=EvaluatedJobApplicationFactory(),
+            proof=None,
+            criteria_certified=True,
+        )
+        assert not evaluated_administrative_criteria.can_upload()
+
+        # Not even during the adversarial stage, where a refused criterion could be uploaded again.
+        evaluated_siae = evaluated_administrative_criteria.evaluated_job_application.evaluated_siae
+        evaluated_siae.reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["reviewed_at"])
+
+        evaluated_administrative_criteria.submitted_at = fake_now
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        for state in evaluation_enums.EvaluatedAdministrativeCriteriaState:
+            with subtests.test(state=state.name):
+                evaluated_administrative_criteria.review_state = state
+                evaluated_administrative_criteria.save(update_fields=["review_state"])
+                assert not evaluated_administrative_criteria.can_upload()
+
 
 def test_siae_get_active_suspension_functions():
     institution = InstitutionFactory(name="DDETS 01", department="01")
