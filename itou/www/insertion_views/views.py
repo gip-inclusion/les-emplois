@@ -30,7 +30,7 @@ from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.users.perms import can_register_mobilization_event
+from itou.users.perms import can_orient_towards_insertion_service, can_register_mobilization_event
 from itou.utils.apis.dora import DoraAPIClient, DoraAPIException
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -572,7 +572,7 @@ def dismiss_orientation_disclaimer(request, session_uuid):
     )
 
 
-@check_request(lambda request: request.from_employer or request.from_prescriber)
+@check_request(can_orient_towards_insertion_service)
 def orientation_details(request, orientation_id):
     template_name = "insertion/orientations/details.html"
 
