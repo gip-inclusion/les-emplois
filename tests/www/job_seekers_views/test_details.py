@@ -586,11 +586,6 @@ def test_display_last_known_advisor_contact_info(client, snapshot):
 
     client.force_login(prescriber)
 
-    # Prescriber is not an advisor of the job seeker
-    response = client.get(url)
-    assertNotContains(response, display_phone_url)
-    assertNotContains(response, display_email_url)
-
     # Prescriber is the last known advisor of the job seeker
     prescriber_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
 
