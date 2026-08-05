@@ -635,6 +635,7 @@ class TestEvaluationCampaignManager:
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=2),
             evaluated_job_application=evaluated_jobapp_accepted,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         refused_ts = timezone.now() - relativedelta(days=3)
@@ -803,6 +804,7 @@ class TestEvaluationCampaignManager:
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=6),
             evaluated_job_application=evaluated_jobapp_submitted,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
@@ -944,6 +946,7 @@ class TestEvaluationCampaignManager:
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=1),
             evaluated_job_application=evaluated_job_application,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         # DDETS accepted the document but forgot to validate
@@ -1230,7 +1233,9 @@ class TestEvaluatedSiaeModel:
         # one evaluated_administrative_criterion
         # empty : proof and submitted_at empty)
         evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof=None
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
+            proof=None,
         )
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -1579,6 +1584,7 @@ class TestEvaluatedSiaeModel:
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=2),
             submitted_at=timezone.now() - relativedelta(days=1),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         with assertSnapshotQueries(snapshot):
@@ -1632,7 +1638,9 @@ class TestEvaluatedJobApplicationModel:
         assert evaluation_enums.EvaluatedJobApplicationsState.PENDING == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof=None
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
+            proof=None,
         )
         assert evaluation_enums.EvaluatedJobApplicationsState.PROCESSING == evaluated_job_application.compute_state()
 

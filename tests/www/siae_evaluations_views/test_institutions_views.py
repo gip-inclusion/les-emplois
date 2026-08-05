@@ -542,7 +542,10 @@ class TestInstitutionEvaluatedSiaeListView:
             for_snapshot=True,
         )
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
+        EvaluatedAdministrativeCriteriaFactory.create(
+            evaluated_job_application=evaluated_job_app,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
+        )
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -1561,6 +1564,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
             submitted_at=timezone.now() - relativedelta(days=1),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         client.force_login(self.user)
@@ -3079,6 +3083,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             evaluated_job_application=accepted_job_application,
             proof=FileFactory(),
             submitted_at=timezone.now(),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
