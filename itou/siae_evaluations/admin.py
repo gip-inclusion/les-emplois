@@ -98,8 +98,8 @@ class EvaluatedJobApplicationsInline(ItouTabularInline):
 
 class EvaluatedAdministrativeCriteriaInline(ItouTabularInline):
     model = models.EvaluatedAdministrativeCriteria
-    fields = ("id_link", "uploaded_at", "submitted_at", "review_state")
-    readonly_fields = ("id_link", "uploaded_at", "submitted_at", "review_state")
+    fields = ("id_link", "criteria_certified", "uploaded_at", "submitted_at", "review_state")
+    readonly_fields = ("id_link", "criteria_certified", "uploaded_at", "submitted_at", "review_state")
     extra = 0
 
     @admin.display(description="lien vers les critères administratifs évalués")
@@ -366,11 +366,18 @@ class EvaluatedJobApplicationAdmin(DeleteOnlyMixin, ItouModelAdmin):
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
 class EvaluatedAdministrativeCriteriaAdmin(DeleteOnlyMixin, ItouModelAdmin):
-    list_display = ("evaluated_job_application", "administrative_criteria", "submitted_at", "review_state")
+    list_display = (
+        "evaluated_job_application",
+        "administrative_criteria",
+        "criteria_certified",
+        "submitted_at",
+        "review_state",
+    )
     list_display_links = ("administrative_criteria",)
     fields = (
         "evaluated_job_application",
         "administrative_criteria",
+        "criteria_certified",
         "uploaded_at",
         "proof_link",
         "submitted_at",
