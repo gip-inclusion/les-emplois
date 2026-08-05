@@ -918,6 +918,8 @@ class EvaluatedAdministrativeCriteria(models.Model):
     def can_upload(self):
         if self.evaluated_job_application.evaluated_siae.submission_freezed_at:
             return False
+        if self.criteria_certified:
+            return False  # Certified criteria do not require a proof.
         if self.submitted_at is None:
             return True
 
