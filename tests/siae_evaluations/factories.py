@@ -90,6 +90,9 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
             criteria=factory.RelatedFactory(
                 "tests.siae_evaluations.factories.EvaluatedAdministrativeCriteriaFactory",
                 factory_related_name="evaluated_job_application",
+                # A single level 1 criterion is enough to satisfy the IAE eligibility rule, so the complete job
+                # application (i.e. auto-prescription) is accepted once its criterion is accepted.
+                level1=True,
                 uploaded_at=factory.LazyAttribute(
                     lambda siae: (
                         siae.factory_parent.evaluated_siae.evaluation_campaign.evaluations_asked_at
@@ -117,6 +120,13 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
 class EvaluatedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluatedAdministrativeCriteria
+
+    class Params:
+        level1 = factory.Trait(
+            administrative_criteria=factory.LazyFunction(
+                lambda: AdministrativeCriteria.objects.level1().order_by("?").first()
+            )
+        )
 
     evaluated_job_application = factory.SubFactory(EvaluatedJobApplicationFactory)
     administrative_criteria = factory.Iterator(AdministrativeCriteria.objects.all())
