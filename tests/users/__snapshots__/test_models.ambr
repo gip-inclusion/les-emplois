@@ -15,12 +15,17 @@
                                                    "prescriber_organization_id",
                                                    "company_id",
                                                    "last_action_kind",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor",
+              "ended_at" = EXCLUDED."ended_at",
+              "end_reason" = EXCLUDED."end_reason" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -42,12 +47,17 @@
                                                    "prescriber_organization_id",
                                                    "company_id",
                                                    "last_action_kind",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor",
+              "ended_at" = EXCLUDED."ended_at",
+              "end_reason" = EXCLUDED."end_reason" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -69,12 +79,17 @@
                                                    "prescriber_organization_id",
                                                    "company_id",
                                                    "last_action_kind",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor",
+              "ended_at" = EXCLUDED."ended_at",
+              "end_reason" = EXCLUDED."end_reason" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -96,12 +111,17 @@
                                                    "prescriber_organization_id",
                                                    "company_id",
                                                    "last_action_kind",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor",
+              "ended_at" = EXCLUDED."ended_at",
+              "end_reason" = EXCLUDED."end_reason" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -123,12 +143,17 @@
                                                    "prescriber_organization_id",
                                                    "company_id",
                                                    "last_action_kind",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor",
+              "ended_at" = EXCLUDED."ended_at",
+              "end_reason" = EXCLUDED."end_reason" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -150,12 +175,17 @@
                                                    "prescriber_organization_id",
                                                    "company_id",
                                                    "last_action_kind",
-                                                   "assigned_to_unknown_advisor")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+                                                   "assigned_to_unknown_advisor",
+                                                   "reason",
+                                                   "ended_at",
+                                                   "end_reason")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind",
-              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor" RETURNING "users_jobseekerassignment"."id"
+              "assigned_to_unknown_advisor" = EXCLUDED."assigned_to_unknown_advisor",
+              "ended_at" = EXCLUDED."ended_at",
+              "end_reason" = EXCLUDED."end_reason" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
