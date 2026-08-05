@@ -378,6 +378,19 @@ def pro_connect_callback(request):
     login(request, user)
 
     mfa_allowlisted_idp = idp_id in settings.PRO_CONNECT_MFA_IDENTITY_PROVIDER_ALLOWLIST
+    if "mfa" in amr:
+        if mfa_allowlisted_idp:
+            # We should be able to remove the identity provider from
+            # the allowlist.
+            # This is NOT an error. But that case should be rare and
+            # we are likely to forget to look for it in logs. Logging
+            # as an error sends it to Sentry, where we _will_ notice
+            # it.
+            logger.error(
+                "Allowlisted identity provider now sends `amr` claim "
+                "(not an error: config should be fixed, see comments in code)",
+                {"idp_id": idp_id},
+            )
     if "mfa" in amr or mfa_allowlisted_idp:
         logger.info(
             "User authenticated through ProConnect with MFA, sidestep from our own MFA",
