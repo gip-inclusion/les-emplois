@@ -38,11 +38,7 @@ from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
-from itou.utils.perms.utils import (
-    can_edit_personal_information,
-    can_view_last_advisor_contact_info,
-    can_view_personal_information,
-)
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -221,7 +217,6 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             # already checked in test_func because the user name is displayed in the title
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
-            "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(self.request, self.object),
             "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
             "is_last_known_advisor": is_last_known_advisor,
             "is_advisor": is_advisor,
@@ -1592,8 +1587,5 @@ def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode)
 
     job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
 
-    if can_view_last_advisor_contact_info(request, job_seeker):
-        last_advisor, _ = job_seeker.last_advisor_with_org
-        return render(request, template_name, {"last_advisor": last_advisor})
-
-    raise PermissionDenied
+    last_advisor, _ = job_seeker.last_advisor_with_org
+    return render(request, template_name, {"last_advisor": last_advisor})
