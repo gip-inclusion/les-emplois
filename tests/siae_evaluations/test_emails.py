@@ -131,6 +131,7 @@ class TestInstitutionEmailFactory:
         )
         evaluated_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(
+            level1=True,
             evaluated_job_application=evaluated_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=51, minutes=1),
             submitted_at=timezone.now() - relativedelta(days=51),
@@ -159,6 +160,7 @@ class TestInstitutionEmailFactory:
         )
         evaluated_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(
+            level1=True,
             evaluated_job_application=evaluated_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=51, minutes=1),
             submitted_at=timezone.now() - relativedelta(days=51),

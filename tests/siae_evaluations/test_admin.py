@@ -89,6 +89,7 @@ class TestEvaluationCampaignAdmin:
         )
         campaign4_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=campaign4_siae)
         EvaluatedAdministrativeCriteriaFactory(
+            level1=True,
             evaluated_job_application=campaign4_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=1),
             submitted_at=timezone.now() - relativedelta(days=1),
