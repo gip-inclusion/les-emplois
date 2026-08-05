@@ -72,10 +72,7 @@
                                     </div>
                                 </button>
                             {% else %}
-                                {% partialdef last-known-advisor-phone inline %}
-                                    <strong>{{ last_advisor.phone }}</strong>
-                                    {% include 'includes/copy_to_clipboard.html' with content=last_advisor.phone css_classes="btn-link" only_icon=True %}
-                                {% endpartialdef %}
+                                {% include "job_seekers_views/includes/advisor_phone.html" with advisor=last_advisor only %}
                             {% endif %}
                         {% else %}
                             <i class="text-disabled">Non renseigné</i>
@@ -100,10 +97,7 @@
                                 </div>
                             </button>
                         {% else %}
-                            {% partialdef last-known-advisor-email inline %}
-                                <strong>{{ last_advisor.email }}</strong>
-                                {% include 'includes/copy_to_clipboard.html' with content=last_advisor.email css_classes="btn-link" only_icon=True %}
-                            {% endpartialdef %}
+                            {% include "job_seekers_views/includes/advisor_email.html" with advisor=last_advisor only %}
                         {% endif %}
                     </li>
                 </ul>

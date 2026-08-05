@@ -1611,8 +1611,8 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
 @check_request(lambda request: request.user.is_job_seeker or request.user.is_professional)
 def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode):
     template_name = {
-        "email": "job_seekers_views/includes/last_known_advisor.html#last-known-advisor-email",
-        "phone": "job_seekers_views/includes/last_known_advisor.html#last-known-advisor-phone",
+        "email": "job_seekers_views/includes/advisor_email.html",
+        "phone": "job_seekers_views/includes/advisor_phone.html",
     }.get(mode, None)
     if not template_name:
         raise ValueError("Invalid mode: %s", mode)
@@ -1620,4 +1620,4 @@ def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode)
     job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
 
     last_advisor, _ = job_seeker.last_advisor_with_org
-    return render(request, template_name, {"last_advisor": last_advisor})
+    return render(request, template_name, {"advisor": last_advisor})
