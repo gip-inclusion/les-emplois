@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEvaluatedSiaeModel.test_state_on_closed_campaign_criteria_accepted
   dict({
-    'num_queries': 2,
+    'num_queries': 3,
     'queries': list([
       dict({
         'origin': list([
@@ -41,6 +41,30 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
+          'state_from[siae_evaluations/models.py]',
+          '<genexpr>[siae_evaluations/models.py]',
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at"
+          FROM "eligibility_administrativecriteria"
+          WHERE "eligibility_administrativecriteria"."id" = %s
+          LIMIT 21
         ''',
       }),
     ]),
@@ -580,7 +604,17 @@
                  "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
                  "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
                  "siae_evaluations_evaluatedadministrativecriteria"."review_state",
-                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
+                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified",
+                 "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at"
           FROM "siae_evaluations_evaluatedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,
