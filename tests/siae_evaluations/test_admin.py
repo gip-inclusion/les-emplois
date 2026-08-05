@@ -111,7 +111,7 @@ class TestEvaluationCampaignAdmin:
             + 1  # Count the full results
             + 1  # Fetch evaluated siae and related evaludation_campaign, siae, convention
             + 1  # Prefetch evaludated job applications
-            + 1  # Prefetch corresponding administrative criteria
+            + 1  # Prefetch corresponding evaluated administrative criteria and their administrative criteria
             + 1  # Prefetch siae memberships
             + 1  # Prefetch users of siae memberships
         ):

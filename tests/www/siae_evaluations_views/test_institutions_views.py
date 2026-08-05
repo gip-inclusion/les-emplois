@@ -1919,7 +1919,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
 
     @freeze_time("2023-01-24 11:11:00")
     def test_data_card_statistics(self, client):
-        company = CompanyFactory()
+        company = CompanyFactory(evaluable_kind=True)
         previous_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             ended_at=timezone.now() - relativedelta(years=1),
@@ -1937,7 +1937,8 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         campaign = EvaluationCampaignFactory(
             institution=self.institution, ended_at=timezone.now() - relativedelta(hours=1)
         )
-        other_evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        other_company = CompanyFactory(evaluable_kind=True)
+        other_evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=other_company)
         EvaluatedJobApplicationFactory(evaluated_siae=other_evaluated_siae)
 
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=company)
