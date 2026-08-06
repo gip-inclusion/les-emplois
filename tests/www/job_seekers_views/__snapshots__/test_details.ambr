@@ -7051,7 +7051,6 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
           'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -8434,7 +8433,6 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
           'JobSeekerDetailTabView.get_context_data[www/job_seekers_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),

@@ -229,7 +229,11 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     )
 
     professional, organization = request.user, request.current_organization
-    is_last_known_advisor = (professional, organization) == job_application.job_seeker.last_advisor_with_org
+    last_assignment = job_application.job_seeker.last_assignment
+    is_last_known_advisor = last_assignment and (professional, organization) == (
+        last_assignment.advisor,
+        last_assignment.organization,
+    )
     is_advisor = (
         is_last_known_advisor
         or JobSeekerAssignment.objects.assigned_to(professional, organization)
@@ -397,7 +401,11 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         refusal_contact_email = ""
 
     professional, organization = request.user, request.current_organization
-    is_last_known_advisor = (professional, organization) == job_application.job_seeker.last_advisor_with_org
+    last_assignment = job_application.job_seeker.last_assignment
+    is_last_known_advisor = last_assignment and (professional, organization) == (
+        last_assignment.advisor,
+        last_assignment.organization,
+    )
     is_advisor = (
         is_last_known_advisor
         or JobSeekerAssignment.objects.assigned_to(professional, organization)

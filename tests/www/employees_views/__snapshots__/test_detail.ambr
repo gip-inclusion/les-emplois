@@ -1034,7 +1034,6 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
