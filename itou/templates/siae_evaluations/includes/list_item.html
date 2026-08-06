@@ -21,7 +21,7 @@
                     {% endif %}
                 {% endif %}
             </div>
-            {% if item.evaluated_administrative_criteria.all %}
+            {% if item.evaluated_administrative_criteria.all and evaluated_job_application_state != 'PENDING' %}
                 {% with collapse_id_suffix=item.pk|stringformat:"s" %}
                     {% with collapse_id="collapseItemsEvaluated"|add:collapse_id_suffix %}
                         {% component_info borderless=True c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id=collapse_id opened=True extra_classes="mt-3" %}
