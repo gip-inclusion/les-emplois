@@ -32,6 +32,7 @@ from itou.openid_connect.pro_connect.models import (
     ProConnectState,
     ProConnectUserData,
 )
+from itou.otp.models import ItouTOTPDevice
 from itou.otp.utils import create_placeholder_for_external_totp_device
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider
@@ -390,6 +391,14 @@ def pro_connect_callback(request):
                 "Allowlisted identity provider now sends `amr` claim "
                 "(not an error: config should be fixed, see comments in code)",
                 {"idp_id": idp_id},
+            )
+        if ItouTOTPDevice.objects.filter(user=user, disabled_at=None).exists():
+            # We probably could remove the user's ItouTOTPDevice
+            # object(s), since they will not be used anymore (as long
+            # as the identity provider enforces MFA).
+            logger.info(
+                "Identity provider now supports MFA, internal TOTP could be deleted",
+                {"idp_id": idp_id, "user_id": user.id},
             )
     if "mfa" in amr or mfa_allowlisted_idp:
         logger.info(
