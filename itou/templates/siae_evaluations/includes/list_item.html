@@ -75,13 +75,13 @@
             {% endif %}
         </div>
     {% endif %}
-    {% if item.should_select_criteria == "PENDING" %}
+    {% if should_select_criteria == "PENDING" %}
         <div class="c-box--results__footer">
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
                 <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Sélectionner les critères</a>
             </div>
         </div>
-    {% elif item.should_select_criteria == "EDITABLE" %}
+    {% elif should_select_criteria == "EDITABLE" %}
         <div class="c-box--results__footer">
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
                 <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Modifier les critères</a>
