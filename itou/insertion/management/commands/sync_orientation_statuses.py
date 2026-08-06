@@ -5,7 +5,8 @@ from django.conf import settings
 from django.db.models import Max
 from itoutils.django.commands import dry_runnable
 
-from itou.insertion.models import Orientation
+from itou.insertion.enums import OrientationStatus, OrientationTransition
+from itou.insertion.models import Orientation, OrientationTransitionLog
 from itou.utils.apis.dora import DoraAPIClient, DoraApiItemsIterator
 from itou.utils.command import BaseCommand
 
@@ -68,6 +69,7 @@ class Command(BaseCommand):
             raise RuntimeError(f"Unknown orientations from DORA: {', '.join(sorted(unknown))}")
 
         to_update = []
+        transition_logs_to_create = []
         for orientation in orientations:
             dora_status = statuses[str(orientation.id)]
             emplois_status = DoraStatus.from_orientation(orientation)
@@ -86,5 +88,25 @@ class Command(BaseCommand):
             orientation.updated_at = dora_status.updated_at
             to_update.append(orientation)
 
+            # Manually create a log transition to have a correct timestamp
+            transition = {
+                OrientationStatus.ACCEPTED: OrientationTransition.ACCEPT,
+                OrientationStatus.REJECTED: OrientationTransition.REJECT,
+                OrientationStatus.EXPIRED: OrientationTransition.EXPIRE,
+                OrientationStatus.PENDING: None,
+            }[OrientationStatus(dora_status.status)]
+
+            if transition:
+                transition_logs_to_create.append(
+                    OrientationTransitionLog(
+                        orientation=orientation,
+                        transition=transition,
+                        from_state=emplois_status.status,
+                        to_state=dora_status.status,
+                        timestamp=dora_status.updated_at,
+                    )
+                )
+
         Orientation.objects.bulk_update(to_update, DoraStatus._fields)
+        OrientationTransitionLog.objects.bulk_create(transition_logs_to_create)
         self.logger.info("Updated count=%d orientation statuses", len(to_update))
