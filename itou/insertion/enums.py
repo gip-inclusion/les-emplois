@@ -1,3 +1,5 @@
+import enum
+
 from django.db import models
 
 
@@ -40,3 +42,9 @@ class OrientationStatus(models.TextChoices):
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
     REJECTED = "REFUSÉE", "Refusée"
+
+
+class OrientationTransition(enum.StrEnum):
+    ACCEPT = "accept"
+    REJECT = "reject"
+    EXPIRE = "expire"

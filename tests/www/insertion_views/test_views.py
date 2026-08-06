@@ -1465,7 +1465,7 @@ class TestOrientationsList:
         client.force_login(user)
         response = client.get(self.LIST_URL)
         displayed_statuses = [orientation.status for orientation in response.context["orientations_page"].object_list]
-        assert sorted(displayed_statuses) == sorted(OrientationStatus.values)
+        assert set(displayed_statuses) == set(OrientationStatus.values)
 
     def test_no_results(self, client):
         client.force_login(PrescriberFactory(membership=True))

@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
+from django_xworkflows import models as xwf_models
 
 from itou.companies.models import Company
 from itou.insertion.enums import (
@@ -17,6 +18,7 @@ from itou.insertion.enums import (
     GenericReferenceItemSource,
     MobilizationEventKind,
     OrientationStatus,
+    OrientationTransition,
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
@@ -604,7 +606,25 @@ class MobilizationEvent(models.Model):
         ]
 
 
-class Orientation(models.Model):
+class OrientationWorkflow(xwf_models.Workflow):
+    """
+    The Orientation workflow.
+    https://django-xworkflows.readthedocs.io/
+    """
+
+    states = OrientationStatus.choices
+    initial_state = OrientationStatus.PENDING
+
+    transitions = (
+        (OrientationTransition.ACCEPT, OrientationStatus.PENDING, OrientationStatus.ACCEPTED),
+        (OrientationTransition.REJECT, OrientationStatus.PENDING, OrientationStatus.REJECTED),
+        (OrientationTransition.EXPIRE, OrientationStatus.PENDING, OrientationStatus.EXPIRED),
+    )
+
+    log_model = "insertion.OrientationTransitionLog"
+
+
+class Orientation(xwf_models.WorkflowEnabled, models.Model):
     id = models.UUIDField(primary_key=True, editable=False)
 
     beneficiary = models.ForeignKey(
@@ -690,12 +710,8 @@ class Orientation(models.Model):
     referent_email = models.EmailField(verbose_name="e-mail du référent")
     orientation_reasons = models.TextField(verbose_name="motif de l'orientation", blank=True)
 
-    status = models.CharField(
-        verbose_name="statut",
-        max_length=20,
-        choices=OrientationStatus.choices,
-        default=OrientationStatus.PENDING,
-    )
+    status = xwf_models.StateField(OrientationWorkflow, verbose_name="statut")
+
     processing_date = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
     duration_weekly_hours = models.PositiveIntegerField(
         verbose_name="nombre d'heures par semaine",
@@ -778,3 +794,17 @@ class Orientation(models.Model):
         if not self.duration_weeks or not self.duration_weekly_hours:
             return
         return self.duration_weekly_hours * self.duration_weeks
+
+
+class OrientationTransitionLog(xwf_models.BaseTransitionLog):
+    MODIFIED_OBJECT_FIELD = "orientation"
+
+    orientation = models.ForeignKey(Orientation, related_name="logs", on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "log des transitions de l’orientation"
+        verbose_name_plural = "logs des transitions de l’orientation"
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return str(self.id)
