@@ -11,6 +11,11 @@ from itou.utils.apis.dora import DoraAPIClient, DoraApiItemsIterator
 from itou.utils.command import BaseCommand
 
 
+# We are comparing datetimes from DORA and from les Emplois.
+# We’ll consider equal two datetimes that are less than 3 seconds away.
+MIN_EMPLOIS_DORA_TIMEDELTA = datetime.timedelta(seconds=3)
+
+
 class DoraStatus(NamedTuple):
     status: str
     processing_date: datetime.datetime | None  # the date on which the orientation was processed by DORA
@@ -75,7 +80,7 @@ class Command(BaseCommand):
             emplois_status = DoraStatus.from_orientation(orientation)
             if dora_status == emplois_status:
                 continue
-            elif emplois_status.updated_at > dora_status.updated_at:
+            elif (emplois_status.updated_at - dora_status.updated_at) > MIN_EMPLOIS_DORA_TIMEDELTA:
                 # This situation should not happen, we want to have only one source of truth.
                 # For now it is DORA from which we update the status, processing_date and updated_at.
                 # Later on, the orientations will be managed on Les Emplois and we don’t want to

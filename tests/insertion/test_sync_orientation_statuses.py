@@ -124,6 +124,38 @@ def test_doesnt_update_more_recent_emplois(dora_settings, respx_mock, caplog):
     assert not OrientationTransitionLog.objects.exists()
 
 
+def test_updates_even_if_small_time_delta(dora_settings, respx_mock):
+    """
+    Real case when the time on les Emplois is slightly in the future in comparison to DORA.
+    In such case: update anyway.
+    """
+    dora_datetime = datetime.datetime(2026, 7, 20, 0, 0, 0, 0, tzinfo=datetime.UTC)
+    emplois_datetime = datetime.datetime(2026, 7, 20, 0, 0, 1, 123, tzinfo=datetime.UTC)
+    with freeze_time(emplois_datetime):
+        orientation = OrientationFactory(status=OrientationStatus.PENDING)
+    respx_mock.get(DORA_STATUS_URL).respond(
+        200,
+        json=paginated(
+            [
+                status_item(
+                    orientation.id,
+                    OrientationStatus.PENDING,
+                    processing_date=None,
+                    updated_at=dora_datetime.isoformat(),
+                )
+            ]
+        ),
+    )
+
+    call_command("sync_orientation_statuses", wet_run=True)
+
+    orientation.refresh_from_db()
+    assert orientation.status == OrientationStatus.PENDING
+    assert orientation.processing_date is None
+    assert orientation.dora_status_updated_at == dora_datetime
+    assert orientation.updated_at == dora_datetime
+
+
 def test_first_run_has_no_updated_after(dora_settings, respx_mock):
     route = respx_mock.get(DORA_STATUS_URL).respond(200, json=paginated([]))
 
