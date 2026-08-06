@@ -58,7 +58,7 @@
                             {% if last_advisor.pk != request.user.pk %}
                                 <button class="btn-link btn-ico"
                                         id="phone-{{ last_advisor.pk }}"
-                                        hx-post="{% url "job_seekers_views:display_last_known_advisor_contact_info" job_seeker.public_id "phone" %}"
+                                        hx-post="{% url "job_seekers_views:display_advisor_contact_info" job_seeker.last_assignment.pk "phone" %}"
                                         hx-swap="outerHTML"
                                         hx-include="#display-contact-info-form"
                                         {% matomo_event "usager" "clic" "afficher-telephone-accompagnateur" %}>
@@ -72,7 +72,7 @@
                                     </div>
                                 </button>
                             {% else %}
-                                {% include "job_seekers_views/includes/advisor_phone.html" with advisor=last_advisor only %}
+                                {% include "job_seekers_views/includes/display_contact_info.html" with info=last_advisor.phone only %}
                             {% endif %}
                         {% else %}
                             <i class="text-disabled">Non renseigné</i>
@@ -83,7 +83,7 @@
                         {% if last_advisor.pk != request.user.pk %}
                             <button class="btn-link btn-ico"
                                     id="email-{{ last_advisor.pk }}"
-                                    hx-post="{% url "job_seekers_views:display_last_known_advisor_contact_info" job_seeker.public_id "email" %}"
+                                    hx-post="{% url "job_seekers_views:display_advisor_contact_info" job_seeker.last_assignment.pk "email" %}"
                                     hx-swap="outerHTML"
                                     hx-include="#display-contact-info-form"
                                     {% matomo_event "usager" "clic" "afficher-email-accompagnateur" %}>
@@ -97,7 +97,7 @@
                                 </div>
                             </button>
                         {% else %}
-                            {% include "job_seekers_views/includes/advisor_email.html" with advisor=last_advisor only %}
+                            {% include "job_seekers_views/includes/display_contact_info.html" with info=last_advisor.email only %}
                         {% endif %}
                     </li>
                 </ul>

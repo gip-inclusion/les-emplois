@@ -1618,13 +1618,23 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
 
 @require_POST
 @check_request(lambda request: request.user.is_job_seeker or request.user.is_professional)
-def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode):
-    template_name = {
-        "email": "job_seekers_views/includes/advisor_email.html",
-        "phone": "job_seekers_views/includes/advisor_phone.html",
-    }.get(mode, None)
-    if not template_name:
+def display_advisor_contact_info(
+    request, assignment_id, mode, template_name="job_seekers_views/includes/display_contact_info.html"
+):
+    getter = {
+        "email": lambda assignment: assignment.advisor.email,
+        "phone": lambda assignment: assignment.advisor.phone,
+    }.get(mode)
+    if not getter:
         raise ValueError("Invalid mode: %s", mode)
+    assignment = get_object_or_404(
+        JobSeekerAssignment.objects.select_related("company", "professional", "prescriber_organization"),
+        pk=assignment_id,
+    )
+    try:
+        info = getter(assignment)
+    except AttributeError:
+        logger.error("Invalid advisor info request assignment=%s mode=%s", assignment.pk, mode)
+        return '<i class="text-disabled">Non renseigné</i>'
 
-    job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
-    return render(request, template_name, {"advisor": getattr(job_seeker.last_assignment, "advisor", None)})
+    return render(request, template_name, {"info": info})
