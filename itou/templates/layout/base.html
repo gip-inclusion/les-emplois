@@ -160,8 +160,8 @@
         <script nonce="{{ csp_nonce }}">
             // Show any toasts present in the loaded DOM
             htmx.onLoad((target) => {
-                $(".toast-container .toast", target).each(function() {
-                    $(this).toast("show");
+                target.querySelectorAll(".toast-container .toast").forEach((toastEl) => {
+                    new bootstrap.Toast(toastEl).show();
                 });
             });
         </script>
