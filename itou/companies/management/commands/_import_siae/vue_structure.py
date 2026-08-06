@@ -77,13 +77,15 @@ def get_vue_structure_df():
     df = df[df.auth_email.notnull()]
     df = df[df.auth_email != ""]
 
-    for _, row in df.iterrows():
+    for idx, row in df.iterrows():
         validate_siret(row.siret)
         validate_siret(row.siret_signature)
         validate_naf(row.naf)
-        assert " " not in row.auth_email
-        assert "@" in row.auth_email
-        assert row.siret[:9] == row.siret_signature[:9]
+        assert " " not in row.auth_email, f"row {idx + 1} has email with space"
+        assert "@" in row.auth_email, f"row {idx + 1} has email without '@'"
+        assert row.siret[:9] == row.siret_signature[:9], (
+            f"row {idx + 1} has inconsistent SIREN {row.siret[:9]} and SIREN signature {row.siret_signature[:9]}"
+        )
 
     return df
 

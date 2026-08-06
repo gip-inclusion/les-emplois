@@ -266,7 +266,9 @@ class TestImportSiaeManagementCommands:
 
         # It should raise an error message and break.
         with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True):
-            error_message = f"SIRET mismatch: existing_siae.siret='{company.siret}', row.siret='{new_siret}'"
+            error_message = (
+                f"SIRET mismatch on siae {company.id}: existing_siae.siret='{company.siret}', row.siret='{new_siret}'"
+            )
             with pytest.raises(AssertionError, match=error_message):
                 create_new_siaes(siret_to_siae, conventions_by_siae_key=get_conventions_by_siae_key(get_vue_af_df()))
         assert not Company.objects.filter(siret=new_siret).exists()
