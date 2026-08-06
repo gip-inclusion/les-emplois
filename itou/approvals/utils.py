@@ -17,14 +17,19 @@ SUSPENSION_DURATION_BEFORE_APPROVAL_CLOSABLE = datetime.timedelta(days=365)
 
 
 def can_close_approval(approval):
-    """Return True when approval meets all three conditions for a user-initiated closure:
+    """Return True when approval meets all conditions for a user-initiated closure:
 
+    0. It isn't already ending today or earlier (nothing left to close).
     1. At least one suspension has been running (or ran) for more than 12
        consecutive months, and no accepted hiring occurred after it ended.
     2. The job seeker has no pending applications in the last 60 days.
     3. The job seeker has no ongoing contract in the ASP data.
     """
     today = timezone.localdate()
+
+    if approval.end_at <= today:
+        # Already closed (or naturally ending) today: nothing left to close.
+        return False
 
     long_suspensions = [
         suspension
