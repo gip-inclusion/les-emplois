@@ -48,7 +48,9 @@
                     </div>
 
                     {% for evaluated_job_application in evaluated_job_applications %}
-                        {% include "siae_evaluations/includes/list_item.html" with item=evaluated_job_application %}
+                        {% with should_select_criteria=evaluated_job_application.should_select_criteria %}
+                            {% include "siae_evaluations/includes/list_item.html" with item=evaluated_job_application should_select_criteria=should_select_criteria %}
+                        {% endwith %}
                     {% endfor %}
 
                     {% if is_submittable %}
