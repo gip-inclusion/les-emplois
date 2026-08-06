@@ -8,6 +8,7 @@ from itou.insertion.models import (
     GenericReferenceItem,
     MobilizationEvent,
     Orientation,
+    OrientationTransitionLog,
     Service,
     Structure,
 )
@@ -196,6 +197,12 @@ class MobilizationEventAdmin(InsertionAdmin):
         return get_admin_view_link(obj.company, content=obj.company.name)
 
 
+class OrientationTransitionLogInline(ReadonlyMixin, ItouTabularInline):
+    model = OrientationTransitionLog
+    extra = 0
+    readonly_fields = ("transition", "from_state", "to_state", "timestamp")
+
+
 @admin.register(Orientation)
 class OrientationAdmin(InsertionAdmin):
     list_display = [
@@ -216,6 +223,7 @@ class OrientationAdmin(InsertionAdmin):
         "service__structure",
     ]
     ordering = ["-created_at"]
+    inlines = [OrientationTransitionLogInline]
     fieldsets = [
         (
             "Orientation",

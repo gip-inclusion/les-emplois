@@ -1,9 +1,12 @@
+import datetime
+
 import pytest
 from django.conf import settings
 from django.db import IntegrityError
+from freezegun import freeze_time
 
-from itou.insertion.enums import BeneficiaryContactPreference, OrientationStatus
-from itou.insertion.models import Orientation
+from itou.insertion.enums import BeneficiaryContactPreference, OrientationStatus, OrientationTransition
+from itou.insertion.models import Orientation, OrientationTransitionLog
 from itou.job_applications.enums import SenderKind
 from tests.companies.factories import CompanyFactory
 from tests.insertion.factories import OrientationFactory, ServiceFactory
@@ -96,3 +99,54 @@ def test_beneficiary_contact_preferences_display(contact_preferences, other_cont
         beneficiary_contact_preferences=contact_preferences, beneficiary_other_contact_method=other_contact_method
     )
     assert orientation.beneficiary_contact_preferences_display == expected
+
+
+def test_transition_accept():
+    orientation = OrientationFactory()
+    timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
+    with freeze_time(timestamp):
+        orientation.accept()
+
+    log = OrientationTransitionLog.objects.get(
+        orientation=orientation,
+        transition=OrientationTransition.ACCEPT,
+        from_state=OrientationStatus.PENDING,
+        to_state=OrientationStatus.ACCEPTED,
+        timestamp=timestamp,
+    )
+    assert log.orientation.status == OrientationStatus.ACCEPTED
+    assert log.orientation.updated_at == timestamp
+
+
+def test_transition_reject():
+    orientation = OrientationFactory()
+    timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
+    with freeze_time(timestamp):
+        orientation.reject()
+
+    log = OrientationTransitionLog.objects.get(
+        orientation=orientation,
+        transition=OrientationTransition.REJECT,
+        from_state=OrientationStatus.PENDING,
+        to_state=OrientationStatus.REJECTED,
+        timestamp=timestamp,
+    )
+    assert log.orientation.status == OrientationStatus.REJECTED
+    assert log.orientation.updated_at == timestamp
+
+
+def test_transition_expire():
+    orientation = OrientationFactory()
+    timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
+    with freeze_time(timestamp):
+        orientation.expire()
+
+    log = OrientationTransitionLog.objects.get(
+        orientation=orientation,
+        transition=OrientationTransition.EXPIRE,
+        from_state=OrientationStatus.PENDING,
+        to_state=OrientationStatus.EXPIRED,
+        timestamp=timestamp,
+    )
+    assert log.orientation.status == OrientationStatus.EXPIRED
+    assert log.orientation.updated_at == timestamp
