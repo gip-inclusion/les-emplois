@@ -4,7 +4,8 @@ import pytest
 from django.core.management import call_command
 from freezegun import freeze_time
 
-from itou.insertion.enums import OrientationStatus
+from itou.insertion.enums import OrientationStatus, OrientationTransition
+from itou.insertion.models import OrientationTransitionLog
 from tests.insertion.factories import OrientationFactory
 
 
@@ -49,11 +50,16 @@ def test_updates_existing_orientation_status(dora_settings, respx_mock):
 
     call_command("sync_orientation_statuses", wet_run=True)
 
-    orientation.refresh_from_db()
-    assert orientation.status == OrientationStatus.ACCEPTED
-    assert orientation.processing_date == datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC)
-    assert orientation.dora_status_updated_at == datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC)
-    assert orientation.updated_at == datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC)
+    log = OrientationTransitionLog.objects.get(
+        transition=OrientationTransition.ACCEPT,
+        from_state=OrientationStatus.PENDING,
+        to_state=OrientationStatus.ACCEPTED,
+        timestamp=datetime.datetime(2026, 7, 20, 9, 30, tzinfo=datetime.UTC),
+    )
+    assert log.orientation.status == OrientationStatus.ACCEPTED
+    assert log.orientation.processing_date == log.timestamp
+    assert log.orientation.dora_status_updated_at == log.timestamp
+    assert log.orientation.updated_at == log.timestamp
 
 
 def test_null_processing_date_is_synced(dora_settings, respx_mock):
@@ -78,10 +84,15 @@ def test_null_processing_date_is_synced(dora_settings, respx_mock):
 
     call_command("sync_orientation_statuses", wet_run=True)
 
-    orientation.refresh_from_db()
-    assert orientation.status == OrientationStatus.EXPIRED
-    assert orientation.processing_date is None
-    assert orientation.updated_at == datetime.datetime(2026, 7, 20, 10, 0, tzinfo=datetime.UTC)
+    log = OrientationTransitionLog.objects.get(
+        transition=OrientationTransition.EXPIRE,
+        from_state=OrientationStatus.PENDING,
+        to_state=OrientationStatus.EXPIRED,
+        timestamp=datetime.datetime(2026, 7, 20, 10, tzinfo=datetime.UTC),
+    )
+    assert log.orientation.status == OrientationStatus.EXPIRED
+    assert log.orientation.processing_date is None
+    assert log.orientation.updated_at == log.timestamp
 
 
 def test_doesnt_update_more_recent_emplois(dora_settings, respx_mock, caplog):
@@ -110,6 +121,7 @@ def test_doesnt_update_more_recent_emplois(dora_settings, respx_mock, caplog):
     assert orientation.dora_status_updated_at is None
     assert orientation.updated_at == more_recent_datetime
     assert f"Trying to update orientation={orientation.pk} with older DORA data" in caplog.messages
+    assert not OrientationTransitionLog.objects.exists()
 
 
 def test_first_run_has_no_updated_after(dora_settings, respx_mock):
@@ -152,6 +164,7 @@ def test_dry_run_does_not_persist(dora_settings, respx_mock):
     assert orientation.status == OrientationStatus.PENDING
     assert orientation.processing_date is None
     assert orientation.dora_status_updated_at is None
+    assert not OrientationTransitionLog.objects.exists()
 
 
 def test_unknown_uid_crashes_without_updating_anything(dora_settings, respx_mock):
@@ -182,3 +195,4 @@ def test_unknown_uid_crashes_without_updating_anything(dora_settings, respx_mock
 
     orientation.refresh_from_db()
     assert orientation.status == OrientationStatus.PENDING
+    assert not OrientationTransitionLog.objects.exists()
