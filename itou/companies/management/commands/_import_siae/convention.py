@@ -30,8 +30,12 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
     ).select_related("convention")
     for siae in managed_siaes_with_conventions:
         convention = siae.convention
-        assert convention.kind == siae.kind
-        assert convention.siren_signature == siae.siren
+        assert convention.kind == siae.kind, (
+            f"convention {convention.id} has kind {convention.kind}, siae {siae.id} has {siae.kind}"
+        )
+        assert convention.siren_signature == siae.siren, (
+            f"convention {convention.id} has SIREN {convention.siren_signature}, siae {siae.id} has {siae.siren}"
+        )
 
         if siae.siret not in siret_to_siae_row:
             # At some point, old C1 siaes stop existing in the latest FluxIAE file.
@@ -53,7 +57,9 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
                 f"convention.id={convention.id} has changed asp_id from "
                 f"{convention.asp_id} to {row.asp_id} (will be updated)"
             )
-            assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
+            assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists(), (
+                f"unexpected convention exists with asp_id={row.asp_id} and kind {siae.kind}"
+            )
             convention.asp_id = row.asp_id
             convention.save(update_fields={"asp_id", "updated_at"})
             continue
@@ -124,12 +130,14 @@ def get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key):
             # Some inactive siaes are absent in the latest ASP exports but
             # are still present in db because they have members and/or job applications.
             # We cannot build a convention object for those.
-            assert not siae.is_active
+            assert not siae.is_active, f"SIAE {siae.id} is unexpectedly active"
             continue
 
         row = siret_to_siae_row[siae.siret]
         # convention is to be unique for an asp_id and a SIAE kind
-        assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
+        assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists(), (
+            f"unexpected convention exists with asp_id={row.asp_id} and kind {siae.kind}"
+        )
 
         convention_data = conventions_by_siae_key[(row.asp_id, siae.kind)]
         convention = SiaeConvention(
@@ -157,16 +165,20 @@ def check_convention_data_consistency():
         # Unfortunately some inactive conventions have lost their ASP siae.
         asp_siaes = [siae for siae in convention.siaes.all() if siae.source == CompanySource.ASP]
         if convention.is_active:
-            assert len(asp_siaes) == 1
+            assert len(asp_siaes) == 1, "unexpected length {len(asp_siaes)} for convention {convention.id}"
         else:
             assert 0 <= len(asp_siaes) <= 1
             # Check that each inactive convention has a grace period start date.
-            assert convention.deactivated_at is not None
+            assert convention.deactivated_at is not None, "convention {convention.id} is unexpectedly active"
 
         # Additional data consistency checks.
         for siae in convention.siaes.all():
-            assert siae.siren == convention.siren_signature
-            assert siae.kind == convention.kind
+            assert siae.siren == convention.siren_signature, (
+                f"siae {siae.id} has siren {siae.siren}, convention {convention.id} has {convention.siren_signature}"
+            )
+            assert siae.kind == convention.kind, (
+                f"siae {siae.id} has kind {siae.kind}, convention {convention.id} has {convention.kind}"
+            )
 
     asp_siaes_without_convention = Company.objects.filter(
         kind__in=CompanyKind.siae_kinds(), source=CompanySource.ASP, convention__isnull=True
@@ -186,12 +198,17 @@ def create_conventions(siret_to_siae_row, conventions_by_siae_key):
     print(f"will create {len(creatable_conventions)} conventions")
 
     for convention, siae in creatable_conventions:
-        assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
+        assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists(), (
+            f"unexpected convention exists with asp_id={convention.asp_id} and kind {convention.kind}"
+        )
         convention.save()
-        assert convention.siaes.count() == 0
+        assert convention.siaes.count() == 0, (
+            f"convention {convention.id} unexpectedly has {convention.siaes.count()} siaes"
+        )
         siae.convention = convention
         siae.save(update_fields={"convention", "updated_at"})
-        assert convention.siaes.filter(source=CompanySource.ASP).count() == 1
+        company_count = convention.siaes.filter(source=CompanySource.ASP).count()
+        assert company_count == 1, f"convention {convention.id} has {company_count} ASP companies"
 
 
 @transaction.atomic()

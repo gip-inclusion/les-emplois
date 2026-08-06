@@ -30,11 +30,15 @@ def build_ea_eatt(row):
     company = Company()
     company.siret = row.siret
     company.kind = row.kind
-    assert company.kind in [CompanyKind.EA, CompanyKind.EATT]
+    assert company.kind in [CompanyKind.EA, CompanyKind.EATT], (
+        f"file as unexpected kind {company.kind} for SIRET {company.siret}"
+    )
     company.source = CompanySource.EA_EATT
 
     company.name = row.name
-    assert not company.name.isnumeric()
+    assert not company.name.isnumeric(), (
+        f"company name is unexpectedly numeric {company.name} for SIRET {company.siret}"
+    )
 
     company.email = ""  # Do not make the authentification email public!
     company.auth_email = row.auth_email

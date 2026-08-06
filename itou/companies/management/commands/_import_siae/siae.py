@@ -76,7 +76,7 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
     for siae in Company.objects.select_related("convention").filter(
         source=CompanySource.ASP, convention__isnull=False
     ):
-        assert siae.should_have_convention
+        assert siae.should_have_convention, f"siae {siae.id} unexpectedly should not have convention"
 
         if siae.convention.asp_id not in asp_id_to_siae_row:
             continue
@@ -90,7 +90,7 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
             auth_email_updates += 1
 
         if siae.siret != row.siret:
-            assert siae.siren == row.siret[:9]
+            assert siae.siren == row.siret[:9], f"siae {siae.id} has SIREN {siae.siren}, file has SIRET {row.siret}"
 
             existing_siae = Company.objects.filter(siret=row.siret, kind=siae.kind).first()
             if existing_siae:
@@ -132,10 +132,14 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
         existing_siaes = Company.objects.select_related("convention").filter(convention__asp_id=asp_id, kind=kind)
         # Siaes with this asp_id already exist, no need to create one more.
         for existing_siae in existing_siaes:
-            assert existing_siae.should_have_convention
+            assert existing_siae.should_have_convention, (
+                f"siae {existing_siae.id} unexpectedly should not have convention"
+            )
             # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
             if existing_siae.source == CompanySource.ASP and existing_siae.siret != row.siret:
-                raise AssertionError(f"SIRET mismatch: {existing_siae.siret=}, {row.siret=}")
+                raise AssertionError(
+                    f"SIRET mismatch on siae {existing_siae.id}: {existing_siae.siret=}, {row.siret=}"
+                )
         try:
             existing_siae = Company.objects.get(siret=row.siret, kind=kind)
         except Company.DoesNotExist:
@@ -158,8 +162,12 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
             if existing_siae.source == CompanySource.ASP:
                 continue
             # Siae with this siret+kind already exists but with the wrong source.
-            assert existing_siae.source in [CompanySource.USER_CREATED, CompanySource.STAFF_CREATED]
-            assert existing_siae.should_have_convention
+            assert existing_siae.source in [CompanySource.USER_CREATED, CompanySource.STAFF_CREATED], (
+                f"unexpected source {existing_siae.source} for siae {existing_siae.id}"
+            )
+            assert existing_siae.should_have_convention, (
+                f"siae {existing_siae.id} unexpectedly should not have convention"
+            )
             print(
                 f"siae.id={existing_siae.id} already exists "
                 f"with wrong source={existing_siae.source} "
