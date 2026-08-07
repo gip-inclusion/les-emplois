@@ -888,14 +888,14 @@
                               Contact
                           </h2>
                           <ul class="fs-sm list-unstyled mb-0">
-                              <li class="d-flex align-items-center">
+                              <li class="d-flex">
                                   <i aria-hidden="true" class="ri-mail-line fw-normal flex-shrink-0 me-2">
                                   </i>
                                   <a aria-label="Contact par mail" class="text-break" href="mailto:contact@service.fr">
                                       contact@service.fr
                                   </a>
                               </li>
-                              <li class="d-flex align-items-center">
+                              <li class="d-flex">
                                   <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
                                   </i>
                                   01 23 45 67 89
