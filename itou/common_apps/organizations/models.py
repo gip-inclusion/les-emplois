@@ -263,6 +263,18 @@ class OrganizationAbstract(models.Model):
             case OrganizationKind.INSTITUTION:
                 return "ri-government-line"
 
+    @property
+    def member_kind_display(self):
+        match self.ORGANIZATION_KIND:
+            case OrganizationKind.PRESCRIBER_ORGANIZATION:
+                if self.is_authorized:
+                    return "prescripteur habilité"
+                return "orienteur"
+            case OrganizationKind.COMPANY:
+                return "employeur"
+            case OrganizationKind.INSTITUTION:
+                return "institutionnel"
+
 
 class MembershipQuerySet(models.QuerySet):
     @property

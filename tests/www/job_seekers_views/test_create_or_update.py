@@ -536,7 +536,7 @@ class TestStandaloneCreateAsPrescriber:
         if in_list:
             # User was already the last known advisor of the job seeker,
             if is_last_known_advisor:
-                assert last_assignment.professional == existing_assignment.professional
+                assert last_assignment.advisor == existing_assignment.professional
                 assert last_assignment.prescriber_organization == existing_assignment.prescriber_organization
                 assert last_assignment.company == existing_assignment.company
                 assert last_assignment.last_action_kind == existing_assignment.last_action_kind
@@ -552,7 +552,7 @@ class TestStandaloneCreateAsPrescriber:
                     ],
                 )
             else:
-                assert last_assignment.professional == user
+                assert last_assignment.advisor == user
                 assert last_assignment.prescriber_organization == prescriber_organization
                 assert last_assignment.last_action_kind == ActionKind.SELF_ASSIGN
                 assertMessages(
@@ -566,7 +566,7 @@ class TestStandaloneCreateAsPrescriber:
                     ],
                 )
         else:
-            assert last_assignment.professional == user
+            assert last_assignment.advisor == user
             assert last_assignment.prescriber_organization == prescriber_organization
             assert last_assignment.last_action_kind == ActionKind.SELF_ASSIGN
             assertRedirects(response, reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))

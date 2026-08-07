@@ -38,11 +38,7 @@ from itou.utils.auth import check_request
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
-from itou.utils.perms.utils import (
-    can_edit_personal_information,
-    can_view_last_advisor_contact_info,
-    can_view_personal_information,
-)
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.readonly import ReadonlyViewMixin, http_methods, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -105,9 +101,10 @@ def build_services_search_url(request, job_seeker):
 
 
 def assign_user_as_job_seeker_last_advisor(request, job_seeker):
-    last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
-    if (last_advisor and last_advisor.pk == request.user.pk) and (
-        last_advisor_org and last_advisor_org.pk == request.current_organization.pk
+    if (
+        job_seeker.last_assignment
+        and job_seeker.last_assignment.advisor == request.user
+        and job_seeker.last_assignment.organization == request.current_organization
     ):
         messages.info(
             request,
@@ -128,25 +125,44 @@ def assign_user_as_job_seeker_last_advisor(request, job_seeker):
         messages.success(request, f"{toast_title}||{toast_message}", extra_tags="toast")
 
 
-class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
+class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
     context_object_name = "job_seeker"
 
-    def test_func(self):
-        if self.template_name in (
-            "job_seekers_views/job_applications.html",
-            "job_seekers_views/details.html",
+    def get_context_data(self, **kwargs):
+        self.approval = None
+        if self.request.from_prescriber or (
+            self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
         ):
-            return self.request.from_prescriber or self.request.from_employer
-        if self.template_name == "job_seekers_views/contracts.html":
-            return self.request.from_authorized_prescriber
+            self.approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
 
-        raise ValueError(f"Unexpected template name: {self.template_name}")
+        fallback_back_url = (
+            reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
+        )
+
+        return super().get_context_data(**kwargs) | {
+            "matomo_custom_title": "Détail candidat",
+            "approval": self.approval,
+            "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
+            # already checked in test_func because the user name is displayed in the title
+            "can_view_personal_information": can_view_personal_information(self.request, self.object),
+            "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
+            "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
+        }
+
+
+class JobSeekerDetailTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/details.html"
+
+    def test_func(self):
+        return self.request.from_prescriber or self.request.from_employer
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
         geiq_eligibility_diagnosis = None
         if self.request.from_prescriber or (
             self.request.from_employer and self.request.current_organization.kind == CompanyKind.GEIQ
@@ -160,13 +176,12 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
                 .first()
             )
 
-        approval = None
         iae_eligibility_diagnosis = None
         can_edit_iae_eligibility = False
+
         if self.request.from_prescriber or (
             self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
         ):
-            approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
             iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.object,
                 for_siae=self.request.current_organization if self.request.from_employer else None,
@@ -176,29 +191,16 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
                 # The job_seeker object already contains a lot of information: no need to re-retrieve it
                 iae_eligibility_diagnosis.job_seeker = self.object
 
-        if self.request.from_authorized_prescriber and approval is None:
+        if self.request.from_authorized_prescriber and self.approval is None:
             can_edit_iae_eligibility = True
 
-        fallback_back_url = (
-            reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
-        )
-
-        can_see_external = can_see_external_job_applications(self.object, self.request)
-        job_applications = self.get_job_applications(can_see_external)
-        received_job_applications, sent_job_applications = None, job_applications
-
-        if self.request.from_employer:
-            received_job_applications, sent_job_applications = [], []
-            for job_app in job_applications:
-                if job_app.to_company.id == self.request.current_organization.pk:
-                    received_job_applications.append(job_app)
-                elif job_app.sender_company.id == self.request.current_organization.pk:
-                    sent_job_applications.append(job_app)
-
-        has_external_applications = any(not a.user_can_see_details for a in job_applications)
-
+        # Last advisor context
         professional, organization = self.request.user, self.request.current_organization
-        is_last_known_advisor = (professional, organization) == self.object.last_advisor_with_org
+        last_assignment = self.object.last_assignment
+        is_last_known_advisor = last_assignment and (professional, organization) == (
+            last_assignment.advisor,
+            last_assignment.organization,
+        )
         is_advisor = (
             is_last_known_advisor
             or JobSeekerAssignment.objects.assigned_to(professional, organization)
@@ -206,26 +208,20 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             .exists()
         )
 
-        return super().get_context_data(**kwargs) | {
+        return context | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
-            "matomo_custom_title": "Détail candidat",
-            "approval": approval,
-            "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
-            "contracts": self.get_contracts(self.request, approval),
-            "received_job_applications": received_job_applications,
-            "sent_job_applications": sent_job_applications,
-            "can_see_external_job_applications": can_see_external,
-            "has_external_applications": has_external_applications,
-            # already checked in test_func because the user name is displayed in the title
-            "can_view_personal_information": can_view_personal_information(self.request, self.object),
-            "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
-            "can_view_last_advisor_contact_info": can_view_last_advisor_contact_info(self.request, self.object),
-            "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
             "is_last_known_advisor": is_last_known_advisor,
             "is_advisor": is_advisor,
         }
+
+
+class JobApplicationTabVIew(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/job_applications.html"
+
+    def test_func(self):
+        return self.request.from_prescriber or self.request.from_employer
 
     def get_job_applications(self, can_see_external):
         if self.request.from_employer:
@@ -247,10 +243,46 @@ class JobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
             applications = applications_qs.annotate(user_can_see_details=Value(True)).all()
         return applications.select_related("to_company", "sender").prefetch_related("selected_jobs")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        can_see_external = can_see_external_job_applications(self.object, self.request)
+        job_applications = self.get_job_applications(can_see_external)
+        received_job_applications, sent_job_applications = None, job_applications
+
+        if self.request.from_employer:
+            received_job_applications, sent_job_applications = [], []
+            for job_app in job_applications:
+                if job_app.to_company.id == self.request.current_organization.pk:
+                    received_job_applications.append(job_app)
+                elif job_app.sender_company.id == self.request.current_organization.pk:
+                    sent_job_applications.append(job_app)
+
+        has_external_applications = any(not a.user_can_see_details for a in job_applications)
+
+        return context | {
+            "can_see_external_job_applications": can_see_external,
+            "received_job_applications": received_job_applications,
+            "sent_job_applications": sent_job_applications,
+            "has_external_applications": has_external_applications,
+        }
+
+
+class ContractsTabView(BaseJobSeekerDetailView):
+    template_name = "job_seekers_views/contracts.html"
+
+    def test_func(self):
+        return self.request.from_authorized_prescriber
+
     def get_contracts(self, request, approval):
         if not request.from_authorized_prescriber or not approval:
             return Contract.objects.none()
         return get_contracts(approval)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "contracts": self.get_contracts(self.request, self.approval),
+        }
 
 
 def can_see_external_job_applications(job_seeker, request):
@@ -412,7 +444,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
         professional, organization = request.user, request.current_organization
-        job_seeker.user_is_last_known_advisor = (professional, organization) == job_seeker.last_advisor_with_org
+        last_assignment = job_seeker.last_assignment
+        job_seeker.user_is_last_known_advisor = last_assignment and (professional, organization) == (
+            last_assignment.advisor,
+            last_assignment.organization,
+        )
         job_seeker.user_is_advisor = request.user.pk in job_seeker.advisors
 
     context = {
@@ -1582,18 +1618,23 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
 
 @require_POST
 @check_request(lambda request: request.user.is_job_seeker or request.user.is_professional)
-def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode):
-    template_name = {
-        "email": "job_seekers_views/includes/last_known_advisor.html#last-known-advisor-email",
-        "phone": "job_seekers_views/includes/last_known_advisor.html#last-known-advisor-phone",
-    }.get(mode, None)
-    if not template_name:
+def display_advisor_contact_info(
+    request, assignment_id, mode, template_name="job_seekers_views/includes/display_contact_info.html"
+):
+    getter = {
+        "email": lambda assignment: assignment.advisor.email,
+        "phone": lambda assignment: assignment.advisor.phone,
+    }.get(mode)
+    if not getter:
         raise ValueError("Invalid mode: %s", mode)
+    assignment = get_object_or_404(
+        JobSeekerAssignment.objects.select_related("company", "professional", "prescriber_organization"),
+        pk=assignment_id,
+    )
+    try:
+        info = getter(assignment)
+    except AttributeError:
+        logger.error("Invalid advisor info request assignment=%s mode=%s", assignment.pk, mode)
+        return '<i class="text-disabled">Non renseigné</i>'
 
-    job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
-
-    if can_view_last_advisor_contact_info(request, job_seeker):
-        last_advisor, _ = job_seeker.last_advisor_with_org
-        return render(request, template_name, {"last_advisor": last_advisor})
-
-    raise PermissionDenied
+    return render(request, template_name, {"info": info})

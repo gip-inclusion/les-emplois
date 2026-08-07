@@ -21,11 +21,11 @@
             {% endif %}
         </div>
     </div>
-    {% if job_seeker.last_advisor_with_org.0 %}
+    {% if job_seeker.last_assignment and job_seeker.last_assignment.advisor %}
         <form id="display-contact-info-form">
             {% csrf_token %}{# Used by htmx posts #}
         </form>
-        {% with last_advisor=job_seeker.last_advisor_with_org.0 last_advisor_org=job_seeker.last_advisor_with_org.1 %}
+        {% with last_advisor=job_seeker.last_assignment.advisor last_advisor_org=job_seeker.last_assignment.organization %}
             <div id="card-{{ last_advisor.public_id }}">
                 <ul class="list-data mb-3">
                     <li>
@@ -54,50 +54,17 @@
                     </li>
                     <li>
                         <small>Téléphone</small>
-                        {% if can_view_last_advisor_contact_info %}
-                            {% if last_advisor.phone %}
-                                {% if last_advisor.pk != request.user.pk %}
-                                    <button class="btn-link btn-ico"
-                                            id="phone-{{ last_advisor.pk }}"
-                                            hx-post="{% url "job_seekers_views:display_last_known_advisor_contact_info" job_seeker.public_id "phone" %}"
-                                            hx-swap="outerHTML"
-                                            hx-include="#display-contact-info-form"
-                                            {% matomo_event "usager" "clic" "afficher-telephone-accompagnateur" %}>
-                                        <div class="stable-text">
-                                            <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
-                                            <span>Afficher le téléphone</span>
-                                        </div>
-                                        <div class="loading-text">
-                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            <span>Affichage en cours</span>
-                                        </div>
-                                    </button>
-                                {% else %}
-                                    {% partialdef last-known-advisor-phone inline %}
-                                        <strong>{{ last_advisor.phone }}</strong>
-                                        {% include 'includes/copy_to_clipboard.html' with content=last_advisor.phone css_classes="btn-link" only_icon=True %}
-                                    {% endpartialdef %}
-                                {% endif %}
-                            {% else %}
-                                <i class="text-disabled">Non renseigné</i>
-                            {% endif %}
-                        {% else %}
-                            <i class="text-disabled">Information non disponible</i>
-                        {% endif %}
-                    </li>
-                    <li>
-                        <small>Adresse e-mail</small>
-                        {% if can_view_last_advisor_contact_info %}
+                        {% if last_advisor.phone %}
                             {% if last_advisor.pk != request.user.pk %}
                                 <button class="btn-link btn-ico"
-                                        id="email-{{ last_advisor.pk }}"
-                                        hx-post="{% url "job_seekers_views:display_last_known_advisor_contact_info" job_seeker.public_id "email" %}"
+                                        id="phone-{{ last_advisor.pk }}"
+                                        hx-post="{% url "job_seekers_views:display_advisor_contact_info" job_seeker.last_assignment.pk "phone" %}"
                                         hx-swap="outerHTML"
                                         hx-include="#display-contact-info-form"
-                                        {% matomo_event "usager" "clic" "afficher-email-accompagnateur" %}>
+                                        {% matomo_event "usager" "clic" "afficher-telephone-accompagnateur" %}>
                                     <div class="stable-text">
                                         <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
-                                        <span>Afficher l'email</span>
+                                        <span>Afficher le téléphone</span>
                                     </div>
                                     <div class="loading-text">
                                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -105,13 +72,32 @@
                                     </div>
                                 </button>
                             {% else %}
-                                {% partialdef last-known-advisor-email inline %}
-                                    <strong>{{ last_advisor.email }}</strong>
-                                    {% include 'includes/copy_to_clipboard.html' with content=last_advisor.email css_classes="btn-link" only_icon=True %}
-                                {% endpartialdef %}
+                                {% include "job_seekers_views/includes/display_contact_info.html" with info=last_advisor.phone only %}
                             {% endif %}
                         {% else %}
-                            <i class="text-disabled">Information non disponible</i>
+                            <i class="text-disabled">Non renseigné</i>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Adresse e-mail</small>
+                        {% if last_advisor.pk != request.user.pk %}
+                            <button class="btn-link btn-ico"
+                                    id="email-{{ last_advisor.pk }}"
+                                    hx-post="{% url "job_seekers_views:display_advisor_contact_info" job_seeker.last_assignment.pk "email" %}"
+                                    hx-swap="outerHTML"
+                                    hx-include="#display-contact-info-form"
+                                    {% matomo_event "usager" "clic" "afficher-email-accompagnateur" %}>
+                                <div class="stable-text">
+                                    <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
+                                    <span>Afficher l'email</span>
+                                </div>
+                                <div class="loading-text">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span>Affichage en cours</span>
+                                </div>
+                            </button>
+                        {% else %}
+                            {% include "job_seekers_views/includes/display_contact_info.html" with info=last_advisor.email only %}
                         {% endif %}
                     </li>
                 </ul>

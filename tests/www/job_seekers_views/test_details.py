@@ -626,7 +626,7 @@ def test_display_last_known_advisor(client, snapshot):
         created_at=timezone.now() - datetime.timedelta(days=7),
         updated_at=timezone.now() - datetime.timedelta(days=7),
     )
-    last_advisor = last_assignment.professional
+    last_advisor = last_assignment.advisor
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
     client.force_login(prescriber)
@@ -664,7 +664,7 @@ def test_display_last_known_advisor(client, snapshot):
 
 
 @freeze_time("2026-06-30")
-def test_display_last_known_advisor_contact_info(client, snapshot):
+def test_display_advisor_contact_info(client, snapshot):
     prescriber_organization = PrescriberOrganizationFactory(for_snapshot=True)
     prescriber = PrescriberMembershipFactory(
         user__public_id="788bc466-3747-4cdb-aafc-80c888d6b69d",
@@ -675,7 +675,7 @@ def test_display_last_known_advisor_contact_info(client, snapshot):
         organization=prescriber_organization,
     ).user
     job_seeker = JobSeekerFactory(for_snapshot=True)
-    last_assignment = JobSeekerAssignmentFactory(
+    assignment = JobSeekerAssignmentFactory(
         job_seeker=job_seeker,
         professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
         professional__first_name="Marie",
@@ -685,25 +685,19 @@ def test_display_last_known_advisor_contact_info(client, snapshot):
         created_at=timezone.now() - datetime.timedelta(days=7),
         updated_at=timezone.now() - datetime.timedelta(days=7),
     )
-    last_known_advisor = last_assignment.professional
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-    display_phone_url = reverse(
-        "job_seekers_views:display_last_known_advisor_contact_info", args=(job_seeker.public_id, "phone")
-    )
-    display_email_url = reverse(
-        "job_seekers_views:display_last_known_advisor_contact_info", args=(job_seeker.public_id, "email")
-    )
 
     client.force_login(prescriber)
-
-    # Prescriber is not an advisor of the job seeker
-    response = client.get(url)
-    assertNotContains(response, display_phone_url)
-    assertNotContains(response, display_email_url)
 
     # Prescriber is the last known advisor of the job seeker
     prescriber_assignment = JobSeekerAssignmentFactory(job_seeker=job_seeker, professional=prescriber)
 
+    display_phone_url = reverse(
+        "job_seekers_views:display_advisor_contact_info", args=(prescriber_assignment.pk, "phone")
+    )
+    display_email_url = reverse(
+        "job_seekers_views:display_advisor_contact_info", args=(prescriber_assignment.pk, "email")
+    )
     response = client.get(url)
     assertNotContains(response, display_phone_url)
     assertNotContains(response, display_email_url)
@@ -711,9 +705,11 @@ def test_display_last_known_advisor_contact_info(client, snapshot):
     assertContains(response, prescriber.email)
 
     # Prescriber is an advisor of the job seeker, but not the last one
-    prescriber_assignment.created_at = last_assignment.created_at - datetime.timedelta(days=7)
-    prescriber_assignment.updated_at = last_assignment.created_at - datetime.timedelta(days=7)
+    prescriber_assignment.created_at = assignment.created_at - datetime.timedelta(days=7)
+    prescriber_assignment.updated_at = assignment.created_at - datetime.timedelta(days=7)
     prescriber_assignment.save()
+    display_phone_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "phone"))
+    display_email_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "email"))
 
     response = client.get(url)
     assertContains(response, display_phone_url)
@@ -722,21 +718,21 @@ def test_display_last_known_advisor_contact_info(client, snapshot):
     simulated_page = parse_response_to_soup(response, selector=f"#last-known-advisor-{job_seeker.public_id}")
 
     response = client.post(display_phone_url)
-    assertContains(response, last_known_advisor.phone)
-    update_page_with_htmx(simulated_page, f"#phone-{last_known_advisor.pk}", response)
+    assertContains(response, assignment.professional.phone)
+    update_page_with_htmx(simulated_page, f"#phone-{assignment.professional.pk}", response)
 
     response = client.post(display_email_url)
-    assertContains(response, last_known_advisor.email)
-    update_page_with_htmx(simulated_page, f"#email-{last_known_advisor.pk}", response)
+    assertContains(response, assignment.professional.email)
+    update_page_with_htmx(simulated_page, f"#email-{assignment.professional.pk}", response)
 
     assert pretty_indented(simulated_page) == snapshot
 
 
 @freeze_time("2026-06-30")
-def test_display_last_known_advisor_contact_info_as_job_seeker(client, snapshot):
+def test_display_advisor_contact_info_as_job_seeker(client, snapshot):
     job_application = JobApplicationFactory(for_snapshot=True, sent_by_prescriber=True)
     job_seeker = job_application.job_seeker
-    last_assignment = JobSeekerAssignmentFactory(
+    assignment = JobSeekerAssignmentFactory(
         job_seeker=job_seeker,
         professional__public_id="77f56f7f-8c45-469a-88c4-5748d497329d",
         professional__first_name="Marie",
@@ -744,14 +740,9 @@ def test_display_last_known_advisor_contact_info_as_job_seeker(client, snapshot)
         professional__email="marie.laforet@test.local",
         professional__phone="0707070707",
     )
-    last_known_advisor = last_assignment.professional
     url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.id})
-    display_phone_url = reverse(
-        "job_seekers_views:display_last_known_advisor_contact_info", args=(job_seeker.public_id, "phone")
-    )
-    display_email_url = reverse(
-        "job_seekers_views:display_last_known_advisor_contact_info", args=(job_seeker.public_id, "email")
-    )
+    display_phone_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "phone"))
+    display_email_url = reverse("job_seekers_views:display_advisor_contact_info", args=(assignment.pk, "email"))
 
     client.force_login(job_seeker)
     response = client.get(url)
@@ -762,12 +753,12 @@ def test_display_last_known_advisor_contact_info_as_job_seeker(client, snapshot)
     simulated_page = parse_response_to_soup(response, selector=f"#last-known-advisor-{job_seeker.public_id}")
 
     response = client.post(display_phone_url)
-    assertContains(response, last_known_advisor.phone)
-    update_page_with_htmx(simulated_page, f"#phone-{last_known_advisor.pk}", response)
+    assertContains(response, assignment.professional.phone)
+    update_page_with_htmx(simulated_page, f"#phone-{assignment.professional.pk}", response)
 
     response = client.post(display_email_url)
-    assertContains(response, last_known_advisor.email)
-    update_page_with_htmx(simulated_page, f"#email-{last_known_advisor.pk}", response)
+    assertContains(response, assignment.professional.email)
+    update_page_with_htmx(simulated_page, f"#email-{assignment.professional.pk}", response)
 
     assert pretty_indented(simulated_page) == snapshot
 
