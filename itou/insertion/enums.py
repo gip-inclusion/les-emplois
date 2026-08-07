@@ -37,8 +37,6 @@ class BeneficiaryContactPreference(models.TextChoices):
 
 class OrientationStatus(models.TextChoices):
     PENDING = "OUVERTE", "En cours de traitement"
-    MODERATION_PENDING = "MODÉRATION_EN_COURS", "En cours de modération"
-    MODERATION_REJECTED = "MODÉRATION_REJETÉE", "Rejetée par la modération"
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
     REJECTED = "REFUSÉE", "Refusée"

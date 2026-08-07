@@ -972,40 +972,24 @@
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="VALIDÉE"/>
                                       <label class="form-check-label" for="id_statuses_1">
-                                          En cours de modération
-                                      </label>
-                                  </div>
-                              </li>
-                              <li>
-                                  <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
-                                      <label class="form-check-label" for="id_statuses_2">
-                                          Rejetée par la modération
-                                      </label>
-                                  </div>
-                              </li>
-                              <li>
-                                  <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="VALIDÉE"/>
-                                      <label class="form-check-label" for="id_statuses_3">
                                           Validée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                      <label class="form-check-label" for="id_statuses_4">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
                                           Expirée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_5" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                      <label class="form-check-label" for="id_statuses_5">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
                                           Refusée
                                       </label>
                                   </div>
@@ -1043,40 +1027,24 @@
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="VALIDÉE"/>
                                           <label class="form-check-label" for="id_statuses_1-top">
-                                              En cours de modération
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li class="dropdown-item">
-                                      <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
-                                          <label class="form-check-label" for="id_statuses_2-top">
-                                              Rejetée par la modération
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li class="dropdown-item">
-                                      <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="VALIDÉE"/>
-                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Validée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                          <label class="form-check-label" for="id_statuses_4-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
                                               Expirée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_5" id="id_statuses_5-top" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                          <label class="form-check-label" for="id_statuses_5-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Refusée
                                           </label>
                                       </div>
@@ -1199,40 +1167,24 @@
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="VALIDÉE"/>
                                       <label class="form-check-label" for="id_statuses_1">
-                                          En cours de modération
-                                      </label>
-                                  </div>
-                              </li>
-                              <li>
-                                  <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
-                                      <label class="form-check-label" for="id_statuses_2">
-                                          Rejetée par la modération
-                                      </label>
-                                  </div>
-                              </li>
-                              <li>
-                                  <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="VALIDÉE"/>
-                                      <label class="form-check-label" for="id_statuses_3">
                                           Validée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                      <label class="form-check-label" for="id_statuses_4">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
                                           Expirée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_5" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                      <label class="form-check-label" for="id_statuses_5">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
                                           Refusée
                                       </label>
                                   </div>
@@ -1319,40 +1271,24 @@
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="MODÉRATION_EN_COURS"/>
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="VALIDÉE"/>
                                           <label class="form-check-label" for="id_statuses_1-top">
-                                              En cours de modération
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li class="dropdown-item">
-                                      <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="MODÉRATION_REJETÉE"/>
-                                          <label class="form-check-label" for="id_statuses_2-top">
-                                              Rejetée par la modération
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li class="dropdown-item">
-                                      <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="VALIDÉE"/>
-                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Validée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                          <label class="form-check-label" for="id_statuses_4-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
                                               Expirée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_5" id="id_statuses_5-top" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                          <label class="form-check-label" for="id_statuses_5-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Refusée
                                           </label>
                                       </div>

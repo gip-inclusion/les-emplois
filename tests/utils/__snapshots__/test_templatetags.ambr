@@ -632,12 +632,6 @@
 # name: test_orientation_state_badge[EXPIR\xc9E]
   '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-emploi-light">Expirée</span>'
 # ---
-# name: test_orientation_state_badge[MOD\xc9RATION_EN_COURS]
-  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03">En cours de modération</span>'
-# ---
-# name: test_orientation_state_badge[MOD\xc9RATION_REJET\xc9E]
-  '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger">Rejetée par la modération</span>'
-# ---
 # name: test_orientation_state_badge[OUVERTE]
   '<span id="state_[PK of Orientation]" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info">En cours de traitement</span>'
 # ---

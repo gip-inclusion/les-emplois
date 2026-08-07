@@ -169,8 +169,6 @@ def criterion_certification_badge(selected_criterion, job_application):
 @register.simple_tag
 def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
     state_classes = {
-        OrientationStatus.MODERATION_PENDING: "bg-accent-03",
-        OrientationStatus.MODERATION_REJECTED: "bg-danger",
         OrientationStatus.PENDING: "bg-info",
         OrientationStatus.ACCEPTED: "bg-success",
         OrientationStatus.REJECTED: "bg-danger",
