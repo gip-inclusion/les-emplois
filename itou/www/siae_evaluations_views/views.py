@@ -676,15 +676,23 @@ def siae_select_criteria(
     ):
         return HttpResponseForbidden()
     eligibility_diagnosis = evaluated_job_application.job_application.eligibility_diagnosis
+    # As a reminder, form checkboxes map to the set of administrative criteria declared at hiring, i.e. the only ones
+    # that can be justified. Evaluated criteria objects only carry the control state and the `criteria_certified` flag
+    # used to pre-check and lock the certified criteria.
     job_application_administrative_criteria = eligibility_diagnosis.selected_administrative_criteria.all()
+    certified_criteria_keys = {
+        eval_criterion.administrative_criteria.key
+        for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
+        if eval_criterion.criteria_certified
+    }
     initial_data = {
         eval_criterion.administrative_criteria.key: True
         for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
     }
-
     form_administrative_criteria = AdministrativeCriteriaEvaluationForm(
         siae=siae,
         job_app_selected_administrative_criteria=job_application_administrative_criteria,
+        certified_criteria_keys=certified_criteria_keys,
         data=request.POST or None,
         initial=initial_data,
     )
@@ -726,6 +734,7 @@ def siae_select_criteria(
         "form_administrative_criteria": form_administrative_criteria,
         "level_1_fields": level_1_fields,
         "level_2_fields": level_2_fields,
+        "certified_criteria_keys": certified_criteria_keys,
         "kind": siae.kind,
         "back_url": back_url,
         "matomo_custom_title": "Contrôle a posteriori : sélection des critères",

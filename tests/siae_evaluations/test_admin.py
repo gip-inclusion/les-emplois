@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries
 
 from itou.companies.enums import CompanyKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
@@ -92,6 +93,7 @@ class TestEvaluationCampaignAdmin:
             evaluated_job_application=campaign4_jobapp,
             uploaded_at=timezone.now() - relativedelta(days=1),
             submitted_at=timezone.now() - relativedelta(days=1),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         # Not selected.
@@ -110,7 +112,8 @@ class TestEvaluationCampaignAdmin:
             + 1  # Count the full results
             + 1  # Fetch evaluated siae and related evaludation_campaign, siae, convention
             + 1  # Prefetch evaludated job applications
-            + 1  # Prefetch corresponding administrative criteria
+            + 1  # Prefetch corresponding evaluated administrative criteria
+            + 1  # Prefetch administrative criteria (level is used to compute the job application state)
             + 1  # Prefetch siae memberships
             + 1  # Prefetch users of siae memberships
         ):

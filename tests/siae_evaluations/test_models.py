@@ -524,6 +524,45 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.reviewed_at is None
         assert evaluated_siae.final_reviewed_at is None
 
+    def test_populate_job_application_with_insufficient_certified_level_2_criterion(self):
+        # A single certified level 2 criterion is not enough for the job application to be accepted: the SIAE still
+        # has to prove a total of 2 or 3 level 2 criteria (depending on the SIAE kind) so the job application must stay
+        # editable and the SIAE must not be auto-accepted.
+        evaluation_campaign = EvaluationCampaignFactory()
+        company = CompanyFactory(
+            department=evaluation_campaign.institution.department, with_membership=True, kind=CompanyKind.EI
+        )
+        create_batch_of_job_applications(company)
+        certified_job_app = JobApplication.objects.first()
+        # `Travailleur handicapé` is a certifiable level 2 criterion.
+        level_2 = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.TH)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis_id=certified_job_app.eligibility_diagnosis_id,
+            administrative_criteria=level_2,
+            criteria_certified=True,
+            certification_period=InclusiveDateRange(certified_job_app.hiring_start_at),
+        )
+        now = timezone.now()
+        evaluation_campaign.populate(now)
+
+        criterion = EvaluatedAdministrativeCriteria.objects.get()
+        assert criterion.criteria_certified is True
+        assert criterion.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        assert criterion.evaluated_job_application.job_application_id == certified_job_app.pk
+
+        evaluated_job_app = EvaluatedJobApplication.objects.get(job_application=certified_job_app)
+        # EI requires 3 accepted level 2 criteria, i.e. a single one is not enough.
+        assert evaluated_job_app.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.PENDING
+        assert (
+            evaluated_job_app.should_select_criteria
+            == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+        )
+
+        evaluated_siae = evaluated_job_app.evaluated_siae
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.PENDING
+        assert evaluated_siae.reviewed_at is None
+        assert evaluated_siae.final_reviewed_at is None
+
     def test_populate_all_job_applications_certified(self, django_capture_on_commit_callbacks, mailoutbox):
         institution_membership = InstitutionMembershipFactory()
         evaluation_campaign = EvaluationCampaignFactory(institution=institution_membership.institution)
@@ -635,6 +674,7 @@ class TestEvaluationCampaignManager:
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=2),
             evaluated_job_application=evaluated_jobapp_accepted,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         refused_ts = timezone.now() - relativedelta(days=3)
@@ -803,6 +843,7 @@ class TestEvaluationCampaignManager:
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=6),
             evaluated_job_application=evaluated_jobapp_submitted,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
@@ -944,6 +985,7 @@ class TestEvaluationCampaignManager:
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=1),
             evaluated_job_application=evaluated_job_application,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         # DDETS accepted the document but forgot to validate
@@ -1230,7 +1272,9 @@ class TestEvaluatedSiaeModel:
         # one evaluated_administrative_criterion
         # empty : proof and submitted_at empty)
         evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof=None
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
+            proof=None,
         )
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -1579,6 +1623,7 @@ class TestEvaluatedSiaeModel:
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=2),
             submitted_at=timezone.now() - relativedelta(days=1),
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         with assertSnapshotQueries(snapshot):
@@ -1632,7 +1677,9 @@ class TestEvaluatedJobApplicationModel:
         assert evaluation_enums.EvaluatedJobApplicationsState.PENDING == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof=None
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=AdministrativeCriteria.objects.level1().first(),
+            proof=None,
         )
         assert evaluation_enums.EvaluatedJobApplicationsState.PROCESSING == evaluated_job_application.compute_state()
 
@@ -1678,6 +1725,49 @@ class TestEvaluatedJobApplicationModel:
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
         assert evaluated_job_application.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
+
+    def test_state_cumulated_accepted_level_2_criteria(self):
+        # Between 2 and 3 accepted level 2 criteria are required (2 for AI or ETTI, 3 otherwise) in order to validate
+        # the job application, i.e. the auto-prescription.
+        level_2a, level_2b, level_2c = AdministrativeCriteria.objects.level2()[:3]
+        level_1 = AdministrativeCriteria.objects.level1().first()
+        campaign = EvaluationCampaignFactory()
+
+        def certified_job_app(kind, criteria):
+            evaluated_job_application = EvaluatedJobApplicationFactory(
+                evaluated_siae__evaluation_campaign=campaign, evaluated_siae__siae__kind=kind
+            )
+            for criterion in criteria:
+                EvaluatedAdministrativeCriteriaFactory(
+                    evaluated_job_application=evaluated_job_application,
+                    administrative_criteria=criterion,
+                    submitted_at=timezone.now(),
+                    review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                    criteria_certified=True,
+                )
+            return evaluated_job_application
+
+        # CASE 1: A single certified level 2 criterion is not enough to validate the auto-prescription.
+        case_1 = certified_job_app(CompanyKind.EI, [level_2a])
+        assert case_1.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.PENDING
+        # It stays editable so the SIAE can make modifications.
+        assert case_1.should_select_criteria == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+
+        # CASE 2: Two certified level 2 criteria are still not enough for an EI (which requires 3).
+        case_2 = certified_job_app(CompanyKind.EI, [level_2a, level_2b])
+        assert case_2.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.PENDING
+
+        # CASE 3: Two certified level 2 criteria are enough for an AI (which requires 2).
+        case_3 = certified_job_app(CompanyKind.AI, [level_2a, level_2b])
+        assert case_3.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+        # Three certified level 2 criteria are enough for an EI.
+        case_3_ei = certified_job_app(CompanyKind.EI, [level_2a, level_2b, level_2c])
+        assert case_3_ei.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+
+        # CASE 4: A certified level 1 criterion validates the auto-prescription on its own, even alongside
+        # (unnecessary) level 2 criteria.
+        case_4 = certified_job_app(CompanyKind.EI, [level_1, level_2a])
+        assert case_4.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
 
     def test_should_select_criteria_with_mock(self, subtests):
         evaluated_job_application = EvaluatedJobApplicationFactory()
