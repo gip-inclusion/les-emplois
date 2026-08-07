@@ -59,23 +59,23 @@ class TestAnnouncementCampaignCache:
         campaign.delete()
         new_campaign.delete()
         with assertNumQueries(0):
-            assert automatic_modals(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request)["display_campaign_announce"] is False
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
         request = get_request(random_user_kind_factory())
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
-            assert automatic_modals(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request)["display_campaign_announce"] is False
 
         with assertNumQueries(0):
-            assert automatic_modals(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request)["display_campaign_announce"] is False
 
     def test_costless_announcement_campaign_cache_for_anonymous_user(self):
         request = get_request(AnonymousUser())
 
         with assertNumQueries(0):
-            assert automatic_modals(request) == {"display_campaign_announce": False}
+            assert automatic_modals(request)["display_campaign_announce"] is False
 
     @freeze_time("2024-01-31")
     def test_active_announcement_campaign_cache_timeout(self):

@@ -1632,27 +1632,55 @@ def test_geiq_eligibility_badge(snapshot, is_eligible, for_job_seeker):
     assert badges.geiq_eligibility_badge(is_eligible=is_eligible, for_job_seeker=for_job_seeker) == snapshot
 
 
-def test_automatic_modals_context_processor(client, settings, empty_active_announcements_cache):
-    AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
+class TestAutomaticModalsContextProcessor:
+    def test_campaign_announce(self, client, settings, empty_active_announcements_cache):
+        AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 
-    response = client.get(reverse("search:employers_results"))
-    assert response.status_code == 200
-    assert response.context["display_campaign_announce"] is False
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        assert response.context["display_campaign_announce"] is False
 
-    client.force_login(random_user_kind_factory())
-    response = client.get(reverse("search:employers_results"))
-    assert response.status_code == 200
-    assert response.context["display_campaign_announce"] is True
+        client.force_login(random_user_kind_factory())
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        assert response.context["display_campaign_announce"] is True
 
-    # The OTP verification page is only reachable by a user who must use our own 2FA
-    settings.REQUIRE_OTP_FOR_STAFF = True
-    staff_user = ItouStaffFactory()
-    ItouTOTPDeviceFactory(user=staff_user)
-    client.force_login(staff_user)
+        # The OTP verification page is only reachable by a user who must use our own 2FA
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        staff_user = ItouStaffFactory()
+        ItouTOTPDeviceFactory(user=staff_user)
+        client.force_login(staff_user)
 
-    response = client.get(reverse("otp_views:verify_otp") + "?next=%2Fadmin%2F")
-    assert response.status_code == 200
-    assert response.context["display_campaign_announce"] is False
+        response = client.get(reverse("otp_views:verify_otp") + "?next=%2Fadmin%2F")
+        assert response.status_code == 200
+        assert response.context["display_campaign_announce"] is False
+
+    def test_display_new_url_redirect(self, client, settings):
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        assert response.context["display_campaign_announce"] is False
+        assert response.context["display_new_url_redirect_modal"] is False
+
+        settings.REDIRECT_TO_NEW_URL = True
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        assert response.context["display_new_url_redirect_modal"] is False
+
+        AnnouncementCampaignFactory(with_item=True, live=True)
+
+        client.force_login(random_user_kind_factory())
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        assert response.context["display_campaign_announce"] is True
+        assert response.context["display_new_url_redirect_modal"] is False
+
+        staff_user = ItouStaffFactory()
+        ItouTOTPDeviceFactory(user=staff_user)
+        client.force_login(staff_user)
+        response = client.get(reverse("search:employers_results"))
+        assert response.status_code == 200
+        assert response.context["display_campaign_announce"] is False
+        assert response.context["display_new_url_redirect_modal"] is True
 
 
 class TestUtilsParseResponseToSoup:

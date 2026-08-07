@@ -1,5 +1,7 @@
 from urllib.parse import urlencode
 
+from django.conf import settings
+
 from itou.communications.cache import get_cached_active_announcement
 
 
@@ -19,12 +21,26 @@ def matomo(request):
 
 
 def automatic_modals(request):
-    if request.user and request.user.is_authenticated and not request.path.startswith("/otp/verify"):
-        if campaign := get_cached_active_announcement():
-            return {
-                "display_campaign_announce": True,
-                "active_campaign_announce": campaign,
-                "active_campaign_announce_items": campaign.items_for_template(request.user.kind),
-            }
+    user = request.user
+    context = {
+        "display_campaign_announce": False,
+        "display_new_url_redirect_modal": False,
+    }
 
-    return {"display_campaign_announce": False}
+    if (
+        settings.REDIRECT_TO_NEW_URL
+        and request.get_host() != settings.NEW_DOMAIN
+        and user.is_authenticated
+        and user.is_itou_staff
+    ):
+        context["display_new_url_redirect_modal"] = True
+        return context
+
+    if user and user.is_authenticated and not request.path.startswith("/otp/verify"):
+        if campaign := get_cached_active_announcement():
+            context["display_campaign_announce"] = True
+            context["active_campaign_announce"] = campaign
+            context["active_campaign_announce_items"] = campaign.items_for_template(user.kind)
+            return context
+
+    return context
