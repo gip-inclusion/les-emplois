@@ -840,6 +840,9 @@ class ProcessOrientationLink(models.Model):
         ordering = ["-created_at"]
         verbose_name = "lien magique de traitement"
         verbose_name_plural = "liens magiques de traitement"
+        permissions = [
+            ("create_process_orientation_link", "Can create a temporary magic link to process a given orientation")
+        ]
 
     @property
     def process_link(self):
