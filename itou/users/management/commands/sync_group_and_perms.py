@@ -11,6 +11,7 @@ PERMS_HIJACK = {"view", "hijack"}
 PERMS_READ = {"view"}
 
 # Permissions for specific staff actions
+PERMS_CREATE_PROCESS_ORIENTATION_LINK = {"create_process_orientation_link"}
 PERMS_DISABLE_PASSWORD_AUTH = {"disable_password_auth"}
 PERMS_EXPORT_FT_API_REJECTIONS = {"export_ft_api_rejections"}
 PERMS_EXPORT_JOB_APPLICATIONS_UNKNOWN_TO_FT = {"export_job_applications_unknown_to_ft"}
@@ -103,7 +104,7 @@ def get_permissions_dict():
         insertion_models.GenericReferenceItem: PERMS_READ,
         insertion_models.MobilizationEvent: PERMS_READ,
         insertion_models.Orientation: PERMS_READ,
-        insertion_models.ProcessOrientationLink: PERMS_READ,
+        insertion_models.ProcessOrientationLink: PERMS_READ | PERMS_CREATE_PROCESS_ORIENTATION_LINK,
         insertion_models.Service: PERMS_READ,
         insertion_models.Structure: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
