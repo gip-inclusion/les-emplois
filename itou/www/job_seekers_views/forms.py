@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.db.models import OuterRef, Q, Subquery
 from django.forms import ValidationError
@@ -9,6 +11,7 @@ from itou.approvals.models import Approval
 from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
+from itou.companies.models import Contract
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, JobSeekerProfileQuerySet, NirModificationRequest, User
@@ -18,6 +21,10 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
+
+
+APPROVAL_ENDING_SOON_DAYS = 90
+IAE_CONTRACT_ENDING_SOON_DAYS = 30
 
 
 class FilterForm(forms.Form):
@@ -34,9 +41,9 @@ class FilterForm(forms.Form):
     eligibility_validated = forms.BooleanField(label="Valide", required=False)
     eligibility_pending = forms.BooleanField(label="À valider", required=False)
 
-    pass_iae_active = forms.BooleanField(label="Valide", required=False)
-    pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
-    no_pass_iae = forms.BooleanField(label="Aucun", required=False)
+    approval_active = forms.BooleanField(label="Valide", required=False)
+    approval_expired = forms.BooleanField(label="Expiré", required=False)
+    no_approval = forms.BooleanField(label="Aucun", required=False)
 
     is_stalled = forms.BooleanField(label="N’afficher que les usagers sans solution", required=False)
 
@@ -44,12 +51,27 @@ class FilterForm(forms.Form):
         label="Nom de la personne", required=False, widget=Select2MultipleWidget
     )
 
+    # Fields only for authorized prescribers set in __init__
+    approval_ending_soon = None
+    contract_ending_soon = None
+
     def __init__(self, job_seeker_qs, data, *args, request, **kwargs):
         super().__init__(data, *args, **kwargs)
         self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seeker_qs, request)
         if request.current_organization:
             self.fields["organization_members"].choices = self._get_choices_for_organization_members(
                 job_seeker_qs, request.current_organization
+            )
+        if request.from_authorized_prescriber:
+            self.fields["approval_ending_soon"] = forms.BooleanField(
+                label="PASS IAE bientôt expiré",
+                required=False,
+                help_text=f"Dans les {APPROVAL_ENDING_SOON_DAYS} prochains jours",
+            )
+            self.fields["contract_ending_soon"] = forms.BooleanField(
+                label="Contrat IAE bientôt terminé",
+                required=False,
+                help_text=f"Dans les {IAE_CONTRACT_ENDING_SOON_DAYS} prochains jours",
             )
 
     def _get_choices_for_job_seeker(self, job_seeker_qs, request):
@@ -92,24 +114,58 @@ class FilterForm(forms.Form):
         elif self.cleaned_data.get("eligibility_pending") and not self.cleaned_data.get("eligibility_validated"):
             queryset = queryset.eligibility_pending()
 
-        # Approval (PASS IAE) status (all checkboxes checked = all cases, so do not filter out results)
-        pass_iae_filters = [
-            self.cleaned_data.get(key) for key in ("pass_iae_active", "pass_iae_expired", "no_pass_iae")
-        ]
-        if any(pass_iae_filters) and not all(pass_iae_filters):
-            last_approval_end_at = Subquery(
-                Approval.objects.filter(user=OuterRef("pk")).order_by("-end_at").values("end_at")[:1]
-            )
-            queryset = queryset.annotate(last_approval_end_at=last_approval_end_at)
+        today = timezone.localdate()
 
-            pass_status_filter = Q()
-            if self.cleaned_data.get("pass_iae_active"):
-                pass_status_filter |= Q(last_approval_end_at__gte=timezone.localdate())
-            if self.cleaned_data.get("pass_iae_expired"):
-                pass_status_filter |= Q(last_approval_end_at__lt=timezone.localdate())
-            if self.cleaned_data.get("no_pass_iae"):
-                pass_status_filter |= Q(last_approval_end_at__isnull=True)
-            filters.append(pass_status_filter)
+        # There are 2 filters using the user approval :
+        # - The  status
+        # - The upcoming approval end
+
+        # Approval status (all checkboxes checked = all cases, so do not filter out results).
+        approval_status_filters = [
+            self.cleaned_data.get(key) for key in ("approval_active", "approval_expired", "no_approval")
+        ]
+        use_approval_status = any(approval_status_filters) and not all(approval_status_filters)
+
+        # The "end of IAE journey" filters are reserved for authorized prescribers.
+        approval_ending_soon = self.cleaned_data.get("approval_ending_soon")
+
+        if use_approval_status or approval_ending_soon:
+            queryset = queryset.annotate(
+                last_approval_end_at=Subquery(
+                    Approval.objects.filter(user=OuterRef("pk")).order_by("-end_at").values("end_at")[:1]
+                )
+            )
+
+        if use_approval_status:
+            approval_status_filter = Q()
+            if self.cleaned_data.get("approval_active"):
+                approval_status_filter |= Q(last_approval_end_at__gte=today)
+            if self.cleaned_data.get("approval_expired"):
+                approval_status_filter |= Q(last_approval_end_at__lt=today)
+            if self.cleaned_data.get("no_approval"):
+                approval_status_filter |= Q(last_approval_end_at__isnull=True)
+            filters.append(approval_status_filter)
+
+        # Upcoming end of IAE journey (authorized prescribers only): the two conditions are combined
+        # with AND when both are checked. approval ending soon is reliable; IAE contract end dates come
+        # from ASP data that is partial and delayed by a few days.
+        contract_ending_soon = self.cleaned_data.get("contract_ending_soon")
+        if approval_ending_soon or contract_ending_soon:
+            end_of_journey_filter = Q()
+            if approval_ending_soon:
+                approval_window = (today, today + datetime.timedelta(days=APPROVAL_ENDING_SOON_DAYS))
+                end_of_journey_filter &= Q(last_approval_end_at__range=approval_window)
+            if contract_ending_soon:
+                queryset = queryset.annotate(
+                    last_contract_end_date=Subquery(
+                        Contract.objects.filter(job_seeker=OuterRef("pk"), end_date__isnull=False)
+                        .order_by("-end_date")
+                        .values("end_date")[:1]
+                    )
+                )
+                contract_window = (today, today + datetime.timedelta(days=IAE_CONTRACT_ENDING_SOON_DAYS))
+                end_of_journey_filter &= Q(last_contract_end_date__range=contract_window)
+            filters.append(end_of_journey_filter)
 
         if self.cleaned_data.get("is_stalled"):
             queryset = queryset.filter(

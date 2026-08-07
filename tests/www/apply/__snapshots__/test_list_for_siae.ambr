@@ -7506,8 +7506,8 @@
                       <li>
                           <div class="">
                               <div class="form-check">
-                                  <input class="form-check-input is-valid" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
-                                  <label class="form-check-label" for="id_pass_iae_active">
+                                  <input class="form-check-input is-valid" id="id_approval_active" name="approval_active" type="checkbox"/>
+                                  <label class="form-check-label" for="id_approval_active">
                                       Actif
                                   </label>
                               </div>
@@ -7516,8 +7516,8 @@
                       <li>
                           <div class="">
                               <div class="form-check">
-                                  <input class="form-check-input is-valid" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/>
-                                  <label class="form-check-label" for="id_pass_iae_suspended">
+                                  <input class="form-check-input is-valid" id="id_approval_suspended" name="approval_suspended" type="checkbox"/>
+                                  <label class="form-check-label" for="id_approval_suspended">
                                       Suspendu
                                   </label>
                               </div>
@@ -7526,8 +7526,8 @@
                       <li>
                           <div class="">
                               <div class="form-check">
-                                  <input class="form-check-input is-valid" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
-                                  <label class="form-check-label" for="id_pass_iae_expired">
+                                  <input class="form-check-input is-valid" id="id_approval_expired" name="approval_expired" type="checkbox"/>
+                                  <label class="form-check-label" for="id_approval_expired">
                                       Expiré
                                   </label>
                               </div>
