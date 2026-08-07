@@ -1,8 +1,12 @@
 import uuid
 
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404, redirect, reverse
+from django.urls import path
+from django.views.decorators.http import require_POST
 
 from itou.insertion.models import (
     GenericReferenceItem,
@@ -213,20 +217,34 @@ class OrientationTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     readonly_fields = ("transition", "from_state", "to_state", "timestamp")
 
 
-class OrientationProcessLinkInline(ReadonlyMixin, ItouTabularInline):
-    # TODO: add buttons to add and invalidate a link
+class OrientationProcessLinkInline(ItouTabularInline):
     model = OrientationProcessLink
     extra = 0
     fields = readonly_fields = ["id", "created_at", "first_opened_at", "process_link", "is_valid"]
     ordering = ["-created_at"]
+
+    def has_add_permission(self, request, obj):
+        return False
 
     @admin.display(description="En cours de validité", boolean=True)
     def is_valid(self, obj):
         return obj.is_valid
 
 
+@require_POST
+def create_orientation_process_link_view(request, orientation_id):
+    if not request.user.has_perm(f"{OrientationProcessLink._meta.app_label}.add_orientationprocesslink"):
+        raise PermissionDenied
+
+    orientation = get_object_or_404(Orientation, pk=orientation_id)
+    link = OrientationProcessLink.objects.create(orientation=orientation)
+    messages.success(request, f"Un lien magique a été créé : {link.process_link}")
+    return redirect(reverse("admin:insertion_orientation_change", kwargs={"object_id": orientation.pk}))
+
+
 @admin.register(Orientation)
-class OrientationAdmin(InsertionAdmin):
+class OrientationAdmin(ItouModelAdmin):
+    change_form_template = "admin/insertion/change_orientation_form.html"
     list_display = [
         "pk",
         "status",
@@ -308,6 +326,10 @@ class OrientationAdmin(InsertionAdmin):
         ),
     ]
 
+    def get_readonly_fields(self, request, obj=None):
+        # All fields remain readonly but the object is editable to allow deleting orientation process links
+        return [field.name for field in self.model._meta.fields + self.model._meta.many_to_many]
+
     def get_search_fields(self, request):
         search_fields = []
         search_term = request.GET.get("q", "").strip()
@@ -324,3 +346,13 @@ class OrientationAdmin(InsertionAdmin):
     def sender_organization_display(self, obj):
         organization = obj.sender_organization
         return organization.name if organization else "—"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        return [
+            path(
+                "<uuid:orientation_id>/create-orientation-process-link",
+                self.admin_site.admin_view(create_orientation_process_link_view),
+                name="insertion_create_orientation_process_link",
+            )
+        ] + urls
