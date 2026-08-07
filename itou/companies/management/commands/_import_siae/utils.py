@@ -43,7 +43,6 @@ def get_filename(filename_prefix, filename_extension, description=None):
         raise RuntimeError(f"No match found for {description}")
     if len(filenames) > 1:
         raise RuntimeError(f"Too many matches for {description}")
-    assert len(filenames) == 1
 
     filename = filenames[0]
     print(f"Selected file {filename} for {description}.")
@@ -283,11 +282,6 @@ def anonymize_fluxiae_df(df):
         for deletable_keyword in deletable_keywords:
             if deletable_keyword in column_name:
                 del df[column_name]
-
-    # Better safe than sorry when dealing with sensitive data!
-    for column_name in df.columns.tolist():
-        for deletable_keyword in deletable_keywords:
-            assert deletable_keyword not in column_name
 
     return df
 

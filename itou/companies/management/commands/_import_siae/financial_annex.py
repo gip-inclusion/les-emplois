@@ -27,7 +27,9 @@ def get_creatable_and_deletable_afs(af_number_to_row):
 
         # The AF already exists in db. Let's check if some of its fields have changed.
         row = af_number_to_row[af.number]
-        assert af.convention.kind == row.kind
+        assert af.convention.kind == row.kind, (
+            f"convention of af {af.id} has kind {af.convention.kind}, CSV has kind {row.kind}"
+        )
 
         updated_fields = set()
         for field in ["start_at", "end_at"]:
