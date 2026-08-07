@@ -93,8 +93,10 @@ def user_uses_external_mfa(user):
 def user_can_enroll_otp_device(user):
     """Whether our own 2FA applies to this user and the identity provider does not already
     handle it: enrolling a device is useful."""
-    return not user_uses_external_mfa(user) and (
-        user.show_upcoming_mfa_activation_banner or user_is_concerned_by_otp(user)
+    if user_uses_external_mfa(user):
+        return False
+    return (user.is_itou_staff and settings.REQUIRE_OTP_FOR_STAFF) or (
+        user.is_professional and settings.REQUIRE_MFA_FOR_PROS
     )
 
 
