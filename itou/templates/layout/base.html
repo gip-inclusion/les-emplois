@@ -166,7 +166,9 @@
             });
         </script>
 
-        {% block script %}{% endblock %}
+        {% block script %}
+            {% include "utils/redirect_to_new_url.html" %}
+        {% endblock %}
 
         {% if display_campaign_announce %}
             {% include "layout/_news_modal.html" %}

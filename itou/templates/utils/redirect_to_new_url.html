@@ -1,0 +1,38 @@
+{% if request.user and request.user.show_redirect_modal %}
+    <div class="modal fade" id="redirectToNewUrlModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="redirectToNewUrlModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="redirectToNewUrlModalLabel">Les Emplois changent d’adresse</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Les Emplois sont désormais accessibles à leur nouvelle adresse :</p>
+
+                    <p class="text-center">
+                        <a href="https://plateforme.inclusion.gouv.fr">https://plateforme.inclusion.gouv.fr</a>
+                    </p>
+                    <p>
+                        Nous vous invitons à mettre à jour vos favoris de
+                        navigateur, configurations d’auto-complétion de
+                        formulaire de connexion (gestionnaire de mot de passe),
+                        etc.
+                    </p>
+                    <p>
+                        En cliquant sur le bouton ci-dessous, vous pourrez
+                        continuer votre navigation sur la nouvelle
+                        adresse. Notez que, lors de votre première visite, vous
+                        devrez vous connecter à nouveau.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" href="https://plateforme.inclusion.gouv.fr{{ request.get_full_path }}">Poursuivre sur la nouvelle adresse des Emplois</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script nonce="{{ csp_nonce }}">
+        const redirectModal = new bootstrap.Modal(document.getElementById('redirectToNewUrlModal'), {})
+        redirectModal.toggle()
+    </script>
+{% endif %}

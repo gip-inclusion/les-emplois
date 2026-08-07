@@ -928,3 +928,5 @@ REQUIRE_MFA_ON_ORGANIZATION_IDS = _read_id_list("otp/data/mfa_required_organizat
 
 # Delay until job descriptions or spontaneous job applications are deactivated
 DEACTIVATION_DELAY = datetime.timedelta(days=90)
+
+REDIRECT_TO_NEW_URL = os.getenv("REDIRECT_TO_NEW_URL", "False") == "True"

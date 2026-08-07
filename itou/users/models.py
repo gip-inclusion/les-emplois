@@ -504,6 +504,13 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         return not ItouTOTPDevice.objects.filter(user=self, disabled_at=None).exists()
 
     @property
+    def show_redirect_modal(self):
+        if not settings.REDIRECT_TO_NEW_URL:
+            return False
+        # Progressively redirect users to the new URL.
+        return self.is_itou_staff
+
+    @property
     def is_itou_staff(self):
         return self.kind == UserKind.ITOU_STAFF
 
