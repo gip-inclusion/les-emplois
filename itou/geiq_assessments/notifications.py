@@ -55,7 +55,7 @@ class AssessmentReviewedForGeiqNotification(EmailNotification):
                 ).values_list("institution", flat=True),
             ).select_related("user")
         }
-        # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
+        # TODO: handle case where more than 2000 CC users are found (cf Brevo limit)
         email_message.cc = sorted(cc_user.email for cc_user in cc_users)
         return email_message
 
@@ -81,7 +81,7 @@ class AssessmentFixRequestedForGeiqNotification(EmailNotification):
                 ).values_list("institution", flat=True),
             ).select_related("user")
         }
-        # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
+        # TODO: handle case where more than 2000 CC users are found (cf Brevo limit)
         email_message.cc = sorted(cc_user.email for cc_user in cc_users)
         return email_message
 
