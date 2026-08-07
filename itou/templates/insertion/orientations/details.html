@@ -50,7 +50,7 @@
                             <div class="col-12 col-sm">
                                 <h2 class="h3{% if can_view_personal_information %} mb-0{% endif %}">Usager</h2>
                             </div>
-                            {% if can_view_personal_information %}
+                            {% if can_view_personal_information and not can_process %}
                                 <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
                                     <a href="{% url "job_seekers_views:details" public_id=orientation.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                        class="btn btn-ico btn-outline-primary"
@@ -160,7 +160,11 @@
 
                 {# Sidebar #}
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% include "insertion/includes/orientation_sidebar_for_sender.html" with service=orientation.service request=request only %}
+                    {% if not can_process %}
+                        {% include "insertion/includes/orientation_sidebar_for_sender.html" with service=orientation.service request=request only %}
+                    {% else %}
+                        {% include "insertion/includes/orientation_sidebar_for_service_provider.html" with orientation=orientation request=request only %}
+                    {% endif %}
                 </div>
             </div>
         </div>
