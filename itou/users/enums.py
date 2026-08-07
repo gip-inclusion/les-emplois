@@ -1,6 +1,4 @@
-"""
-Enums fields used in User models.
-"""
+import enum
 
 from django.db import models
 
@@ -69,3 +67,23 @@ class ActionKind(models.TextChoices):
     IAE_ELIGIBILITY = "IAE_ELIGIBILITY", "validation de l'éligibilité IAE"
     GEIQ_ELIGIBILITY = "GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"
     SELF_ASSIGN = "SELF_ASSIGN", "se positionner comme accompagnateur"
+
+
+class AssignmentEndReason(models.TextChoices):
+    AUTOMATIC = "AUTOMATIC", "automatique"
+    MANUAL = "MANUAL", "manuel"
+
+
+class JobSeekerAssignmentDisplayMode(enum.StrEnum):
+    ACTIVE_WITH_ORG_AND_MEMBERSHIP = "ACTIVE_WITH_ORG_AND_MEMBERSHIP"
+    ACTIVE_WITH_ORG_NO_MEMBERSHIP = "ACTIVE_WITH_ORG_NO_MEMBERSHIP"
+    ACTIVE_NO_ORG = "ACTIVE_NO_ORG"
+    UNKNOWN_ADVISOR = "UNKNOWN_ADVISOR"
+    INACTIVE_WITH_ORG = "INACTIVE_WITH_ORG"
+    INACTIVE_NO_ORG = "INACTIVE_NO_ORG"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)

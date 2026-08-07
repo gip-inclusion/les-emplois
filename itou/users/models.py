@@ -41,8 +41,10 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
+    AssignmentEndReason,
     IdentityCertificationAuthorities,
     IdentityProvider,
+    JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
     Title,
@@ -1623,15 +1625,17 @@ class JobSeekerAssignmentManager(models.Manager):
             company=company,
             last_action_kind=last_action_kind,
             assigned_to_unknown_advisor=assigned_to_unknown_advisor,
+            ended_at=None,
+            end_reason=None,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
-            update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor"],
+            update_fields=["updated_at", "last_action_kind", "assigned_to_unknown_advisor", "ended_at", "end_reason"],
             unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
         )
 
-    def assigned_to(self, professional, organization, from_all_coworkers=False):
+    def assigned_to(self, professional, organization, from_all_coworkers=False, archived=None):
         filters = [Q(professional=professional, prescriber_organization__isnull=True, company__isnull=True)]
         if organization:
             prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
@@ -1643,7 +1647,14 @@ class JobSeekerAssignmentManager(models.Manager):
                     Q(professional=professional, prescriber_organization=prescriber_organization, company=company)
                 )
 
-        return JobSeekerAssignment.objects.filter(or_queries(filters))
+        qs = JobSeekerAssignment.objects.filter(or_queries(filters))
+
+        match archived:
+            case True:
+                qs.exclude(ended_at=None)
+            case False:
+                qs.filter(ended_at=None)
+        return qs
 
 
 class JobSeekerAssignment(models.Model):
@@ -1692,6 +1703,15 @@ class JobSeekerAssignment(models.Model):
         default=False,
     )
 
+    reason = models.TextField(blank=True, verbose_name="motif d'accompagnement")
+    ended_at = models.DateTimeField(verbose_name="date de fin d'accompagnement", null=True, blank=True)
+    end_reason = models.CharField(
+        verbose_name="motif de fin",
+        null=True,
+        blank=True,
+        choices=AssignmentEndReason.choices,
+    )
+
     objects = JobSeekerAssignmentManager()
 
     class Meta:
@@ -1725,6 +1745,14 @@ class JobSeekerAssignment(models.Model):
                     "si elle est liée à un accompagnateur non référencé sur le service."
                 ),
             ),
+            models.CheckConstraint(
+                name="assignment_end_coherence",
+                violation_error_message="Incohérence du champ motif de fin",
+                condition=(
+                    models.Q(ended_at=None, end_reason=None)
+                    | models.Q(ended_at__isnull=False, end_reason__isnull=False)
+                ),
+            ),
         ]
 
     def __str__(self):
@@ -1743,3 +1771,22 @@ class JobSeekerAssignment(models.Model):
         if self.assigned_to_unknown_advisor:
             return None
         return self.professional
+
+    @cached_property
+    def is_still_member(self):
+        # Overrite obj._is_still_member in objects list to avoid 1+N queries
+        pass
+
+    @property
+    def display_mode(self):
+        if self.assigned_to_unknown_advisor:
+            return JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
+        if self.professional.is_active:
+            if self.organization:
+                if self.is_still_member:
+                    return JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP
+                return JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP
+            return JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG
+        if self.organization:
+            return JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG
+        return JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG

@@ -1,0 +1,66 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}
+    Profil de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False services_search_url=services_search_url service_search_event_option="services-search-from-details-advisors" only %}
+{% endblock %}
+
+{% block title_extra %}
+    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker active_nav_tab="advisors" back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Accompagnateurs</h2>
+
+            <form id="display-contact-info-form">
+                {% csrf_token %}{# Used by htmx posts #}
+            </form>
+            <div class="row">
+                <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                    <p>Accompagnateur actuels ({{ active_assignments|length }})</p>
+                    {% for assignment in active_assignments %}
+                        {% include "job_seekers_views/includes/advisor.html" with assignment=assignment request=request only %}
+                    {% endfor %}
+                    <p>Historique des accompagnateurs ({{ ended_assignments|length }})</p>
+                    {% for assignment in ended_assignments %}
+                        {% include "job_seekers_views/includes/advisor.html" with assignment=assignment request=request only %}
+                    {% endfor %}
+                </div>
+                <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                    <div class="c-box c-box--promo-partenaire">
+                        <div class="row g-0">
+                            <div class="col-12 col-md pe-3 pe-md-4 py-3 py-md-4">
+                                <h3 class="text-tertiary">Un même fil rouge entre intervenants</h3>
+                                <p>
+                                    Mon Récap facilite la coordination entre pros en rassemblant les infos essentielles du bénéficiaire dans un support papier. Équipez vos usagers dès aujourd’hui pour réduire les redites, fluidifier les relais et sécuriser l’accompagnement multi-acteurs.
+                                </p>
+                                <a href="https://mon-recap.inclusion.beta.gouv.fr/?mtm_campaign=Encart%20GPS" class="btn btn-block w-100 w-md-auto btn-outline-primary has-external-link">👉 Découvrir Mon Récap</a>
+                            </div>
+                            <div class="d-none d-md-inline-flex col-md-auto align-self-end">
+                                <div>
+                                    <img src="{% static 'img/illustration-mon-recap.png' %}" class="img-fluid" alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}

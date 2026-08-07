@@ -58,6 +58,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
@@ -257,6 +262,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -575,6 +585,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
@@ -867,6 +882,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
@@ -1120,6 +1140,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -1740,6 +1765,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -2567,6 +2597,11 @@
                           <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -3500,6 +3535,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
@@ -4378,6 +4418,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
@@ -4701,6 +4746,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
@@ -5012,6 +5062,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
@@ -5253,6 +5308,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -5552,6 +5612,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -5866,6 +5931,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
+                                  Accompagnateurs
+                              </a>
+                          </li>
+                          <li class="nav-item">
                               <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
@@ -6107,6 +6177,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -7064,6 +7139,9 @@
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason",
                  T3."id",
                  T3."password",
                  T3."last_login",
@@ -7348,6 +7426,11 @@
                           <li class="nav-item">
                               <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="accompagnateurs" href="/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Accompagnateurs
                               </a>
                           </li>
                           <li class="nav-item">
@@ -8446,6 +8529,9 @@
                  "users_jobseekerassignment"."company_id",
                  "users_jobseekerassignment"."last_action_kind",
                  "users_jobseekerassignment"."assigned_to_unknown_advisor",
+                 "users_jobseekerassignment"."reason",
+                 "users_jobseekerassignment"."ended_at",
+                 "users_jobseekerassignment"."end_reason",
                  T3."id",
                  T3."password",
                  T3."last_login",
