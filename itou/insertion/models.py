@@ -1,4 +1,6 @@
+import datetime
 import logging
+import uuid
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
@@ -6,6 +8,7 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
 from django.utils import timezone
@@ -812,3 +815,37 @@ class OrientationTransitionLog(xwf_models.BaseTransitionLog):
 
     def __str__(self):
         return str(self.id)
+
+
+class ProcessOrientationLink(models.Model):
+    DEFAULT_VALIDITY_DAYS = 7
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    orientation = models.ForeignKey(Orientation, on_delete=models.CASCADE, related_name="process_links")
+    validity_days = models.PositiveSmallIntegerField(
+        verbose_name="durée de validité en jours",
+        default=DEFAULT_VALIDITY_DAYS,
+        validators=[MinValueValidator(1), MaxValueValidator(90)],
+    )
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
+    first_opened_at = models.DateTimeField(verbose_name="date du premier clic", null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "lien magique de traitement"
+        verbose_name_plural = "liens magiques de traitement"
+
+    @property
+    def process_link(self):
+        """
+        Link present in the email sent to the service provider.
+        """
+        pass  # in a later commit
+
+    @property
+    def expiration_date(self):
+        return self.created_at + datetime.timedelta(days=self.validity_days)
+
+    @property
+    def has_expired(self):
+        return self.expiration_date <= timezone.now()

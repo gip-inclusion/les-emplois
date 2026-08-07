@@ -103,6 +103,7 @@ def get_permissions_dict():
         insertion_models.GenericReferenceItem: PERMS_READ,
         insertion_models.MobilizationEvent: PERMS_READ,
         insertion_models.Orientation: PERMS_READ,
+        insertion_models.ProcessOrientationLink: PERMS_READ,
         insertion_models.Service: PERMS_READ,
         insertion_models.Structure: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
