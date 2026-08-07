@@ -34,7 +34,7 @@
                 </thead>
                 <tbody>
                     {% for orientation in orientations_page %}
-                        {% url "insertion_views:orientation_details" orientation_id=orientation.id as details_url %}
+                        {% url "insertion_views:orientation_details_for_sender" orientation_id=orientation.id as details_url %}
                         <tr class="align-top">
                             <td>
                                 <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "orientation" "clic" "voir_orientation" %}>

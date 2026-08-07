@@ -1,0 +1,12 @@
+{% extends 'admin/change_form.html' %}
+{% block object-tools-items %}
+    {% if perms.insertion.create_process_orientation_link %}
+        <li>
+            <form method="post" action="{% url "admin:insertion_orientation_create_process_link" original.pk %}">
+                {% csrf_token %}
+                <input type="submit" value="Créer un lien magique de traitement" />
+            </form>
+        </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

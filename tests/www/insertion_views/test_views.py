@@ -1001,7 +1001,7 @@ class TestServices:
 
 class TestOrientationDetails:
     def get_orientation_url(self, orientation):
-        return reverse("insertion_views:orientation_details", kwargs={"orientation_id": orientation.id})
+        return reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id})
 
     def get_job_seeker_details_url(self, job_seeker):
         return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})

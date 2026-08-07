@@ -37,6 +37,15 @@ urlpatterns = [
         views.OrientationConfirmationView.as_view(),
         name="orientation_confirmation",
     ),
-    path("orientations/<uuid:orientation_id>/", views.orientation_details, name="orientation_details"),
+    path(
+        "orientations/<uuid:orientation_id>/",
+        views.orientation_details_for_sender,
+        name="orientation_details_for_sender",
+    ),
+    path(
+        "orientations/process/<uuid:link_id>/",
+        views.orientation_details_for_service_provider,
+        name="orientation_details_for_service_provider",
+    ),
     path("orientations/", views.orientations_list, name="orientations_list"),
 ]

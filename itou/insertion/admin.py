@@ -1,14 +1,19 @@
 import uuid
 
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404, redirect, reverse
+from django.urls import path
+from django.views.decorators.http import require_POST
 
 from itou.insertion.models import (
     GenericReferenceItem,
     MobilizationEvent,
     Orientation,
     OrientationTransitionLog,
+    ProcessOrientationLink,
     Service,
     Structure,
 )
@@ -203,8 +208,32 @@ class OrientationTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     readonly_fields = ("transition", "from_state", "to_state", "timestamp")
 
 
+class ProcessOrientationLinkInline(ReadonlyMixin, ItouTabularInline):
+    # TODO: add a buttons to invalidate a link
+    model = ProcessOrientationLink
+    extra = 0
+    fields = readonly_fields = ["id", "created_at", "first_opened_at", "process_link", "is_valid"]
+    ordering = ["-created_at"]
+
+    @admin.display(description="En cours de validité", boolean=True)
+    def is_valid(self, obj):
+        return bool(not obj.has_expired)
+
+
+@require_POST
+def create_process_link_view(request, orientation_id):
+    if not request.user.has_perm(f"{Orientation._meta.app_label}.create_process_link_view"):
+        raise PermissionDenied
+
+    orientation = get_object_or_404(Orientation, pk=orientation_id)
+    link = ProcessOrientationLink.objects.create(orientation=orientation)
+    messages.success(request, f"Un lien magique a été créé : {link.process_link}")
+    return redirect(reverse("admin:insertion_orientation_change", kwargs={"object_id": orientation.pk}))
+
+
 @admin.register(Orientation)
 class OrientationAdmin(InsertionAdmin):
+    change_form_template = "admin/insertion/change_orientation_form.html"
     list_display = [
         "pk",
         "status",
@@ -223,7 +252,7 @@ class OrientationAdmin(InsertionAdmin):
         "service__structure",
     ]
     ordering = ["-created_at"]
-    inlines = [OrientationTransitionLogInline]
+    inlines = [OrientationTransitionLogInline, ProcessOrientationLinkInline]
     fieldsets = [
         (
             "Orientation",
@@ -302,3 +331,13 @@ class OrientationAdmin(InsertionAdmin):
     def sender_organization_display(self, obj):
         organization = obj.sender_organization
         return organization.name if organization else "—"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        return [
+            path(
+                "<uuid:orientation_id>/create-process-link",
+                self.admin_site.admin_view(create_process_link_view),
+                name="insertion_orientation_create_process_link",
+            )
+        ] + urls
