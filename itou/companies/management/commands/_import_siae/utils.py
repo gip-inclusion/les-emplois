@@ -43,7 +43,6 @@ def get_filename(filename_prefix, filename_extension, description=None):
         raise RuntimeError(f"No match found for {description}")
     if len(filenames) > 1:
         raise RuntimeError(f"Too many matches for {description}")
-    assert len(filenames) == 1
 
     filename = filenames[0]
     print(f"Selected file {filename} for {description}.")
