@@ -9,6 +9,7 @@ from itou.insertion.models import (
     MobilizationEvent,
     Orientation,
     OrientationTransitionLog,
+    ProcessOrientationLink,
     Service,
     Structure,
 )
@@ -203,6 +204,18 @@ class OrientationTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     readonly_fields = ("transition", "from_state", "to_state", "timestamp")
 
 
+class ProcessOrientationLinkInline(ReadonlyMixin, ItouTabularInline):
+    # TODO: add buttons to add and invalidate a link
+    model = ProcessOrientationLink
+    extra = 0
+    fields = readonly_fields = ["id", "created_at", "first_opened_at", "process_link", "is_valid"]
+    ordering = ["-created_at"]
+
+    @admin.display(description="En cours de validité", boolean=True)
+    def is_valid(self, obj):
+        return bool(not obj.has_expired)
+
+
 @admin.register(Orientation)
 class OrientationAdmin(InsertionAdmin):
     list_display = [
@@ -223,7 +236,7 @@ class OrientationAdmin(InsertionAdmin):
         "service__structure",
     ]
     ordering = ["-created_at"]
-    inlines = [OrientationTransitionLogInline]
+    inlines = [OrientationTransitionLogInline, ProcessOrientationLinkInline]
     fieldsets = [
         (
             "Orientation",
