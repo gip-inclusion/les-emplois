@@ -42,5 +42,10 @@ urlpatterns = [
         views.orientation_details_for_sender,
         name="orientation_details_for_sender",
     ),
+    path(
+        "orientations/process/",
+        views.orientation_details_for_service_provider,
+        name="orientation_details_for_service_provider",
+    ),
     path("orientations/", views.orientations_list, name="orientations_list"),
 ]

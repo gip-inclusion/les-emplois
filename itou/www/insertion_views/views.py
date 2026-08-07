@@ -11,6 +11,7 @@ from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
@@ -650,8 +651,43 @@ def orientation_details_for_sender(request, orientation_id):
     context = {
         "orientation": orientation,
         "can_view_personal_information": can_view_personal_information(request, orientation.beneficiary),
+        "can_process": False,
         "back_url": get_safe_url(request, "back_url"),
         "matomo_custom_title": "Détail d’une orientation",
+    }
+
+    return render(request, template_name, context)
+
+
+@login_not_required
+def orientation_details_for_service_provider(request):
+    template_name = "insertion/orientations/details.html"
+
+    link = get_object_or_404(
+        insertion_models.OrientationProcessLink.objects.select_related(
+            "orientation",
+            "orientation__beneficiary",
+            "orientation__sender",
+            "orientation__service",
+            "orientation__service__structure",
+            "orientation__service__source",
+        ),
+        id=request.GET.get("token"),
+    )
+    if not link.is_valid:
+        # TODO: button to send an email with a new link
+        raise PermissionDenied()
+
+    if not link.first_opened_at:
+        link.first_opened_at = timezone.now()
+        link.save(update_fields=["first_opened_at"])
+
+    context = {
+        "orientation": link.orientation,
+        "can_view_personal_information": True,
+        "can_process": True,
+        "back_url": None,
+        "matomo_custom_title": "Détail d’une orientation pour offreur de service",
     }
 
     return render(request, template_name, context)
