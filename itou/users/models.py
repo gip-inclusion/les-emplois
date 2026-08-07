@@ -44,6 +44,7 @@ from itou.users.enums import (
     AssignmentEndReason,
     IdentityCertificationAuthorities,
     IdentityProvider,
+    JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
     Title,
@@ -1770,3 +1771,22 @@ class JobSeekerAssignment(models.Model):
         if self.assigned_to_unknown_advisor:
             return None
         return self.professional
+
+    @cached_property
+    def is_still_member(self):
+        # Overrite obj._is_still_member in objects list to avoid 1+N queries
+        pass
+
+    @property
+    def display_mode(self):
+        if self.assigned_to_unknown_advisor:
+            return JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
+        if self.professional.is_active:
+            if self.organization:
+                if self.is_still_member:
+                    return JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP
+                return JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP
+            return JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG
+        if self.organization:
+            return JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG
+        return JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG

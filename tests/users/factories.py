@@ -14,7 +14,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
-from itou.users.enums import ActionKind, IdentityProvider, Title, UserKind
+from itou.users.enums import ActionKind, IdentityProvider, JobSeekerAssignmentDisplayMode, Title, UserKind
 from itou.utils import triggers
 from itou.utils.mocks.address_format import (
     BAN_GEOCODING_API_RESULTS_MOCK,
@@ -482,3 +482,39 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
     job_seeker = factory.SubFactory(JobSeekerFactory)
     professional = factory.SubFactory(PrescriberFactory, membership=True)
     last_action_kind = factory.fuzzy.FuzzyChoice(ActionKind.values)
+
+    @factory.post_generation
+    def display_mode(obj, create, extracted, **kwargs):
+        from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+
+        match extracted:
+            case JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP:
+                assert obj.professional.is_active is True
+                if obj.prescriber_organization is None and obj.company is None:
+                    obj.prescriber_organization = PrescriberMembershipFactory(user=obj.professional).organization
+            case JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP:
+                assert obj.professional.is_active is True
+                if obj.prescriber_organization is None and obj.company is None:
+                    obj.prescriber_organization = PrescriberMembershipFactory(
+                        user=obj.professional, is_active=False
+                    ).organization
+            case JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG:
+                assert obj.professional.is_active is True
+                assert obj.company is None
+                assert obj.prescriber_organization is None
+            case JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR:
+                obj.assigned_to_unknown_advisor = True
+                if obj.prescriber_organization is None and obj.company is None:
+                    obj.prescriber_organization = PrescriberOrganizationFactory()
+            case JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG:
+                if obj.professional.is_active is True:
+                    obj.professional.is_active = False
+                    obj.professional.save()
+                if obj.prescriber_organization is None and obj.company is None:
+                    obj.prescriber_organization = PrescriberOrganizationFactory()
+            case JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG:
+                if obj.professional.is_active is True:
+                    obj.professional.is_active = False
+                    obj.professional.save()
+                assert obj.company is None
+                assert obj.prescriber_organization is None
