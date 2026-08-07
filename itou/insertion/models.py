@@ -11,6 +11,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Exists, OuterRef, Q, Value
+from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
@@ -27,6 +28,7 @@ from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.storage.s3 import generate_dora_storage_url
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_post_code
 
 
@@ -798,6 +800,10 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
             return
         return self.duration_weekly_hours * self.duration_weeks
 
+    @property
+    def sender_is_referent(self):
+        return self.referent_email == self.sender.email
+
 
 class OrientationTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "orientation"
@@ -836,7 +842,9 @@ class ProcessOrientationLink(models.Model):
         """
         Link present in the email sent to the service provider.
         """
-        pass  # in a later commit
+        return get_absolute_url(
+            reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": self.pk})
+        )
 
     @property
     def expiration_date(self):
