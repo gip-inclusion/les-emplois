@@ -118,7 +118,7 @@
       "service": 4,
       "situation": "[]",
       "situation_other": "",
-      "status": "MODÉRATION_EN_COURS"
+      "status": "EXPIRÉE"
     },
     "model": "insertion.orientation",
     "pk": "0ea06fa2-6c45-4a85-9755-13f1052fb576"

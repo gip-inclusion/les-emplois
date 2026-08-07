@@ -118,8 +118,6 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("OUVERTE", "En cours de traitement"),
-                            ("MODÉRATION_EN_COURS", "En cours de modération"),
-                            ("MODÉRATION_REJETÉE", "Rejetée par la modération"),
                             ("VALIDÉE", "Validée"),
                             ("EXPIRÉE", "Expirée"),
                             ("REFUSÉE", "Refusée"),
