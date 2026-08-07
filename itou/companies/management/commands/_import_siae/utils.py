@@ -283,11 +283,6 @@ def anonymize_fluxiae_df(df):
             if deletable_keyword in column_name:
                 del df[column_name]
 
-    # Better safe than sorry when dealing with sensitive data!
-    for column_name in df.columns.tolist():
-        for deletable_keyword in deletable_keywords:
-            assert deletable_keyword not in column_name
-
     return df
 
 
