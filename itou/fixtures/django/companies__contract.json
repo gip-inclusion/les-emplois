@@ -75,5 +75,17 @@
     },
     "model": "companies.contract",
     "pk": 9
+  },
+  {
+    "model": "companies.contract",
+    "pk": 10,
+    "fields": {
+      "company": 3852,
+      "details": "[]",
+      "end_date": null,
+      "job_seeker": 2,
+      "start_date": "2025-08-01",
+      "updated_at": "2025-08-01T09:00:00Z"
+    }
   }
 ]

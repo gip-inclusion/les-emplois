@@ -1,5 +1,4 @@
 import logging
-import urllib.parse
 from datetime import timedelta
 
 from django.conf import settings
@@ -7,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db.models import Exists, F, Max, OuterRef, Prefetch, Subquery
+from django.db.models import Exists, F, OuterRef, Prefetch, Subquery
 from django.db.models.base import Coalesce
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -17,10 +16,9 @@ from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
-from itou.approvals import enums as approvals_enums
+from itou.approvals import enums as approvals_enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.models import (
-    SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE,
     Approval,
     Prolongation,
     ProlongationRequest,
@@ -28,7 +26,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
-from itou.approvals.utils import get_contracts
+from itou.approvals.utils import can_close_approval, close_approval, get_contracts
 from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -182,44 +180,15 @@ class BaseApprovalDetailView(ReadonlyViewMixin, UserPassesTestMixin, DetailView)
         context["matomo_custom_title"] = "Détail PASS IAE"
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))
 
-        # Display or not the deletion form link
+        # Display the closure button (active or disabled) to employers
+        context["show_close_approval_button"] = self.request.from_employer and approval.is_in_progress
         context["approval_deletion_form_url"] = None
-        if self.request.from_employer and approval.is_in_progress:
-            approval_can_be_deleted = False
-
-            long_suspensions = [
-                suspension
-                for suspension in approval.suspension_set.all()
-                if (timezone.localdate() - suspension.start_at if suspension.is_in_progress else suspension.duration)
-                > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
-            ]
-
-            if any(suspension.is_in_progress for suspension in long_suspensions):
-                approval_can_be_deleted = True
-            elif long_suspensions:
-                last_hiring_start_at = approval.jobapplication_set.accepted().aggregate(Max("hiring_start_at"))[
-                    "hiring_start_at__max"
-                ]
-                if last_hiring_start_at is None or any(
-                    suspension.end_at > last_hiring_start_at for suspension in long_suspensions
-                ):
-                    approval_can_be_deleted = True
-
-            if approval_can_be_deleted:
-                # ... and no hiring after this suspension: this approval is eligible for deletion
-                context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
-                    {
-                        "siaeID": self.request.current_organization.pk,
-                        "nomSIAE": self.request.current_organization.display_name,
-                        "prenomemployeur": self.request.user.first_name,
-                        "nomemployeur": self.request.user.last_name,
-                        "emailemployeur": self.request.user.email,
-                        "userID": self.request.user.pk,
-                        "numPASS": approval.number_with_spaces,
-                        "prenomsalarie": approval.user.first_name,
-                        "nomsalarie": approval.user.last_name,
-                    }
-                )
+        if context["show_close_approval_button"] and can_close_approval(approval):
+            context["approval_deletion_form_url"] = reverse(
+                "approvals:close",
+                kwargs={"approval_id": approval.pk},
+                query={"back_url": self.request.get_full_path()},
+            )
 
         return context
 
@@ -718,6 +687,40 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         "preview": preview,
     }
     return render(request, template_name, context)
+
+
+@http_methods(db_write=["POST"])
+def close(request, approval_id):
+    siae = get_current_company_or_404(request)
+    approval = get_object_or_404(
+        Approval.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("pk"),
+                    to_company=siae,
+                    state=JobApplicationState.ACCEPTED,
+                )
+            )
+        ).select_related("user"),
+        pk=approval_id,
+    )
+
+    if not can_close_approval(approval):
+        raise PermissionDenied()
+
+    back_url = get_safe_url(
+        request, "back_url", fallback_url=reverse("approvals:details", kwargs={"public_id": approval.public_id})
+    )
+
+    close_approval(approval, closed_by=request.user)
+    notifications.ApprovalClosedForJobSeekerNotification(approval.user, siae, approval=approval).send()
+    logger.info("user=%s closed approval=%s", request.user.pk, approval.pk)
+    messages.error(
+        request,
+        f"PASS IAE clôturé||Le PASS IAE de {approval.user.get_inverted_full_name()} a bien été clôturé.",
+        extra_tags="toast",
+    )
+    return HttpResponseRedirect(back_url)
 
 
 @http_methods(db_readonly=["GET", "HEAD", "POST"])
