@@ -631,7 +631,7 @@ def orientations_list(request):
 
 
 @check_request(can_orient_towards_insertion_service)
-def orientation_details(request, orientation_id):
+def orientation_details_for_sender(request, orientation_id):
     template_name = "insertion/orientations/details.html"
 
     sender_prescriber_organization = (
