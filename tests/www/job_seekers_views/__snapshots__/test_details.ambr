@@ -201,6 +201,270 @@
   
   '''
 # ---
+# name: TestLastKnownAdvisor.test_display_advisor_contact_info
+  '''
+  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Dernier accompagnateur connu
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+              <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-outline-primary" type="submit">
+                      Me désigner dernier accompagnateur connu
+                  </button>
+              </form>
+          </div>
+      </div>
+      <form id="display-contact-info-form">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      </form>
+      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
+          <ul class="list-data mb-3">
+              <li>
+                  <small>
+                      Accompagnateur
+                  </small>
+                  <strong class="d-flex gap-2">
+                      Marie LAFORÊT
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Type
+                  </small>
+                  <strong>
+                      Professionnel
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Organisation
+                  </small>
+                  <i class="text-disabled">
+                      Sans organisation
+                  </i>
+              </li>
+              <li>
+                  <small>
+                      Accompagnateur depuis le
+                  </small>
+                  <strong>
+                      23/06/2026
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0707070707
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      marie.laforet@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_display_advisor_contact_info_as_job_seeker
+  '''
+  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Dernier accompagnateur connu
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+          </div>
+      </div>
+      <form id="display-contact-info-form">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      </form>
+      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
+          <ul class="list-data mb-3">
+              <li>
+                  <small>
+                      Accompagnateur
+                  </small>
+                  <strong class="d-flex gap-2">
+                      Marie LAFORÊT
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Type
+                  </small>
+                  <strong>
+                      Professionnel
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Organisation
+                  </small>
+                  <i class="text-disabled">
+                      Sans organisation
+                  </i>
+              </li>
+              <li>
+                  <small>
+                      Accompagnateur depuis le
+                  </small>
+                  <strong>
+                      30/06/2026
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0707070707
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      marie.laforet@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestLastKnownAdvisor.test_display_last_known_advisor
+  '''
+  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Dernier accompagnateur connu
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+          </div>
+      </div>
+      <form id="display-contact-info-form">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      </form>
+      <div id="card-788bc466-3747-4cdb-aafc-80c888d6b69d">
+          <ul class="list-data mb-3">
+              <li>
+                  <small>
+                      Accompagnateur
+                  </small>
+                  <strong class="d-flex gap-2">
+                      Pierre DUBOIS
+                      <span class="badge badge-xs rounded-pill bg-emploi-light text-primary font-weight-normal">
+                          c’est vous
+                      </span>
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Type
+                  </small>
+                  <strong>
+                      Professionnel
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Organisation
+                  </small>
+                  <strong>
+                      Pres. Org.
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Accompagnateur depuis le
+                  </small>
+                  <strong>
+                      30/06/2026
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0606060606
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0606060606" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      pierre.dubois@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dubois@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_both_diag_from_company[snapshot with GEIQ diag]
   '''
   <main class="s-main" id="main" role="main">
@@ -1417,270 +1681,6 @@
           </div>
       </section>
   </main>
-  
-  '''
-# ---
-# name: test_display_last_known_advisor
-  '''
-  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Dernier accompagnateur connu
-              </h3>
-          </div>
-          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-          </div>
-      </div>
-      <form id="display-contact-info-form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-      </form>
-      <div id="card-788bc466-3747-4cdb-aafc-80c888d6b69d">
-          <ul class="list-data mb-3">
-              <li>
-                  <small>
-                      Accompagnateur
-                  </small>
-                  <strong class="d-flex gap-2">
-                      Pierre DUBOIS
-                      <span class="badge badge-xs rounded-pill bg-emploi-light text-primary font-weight-normal">
-                          c’est vous
-                      </span>
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Type
-                  </small>
-                  <strong>
-                      Professionnel
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Organisation
-                  </small>
-                  <strong>
-                      Pres. Org.
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Accompagnateur depuis le
-                  </small>
-                  <strong>
-                      30/06/2026
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Téléphone
-                  </small>
-                  <strong>
-                      0606060606
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0606060606" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-              <li>
-                  <small>
-                      Adresse e-mail
-                  </small>
-                  <strong>
-                      pierre.dubois@test.local
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dubois@test.local" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-          </ul>
-      </div>
-  </div>
-  
-  '''
-# ---
-# name: test_display_last_known_advisor_contact_info
-  '''
-  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Dernier accompagnateur connu
-              </h3>
-          </div>
-          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <form action="/job-seekers/assign_oneself_as_advisor/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a" method="post">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-outline-primary" type="submit">
-                      Me désigner dernier accompagnateur connu
-                  </button>
-              </form>
-          </div>
-      </div>
-      <form id="display-contact-info-form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-      </form>
-      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
-          <ul class="list-data mb-3">
-              <li>
-                  <small>
-                      Accompagnateur
-                  </small>
-                  <strong class="d-flex gap-2">
-                      Marie LAFORÊT
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Type
-                  </small>
-                  <strong>
-                      Professionnel
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Organisation
-                  </small>
-                  <i class="text-disabled">
-                      Sans organisation
-                  </i>
-              </li>
-              <li>
-                  <small>
-                      Accompagnateur depuis le
-                  </small>
-                  <strong>
-                      23/06/2026
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Téléphone
-                  </small>
-                  <strong>
-                      0707070707
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-              <li>
-                  <small>
-                      Adresse e-mail
-                  </small>
-                  <strong>
-                      marie.laforet@test.local
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-          </ul>
-      </div>
-  </div>
-  
-  '''
-# ---
-# name: test_display_last_known_advisor_contact_info_as_job_seeker
-  '''
-  <div class="c-box mb-3 mb-md-4" id="last-known-advisor-7614fc4b-aef9-4694-ab17-12324300180a">
-      <div class="row mb-3">
-          <div class="col-12 col-sm">
-              <h3 class="mb-0">
-                  Dernier accompagnateur connu
-              </h3>
-          </div>
-          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-          </div>
-      </div>
-      <form id="display-contact-info-form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-      </form>
-      <div id="card-77f56f7f-8c45-469a-88c4-5748d497329d">
-          <ul class="list-data mb-3">
-              <li>
-                  <small>
-                      Accompagnateur
-                  </small>
-                  <strong class="d-flex gap-2">
-                      Marie LAFORÊT
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Type
-                  </small>
-                  <strong>
-                      Professionnel
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Organisation
-                  </small>
-                  <i class="text-disabled">
-                      Sans organisation
-                  </i>
-              </li>
-              <li>
-                  <small>
-                      Accompagnateur depuis le
-                  </small>
-                  <strong>
-                      30/06/2026
-                  </strong>
-              </li>
-              <li>
-                  <small>
-                      Téléphone
-                  </small>
-                  <strong>
-                      0707070707
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0707070707" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-              <li>
-                  <small>
-                      Adresse e-mail
-                  </small>
-                  <strong>
-                      marie.laforet@test.local
-                  </strong>
-                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="marie.laforet@test.local" type="button">
-                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                      </i>
-                      <span class="visually-hidden">
-                          Copier
-                      </span>
-                  </button>
-              </li>
-          </ul>
-      </div>
-  </div>
   
   '''
 # ---
