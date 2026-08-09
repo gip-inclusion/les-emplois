@@ -31,6 +31,7 @@ from itou.users.enums import (
     AssignmentEndReason,
     IdentityCertificationAuthorities,
     IdentityProvider,
+    JobSeekerAssignmentDisplayMode,
     LackOfNIRReason,
     LackOfPoleEmploiId,
     Title,
@@ -1508,3 +1509,50 @@ class TestJobSeekerAssignment:
         membership.save()
         del assignment.is_still_member  # clear cached property
         assert assignment.is_still_member is False
+
+    def test_display_mode(self):
+        # No org
+        assignment = JobSeekerAssignmentFactory()
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG
+
+        # No org and inactive
+        assignment = JobSeekerAssignmentFactory(professional__is_active=False)
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_NO_ORG
+
+        # With a company and no membership
+        assignment = JobSeekerAssignmentFactory(company=CompanyFactory())
+        assignment.is_still_member = False
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP
+
+        # With a company membership
+        assignment.is_still_member = True
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP
+
+        # Inactive with a company
+        assignment = JobSeekerAssignmentFactory(company=CompanyFactory(), professional__is_active=False)
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG
+
+        # With a precriber organization and no membership
+        assignment = JobSeekerAssignmentFactory(prescriber_organization=PrescriberOrganizationFactory())
+        assignment.is_still_member = False
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP
+
+        # with a prescriber membership
+        assignment.is_still_member = True
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP
+
+        # Inactive with a prescriber organization
+        assignment = JobSeekerAssignmentFactory(
+            prescriber_organization=PrescriberOrganizationFactory(), professional__is_active=False
+        )
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.INACTIVE_WITH_ORG
+
+        # With a company but assigned to a unknown user
+        assignment = JobSeekerAssignmentFactory(company=CompanyFactory(), assigned_to_unknown_advisor=True)
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
+
+        # With a prescriber organization but assigned to a unknown user
+        assignment = JobSeekerAssignmentFactory(
+            prescriber_organization=PrescriberOrganizationFactory(), assigned_to_unknown_advisor=True
+        )
+        assert assignment.display_mode == JobSeekerAssignmentDisplayMode.UNKNOWN_ADVISOR
