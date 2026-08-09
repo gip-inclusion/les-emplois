@@ -407,11 +407,6 @@ class TestGroupDetailsMembershipTab:
                     f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",
                     "user_organization_id=[PK of organization]",
                 ),
-                (
-                    "href",
-                    f"/gps/request-new-participant/{beneficiary.public_id}",
-                    "/gps/request-new-participant/[Public ID of beneficiary]",
-                ),
                 ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
                 ("id", f"card-{prescriber.public_id}", "card-[Public ID of prescriber]"),
                 ("id", f"card-{participant.public_id}", "card-[Public ID of participant]"),
