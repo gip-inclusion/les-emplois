@@ -22,7 +22,7 @@ from rest_framework import status
 from itou.companies.models import Company
 from itou.insertion import models as insertion_models
 from itou.insertion.division_labels import bulk_load_division_labels
-from itou.insertion.enums import MobilizationEventKind
+from itou.insertion.enums import MobilizationEventKind, OrientationStatus
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import (
     get_missing_orientation_beneficiary_field_labels,
@@ -671,15 +671,34 @@ def orientation_details_for_service_provider(request, link_id):
     if link.has_expired:
         # TODO: button to send an email with a new link
         raise PermissionDenied()
+    orientation = link.orientation
 
     if not link.first_opened_at:
         link.first_opened_at = timezone.now()
         link.save(update_fields=["first_opened_at"])
 
+    if request.method == "POST" and request.POST.get("action") == "accept":
+        if not orientation.accept.is_available():
+            messages.warning(request, "Cette orientation a déjà été traitée.", extra_tags="toast")
+        else:
+            orientation.accept()
+            messages.success(
+                request,
+                "Demande d’orientation acceptée||"
+                "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(
+                reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
+            )
+
+    actions_available = orientation.status == OrientationStatus.PENDING
+
     context = {
-        "orientation": link.orientation,
+        "orientation": orientation,
         "can_view_personal_information": True,
         "can_process": True,
+        "actions_available": actions_available,
         "back_url": None,
         "matomo_custom_title": "Détail d’une orientation pour offreur de service",
     }

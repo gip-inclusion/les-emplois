@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.decoupage_administratif.models import Department, Region
 from itoutils.django.testing import assertSnapshotQueries
@@ -28,6 +29,7 @@ from itou.insertion.models import (
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEvent,
+    Orientation,
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
@@ -36,6 +38,7 @@ from tests.insertion.factories import (
     GenericReferenceItemFactory,
     InPersonReceptionFactory,
     OrientationFactory,
+    ProcessOrientationLinkFactory,
     RemoteReceptionFactory,
     ServiceFactory,
     StructureFactory,
@@ -1309,6 +1312,67 @@ class TestOrientationDetails:
                 <span>Accéder au détail du service</span>
             </a>"""
         assertion(response, servce_button_markup, html=True)
+
+
+class TestProcessOrientationView:
+    def get_process_link_url(self, link):
+        return reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
+
+    @pytest.mark.parametrize("status", OrientationStatus.values)
+    def test_display_actions(self, client, status, snapshot):
+        with freeze_time("2026-08-01"):
+            link = ProcessOrientationLinkFactory(
+                orientation__status=status,
+                orientation__service__name="Accompagnement aux devoirs",
+                orientation__service__uid="uid-service",
+            )
+            response = client.get(self.get_process_link_url(link))
+
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector=".s-title-02",
+                    replace_in_attr=[("href", str(link.id), "[PK of ProcessOrientationLink]")],
+                )
+            )
+            == snapshot
+        )
+
+    def test_accept(self, client):
+        link = ProcessOrientationLinkFactory(
+            orientation__status=OrientationStatus.PENDING,
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        response = client.get(self.get_process_link_url(link))
+        assertContains(response, "<span>Accepter</span>", html=True)
+
+        accepted_at = timezone.now() + datetime.timedelta(hours=1)
+        with freeze_time(accepted_at):
+            response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
+        assertContains(response, "Demande d’orientation acceptée", html=True)
+        orientation = Orientation.objects.get()
+        assert orientation.status == OrientationStatus.ACCEPTED
+        assert orientation.updated_at == accepted_at
+
+        response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
+        assertContains(response, "Cette orientation a déjà été traitée.")
+        assert orientation.updated_at == accepted_at
+
+    def test_cannot_accept(self, client):
+        link = ProcessOrientationLinkFactory(
+            orientation__status=random.choice(
+                [OrientationStatus.ACCEPTED, OrientationStatus.REJECTED, OrientationStatus.EXPIRED]
+            ),
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        response = client.post(self.get_process_link_url(link), data={"action": "accept"})
+        assertContains(response, "Cette orientation a déjà été traitée.")
+
+        orientation = Orientation.objects.get()
+        assert orientation.status == link.orientation.status
 
 
 class TestOrientationsList:
