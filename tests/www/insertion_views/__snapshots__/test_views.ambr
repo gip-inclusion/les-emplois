@@ -972,24 +972,32 @@
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="ÉTUDE"/>
                                       <label class="form-check-label" for="id_statuses_1">
+                                          À l’étude
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
                                           Validée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                      <label class="form-check-label" for="id_statuses_2">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
                                           Expirée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                      <label class="form-check-label" for="id_statuses_3">
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_4">
                                           Refusée
                                       </label>
                                   </div>
@@ -1027,24 +1035,32 @@
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="ÉTUDE"/>
                                           <label class="form-check-label" for="id_statuses_1-top">
+                                              À l’étude
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
                                               Validée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                          <label class="form-check-label" for="id_statuses_2-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Expirée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                          <label class="form-check-label" for="id_statuses_3-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
                                               Refusée
                                           </label>
                                       </div>
@@ -1167,24 +1183,32 @@
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <input class="form-check-input" id="id_statuses_1" name="statuses" type="checkbox" value="ÉTUDE"/>
                                       <label class="form-check-label" for="id_statuses_1">
+                                          À l’étude
+                                      </label>
+                                  </div>
+                              </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                      <label class="form-check-label" for="id_statuses_2">
                                           Validée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_2" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                      <label class="form-check-label" for="id_statuses_2">
+                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                      <label class="form-check-label" for="id_statuses_3">
                                           Expirée
                                       </label>
                                   </div>
                               </li>
                               <li>
                                   <div class="form-check">
-                                      <input class="form-check-input" id="id_statuses_3" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                      <label class="form-check-label" for="id_statuses_3">
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                      <label class="form-check-label" for="id_statuses_4">
                                           Refusée
                                       </label>
                                   </div>
@@ -1271,24 +1295,32 @@
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_1" id="id_statuses_1-top" name="statuses" type="checkbox" value="ÉTUDE"/>
                                           <label class="form-check-label" for="id_statuses_1-top">
+                                              À l’étude
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="VALIDÉE"/>
+                                          <label class="form-check-label" for="id_statuses_2-top">
                                               Validée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_2" id="id_statuses_2-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
-                                          <label class="form-check-label" for="id_statuses_2-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="EXPIRÉE"/>
+                                          <label class="form-check-label" for="id_statuses_3-top">
                                               Expirée
                                           </label>
                                       </div>
                                   </li>
                                   <li class="dropdown-item">
                                       <div class="form-check">
-                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
-                                          <label class="form-check-label" for="id_statuses_3-top">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="REFUSÉE"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
                                               Refusée
                                           </label>
                                       </div>
@@ -2207,6 +2239,63 @@
                                   Accéder au détail du service
                               </span>
                           </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestProcessOrientationView.test_display_actions[\xc9TUDE]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-accent-03">
+                                  À l’étude
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/[PK of ProcessOrientationLink]/">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--action">
+                      <h2 class="visually-hidden">
+                          Actions rapides
+                      </h2>
+                      <div class="form-row align-items-center gx-3">
+                          <div class="form-group col-12 col-lg-auto">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Accepter
+                                      </span>
+                                  </button>
+                              </form>
+                          </div>
                       </div>
                   </div>
               </div>

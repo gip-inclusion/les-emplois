@@ -101,8 +101,26 @@ def test_beneficiary_contact_preferences_display(contact_preferences, other_cont
     assert orientation.beneficiary_contact_preferences_display == expected
 
 
-def test_transition_accept():
+def test_transition_process():
     orientation = OrientationFactory()
+    timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
+    with freeze_time(timestamp):
+        orientation.process()
+
+    log = OrientationTransitionLog.objects.get(
+        orientation=orientation,
+        transition=OrientationTransition.PROCESS,
+        from_state=OrientationStatus.PENDING,
+        to_state=OrientationStatus.PROCESSING,
+        timestamp=timestamp,
+    )
+    assert log.orientation.status == OrientationStatus.PROCESSING
+    assert log.orientation.updated_at == timestamp
+
+
+@pytest.mark.parametrize("from_state", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
+def test_transition_accept(from_state):
+    orientation = OrientationFactory(status=from_state)
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
         orientation.accept()
@@ -110,7 +128,7 @@ def test_transition_accept():
     log = OrientationTransitionLog.objects.get(
         orientation=orientation,
         transition=OrientationTransition.ACCEPT,
-        from_state=OrientationStatus.PENDING,
+        from_state=from_state,
         to_state=OrientationStatus.ACCEPTED,
         timestamp=timestamp,
     )
@@ -118,8 +136,9 @@ def test_transition_accept():
     assert log.orientation.updated_at == timestamp
 
 
-def test_transition_reject():
-    orientation = OrientationFactory()
+@pytest.mark.parametrize("from_state", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
+def test_transition_reject(from_state):
+    orientation = OrientationFactory(status=from_state)
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
         orientation.reject()
@@ -127,7 +146,7 @@ def test_transition_reject():
     log = OrientationTransitionLog.objects.get(
         orientation=orientation,
         transition=OrientationTransition.REJECT,
-        from_state=OrientationStatus.PENDING,
+        from_state=from_state,
         to_state=OrientationStatus.REJECTED,
         timestamp=timestamp,
     )
@@ -135,8 +154,9 @@ def test_transition_reject():
     assert log.orientation.updated_at == timestamp
 
 
-def test_transition_expire():
-    orientation = OrientationFactory()
+@pytest.mark.parametrize("from_state", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
+def test_transition_expire(from_state):
+    orientation = OrientationFactory(status=from_state)
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
         orientation.expire()
@@ -144,7 +164,7 @@ def test_transition_expire():
     log = OrientationTransitionLog.objects.get(
         orientation=orientation,
         transition=OrientationTransition.EXPIRE,
-        from_state=OrientationStatus.PENDING,
+        from_state=from_state,
         to_state=OrientationStatus.EXPIRED,
         timestamp=timestamp,
     )

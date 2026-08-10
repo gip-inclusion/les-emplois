@@ -692,7 +692,7 @@ def orientation_details_for_service_provider(request, link_id):
                 reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
             )
 
-    actions_available = orientation.status == OrientationStatus.PENDING
+    actions_available = orientation.status in [OrientationStatus.PENDING, OrientationStatus.PROCESSING]
 
     context = {
         "orientation": orientation,

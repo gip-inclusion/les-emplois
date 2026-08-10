@@ -1341,7 +1341,7 @@ class TestProcessOrientationView:
 
     def test_accept(self, client):
         link = ProcessOrientationLinkFactory(
-            orientation__status=OrientationStatus.PENDING,
+            orientation__status=random.choice([OrientationStatus.PENDING, OrientationStatus.PROCESSING]),
             orientation__service__name="Accompagnement aux devoirs",
             orientation__service__uid="uid-service",
         )
