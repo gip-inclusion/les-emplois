@@ -1,0 +1,16 @@
+{% load matomo %}
+
+<div class="c-box c-box--action">
+    <h2 class="visually-hidden">Actions rapides</h2>
+    <div class="form-row align-items-center gx-3">
+        <div class="form-group col-12 col-lg-auto">
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" type="submit" name="action" value="accept" {% matomo_event "orientation" "clic" "accepter" %}>
+                    <i class="ri-check-line fw-medium" aria-hidden="true"></i>
+                    <span>Accepter</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
