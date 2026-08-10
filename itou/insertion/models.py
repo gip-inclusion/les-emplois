@@ -625,9 +625,22 @@ class OrientationWorkflow(xwf_models.Workflow):
     initial_state = OrientationStatus.PENDING
 
     transitions = (
-        (OrientationTransition.ACCEPT, OrientationStatus.PENDING, OrientationStatus.ACCEPTED),
-        (OrientationTransition.REJECT, OrientationStatus.PENDING, OrientationStatus.REJECTED),
-        (OrientationTransition.EXPIRE, OrientationStatus.PENDING, OrientationStatus.EXPIRED),
+        (OrientationTransition.PROCESS, OrientationStatus.PENDING, OrientationStatus.PROCESSING),
+        (
+            OrientationTransition.ACCEPT,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.ACCEPTED,
+        ),
+        (
+            OrientationTransition.REJECT,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.REJECTED,
+        ),
+        (
+            OrientationTransition.EXPIRE,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.EXPIRED,
+        ),
     )
 
     log_model = "insertion.OrientationTransitionLog"
