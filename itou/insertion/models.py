@@ -626,7 +626,7 @@ class OrientationWorkflow(xwf_models.Workflow):
 
     transitions = (
         (OrientationTransition.ACCEPT, OrientationStatus.PENDING, OrientationStatus.ACCEPTED),
-        (OrientationTransition.REJECT, OrientationStatus.PENDING, OrientationStatus.REJECTED),
+        (OrientationTransition.REFUSE, OrientationStatus.PENDING, OrientationStatus.REFUSED),
         (OrientationTransition.EXPIRE, OrientationStatus.PENDING, OrientationStatus.EXPIRED),
     )
 
