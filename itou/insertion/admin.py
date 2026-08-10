@@ -275,6 +275,8 @@ class OrientationAdmin(ItouModelAdmin):
                     "duration_weekly_hours",
                     "duration_weeks",
                     "data_protection_commitment",
+                    "refusal_reasons",
+                    "refusal_details",
                 ]
             },
         ),
