@@ -430,7 +430,7 @@ class TestServices:
             uid="test-external-uid",
             name="Service avec lien externe",
             updated_on="2025-01-15",
-            is_orientable_with_form=False,
+            is_orientable_with_form=True,
             mobilization_modes_professionals_external_form_link="https://test.example.com",
             mobilization_modes_professionals_external_form_link_text="Test link",
             structure__uid="test-structure-external-uid",
@@ -460,12 +460,12 @@ class TestServices:
         assertContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, f'href="{external_link}"')
 
-    def test_detail_orientable_with_external_link_prefers_wizard(self, client):
+    def test_di_service_orientable_with_external_link_prefers_link(self, client, snapshot):
         user = PrescriberFactory(membership=True)
         external_link = "https://test.example.com"
         service = ServiceFactory(
             uid="test-orientable-ext-uid",
-            name="Service orientable avec lien externe",
+            name="DI service orientable avec lien externe",
             updated_on="2025-01-15",
             is_orientable_with_form=True,
             mobilization_modes_professionals_external_form_link=external_link,
@@ -473,10 +473,51 @@ class TestServices:
             structure__uid="test-structure-orientable-ext-uid",
             structure__updated_on="2025-01-15",
         )
+
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, f'href="{external_link}"')
+        assertNotContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
+        assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
+
+    def test_dora_service_orientable_with_form_and_external_link_prefers_wizard(self, client, snapshot):
+        user = PrescriberFactory(membership=True)
+        external_link = "https://test.example.com"
+        service = ServiceFactory(
+            uid="test-orientable-ext-uid",
+            name="Dora service orientable avec lien externe",
+            updated_on="2025-01-15",
+            is_orientable_with_form=True,
+            mobilization_modes_professionals_external_form_link=external_link,
+            mobilization_modes_professionals_external_form_link_text="Lien externe",
+            structure__uid="test-structure-orientable-ext-uid",
+            structure__updated_on="2025-01-15",
+            source__value="dora",
+        )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
         assertContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
-        assertNotContains(response, f'href="{external_link}"')
+        assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
+
+    def test_dora_service_not_orientable_with_form_prefers_external_link(self, client, snapshot):
+        user = PrescriberFactory(membership=True)
+        external_link = "https://test.example.com"
+        service = ServiceFactory(
+            uid="test-orientable-ext-uid",
+            name="Dora service pas orientable avec le formulaire qui a un lien externe",
+            updated_on="2025-01-15",
+            is_orientable_with_form=False,
+            mobilization_modes_professionals_external_form_link=external_link,
+            mobilization_modes_professionals_external_form_link_text="Lien externe",
+            structure__uid="test-structure-orientable-ext-uid",
+            structure__updated_on="2025-01-15",
+            source__value="dora",
+        )
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+        assertContains(response, f'href="{external_link}"')
+        assertNotContains(response, reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid}))
+        assert pretty_indented(parse_response_to_soup(response, ".c-box--action")) == snapshot
 
     def test_detail_orientable_and_user_authenticated(self, client, snapshot):
         user = PrescriberFactory(membership=True)
