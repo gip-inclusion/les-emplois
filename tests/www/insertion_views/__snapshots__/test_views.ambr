@@ -17,7 +17,7 @@
                           <div class="c-title__main">
                               <h1>
                                   S’hair vice
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info">
                                       En cours de traitement
                                   </span>
                               </h1>
@@ -580,7 +580,7 @@
                           <div class="c-title__main">
                               <h1>
                                   S’hair vice
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info">
                                       En cours de traitement
                                   </span>
                               </h1>
@@ -719,7 +719,7 @@
                           <div class="c-title__main">
                               <h1>
                                   Service complet
-                                  <span class="badge rounded-pill text-nowrap badge-base bg-success" id="state_00000000-1111-2222-3333-444444444444">
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-success">
                                       Validée
                                   </span>
                               </h1>
@@ -1396,7 +1396,7 @@
                                               </a>
                                           </td>
                                           <td>
-                                              <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_00000000-1111-2222-3333-444444444444">
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-info">
                                                   En cours de traitement
                                               </span>
                                           </td>
@@ -1435,7 +1435,7 @@
                                               </a>
                                           </td>
                                           <td>
-                                              <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_00000000-1111-2222-3333-555555555555">
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-danger">
                                                   Refusée
                                               </span>
                                           </td>
