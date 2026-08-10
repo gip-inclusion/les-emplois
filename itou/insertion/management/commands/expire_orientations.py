@@ -1,11 +1,11 @@
 import datetime
 
-from django.db.models import Q
+from django.db.models import OuterRef, Q, Subquery
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
 
-from itou.insertion.enums import OrientationStatus
-from itou.insertion.models import Orientation
+from itou.insertion.enums import OrientationStatus, OrientationTransition
+from itou.insertion.models import Orientation, OrientationTransitionLog
 from itou.utils.command import BaseCommand
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -21,11 +21,30 @@ class Command(BaseCommand):
     def handle(self, *, wet_run, limit, **options):
         now = timezone.now()
         to_expire = (
-            Orientation.objects.filter(
+            Orientation.objects.annotate(
+                last_process_log_timestamp=Subquery(
+                    OrientationTransitionLog.objects.filter(
+                        transition=OrientationTransition.PROCESS, orientation=OuterRef("pk")
+                    )
+                    .order_by("-timestamp")
+                    .values("timestamp")[:1]
+                )
+            )
+            .filter(
                 Q(
                     status=OrientationStatus.PENDING,
                     created_at__lte=now - datetime.timedelta(days=Orientation.PENDING_EXPIRATION_PERIOD_DAYS),
                 )
+                | Q(
+                    status=OrientationStatus.PROCESSING,
+                    last_process_log_timestamp__lte=now
+                    - datetime.timedelta(days=Orientation.PROCESSING_EXPIRATION_PERIOD_DAYS),
+                )
+                | Q(
+                    status=OrientationStatus.PROCESSING,
+                    last_process_log_timestamp__isnull=True,
+                    created_at__lte=now - datetime.timedelta(days=Orientation.PROCESSING_EXPIRATION_PERIOD_DAYS),
+                )  # Unlikely case where an orientation has manually been set to PROCESSING without a transition log
             )
             .select_related(
                 "beneficiary",

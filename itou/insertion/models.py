@@ -629,9 +629,22 @@ class OrientationWorkflow(xwf_models.Workflow):
     initial_state = OrientationStatus.PENDING
 
     transitions = (
-        (OrientationTransition.ACCEPT, OrientationStatus.PENDING, OrientationStatus.ACCEPTED),
-        (OrientationTransition.REFUSE, OrientationStatus.PENDING, OrientationStatus.REFUSED),
-        (OrientationTransition.EXPIRE, OrientationStatus.PENDING, OrientationStatus.EXPIRED),
+        (OrientationTransition.PROCESS, OrientationStatus.PENDING, OrientationStatus.PROCESSING),
+        (
+            OrientationTransition.ACCEPT,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.ACCEPTED,
+        ),
+        (
+            OrientationTransition.REFUSE,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.REFUSED,
+        ),
+        (
+            OrientationTransition.EXPIRE,
+            [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
+            OrientationStatus.EXPIRED,
+        ),
     )
 
     log_model = "insertion.OrientationTransitionLog"
@@ -843,6 +856,13 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
 
     # Transitions
     @xwf_models.transition()
+    def process(self):
+        if not self.sender_is_referent:
+            self.email_processing_orientation_for_referent.send()
+        self.notification_processing_for_beneficiary.send()
+        self.notification_processing_for_sender.send()
+
+    @xwf_models.transition()
     def accept(self):
         process_link = OrientationProcessLink.objects.create(orientation=self)
         process_link.email_accepted_orientation_for_structure.send()
@@ -887,6 +907,16 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         return orientation_notifications.NewOrientationForSender(self.sender, orientation=self)
 
     @property
+    def notification_processing_for_beneficiary(self):
+        return orientation_notifications.ProcessingOrientationForBeneficiary(self.beneficiary, orientation=self)
+
+    @property
+    def notification_processing_for_sender(self):
+        return orientation_notifications.ProcessingOrientationForSender(
+            self.sender, orientation=self, can_view_personal_information=self.sender_can_view_personal_information
+        )
+
+    @property
     def notification_accepted_for_beneficiary(self):
         return orientation_notifications.AcceptedOrientationForBeneficiary(self.beneficiary, orientation=self)
 
@@ -921,6 +951,16 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
         }
         subject = "insertion/email/new_for_referent_subject.txt"
         body = "insertion/email/new_for_referent_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_processing_orientation_for_referent(self):
+        to = [self.referent_email]
+        context = {
+            "orientation": self,
+        }
+        subject = "insertion/email/processing_for_referent_subject.txt"
+        body = "insertion/email/processing_for_referent_body.txt"
         return get_email_message(to, context, subject, body)
 
     @property

@@ -19,13 +19,21 @@ def test_expire_orientations(caplog, snapshot):
 
     with freeze_time(recent_datetime):
         recent_pending_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        recent_processing_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        recent_processing_orientation.process()
 
     with freeze_time(old_datetime):
         old_pending_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        old_processing_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        old_processing_orientation.process()
 
     with freeze_time(older_datetime):
         older_pending_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        older_processing_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        older_processing_orientation.process()
+        older_processing_orientation_without_log = OrientationFactory(status=OrientationStatus.PROCESSING)
         accepted_orientation = OrientationFactory()
+        accepted_orientation.process()  # an intermediary transition log should not interfere
         accepted_orientation.accept()
         refused_orientation = OrientationFactory(status=OrientationStatus.REFUSED)
         expired_orientation = OrientationFactory(status=OrientationStatus.EXPIRED)
@@ -35,24 +43,35 @@ def test_expire_orientations(caplog, snapshot):
             call_command("expire_orientations", wet_run=True)
 
     recent_pending_orientation.refresh_from_db()
+    recent_processing_orientation.refresh_from_db()
     old_pending_orientation.refresh_from_db()
+    old_processing_orientation.refresh_from_db()
     older_pending_orientation.refresh_from_db()
+    older_processing_orientation.refresh_from_db()
+    older_processing_orientation_without_log.refresh_from_db()
     accepted_orientation.refresh_from_db()
     refused_orientation.refresh_from_db()
     expired_orientation.refresh_from_db()
 
-    assert "Found 2 orientations to expire." in caplog.messages
+    assert "Found 4 orientations to expire." in caplog.messages
 
     # Too recent to be expired
     assert recent_pending_orientation.status == OrientationStatus.PENDING
-    assert recent_pending_orientation.updated_at != now
+    assert recent_processing_orientation.status == OrientationStatus.PROCESSING
+    assert old_processing_orientation.status == OrientationStatus.PROCESSING
+    for orientation in [recent_pending_orientation, recent_processing_orientation, old_processing_orientation]:
+        assert orientation.updated_at != now
 
     # Expired
     assert old_pending_orientation.status == OrientationStatus.EXPIRED
     assert older_pending_orientation.status == OrientationStatus.EXPIRED
+    assert older_processing_orientation.status == OrientationStatus.EXPIRED
+    assert older_processing_orientation_without_log.status == OrientationStatus.EXPIRED
     for orientation in [
         old_pending_orientation,
         older_pending_orientation,
+        older_processing_orientation,
+        older_processing_orientation_without_log,
     ]:
         assert orientation.updated_at == now
 
@@ -73,14 +92,15 @@ def test_expire_orientations_sequentially():
         old_pending_orientation = OrientationFactory(status=OrientationStatus.PENDING)
 
     with freeze_time(older_datetime):
-        older_pending_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        older_processing_orientation = OrientationFactory(status=OrientationStatus.PENDING)
+        older_processing_orientation.process()
 
     call_command("expire_orientations", wet_run=True, limit=1)
     assert set(Orientation.objects.filter(status=OrientationStatus.EXPIRED).values_list("pk", flat=True)) == {
-        older_pending_orientation.pk
+        older_processing_orientation.pk
     }
     call_command("expire_orientations", wet_run=True, limit=1)
     assert set(Orientation.objects.filter(status=OrientationStatus.EXPIRED).values_list("pk", flat=True)) == {
-        older_pending_orientation.pk,
+        older_processing_orientation.pk,
         old_pending_orientation.pk,
     }
