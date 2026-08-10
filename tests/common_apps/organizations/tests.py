@@ -1,7 +1,14 @@
+from functools import partial
+
+import pytest
+
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
+from tests.companies.factories import CompanyFactory
+from tests.institutions.factories import InstitutionFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 
 
 def assert_set_admin_role_creation(user, organization, mailoutbox):
@@ -43,3 +50,17 @@ def assert_set_admin_role_removal(user, organization, mailoutbox):
     assert f"[TEST] [Désactivation] Vous n'êtes plus administrateur de {organization.display_name}" == email.subject
     assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
     assert email.to[0] == user.email
+
+
+@pytest.mark.parametrize(
+    "factory,expected",
+    (
+        (PrescriberOrganizationFactory, "orienteur"),
+        (partial(PrescriberOrganizationFactory, authorized=True), "prescripteur habilité"),
+        (CompanyFactory, "employeur"),
+        (InstitutionFactory, "institutionnel"),
+    ),
+)
+def test_member_kind_display(factory, expected):
+    org = factory()
+    assert org.member_kind_display == expected
