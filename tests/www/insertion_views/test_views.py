@@ -1339,6 +1339,40 @@ class TestProcessOrientationView:
             == snapshot
         )
 
+    def test_process(self, client):
+        link = ProcessOrientationLinkFactory(
+            orientation__status=OrientationStatus.PENDING,
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        response = client.get(self.get_process_link_url(link))
+        assertContains(response, "<span>Étudier</span>", html=True)
+
+        processing_at = timezone.now() + datetime.timedelta(hours=1)
+        with freeze_time(processing_at):
+            response = client.post(self.get_process_link_url(link), data={"action": "process"}, follow=True)
+        assertContains(response, "Demande d’orientation à l’étude", html=True)
+        orientation = Orientation.objects.get()
+        assert orientation.status == OrientationStatus.PROCESSING
+        assert orientation.updated_at == processing_at
+
+        response = client.post(self.get_process_link_url(link), data={"action": "process"}, follow=True)
+        assertContains(response, "Cette orientation ne peut pas être mise à l’étude")
+
+        assert orientation.updated_at == processing_at
+
+    def test_cannot_process(self, client):
+        link = ProcessOrientationLinkFactory(
+            orientation__status=random.choice(list(set(OrientationStatus.values) - {OrientationStatus.PENDING.value})),
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        response = client.post(self.get_process_link_url(link), data={"action": "process"})
+        assertContains(response, "Cette orientation ne peut pas être mise à l’étude.")
+
+        orientation = Orientation.objects.get()
+        assert orientation.status == link.orientation.status
+
     def test_accept(self, client):
         link = ProcessOrientationLinkFactory(
             orientation__status=random.choice([OrientationStatus.PENDING, OrientationStatus.PROCESSING]),
