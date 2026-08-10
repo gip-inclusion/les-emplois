@@ -516,7 +516,7 @@ def test_display_last_known_advisor(client, snapshot):
         created_at=timezone.now() - datetime.timedelta(days=7),
         updated_at=timezone.now() - datetime.timedelta(days=7),
     )
-    last_advisor = last_assignment.professional
+    last_advisor = last_assignment.advisor
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
     client.force_login(prescriber)
@@ -575,7 +575,7 @@ def test_display_last_known_advisor_contact_info(client, snapshot):
         created_at=timezone.now() - datetime.timedelta(days=7),
         updated_at=timezone.now() - datetime.timedelta(days=7),
     )
-    last_known_advisor = last_assignment.professional
+    last_known_advisor = last_assignment.advisor
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
     display_phone_url = reverse(
         "job_seekers_views:display_last_known_advisor_contact_info", args=(job_seeker.public_id, "phone")
@@ -629,7 +629,7 @@ def test_display_last_known_advisor_contact_info_as_job_seeker(client, snapshot)
         professional__email="marie.laforet@test.local",
         professional__phone="0707070707",
     )
-    last_known_advisor = last_assignment.professional
+    last_known_advisor = last_assignment.advisor
     url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.id})
     display_phone_url = reverse(
         "job_seekers_views:display_last_known_advisor_contact_info", args=(job_seeker.public_id, "phone")

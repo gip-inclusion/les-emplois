@@ -21,11 +21,11 @@
             {% endif %}
         </div>
     </div>
-    {% if job_seeker.last_advisor_with_org.0 %}
+    {% if job_seeker.last_assignment and job_seeker.last_assignment.advisor %}
         <form id="display-contact-info-form">
             {% csrf_token %}{# Used by htmx posts #}
         </form>
-        {% with last_advisor=job_seeker.last_advisor_with_org.0 last_advisor_org=job_seeker.last_advisor_with_org.1 %}
+        {% with last_advisor=job_seeker.last_assignment.advisor last_advisor_org=job_seeker.last_assignment.organization %}
             <div id="card-{{ last_advisor.public_id }}">
                 <ul class="list-data mb-3">
                     <li>

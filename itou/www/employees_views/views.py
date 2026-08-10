@@ -108,8 +108,11 @@ class EmployeeDetailView(ReadonlyViewMixin, DetailView):
         eligibility_diagnosis = job_application and job_application.get_eligibility_diagnosis()
 
         professional, organization = self.request.user, self.request.current_organization
-        is_last_known_advisor = (professional, organization) == self.object.last_advisor_with_org
-
+        last_assignment = self.object.last_assignment
+        is_last_known_advisor = last_assignment and (professional, organization) == (
+            last_assignment.advisor,
+            last_assignment.organization,
+        )
         is_advisor = (
             is_last_known_advisor
             or JobSeekerAssignment.objects.assigned_to(professional, organization)

@@ -2485,7 +2485,6 @@
       dict({
         'origin': list([
           'User.last_assignment[users/models.py]',
-          'User.last_advisor_with_org[users/models.py]',
           'details_for_company[www/apply/views/process_views.py]',
           '_check_request_view_wrapper[utils/auth.py]',
         ]),

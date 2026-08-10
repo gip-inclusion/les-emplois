@@ -56,7 +56,7 @@
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.advisors|length }}</td>
                             <td>
-                                {{ job_seeker.last_advisor_with_org.0.get_inverted_full_name|default:"Non précisé" }} ({{ job_seeker.last_advisor_with_org.1.name|default:"Non précisé" }})
+                                {{ job_seeker.last_assignment.advisor.get_inverted_full_name|default:"Non précisé" }} ({{ job_seeker.last_assignment.organization.display_name|default:"Non précisé" }})
                             </td>
                             <td class="text-end {% if job_seeker.show_more_actions %}w-100px{% else %}w-50px{% endif %}">
                                 {% url "search:employers_results" as search_url %}
