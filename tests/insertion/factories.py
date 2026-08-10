@@ -5,7 +5,7 @@ import factory
 import factory.fuzzy
 from django.utils import timezone
 
-from itou.insertion.enums import MobilizationEventKind, OrientationStatus
+from itou.insertion.enums import MobilizationEventKind, OrientationRefusalReason, OrientationStatus
 from itou.insertion.models import (
     GenericReferenceItem,
     GenericReferenceItemKind,
@@ -130,6 +130,9 @@ class OrientationFactory(factory.django.DjangoModelFactory):
     referent_email = factory.Faker("email")
     referent_phone = "0142030405"
     data_protection_commitment = True
+    refusal_reasons = factory.LazyAttribute(
+        lambda obj: [OrientationRefusalReason.NOT_MOBILE] if obj.status == OrientationStatus.REFUSED else []
+    )
     status = OrientationStatus.PENDING
 
 

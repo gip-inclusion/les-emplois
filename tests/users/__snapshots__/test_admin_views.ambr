@@ -572,6 +572,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."refusal_reasons",
+                 "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
                  "insertion_orientation"."processing_date",
                  "insertion_orientation"."duration_weekly_hours",
