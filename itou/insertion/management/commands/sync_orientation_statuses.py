@@ -96,7 +96,7 @@ class Command(BaseCommand):
             # Manually create a log transition to have a correct timestamp
             transition = {
                 OrientationStatus.ACCEPTED: OrientationTransition.ACCEPT,
-                OrientationStatus.REJECTED: OrientationTransition.REJECT,
+                OrientationStatus.REFUSED: OrientationTransition.REFUSE,
                 OrientationStatus.EXPIRED: OrientationTransition.EXPIRE,
                 OrientationStatus.PENDING: None,
             }[OrientationStatus(dora_status.status)]
