@@ -698,7 +698,7 @@ def orientation_details_for_service_provider(request):
                 reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
             )
 
-    has_actions = orientation.status == OrientationStatus.PENDING
+    has_actions = orientation.status in [OrientationStatus.PENDING, OrientationStatus.PROCESSING]
 
     context = {
         "orientation": orientation,

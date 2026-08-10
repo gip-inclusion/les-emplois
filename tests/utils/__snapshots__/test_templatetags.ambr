@@ -641,3 +641,6 @@
 # name: test_orientation_state_badge[VALID\xc9E]
   '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success">Validée</span>'
 # ---
+# name: test_orientation_state_badge[\xc9TUDE]
+  '<span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary">À l’étude</span>'
+# ---

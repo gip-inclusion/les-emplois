@@ -1507,9 +1507,10 @@ class TestOrientationDetailsForServiceProvider:
             == snapshot
         )
 
-    def test_accept(self, client):
+    @pytest.mark.parametrize("from_status", [OrientationStatus.PENDING, OrientationStatus.PROCESSING])
+    def test_accept(self, client, from_status):
         link = OrientationProcessLinkFactory(
-            orientation__status=OrientationStatus.PENDING,
+            orientation__status=from_status,
             orientation__service__name="Accompagnement aux devoirs",
             orientation__service__uid="uid-service",
         )
