@@ -45,7 +45,7 @@
         {% endfragment %}
     {% endcomponent_title %}
     {% if can_process and has_actions %}
-        {% include "insertion/includes/orientations/service_provider_actions.html" with csrf_token=csrf_token only %}
+        {% include "insertion/includes/orientations/service_provider_actions.html" with link=link csrf_token=csrf_token only %}
     {% endif %}
 {% endblock %}
 

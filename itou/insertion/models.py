@@ -647,6 +647,8 @@ class OrientationWorkflow(xwf_models.Workflow):
 
 
 class Orientation(xwf_models.WorkflowEnabled, models.Model):
+    PROCESSING_EXPIRATION_PERIOD_DAYS = 60  # arbitrarily set to twice the PENDING period
+
     id = models.UUIDField(primary_key=True, editable=False)
 
     beneficiary = models.ForeignKey(
