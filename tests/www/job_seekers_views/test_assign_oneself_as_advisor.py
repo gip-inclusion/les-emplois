@@ -35,7 +35,7 @@ def test_view(client):
         extra_tags="toast",
     )
 
-    assert job_seeker.last_advisor_with_org == (assignment.professional, None)
+    assert job_seeker.last_assignment == assignment
 
     client.force_login(professional)
 
@@ -45,7 +45,8 @@ def test_view(client):
     assertRedirects(response, reverse("job_seekers_views:list"), fetch_redirect_response=False)
     del job_seeker.last_assignment
     last_assignment = job_seeker.last_assignment
-    assert job_seeker.last_advisor_with_org == (professional, organization)
+    assert last_assignment.advisor == professional
+    assert last_assignment.organization == organization
     assert last_assignment.last_action_kind == ActionKind.SELF_ASSIGN
     assertMessages(response, [SUCCESS_MESSAGE])
 

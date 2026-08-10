@@ -101,9 +101,10 @@ def build_services_search_url(request, job_seeker):
 
 
 def assign_user_as_job_seeker_last_advisor(request, job_seeker):
-    last_advisor, last_advisor_org = job_seeker.last_advisor_with_org
-    if (last_advisor and last_advisor.pk == request.user.pk) and (
-        last_advisor_org and last_advisor_org.pk == request.current_organization.pk
+    if (
+        job_seeker.last_assignment
+        and job_seeker.last_assignment.advisor == request.user
+        and job_seeker.last_assignment.organization == request.current_organization
     ):
         messages.info(
             request,
@@ -194,7 +195,11 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
 
         # Last advisor context
         professional, organization = self.request.user, self.request.current_organization
-        is_last_known_advisor = (professional, organization) == self.object.last_advisor_with_org
+        last_assignment = self.object.last_assignment
+        is_last_known_advisor = last_assignment and (professional, organization) == (
+            last_assignment.advisor,
+            last_assignment.organization,
+        )
         is_advisor = (
             is_last_known_advisor
             or JobSeekerAssignment.objects.assigned_to(professional, organization)
@@ -435,7 +440,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
         professional, organization = request.user, request.current_organization
-        job_seeker.user_is_last_known_advisor = (professional, organization) == job_seeker.last_advisor_with_org
+        last_assignment = job_seeker.last_assignment
+        job_seeker.user_is_last_known_advisor = last_assignment and (professional, organization) == (
+            last_assignment.advisor,
+            last_assignment.organization,
+        )
         job_seeker.user_is_advisor = request.user.pk in job_seeker.advisors
 
     context = {
@@ -1614,6 +1623,5 @@ def display_last_known_advisor_contact_info(request, job_seeker_public_id, mode)
         raise ValueError("Invalid mode: %s", mode)
 
     job_seeker = get_object_or_404(User, public_id=job_seeker_public_id, kind=UserKind.JOB_SEEKER)
-
-    last_advisor, _ = job_seeker.last_advisor_with_org
+    last_advisor = job_seeker.last_assignment.advisor if job_seeker.last_assignment else None
     return render(request, template_name, {"last_advisor": last_advisor})
