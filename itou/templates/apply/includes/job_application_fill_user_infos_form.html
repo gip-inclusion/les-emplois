@@ -4,7 +4,7 @@
 <h2 class="h3">Candidat</h2>
 
 {% if form_personal_data.birth_name %}
-    {% include "job_seekers_views/includes/warning_new_birth_name_field.html" %}
+    {% include "job_seekers_views/includes/warning_new_birth_name_field.html" only %}
 {% endif %}
 
 {% if form_personal_data %}
