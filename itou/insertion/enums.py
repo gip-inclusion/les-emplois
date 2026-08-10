@@ -42,11 +42,11 @@ class OrientationStatus(models.TextChoices):
     PROCESSING = "ÉTUDE", "À l’étude"
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
-    REJECTED = "REFUSÉE", "Refusée"
+    REFUSED = "REFUSÉE", "Déclinée"
 
 
 class OrientationTransition(enum.StrEnum):
     PROCESS = "process"
     ACCEPT = "accept"
-    REJECT = "reject"
+    REFUSE = "refuse"
     EXPIRE = "expire"

@@ -172,7 +172,7 @@ def orientation_state_badge(orientation, *, extra_classes="badge-sm mb-1"):
         OrientationStatus.PENDING: "bg-info",
         OrientationStatus.PROCESSING: "bg-accent-03 text-primary",
         OrientationStatus.ACCEPTED: "bg-success",
-        OrientationStatus.REJECTED: "bg-danger",
+        OrientationStatus.REFUSED: "bg-danger",
         OrientationStatus.EXPIRED: "bg-emploi-light",
     }[orientation.status]
     attrs = [
