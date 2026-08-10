@@ -51,6 +51,7 @@ from itou.www.insertion_views.forms import (
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
     OrientationsFilterForm,
+    RefusalOrientationForm,
 )
 from itou.www.utils.wizard import WizardView
 
@@ -713,12 +714,63 @@ def orientation_details_for_service_provider(request, link_id):
 
     context = {
         "orientation": orientation,
-        "link": "link",
+        "link": link,
         "can_view_personal_information": True,
         "can_process": True,
         "actions_available": actions_available,
         "back_url": None,
         "matomo_custom_title": "Détail d’une orientation pour offreur de service",
+    }
+
+    return render(request, template_name, context)
+
+
+# TODO: 404 for logged in users
+@login_not_required
+def refuse_orientation(request, link_id):
+    template_name = "insertion/orientations/refuse.html"
+
+    link = get_object_or_404(
+        insertion_models.ProcessOrientationLink.objects.filter(
+            orientation__status__in=[OrientationStatus.PENDING, OrientationStatus.PROCESSING]
+        ).select_related(
+            "orientation",
+            "orientation__beneficiary",
+            "orientation__sender",
+            "orientation__service",
+            "orientation__service__structure",
+        ),
+        id=link_id,
+    )
+    if link.has_expired:
+        # TODO: button to send an email with a new link
+        raise PermissionDenied()
+    orientation = link.orientation
+
+    if not link.first_opened_at:
+        link.first_opened_at = timezone.now()
+        link.save(update_fields=["first_opened_at"])
+
+    form = RefusalOrientationForm(instance=orientation, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        orientation = form.save(commit=False)
+        orientation.refuse()
+        messages.error(
+            request,
+            "Demande d’orientation déclinée||"
+            "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(
+            reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
+        )
+
+    context = {
+        "orientation": orientation,
+        "form": form,
+        "reset_url": reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id}),
+        "matomo_custom_title": "Décliner une orientation",
     }
 
     return render(request, template_name, context)

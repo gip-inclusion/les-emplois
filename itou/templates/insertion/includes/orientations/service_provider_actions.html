@@ -12,6 +12,12 @@
                 </button>
             </form>
         </div>
+        <div class="form-group col-12 col-lg-auto">
+            <a href="{% url 'insertion_views:refuse_orientation' link_id=link.id %}" class="btn btn-lg btn-link-white btn-block btn-ico" {% matomo_event "orientation" "clic" "décliner" %}>
+                <i class="ri-close-line fw-medium" aria-hidden="true"></i>
+                <span>Décliner</span>
+            </a>
+        </div>
         <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
             <div class="dropdown">
                 <button id="other_actions" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">

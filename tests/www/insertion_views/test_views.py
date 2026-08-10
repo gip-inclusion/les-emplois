@@ -19,11 +19,17 @@ from pytest_django.asserts import (
     assertNotContains,
     assertNumQueries,
     assertQuerySetEqual,
+    assertRedirects,
     assertTemplateUsed,
 )
 
 from itou.companies.models import CompanyMembership
-from itou.insertion.enums import BeneficiaryContactPreference, MobilizationEventKind, OrientationStatus
+from itou.insertion.enums import (
+    BeneficiaryContactPreference,
+    MobilizationEventKind,
+    OrientationRefusalReason,
+    OrientationStatus,
+)
 from itou.insertion.models import (
     SOURCE_DORA_VALUE,
     GenericReferenceItemKind,
@@ -1318,6 +1324,9 @@ class TestProcessOrientationView:
     def get_process_link_url(self, link):
         return reverse("insertion_views:orientation_details_for_service_provider", kwargs={"link_id": link.id})
 
+    def get_refuse_link_url(self, link):
+        return reverse("insertion_views:refuse_orientation", kwargs={"link_id": link.id})
+
     @pytest.mark.parametrize("status", OrientationStatus.values)
     def test_display_actions(self, client, status, snapshot):
         with freeze_time("2026-08-01"):
@@ -1407,6 +1416,93 @@ class TestProcessOrientationView:
 
         orientation = Orientation.objects.get()
         assert orientation.status == link.orientation.status
+
+    def test_access_refuse_view(self, client):
+        # todo after having tested orientation_details_for_service_provider
+        pass
+
+    def test_refuse(self, client):
+        link = ProcessOrientationLinkFactory(
+            orientation__status=random.choice([OrientationStatus.PENDING, OrientationStatus.PROCESSING]),
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        orientation = link.orientation
+        response = client.get(self.get_process_link_url(link))
+        assertContains(response, self.get_refuse_link_url(link))
+
+        response = client.get(self.get_refuse_link_url(link))
+        assertContains(
+            response,
+            f"""
+                       Vous êtes sur le point de décliner une demande de prescription de service qui vous a été
+                       adressée par {orientation.sender.get_inverted_full_name()} de la structure
+                       {orientation.sender_organization.name} pour le service {orientation.service.name}. L’usager
+                       {orientation.beneficiary.get_inverted_full_name()} recevra la décision par e-mail. Pour des
+                       raisons de confidentialité, le motif et le détail du refus ne lui seront pas transmis.
+            """,
+            html=True,
+        )
+        assertContains(response, self.get_process_link_url(link))  # reset button
+
+        # errors in form
+        response = client.post(
+            self.get_refuse_link_url(link), data={"refusal_reasons": [], "refusal_details": "Des détails."}
+        )
+        assertContains(
+            response,
+            """
+            <div id="id_refusal_reasons_error" class="w-100">
+                <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
+            </div>""",
+            html=True,
+        )
+        response = client.post(
+            self.get_refuse_link_url(link), data={"refusal_reasons": ["invalid_input"], "refusal_details": ""}
+        )
+        assertContains(
+            response,
+            "Sélectionnez un choix valide. invalid_input n’en fait pas partie.",
+            html=True,
+        )
+
+        # valid form
+        refused_at = timezone.now() + datetime.timedelta(hours=1)
+        with freeze_time(refused_at):
+            response = client.post(
+                self.get_refuse_link_url(link),
+                data={
+                    "refusal_reasons": [OrientationRefusalReason.NOT_MOBILE, OrientationRefusalReason.SESSION_FULL],
+                    "refusal_details": "",
+                },
+                follow=True,
+            )
+        assertRedirects(response, self.get_process_link_url(link))
+        assertContains(response, "Demande d’orientation déclinée", html=True)
+        orientation.refresh_from_db()
+        assert orientation.status == OrientationStatus.REFUSED
+        assert orientation.refusal_reasons == [
+            OrientationRefusalReason.NOT_MOBILE,
+            OrientationRefusalReason.SESSION_FULL,
+        ]
+        assert orientation.updated_at == refused_at
+
+    def test_cannot_refuse(self, client):
+        link = ProcessOrientationLinkFactory(
+            orientation__status=random.choice(
+                [OrientationStatus.ACCEPTED, OrientationStatus.REFUSED, OrientationStatus.EXPIRED]
+            ),
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+
+        response = client.get(self.get_refuse_link_url(link))
+        assert response.status_code == 404
+        response = client.post(
+            self.get_refuse_link_url(link),
+            data={"refusal_reasons": [OrientationRefusalReason.NOT_MOBILE], "refusal_details": ""},
+        )
+        assert response.status_code == 404
 
 
 class TestOrientationsList:
