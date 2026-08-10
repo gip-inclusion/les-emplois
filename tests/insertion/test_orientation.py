@@ -1,12 +1,18 @@
 import datetime
+import random
 
 import pytest
 from django.conf import settings
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.insertion.enums import BeneficiaryContactPreference, OrientationStatus, OrientationTransition
+from itou.insertion.enums import (
+    BeneficiaryContactPreference,
+    OrientationRefusalReason,
+    OrientationStatus,
+    OrientationTransition,
+)
 from itou.insertion.models import Orientation, OrientationProcessLink, OrientationTransitionLog
 from itou.job_applications.enums import SenderKind
 from tests.companies.factories import CompanyFactory
@@ -115,6 +121,18 @@ def test_beneficiary_contact_preferences_display(contact_preferences, other_cont
     assert orientation.beneficiary_contact_preferences_display == expected
 
 
+@pytest.mark.django_db(transaction=True)
+def test_refusal_consistency():
+    with pytest.raises(IntegrityError, match=".*orientation_refusal_status_and_reasons_consistent.*"):
+        OrientationFactory(status=OrientationStatus.REFUSED, refusal_reasons=[])
+    with pytest.raises(IntegrityError, match=".*orientation_refusal_status_and_reasons_consistent.*"):
+        OrientationFactory(
+            status=random.choice(list(set(OrientationStatus.values) - {OrientationStatus.REFUSED.value})),
+            refusal_reasons=[OrientationRefusalReason.DID_NOT_COME_TO_INTERVIEW],
+        )
+    assert not Orientation.objects.exists()
+
+
 def test_transition_process():
     orientation = OrientationFactory()
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
@@ -155,7 +173,9 @@ def test_transition_refuse(from_state):
     orientation = OrientationFactory(status=from_state)
     timestamp = datetime.datetime(2026, 8, 6, 12, 0, tzinfo=datetime.UTC)
     with freeze_time(timestamp):
-        orientation.refuse()
+        with transaction.atomic():
+            orientation.refusal_reasons = [OrientationRefusalReason.NOT_ELIGIBLE]
+            orientation.refuse()
 
     log = OrientationTransitionLog.objects.get(
         orientation=orientation,
