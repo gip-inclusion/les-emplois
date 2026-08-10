@@ -55,7 +55,7 @@ class TestOrientationAPI:
             )
         with freeze_time("2026-09-01"):
             refused_orientation = OrientationFactory(
-                status=OrientationStatus.REJECTED,
+                status=OrientationStatus.REFUSED,
                 beneficiary__first_name="Charly",
                 beneficiary__last_name="Cha",
                 beneficiary__jobseeker_profile__pole_emploi_id="hidden",  # will not be displayed
