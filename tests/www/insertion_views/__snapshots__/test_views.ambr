@@ -2694,6 +2694,114 @@
   
   '''
 # ---
+# name: TestServices.test_di_service_orientable_with_external_link_prefers_link
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+                  <span>
+                      Lien externe
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-ext-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestServices.test_dora_service_not_orientable_with_form_prefers_external_link
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-external-link="https://test.example.com" data-emplois-mobilization-kind="service_ext_link" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="https://test.example.com" rel="noopener" target="_blank">
+                  <span>
+                      Lien externe
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-ext-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestServices.test_dora_service_orientable_with_form_and_external_link_prefers_wizard
+  '''
+  <div class="c-box c-box--action">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-emplois-mobilization-kind="service_orientation" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="orienter-un-bénéficiaire" href="/insertion/orientations/test-orientable-ext-uid/start/">
+                  <span>
+                      Orienter un bénéficiaire
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-lg btn-link-white btn-block w-lg-auto pe-0" data-bs-toggle="dropdown" id="other_actions_orientation" type="button">
+                      <i aria-hidden="true" class="ri-more-2-fill fw-medium">
+                      </i>
+                  </button>
+                  <div aria-labelledby="other_actions_orientation" class="dropdown-menu dropdown-menu-lg-end">
+                      <button class="btn btn-ico justify-content-start dropdown-item" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://testserver/insertion/services/test-orientable-ext-uid/" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="copier-lien-page" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette page
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestStructures.test_card_view_anonymous_renders_description_tab
   dict({
     'num_queries': 6,
