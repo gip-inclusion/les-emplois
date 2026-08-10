@@ -39,12 +39,14 @@ class BeneficiaryContactPreference(models.TextChoices):
 
 class OrientationStatus(models.TextChoices):
     PENDING = "OUVERTE", "En cours de traitement"
+    PROCESSING = "ÉTUDE", "À l’étude"
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
     REFUSED = "REFUSÉE", "Déclinée"
 
 
 class OrientationTransition(enum.StrEnum):
+    PROCESS = "process"
     ACCEPT = "accept"
     REFUSE = "refuse"
     EXPIRE = "expire"
