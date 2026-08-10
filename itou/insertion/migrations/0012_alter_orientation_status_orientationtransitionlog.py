@@ -30,13 +30,13 @@ def generate_transitions(apps, schema_editor):
                 )
             )
             accepted_orientations_count += 1
-        elif orientation.status == OrientationStatus.REJECTED:
+        elif orientation.status == OrientationStatus.REFUSED:
             transitions.append(
                 OrientationTransitionLog(
                     orientation=orientation,
-                    transition=OrientationTransition.REJECT,
+                    transition=OrientationTransition.REFUSE,
                     from_state=OrientationStatus.PENDING,
-                    to_state=OrientationStatus.REJECTED,
+                    to_state=OrientationStatus.REFUSED,
                     timestamp=orientation.dora_status_updated_at,
                 )
             )

@@ -1796,7 +1796,7 @@
                           <h1>
                               Accompagnement aux devoirs
                               <span class="badge rounded-pill text-nowrap badge-base bg-danger">
-                                  Refusée
+                                  Déclinée
                               </span>
                           </h1>
                           <p>
@@ -2016,7 +2016,7 @@
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="REFUSÉE"/>
                                       <label class="form-check-label" for="id_statuses_4">
-                                          Refusée
+                                          Déclinée
                                       </label>
                                   </div>
                               </li>
@@ -2079,7 +2079,7 @@
                                       <div class="form-check">
                                           <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="REFUSÉE"/>
                                           <label class="form-check-label" for="id_statuses_4-top">
-                                              Refusée
+                                              Déclinée
                                           </label>
                                       </div>
                                   </li>
@@ -2227,7 +2227,7 @@
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="REFUSÉE"/>
                                       <label class="form-check-label" for="id_statuses_4">
-                                          Refusée
+                                          Déclinée
                                       </label>
                                   </div>
                               </li>
@@ -2339,7 +2339,7 @@
                                       <div class="form-check">
                                           <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="REFUSÉE"/>
                                           <label class="form-check-label" for="id_statuses_4-top">
-                                              Refusée
+                                              Déclinée
                                           </label>
                                       </div>
                                   </li>
@@ -2486,7 +2486,7 @@
                                           </td>
                                           <td>
                                               <span class="badge rounded-pill text-nowrap badge-sm bg-danger">
-                                                  Refusée
+                                                  Déclinée
                                               </span>
                                           </td>
                                           <td>
