@@ -30,6 +30,7 @@ from itou.insertion.models import (
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEvent,
+    Orientation,
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
@@ -1484,6 +1485,63 @@ class TestOrientationDetailsForServiceProvider:
         response = client.get(self.get_process_link_url(process_link))
         assertContains(response, META_ROBOTS_MARKUP, html=True)
         assertContains(response, REL_CANONICAL_MARKUP_FOR_SERVICE_PROVIDER, html=True)
+
+    @pytest.mark.parametrize("status", OrientationStatus.values)
+    def test_display_actions(self, client, status, snapshot):
+        with freeze_time("2026-08-01"):
+            link = OrientationProcessLinkFactory(
+                orientation__status=status,
+                orientation__service__name="Accompagnement aux devoirs",
+                orientation__service__uid="uid-service",
+            )
+            response = client.get(self.get_process_link_url(link))
+
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    selector=".s-title-02",
+                    replace_in_attr=[("href", str(link.id), "[PK of OrientationProcessLink]")],
+                )
+            )
+            == snapshot
+        )
+
+    def test_accept(self, client):
+        link = OrientationProcessLinkFactory(
+            orientation__status=OrientationStatus.PENDING,
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        response = client.get(self.get_process_link_url(link))
+        assertContains(response, "<span>Accepter</span>", html=True)
+
+        accepted_at = timezone.now() + datetime.timedelta(hours=1)
+        with freeze_time(accepted_at):
+            response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
+        assertContains(response, "Demande d’orientation acceptée", html=True)
+        orientation = Orientation.objects.get()
+        assert orientation.status == OrientationStatus.ACCEPTED
+        assert orientation.updated_at == accepted_at
+
+        response = client.post(self.get_process_link_url(link), data={"action": "accept"}, follow=True)
+        assertContains(response, "Cette orientation a déjà été traitée.")
+        assert orientation.updated_at == accepted_at
+
+    @pytest.mark.parametrize(
+        "from_status", [OrientationStatus.ACCEPTED, OrientationStatus.REJECTED, OrientationStatus.EXPIRED]
+    )
+    def test_cannot_accept(self, client, from_status):
+        link = OrientationProcessLinkFactory(
+            orientation__status=from_status,
+            orientation__service__name="Accompagnement aux devoirs",
+            orientation__service__uid="uid-service",
+        )
+        response = client.post(self.get_process_link_url(link), data={"action": "accept"})
+        assertContains(response, "Cette orientation a déjà été traitée.")
+
+        orientation = Orientation.objects.get()
+        assert orientation.status == link.orientation.status
 
 
 class TestOrientationsList:

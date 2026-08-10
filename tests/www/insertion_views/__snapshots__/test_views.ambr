@@ -944,6 +944,25 @@
                               </a>
                           </div>
                       </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <form method="post">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                          <i aria-hidden="true" class="ri-check-line fw-medium">
+                                          </i>
+                                          <span>
+                                              Accepter
+                                          </span>
+                                      </button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -1075,7 +1094,7 @@
 # ---
 # name: TestOrientationDetailsForServiceProvider.test_detail_basic_dora[queries]
   dict({
-    'num_queries': 4,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -1294,6 +1313,46 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "django_session"
+          WHERE "django_session"."session_key" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "django_session" ("session_key",
+                                        "session_data",
+                                        "expire_date")
+          VALUES (%s, %s, %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
@@ -1329,6 +1388,25 @@
                                       Accéder au détail du service
                                   </span>
                               </a>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <form method="post">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                          <i aria-hidden="true" class="ri-check-line fw-medium">
+                                          </i>
+                                          <span>
+                                              Accepter
+                                          </span>
+                                      </button>
+                                  </form>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -1510,6 +1588,177 @@
           </div>
       </section>
   </main>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[EXPIR\xc9E]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-emploi-light">
+                                  Expirée
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[OUVERTE]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-info">
+                                  En cours de traitement
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--action">
+                      <h2 class="visually-hidden">
+                          Actions rapides
+                      </h2>
+                      <div class="form-row align-items-center gx-3">
+                          <div class="form-group col-12 col-lg-auto">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="accepter" name="action" type="submit" value="accept">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Accepter
+                                      </span>
+                                  </button>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[REFUS\xc9E]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-danger">
+                                  Refusée
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[VALID\xc9E]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-success">
+                                  Validée
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
   
   '''
 # ---
