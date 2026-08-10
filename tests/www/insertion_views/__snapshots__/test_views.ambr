@@ -963,6 +963,15 @@
                                       </button>
                                   </form>
                               </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=1111111111zzzzzzzzzz3333333333_4">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Décliner
+                                      </span>
+                                  </a>
+                              </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                                   <div class="dropdown">
                                       <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
@@ -1433,6 +1442,15 @@
                                       </button>
                                   </form>
                               </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=1111111111zzzzzzzzzz3333333333_4">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Décliner
+                                      </span>
+                                  </a>
+                              </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                                   <div class="dropdown">
                                       <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
@@ -1725,6 +1743,15 @@
                                   </button>
                               </form>
                           </div>
+                          <div class="form-group col-12 col-lg-auto">
+                              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=[PK of OrientationProcessLink]">
+                                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Décliner
+                                  </span>
+                              </a>
+                          </div>
                           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                               <div class="dropdown">
                                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
@@ -1879,6 +1906,15 @@
                                       </span>
                                   </button>
                               </form>
+                          </div>
+                          <div class="form-group col-12 col-lg-auto">
+                              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" href="/insertion/orientations/refuse/?token=[PK of OrientationProcessLink]">
+                                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Décliner
+                                  </span>
+                              </a>
                           </div>
                           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                               <div class="dropdown">

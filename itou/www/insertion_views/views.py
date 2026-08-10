@@ -52,6 +52,7 @@ from itou.www.insertion_views.forms import (
     OrientationReferentForm,
     OrientationSelectJobSeekerForm,
     OrientationsFilterForm,
+    RefusalOrientationForm,
 )
 from itou.www.utils.wizard import WizardView
 
@@ -725,6 +726,55 @@ def orientation_details_for_service_provider(request):
         "has_actions": has_actions,
         "back_url": None,
         "matomo_custom_title": "Détail d’une orientation pour offreur de service",
+    }
+
+    return render(request, template_name, context)
+
+
+@login_not_required
+def refuse_orientation(request):
+    template_name = "insertion/orientations/refuse.html"
+
+    link = get_object_or_404(
+        insertion_models.OrientationProcessLink.objects.filter(
+            orientation__status__in=[OrientationStatus.PENDING, OrientationStatus.PROCESSING]
+        ).select_related(
+            "orientation",
+            "orientation__beneficiary",
+            "orientation__sender",
+            "orientation__service",
+            "orientation__service__structure",
+        ),
+        id=request.GET.get("token"),
+    )
+    if not link.is_valid:
+        raise PermissionDenied()
+    orientation = link.orientation
+
+    if not link.first_opened_at:
+        link.first_opened_at = timezone.now()
+        link.save(update_fields=["first_opened_at"])
+
+    form = RefusalOrientationForm(instance=orientation, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        orientation = form.save(commit=False)
+        orientation.refuse()
+        messages.error(
+            request,
+            "Demande d’orientation déclinée||"
+            "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(
+            reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
+        )
+
+    context = {
+        "orientation": orientation,
+        "form": form,
+        "reset_url": reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id}),
+        "matomo_custom_title": "Décliner une orientation",
     }
 
     return render(request, template_name, context)
