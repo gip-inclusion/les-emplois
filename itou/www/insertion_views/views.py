@@ -683,25 +683,43 @@ def orientation_details_for_service_provider(request):
         link.first_opened_at = timezone.now()
         link.save(update_fields=["first_opened_at"])
 
-    if request.method == "POST" and request.POST.get("action") == "accept":
-        if not orientation.accept.is_available():
-            messages.warning(request, "Cette orientation a déjà été traitée.", extra_tags="toast")
-        else:
-            orientation.accept()
-            messages.success(
-                request,
-                "Demande d’orientation acceptée||"
-                "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
-                extra_tags="toast",
-            )
-            return HttpResponseRedirect(
-                reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
-            )
+    if request.method == "POST":
+        if request.POST.get("action") == "process":
+            if not orientation.process.is_available():
+                messages.warning(request, "Cette orientation ne peut pas être mise à l’étude.", extra_tags="toast")
+            else:
+                orientation.process()
+                messages.info(
+                    request,
+                    "Demande d’orientation à l’étude||"
+                    f"Vous disposez de {insertion_models.Orientation.PROCESSING_EXPIRATION_PERIOD_DAYS} jours pour "
+                    "accepter ou décliner cette demande d’orientation, passé ce délai, la demande d’orientation "
+                    "sera expirée.",
+                    extra_tags="toast",
+                )
+                return HttpResponseRedirect(
+                    reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
+                )
+        elif request.POST.get("action") == "accept":
+            if not orientation.accept.is_available():
+                messages.warning(request, "Cette orientation a déjà été traitée.", extra_tags="toast")
+            else:
+                orientation.accept()
+                messages.success(
+                    request,
+                    "Demande d’orientation acceptée||"
+                    "Un e-mail récapitulatif va vous être envoyé ainsi qu’à toutes les parties prenantes.",
+                    extra_tags="toast",
+                )
+                return HttpResponseRedirect(
+                    reverse("insertion_views:orientation_details_for_service_provider", query={"token": link.id})
+                )
 
     has_actions = orientation.status in [OrientationStatus.PENDING, OrientationStatus.PROCESSING]
 
     context = {
         "orientation": orientation,
+        "link": link,
         "can_view_personal_information": True,
         "can_process": True,
         "has_actions": has_actions,
