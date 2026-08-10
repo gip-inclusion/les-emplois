@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 2026-07-27
+
+### Ajouté
+
+- [Insertion : Ajout du modèle Orientation](https://github.com/gip-inclusion/les-emplois/pull/8358)
+
+### Modifié
+
+- [Fiches salarié : Correction de l'envoi à l'ASP pour les salarié.es né.es dans certaines communes de Polynésie](https://github.com/gip-inclusion/les-emplois/pull/8444)
+
 ## 2026-07-20
 
 ### Ajouté
