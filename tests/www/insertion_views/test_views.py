@@ -1397,7 +1397,7 @@ class TestProcessOrientationView:
     def test_cannot_accept(self, client):
         link = ProcessOrientationLinkFactory(
             orientation__status=random.choice(
-                [OrientationStatus.ACCEPTED, OrientationStatus.REJECTED, OrientationStatus.EXPIRED]
+                [OrientationStatus.ACCEPTED, OrientationStatus.REFUSED, OrientationStatus.EXPIRED]
             ),
             orientation__service__name="Accompagnement aux devoirs",
             orientation__service__uid="uid-service",
@@ -1461,7 +1461,7 @@ class TestOrientationsList:
                 sender_kind=SenderKind.PRESCRIBER,
                 service=ServiceFactory(name="Sers vis", structure__name="Structure gonflable"),
                 created_at=datetime.datetime(2026, 1, 1, 0, 0, tzinfo=datetime.UTC),
-                status=OrientationStatus.REJECTED,
+                status=OrientationStatus.REFUSED,
             )
         client.force_login(user)
 
@@ -1669,7 +1669,7 @@ class TestOrientationsList:
             sender=user, sender_prescriber_organization=organization, status=OrientationStatus.PENDING
         )
         rejected_orientation = OrientationFactory(
-            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REJECTED
+            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REFUSED
         )
         client.force_login(user)
 
@@ -1680,7 +1680,7 @@ class TestOrientationsList:
         assert response.context["orientations_page"].object_list == [pending_orientation]
 
         response = client.get(
-            self.LIST_URL, {"statuses": [OrientationStatus.PENDING.value, OrientationStatus.REJECTED.value]}
+            self.LIST_URL, {"statuses": [OrientationStatus.PENDING.value, OrientationStatus.REFUSED.value]}
         )
         assert set(response.context["orientations_page"].object_list) == {pending_orientation, rejected_orientation}
 
@@ -1795,7 +1795,7 @@ class TestOrientationsList:
             sender=other_user, sender_prescriber_organization=organization, status=OrientationStatus.PENDING
         )
         orientation_2 = OrientationFactory(
-            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REJECTED
+            sender=user, sender_prescriber_organization=organization, status=OrientationStatus.REFUSED
         )
         client.force_login(user)
 

@@ -632,9 +632,9 @@ class OrientationWorkflow(xwf_models.Workflow):
             OrientationStatus.ACCEPTED,
         ),
         (
-            OrientationTransition.REJECT,
+            OrientationTransition.REFUSE,
             [OrientationStatus.PENDING, OrientationStatus.PROCESSING],
-            OrientationStatus.REJECTED,
+            OrientationStatus.REFUSED,
         ),
         (
             OrientationTransition.EXPIRE,
