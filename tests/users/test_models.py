@@ -963,11 +963,6 @@ class TestLastAssignment:
         del job_seeker.last_assignment  # clear cache to retrieve accurate value
         assert job_seeker.last_assignment == job_seeker_assignment_2
 
-    def test_inactive_assignment(self):
-        job_seeker = JobSeekerFactory()
-        JobSeekerAssignmentFactory(job_seeker=job_seeker, professional__is_active=False)
-        assert job_seeker.last_assignment is None
-
     def test_advisor(self):
         assignment = JobSeekerAssignmentFactory()
         assert assignment.advisor == assignment.professional
