@@ -1472,3 +1472,39 @@ class TestJobSeekerAssignment:
             [assignment_no_organization, assignment_with_organization, assignment_coworker_organization],
             ordered=False,
         )
+
+    def test_is_still_member(self):
+        # No organization
+        assert JobSeekerAssignmentFactory().is_still_member is False
+
+        # A company with no membership
+        assignment = JobSeekerAssignmentFactory(company=CompanyFactory())
+        assert assignment.is_still_member is False
+
+        # With an active company membership
+        del assignment.is_still_member  # clear cached property
+        membership = CompanyMembershipFactory(company=assignment.company, user=assignment.professional)
+        assert assignment.is_still_member is True
+
+        # If the company membership is inactive
+        membership.is_active = False
+        membership.save()
+        del assignment.is_still_member  # clear cached property
+        assert assignment.is_still_member is False
+
+        # An organization with no membership
+        assignment = JobSeekerAssignmentFactory(prescriber_organization=PrescriberOrganizationFactory())
+        assert assignment.is_still_member is False
+
+        # With an active prescriber membership
+        del assignment.is_still_member  # clear cached property
+        membership = PrescriberMembershipFactory(
+            organization=assignment.prescriber_organization, user=assignment.professional
+        )
+        assert assignment.is_still_member is True
+
+        # If the prescriber membership is inactive
+        membership.is_active = False
+        membership.save()
+        del assignment.is_still_member  # clear cached property
+        assert assignment.is_still_member is False

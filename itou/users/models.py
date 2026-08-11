@@ -35,10 +35,10 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.models import Company
+from itou.companies.models import Company, CompanyMembership
 from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import (
     ActionKind,
     AssignmentEndReason,
@@ -1778,3 +1778,18 @@ class JobSeekerAssignment(models.Model):
         if self.assigned_to_unknown_advisor:
             return None
         return self.professional
+
+    @cached_property
+    def is_still_member(self):
+        # This property can be overridden in a query set by setting it directly (assignment.is_still_member = bool)
+        if self.company:
+            return CompanyMembership.objects.filter(
+                user=self.professional,
+                company=self.company,
+            ).exists()
+        if self.prescriber_organization:
+            return PrescriberMembership.objects.filter(
+                user=self.professional,
+                organization=self.prescriber_organization,
+            ).exists()
+        return False
