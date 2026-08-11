@@ -462,6 +462,10 @@ class Service(GeolocatedAddressMixin, models.Model):
         return self.source.value in settings.NON_ORIENTABLE_DI_SOURCES
 
     @property
+    def should_mobilize_via_external_link(self) -> bool:
+        return not self.is_dora and bool(self.mobilization_modes_professionals_external_form_link)
+
+    @property
     def has_orientation_action(self):
         return (self.is_orientable_with_form and not self.from_non_orientable_di_source) or bool(
             self.mobilization_modes_professionals_external_form_link

@@ -41,7 +41,7 @@
                             {% if request.GET.job_seeker_public_id %}
                                 {% url_add_query start_orientation_url job_seeker_public_id=request.GET.job_seeker_public_id as start_orientation_url %}
                             {% endif %}
-                            {% if not service.is_dora and service.mobilization_modes_professionals_external_form_link %}
+                            {% if service.should_mobilize_via_external_link %}
                                 {% include "insertion/includes/orientation_external_link_button.html" with service=service MobilizationEventKind=MobilizationEventKind request=request only %}
                             {% elif service.is_orientable_with_form and not service.from_non_orientable_di_source %}
                                 {% if can_orient_towards_insertion_service %}
