@@ -1365,7 +1365,7 @@ class TestJobApplicationNotifications:
         assert len(email.to) == 1
         assert len(email.bcc) == 0
         # Subject.
-        assert "Candidature acceptée et votre avis sur les emplois de l'inclusion" in email.subject
+        assert "Candidature acceptée" in email.subject
         # Body.
         assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
         assertion(job_application.job_seeker.get_inverted_full_name(), email.body)
@@ -1381,8 +1381,6 @@ class TestJobApplicationNotifications:
             assert "Non référencé" in email.body
         else:
             assert job_application.job_seeker.last_assignment.advisor.get_full_name() in email.body
-        if is_authorized_prescriber:
-            assert job_application.sender_prescriber_organization.accept_survey_url in email.body
 
     def test_accept_for_proxy_without_hiring_end_at(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber=True, hiring_end_at=None)
@@ -1725,7 +1723,7 @@ class TestJobApplicationNotifications:
 
 class TestJobApplicationWorkflow:
     SENT_PASS_EMAIL_SUBJECT = "PASS IAE pour"
-    ACCEPT_EMAIL_SUBJECT_PROXY = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
+    ACCEPT_EMAIL_SUBJECT_PROXY = "Candidature acceptée"
     ACCEPT_EMAIL_SUBJECT_JOB_SEEKER = "Candidature acceptée"
 
     @pytest.fixture(autouse=True)
