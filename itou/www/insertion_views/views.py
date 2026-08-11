@@ -236,6 +236,8 @@ def start_orientation(request, service_uid):
         uid=service_uid,
         is_orientable_with_form=True,
     )
+    if service.should_mobilize_via_external_link:
+        return HttpResponseRedirect(reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
     if not (job_seeker_public_id := request.GET.get("job_seeker_public_id")):
         logger.info(
             "orientation wizard start_without_job_seeker user=%s service_uid=%s",
@@ -272,6 +274,10 @@ class OrientationSelectJobSeekerView(FormView):
     def dispatch(self, request, *args, **kwargs):
         if not (request.from_employer or request.from_prescriber):
             raise PermissionDenied("Vous n'êtes pas autorisé à orienter un usager.")
+        if self.service.should_mobilize_via_external_link:
+            return HttpResponseRedirect(
+                reverse("insertion_views:service_detail", kwargs={"service_uid": self.service.uid})
+            )
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, service_uid, **kwargs):

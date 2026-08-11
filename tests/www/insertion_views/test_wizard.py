@@ -283,6 +283,40 @@ def test_start_with_non_orientable_di_sources(client, settings, is_blacklisted, 
     assert response.status_code == status_code
 
 
+def test_start_orientation_redirects_when_external_link_preferred(client):
+    # A DI service that both is form-orientable and has an external link prefers the link:
+    # direct access to the form flow must bounce back to the service detail page.
+    prescriber = PrescriberFactory(membership=True)
+    service = ServiceFactory(
+        is_orientable_with_form=True,
+        source__value="other",
+        mobilization_modes_professionals_external_form_link="https://test.example.com",
+    )
+    assert service.should_mobilize_via_external_link
+    start_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+    service_detail_url = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+    client.force_login(prescriber)
+
+    response = client.get(start_url)
+    assertRedirects(response, service_detail_url, fetch_redirect_response=False)
+
+
+def test_orientation_select_job_seeker_redirects_when_external_link_preferred(client):
+    prescriber = PrescriberFactory(membership=True)
+    service = ServiceFactory(
+        is_orientable_with_form=True,
+        source__value="other",
+        mobilization_modes_professionals_external_form_link="https://test.example.com",
+    )
+    assert service.should_mobilize_via_external_link
+    select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+    service_detail_url = reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid})
+    client.force_login(prescriber)
+
+    response = client.get(select_url)
+    assertRedirects(response, service_detail_url, fetch_redirect_response=False)
+
+
 def test_session_isolation_between_users(client):
     prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory(phone="0606060606")
