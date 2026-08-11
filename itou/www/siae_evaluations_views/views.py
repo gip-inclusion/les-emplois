@@ -607,7 +607,7 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
         messages.success(
             request,
             mark_safe(
-                "<b>Résultats enregistrés !</b><br>Merci d'avoir pris le temps de contrôler les pièces justificatives."
+                "<b>Résultats enregistrés</b><br>Merci d'avoir pris le temps de contrôler les pièces justificatives."
             ),
         )
 
@@ -827,7 +827,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     messages.success(
         request,
         (
-            "Justificatifs transmis !||Leur contrôle est à la charge de votre DDETS."
+            "Justificatifs transmis !||Leur contrôle est à la charge de votre DDETS. "
             "Une fois finalisée, vous serez notifié du résultat par email."
         ),
         extra_tags="toast",

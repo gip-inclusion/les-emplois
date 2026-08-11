@@ -4267,7 +4267,7 @@ class TestInstitutionEvaluatedSiaeValidationView:
             [
                 messages.Message(
                     messages.SUCCESS,
-                    "<b>Résultats enregistrés !</b><br>"
+                    "<b>Résultats enregistrés</b><br>"
                     "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
                 )
             ],
@@ -4290,7 +4290,7 @@ class TestInstitutionEvaluatedSiaeValidationView:
             [
                 messages.Message(
                     messages.SUCCESS,
-                    "<b>Résultats enregistrés !</b><br>"
+                    "<b>Résultats enregistrés</b><br>"
                     "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
                 )
             ],
