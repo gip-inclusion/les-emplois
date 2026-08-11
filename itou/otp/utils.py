@@ -110,6 +110,9 @@ def require_otp(user):
     if user.is_verified():  # user has already authenticated with MFA
         return False
 
+    if getattr(user, "is_hijacked", False):
+        return False
+
     return user_is_concerned_by_otp(user)
 
 

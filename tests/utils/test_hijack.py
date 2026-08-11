@@ -2,11 +2,12 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django_otp.oath import TOTP
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.users.enums import IdentityProvider
 from tests.otp.factories import ItouTOTPDeviceFactory
 from tests.users.factories import (
+    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     PrescriberFactory,
@@ -84,6 +85,28 @@ class TestUserHijack:
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assertRedirects(response, "/bar/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
+
+    def test_circumvent_2fa_on_hijacked_user(self, client, settings):
+        # If hijacked (target) user must use 2FA, circumvent it for hijacker.
+        settings.REQUIRE_MFA_FOR_PROS = True
+        hijacked = EmployerFactory(membership=True)
+        settings.REQUIRE_MFA_ON_COMPANY_IDS = {hijacked.company_set.get().id}
+
+        # 2FA is required for hijacked user.
+        client.force_login(hijacked)
+        dashboard_url = reverse("dashboard:index")
+        response = client.get(dashboard_url)
+        assertRedirects(response, reverse("otp_views:enrollment_step_0_intro"))
+
+        # 2FA is _not_ required for hijacker.
+        hijacker = ItouStaffFactory(is_superuser=True)
+        client.force_login(hijacker)
+        response = client.post(
+            reverse("hijack:acquire"),
+            {"user_pk": hijacked.pk, "next": dashboard_url},
+            follow=True,
+        )
+        assertContains(response, "Voir toutes les candidatures")
 
     @pytest.mark.parametrize("hijacked_must_accept_terms", [True, False])
     def test_release_redirects_to_admin(self, client, hijacked_must_accept_terms):
